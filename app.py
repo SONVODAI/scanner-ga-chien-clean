@@ -1,336 +1,436 @@
-import os
-import io
-from datetime import datetime
-
+import datetime
+import numpy as np
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
+import yfinance as yf
 
-st.set_page_config(page_title="Scanner Gà Chiến V15.2", layout="wide")
+st.set_page_config(page_title="Scanner Gà Chiến V15", layout="wide")
 
-# ======================
-# HEADER
-# ======================
-st.title("🐔 Scanner Gà Chiến V15.2 – Stable No-Crash")
-st.caption(f"Cập nhật: {datetime.now().strftime('%H:%M:%S %d/%m/%Y')}")
-
-# ======================
-# SIDEBAR
-# ======================
-st.sidebar.header("Thiết lập")
-market_score = st.sidebar.slider("Market Score", 1.0, 10.0, 8.0, 0.5)
-top_n = st.sidebar.slider("Top cổ phiếu", 5, 30, 10)
-
-st.sidebar.markdown("---")
-uploaded_file = st.sidebar.file_uploader("Upload stock_data.csv", type=["csv"])
-
-# ======================
-# DATA INPUT
-# ======================
-st.subheader("Nguồn dữ liệu")
-
-csv_text = st.text_area(
-    "Hoặc dán CSV vào đây",
-    value="",
-    height=140,
-    placeholder=(
-        "Ví dụ:\n"
-        "Ticker,OBV_trend,Price_vs_EMA,RSI,MACD\n"
-        "VCI,strong,above_ema9,66,bullish\n"
-        "HDB,strong,near_ema9,61,bullish"
-    ),
+# =========================
+# AUTO REFRESH 5 PHÚT
+# =========================
+components.html(
+    """
+    <script>
+        setTimeout(function() {
+            window.parent.location.reload();
+        }, 300000);
+    </script>
+    """,
+    height=0,
 )
 
-# ======================
-# FALLBACK DEMO DATA
-# ======================
-def get_demo_data():
-    return pd.DataFrame([
-        {"Ticker": "VCI", "OBV_trend": "strong", "Price_vs_EMA": "above_ema9", "RSI": 66, "MACD": "bullish"},
-        {"Ticker": "HDB", "OBV_trend": "strong", "Price_vs_EMA": "near_ema9", "RSI": 61, "MACD": "bullish"},
-        {"Ticker": "NTL", "OBV_trend": "strong", "Price_vs_EMA": "near_ema9", "RSI": 63, "MACD": "neutral"},
-        {"Ticker": "DPR", "OBV_trend": "strong", "Price_vs_EMA": "near_ema9", "RSI": 68, "MACD": "neutral"},
-        {"Ticker": "BCM", "OBV_trend": "medium", "Price_vs_EMA": "above_ema9", "RSI": 64, "MACD": "bullish"},
-        {"Ticker": "FTS", "OBV_trend": "medium", "Price_vs_EMA": "above_ema9", "RSI": 62, "MACD": "bullish"},
-        {"Ticker": "DGW", "OBV_trend": "medium", "Price_vs_EMA": "above_ema9", "RSI": 58, "MACD": "neutral"},
-        {"Ticker": "MSB", "OBV_trend": "recover", "Price_vs_EMA": "near_ema9", "RSI": 54, "MACD": "neutral"},
-        {"Ticker": "PVS", "OBV_trend": "recover", "Price_vs_EMA": "near_ema9", "RSI": 52, "MACD": "neutral"},
-        {"Ticker": "VHM", "OBV_trend": "weak", "Price_vs_EMA": "below_ma20", "RSI": 45, "MACD": "bearish"},
-    ])
+st.title("🐔 Scanner Gà Chiến V15 – Alert Realtime")
+st.caption(f"⏱ Tự cập nhật mỗi 5 phút | Cập nhật lúc: {datetime.datetime.now().strftime('%H:%M:%S %d/%m/%Y')}")
 
-# ======================
-# LOAD DATA
-# ======================
-def load_data():
-    # 1) file local
-    if os.path.exists("stock_data.csv"):
-        try:
-            df = pd.read_csv("stock_data.csv")
-            return df, "Đang dùng file local: stock_data.csv"
-        except Exception as e:
-            st.warning(f"Đọc file local lỗi: {e}")
+# =========================
+# SIDEBAR
+# =========================
+st.sidebar.header("Thiết lập")
+market_score = st.sidebar.slider("Market Score", 1, 10, 8)
+top_n = st.sidebar.slider("Top toàn thị trường", 3, 15, 5)
 
-    # 2) uploaded file
-    if uploaded_file is not None:
-        try:
-            df = pd.read_csv(uploaded_file)
-            return df, "Đang dùng file upload"
-        except Exception as e:
-            st.warning(f"Đọc file upload lỗi: {e}")
+# =========================
+# INPUT
+# =========================
+watchlist_text = st.text_area(
+    "Danh sách mã theo dõi",
+    """VCB, BID, CTG, TCB, MBB, VPB, STB, HDB, ACB, SHB, TPB, LPB, EIB, ABB, MSB, KLB, EVF
+SSI, VIX, SHS, MBS, HCM, VCI, VND, CTS, FTS, BSI, BVS, ORS, VDS, AGR
+VHM, NLG, KDH, CEO, CII, DXG, TCH, DPG, HDC, NVL, NTL, NHA, HUT, DIG, PDR, DXS
+VGC, IDC, KBC, SZC, BCM, LHG, IJC, GVR, PHR, DPR, SIP, TRC, DRC, CSM
+MWG, DGW, FRT, PET, PNJ, MSN, PAN, FMC, DBC, HAG, VNM, SAB, SBT, TLG
+REE, GEE, GEX, PC1, NT2, HDG, GEG, POW
+DPM, DCM, LAS, DDV, DGC, CSV, BFC, MSR, BMP, NTP
+BSR, PVS, PVD, PVB, PVC, PVT, OIL, PLX, GAS
+HAH, GMD, VSC, VOS, VTO, HVN, VJC, ACV""",
+    height=220,
+)
 
-    # 3) pasted csv text
-    if csv_text.strip():
-        try:
-            df = pd.read_csv(io.StringIO(csv_text.strip()))
-            return df, "Đang dùng dữ liệu dán tay"
-        except Exception as e:
-            st.warning(f"Đọc dữ liệu dán tay lỗi: {e}")
+top_week_text = st.text_area(
+    "Top tăng tuần",
+    """VHM, VIC, GEE, NVL, HHS, HCM, GEX, PET, TCH, VJC, CII, VRE, VPL, SHS, KBC, LHG, MSB, LPB, IDC, VIX, VGI, BMP, HAG, DXG, VPB, VTP, CTR, TCB, HVN, BFC""",
+    height=120,
+)
 
-    # 4) demo fallback
-    return get_demo_data(), "Đang dùng DEMO MODE vì chưa có dữ liệu thật"
+top_month_text = st.text_area(
+    "Top tăng tháng",
+    """VHM, VIC, GEE, NVL, HHS, HCM, GEX, PET, TCH, VJC, CII, VRE, VPL, SHS, KBC, LHG, MSB, LPB, IDC, VIX, VGI, BMP, HAG, DXG, VPB, VTP, CTR, TCB, HVN, MSH""",
+    height=120,
+)
 
-df, source_note = load_data()
+# =========================
+# HELPERS
+# =========================
+def parse_codes(text: str):
+    items = []
+    for x in text.replace("\n", ",").split(","):
+        x = x.strip().upper()
+        if x:
+            if not x.endswith(".VN"):
+                x += ".VN"
+            items.append(x)
+    return list(dict.fromkeys(items))
 
-# ======================
-# NORMALIZE COLUMNS
-# ======================
-df.columns = [str(c).strip() for c in df.columns]
+watchlist = parse_codes(watchlist_text)
+top_week = set(parse_codes(top_week_text))
+top_month = set(parse_codes(top_month_text))
 
-required_cols = ["Ticker", "OBV_trend", "Price_vs_EMA", "RSI", "MACD"]
-missing_cols = [c for c in required_cols if c not in df.columns]
-
-if missing_cols:
-    st.error("Thiếu cột bắt buộc: " + ", ".join(missing_cols))
-    st.write("Cột hiện có trong file:", list(df.columns))
-    st.stop()
-
-# Clean dữ liệu
-df = df.copy()
-df["Ticker"] = df["Ticker"].astype(str).str.strip().str.upper()
-df["OBV_trend"] = df["OBV_trend"].astype(str).str.strip().str.lower()
-df["Price_vs_EMA"] = df["Price_vs_EMA"].astype(str).str.strip().str.lower()
-df["MACD"] = df["MACD"].astype(str).str.strip().str.lower()
-df["RSI"] = pd.to_numeric(df["RSI"], errors="coerce")
-df = df.dropna(subset=["Ticker", "RSI"]).drop_duplicates(subset=["Ticker"]).reset_index(drop=True)
-
-# ======================
-# MAP GIÁ TRỊ VỀ CHUẨN
-# ======================
-def map_obv(x):
-    if x in ["strong", "manh", "mạnh", "up", "bullish"]:
-        return "strong"
-    if x in ["medium", "vua", "vừa", "flat", "neutral"]:
-        return "medium"
-    if x in ["recover", "dao chieu", "đảo chiều", "reversal"]:
-        return "recover"
-    return "weak"
-
-def map_price(x):
-    if x in ["above_ema9", "above ema9", "tren ema9", "trên ema9"]:
-        return "above_ema9"
-    if x in ["near_ema9", "near ema9", "gan ema9", "gần ema9", "pull_ema9"]:
-        return "near_ema9"
-    return "below_ma20"
-
-def map_macd(x):
-    if x in ["bullish", "bull", "duong", "dương", "positive"]:
-        return "bullish"
-    if x in ["neutral", "flat", "trung tinh", "trung tính"]:
-        return "neutral"
-    return "bearish"
-
-df["OBV_trend"] = df["OBV_trend"].apply(map_obv)
-df["Price_vs_EMA"] = df["Price_vs_EMA"].apply(map_price)
-df["MACD"] = df["MACD"].apply(map_macd)
-
-# ======================
-# SCORE V15 STYLE
-# ======================
-def score(row):
-    s = 0
-
-    # OBV
-    if row["OBV_trend"] == "strong":
-        s += 3
-    elif row["OBV_trend"] == "medium":
-        s += 2
-    elif row["OBV_trend"] == "recover":
-        s += 1
-
-    # PRICE
-    if row["Price_vs_EMA"] == "above_ema9":
-        s += 3
-    elif row["Price_vs_EMA"] == "near_ema9":
-        s += 1
-
-    # RSI
-    if row["RSI"] >= 65:
-        s += 2
-    elif row["RSI"] >= 55:
-        s += 1
-
-    # MACD
-    if row["MACD"] == "bullish":
-        s += 2
-    elif row["MACD"] == "neutral":
-        s += 1
-
-    return s
-
-df["Score"] = df.apply(score, axis=1)
-
-# ======================
-# CLASSIFY
-# ======================
-def classify(row):
-    if row["Score"] >= 8 and row["OBV_trend"] == "strong" and row["Price_vs_EMA"] != "below_ma20":
-        return "🟩 ƯU TIÊN MUA"
-    elif row["Score"] >= 6:
-        return "🟨 THEO DÕI"
-    elif row["Score"] >= 4:
-        return "🟦 ĐẢO CHIỀU SỚM"
-    else:
-        return "🟥 LOẠI"
-
-df["State"] = df.apply(classify, axis=1)
-
-# ======================
-# GOLD SCORE
-# ======================
-if market_score >= 8:
-    df["GoldScore"] = (df["Score"] * market_score).round(2)
-else:
-    df["GoldScore"] = 0.0
-
-# ======================
-# ACTION
-# ======================
-def action_text(row):
-    if market_score < 8:
-        return "Đứng ngoài / quan sát"
-
-    if row["State"] == "🟩 ƯU TIÊN MUA":
-        return "Canh mua thăm dò / pull đẹp"
-    if row["State"] == "🟨 THEO DÕI":
-        return "Theo dõi chờ xác nhận"
-    if row["State"] == "🟦 ĐẢO CHIỀU SỚM":
-        return "Quan sát thêm"
-    return "Loại"
-
-df["Action"] = df.apply(action_text, axis=1)
-
-# ======================
-# REASON
-# ======================
-def reason_text(row):
-    parts = []
-
-    if row["OBV_trend"] == "strong":
-        parts.append("OBV khỏe")
-    elif row["OBV_trend"] == "medium":
-        parts.append("OBV vừa")
-    elif row["OBV_trend"] == "recover":
-        parts.append("OBV hồi")
-    else:
-        parts.append("OBV yếu")
-
-    if row["Price_vs_EMA"] == "above_ema9":
-        parts.append("giá trên EMA9")
-    elif row["Price_vs_EMA"] == "near_ema9":
-        parts.append("giá gần EMA9")
-    else:
-        parts.append("giá dưới MA20")
-
-    parts.append(f"RSI {row['RSI']:.1f}")
-
-    if row["MACD"] == "bullish":
-        parts.append("MACD dương")
-    elif row["MACD"] == "neutral":
-        parts.append("MACD trung tính")
-    else:
-        parts.append("MACD âm")
-
-    return " | ".join(parts)
-
-df["Reason"] = df.apply(reason_text, axis=1)
-
-# ======================
-# SORT
-# ======================
-state_order = {
-    "🟩 ƯU TIÊN MUA": 4,
-    "🟨 THEO DÕI": 3,
-    "🟦 ĐẢO CHIỀU SỚM": 2,
-    "🟥 LOẠI": 1,
+sector_map = {
+    "VCB.VN":"BANK","BID.VN":"BANK","CTG.VN":"BANK","TCB.VN":"BANK","MBB.VN":"BANK","VPB.VN":"BANK","STB.VN":"BANK","HDB.VN":"BANK","ACB.VN":"BANK","SHB.VN":"BANK","TPB.VN":"BANK","LPB.VN":"BANK","EIB.VN":"BANK","ABB.VN":"BANK","MSB.VN":"BANK","KLB.VN":"BANK","EVF.VN":"BANK",
+    "SSI.VN":"CK","VIX.VN":"CK","SHS.VN":"CK","MBS.VN":"CK","HCM.VN":"CK","VCI.VN":"CK","VND.VN":"CK","CTS.VN":"CK","FTS.VN":"CK","BSI.VN":"CK","BVS.VN":"CK","ORS.VN":"CK","VDS.VN":"CK","AGR.VN":"CK",
+    "VHM.VN":"BDS","NLG.VN":"BDS","KDH.VN":"BDS","CEO.VN":"BDS","CII.VN":"BDS","DXG.VN":"BDS","TCH.VN":"BDS","DPG.VN":"BDS","HDC.VN":"BDS","NVL.VN":"BDS","NTL.VN":"BDS","NHA.VN":"BDS","HUT.VN":"BDS","DIG.VN":"BDS","PDR.VN":"BDS","DXS.VN":"BDS",
+    "VGC.VN":"BDS_CN","IDC.VN":"BDS_CN","KBC.VN":"BDS_CN","SZC.VN":"BDS_CN","BCM.VN":"BDS_CN","LHG.VN":"BDS_CN","IJC.VN":"BDS_CN","GVR.VN":"BDS_CN","PHR.VN":"BDS_CN","DPR.VN":"BDS_CN","SIP.VN":"BDS_CN","TRC.VN":"BDS_CN","DRC.VN":"BDS_CN","CSM.VN":"BDS_CN",
+    "MWG.VN":"BAN_LE","DGW.VN":"BAN_LE","FRT.VN":"BAN_LE","PET.VN":"BAN_LE","PNJ.VN":"BAN_LE","MSN.VN":"BAN_LE","PAN.VN":"BAN_LE","FMC.VN":"BAN_LE","DBC.VN":"BAN_LE","HAG.VN":"BAN_LE","VNM.VN":"BAN_LE","SAB.VN":"BAN_LE","SBT.VN":"BAN_LE","TLG.VN":"BAN_LE",
+    "REE.VN":"DIEN","GEE.VN":"DIEN","GEX.VN":"DIEN","PC1.VN":"DIEN","NT2.VN":"DIEN","HDG.VN":"DIEN","GEG.VN":"DIEN","POW.VN":"DIEN",
+    "DPM.VN":"HOA_CHAT","DCM.VN":"HOA_CHAT","LAS.VN":"HOA_CHAT","DDV.VN":"HOA_CHAT","DGC.VN":"HOA_CHAT","CSV.VN":"HOA_CHAT","BFC.VN":"HOA_CHAT","MSR.VN":"HOA_CHAT","BMP.VN":"HOA_CHAT","NTP.VN":"HOA_CHAT",
+    "BSR.VN":"DAU","PVS.VN":"DAU","PVD.VN":"DAU","PVB.VN":"DAU","PVC.VN":"DAU","PVT.VN":"DAU","OIL.VN":"DAU","PLX.VN":"DAU","GAS.VN":"DAU",
+    "HAH.VN":"LOGIS","GMD.VN":"LOGIS","VSC.VN":"LOGIS","VOS.VN":"LOGIS","VTO.VN":"LOGIS","HVN.VN":"LOGIS","VJC.VN":"LOGIS","ACV.VN":"LOGIS",
 }
-df["StateRank"] = df["State"].map(state_order)
 
-df = df.sort_values(
-    by=["GoldScore", "StateRank", "Score", "RSI", "Ticker"],
-    ascending=[False, False, False, False, True]
-).reset_index(drop=True)
+def normalize_series(x):
+    if isinstance(x, pd.DataFrame):
+        x = x.iloc[:, 0]
+    return pd.to_numeric(x, errors="coerce")
 
-strong = df[df["State"] == "🟩 ƯU TIÊN MUA"].copy()
-watch = df[df["State"] == "🟨 THEO DÕI"].copy()
-early = df[df["State"] == "🟦 ĐẢO CHIỀU SỚM"].copy()
+def compute_rsi(close: pd.Series):
+    delta = close.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
 
-# ======================
-# SOURCE NOTE
-# ======================
-if "DEMO MODE" in source_note:
-    st.warning(source_note)
-else:
-    st.success(source_note)
+def calc_obv(close: pd.Series, volume: pd.Series):
+    return (np.sign(close.diff()) * volume).fillna(0).cumsum()
 
-# ======================
-# METRICS
-# ======================
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Tổng số mã", len(df))
-c2.metric("Ưu tiên mua", len(strong))
-c3.metric("Theo dõi", len(watch))
-c4.metric("Đảo chiều sớm", len(early))
-
-st.markdown("---")
-
-# ======================
-# MAIN TABLES
-# ======================
-tab1, tab2, tab3 = st.tabs(["🏆 Top cổ phiếu", "🔥 Ưu tiên mua", "📋 Toàn bộ dữ liệu"])
-
-with tab1:
-    st.dataframe(
-        df[["Ticker", "Score", "GoldScore", "State", "RSI", "OBV_trend", "Price_vs_EMA", "MACD", "Reason", "Action"]].head(top_n),
-        use_container_width=True,
-        hide_index=True
+@st.cache_data(ttl=300)
+def fetch_daily(symbol: str):
+    return yf.download(
+        symbol,
+        period="9mo",
+        interval="1d",
+        progress=False,
+        auto_adjust=False,
+        threads=False,
     )
 
-with tab2:
-    if strong.empty:
-        st.info("Chưa có mã nào đạt chuẩn ƯU TIÊN MUA.")
+@st.cache_data(ttl=300)
+def fetch_intraday(symbol: str):
+    return yf.download(
+        symbol,
+        period="5d",
+        interval="15m",
+        progress=False,
+        auto_adjust=False,
+        threads=False,
+    )
+
+def analyze_stock(symbol: str):
+    try:
+        raw = fetch_daily(symbol)
+        if raw is None or raw.empty or len(raw) < 80:
+            return None
+
+        close = normalize_series(raw["Close"]).dropna()
+        high = normalize_series(raw["High"]).reindex(close.index)
+        low = normalize_series(raw["Low"]).reindex(close.index)
+        volume = normalize_series(raw["Volume"]).reindex(close.index)
+
+        df = pd.DataFrame({
+            "Close": close,
+            "High": high,
+            "Low": low,
+            "Volume": volume
+        }).dropna()
+
+        if len(df) < 80:
+            return None
+
+        # indicators
+        df["EMA9"] = df["Close"].ewm(span=9, adjust=False).mean()
+        df["MA20"] = df["Close"].rolling(20).mean()
+        df["RSI"] = compute_rsi(df["Close"])
+        df["RSI_EMA"] = df["RSI"].ewm(span=9, adjust=False).mean()
+        df["OBV"] = calc_obv(df["Close"], df["Volume"])
+        df["OBV_EMA"] = df["OBV"].ewm(span=9, adjust=False).mean()
+        df["VolMA20"] = df["Volume"].rolling(20).mean()
+
+        latest = df.iloc[-1]
+
+        close_now = float(latest["Close"])
+        ema9 = float(latest["EMA9"])
+        ma20 = float(latest["MA20"]) if pd.notna(latest["MA20"]) else np.nan
+        rsi = float(latest["RSI"]) if pd.notna(latest["RSI"]) else np.nan
+        obv = float(latest["OBV"]) if pd.notna(latest["OBV"]) else np.nan
+        obv_ema = float(latest["OBV_EMA"]) if pd.notna(latest["OBV_EMA"]) else np.nan
+        vol = float(latest["Volume"])
+        vol_ma = float(latest["VolMA20"]) if pd.notna(latest["VolMA20"]) else 0.0
+
+        # trend
+        cond_price = close_now > ema9 > ma20 if not np.isnan(ma20) else False
+        cond_obv = obv > obv_ema if not np.isnan(obv_ema) else False
+        cond_slope = ema9 > float(df["EMA9"].iloc[-3])
+        cond_rsi_turn = rsi > float(df["RSI"].iloc[-3]) if pd.notna(df["RSI"].iloc[-3]) else False
+        cond_rs = close_now > ma20 * 1.03 if not np.isnan(ma20) else False
+
+        dist_ma20 = (close_now - ma20) / ma20 if not np.isnan(ma20) and ma20 != 0 else 0.0
+        too_extended = dist_ma20 > 0.15
+
+        # returns
+        ret_20d = (close_now / float(df["Close"].iloc[-20]) - 1) if len(df) > 20 else 0.0
+        ret_60d = (close_now / float(df["Close"].iloc[-60]) - 1) if len(df) > 60 else 0.0
+
+        # volume / money
+        vol_dry = vol_ma > 0 and vol < vol_ma * 0.8
+        vol_break = vol_ma > 0 and vol > vol_ma * 1.5
+        money_score = (vol / vol_ma) if vol_ma > 0 else 1.0
+
+        # base
+        high_15 = float(df["High"].rolling(15).max().iloc[-1])
+        low_15 = float(df["Low"].rolling(15).min().iloc[-1])
+        price_range = (high_15 - low_15) / close_now if close_now > 0 else 0.0
+        tight_base = price_range < 0.15
+
+        # break
+        prev_high_20 = float(df["High"].rolling(20).max().iloc[-2]) if len(df) > 21 else high_15
+        break_strong = close_now >= prev_high_20 * 0.98 and vol_break
+
+        # intraday confirm
+        intraday_ok = False
+        try:
+            intra = fetch_intraday(symbol)
+            if intra is not None and not intra.empty and len(intra) > 10:
+                iclose = normalize_series(intra["Close"]).dropna()
+                ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
+                if len(iclose) > 10:
+                    iema9 = iclose.ewm(span=9, adjust=False).mean()
+                    iobv = calc_obv(iclose, ivol)
+                    intraday_ok = bool(
+                        iclose.iloc[-1] > iema9.iloc[-1]
+                        and iobv.iloc[-1] > iobv.iloc[-3]
+                    )
+        except Exception:
+            intraday_ok = False
+
+        # leader score
+        leader_score = 0
+        if ret_20d > 0.15:
+            leader_score += 1
+        if ret_60d > 0.30:
+            leader_score += 1
+        if money_score > 1.20:
+            leader_score += 1
+        if cond_rs:
+            leader_score += 1
+        if cond_obv:
+            leader_score += 1
+        if symbol in top_week:
+            leader_score += 1
+        if symbol in top_month:
+            leader_score += 1
+        if intraday_ok:
+            leader_score += 1
+
+        # stage
+        if ret_20d < 0.10 and tight_base:
+            stage = "B1-TÍCH LŨY"
+        elif ret_20d >= 0.10 and ret_20d < 0.25 and leader_score >= 3:
+            stage = "B2-ĐANG VÀO SÓNG"
+        elif ret_20d >= 0.25 and leader_score >= 4 and not too_extended:
+            stage = "B3-LEADER"
+        elif too_extended:
+            stage = "B3-QUÁ XA"
+        else:
+            stage = "NONE"
+
+        # status
+        if not cond_price or not cond_obv or not cond_slope:
+            status = "LOẠI"
+        elif ret_20d < 0.10 and rsi < 55 and tight_base and vol_dry:
+            status = "EARLY REVERSAL"
+        elif (
+            leader_score >= 4
+            and rsi > 58
+            and cond_price
+            and cond_obv
+            and cond_slope
+            and (break_strong or ret_20d > 0.15)
+        ):
+            status = "ƯU TIÊN MUA"
+        elif ret_20d > 0.35:
+            status = "THEO DÕI"
+        else:
+            status = "THEO DÕI"
+
+        # chicken state
+        if stage == "B1-TÍCH LŨY":
+            chicken = "🐣 Gà con"
+        elif stage == "B2-ĐANG VÀO SÓNG":
+            chicken = "🐥 Gà chạy"
+        elif stage == "B3-LEADER":
+            chicken = "🐔 Gà chiến"
+        elif stage == "B3-QUÁ XA":
+            chicken = "⚠️ Gà bay cao"
+        else:
+            chicken = "❌"
+
+        # action
+        if market_score < 8:
+            action = "Đứng ngoài"
+        else:
+            if status == "ƯU TIÊN MUA" and stage == "B2-ĐANG VÀO SÓNG":
+                action = "👉 MUA CHÍNH"
+            elif status == "ƯU TIÊN MUA" and stage == "B3-LEADER":
+                action = "👉 GIỮ / ADD"
+            elif status == "THEO DÕI":
+                action = "👀 CANH PULL"
+            elif status == "EARLY REVERSAL":
+                action = "🌱 MUA THĂM DÒ"
+            elif stage == "B3-QUÁ XA":
+                action = "⛔ KHÔNG ĐU"
+            else:
+                action = "❌ BỎ"
+
+        buy_zone = round(ema9, 2)
+        cut_loss = round(ma20, 2) if not np.isnan(ma20) else None
+
+        score = leader_score + int(cond_price) + int(cond_rsi_turn)
+        gold_score = score * market_score
+
+        return {
+            "Sector": sector_map.get(symbol, "KHÁC"),
+            "Ticker": symbol,
+            "Close": round(close_now, 2),
+            "EMA9": round(ema9, 2),
+            "MA20": round(ma20, 2) if not np.isnan(ma20) else None,
+            "RSI": round(rsi, 2) if not np.isnan(rsi) else None,
+            "Leader Score": leader_score,
+            "Base": "✔" if tight_base else "✖",
+            "Cạn cung": "✔" if vol_dry else "✖",
+            "Break": "✔" if break_strong else "✖",
+            "Top tuần": "✔" if symbol in top_week else "✖",
+            "Top tháng": "✔" if symbol in top_month else "✖",
+            "Intraday": "✔" if intraday_ok else "✖",
+            "Money+": "✔" if money_score > 1.2 else "✖",
+            "Ret 20D %": round(ret_20d * 100, 1),
+            "Ret 60D %": round(ret_60d * 100, 1),
+            "Stage": stage,
+            "Trạng thái gà": chicken,
+            "Hành động": action,
+            "Điểm mua": buy_zone,
+            "Cutloss": cut_loss,
+            "Score": score,
+            "Gold Score": gold_score,
+            "Status": status,
+        }
+
+    except Exception:
+        return None
+
+# =========================
+# ALERT STATE
+# =========================
+if "prev_results" not in st.session_state:
+    st.session_state["prev_results"] = {}
+
+def build_alerts(current_df: pd.DataFrame):
+    alerts = []
+    prev_map = st.session_state["prev_results"]
+
+    for _, row in current_df.iterrows():
+        ticker = row["Ticker"]
+        current_status = row["Status"]
+        current_stage = row["Stage"]
+        current_break = row["Break"]
+
+        old = prev_map.get(ticker)
+        if old is not None:
+            if old.get("Break") == "✖" and current_break == "✔":
+                alerts.append(f"🚀 {ticker} vừa BREAK mạnh")
+            if old.get("Stage") != "B2-ĐANG VÀO SÓNG" and current_stage == "B2-ĐANG VÀO SÓNG":
+                alerts.append(f"🐥 {ticker} vừa vào B2")
+            if old.get("Status") == "ƯU TIÊN MUA" and current_status != "ƯU TIÊN MUA":
+                alerts.append(f"⚠️ {ticker} gãy khỏi nhóm ƯU TIÊN MUA")
+
+        prev_map[ticker] = {
+            "Status": current_status,
+            "Stage": current_stage,
+            "Break": current_break,
+        }
+
+    st.session_state["prev_results"] = prev_map
+    return alerts
+
+# =========================
+# RUN
+# =========================
+run_scan = st.button("🚀 Quét V15")
+
+if run_scan:
+    results = []
+    progress = st.progress(0)
+
+    for i, symbol in enumerate(watchlist):
+        row = analyze_stock(symbol)
+        if row:
+            results.append(row)
+        progress.progress((i + 1) / len(watchlist))
+
+    if not results:
+        st.warning("Không có dữ liệu.")
+        st.stop()
+
+    df_res = pd.DataFrame(results)
+    df_res = df_res.sort_values(
+        by=["Gold Score", "Leader Score", "Score", "Ret 20D %"],
+        ascending=False
+    )
+
+    alerts = build_alerts(df_res)
+
+    if alerts:
+        st.subheader("🔔 Cảnh báo realtime")
+        for msg in alerts:
+            st.warning(msg)
     else:
-        st.dataframe(
-            strong[["Ticker", "Score", "GoldScore", "RSI", "OBV_trend", "Price_vs_EMA", "MACD", "Reason", "Action"]].head(top_n),
-            use_container_width=True,
-            hide_index=True
-        )
+        st.info("Chưa có tín hiệu mới so với lần quét trước.")
 
-with tab3:
+    display_cols = [
+        "Sector", "Ticker", "Close", "EMA9", "MA20", "RSI",
+        "Leader Score", "Base", "Cạn cung", "Break",
+        "Top tuần", "Top tháng", "Intraday", "Money+",
+        "Ret 20D %", "Ret 60D %",
+        "Stage", "Trạng thái gà", "Hành động",
+        "Điểm mua", "Cutloss", "Score", "Gold Score", "Status"
+    ]
+
+    st.subheader("📊 Kết quả tổng hợp")
+    st.dataframe(df_res[display_cols], use_container_width=True)
+
+    st.subheader("🔥 Nhóm ƯU TIÊN MUA")
     st.dataframe(
-        df[["Ticker", "Score", "GoldScore", "State", "RSI", "OBV_trend", "Price_vs_EMA", "MACD", "Reason", "Action"]],
-        use_container_width=True,
-        hide_index=True
+        df_res[df_res["Status"] == "ƯU TIÊN MUA"][display_cols].head(top_n),
+        use_container_width=True
     )
 
-# ======================
-# GUIDE
-# ======================
-with st.expander("Hướng dẫn format CSV"):
-    st.code(
-        "Ticker,OBV_trend,Price_vs_EMA,RSI,MACD\n"
-        "VCI,strong,above_ema9,66,bullish\n"
-        "HDB,strong,near_ema9,61,bullish\n"
-        "NTL,strong,near_ema9,63,neutral\n",
-        language="csv"
+    st.subheader("👀 Nhóm THEO DÕI")
+    st.dataframe(
+        df_res[df_res["Status"] == "THEO DÕI"][display_cols],
+        use_container_width=True
     )
 
-st.caption("V15.2 | Ưu tiên ổn định, không crash | Có local file / upload / paste CSV / demo fallback")
+    st.subheader("🌱 Nhóm EARLY REVERSAL")
+    st.dataframe(
+        df_res[df_res["Status"] == "EARLY REVERSAL"][display_cols],
+        use_container_width=True
+    )
+
+    st.subheader("❌ LOẠI")
+    st.dataframe(
+        df_res[df_res["Status"] == "LOẠI"][display_cols],
+        use_container_width=True
+    )
+
+else:
+    st.info("Bấm 'Quét V15' để chạy scanner.")
