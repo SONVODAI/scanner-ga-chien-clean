@@ -3,10 +3,10 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime
 
-st.set_page_config(page_title="Scanner Gà Chiến V6", layout="wide")
+st.set_page_config(page_title="Scanner Gà Chiến V7", layout="wide")
 
 # =========================
-# WATCHLIST MẶC ĐỊNH THEO ẢNH ANH GỬI
+# DEFAULT WATCHLIST
 # =========================
 DEFAULT_SECTORS = {
     "BANK": ["VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","TPB","LPB","EIB","ABB","MSB","KLB","EVF"],
@@ -28,7 +28,7 @@ STATUS_ORDER = {
 }
 
 # =========================
-# HÀM PHỤ
+# HELPERS
 # =========================
 def build_default_text() -> str:
     lines = []
@@ -54,7 +54,7 @@ def parse_watchlist(text: str):
                 if not code.endswith(".VN"):
                     code = f"{code}.VN"
                 rows.append((current_sector, code))
-    # bỏ trùng
+
     seen = set()
     dedup = []
     for sector, ticker in rows:
@@ -77,75 +77,84 @@ def normalize_series(x):
         x = x.iloc[:, 0]
     return pd.to_numeric(x, errors="coerce")
 
-def analyze_ticker(sector: str, ticker: str, market_score: int):
+@st.cache_data(ttl=120, show_spinner=False)
+def load_daily_data(ticker: str):
+    df = yf.download(
+        ticker,
+        period="6mo",
+        interval="1d",
+        auto_adjust=False,
+        progress=False,
+        threads=False,
+    )
+    return df
+
+@st.cache_data(ttl=60, show_spinner=False)
+def load_intraday_data(ticker: str, interval: str):
+    # Yahoo thường hỗ trợ 5m/15m tốt trong phạm vi ngắn
+    df = yf.download(
+        ticker,
+        period="5d",
+        interval=interval,
+        auto_adjust=False,
+        progress=False,
+        threads=False,
+    )
+    return df
+
+def calc_obv(close: pd.Series, volume: pd.Series) -> pd.Series:
+    direction = close.diff().fillna(0)
+    obv_step = pd.Series(0.0, index=close.index)
+    obv_step[direction > 0] = volume[direction > 0]
+    obv_step[direction < 0] = -volume[direction < 0]
+    return obv_step.cumsum()
+
+def analyze_ticker(sector: str, ticker: str, market_score: int, use_intraday: bool, intraday_interval: str):
     try:
-        df = yf.download(
-            ticker,
-            period="6mo",
-            interval="1d",
-            auto_adjust=False,
-            progress=False,
-            threads=False,
-        )
-        if df is None or df.empty:
+        daily_df = load_daily_data(ticker)
+        if daily_df is None or daily_df.empty:
             return None
 
         required_cols = ["Close", "Volume", "High", "Low"]
         for col in required_cols:
-            if col not in df.columns:
+            if col not in daily_df.columns:
                 return None
 
-        close = normalize_series(df["Close"]).dropna()
-        volume = normalize_series(df["Volume"]).reindex(close.index)
-        high = normalize_series(df["High"]).reindex(close.index)
-        low = normalize_series(df["Low"]).reindex(close.index)
-
-        if len(close) < 30:
+        close_d = normalize_series(daily_df["Close"]).dropna()
+        volume_d = normalize_series(daily_df["Volume"]).reindex(close_d.index)
+        if len(close_d) < 30:
             return None
 
-        ema9 = close.ewm(span=9, adjust=False).mean()
-        ma20 = close.rolling(20).mean()
+        ema9_d = close_d.ewm(span=9, adjust=False).mean()
+        ma20_d = close_d.rolling(20).mean()
 
-        rsi = compute_rsi(close, 14)
-        rsi_ema9 = rsi.ewm(span=9, adjust=False).mean()
+        rsi_d = compute_rsi(close_d, 14)
+        rsi_ema9_d = rsi_d.ewm(span=9, adjust=False).mean()
 
-        direction = close.diff().fillna(0)
-        obv_step = pd.Series(0.0, index=close.index)
-        obv_step[direction > 0] = volume[direction > 0]
-        obv_step[direction < 0] = -volume[direction < 0]
-        obv = obv_step.cumsum()
-        obv_ema9 = obv.ewm(span=9, adjust=False).mean()
+        obv_d = calc_obv(close_d, volume_d)
+        obv_ema9_d = obv_d.ewm(span=9, adjust=False).mean()
 
-        vol_ma20 = volume.rolling(20).mean()
+        vol_ma20_d = volume_d.rolling(20).mean()
 
-        latest_close = float(close.iloc[-1])
-        latest_ema9 = float(ema9.iloc[-1])
-        latest_ma20 = float(ma20.iloc[-1]) if pd.notna(ma20.iloc[-1]) else None
-        latest_rsi = float(rsi.iloc[-1]) if pd.notna(rsi.iloc[-1]) else None
-        latest_rsi_ema9 = float(rsi_ema9.iloc[-1]) if pd.notna(rsi_ema9.iloc[-1]) else None
-        latest_obv = float(obv.iloc[-1]) if pd.notna(obv.iloc[-1]) else None
-        latest_obv_ema9 = float(obv_ema9.iloc[-1]) if pd.notna(obv_ema9.iloc[-1]) else None
-        latest_vol = float(volume.iloc[-1]) if pd.notna(volume.iloc[-1]) else None
-        latest_vol_ma20 = float(vol_ma20.iloc[-1]) if pd.notna(vol_ma20.iloc[-1]) else None
+        latest_close = float(close_d.iloc[-1])
+        latest_ema9 = float(ema9_d.iloc[-1])
+        latest_ma20 = float(ma20_d.iloc[-1]) if pd.notna(ma20_d.iloc[-1]) else None
+        latest_rsi = float(rsi_d.iloc[-1]) if pd.notna(rsi_d.iloc[-1]) else None
+        latest_rsi_ema9 = float(rsi_ema9_d.iloc[-1]) if pd.notna(rsi_ema9_d.iloc[-1]) else None
+        latest_obv = float(obv_d.iloc[-1]) if pd.notna(obv_d.iloc[-1]) else None
+        latest_obv_ema9 = float(obv_ema9_d.iloc[-1]) if pd.notna(obv_ema9_d.iloc[-1]) else None
+        latest_vol = float(volume_d.iloc[-1]) if pd.notna(volume_d.iloc[-1]) else None
+        latest_vol_ma20 = float(vol_ma20_d.iloc[-1]) if pd.notna(vol_ma20_d.iloc[-1]) else None
 
-        recent_10_high = float(close.iloc[-11:-1].max()) if len(close) >= 11 else latest_close
+        recent_10_high = float(close_d.iloc[-11:-1].max()) if len(close_d) >= 11 else latest_close
 
-        # ===== TRỤC =====
+        # ===== DAILY CONDITIONS =====
         price_above_ema9 = latest_close > latest_ema9
         rsi_strong = latest_rsi is not None and latest_rsi > 55
-        rsi_above_ema = (
-            latest_rsi is not None
-            and latest_rsi_ema9 is not None
-            and latest_rsi > latest_rsi_ema9
-        )
-        obv_above_ema = (
-            latest_obv is not None
-            and latest_obv_ema9 is not None
-            and latest_obv > latest_obv_ema9
-        )
-        obv_up = len(obv) >= 3 and obv.iloc[-1] > obv.iloc[-2] > obv.iloc[-3]
+        rsi_above_ema = latest_rsi is not None and latest_rsi_ema9 is not None and latest_rsi > latest_rsi_ema9
+        obv_above_ema = latest_obv is not None and latest_obv_ema9 is not None and latest_obv > latest_obv_ema9
+        obv_up = len(obv_d) >= 3 and obv_d.iloc[-1] > obv_d.iloc[-2] > obv_d.iloc[-3]
 
-        # ===== MẪU HÌNH =====
         pull_ok = (
             latest_close >= latest_ema9 * 0.98
             and latest_close <= latest_ema9 * 1.03
@@ -168,7 +177,42 @@ def analyze_ticker(sector: str, ticker: str, market_score: int):
             and price_above_ema9
         )
 
-        # ===== STOCK SCORE 8 ĐIỂM =====
+        # ===== INTRADAY CHECK =====
+        intraday_break = False
+        intraday_obv_up = False
+        intraday_note = "Không dùng intraday"
+
+        chart_close = close_d.tail(80)
+        chart_ema9 = ema9_d.tail(80)
+        chart_ma20 = ma20_d.tail(80)
+
+        if use_intraday:
+            try:
+                intra_df = load_intraday_data(ticker, intraday_interval)
+                if intra_df is not None and not intra_df.empty and "Close" in intra_df.columns and "Volume" in intra_df.columns:
+                    close_i = normalize_series(intra_df["Close"]).dropna()
+                    vol_i = normalize_series(intra_df["Volume"]).reindex(close_i.index)
+
+                    if len(close_i) >= 10:
+                        ema9_i = close_i.ewm(span=9, adjust=False).mean()
+                        obv_i = calc_obv(close_i, vol_i)
+                        intraday_high_10 = float(close_i.iloc[-11:-1].max()) if len(close_i) >= 11 else float(close_i.iloc[-1])
+
+                        intraday_break = float(close_i.iloc[-1]) > intraday_high_10
+                        intraday_obv_up = len(obv_i) >= 3 and obv_i.iloc[-1] > obv_i.iloc[-2] > obv_i.iloc[-3]
+                        intraday_note = "Intraday xác nhận" if (intraday_break or intraday_obv_up) else "Intraday trung tính"
+
+                        chart_close = close_i.tail(80)
+                        chart_ema9 = ema9_i.tail(80)
+                        chart_ma20 = close_i.rolling(20).mean().tail(80)
+                    else:
+                        intraday_note = "Intraday thiếu dữ liệu"
+                else:
+                    intraday_note = "Intraday không có dữ liệu"
+            except Exception:
+                intraday_note = "Intraday lỗi"
+
+        # ===== SCORE 10 ĐIỂM =====
         score = 0
         score += int(price_above_ema9)
         score += int(rsi_strong)
@@ -178,33 +222,46 @@ def analyze_ticker(sector: str, ticker: str, market_score: int):
         score += int(pull_ok)
         score += int(can_cung)
         score += int(breakout_ok)
+        score += int(intraday_break)
+        score += int(intraday_obv_up)
 
-        # ===== PHÂN LOẠI =====
-        if score >= 6:
+        # ===== STATUS =====
+        if score >= 7:
             status = "🟩 ƯU TIÊN MUA"
-        elif score >= 4:
+        elif score >= 5:
             status = "🟨 THEO DÕI"
-        elif score >= 2:
+        elif score >= 3:
             status = "🟦 EARLY REVERSAL"
         else:
             status = "🟥 LOẠI"
 
-        # ===== GIAI ĐOẠN =====
-        if breakout_ok:
-            stage = "🚀 Break"
+        # ===== STAGE =====
+        if breakout_ok and intraday_break:
+            stage = "🚀 Break mạnh + intraday xác nhận"
+        elif breakout_ok:
+            stage = "🚀 Break daily"
+        elif pull_ok and can_cung:
+            stage = "📉 Pull đẹp + cạn cung"
         elif pull_ok:
-            stage = "📉 Pull"
-        elif score >= 2:
-            stage = "🌱 Early"
+            stage = "📉 Pull đẹp"
+        elif intraday_obv_up:
+            stage = "🌱 Early intraday"
+        elif score >= 3:
+            stage = "🌱 Early daily"
         else:
-            stage = "❌"
+            stage = "❌ Chưa đạt"
 
         # ===== HÀNH ĐỘNG =====
         if market_score < 8:
-            action = "Đứng ngoài"
+            action = "Đứng ngoài / giữ tỷ trọng thấp"
         else:
             if status == "🟩 ƯU TIÊN MUA":
-                action = "Canh mua pull" if pull_ok else ("Canh mua break" if breakout_ok else "Ưu tiên theo dõi sát")
+                if pull_ok:
+                    action = "Canh mua pull"
+                elif breakout_ok or intraday_break:
+                    action = "Canh mua break"
+                else:
+                    action = "Ưu tiên theo dõi sát"
             elif status == "🟨 THEO DÕI":
                 action = "Chờ xác nhận thêm"
             elif status == "🟦 EARLY REVERSAL":
@@ -212,14 +269,26 @@ def analyze_ticker(sector: str, ticker: str, market_score: int):
             else:
                 action = "Loại"
 
+        # ===== NAV GỢI Ý =====
+        if market_score < 8:
+            nav = "0-10%"
+        else:
+            if status == "🟩 ƯU TIÊN MUA":
+                nav = "20-30%"
+            elif status == "🟨 THEO DÕI":
+                nav = "10-15%"
+            elif status == "🟦 EARLY REVERSAL":
+                nav = "5-10%"
+            else:
+                nav = "0%"
+
         gold_score = market_score * score if market_score >= 8 else 0
 
         chart_df = pd.DataFrame({
-            "Close": close.tail(80),
-            "EMA9": ema9.tail(80),
-            "MA20": ma20.tail(80),
-            "RSI": rsi.tail(80),
-        })
+            "Close": chart_close,
+            "EMA9": chart_ema9,
+            "MA20": chart_ma20,
+        }).dropna(how="all")
 
         return {
             "Sector": sector,
@@ -232,15 +301,30 @@ def analyze_ticker(sector: str, ticker: str, market_score: int):
             "Pull đẹp": "✅" if pull_ok else "❌",
             "Cạn cung": "✅" if can_cung else "❌",
             "Break chuẩn": "✅" if breakout_ok else "❌",
+            "Intraday Break": "✅" if intraday_break else "❌",
+            "Intraday OBV": "✅" if intraday_obv_up else "❌",
             "Score": score,
             "Gold Score": gold_score,
             "Stage": stage,
             "Status": status,
             "Hành động": action,
+            "NAV gợi ý": nav,
+            "Ghi chú intraday": intraday_note,
             "_chart": chart_df,
         }
     except Exception:
         return None
+
+# =========================
+# STYLE
+# =========================
+st.markdown("""
+<style>
+div[data-testid="stDataFrame"] {
+    font-size: 15px;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # =========================
 # SIDEBAR
@@ -253,9 +337,17 @@ status_filter = st.sidebar.multiselect(
     ["🟩 ƯU TIÊN MUA", "🟨 THEO DÕI", "🟦 EARLY REVERSAL", "🟥 LOẠI"],
     default=["🟩 ƯU TIÊN MUA", "🟨 THEO DÕI", "🟦 EARLY REVERSAL", "🟥 LOẠI"]
 )
+use_intraday = st.sidebar.toggle("Bật quét intraday", value=True)
+intraday_interval = st.sidebar.selectbox("Khung intraday", ["15m", "5m"], index=0)
 
 # =========================
-# INPUT WATCHLIST
+# TITLE
+# =========================
+st.title("🐔 Scanner Gà Chiến V7")
+st.caption("V7: có intraday gần realtime, cột Stage rộng hơn, thêm NAV gợi ý và ghi chú intraday.")
+
+# =========================
+# INPUT
 # =========================
 watchlist_text = st.text_area(
     "Danh sách mã theo ngành",
@@ -263,7 +355,7 @@ watchlist_text = st.text_area(
     height=280
 )
 
-col_a, col_b, col_c = st.columns([1,1,1])
+col_a, col_b, col_c = st.columns([1, 1, 1])
 with col_a:
     run_scan = st.button("🚀 Quét ngay", use_container_width=True)
 with col_b:
@@ -275,7 +367,7 @@ if refresh_now:
     st.rerun()
 
 # =========================
-# MAIN
+# RUN
 # =========================
 if run_scan:
     watchlist = parse_watchlist(watchlist_text)
@@ -288,7 +380,7 @@ if run_scan:
 
         total = len(watchlist)
         for idx, (sector, ticker) in enumerate(watchlist, start=1):
-            row = analyze_ticker(sector, ticker, market_score)
+            row = analyze_ticker(sector, ticker, market_score, use_intraday, intraday_interval)
             if row is not None:
                 results.append(row)
             progress.progress(idx / total, text=f"Đang quét {ticker} ({idx}/{total})")
@@ -305,24 +397,34 @@ if run_scan:
                 ascending=[False, False, False, False]
             )
 
-            # filter
             out = out[out["Status"].isin(status_filter)].copy()
-
-            # charts dict
             charts = {row["Ticker"]: row["_chart"] for row in results}
 
             display_cols = [
                 "Sector", "Ticker", "Close", "EMA9", "MA20", "RSI",
                 "OBV > EMA9", "Pull đẹp", "Cạn cung", "Break chuẩn",
-                "Score", "Gold Score", "Stage", "Status", "Hành động"
+                "Intraday Break", "Intraday OBV",
+                "Score", "Gold Score", "Stage", "Status", "Hành động", "NAV gợi ý", "Ghi chú intraday"
             ]
 
             st.subheader("📊 Kết quả quét tổng hợp")
-            st.dataframe(out[display_cols], use_container_width=True)
+            st.dataframe(
+                out[display_cols],
+                use_container_width=True,
+                column_config={
+                    "Stage": st.column_config.TextColumn("Stage", width="large"),
+                    "Hành động": st.column_config.TextColumn("Hành động", width="medium"),
+                    "Ghi chú intraday": st.column_config.TextColumn("Ghi chú intraday", width="medium"),
+                }
+            )
 
             top_market = out.head(show_top_n)
             st.subheader(f"🔥 Top {show_top_n} toàn thị trường")
-            st.dataframe(top_market[display_cols], use_container_width=True)
+            st.dataframe(
+                top_market[display_cols],
+                use_container_width=True,
+                column_config={"Stage": st.column_config.TextColumn("Stage", width="large")}
+            )
 
             st.subheader("🏆 Top 1 mỗi ngành")
             top_sector = (
@@ -330,29 +432,49 @@ if run_scan:
                    .groupby("Sector", as_index=False)
                    .head(1)
             )
-            st.dataframe(top_sector[display_cols], use_container_width=True)
+            st.dataframe(
+                top_sector[display_cols],
+                use_container_width=True,
+                column_config={"Stage": st.column_config.TextColumn("Stage", width="large")}
+            )
 
             st.subheader("🔥 Nhóm ƯU TIÊN MUA")
-            st.dataframe(out[out["Status"] == "🟩 ƯU TIÊN MUA"][display_cols], use_container_width=True)
+            st.dataframe(
+                out[out["Status"] == "🟩 ƯU TIÊN MUA"][display_cols],
+                use_container_width=True,
+                column_config={"Stage": st.column_config.TextColumn("Stage", width="large")}
+            )
 
             st.subheader("👀 Nhóm THEO DÕI")
-            st.dataframe(out[out["Status"] == "🟨 THEO DÕI"][display_cols], use_container_width=True)
+            st.dataframe(
+                out[out["Status"] == "🟨 THEO DÕI"][display_cols],
+                use_container_width=True,
+                column_config={"Stage": st.column_config.TextColumn("Stage", width="large")}
+            )
 
             st.subheader("🌱 Nhóm EARLY REVERSAL")
-            st.dataframe(out[out["Status"] == "🟦 EARLY REVERSAL"][display_cols], use_container_width=True)
+            st.dataframe(
+                out[out["Status"] == "🟦 EARLY REVERSAL"][display_cols],
+                use_container_width=True,
+                column_config={"Stage": st.column_config.TextColumn("Stage", width="large")}
+            )
 
             st.subheader("🚨 Gà chiến mới nổi")
-            alert = out[(out["Status"] == "🟩 ƯU TIÊN MUA") & (out["Break chuẩn"] == "✅")]
+            alert = out[(out["Status"] == "🟩 ƯU TIÊN MUA") & ((out["Break chuẩn"] == "✅") | (out["Intraday Break"] == "✅"))]
             if not alert.empty:
                 st.success("Có gà mạnh mới nổi.")
-                st.dataframe(alert[display_cols], use_container_width=True)
+                st.dataframe(
+                    alert[display_cols],
+                    use_container_width=True,
+                    column_config={"Stage": st.column_config.TextColumn("Stage", width="large")}
+                )
             else:
                 st.info("Chưa có gà mới nổi.")
 
             st.subheader("📈 Xem chart nhanh từng mã")
             selected = st.selectbox("Chọn mã để xem chart", out["Ticker"].tolist())
             if selected in charts:
-                st.line_chart(charts[selected][["Close", "EMA9", "MA20"]])
+                st.line_chart(charts[selected], use_container_width=True)
 
             st.subheader("🧠 Kết luận nhanh")
             if market_score < 8:
