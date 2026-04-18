@@ -6,12 +6,11 @@ st.set_page_config(page_title="Scanner Gà Chiến", layout="centered")
 
 st.title("🐔 Scanner Gà Chiến")
 
-ticker = st.text_input("Nhập mã cổ phiếu (ví dụ: FPT.VN, HPG.VN):")
+ticker = st.text_input("Nhập mã cổ phiếu (ví dụ: FPT.VN, HPG.VN):").upper()
 
 if ticker:
-    data = yf.download(ticker, period="6mo")
-
-    if not data.empty:
+    data =  yf.download(ticker.upper(), period="6mo")
+    if data is not None and not data.empty and "Close" in data.columns:
         data["EMA9"] = data["Close"].ewm(span=9).mean()
         data["RSI"] = 100 - (100 / (1 + data["Close"].pct_change().rolling(14).mean()))
 
