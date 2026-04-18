@@ -1,147 +1,317 @@
-# ==============================
-# 🚀 V13 – GÀ CHIẾN FINAL LOGIC
-# ==============================
-
+import streamlit as st
+import pandas as pd
 import numpy as np
+import yfinance as yf
 
-# ===== BASIC =====
-latest = df.iloc[-1]
+st.set_page_config(page_title="Scanner Gà Chiến V13", layout="wide")
 
-close = latest["Close"]
-ema9 = latest["EMA9"]
-ma20 = latest["MA20"]
-rsi = latest["RSI"]
-obv = latest["OBV"]
-obv_ema = latest["OBV_EMA"]
+st.title("🐔 Scanner Gà Chiến V13 – Leader Filter")
 
-# ===== CONDITIONS =====
-cond_price = close > ema9 > ma20
-cond_obv = obv > obv_ema
-cond_slope = ema9 > df["EMA9"].iloc[-3]
-cond_rsi_turn = rsi > df["RSI"].iloc[-3]
-cond_rs = latest["RS"] > df["RS"].rolling(10).mean().iloc[-1]
+# =========================
+# SIDEBAR
+# =========================
+st.sidebar.header("Thiết lập")
+market_score = st.sidebar.slider("Market Score", 1, 10, 8)
+top_n = st.sidebar.slider("Top toàn thị trường", 3, 15, 5)
 
-dist_ma20 = abs(close - ma20) / ma20
+# =========================
+# INPUT
+# =========================
+watchlist_text = st.text_area(
+    "Danh sách mã theo dõi",
+    """VCB, BID, CTG, TCB, MBB, VPB, STB, HDB, ACB, SHB, TPB, LPB, EIB, ABB, MSB, KLB, EVF
+SSI, VIX, SHS, MBS, HCM, VCI, VND, CTS, FTS, BSI, BVS, ORS, VDS, AGR
+VHM, NLG, KDH, CEO, CII, DXG, TCH, DPG, HDC, NVL, NTL, NHA, HUT, DIG, PDR, DXS
+VGC, IDC, KBC, SZC, BCM, LHG, IJC, GVR, PHR, DPR, SIP, TRC, DRC, CSM
+MWG, DGW, FRT, PET, PNJ, MSN, PAN, FMC, DBC, HAG, VNM, SAB, SBT, TLG
+REE, GEE, GEX, PC1, NT2, HDG, GEG, POW
+DPM, DCM, LAS, DDV, DGC, CSV, BFC, MSR, BMP, NTP
+BSR, PVS, PVD, PVB, PVC, PVT, OIL, PLX, GAS
+HAH, GMD, VSC, VOS, VTO, HVN, VJC, ACV""",
+    height=220
+)
 
-# ===== PERFORMANCE =====
-ret_20d = (close / df["Close"].iloc[-20]) - 1 if len(df) > 20 else 0
-ret_60d = (close / df["Close"].iloc[-60]) - 1 if len(df) > 60 else 0
+top_week_text = st.text_area(
+    "Top tăng tuần",
+    """VHM, VIC, GEE, NVL, HHS, HCM, GEX, PET, TCH, VJC, CII, VRE, VPL, SHS, KBC, LHG, MSB, LPB, IDC, VIX, VGI, BMP, HAG, DXG, VPB, VTP, CTR, TCB, HVN, BFC""",
+    height=120
+)
 
-# ===== VOLUME =====
-vol = latest["Volume"]
-vol_ma = df["Volume"].rolling(20).mean().iloc[-1]
-vol_dry = vol < vol_ma * 0.8
-vol_break = vol > vol_ma * 1.5
+top_month_text = st.text_area(
+    "Top tăng tháng",
+    """VHM, VIC, GEE, NVL, HHS, HCM, GEX, PET, TCH, VJC, CII, VRE, VPL, SHS, KBC, LHG, MSB, LPB, IDC, VIX, VGI, BMP, HAG, DXG, VPB, VTP, CTR, TCB, HVN, MSH""",
+    height=120
+)
 
-# ===== MONEY FLOW =====
-money_score = vol / vol_ma if vol_ma > 0 else 1
+def parse_codes(text: str):
+    items = []
+    for line in text.replace("\n", ",").split(","):
+        x = line.strip().upper()
+        if x:
+            if not x.endswith(".VN"):
+                x = x + ".VN"
+            items.append(x)
+    return list(dict.fromkeys(items))
 
-# ===== BASE =====
-price_range = (df["High"].rolling(15).max().iloc[-1] - df["Low"].rolling(15).min().iloc[-1]) / close
-tight_base = price_range < 0.15
+watchlist = parse_codes(watchlist_text)
+top_week = set(parse_codes(top_week_text))
+top_month = set(parse_codes(top_month_text))
 
-# ===== BREAK =====
-break_strong = close >= df["High"].rolling(20).max().iloc[-2] and vol_break
-
-# ===== EXTENDED =====
-too_extended = dist_ma20 > 0.15
-
-# ==============================
-# 🧠 LEADER SCORE (CỐT LÕI)
-# ==============================
-leader_score = 0
-
-if ret_20d > 0.15:
-    leader_score += 1
-
-if ret_60d > 0.3:
-    leader_score += 1
-
-if money_score > 1.2:
-    leader_score += 1
-
-if cond_rs:
-    leader_score += 1
-
-if cond_obv:
-    leader_score += 1
-
-
-# ==============================
-# 🧠 STAGE (CHU KỲ GÀ)
-# ==============================
-if ret_20d < 0.1 and tight_base:
-    stage = "B1-TÍCH LŨY"
-
-elif ret_20d >= 0.1 and ret_20d < 0.25 and leader_score >= 2:
-    stage = "B2-ĐANG VÀO SÓNG"
-
-elif ret_20d >= 0.25 and leader_score >= 3:
-    stage = "B3-LEADER"
-
-elif too_extended:
-    stage = "B3-QUÁ XA"
-
-else:
-    stage = "NONE"
-
-
-# ==============================
-# 🧠 CLASSIFY (QUAN TRỌNG NHẤT)
-# ==============================
-
-# ❌ LOẠI
-if not cond_price or not cond_obv or not cond_slope:
-    status = "LOẠI"
-
-# 🌱 EARLY (CHƯA CHẠY)
-elif (
-    ret_20d < 0.1
-    and rsi < 55
-    and tight_base
-    and vol_dry
-):
-    status = "EARLY REVERSAL"
-
-# 🔥 ƯU TIÊN MUA (LEADER THẬT)
-elif (
-    leader_score >= 3
-    and rsi > 58
-    and cond_price
-    and cond_obv
-    and cond_slope
-    and (break_strong or ret_20d > 0.15)
-):
-    status = "ƯU TIÊN MUA"
-
-# ⚠️ CHẶN FOMO (ĐÃ CHẠY XA)
-elif ret_20d > 0.35:
-    status = "THEO DÕI"
-
-# 👀 THEO DÕI
-else:
-    status = "THEO DÕI"
-
-
-# ==============================
-# 📊 SCORE
-# ==============================
-score = leader_score + (1 if cond_price else 0) + (1 if cond_rsi_turn else 0)
-
-gold_score = score * market_score
-
-
-# ==============================
-# OUTPUT
-# ==============================
-result = {
-    "Close": close,
-    "EMA9": ema9,
-    "MA20": ma20,
-    "RSI": rsi,
-    "Leader Score": leader_score,
-    "Stage": stage,
-    "Score": score,
-    "Gold Score": gold_score,
-    "Status": status
+# =========================
+# SECTOR MAP
+# =========================
+sector_map = {
+    "VCB.VN":"BANK","BID.VN":"BANK","CTG.VN":"BANK","TCB.VN":"BANK","MBB.VN":"BANK","VPB.VN":"BANK","STB.VN":"BANK","HDB.VN":"BANK","ACB.VN":"BANK","SHB.VN":"BANK","TPB.VN":"BANK","LPB.VN":"BANK","EIB.VN":"BANK","ABB.VN":"BANK","MSB.VN":"BANK","KLB.VN":"BANK","EVF.VN":"BANK",
+    "SSI.VN":"CK","VIX.VN":"CK","SHS.VN":"CK","MBS.VN":"CK","HCM.VN":"CK","VCI.VN":"CK","VND.VN":"CK","CTS.VN":"CK","FTS.VN":"CK","BSI.VN":"CK","BVS.VN":"CK","ORS.VN":"CK","VDS.VN":"CK","AGR.VN":"CK",
+    "VHM.VN":"BDS","NLG.VN":"BDS","KDH.VN":"BDS","CEO.VN":"BDS","CII.VN":"BDS","DXG.VN":"BDS","TCH.VN":"BDS","DPG.VN":"BDS","HDC.VN":"BDS","NVL.VN":"BDS","NTL.VN":"BDS","NHA.VN":"BDS","HUT.VN":"BDS","DIG.VN":"BDS","PDR.VN":"BDS","DXS.VN":"BDS",
+    "VGC.VN":"BDS_CN","IDC.VN":"BDS_CN","KBC.VN":"BDS_CN","SZC.VN":"BDS_CN","BCM.VN":"BDS_CN","LHG.VN":"BDS_CN","IJC.VN":"BDS_CN","GVR.VN":"BDS_CN","PHR.VN":"BDS_CN","DPR.VN":"BDS_CN","SIP.VN":"BDS_CN","TRC.VN":"BDS_CN","DRC.VN":"BDS_CN","CSM.VN":"BDS_CN",
+    "MWG.VN":"BAN_LE","DGW.VN":"BAN_LE","FRT.VN":"BAN_LE","PET.VN":"BAN_LE","PNJ.VN":"BAN_LE","MSN.VN":"BAN_LE","PAN.VN":"BAN_LE","FMC.VN":"BAN_LE","DBC.VN":"BAN_LE","HAG.VN":"BAN_LE","VNM.VN":"BAN_LE","SAB.VN":"BAN_LE","SBT.VN":"BAN_LE","TLG.VN":"BAN_LE",
+    "REE.VN":"DIEN","GEE.VN":"DIEN","GEX.VN":"DIEN","PC1.VN":"DIEN","NT2.VN":"DIEN","HDG.VN":"DIEN","GEG.VN":"DIEN","POW.VN":"DIEN",
+    "DPM.VN":"HOA_CHAT","DCM.VN":"HOA_CHAT","LAS.VN":"HOA_CHAT","DDV.VN":"HOA_CHAT","DGC.VN":"HOA_CHAT","CSV.VN":"HOA_CHAT","BFC.VN":"HOA_CHAT","MSR.VN":"HOA_CHAT","BMP.VN":"HOA_CHAT","NTP.VN":"HOA_CHAT",
+    "BSR.VN":"DAU","PVS.VN":"DAU","PVD.VN":"DAU","PVB.VN":"DAU","PVC.VN":"DAU","PVT.VN":"DAU","OIL.VN":"DAU","PLX.VN":"DAU","GAS.VN":"DAU",
+    "HAH.VN":"LOGIS","GMD.VN":"LOGIS","VSC.VN":"LOGIS","VOS.VN":"LOGIS","VTO.VN":"LOGIS","HVN.VN":"LOGIS","VJC.VN":"LOGIS","ACV.VN":"LOGIS",
 }
+
+# =========================
+# DATA FUNCTIONS
+# =========================
+@st.cache_data(ttl=300)
+def fetch_data(symbol: str):
+    return yf.download(
+        symbol,
+        period="9mo",
+        interval="1d",
+        progress=False,
+        auto_adjust=False,
+        threads=False
+    )
+
+def normalize_series(x):
+    if isinstance(x, pd.DataFrame):
+        x = x.iloc[:, 0]
+    return pd.to_numeric(x, errors="coerce")
+
+def compute_rsi(close: pd.Series):
+    delta = close.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
+
+def calc_obv(close: pd.Series, volume: pd.Series):
+    return (np.sign(close.diff()) * volume).fillna(0).cumsum()
+
+# =========================
+# MAIN ANALYSIS
+# =========================
+def analyze_stock(symbol: str):
+    try:
+        raw = fetch_data(symbol)
+        if raw is None or raw.empty or len(raw) < 80:
+            return None
+
+        close = normalize_series(raw["Close"]).dropna()
+        high = normalize_series(raw["High"]).reindex(close.index)
+        low = normalize_series(raw["Low"]).reindex(close.index)
+        volume = normalize_series(raw["Volume"]).reindex(close.index)
+
+        df = pd.DataFrame({
+            "Close": close,
+            "High": high,
+            "Low": low,
+            "Volume": volume
+        }).dropna()
+
+        if len(df) < 80:
+            return None
+
+        # ===== INDICATORS =====
+        df["EMA9"] = df["Close"].ewm(span=9, adjust=False).mean()
+        df["MA20"] = df["Close"].rolling(20).mean()
+        df["RSI"] = compute_rsi(df["Close"])
+        df["RSI_EMA"] = df["RSI"].ewm(span=9, adjust=False).mean()
+        df["OBV"] = calc_obv(df["Close"], df["Volume"])
+        df["OBV_EMA"] = df["OBV"].ewm(span=9, adjust=False).mean()
+        df["VolMA20"] = df["Volume"].rolling(20).mean()
+
+        latest = df.iloc[-1]
+
+        close_now = float(latest["Close"])
+        ema9 = float(latest["EMA9"])
+        ma20 = float(latest["MA20"]) if pd.notna(latest["MA20"]) else np.nan
+        rsi = float(latest["RSI"]) if pd.notna(latest["RSI"]) else np.nan
+        obv = float(latest["OBV"]) if pd.notna(latest["OBV"]) else np.nan
+        obv_ema = float(latest["OBV_EMA"]) if pd.notna(latest["OBV_EMA"]) else np.nan
+        vol = float(latest["Volume"])
+        vol_ma = float(latest["VolMA20"]) if pd.notna(latest["VolMA20"]) else 0.0
+
+        # ===== CONDITIONS =====
+        cond_price = close_now > ema9 > ma20
+        cond_obv = obv > obv_ema
+        cond_slope = ema9 > float(df["EMA9"].iloc[-3])
+        cond_rsi_turn = rsi > float(df["RSI"].iloc[-3]) if pd.notna(df["RSI"].iloc[-3]) else False
+
+        # RS nội bộ đơn giản: giá hiện tại mạnh hơn MA20
+        cond_rs = close_now > ma20 * 1.03 if ma20 and not np.isnan(ma20) else False
+
+        dist_ma20 = abs(close_now - ma20) / ma20 if ma20 and not np.isnan(ma20) else 0
+
+        # ===== PERFORMANCE =====
+        ret_20d = (close_now / float(df["Close"].iloc[-20]) - 1) if len(df) > 20 else 0
+        ret_60d = (close_now / float(df["Close"].iloc[-60]) - 1) if len(df) > 60 else 0
+
+        # ===== VOLUME =====
+        vol_dry = vol_ma > 0 and vol < vol_ma * 0.8
+        vol_break = vol_ma > 0 and vol > vol_ma * 1.5
+
+        # ===== MONEY FLOW =====
+        money_score = (vol / vol_ma) if vol_ma > 0 else 1
+
+        # ===== BASE =====
+        high_15 = float(df["High"].rolling(15).max().iloc[-1])
+        low_15 = float(df["Low"].rolling(15).min().iloc[-1])
+        price_range = (high_15 - low_15) / close_now if close_now > 0 else 0
+        tight_base = price_range < 0.15
+
+        # ===== BREAK =====
+        prev_high_20 = float(df["High"].rolling(20).max().iloc[-2]) if len(df) > 21 else high_15
+        break_strong = close_now >= prev_high_20 * 0.98 and vol_break
+
+        # ===== EXTENDED =====
+        too_extended = dist_ma20 > 0.15
+
+        # ==============================
+        # 🧠 LEADER SCORE
+        # ==============================
+        leader_score = 0
+        if ret_20d > 0.15:
+            leader_score += 1
+        if ret_60d > 0.3:
+            leader_score += 1
+        if money_score > 1.2:
+            leader_score += 1
+        if cond_rs:
+            leader_score += 1
+        if cond_obv:
+            leader_score += 1
+
+        # ==============================
+        # 🧠 STAGE
+        # ==============================
+        if ret_20d < 0.1 and tight_base:
+            stage = "B1-TÍCH LŨY"
+        elif ret_20d >= 0.1 and ret_20d < 0.25 and leader_score >= 2:
+            stage = "B2-ĐANG VÀO SÓNG"
+        elif ret_20d >= 0.25 and leader_score >= 3 and not too_extended:
+            stage = "B3-LEADER"
+        elif too_extended:
+            stage = "B3-QUÁ XA"
+        else:
+            stage = "NONE"
+
+        # ==============================
+        # 🧠 CLASSIFY
+        # ==============================
+        if not cond_price or not cond_obv or not cond_slope:
+            status = "LOẠI"
+
+        elif (
+            ret_20d < 0.1
+            and rsi < 55
+            and tight_base
+            and vol_dry
+        ):
+            status = "EARLY REVERSAL"
+
+        elif (
+            leader_score >= 3
+            and rsi > 58
+            and cond_price
+            and cond_obv
+            and cond_slope
+            and (break_strong or ret_20d > 0.15)
+        ):
+            status = "ƯU TIÊN MUA"
+
+        elif ret_20d > 0.35:
+            status = "THEO DÕI"
+
+        else:
+            status = "THEO DÕI"
+
+        # ==============================
+        # SCORE
+        # ==============================
+        score = leader_score + (1 if cond_price else 0) + (1 if cond_rsi_turn else 0)
+        gold_score = score * market_score
+
+        return {
+            "Sector": sector_map.get(symbol, "KHÁC"),
+            "Ticker": symbol,
+            "Close": round(close_now, 2),
+            "EMA9": round(ema9, 2),
+            "MA20": round(ma20, 2) if not np.isnan(ma20) else None,
+            "RSI": round(rsi, 2) if not np.isnan(rsi) else None,
+            "Leader Score": leader_score,
+            "Base": "✔" if tight_base else "✖",
+            "Cạn cung": "✔" if vol_dry else "✖",
+            "Break": "✔" if break_strong else "✖",
+            "Top tuần": "✔" if symbol in top_week else "✖",
+            "Top tháng": "✔" if symbol in top_month else "✖",
+            "Money+": "✔" if money_score > 1.2 else "✖",
+            "Ret 20D %": round(ret_20d * 100, 1),
+            "Ret 60D %": round(ret_60d * 100, 1),
+            "Stage": stage,
+            "Score": score,
+            "Gold Score": gold_score,
+            "Status": status,
+        }
+
+    except Exception:
+        return None
+
+# =========================
+# RUN
+# =========================
+if st.button("🚀 Quét V13"):
+    results = []
+    progress = st.progress(0)
+
+    for i, symbol in enumerate(watchlist):
+        row = analyze_stock(symbol)
+        if row:
+            results.append(row)
+        progress.progress((i + 1) / len(watchlist))
+
+    if not results:
+        st.warning("Không có dữ liệu.")
+        st.stop()
+
+    df_res = pd.DataFrame(results)
+    df_res = df_res.sort_values(by=["Gold Score", "Leader Score", "Score"], ascending=False)
+
+    display_cols = [
+        "Sector", "Ticker", "Close", "EMA9", "MA20", "RSI",
+        "Leader Score", "Base", "Cạn cung", "Break",
+        "Top tuần", "Top tháng", "Money+",
+        "Ret 20D %", "Ret 60D %",
+        "Stage", "Score", "Gold Score", "Status"
+    ]
+
+    st.subheader("📊 Kết quả tổng hợp")
+    st.dataframe(df_res[display_cols], use_container_width=True)
+
+    st.subheader("🔥 Nhóm ƯU TIÊN MUA")
+    st.dataframe(df_res[df_res["Status"] == "ƯU TIÊN MUA"][display_cols].head(top_n), use_container_width=True)
+
+    st.subheader("👀 Nhóm THEO DÕI")
+    st.dataframe(df_res[df_res["Status"] == "THEO DÕI"][display_cols], use_container_width=True)
+
+    st.subheader("🌱 Nhóm EARLY REVERSAL")
+    st.dataframe(df_res[df_res["Status"] == "EARLY REVERSAL"][display_cols], use_container_width=True)
+
+    st.subheader("❌ LOẠI")
+    st.dataframe(df_res[df_res["Status"] == "LOẠI"][display_cols], use_container_width=True)
+
+else:
+    st.info("Bấm 'Quét V13' để chạy scanner.")
