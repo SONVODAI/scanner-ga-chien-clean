@@ -4,58 +4,98 @@ import yfinance as yf
 
 st.set_page_config(page_title="Scanner Gà Chiến", layout="centered")
 
-st.title("🐔 Scanner Gà Chiến")
+st.title("🐔 Scanner Gà Chiến PRO")
 
-ticker = st.text_input("Nhập mã cổ phiếu (ví dụ: FPT.VN, HPG.VN):").upper().strip()
+# ===== INPUT =====
+tickers_input = st.text_area(
+    "Nhập danh sách mã (mỗi dòng 1 mã, ví dụ: HPG.VN)",
+    value="HPG.VN\nFPT.VN\nMWG.VN\nSSI.VN"
+)
 
-if ticker:
-    df = yf.download(ticker, period="6mo", auto_adjust=False, progress=False)
+tickers = [t.strip().upper() for t in tickers_input.split("\n") if t.strip()]
 
-    if df is None or df.empty:
-        st.error("❌ Không lấy được dữ liệu. Hãy thử mã như HPG.VN")
-    else:
+results = []
+
+# ===== LOOP QUÉT =====
+for ticker in tickers:
+    try:
+        df = yf.download(ticker, period="6mo", progress=False)
+
+        if df is None or df.empty or "Close" not in df.columns:
+            continue
+
         close = df["Close"]
 
-        # Nếu yfinance trả về DataFrame nhiều tầng thì lấy cột đầu tiên
+        # Fix trường hợp MultiIndex
         if isinstance(close, pd.DataFrame):
             close = close.iloc[:, 0]
 
         close = pd.to_numeric(close, errors="coerce").dropna()
 
         if close.empty:
-            st.error("❌ Không có dữ liệu giá đóng cửa.")
+            continue
+
+        # ===== EMA9 =====
+        ema9 = close.ewm(span=9, adjust=False).mean()
+
+        # ===== RSI =====
+        delta = close.diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
+        avg_gain = gain.rolling(14).mean()
+        avg_loss = loss.rolling(14).mean()
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+
+        latest_close = close.iloc[-1]
+        latest_ema9 = ema9.iloc[-1]
+        latest_rsi = rsi.iloc[-1]
+
+        # ===== CHẤM ĐIỂM =====
+        score = 0
+
+        if latest_close > latest_ema9:
+            score += 1
+
+        if latest_rsi > 55:
+            score += 1
+
+        if latest_rsi > rsi.rolling(9).mean().iloc[-1]:
+            score += 1
+
+        # ===== XẾP LOẠI =====
+        if score == 3:
+            status = "🟩 Gà chiến"
+        elif score == 2:
+            status = "🟨 Theo dõi"
         else:
-            ema9 = close.ewm(span=9, adjust=False).mean()
+            status = "🟥 Loại"
 
-            delta = close.diff()
-            gain = delta.clip(lower=0)
-            loss = -delta.clip(upper=0)
-            avg_gain = gain.rolling(14).mean()
-            avg_loss = loss.rolling(14).mean()
-            rs = avg_gain / avg_loss
-            rsi = 100 - (100 / (1 + rs))
+        results.append({
+            "Ticker": ticker,
+            "Close": round(float(latest_close), 2),
+            "EMA9": round(float(latest_ema9), 2),
+            "RSI": round(float(latest_rsi), 2),
+            "Score": score,
+            "Status": status
+        })
 
-            chart_df = pd.DataFrame({
-                "Close": close,
-                "EMA9": ema9
-            })
+    except:
+        continue
 
-            st.line_chart(chart_df)
+# ===== HIỂN THỊ =====
+if results:
+    df_result = pd.DataFrame(results)
 
-            latest_close = float(close.iloc[-1])
-            latest_ema9 = float(ema9.iloc[-1])
-            latest_rsi = float(rsi.iloc[-1]) if pd.notna(rsi.iloc[-1]) else None
+    # Sắp xếp mạnh → yếu
+    df_result = df_result.sort_values(by="Score", ascending=False)
 
-            st.write("### 📊 Kết quả:")
+    st.write("## 📊 Kết quả quét")
+    st.dataframe(df_result, use_container_width=True)
 
-            if latest_close > latest_ema9:
-                st.success("✅ Giá trên EMA9 → Xu hướng OK")
-            else:
-                st.error("❌ Giá dưới EMA9 → Chưa đạt")
+    # Top gà chiến
+    st.write("## 🔥 Top Gà Chiến")
+    st.dataframe(df_result[df_result["Score"] == 3])
 
-            if latest_rsi is None:
-                st.warning("⚠️ RSI chưa đủ dữ liệu")
-            elif latest_rsi > 55:
-                st.success("✅ RSI > 55 → Mạnh")
-            else:
-                st.warning("⚠️ RSI yếu")
+else:
+    st.warning("⚠️ Không có dữ liệu hợp lệ")
