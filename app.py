@@ -2,10 +2,18 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import yfinance as yf
+import time
 
-st.set_page_config(page_title="Scanner Gà Chiến V13", layout="wide")
+st.set_page_config(page_title="Scanner Gà Chiến V14", layout="wide")
 
-st.title("🐔 Scanner Gà Chiến V13 – Leader Filter")
+st.title("🐔 Scanner Gà Chiến V14 – Nuôi Gà Chiến Final")
+
+# =========================
+# AUTO REFRESH 5 PHÚT
+# =========================
+st.caption("⏱ Ứng dụng tự cập nhật mỗi 5 phút.")
+time.sleep(300)
+st.rerun()
 
 # =========================
 # SIDEBAR
@@ -76,11 +84,22 @@ sector_map = {
 # DATA FUNCTIONS
 # =========================
 @st.cache_data(ttl=300)
-def fetch_data(symbol: str):
+def fetch_daily(symbol: str):
     return yf.download(
         symbol,
         period="9mo",
         interval="1d",
+        progress=False,
+        auto_adjust=False,
+        threads=False
+    )
+
+@st.cache_data(ttl=300)
+def fetch_intraday(symbol: str):
+    return yf.download(
+        symbol,
+        period="5d",
+        interval="15m",
         progress=False,
         auto_adjust=False,
         threads=False
@@ -106,7 +125,7 @@ def calc_obv(close: pd.Series, volume: pd.Series):
 # =========================
 def analyze_stock(symbol: str):
     try:
-        raw = fetch_data(symbol)
+        raw = fetch_daily(symbol)
         if raw is None or raw.empty or len(raw) < 80:
             return None
 
@@ -125,7 +144,7 @@ def analyze_stock(symbol: str):
         if len(df) < 80:
             return None
 
-        # ===== INDICATORS =====
+        # ===== DAILY INDICATORS =====
         df["EMA9"] = df["Close"].ewm(span=9, adjust=False).mean()
         df["MA20"] = df["Close"].rolling(20).mean()
         df["RSI"] = compute_rsi(df["Close"])
@@ -151,7 +170,7 @@ def analyze_stock(symbol: str):
         cond_slope = ema9 > float(df["EMA9"].iloc[-3])
         cond_rsi_turn = rsi > float(df["RSI"].iloc[-3]) if pd.notna(df["RSI"].iloc[-3]) else False
 
-        # RS nội bộ đơn giản: giá hiện tại mạnh hơn MA20
+        # RS đơn giản
         cond_rs = close_now > ma20 * 1.03 if ma20 and not np.isnan(ma20) else False
 
         dist_ma20 = abs(close_now - ma20) / ma20 if ma20 and not np.isnan(ma20) else 0
@@ -180,8 +199,25 @@ def analyze_stock(symbol: str):
         # ===== EXTENDED =====
         too_extended = dist_ma20 > 0.15
 
+        # ===== INTRADAY CONFIRM =====
+        intraday_ok = False
+        try:
+            intra = fetch_intraday(symbol)
+            if intra is not None and not intra.empty and len(intra) > 10:
+                intra_close = normalize_series(intra["Close"]).dropna()
+                intra_vol = normalize_series(intra["Volume"]).reindex(intra_close.index)
+                if len(intra_close) > 10:
+                    intra_ema9 = intra_close.ewm(span=9, adjust=False).mean()
+                    intra_obv = calc_obv(intra_close, intra_vol)
+                    intraday_ok = (
+                        intra_close.iloc[-1] > intra_ema9.iloc[-1]
+                        and intra_obv.iloc[-1] > intra_obv.iloc[-3]
+                    )
+        except Exception:
+            intraday_ok = False
+
         # ==============================
-        # 🧠 LEADER SCORE
+        # LEADER SCORE
         # ==============================
         leader_score = 0
         if ret_20d > 0.15:
@@ -194,15 +230,21 @@ def analyze_stock(symbol: str):
             leader_score += 1
         if cond_obv:
             leader_score += 1
+        if symbol in top_week:
+            leader_score += 1
+        if symbol in top_month:
+            leader_score += 1
+        if intraday_ok:
+            leader_score += 1
 
         # ==============================
-        # 🧠 STAGE
+        # STAGE
         # ==============================
         if ret_20d < 0.1 and tight_base:
             stage = "B1-TÍCH LŨY"
-        elif ret_20d >= 0.1 and ret_20d < 0.25 and leader_score >= 2:
+        elif ret_20d >= 0.1 and ret_20d < 0.25 and leader_score >= 3:
             stage = "B2-ĐANG VÀO SÓNG"
-        elif ret_20d >= 0.25 and leader_score >= 3 and not too_extended:
+        elif ret_20d >= 0.25 and leader_score >= 4 and not too_extended:
             stage = "B3-LEADER"
         elif too_extended:
             stage = "B3-QUÁ XA"
@@ -210,11 +252,10 @@ def analyze_stock(symbol: str):
             stage = "NONE"
 
         # ==============================
-        # 🧠 CLASSIFY
+        # STATUS
         # ==============================
         if not cond_price or not cond_obv or not cond_slope:
             status = "LOẠI"
-
         elif (
             ret_20d < 0.1
             and rsi < 55
@@ -222,9 +263,8 @@ def analyze_stock(symbol: str):
             and vol_dry
         ):
             status = "EARLY REVERSAL"
-
         elif (
-            leader_score >= 3
+            leader_score >= 4
             and rsi > 58
             and cond_price
             and cond_obv
@@ -232,12 +272,49 @@ def analyze_stock(symbol: str):
             and (break_strong or ret_20d > 0.15)
         ):
             status = "ƯU TIÊN MUA"
-
         elif ret_20d > 0.35:
             status = "THEO DÕI"
-
         else:
             status = "THEO DÕI"
+
+        # ==============================
+        # TRẠNG THÁI GÀ
+        # ==============================
+        if stage == "B1-TÍCH LŨY":
+            chicken = "🐣 Gà con"
+        elif stage == "B2-ĐANG VÀO SÓNG":
+            chicken = "🐥 Gà chạy"
+        elif stage == "B3-LEADER":
+            chicken = "🐔 Gà chiến"
+        elif stage == "B3-QUÁ XA":
+            chicken = "⚠️ Gà bay cao"
+        else:
+            chicken = "❌"
+
+        # ==============================
+        # HÀNH ĐỘNG
+        # ==============================
+        if market_score < 8:
+            action = "Đứng ngoài"
+        else:
+            if status == "ƯU TIÊN MUA" and stage == "B2-ĐANG VÀO SÓNG":
+                action = "👉 MUA CHÍNH"
+            elif status == "ƯU TIÊN MUA" and stage == "B3-LEADER":
+                action = "👉 GIỮ / ADD"
+            elif status == "THEO DÕI":
+                action = "👀 CANH PULL"
+            elif status == "EARLY REVERSAL":
+                action = "🌱 MUA THĂM DÒ"
+            elif stage == "B3-QUÁ XA":
+                action = "⛔ KHÔNG ĐU"
+            else:
+                action = "❌ BỎ"
+
+        # ==============================
+        # ĐIỂM MUA / CUTLOSS
+        # ==============================
+        buy_zone = round(ema9, 2)
+        cut_loss = round(ma20, 2) if not np.isnan(ma20) else None
 
         # ==============================
         # SCORE
@@ -258,10 +335,15 @@ def analyze_stock(symbol: str):
             "Break": "✔" if break_strong else "✖",
             "Top tuần": "✔" if symbol in top_week else "✖",
             "Top tháng": "✔" if symbol in top_month else "✖",
+            "Intraday": "✔" if intraday_ok else "✖",
             "Money+": "✔" if money_score > 1.2 else "✖",
             "Ret 20D %": round(ret_20d * 100, 1),
             "Ret 60D %": round(ret_60d * 100, 1),
             "Stage": stage,
+            "Trạng thái gà": chicken,
+            "Hành động": action,
+            "Điểm mua": buy_zone,
+            "Cutloss": cut_loss,
             "Score": score,
             "Gold Score": gold_score,
             "Status": status,
@@ -273,7 +355,9 @@ def analyze_stock(symbol: str):
 # =========================
 # RUN
 # =========================
-if st.button("🚀 Quét V13"):
+run_scan = st.button("🚀 Quét V14")
+
+if run_scan:
     results = []
     progress = st.progress(0)
 
@@ -288,30 +372,46 @@ if st.button("🚀 Quét V13"):
         st.stop()
 
     df_res = pd.DataFrame(results)
-    df_res = df_res.sort_values(by=["Gold Score", "Leader Score", "Score"], ascending=False)
+    df_res = df_res.sort_values(
+        by=["Gold Score", "Leader Score", "Score", "Ret 20D %"],
+        ascending=False
+    )
 
     display_cols = [
         "Sector", "Ticker", "Close", "EMA9", "MA20", "RSI",
         "Leader Score", "Base", "Cạn cung", "Break",
-        "Top tuần", "Top tháng", "Money+",
+        "Top tuần", "Top tháng", "Intraday", "Money+",
         "Ret 20D %", "Ret 60D %",
-        "Stage", "Score", "Gold Score", "Status"
+        "Stage", "Trạng thái gà", "Hành động",
+        "Điểm mua", "Cutloss", "Score", "Gold Score", "Status"
     ]
 
     st.subheader("📊 Kết quả tổng hợp")
     st.dataframe(df_res[display_cols], use_container_width=True)
 
     st.subheader("🔥 Nhóm ƯU TIÊN MUA")
-    st.dataframe(df_res[df_res["Status"] == "ƯU TIÊN MUA"][display_cols].head(top_n), use_container_width=True)
+    st.dataframe(
+        df_res[df_res["Status"] == "ƯU TIÊN MUA"][display_cols].head(top_n),
+        use_container_width=True
+    )
 
     st.subheader("👀 Nhóm THEO DÕI")
-    st.dataframe(df_res[df_res["Status"] == "THEO DÕI"][display_cols], use_container_width=True)
+    st.dataframe(
+        df_res[df_res["Status"] == "THEO DÕI"][display_cols],
+        use_container_width=True
+    )
 
     st.subheader("🌱 Nhóm EARLY REVERSAL")
-    st.dataframe(df_res[df_res["Status"] == "EARLY REVERSAL"][display_cols], use_container_width=True)
+    st.dataframe(
+        df_res[df_res["Status"] == "EARLY REVERSAL"][display_cols],
+        use_container_width=True
+    )
 
     st.subheader("❌ LOẠI")
-    st.dataframe(df_res[df_res["Status"] == "LOẠI"][display_cols], use_container_width=True)
+    st.dataframe(
+        df_res[df_res["Status"] == "LOẠI"][display_cols],
+        use_container_width=True
+    )
 
 else:
-    st.info("Bấm 'Quét V13' để chạy scanner.")
+    st.info("Bấm 'Quét V14' để chạy scanner.")
