@@ -36,7 +36,7 @@ top_n = st.sidebar.slider("Top toàn thị trường", 3, 15, 5)
 # =========================
 watchlist_text = st.text_area(
     "Danh sách mã theo dõi",
-    """VCB, BID, CTG, TCB, MBB, VPB, STB, HDB, ACB, SHB, TPB, LPB, EIB, ABB, MSB, KLB, EVF
+    """VCB, BID, CTG, TCB, MBB, VPB, STB, HDB, ACB, SHB, TPB, LPB, EIB, ABB, MSB, KLB, EVF, VNINDEX
 SSI, VIX, SHS, MBS, HCM, VCI, VND, CTS, FTS, BSI, BVS, ORS, VDS, AGR
 VHM, NLG, KDH, CEO, CII, DXG, TCH, DPG, HDC, NVL, NTL, NHA, HUT, DIG, PDR, DXS, VIC, VPL,VRE
 VGC, IDC, KBC, SZC, BCM, LHG, IJC, GVR, PHR, DPR, SIP, TRC, DRC, CSM
