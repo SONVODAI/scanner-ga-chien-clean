@@ -96,11 +96,15 @@ def normalize_series(x):
 
 def compute_rsi(close: pd.Series):
     delta = close.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-    rs = gain / loss
-    return 100 - (100 / (1 + rs))
 
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+
+    avg_gain = gain.ewm(alpha=1/14, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
+
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
 def calc_obv(close: pd.Series, volume: pd.Series):
     return (np.sign(close.diff()) * volume).fillna(0).cumsum()
 
