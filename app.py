@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from vnstock import Quote
+import yfinance as yf
 
 st.set_page_config(layout="wide")
 
@@ -27,21 +27,20 @@ WATCHLIST = [
 @st.cache_data(ttl=900)
 def fetch_data(symbol):
     try:
-        today = datetime.now().strftime("%Y-%m-%d")
-
-        quote = Quote(symbol=symbol, source="VCI")
-        df = quote.history(start="2023-01-01", end=today, interval="1D")
+        df = yf.download(symbol + ".VN", period="6mo", progress=False)
 
         if df is None or df.empty:
             return pd.DataFrame()
 
-        # chuẩn hóa cột
         df = df.rename(columns={
-            "time": "date",
-            "close": "close",
-            "volume": "volume"
+            "Close": "close",
+            "Volume": "volume"
         })
 
+        return df
+
+    except:
+        return pd.DataFrame()
         return df
 
     except:
