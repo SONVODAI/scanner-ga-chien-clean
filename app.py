@@ -359,9 +359,7 @@ def analyze_stock(symbol: str):
 
         score = leader_score + int(cond_price) + int(cond_rsi_turn)
         gold_score = score * market_score
-        "Buy Code": buy_code if buy_code else "",
-        "Buy Signal": buy_note,
-        "Can Buy": "MUA" if buy_code else "",
+        
         return {
             "Sector": sector_map.get(symbol, "KHÁC"),
             "Ticker": symbol,
@@ -387,8 +385,10 @@ def analyze_stock(symbol: str):
             "Score": score,
             "Gold Score": gold_score,
             "Status": status,
-        }
-
+            "Buy Code": buy_code if buy_code else "",
+            "Buy Signal": buy_note,
+            "Can Buy": "MUA" if buy_code else "",
+            }
     except Exception:
         return None
 
