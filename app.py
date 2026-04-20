@@ -2,23 +2,22 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import yfinance as yf
+from vnstock import stock_historical_data
 
 st.set_page_config(layout="wide")
 
 # ================= WATCHLIST =================
 WATCHLIST = [
-"VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","TPB","LPB","EIB","MSB","VIB","OCB",
-"SSI","VIX","SHS","HCM","VCI","VND","FTS","BSI",
-"VHM","VIC","NLG","KDH","DXG","TCH","DIG","PDR","NVL","VRE",
-"MWG","DGW","FRT","PET","PNJ","MSN",
-"REE","GEX","PC1","HDG","POW",
-"DPM","DCM","DGC","BFC",
-"BSR","PVS","PVD","PLX","GAS",
-"HAH","GMD","VSC","HVN","VJC",
-"FPT","CTR","VGI",
+"VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB",
+"SSI","VIX","SHS","HCM","VCI","VND",
+"VHM","VIC","DXG","DIG","NVL",
+"MWG","FRT","PNJ",
+"REE","GEX","PC1",
+"DGC","DCM","DPM",
+"BSR","PVS","GAS",
+"GMD","HAH","VSC",
+"FPT","CTR",
 "VHC","ANV",
-"CTD","HHV","FCN","VCG",
 "HPG","HSG","NKG"
 ]
 
@@ -26,14 +25,20 @@ WATCHLIST = [
 @st.cache_data(ttl=600)
 def fetch_data(symbol):
     try:
-        df = yf.download(symbol + ".VN", period="6mo", progress=False)
+        df = stock_historical_data(
+            symbol=symbol,
+            start_date="2023-01-01",
+            end_date=datetime.now().strftime("%Y-%m-%d"),
+            resolution="1D",
+            type="stock"
+        )
 
         if df is None or df.empty:
             return pd.DataFrame()
 
         df = df.rename(columns={
-            "Close": "close",
-            "Volume": "volume"
+            "close": "close",
+            "volume": "volume"
         })
 
         return df
@@ -58,6 +63,7 @@ def calc_indicators(df):
         df["OBV_EMA"] = df["OBV"].ewm(span=9).mean()
 
         return df
+
     except:
         return pd.DataFrame()
 
@@ -75,13 +81,13 @@ def classify(row):
 
         dist = (price - ema9) / ema9 * 100
 
-        if rsi >= 70 and price > ema9 and obv > obv_ema:
+        if rsi >= 65 and price > ema9 and obv > obv_ema:
             return "STRONG_TREND"
 
-        elif 60 <= rsi < 70 and abs(dist) < 4:
+        elif 55 <= rsi < 65:
             return "BUY_PULL"
 
-        elif 45 < rsi < 60:
+        elif 45 < rsi < 55:
             return "BUY_EARLY"
 
         elif rsi >= 75:
@@ -97,13 +103,14 @@ def classify(row):
         return "AVOID"
 
 # ================= UI =================
-st.title("🔥 SCANNER GÀ CHIẾN V15 FINAL")
+st.title("🔥 SCANNER GÀ CHIẾN V16 PRO (VN DATA)")
 
 if st.button("🚀 SCAN"):
 
     results = []
 
     for symbol in WATCHLIST:
+
         df = fetch_data(symbol)
 
         if df.empty:
