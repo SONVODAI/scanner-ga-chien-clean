@@ -144,10 +144,10 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         }, inplace=True)
 
         df["Date"] = pd.to_datetime(df["date"])
-        df.set_index("Date", inplace=True)
+       df.set_index("Date", inplace=True)
 
-        return df
-def fetch_daily(symbol: str) -> pd.DataFrame:
+
+def fetch_daily(symbol: str) -> pd.DataFrame:    
     try:
         df = yf.download(symbol + ".VN", period="6mo", progress=False)
 
