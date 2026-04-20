@@ -28,7 +28,7 @@ WATCHLIST = [
 def fetch_data(symbol):
     try:
         df = yf.download(symbol + ".VN", period="6mo", progress=False, auto_adjust=True)
-             st.write(symbol, df.shape)
+            
         if df is None or df.empty:
             return pd.DataFrame()
 
