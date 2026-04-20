@@ -247,7 +247,6 @@ def analyze_stock(symbol: str):
         high = normalize_series(raw["High"]).reindex(close.index)
         low = normalize_series(raw["Low"]).reindex(close.index)
         volume = normalize_series(raw["Volume"]).reindex(close.index)
-
         df = pd.DataFrame({
             "Close": close,
             "High": high,
@@ -271,7 +270,6 @@ def analyze_stock(symbol: str):
 
         close_now = float(latest["Close"])
         ema9 = float(latest["EMA9"])
-        ma20 = float(latest["MA20"]) if pd.notna(latest["MA20"]) else np.nan
         rsi = float(latest["RSI"]) if pd.notna(latest["RSI"]) else np.nan
         obv = float(latest["OBV"]) if pd.notna(latest["OBV"]) else np.nan
         obv_ema = float(latest["OBV_EMA"]) if pd.notna(latest["OBV_EMA"]) else np.nan
@@ -282,11 +280,11 @@ def analyze_stock(symbol: str):
         # =========================
         buy_code, buy_note = check_buy_trigger(df)
         # trend
-        cond_price = close_now > ema9 > ma20 if not np.isnan(ma20) else False
+        cond_price = (close_now > ema9 and ema9 > ma20) if not np.isnan(ma20) else False
         cond_obv = obv > obv_ema if not np.isnan(obv_ema) else False
         cond_slope = ema9 > float(df["EMA9"].iloc[-3])
-        cond_rsi_turn = rsi > float(df["RSI"].iloc[-3]) if pd.notna(df["RSI"].iloc[-3]) else False
-        cond_rs = close_now > ma20 * 1.03 if not np.isnan(ma20) else False
+        cond_rsi_turn = rsi > float(df["RSI"].iloc[-3]) if len(df) > 3 and pd.notna(df["RSI"].iloc[-3]) else False
+        cond_rs = (close_now > ma20 * 1.03) if not np.isnan(ma20) else False
 
         dist_ma20 = (close_now - ma20) / ma20 if not np.isnan(ma20) and ma20 != 0 else 0.0
         too_extended = dist_ma20 > 0.15
