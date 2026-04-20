@@ -113,7 +113,6 @@ def format_pct(x) -> str:
 # DATA FETCH
 # =========================================================
 @st.cache_data(ttl=300)
-import requests
 
 @st.cache_data(ttl=300)
 def fetch_daily(symbol: str) -> pd.DataFrame:
