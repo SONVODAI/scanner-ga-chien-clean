@@ -139,15 +139,8 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         df.set_index("Date", inplace=True)
 
         return df
-
-    except:
-        return pd.DataFrame()
     except Exception:
-        return pd.DataFrame()
-        return df
-
-    except Exception:
-        return pd.DataFrame()    
+        return pd.DataFrame()   
 # =========================================================
 # INDICATORS
 # =========================================================
