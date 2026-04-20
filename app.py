@@ -316,9 +316,9 @@ try:
                 iclose.iloc[-1] > iema9.iloc[-1]
                 and iobv.iloc[-1] > iobv.iloc[-3]
             )
+intraday_ok = False
 
-except Exception:
-    intraday_ok = False try:
+try:
     intra = fetch_intraday(symbol)
 
     if intra is not None and not intra.empty and len(intra) > 10:
@@ -336,8 +336,6 @@ except Exception:
 
 except Exception:
     intraday_ok = False
-
-
 # ===== leader score =====
 leader_score = 0
 
