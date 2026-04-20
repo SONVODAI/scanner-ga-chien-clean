@@ -115,6 +115,7 @@ def format_pct(x) -> str:
 @st.cache_data(ttl=300)
 
 @st.cache_data(ttl=300)
+@st.cache_data(ttl=300)
 def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
         # ===== 1. TRY YFINANCE =====
@@ -122,42 +123,34 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         if df is not None and not df.empty:
             return df
 
-        # ===== 2. FALLBACK: FIREANT API =====
+        # ===== 2. FALLBACK: FIREANT =====
         url = f"https://restv2.fireant.vn/symbols/{symbol}/prices?startDate=2023-01-01"
         res = requests.get(url)
-        
-       if res.status_code != 200:
-    return pd.DataFrame()
 
-data = res.json()
-if not data:
-    return pd.DataFrame()
-
-try:
-    df = pd.DataFrame(data)
-
-    df.rename(columns={
-        "open": "Open",
-        "close": "Close",
-        "high": "High",
-        "low": "Low",
-        "volume": "Volume"
-    }, inplace=True)
-
-    df["Date"] = pd.to_datetime(df["date"] if "date" in df.columns else df["Date"])
-    df.set_index("Date", inplace=True)
-
-    return df
-
-except Exception:
-    return pd.DataFrame()
-def fetch_daily(symbol: str) -> pd.DataFrame:
-    try:
-        df = yf.download(symbol + ".VN", period="6mo", progress=False)
-
-        if df is None or df.empty:
+        if res.status_code != 200:
             return pd.DataFrame()
 
+        data = res.json()
+        if not data:
+            return pd.DataFrame()
+
+        df = pd.DataFrame(data)
+
+        df.rename(columns={
+            "open": "Open",
+            "close": "Close",
+            "high": "High",
+            "low": "Low",
+            "volume": "Volume"
+        }, inplace=True)
+
+        df["Date"] = pd.to_datetime(df["date"] if "date" in df.columns else df["Date"])
+        df.set_index("Date", inplace=True)
+
+        return df
+
+    except Exception:
+        return pd.DataFrame()
         return df
 
     except Exception:
