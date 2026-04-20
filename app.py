@@ -115,17 +115,24 @@ def format_pct(x) -> str:
 @st.cache_data(ttl=300)
 def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
-        url = f"https://restv2.fireant.vn/symbols/{symbol}/prices?startDate=2023-01-01"
-        res = requests.get(url)
+        df = pd.read_csv("data.csv")
+        df = df[df["symbol"] == symbol]
 
-        if res.status_code != 200:
+        if df.empty:
             return pd.DataFrame()
 
-        data = res.json()
-        if not data:
-            return pd.DataFrame()
+        df["Date"] = pd.Timestamp.today()
+        df.set_index("Date", inplace=True)
 
-        df = pd.DataFrame(data)
+        df.rename(columns={
+            "close": "Close",
+            "volume": "Volume"
+        }, inplace=True)
+
+        return df
+
+    except:
+        return pd.DataFrame()       df = pd.DataFrame(data)
 
         df.rename(columns={
             "open": "Open",
