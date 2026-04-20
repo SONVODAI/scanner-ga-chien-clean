@@ -28,7 +28,7 @@ WATCHLIST = [
 def fetch_data(symbol):
     try:
         df = yf.download(symbol + ".VN", period="6mo", progress=False, auto_adjust=True)
-            
+
         if df is None or df.empty:
             return pd.DataFrame()
 
@@ -37,11 +37,10 @@ def fetch_data(symbol):
             "Volume": "volume"
         })
 
-               return df
+        return df
 
     except Exception:
         return pd.DataFrame()
-
 # ============== INDICATORS ==============
 def calc_indicators(df):
     df = df.copy()
