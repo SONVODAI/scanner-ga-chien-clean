@@ -339,17 +339,22 @@ try:
             )
 
 except Exception:
-    intraday_ok = False        # stage
-        if ret_20d < 0.10 and tight_base:
-            stage = "B1-TÍCH LŨY"
-        elif ret_20d >= 0.10 and ret_20d < 0.25 and leader_score >= 3:
-            stage = "B2-ĐANG VÀO SÓNG"
-        elif ret_20d >= 0.25 and leader_score >= 4 and not too_extended:
-            stage = "B3-LEADER"
-        elif too_extended:
-            stage = "B3-QUÁ XA"
-        else:
-            stage = "NONE"
+    intraday_ok = False
+# ===== stage =====
+if ret_20d < 0.10 and tight_base:
+    stage = "B1-TÍCH LŨY"
+
+elif ret_20d >= 0.10 and ret_20d < 0.25 and leader_score >= 3:
+    stage = "B2-ĐANG VÀO SÓNG"
+
+elif ret_20d >= 0.25 and leader_score >= 4 and not too_extended:
+    stage = "B3-LEADER"
+
+elif too_extended:
+    stage = "B3-QUÁ XA"
+
+else:
+    stage = "NONE"
         # status
         # status (chuẩn hệ 4 trạng thái)
     if buy_code == "B2":
