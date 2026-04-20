@@ -115,7 +115,7 @@ def format_pct(x) -> str:
 @st.cache_data(ttl=300)
 def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
-        df = yf.download(symbol, period="8mo", progress=False, auto_adjust=False, threads=False)
+        df = yf.download(symbol + ".VN", period="8mo", progress=False, auto_adjust=False, threads=False)
         if df is None or df.empty:
             return pd.DataFrame()
         return df
@@ -126,7 +126,7 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
 def fetch_intraday(symbol: str) -> pd.DataFrame:
     try:
         df = yf.download(
-            symbol,
+        symbol + ".VN",
             period="5d",
             interval="15m",
             progress=False,
