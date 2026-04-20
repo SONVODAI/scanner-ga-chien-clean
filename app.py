@@ -119,7 +119,61 @@ def fetch_daily(symbol: str):
         auto_adjust=False,
         threads=False,
     )
+# =========================
+# BUY TRIGGER REALTIME (B1-B2-B3)
+# =========================
+def check_buy_trigger(df):
+    latest = df.iloc[-1]
+    prev = df.iloc[-2]
 
+    close = latest["Close"]
+    ema9 = latest["EMA9"]
+    ma20 = latest["MA20"]
+    rsi = latest["RSI"]
+    rsi_ema = latest["RSI_EMA"]
+    obv = latest["OBV"]
+    obv_ema = latest["OBV_EMA"]
+    vol = latest["Volume"]
+    vol_ma = latest["VolMA20"]
+
+    # =====================
+    # B1 – Early
+    # =====================
+    if (
+        rsi > rsi_ema
+        and obv > obv_ema
+        and close > ema9
+        and vol > vol_ma * 0.8
+        and abs(close - ema9) / ema9 < 0.03
+    ):
+        return "B1", "Early bật lên"
+
+    # =====================
+    # B2 – Pullback đẹp
+    # =====================
+    if (
+        close > ema9 > ma20
+        and obv >= obv_ema
+        and rsi > 50
+        and abs(close - ema9) / ema9 < 0.02
+        and vol >= prev["Volume"]
+    ):
+        return "B2", "Pull EMA9 đẹp"
+
+    # =====================
+    # B3 – Breakout
+    # =====================
+    prev_high = df["High"].rolling(20).max().iloc[-2]
+
+    if (
+        close > prev_high
+        and vol > vol_ma * 1.5
+        and rsi > 60
+        and obv >= obv_ema
+    ):
+        return "B3", "Breakout mạnh"
+
+    return None, ""
 @st.cache_data(ttl=300)
 def fetch_intraday(symbol: str):
     return yf.download(
@@ -171,7 +225,10 @@ def analyze_stock(symbol: str):
         obv_ema = float(latest["OBV_EMA"]) if pd.notna(latest["OBV_EMA"]) else np.nan
         vol = float(latest["Volume"])
         vol_ma = float(latest["VolMA20"]) if pd.notna(latest["VolMA20"]) else 0.0
-
+        # =========================
+        # CHECK BUY SIGNAL
+        # =========================
+        buy_code, buy_note = check_buy_trigger(df)
         # trend
         cond_price = close_now > ema9 > ma20 if not np.isnan(ma20) else False
         cond_obv = obv > obv_ema if not np.isnan(obv_ema) else False
@@ -302,7 +359,9 @@ def analyze_stock(symbol: str):
 
         score = leader_score + int(cond_price) + int(cond_rsi_turn)
         gold_score = score * market_score
-
+        "Buy Code": buy_code if buy_code else "",
+        "Buy Signal": buy_note,
+        "Can Buy": "MUA" if buy_code else "",
         return {
             "Sector": sector_map.get(symbol, "KHÁC"),
             "Ticker": symbol,
@@ -342,7 +401,12 @@ if "prev_results" not in st.session_state:
 def build_alerts(current_df: pd.DataFrame):
     alerts = []
     prev_map = st.session_state["prev_results"]
+    # ALERT BUY REALTIME
+    buy_now = df_res[df_res["Can Buy"] == "MUA"]
 
+if not buy_now.empty:
+    st.subheader("🚀 TÍN HIỆU MUA REALTIME")
+    st.dataframe(buy_now[["Ticker","Buy Code","Buy Signal"]])
     for _, row in current_df.iterrows():
         ticker = row["Ticker"]
         current_status = row["Status"]
@@ -402,6 +466,9 @@ if run_scan:
         st.info("Chưa có tín hiệu mới so với lần quét trước.")
 
     display_cols = [
+        "Buy Code",
+        "Buy Signal",
+        "Can Buy",
         "Sector", "Ticker", "Close", "EMA9", "MA20", "RSI",
         "Leader Score", "Base", "Cạn cung", "Break",
         "Top tuần", "Top tháng", "Intraday", "Money+",
