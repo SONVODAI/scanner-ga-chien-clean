@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from vnstock import stock_historical_data
+import yfinance as yf
 
 st.set_page_config(layout="wide")
 
@@ -42,6 +42,27 @@ def fetch_data(symbol):
     except:
         return pd.DataFrame()
 # ================= INDICATORS =================
+# ============== DATA ==============
+@st.cache_data(ttl=600)
+def fetch_data(symbol):
+    try:
+        df = yf.download(symbol + ".VN", period="6mo", progress=False, auto_adjust=True)
+
+        if df is None or df.empty:
+            return pd.DataFrame()
+
+        df = df.rename(columns={
+            "Close": "close",
+            "Volume": "volume"
+        })
+
+        return df
+
+    except Exception:
+        return pd.DataFrame()
+
+
+# ============== INDICATORS ==============
 def calc_indicators(df):
     try:
         df = df.copy()
@@ -59,9 +80,8 @@ def calc_indicators(df):
 
         return df
 
-    except:
+    except Exception:
         return pd.DataFrame()
-
 # ================= CLASSIFY =================
 def classify(row):
     try:
