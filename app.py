@@ -358,7 +358,7 @@ def analyze_stock(symbol: str):
         else:
             stage = "NONE"
     # status
-     # status (chuẩn hệ 4 trạng thái)
+    # status (chuẩn hệ 4 trạng thái)
 if buy_code == "B2":
     status = "ƯU TIÊN MUA"
 
@@ -375,9 +375,7 @@ elif leader_score >= 4 and cond_price and cond_obv:
     status = "THEO DÕI"
 
 else:
-    status = "LOẠI"           else:
-            status = "THEO DÕI"
-
+    status = "LOẠI"
         # chicken state
         if stage == "B1-TÍCH LŨY":
             chicken = "🐣 Gà con"
