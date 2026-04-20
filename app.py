@@ -401,12 +401,7 @@ if "prev_results" not in st.session_state:
 def build_alerts(current_df: pd.DataFrame):
     alerts = []
     prev_map = st.session_state["prev_results"]
-    # ALERT BUY REALTIME
-    buy_now = df_res[df_res["Can Buy"] == "MUA"]
-
-if not buy_now.empty:
-    st.subheader("🚀 TÍN HIỆU MUA REALTIME")
-    st.dataframe(buy_now[["Ticker","Buy Code","Buy Signal"]])
+   
     for _, row in current_df.iterrows():
         ticker = row["Ticker"]
         current_status = row["Status"]
@@ -457,7 +452,14 @@ if run_scan:
     )
 
     alerts = build_alerts(df_res)
+    buy_now = df_res[df_res["Can Buy"] == "MUA"]
 
+    if not buy_now.empty:
+        st.subheader("🚀 TÍN HIỆU MUA REALTIME")
+        st.dataframe(
+          buy_now[["Ticker", "Buy Code", "Buy Signal"]],
+           use_container_width=True
+      )
     if alerts:
         st.subheader("🔔 Cảnh báo realtime")
         for msg in alerts:
