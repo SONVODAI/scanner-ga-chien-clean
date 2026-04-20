@@ -149,7 +149,8 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         return df
 
     except:
-        return pd.DataFrame()def fetch_intraday(symbol: str) -> pd.DataFrame:
+        return pd.DataFrame()
+        def fetch_intraday(symbol: str) -> pd.DataFrame:
     try:
         df = yf.download(
         symbol + ".VN",
