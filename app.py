@@ -426,6 +426,12 @@ def analyze_stock(symbol: str):
             "EMA9": round(ema9, 2),
             "MA20": round(ma20, 2) if not np.isnan(ma20) else None,
             "RSI": round(rsi, 2) if not np.isnan(rsi) else None,
+            obv = float(latest["OBV"]) if pd.notna(latest["OBV"]) else np.nan
+            obv_ema = float(latest["OBV_EMA"]) if pd.notna(latest["OBV_EMA"]) else np.nan
+            vol = float(latest["Volume"])
+            vol_ma = float(latest["VolMA20"]) if pd.notna(latest["VolMA20"]) else 0.0
+
+            cond_obv = obv >= obv_ema if not np.isnan(obv_ema) else False 
             "Leader Score": leader_score,
             "Base": "✔" if tight_base else "✖",
             "Cạn cung": "✔" if vol_dry else "✖",
