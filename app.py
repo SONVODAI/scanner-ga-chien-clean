@@ -297,9 +297,10 @@ ret_60d = (close_now / float(df["Close"].iloc[-60]) - 1) if len(df) > 60 else 0.
 vol_dry = vol_ma > 0 and vol < vol_ma * 0.8
 vol_break = vol_ma > 0 and vol > vol_ma * 1.5
 money_score = (vol / vol_ma) if vol_ma > 0 else 1.0
-
 # ===== intraday confirm =====
-intraday_ok = False 
+intraday_ok = False
+# ===== intraday confirm =====
+intraday_ok = False
 
 try:
     intra = fetch_intraday(symbol)
@@ -316,9 +317,9 @@ try:
                 iclose.iloc[-1] > iema9.iloc[-1]
                 and iobv.iloc[-1] > iobv.iloc[-3]
             )
-# ===== intraday confirm =====
-intraday_ok = False
 
+except Exception:
+    intraday_ok = False
 # ===== intraday confirm =====
 intraday_ok = False
 
