@@ -126,12 +126,12 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         url = f"https://restv2.fireant.vn/symbols/{symbol}/prices?startDate=2023-01-01"
         res = requests.get(url)
         
-        if res.status_code != 200:
-            return pd.DataFrame()
+       if res.status_code != 200:
+    return pd.DataFrame()
 
-        data = res.json()
-        if not data:
-            return pd.DataFrame()
+data = res.json()
+if not data:
+    return pd.DataFrame()
 
 try:
     df = pd.DataFrame(data)
