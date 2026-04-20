@@ -160,9 +160,9 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
                 auto_adjust=False,
                 threads=False
             )
-        if df is None or df.empty:
+            if df is None or df.empty:
             return pd.DataFrame()
-        return df
+            return df
     except Exception:
         return pd.DataFrame()
 
