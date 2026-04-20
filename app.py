@@ -147,25 +147,24 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         df.set_index("Date", inplace=True)
 
         return df
+def fetch_intraday(symbol: str) -> pd.DataFrame:
+    try:
+        df = yf.download(
+            symbol + ".VN",
+            period="5d",
+            interval="15m",
+            progress=False,
+            auto_adjust=False,
+            threads=False
+        )
 
-    except:
-        return pd.DataFrame()
-    def fetch_intraday(symbol: str) -> pd.DataFrame:
-        try:
-            df = yf.download(
-                symbol + ".VN",
-                period="5d",
-                interval="15m",
-                progress=False,
-                auto_adjust=False,
-                threads=False
-            )
-            if df is None or df.empty:
+        if df is None or df.empty:
             return pd.DataFrame()
-            return df
-    except Exception:
-        return pd.DataFrame()
 
+        return df
+
+    except Exception:
+        return pd.DataFrame()    
 # =========================================================
 # INDICATORS
 # =========================================================
