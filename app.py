@@ -290,17 +290,35 @@ def analyze_stock(symbol: str):
         too_extended = dist_ma20 > 0.15
 
         # returns
-        ret_20d = (close_now / float(df["Close"].iloc[-20]) - 1) if len(df) > 20 else 0.0
-        ret_60d = (close_now / float(df["Close"].iloc[-60]) - 1) if len(df) > 60 else 0.0
+       ret_20d = (close_now / float(df["Close"].iloc[-20]) - 1) if len(df) > 20 else 0.0
+ret_60d = (close_now / float(df["Close"].iloc[-60]) - 1) if len(df) > 60 else 0.0
 
-        # volume / money
-        vol_dry = vol_ma > 0 and vol < vol_ma * 0.8
-        vol_break = vol_ma > 0 and vol > vol_ma * 1.5
-        money_score = (vol / vol_ma) if vol_ma > 0 else 1.0
+# volume / money
+vol_dry = vol_ma > 0 and vol < vol_ma * 0.8
+vol_break = vol_ma > 0 and vol > vol_ma * 1.5
+money_score = (vol / vol_ma) if vol_ma > 0 else 1.0
+
 # ===== intraday confirm =====
 intraday_ok = False
 
 try:
+    intra = fetch_intraday(symbol)
+
+    if intra is not None and not intra.empty and len(intra) > 10:
+        iclose = normalize_series(intra["Close"]).dropna()
+        ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
+
+        if len(iclose) > 10:
+            iema9 = iclose.ewm(span=9, adjust=False).mean()
+            iobv = calc_obv(iclose, ivol)
+
+            intraday_ok = bool(
+                iclose.iloc[-1] > iema9.iloc[-1]
+                and iobv.iloc[-1] > iobv.iloc[-3]
+            )
+
+except Exception:
+    intraday_ok = False try:
     intra = fetch_intraday(symbol)
 
     if intra is not None and not intra.empty and len(intra) > 10:
