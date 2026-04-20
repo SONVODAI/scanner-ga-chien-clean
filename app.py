@@ -299,52 +299,32 @@ vol_break = vol_ma > 0 and vol > vol_ma * 1.5
 money_score = (vol / vol_ma) if vol_ma > 0 else 1.0
 # ===== intraday confirm =====
 intraday_ok = False
-# ===== intraday confirm =====
-intraday_ok = False
-
-try:
-    intra = fetch_intraday(symbol)
-
-    if intra is not None and not intra.empty and len(intra) > 10:
-        iclose = normalize_series(intra["Close"]).dropna()
-        ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
-
-        if len(iclose) > 10:
-            iema9 = iclose.ewm(span=9, adjust=False).mean()
-            iobv = calc_obv(iclose, ivol)
-
-            intraday_ok = bool(
-                iclose.iloc[-1] > iema9.iloc[-1]
-                and iobv.iloc[-1] > iobv.iloc[-3]
-            )
-
-except Exception:
-    intraday_ok = False
-# ===== intraday confirm =====
-intraday_ok = False
-
-try:
-    intra = fetch_intraday(symbol)
-
-    if intra is not None and not intra.empty and len(intra) > 10:
-        iclose = normalize_series(intra["Close"]).dropna()
-        ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
-
-        if len(iclose) > 10:
-            iema9 = iclose.ewm(span=9, adjust=False).mean()
-            iobv = calc_obv(iclose, ivol)
-
-            intraday_ok = bool(
-                iclose.iloc[-1] > iema9.iloc[-1]
-                and iobv.iloc[-1] > iobv.iloc[-3]
-            )
-
 except Exception:
     intraday_ok = False
 # ===== stage =====
 if ret_20d < 0.10 and tight_base:
     stage = "B1-TÍCH LŨY"
+# ===== intraday confirm =====
+intraday_ok = False
 
+try:
+    intra = fetch_intraday(symbol)
+
+    if intra is not None and not intra.empty and len(intra) > 10:
+        iclose = normalize_series(intra["Close"]).dropna()
+        ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
+
+        if len(iclose) > 10:
+            iema9 = iclose.ewm(span=9, adjust=False).mean()
+            iobv = calc_obv(iclose, ivol)
+
+            intraday_ok = bool(
+                iclose.iloc[-1] > iema9.iloc[-1]
+                and iobv.iloc[-1] > iobv.iloc[-3]
+            )
+
+except Exception:
+    intraday_ok = False
 elif ret_20d >= 0.10 and ret_20d < 0.25 and leader_score >= 3:
     stage = "B2-ĐANG VÀO SÓNG"
 
