@@ -113,17 +113,44 @@ def format_pct(x) -> str:
 # DATA FETCH
 # =========================================================
 @st.cache_data(ttl=300)
-def fetch_daily(symbol: str) -> pd.DataFrame:
-    try:
-        df = yf.download(symbol + ".VN", period="8mo", progress=False, auto_adjust=False, threads=False)
-        if df is None or df.empty:
-            return pd.DataFrame()
-        return df
-    except Exception:
-        return pd.DataFrame()
+import requests
 
 @st.cache_data(ttl=300)
-def fetch_intraday(symbol: str) -> pd.DataFrame:
+def fetch_daily(symbol: str) -> pd.DataFrame:
+    try:
+        # ===== 1. TRY YFINANCE =====
+        df = yf.download(symbol + ".VN", period="6mo", progress=False)
+        if df is not None and not df.empty:
+            return df
+
+        # ===== 2. FALLBACK: FIREANT API =====
+        url = f"https://restv2.fireant.vn/symbols/{symbol}/prices?startDate=2023-01-01"
+        res = requests.get(url)
+        
+        if res.status_code != 200:
+            return pd.DataFrame()
+
+        data = res.json()
+        if not data:
+            return pd.DataFrame()
+
+        df = pd.DataFrame(data)
+
+        df.rename(columns={
+            "open": "Open",
+            "close": "Close",
+            "high": "High",
+            "low": "Low",
+            "volume": "Volume"
+        }, inplace=True)
+
+        df["Date"] = pd.to_datetime(df["date"])
+        df.set_index("Date", inplace=True)
+
+        return df
+
+    except:
+        return pd.DataFrame()def fetch_intraday(symbol: str) -> pd.DataFrame:
     try:
         df = yf.download(
         symbol + ".VN",
