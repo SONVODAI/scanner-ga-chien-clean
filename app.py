@@ -133,26 +133,24 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         if not data:
             return pd.DataFrame()
 
-        df = pd.DataFrame(data)
-    
+try:
+    df = pd.DataFrame(data)
+
     df.rename(columns={
-    "open": "Open",
-    "close": "Close",
-    "high": "High",
-    "low": "Low",
-    "volume": "Volume"
+        "open": "Open",
+        "close": "Close",
+        "high": "High",
+        "low": "Low",
+        "volume": "Volume"
     }, inplace=True)
-    
-    df["Date"] = pd.to_datetime(df["date"])
+
+    df["Date"] = pd.to_datetime(df["date"] if "date" in df.columns else df["Date"])
     df.set_index("Date", inplace=True)
-    
+
     return df
-    
-    except Exception:
+
+except Exception:
     return pd.DataFrame()
-        return pd.DataFrame()
-
-
 def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
         df = yf.download(symbol + ".VN", period="6mo", progress=False)
