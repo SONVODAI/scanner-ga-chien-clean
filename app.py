@@ -487,22 +487,22 @@ if run_scan:
     results = []
     progress = st.progress(0)
 
-    for i, symbol in enumerate(watchlist):
+    for i, symbol in enumerate(watchlist or []):
         row = analyze_stock(symbol)
         if row:
             results.append(row)
-        progress.progress((i + 1) / len(watchlist))
+        total = len(watchlist) if watchlist else 1
+        progress.progress((i + 1) / total)
 
     if not results:
         st.warning("Không có dữ liệu.")
         st.stop()
 
     df_res = pd.DataFrame(results)
-    df_res = df_res.sort_values(
-        by=["Gold Score", "Leader Score", "Score", "Ret 20D %"],
-        ascending=False
-    )
+    cols = ["Gold Score", "Leader Score", "Score", "Ret 20D %"]
+    cols = [c for c in cols if c in df_res.columns]
 
+    df_res = df_res.sort_values(by=cols, ascending=False)
     alerts = build_alerts(df_res)
     buy_now = df_res[df_res["Can Buy"] == "MUA"]
 
