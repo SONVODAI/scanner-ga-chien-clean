@@ -309,20 +309,24 @@ def analyze_stock(symbol: str):
         break_strong = close_now >= prev_high_20 * 0.98 and vol_break
                 # intraday confirm
         intraday_ok = False
-        try:
-            intra = fetch_intraday(symbol)
-            if intra is not None and not intra.empty and len(intra) > 10:
-                iclose = normalize_series(intra["Close"]).dropna()
-                ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
-                if len(iclose) > 10:
-                    iema9 = iclose.ewm(span=9, adjust=False).mean()
-                    iobv = calc_obv(iclose, ivol)
-                    intraday_ok = bool(
-                        iclose.iloc[-1] > iema9.iloc[-1]
-                        and iobv.iloc[-1] > iobv.iloc[-3]
-                    )
-    except Exception:
-            intraday_ok = False
+try:
+    intra = fetch_intraday(symbol)
+
+    if intra is not None and not intra.empty and len(intra) > 10:
+        iclose = normalize_series(intra["Close"]).dropna()
+        ivol = normalize_series(intra["Volume"]).reindex(iclose.index)
+
+        if len(iclose) > 10:
+            iema9 = iclose.ewm(span=9, adjust=False).mean()
+            iobv = calc_obv(iclose, ivol)
+
+            intraday_ok = bool(
+                iclose.iloc[-1] > iema9.iloc[-1]
+                and iobv.iloc[-1] > iobv.iloc[-3]
+            )
+
+except Exception:
+    intraday_ok = False
         # leader score
         leader_score = 0
         if ret_20d > 0.15:
