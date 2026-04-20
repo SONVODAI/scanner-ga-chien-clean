@@ -321,7 +321,7 @@ def analyze_stock(symbol: str):
                         iclose.iloc[-1] > iema9.iloc[-1]
                         and iobv.iloc[-1] > iobv.iloc[-3]
                     )
-        except Exception:
+    except Exception:
             intraday_ok = False
         # leader score
         leader_score = 0
@@ -371,19 +371,19 @@ def analyze_stock(symbol: str):
         status = "THEO DÕI"
     
     else:
-        status = "LOẠI"
-            # chicken state
-            if stage == "B1-TÍCH LŨY":
-                chicken = "🐣 Gà con"
-            elif stage == "B2-ĐANG VÀO SÓNG":
-                chicken = "🐥 Gà chạy"
-            elif stage == "B3-LEADER":
-                chicken = "🐔 Gà chiến"
-            elif stage == "B3-QUÁ XA":
-                chicken = "⚠️ Gà bay cao"
-            else:
-                chicken = "❌"
-    
+    status = "LOẠI"
+        # chicken state
+    if stage == "B1-TÍCH LŨY":
+            chicken = "🐣 Gà con"
+    elif stage == "B2-ĐANG VÀO SÓNG":
+            chicken = "🐥 Gà chạy"
+    elif stage == "B3-LEADER":
+            chicken = "🐔 Gà chiến"
+    elif stage == "B3-QUÁ XA":
+            chicken = "⚠️ Gà bay cao"
+    else:
+            chicken = "❌"
+
                # action
                 # action
         if market_score < 8:
