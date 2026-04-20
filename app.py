@@ -135,7 +135,7 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
 
         df = pd.DataFrame(data)
 
-        df.rename(columns={
+               df.rename(columns={
             "open": "Open",
             "close": "Close",
             "high": "High",
@@ -144,10 +144,15 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         }, inplace=True)
 
         df["Date"] = pd.to_datetime(df["date"])
-       df.set_index("Date", inplace=True)
+        df.set_index("Date", inplace=True)
+
+        return df
+
+    except Exception:
+        return pd.DataFrame()
 
 
-def fetch_daily(symbol: str) -> pd.DataFrame:    
+def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
         df = yf.download(symbol + ".VN", period="6mo", progress=False)
 
@@ -155,6 +160,7 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
             return pd.DataFrame()
 
         return df
+
     except Exception:
         return pd.DataFrame()    
 # =========================================================
