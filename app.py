@@ -324,7 +324,6 @@ try:
                 iclose.iloc[-1] > iema9.iloc[-1]
                 and iobv.iloc[-1] > iobv.iloc[-3]
             )
-
 except Exception:
     intraday_ok = False
         # leader score
