@@ -358,27 +358,24 @@ def analyze_stock(symbol: str):
         else:
             stage = "NONE"
     # status
-    if not cond_obv:
-        status = "LOẠI"
+     # status (chuẩn hệ 4 trạng thái)
+if buy_code == "B2":
+    status = "ƯU TIÊN MUA"
 
-    elif buy_code == "B2":
-        status = "ƯU TIÊN MUA"
+elif buy_code == "B3":
+    status = "ƯU TIÊN MUA"
 
-    elif buy_code == "B3":
-        status = "ƯU TIÊN MUA"
+elif buy_code == "RE":
+    status = "THEO DÕI"
 
-    elif buy_code == "RE":
-        status = "THEO DÕI"
+elif buy_code == "ER":
+    status = "THEO DÕI ĐẢO CHIỀU"
 
-    elif buy_code == "ER":
-        status = "THEO DÕI ĐẢO CHIỀU"
+elif leader_score >= 4 and cond_price and cond_obv:
+    status = "THEO DÕI"
 
-    elif leader_score >= 4 and cond_price and cond_obv:
-        status = "THEO DÕI"
-
-    else:
-        status = "LOẠI"
-            else:
+else:
+    status = "LOẠI"           else:
             status = "THEO DÕI"
 
         # chicken state
