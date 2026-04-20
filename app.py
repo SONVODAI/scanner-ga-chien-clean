@@ -309,7 +309,7 @@ def analyze_stock(symbol: str):
         break_strong = close_now >= prev_high_20 * 0.98 and vol_break
                 # intraday confirm
         intraday_ok = False
-try:
+    try:
     intra = fetch_intraday(symbol)
 
     if intra is not None and not intra.empty and len(intra) > 10:
