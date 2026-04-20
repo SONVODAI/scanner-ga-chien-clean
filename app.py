@@ -125,6 +125,7 @@ def fetch_daily(symbol: str):
 def check_buy_trigger(df):
     latest = df.iloc[-1]
     prev = df.iloc[-2]
+    prev3 = df.iloc[-4] if len(df) >= 4 else df.iloc[0]
 
     close = latest["Close"]
     ema9 = latest["EMA9"]
@@ -136,42 +137,93 @@ def check_buy_trigger(df):
     vol = latest["Volume"]
     vol_ma = latest["VolMA20"]
 
-    # =====================
-    # B1 – Early
-    # =====================
+    if pd.isna(ma20) or pd.isna(vol_ma):
+        return None, ""
+
+    # =========================
+    # 1. Xác nhận trước đó cổ phiếu đã có pha tăng mạnh
+    # =========================
+    ref = df.iloc[-16:-4] if len(df) >= 20 else df.iloc[:-4]
+    had_strong_run = False
+    if len(ref) >= 8:
+        ref_close_start = ref["Close"].iloc[0]
+        ref_close_end = ref["Close"].iloc[-1]
+        ref_rsi_max = ref["RSI"].max()
+        ref_ema9 = ref["EMA9"].iloc[-1]
+        ref_ma20 = ref["MA20"].iloc[-1]
+
+        had_strong_run = (
+            ref_close_end > ref_close_start * 1.08
+            and ref_close_end > ref_ema9 > ref_ma20
+            and ref_rsi_max >= 60
+        )
+
+    # =========================
+    # 2. Pull đẹp thực sự
+    # =========================
+    recent_high = df["Close"].iloc[-9:-1].max() if len(df) >= 10 else df["Close"].max()
+    drawdown = (recent_high - close) / recent_high if recent_high > 0 else 0
+
+    near_ema9 = abs(close - ema9) / ema9 <= 0.02
+    above_ma20 = close >= ma20 * 0.99
+    pull_depth_ok = 0.02 <= drawdown <= 0.08
+    vol_dry = vol < vol_ma
+    candle_ok = abs(latest["Close"] - latest["Open"]) / latest["Close"] <= 0.03
+    rsi_ok = rsi >= 50
+    obv_ok = obv >= obv_ema * 0.995
+
+    # loại case đã thủng EMA9 rồi mới ngoi lên lại
+    reclaim_case = prev["Close"] < prev["EMA9"] * 0.992 and close >= ema9
+
     if (
-        rsi > rsi_ema
-        and obv > obv_ema
-        and close > ema9
-        and vol > vol_ma * 0.8
-        and abs(close - ema9) / ema9 < 0.03
+        had_strong_run
+        and near_ema9
+        and above_ma20
+        and pull_depth_ok
+        and vol_dry
+        and candle_ok
+        and rsi_ok
+        and obv_ok
+        and not reclaim_case
     ):
-        return "B1", "Early bật lên"
+        return "B2", "Pull đẹp thật"
 
-    # =====================
-    # B2 – Pullback đẹp
-    # =====================
-    if (
-        close > ema9 > ma20
-        and obv >= obv_ema
-        and rsi > 50
-        and abs(close - ema9) / ema9 < 0.02
-        and vol >= prev["Volume"]
-    ):
-        return "B2", "Pull EMA9 đẹp"
+    # =========================
+    # 3. Reclaim EMA9
+    # =========================
+    reclaim_ok = (
+        prev["Close"] < prev["EMA9"]
+        and close >= ema9
+        and obv >= obv_ema * 0.99
+        and rsi > prev["RSI"]
+    )
+    if reclaim_ok:
+        return "RE", "Reclaim EMA9"
 
-    # =====================
-    # B3 – Breakout
-    # =====================
-    prev_high = df["High"].rolling(20).max().iloc[-2]
-
-    if (
+    # =========================
+    # 4. Breakout
+    # =========================
+    prev_high = df["High"].rolling(20).max().iloc[-2] if len(df) > 21 else df["High"].max()
+    break_ok = (
         close > prev_high
-        and vol > vol_ma * 1.5
-        and rsi > 60
+        and vol > vol_ma * 1.3
+        and rsi >= 60
         and obv >= obv_ema
-    ):
+    )
+    if break_ok:
         return "B3", "Breakout mạnh"
+
+    # =========================
+    # 5. Early reversal
+    # =========================
+    early_ok = (
+        rsi >= 45
+        and rsi > rsi_ema
+        and close >= ema9 * 0.995
+        and obv >= obv_ema * 0.98
+    )
+    if early_ok:
+        return "ER", "Early reversal"
 
     return None, ""
 @st.cache_data(ttl=300)
@@ -305,24 +357,28 @@ def analyze_stock(symbol: str):
             stage = "B3-QUÁ XA"
         else:
             stage = "NONE"
+    # status
+    if not cond_obv:
+        status = "LOẠI"
 
-        # status
-        if not cond_price or not cond_obv or not cond_slope:
-            status = "LOẠI"
-        elif ret_20d < 0.10 and rsi < 55 and tight_base and vol_dry:
-            status = "EARLY REVERSAL"
-        elif (
-            leader_score >= 4
-            and rsi > 58
-            and cond_price
-            and cond_obv
-            and cond_slope
-            and (break_strong or ret_20d > 0.15)
-        ):
-            status = "ƯU TIÊN MUA"
-        elif ret_20d > 0.35:
-            status = "THEO DÕI"
-        else:
+    elif buy_code == "B2":
+        status = "ƯU TIÊN MUA"
+
+    elif buy_code == "B3":
+        status = "ƯU TIÊN MUA"
+
+    elif buy_code == "RE":
+        status = "THEO DÕI"
+
+    elif buy_code == "ER":
+        status = "THEO DÕI ĐẢO CHIỀU"
+
+    elif leader_score >= 4 and cond_price and cond_obv:
+        status = "THEO DÕI"
+
+    else:
+        status = "LOẠI"
+            else:
             status = "THEO DÕI"
 
         # chicken state
@@ -337,24 +393,27 @@ def analyze_stock(symbol: str):
         else:
             chicken = "❌"
 
-        # action
-        if market_score < 8:
-            action = "Đứng ngoài"
+           # action
+            # action
+    if market_score < 8:
+        if status == "THEO DÕI ĐẢO CHIỀU":
+            action = "⏳ THEO DÕI ĐẢO CHIỀU"
         else:
-            if status == "ƯU TIÊN MUA" and stage == "B2-ĐANG VÀO SÓNG":
-                action = "👉 MUA CHÍNH"
-            elif status == "ƯU TIÊN MUA" and stage == "B3-LEADER":
-                action = "👉 GIỮ / ADD"
-            elif status == "THEO DÕI":
-                action = "👀 CANH PULL"
-            elif status == "EARLY REVERSAL":
-                action = "🌱 MUA THĂM DÒ"
-            elif stage == "B3-QUÁ XA":
-                action = "⛔ KHÔNG ĐU"
-            else:
-                action = "❌ BỎ"
-
-        buy_zone = round(ema9, 2)
+            action = "Đứng ngoài"
+    else:
+        if buy_code == "B2":
+            action = "👉 MUA PULL"
+        elif buy_code == "B3":
+            action = "👉 MUA BREAK"
+        elif buy_code == "RE":
+            action = "👀 THEO DÕI RECLAIM"
+        elif buy_code == "ER":
+            action = "🌱 MUA THĂM DÒ"
+        elif status == "THEO DÕI":
+            action = "👀 THEO DÕI"
+        else:
+            action = "❌ BỎ"
+           buy_zone = round(ema9, 2)
         cut_loss = round(ma20, 2) if not np.isnan(ma20) else None
 
         score = leader_score + int(cond_price) + int(cond_rsi_turn)
@@ -387,7 +446,7 @@ def analyze_stock(symbol: str):
             "Status": status,
             "Buy Code": buy_code if buy_code else "",
             "Buy Signal": buy_note,
-            "Can Buy": "MUA" if buy_code else "",
+            "Can Buy": "MUA" if buy_code in ["B2", "B3"] and market_score >= 8 else "",
             }
     except Exception:
         return None
