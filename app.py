@@ -113,17 +113,8 @@ def format_pct(x) -> str:
 # DATA FETCH
 # =========================================================
 @st.cache_data(ttl=300)
-
-@st.cache_data(ttl=300)
-@st.cache_data(ttl=300)
 def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
-        # ===== 1. TRY YFINANCE =====
-        df = yf.download(symbol + ".VN", period="6mo", progress=False)
-        if df is not None and not df.empty:
-            return df
-
-        # ===== 2. FALLBACK: FIREANT =====
         url = f"https://restv2.fireant.vn/symbols/{symbol}/prices?startDate=2023-01-01"
         res = requests.get(url)
 
@@ -144,11 +135,13 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
             "volume": "Volume"
         }, inplace=True)
 
-        df["Date"] = pd.to_datetime(df["date"] if "date" in df.columns else df["Date"])
+        df["Date"] = pd.to_datetime(df["date"])
         df.set_index("Date", inplace=True)
 
         return df
 
+    except:
+        return pd.DataFrame()
     except Exception:
         return pd.DataFrame()
         return df
