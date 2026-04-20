@@ -150,16 +150,16 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
 
     except:
         return pd.DataFrame()
-        def fetch_intraday(symbol: str) -> pd.DataFrame:
-    try:
-        df = yf.download(
-        symbol + ".VN",
-            period="5d",
-            interval="15m",
-            progress=False,
-            auto_adjust=False,
-            threads=False
-        )
+    def fetch_intraday(symbol: str) -> pd.DataFrame:
+        try:
+            df = yf.download(
+                symbol + ".VN",
+                period="5d",
+                interval="15m",
+                progress=False,
+                auto_adjust=False,
+                threads=False
+            )
         if df is None or df.empty:
             return pd.DataFrame()
         return df
