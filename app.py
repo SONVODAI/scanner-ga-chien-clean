@@ -298,19 +298,6 @@ def analyze_stock(symbol: str):
         vol_break = vol_ma > 0 and vol > vol_ma * 1.5
         money_score = (vol / vol_ma) if vol_ma > 0 else 1.0
 
-        # base
-        high_15 = float(df["High"].rolling(15).max().iloc[-1])
-        low_15 = float(df["Low"].rolling(15).min().iloc[-1])
-        price_range = (high_15 - low_15) / close_now if close_now > 0 else 0.0
-        tight_base = price_range < 0.15
-
-        # break
-        prev_high_20 = float(df["High"].rolling(20).max().iloc[-2]) if len(df) > 21 else high_15
-        break_strong = close_now >= prev_high_20 * 0.98 and vol_break
-                # intraday confirm
-        intraday_ok = False
-        intraday_ok = False
-
 try:
     intra = fetch_intraday(symbol)
 
