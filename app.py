@@ -345,102 +345,102 @@ def analyze_stock(symbol: str):
         # stage
         if ret_20d < 0.10 and tight_base:
             stage = "B1-TÍCH LŨY"
-        elif ret_20d >= 0.10 and ret_20d < 0.25 and leader_score >= 3:
-            stage = "B2-ĐANG VÀO SÓNG"
-        elif ret_20d >= 0.25 and leader_score >= 4 and not too_extended:
-            stage = "B3-LEADER"
-        elif too_extended:
-            stage = "B3-QUÁ XA"
-        else:
-            stage = "NONE"
-    # status
-    # status (chuẩn hệ 4 trạng thái)
-if buy_code == "B2":
-    status = "ƯU TIÊN MUA"
-
-elif buy_code == "B3":
-    status = "ƯU TIÊN MUA"
-
-elif buy_code == "RE":
-    status = "THEO DÕI"
-
-elif buy_code == "ER":
-    status = "THEO DÕI ĐẢO CHIỀU"
-
-elif leader_score >= 4 and cond_price and cond_obv:
-    status = "THEO DÕI"
-
-else:
-    status = "LOẠI"
-        # chicken state
-        if stage == "B1-TÍCH LŨY":
-            chicken = "🐣 Gà con"
-        elif stage == "B2-ĐANG VÀO SÓNG":
-            chicken = "🐥 Gà chạy"
-        elif stage == "B3-LEADER":
-            chicken = "🐔 Gà chiến"
-        elif stage == "B3-QUÁ XA":
-            chicken = "⚠️ Gà bay cao"
-        else:
-            chicken = "❌"
-
-           # action
-            # action
-    if market_score < 8:
-        if status == "THEO DÕI ĐẢO CHIỀU":
-            action = "⏳ THEO DÕI ĐẢO CHIỀU"
-        else:
-            action = "Đứng ngoài"
+            elif ret_20d >= 0.10 and ret_20d < 0.25 and leader_score >= 3:
+                stage = "B2-ĐANG VÀO SÓNG"
+            elif ret_20d >= 0.25 and leader_score >= 4 and not too_extended:
+                stage = "B3-LEADER"
+            elif too_extended:
+                stage = "B3-QUÁ XA"
+            else:
+                stage = "NONE"
+        # status
+        # status (chuẩn hệ 4 trạng thái)
+    if buy_code == "B2":
+        status = "ƯU TIÊN MUA"
+    
+    elif buy_code == "B3":
+        status = "ƯU TIÊN MUA"
+    
+    elif buy_code == "RE":
+        status = "THEO DÕI"
+    
+    elif buy_code == "ER":
+        status = "THEO DÕI ĐẢO CHIỀU"
+    
+    elif leader_score >= 4 and cond_price and cond_obv:
+        status = "THEO DÕI"
+    
     else:
-        if buy_code == "B2":
-            action = "👉 MUA PULL"
-        elif buy_code == "B3":
-            action = "👉 MUA BREAK"
-        elif buy_code == "RE":
-            action = "👀 THEO DÕI RECLAIM"
-        elif buy_code == "ER":
-            action = "🌱 MUA THĂM DÒ"
-        elif status == "THEO DÕI":
-            action = "👀 THEO DÕI"
+        status = "LOẠI"
+            # chicken state
+            if stage == "B1-TÍCH LŨY":
+                chicken = "🐣 Gà con"
+            elif stage == "B2-ĐANG VÀO SÓNG":
+                chicken = "🐥 Gà chạy"
+            elif stage == "B3-LEADER":
+                chicken = "🐔 Gà chiến"
+            elif stage == "B3-QUÁ XA":
+                chicken = "⚠️ Gà bay cao"
+            else:
+                chicken = "❌"
+    
+               # action
+                # action
+        if market_score < 8:
+            if status == "THEO DÕI ĐẢO CHIỀU":
+                action = "⏳ THEO DÕI ĐẢO CHIỀU"
+            else:
+                action = "Đứng ngoài"
         else:
-            action = "❌ BỎ"
-           buy_zone = round(ema9, 2)
-        cut_loss = round(ma20, 2) if not np.isnan(ma20) else None
-
-        score = leader_score + int(cond_price) + int(cond_rsi_turn)
-        gold_score = score * market_score
-        
-        return {
-            "Sector": sector_map.get(symbol, "KHÁC"),
-            "Ticker": symbol,
-            "Close": round(close_now, 2),
-            "EMA9": round(ema9, 2),
-            "MA20": round(ma20, 2) if not np.isnan(ma20) else None,
-            "RSI": round(rsi, 2) if not np.isnan(rsi) else None,
-            "Leader Score": leader_score,
-            "Base": "✔" if tight_base else "✖",
-            "Cạn cung": "✔" if vol_dry else "✖",
-            "Break": "✔" if break_strong else "✖",
-            "Top tuần": "✔" if symbol in top_week else "✖",
-            "Top tháng": "✔" if symbol in top_month else "✖",
-            "Intraday": "✔" if intraday_ok else "✖",
-            "Money+": "✔" if money_score > 1.2 else "✖",
-            "Ret 20D %": round(ret_20d * 100, 1),
-            "Ret 60D %": round(ret_60d * 100, 1),
-            "Stage": stage,
-            "Trạng thái gà": chicken,
-            "Hành động": action,
-            "Điểm mua": buy_zone,
-            "Cutloss": cut_loss,
-            "Score": score,
-            "Gold Score": gold_score,
-            "Status": status,
-            "Buy Code": buy_code if buy_code else "",
-            "Buy Signal": buy_note,
-            "Can Buy": "MUA" if buy_code in ["B2", "B3"] and market_score >= 8 else "",
-            }
-    except Exception:
-        return None
+            if buy_code == "B2":
+                action = "👉 MUA PULL"
+            elif buy_code == "B3":
+                action = "👉 MUA BREAK"
+            elif buy_code == "RE":
+                action = "👀 THEO DÕI RECLAIM"
+            elif buy_code == "ER":
+                action = "🌱 MUA THĂM DÒ"
+            elif status == "THEO DÕI":
+                action = "👀 THEO DÕI"
+            else:
+                action = "❌ BỎ"
+               buy_zone = round(ema9, 2)
+            cut_loss = round(ma20, 2) if not np.isnan(ma20) else None
+    
+            score = leader_score + int(cond_price) + int(cond_rsi_turn)
+            gold_score = score * market_score
+            
+            return {
+                "Sector": sector_map.get(symbol, "KHÁC"),
+                "Ticker": symbol,
+                "Close": round(close_now, 2),
+                "EMA9": round(ema9, 2),
+                "MA20": round(ma20, 2) if not np.isnan(ma20) else None,
+                "RSI": round(rsi, 2) if not np.isnan(rsi) else None,
+                "Leader Score": leader_score,
+                "Base": "✔" if tight_base else "✖",
+                "Cạn cung": "✔" if vol_dry else "✖",
+                "Break": "✔" if break_strong else "✖",
+                "Top tuần": "✔" if symbol in top_week else "✖",
+                "Top tháng": "✔" if symbol in top_month else "✖",
+                "Intraday": "✔" if intraday_ok else "✖",
+                "Money+": "✔" if money_score > 1.2 else "✖",
+                "Ret 20D %": round(ret_20d * 100, 1),
+                "Ret 60D %": round(ret_60d * 100, 1),
+                "Stage": stage,
+                "Trạng thái gà": chicken,
+                "Hành động": action,
+                "Điểm mua": buy_zone,
+                "Cutloss": cut_loss,
+                "Score": score,
+                "Gold Score": gold_score,
+                "Status": status,
+                "Buy Code": buy_code if buy_code else "",
+                "Buy Signal": buy_note,
+                "Can Buy": "MUA" if buy_code in ["B2", "B3"] and market_score >= 8 else "",
+                }
+   except Exception:
+            return None
 
 # =========================
 # ALERT STATE
