@@ -147,8 +147,6 @@ def fetch_daily(symbol: str) -> pd.DataFrame:
         df.set_index("Date", inplace=True)
 
         return df
-
-        return df
 def fetch_daily(symbol: str) -> pd.DataFrame:
     try:
         df = yf.download(symbol + ".VN", period="6mo", progress=False)
