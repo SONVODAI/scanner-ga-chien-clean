@@ -39,13 +39,8 @@ def fetch_data(symbol):
 
         return df
 
-    except:
-        return pd.DataFrame()
-        return df
-
-    except:
-        return pd.DataFrame()
-
+   except Exception:
+    return pd.DataFrame()
 # ================= INDICATORS =================
 def calc_indicators(df):
     df = df.copy()
