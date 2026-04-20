@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from vnstock import stock_historical_data
+from vnstock import Quote
 
 st.set_page_config(layout="wide")
 
@@ -25,22 +25,12 @@ WATCHLIST = [
 @st.cache_data(ttl=600)
 def fetch_data(symbol):
     try:
-        df = stock_historical_data(
-            symbol=symbol,
-            start_date="2023-01-01",
-            end_date=datetime.now().strftime("%Y-%m-%d"),
-            resolution="1D",
-            type="stock"
-        )
+        q = Quote(symbol=symbol, source="VCI")
+        df = q.history(start="2023-01-01", interval="1D")
+           
 
         if df is None or df.empty:
             return pd.DataFrame()
-
-        df = df.rename(columns={
-            "close": "close",
-            "volume": "volume"
-        })
-
         return df
 
     except:
