@@ -1,356 +1,592 @@
-import streamlit as st
-import pandas as pd
+# =========================================================
+# SCANNER GÀ CHIẾN V18 CLEAN
+# Full clean rewrite - copy all into app.py
+# =========================================================
+
+import time
+from datetime import datetime
+
 import numpy as np
+import pandas as pd
+import streamlit as st
 import yfinance as yf
 
-st.set_page_config(layout="wide", page_title="Scanner Gà Chiến V16 Clean")
 
 # =========================================================
-# WATCHLIST CHÍNH
+# PAGE
 # =========================================================
-WATCHLIST = [
-    "VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","TPB","LPB","EIB","ABB","MSB","KLB","EVF","SSB","VIB","BVB","OCB",
-    "SSI","VIX","SHS","MBS","HCM","VCI","VND","CTS","FTS","BSI","BVS","ORS","VDS","AGR",
-    "VHM","VIC","NLG","KDH","CEO","CII","DXG","TCH","HHS","DPG","HDC","NVL","NTL","NHA","HUT","DIG","PDR","DXS","VRE",
-    "VGC","IDC","KBC","SZC","BCM","DTD","LHG","IJC","GVR","PHR","DPR","SIP","TRC",
-    "MWG","DGW","FRT","PET","PNJ","MSN","MCH","PAN","FMC","DBC","HAG","VNM","MML","SAB","SBT","TLG","BAF",
-    "REE","GEE","GEX","PC1","NT2","HDG","GEG","POW",
-    "DPM","DCM","LAS","DDV","DGC","CSV","BFC","MSR","BMP","NTP",
-    "BSR","PVS","PVD","PVB","PVC","PVT","OIL","PLX","GAS",
-    "HAH","GMD","VSC","VOS","VTO","HVN","VJC","ACV",
-    "VTP","CTR","VGI","FPT","FOX","CMG","ELC",
-    "MSH","TNG","TCM","GIL","VGT","VHC","ANV","VCS","PTB",
-    "CTD","HHV","FCN","LCG","CTI","KSB","C4G","VCG","DHA","PLC","HT1",
-    "HPG","HSG","NKG","VGS","TLH","TVN",
-    "DVN","DCL","DHG","IMP","DBD","DHT",
-    "BVH","MIG","BMI"
-]
+st.set_page_config(
+    page_title="Scanner Gà Chiến V18 Clean",
+    page_icon="🐔",
+    layout="wide",
+)
+
+st.title("🐔 Scanner Gà Chiến V18 Clean")
+st.caption("Leader first → rồi mới phân loại CP Mạnh / Break / Pull / Early")
+
 
 # =========================================================
-# PHÂN NHÓM
+# WATCHLIST
 # =========================================================
-SECTOR_MAP = {
-    "NGÂN HÀNG": ["VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","TPB","LPB","EIB","ABB","MSB","KLB","SSB","VIB","BVB","OCB"],
-    "CHỨNG KHOÁN": ["SSI","VIX","SHS","MBS","HCM","VCI","VND","CTS","FTS","BSI","BVS","ORS","VDS","AGR"],
-    "BĐS DÂN CƯ": ["VHM","VIC","NLG","KDH","CEO","CII","DXG","TCH","HHS","DPG","HDC","NVL","NTL","NHA","HUT","DIG","PDR","DXS","VRE"],
-    "KCN - CAO SU": ["VGC","IDC","KBC","SZC","BCM","DTD","LHG","IJC","GVR","PHR","DPR","SIP","TRC"],
-    "BÁN LẺ - TIÊU DÙNG": ["MWG","DGW","FRT","PET","PNJ","MSN","MCH","PAN","FMC","DBC","HAG","VNM","MML","SAB","SBT","TLG","BAF"],
-    "ĐIỆN - HẠ TẦNG": ["REE","GEE","GEX","PC1","NT2","HDG","GEG","POW"],
-    "PHÂN BÓN - HÓA CHẤT": ["DPM","DCM","LAS","DDV","DGC","CSV","BFC","MSR","BMP","NTP"],
-    "DẦU KHÍ": ["BSR","PVS","PVD","PVB","PVC","PVT","OIL","PLX","GAS"],
-    "VẬN TẢI - LOGISTICS": ["HAH","GMD","VSC","VOS","VTO","HVN","VJC","ACV"],
-    "CÔNG NGHỆ - VIỄN THÔNG": ["VTP","CTR","VGI","FPT","FOX","CMG","ELC"],
-    "XUẤT KHẨU": ["MSH","TNG","TCM","GIL","VGT","VHC","ANV","VCS","PTB"],
-    "ĐẦU TƯ CÔNG - VLXD": ["CTD","HHV","FCN","LCG","CTI","KSB","C4G","VCG","DHA","PLC","HT1"],
-    "THÉP": ["HPG","HSG","NKG","VGS","TLH","TVN"],
-    "DƯỢC - BẢO HIỂM": ["DVN","DCL","DHG","IMP","DBD","DHT","BVH","MIG","BMI"],
+WATCHLIST = sorted(list(set([
+    # Dầu khí & Vận tải
+    "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
+    "HAH", "VSC", "GMD", "VOS", "VTO", "ACV",
+
+    # Xuất khẩu
+    "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB",
+
+    # Điện & Hóa chất
+    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", "AAA",
+    "PAC", "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
+    "TV2", "DGC",
+
+    # Đầu tư công & vật liệu
+    "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
+    "NKG", "VGS", "CTD", "HHV", "VCG",
+
+    # Bán lẻ & chăn nuôi
+    "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
+    "MCH", "PAN", "VNM", "MML",
+
+    # Ngân hàng & tài chính
+    "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
+    "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
+    "VND", "SSI", "HCM", "SHS", "VIX", "BSI", "FTS", "TVS", "APS",
+    "AGR", "VCI",
+
+    # Công nghệ & logistic
+    "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
+
+    # Cổ phiếu lẻ
+    "HVN", "VJC", "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
+    "TNH",
+
+    # BĐS / mã hay xem
+    "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
+    "KBC", "IJC", "EVF", "LHG", "SAB"
+])))
+
+DEFAULT_SUFFIX = ".VN"
+
+
+# =========================================================
+# STYLE
+# =========================================================
+st.markdown("""
+<style>
+div[data-testid="stDataFrame"] {
+    border-radius: 10px;
 }
+.small-note {
+    color: #666;
+    font-size: 13px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # =========================================================
-# HÀM PHỤ
+# HELPERS
 # =========================================================
-def get_symbols_by_sector(sector_name: str):
-    if sector_name == "TẤT CẢ":
-        return WATCHLIST
-    return SECTOR_MAP.get(sector_name, WATCHLIST)
+def to_float(value, default=np.nan):
+    try:
+        if isinstance(value, pd.Series):
+            if len(value) == 0:
+                return default
+            value = value.iloc[-1]
+        if isinstance(value, np.ndarray):
+            if len(value) == 0:
+                return default
+            value = value[-1]
+        return float(value)
+    except Exception:
+        return default
+
+
+def ema(series: pd.Series, span: int) -> pd.Series:
+    return series.ewm(span=span, adjust=False).mean()
+
+
+def sma(series: pd.Series, window: int) -> pd.Series:
+    return series.rolling(window=window).mean()
+
+
+def calc_rsi(close: pd.Series, period: int = 14) -> pd.Series:
+    delta = close.diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+
+    avg_gain = gain.ewm(alpha=1 / period, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1 / period, adjust=False).mean()
+
+    rs = avg_gain / avg_loss.replace(0, np.nan)
+    rsi = 100 - (100 / (1 + rs))
+    return rsi.fillna(50)
+
+
+def calc_obv(close: pd.Series, volume: pd.Series) -> pd.Series:
+    direction = np.sign(close.diff()).fillna(0)
+    return (direction * volume).fillna(0).cumsum()
 
 
 def flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
     if isinstance(df.columns, pd.MultiIndex):
-        df.columns = [c[0] if isinstance(c, tuple) else c for c in df.columns]
+        df.columns = [
+            "_".join([str(x) for x in col if str(x) != ""]).strip("_")
+            for col in df.columns.to_list()
+        ]
+    else:
+        df.columns = [str(c) for c in df.columns]
     return df
 
 
-def safe_float(x):
-    try:
-        return float(x)
-    except Exception:
-        return np.nan
+def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
+    lower_map = {str(c).lower(): c for c in df.columns}
+    for cand in candidates:
+        if cand.lower() in lower_map:
+            return lower_map[cand.lower()]
 
-
-def fmt_num(x, digits=2):
-    if pd.isna(x):
-        return ""
-    return round(float(x), digits)
+    for c in df.columns:
+        cl = str(c).lower()
+        for cand in candidates:
+            if cand.lower() in cl:
+                return c
+    return None
 
 
 # =========================================================
 # DATA
 # =========================================================
-@st.cache_data(ttl=600)
-def fetch_data(symbol: str) -> pd.DataFrame:
+@st.cache_data(ttl=300, show_spinner=False)
+def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
+    ticker = f"{symbol}{DEFAULT_SUFFIX}"
+
     try:
         df = yf.download(
-            symbol + ".VN",
-            period="8mo",
-            interval="1d",
+            ticker,
+            period=period,
+            interval=interval,
+            auto_adjust=False,
             progress=False,
-            auto_adjust=True,
-            threads=False
+            threads=False,
+            group_by="column",
         )
-
-        if df is None or df.empty:
-            return pd.DataFrame()
-
-        df = flatten_columns(df).copy()
-
-        rename_map = {}
-        for col in df.columns:
-            c = str(col).lower()
-            if c == "open":
-                rename_map[col] = "open"
-            elif c == "high":
-                rename_map[col] = "high"
-            elif c == "low":
-                rename_map[col] = "low"
-            elif c == "close":
-                rename_map[col] = "close"
-            elif c == "volume":
-                rename_map[col] = "volume"
-
-        df = df.rename(columns=rename_map)
-
-        required = ["open", "high", "low", "close", "volume"]
-        if not all(col in df.columns for col in required):
-            return pd.DataFrame()
-
-        df = df[required].dropna().copy()
-        if len(df) < 35:
-            return pd.DataFrame()
-
-        return df
     except Exception:
         return pd.DataFrame()
 
-
-# =========================================================
-# INDICATORS
-# =========================================================
-def calc_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    try:
-        out = df.copy()
-
-        out["EMA9"] = out["close"].ewm(span=9, adjust=False).mean()
-        out["EMA20"] = out["close"].ewm(span=20, adjust=False).mean()
-        out["EMA50"] = out["close"].ewm(span=50, adjust=False).mean()
-
-        delta = out["close"].diff()
-        gain = delta.clip(lower=0)
-        loss = -delta.clip(upper=0)
-
-        avg_gain = gain.ewm(alpha=1/14, adjust=False).mean()
-        avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
-
-        rs = avg_gain / avg_loss.replace(0, np.nan)
-        out["RSI"] = 100 - (100 / (1 + rs))
-        out["RSI_EMA9"] = out["RSI"].ewm(span=9, adjust=False).mean()
-
-        obv_delta = np.sign(out["close"].diff().fillna(0)) * out["volume"]
-        out["OBV"] = obv_delta.cumsum()
-        out["OBV_EMA9"] = out["OBV"].ewm(span=9, adjust=False).mean()
-
-        ema12 = out["close"].ewm(span=12, adjust=False).mean()
-        ema26 = out["close"].ewm(span=26, adjust=False).mean()
-        out["MACD"] = ema12 - ema26
-        out["MACD_SIGNAL"] = out["MACD"].ewm(span=9, adjust=False).mean()
-        out["MACD_HIST"] = out["MACD"] - out["MACD_SIGNAL"]
-
-        prev_close = out["close"].shift(1)
-        tr1 = out["high"] - out["low"]
-        tr2 = (out["high"] - prev_close).abs()
-        tr3 = (out["low"] - prev_close).abs()
-        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-        out["ATR14"] = tr.ewm(alpha=1/14, adjust=False).mean()
-
-        out["VOL_MA20"] = out["volume"].rolling(20).mean()
-
-        return out.dropna().copy()
-    except Exception:
+    if df is None or df.empty:
         return pd.DataFrame()
 
+    df = flatten_columns(df).reset_index()
 
-# =========================================================
-# SCORING & CLASSIFY
-# =========================================================
-def classify_stock(row: pd.Series, prev_row: pd.Series) -> tuple:
-    try:
-        price = safe_float(row["close"])
-        ema9 = safe_float(row["EMA9"])
-        ema20 = safe_float(row["EMA20"])
-        ema50 = safe_float(row["EMA50"])
-        rsi = safe_float(row["RSI"])
-        rsi_ema9 = safe_float(row["RSI_EMA9"])
-        obv = safe_float(row["OBV"])
-        obv_ema9 = safe_float(row["OBV_EMA9"])
-        macd = safe_float(row["MACD"])
-        macd_hist = safe_float(row["MACD_HIST"])
-        volume = safe_float(row["volume"])
-        vol_ma20 = safe_float(row["VOL_MA20"])
-        atr = safe_float(row["ATR14"])
+    date_col = find_col(df, ["Date", "Datetime"])
+    open_col = find_col(df, ["Open"])
+    high_col = find_col(df, ["High"])
+    low_col = find_col(df, ["Low"])
+    close_col = find_col(df, ["Close"])
+    vol_col = find_col(df, ["Volume"])
 
-        prev_high = safe_float(prev_row["high"])
-        prev_close = safe_float(prev_row["close"])
-        prev_rsi = safe_float(prev_row["RSI"])
+    needed = [date_col, open_col, high_col, low_col, close_col, vol_col]
+    if any(col is None for col in needed):
+        return pd.DataFrame()
 
-        if any(pd.isna(v) for v in [price, ema9, ema20, rsi, obv, obv_ema9]):
-            return ("LOẠI", 0)
+    out = df[[date_col, open_col, high_col, low_col, close_col, vol_col]].copy()
+    out.columns = ["date", "open", "high", "low", "close", "volume"]
 
-        score = 0
+    for col in ["open", "high", "low", "close", "volume"]:
+        out[col] = pd.to_numeric(out[col], errors="coerce")
 
-        # 1. Giá và cấu trúc
-        if price > ema9:
-            score += 2
-        if ema9 > ema20:
-            score += 2
-        if ema20 > ema50:
-            score += 1
+    out = out.dropna(subset=["close"])
+    out = out.sort_values("date").reset_index(drop=True)
+    return out
 
-        # 2. RSI
-        if rsi > 55:
-            score += 2
-        if rsi > rsi_ema9:
-            score += 1
 
-        # 3. OBV
-        if obv > obv_ema9:
-            score += 2
+def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    x = df.copy()
 
-        # 4. MACD
-        if macd > 0:
-            score += 1
-        if macd_hist > 0:
-            score += 1
+    x["ema9"] = ema(x["close"], 9)
+    x["ma20"] = sma(x["close"], 20)
 
-        # 5. Volume
-        if not pd.isna(vol_ma20) and vol_ma20 > 0 and volume > vol_ma20:
-            score += 1
+    x["rsi14"] = calc_rsi(x["close"], 14)
+    x["rsi_ema9"] = ema(x["rsi14"], 9)
 
-        # 6. ATR
-        if not pd.isna(atr) and atr > 0:
-            score += 1
+    x["obv"] = calc_obv(x["close"], x["volume"])
+    x["obv_ema9"] = ema(x["obv"], 9)
 
-        dist_pct = ((price - ema9) / ema9) * 100 if ema9 > 0 else np.nan
-        break_signal = price > prev_high and volume > vol_ma20 and rsi >= 60 if not pd.isna(prev_high) and not pd.isna(vol_ma20) else False
-        pull_signal = price > ema9 and ema9 > ema20 and 55 <= rsi <= 70 and abs(dist_pct) <= 4 and obv > obv_ema9
-        early_signal = price >= ema9 * 0.98 and 45 <= rsi < 60 and rsi >= prev_rsi and obv >= obv_ema9 * 0.98 if not pd.isna(prev_rsi) else False
-        accumulation_signal = 40 <= rsi <= 55 and abs(dist_pct) <= 5 if not pd.isna(dist_pct) else False
-        strong_signal = price > ema9 and ema9 > ema20 and rsi >= 70 and obv > obv_ema9 and macd > 0
+    x["vol_ma20"] = sma(x["volume"], 20)
 
-        if strong_signal and score >= 9:
-            action = "CP MẠNH"
-        elif break_signal and score >= 8:
-            action = "MUA BREAK"
-        elif pull_signal and score >= 8:
-            action = "MUA PULL"
-        elif early_signal and score >= 6:
-            action = "MUA EARLY"
-        elif accumulation_signal and score >= 5:
-            action = "TÍCH LŨY"
-        elif score >= 4:
-            action = "THEO DÕI"
-        else:
-            action = "LOẠI"
+    x["highest_20"] = x["high"].rolling(20).max()
+    x["lowest_20"] = x["low"].rolling(20).min()
 
-        return (action, score)
-
-    except Exception:
-        return ("LOẠI", 0)
+    return x
 
 
 # =========================================================
-# SCAN ENGINE
+# SCORE
 # =========================================================
+def calc_price_score(close_, ema9_, ma20_, ema9_prev):
+    if pd.notna(close_) and pd.notna(ema9_) and pd.notna(ma20_) and pd.notna(ema9_prev):
+        if close_ > ema9_ > ma20_ and ema9_ > ema9_prev:
+            return 2
+        if close_ > ema9_:
+            return 1
+    return 0
+
+
+def calc_rsi_score(rsi_, rsi_ema9_):
+    if pd.notna(rsi_) and pd.notna(rsi_ema9_):
+        if rsi_ > 60 and rsi_ > rsi_ema9_:
+            return 2
+        if rsi_ > 55:
+            return 1
+    return 0
+
+
+def calc_obv_score(obv_, obv_ema9_, obv_prev):
+    if pd.notna(obv_) and pd.notna(obv_ema9_) and pd.notna(obv_prev):
+        if obv_ > obv_ema9_ and obv_ > obv_prev:
+            return 2
+        if obv_ > obv_ema9_:
+            return 1
+    return 0
+
+
+def build_warning(close_, ema9_, rsi_, rsi_ema9_, obv_, obv_ema9_):
+    warnings = []
+
+    if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ < obv_ema9_:
+        warnings.append("OBV gãy")
+
+    if pd.notna(rsi_) and pd.notna(rsi_ema9_) and rsi_ < rsi_ema9_:
+        warnings.append("RSI yếu")
+
+    if pd.notna(close_) and pd.notna(ema9_) and close_ < ema9_:
+        warnings.append("Giá dưới EMA9")
+
+    return " | ".join(warnings)
+
+
+def build_status(total_score, warning):
+    if total_score >= 5 and warning == "":
+        return "🟢"
+    if total_score >= 3:
+        return "🟡"
+    return "🔴"
+
+
+# =========================================================
+# CLASSIFY
+# =========================================================
+def classify_group(row: dict) -> str:
+    price = row["price"]
+    ema9_ = row["ema9"]
+    ma20_ = row["ma20"]
+    rsi_ = row["rsi14"]
+    rsi_ema9_ = row["rsi_ema9"]
+    obv_ = row["obv"]
+    obv_ema9_ = row["obv_ema9"]
+    vol_ = row["volume"]
+    vol_ma20_ = row["vol_ma20"]
+    total = row["total_score"]
+    e = row["E"]
+    r = row["R"]
+    o = row["O"]
+    dist_from_ema9 = row["dist_from_ema9_pct"]
+    breakout_ref = row["breakout_ref"]
+
+    # -------------------------------
+    # 1) LEADER FIRST
+    # -------------------------------
+    leader = (
+        total >= 5
+        and e >= 1
+        and o >= 1
+        and pd.notna(price)
+        and pd.notna(ema9_)
+        and price >= ema9_ * 0.97
+    )
+
+    if not leader:
+        if total <= 1:
+            return "THEO DÕI"
+        if total == 2:
+            return "TÍCH LŨY"
+        return "MUA EARLY"
+
+    # -------------------------------
+    # 2) PULL: leader đang nghỉ đẹp gần EMA9
+    # -------------------------------
+    if (
+        pd.notna(dist_from_ema9)
+        and -3.0 <= dist_from_ema9 <= 1.5
+        and pd.notna(price)
+        and pd.notna(ma20_)
+        and price >= ma20_
+        and o >= 1
+    ):
+        return "MUA PULL"
+
+    # -------------------------------
+    # 3) BREAK: leader vượt vùng gần nhất + vol xác nhận
+    # -------------------------------
+    if (
+        pd.notna(breakout_ref)
+        and pd.notna(price)
+        and pd.notna(vol_)
+        and pd.notna(vol_ma20_)
+        and price >= breakout_ref * 1.01
+        and vol_ >= vol_ma20_ * 1.2
+        and r >= 1
+        and o >= 1
+    ):
+        return "MUA BREAK"
+
+    # -------------------------------
+    # 4) CP MẠNH: leader đang chạy xa EMA9
+    # -------------------------------
+    if (
+        pd.notna(dist_from_ema9)
+        and dist_from_ema9 > 1.5
+        and e == 2
+        and r >= 1
+        and o >= 1
+    ):
+        return "CP MẠNH"
+
+    # -------------------------------
+    # 5) EARLY: leader nhưng chưa vào đúng break/pull
+    # -------------------------------
+    if (
+        pd.notna(rsi_) and pd.notna(rsi_ema9_) and rsi_ > rsi_ema9_
+        and pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ > obv_ema9_
+    ):
+        return "MUA EARLY"
+
+    return "TÍCH LŨY"
+
+
+# =========================================================
+# ANALYZE ONE SYMBOL
+# =========================================================
+def analyze_symbol(symbol: str) -> dict | None:
+    raw = download_symbol_data(symbol)
+    if raw.empty or len(raw) < 40:
+        return None
+
+    df = build_indicators(raw)
+    if len(df) < 25:
+        return None
+
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+
+    price = to_float(last["close"])
+    ema9_ = to_float(last["ema9"])
+    ma20_ = to_float(last["ma20"])
+    ema9_prev = to_float(prev["ema9"])
+
+    rsi_ = to_float(last["rsi14"])
+    rsi_ema9_ = to_float(last["rsi_ema9"])
+
+    obv_ = to_float(last["obv"])
+    obv_ema9_ = to_float(last["obv_ema9"])
+    obv_prev = to_float(prev["obv"])
+
+    vol_ = to_float(last["volume"])
+    vol_ma20_ = to_float(last["vol_ma20"])
+
+    high20_prev = to_float(df["high"].iloc[-21:-1].max())
+    dist_from_ema9 = np.nan
+    if pd.notna(price) and pd.notna(ema9_) and ema9_ != 0:
+        dist_from_ema9 = (price / ema9_ - 1) * 100
+
+    E = calc_price_score(price, ema9_, ma20_, ema9_prev)
+    R = calc_rsi_score(rsi_, rsi_ema9_)
+    O = calc_obv_score(obv_, obv_ema9_, obv_prev)
+    total_score = E + R + O
+
+    warning = build_warning(price, ema9_, rsi_, rsi_ema9_, obv_, obv_ema9_)
+    status = build_status(total_score, warning)
+
+    row = {
+        "symbol": symbol,
+        "price": round(price, 0) if pd.notna(price) else np.nan,
+        "ema9": round(ema9_, 2) if pd.notna(ema9_) else np.nan,
+        "ma20": round(ma20_, 2) if pd.notna(ma20_) else np.nan,
+        "rsi14": round(rsi_, 2) if pd.notna(rsi_) else np.nan,
+        "rsi_ema9": round(rsi_ema9_, 2) if pd.notna(rsi_ema9_) else np.nan,
+        "obv": round(obv_, 0) if pd.notna(obv_) else np.nan,
+        "obv_ema9": round(obv_ema9_, 0) if pd.notna(obv_ema9_) else np.nan,
+        "volume": round(vol_, 0) if pd.notna(vol_) else np.nan,
+        "vol_ma20": round(vol_ma20_, 0) if pd.notna(vol_ma20_) else np.nan,
+        "breakout_ref": round(high20_prev, 2) if pd.notna(high20_prev) else np.nan,
+        "dist_from_ema9_pct": round(dist_from_ema9, 2) if pd.notna(dist_from_ema9) else np.nan,
+        "E": E,
+        "R": R,
+        "O": O,
+        "total_score": total_score,
+        "status": status,
+        "warning": warning,
+    }
+
+    row["group"] = classify_group(row)
+    return row
+
+
+# =========================================================
+# SCAN
+# =========================================================
+@st.cache_data(ttl=300, show_spinner=False)
 def run_scan(symbols: list[str]) -> pd.DataFrame:
-    records = []
+    rows = []
 
     for symbol in symbols:
-        raw = fetch_data(symbol)
-        if raw.empty:
+        try:
+            item = analyze_symbol(symbol)
+            if item is not None:
+                rows.append(item)
+        except Exception:
             continue
 
-        df = calc_indicators(raw)
-        if df.empty or len(df) < 25:
-            continue
-
-        row = df.iloc[-1]
-        prev_row = df.iloc[-2]
-
-        action, score = classify_stock(row, prev_row)
-
-        if action == "LOẠI":
-            continue
-
-        records.append({
-            "symbol": symbol,
-            "price": fmt_num(row["close"], 2),
-            "EMA9": fmt_num(row["EMA9"], 2),
-            "EMA20": fmt_num(row["EMA20"], 2),
-            "RSI": fmt_num(row["RSI"], 1),
-            "OBV>EMA": "Có" if safe_float(row["OBV"]) > safe_float(row["OBV_EMA9"]) else "Không",
-            "MACD": fmt_num(row["MACD"], 2),
-            "VOL/MA20": fmt_num(row["volume"] / row["VOL_MA20"], 2) if safe_float(row["VOL_MA20"]) > 0 else np.nan,
-            "score": score,
-            "action": action
-        })
-
-    if len(records) == 0:
+    if not rows:
         return pd.DataFrame()
 
-    result = pd.DataFrame(records).sort_values(
-        by=["score", "RSI", "VOL/MA20"],
-        ascending=[False, False, False]
+    df = pd.DataFrame(rows)
+
+    df = df.sort_values(
+        by=["total_score", "E", "O", "R", "dist_from_ema9_pct"],
+        ascending=[False, False, False, False, True],
     ).reset_index(drop=True)
 
-    return result
+    return df
 
 
 # =========================================================
-# UI
+# UI CONTROLS
 # =========================================================
-st.title("🔥 SCANNER GÀ CHIẾN V16 PRO (.VN CLEAN)")
+left1, left2, left3, left4 = st.columns([1.1, 1.2, 1.1, 2.2])
 
-sector_options = ["TẤT CẢ"] + list(SECTOR_MAP.keys())
-selected_sector = st.selectbox("Chọn nhóm", sector_options, index=0)
+with left1:
+    scan_btn = st.button("🚀 SCAN", use_container_width=True)
 
-show_strong_only = st.checkbox("Chỉ hiện nhóm mạnh / mua", value=False)
+with left2:
+    auto_refresh = st.checkbox("Auto refresh 5 phút", value=True)
 
-symbols = get_symbols_by_sector(selected_sector)
+with left3:
+    show_detail = st.checkbox("Hiện bảng tổng", value=False)
 
-if st.button("🚀 SCAN", use_container_width=False):
-    result_df = run_scan(symbols)
+with left4:
+    st.markdown(
+        f"""
+        <div class="small-note">
+        Watchlist: <b>{len(WATCHLIST)}</b> mã &nbsp; | &nbsp;
+        Update: <b>{datetime.now().strftime("%d/%m/%Y %H:%M:%S")}</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    if result_df.empty:
-        st.warning("Không có dữ liệu hoặc chưa có mã đạt điều kiện.")
+if "last_auto_refresh" not in st.session_state:
+    st.session_state["last_auto_refresh"] = time.time()
+
+if auto_refresh:
+    now_ts = time.time()
+    if now_ts - st.session_state["last_auto_refresh"] > 300:
+        st.session_state["last_auto_refresh"] = now_ts
+        st.cache_data.clear()
+        st.rerun()
+
+if scan_btn:
+    st.cache_data.clear()
+
+with st.spinner("Đang quét dữ liệu..."):
+    scan_df = run_scan(WATCHLIST)
+
+if scan_df.empty:
+    st.error("Không lấy được dữ liệu. Anh kiểm tra lại mạng hoặc nguồn Yahoo Finance.")
+    st.stop()
+
+
+# =========================================================
+# SUMMARY
+# =========================================================
+GROUP_ORDER = ["CP MẠNH", "MUA BREAK", "MUA PULL", "MUA EARLY", "TÍCH LŨY", "THEO DÕI"]
+
+sum_cols = st.columns(6)
+for i, group_name in enumerate(GROUP_ORDER):
+    cnt = int((scan_df["group"] == group_name).sum())
+    with sum_cols[i]:
+        st.metric(group_name, cnt)
+
+
+# =========================================================
+# DISPLAY
+# =========================================================
+DISPLAY_COLUMNS = ["symbol", "price", "E", "R", "O", "total_score", "status"]
+
+def show_group_table(df: pd.DataFrame, group_name: str):
+    sub = df[df["group"] == group_name].copy()
+    if sub.empty:
+        st.info("Không có mã")
+        return
+
+    if group_name == "MUA PULL":
+        cols = ["symbol", "price", "E", "R", "O", "total_score", "dist_from_ema9_pct", "status"]
+    elif group_name == "MUA BREAK":
+        cols = ["symbol", "price", "E", "R", "O", "total_score", "breakout_ref", "status"]
     else:
-        if show_strong_only:
-            result_df = result_df[result_df["action"].isin(["CP MẠNH", "MUA BREAK", "MUA PULL", "MUA EARLY"])]
+        cols = DISPLAY_COLUMNS
 
-        col1, col2, col3, col4, col5, col6 = st.columns(6)
+    out = sub[cols].copy()
+    out.index = range(len(out))
 
-        with col1:
-            st.subheader("CP MẠNH")
-            st.dataframe(result_df[result_df["action"] == "CP MẠNH"], use_container_width=True)
+    st.dataframe(
+        out,
+        use_container_width=True,
+        height=min(520, 80 + len(out) * 35)
+    )
 
-        with col2:
-            st.subheader("MUA BREAK")
-            st.dataframe(result_df[result_df["action"] == "MUA BREAK"], use_container_width=True)
 
-        with col3:
-            st.subheader("MUA PULL")
-            st.dataframe(result_df[result_df["action"] == "MUA PULL"], use_container_width=True)
+st.markdown("---")
 
-        with col4:
-            st.subheader("MUA EARLY")
-            st.dataframe(result_df[result_df["action"] == "MUA EARLY"], use_container_width=True)
+cols = st.columns(6)
+for i, group_name in enumerate(GROUP_ORDER):
+    with cols[i]:
+        st.subheader(group_name)
+        show_group_table(scan_df, group_name)
 
-        with col5:
-            st.subheader("TÍCH LŨY")
-            st.dataframe(result_df[result_df["action"] == "TÍCH LŨY"], use_container_width=True)
 
-        with col6:
-            st.subheader("THEO DÕI")
-            st.dataframe(result_df[result_df["action"] == "THEO DÕI"], use_container_width=True)
+# =========================================================
+# DETAIL
+# =========================================================
+if show_detail:
+    st.markdown("---")
+    st.subheader("BẢNG TỔNG CHI TIẾT")
 
-        st.divider()
-        st.subheader("Tổng hợp toàn bộ mã đạt điều kiện")
-        st.dataframe(result_df, use_container_width=True)
+    detail_cols = [
+        "symbol", "group", "price",
+        "ema9", "ma20",
+        "rsi14", "rsi_ema9",
+        "E", "R", "O", "total_score",
+        "dist_from_ema9_pct", "breakout_ref",
+        "status", "warning"
+    ]
+
+    detail_df = scan_df[detail_cols].copy()
+    detail_df.index = range(len(detail_df))
+
+    st.dataframe(detail_df, use_container_width=True, height=720)
+
+
+# =========================================================
+# FOOTER
+# =========================================================
+st.markdown("---")
+st.caption(
+    "Đọc nhanh: "
+    "E = trục giá, R = RSI, O = OBV. "
+    "Pull = leader đang về gần EMA9. "
+    "Break = leader vượt vùng gần nhất kèm vol. "
+    "🟢 đẹp, 🟡 trung tính, 🔴 yếu."
+)
