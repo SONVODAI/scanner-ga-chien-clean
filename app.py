@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 
 # ================= WATCHLIST =================
 WATCHLIST = [
-"VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","VPB", "VIB", "MSB", 'TPB","ABB","LPB",:EIB","ACB","EVF","KLB","OCB"
+"VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","VPB", "VIB", "MSB","TPB","ABB","LPB","EIB","ACB","EVF","KLB","OCB"
 "SSI","VIX","SHS","HCM","VCI","VND","CTS",FTS","MBS","BSI","BVS","ORS","AGR","TCX","VPX","VCK","VDS"
 "VHM","VIC","DXG","DIG","NVL","VPL","VRE","NLG","KDH","CII","HHS","TCH","CEO","DIG","PDR","HDG","HDC","NHA","NTL","DPG""DXS","HUT"
 "MWG","FRT","PNJ","DGW","PET","MSN","MCH","MML","DBC","HAG","MML","SAB","PAN","FMC","BAF","HPA',"TLG","SBT"
