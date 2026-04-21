@@ -60,12 +60,12 @@ WATCHLIST = sorted(list(set([
 
     # Cổ phiếu lẻ
     "HVN", "VJC", "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
-    "TNH",
+    "TNH", "YEG",
 
     # BĐS / mã hay xem
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
     "KBC", "IJC", "EVF", "LHG", "SAB"
-])))
+]))) 
 
 DEFAULT_SUFFIX = ".VN"
 
