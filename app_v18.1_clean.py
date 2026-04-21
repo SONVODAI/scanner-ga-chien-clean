@@ -1,9 +1,11 @@
 # =========================================================
-# SCANNER GÀ CHIẾN V18.2 CLEAN
-# Nâng cấp từ V18.1 clean:
-# - RSI dùng zone + slope
-# - Pull phân loại: ĐẸP / VỪA / XẤU
-# - Giữ cách xử lý dữ liệu an toàn như V18.1 clean
+# SCANNER GÀ CHIẾN V18.3 CLEAN FINAL
+# Full rewrite from scratch
+# - Safe Yahoo parsing
+# - RSI zone + slope
+# - Pull classification: ĐẸP / VỪA / XẤU
+# - Market Score
+# - Top picks + NAV suggestion
 # =========================================================
 
 import time
@@ -19,13 +21,13 @@ import yfinance as yf
 # PAGE
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V18.2 Clean",
+    page_title="Scanner Gà Chiến V18.3 Clean",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V18.2 Clean")
-st.caption("RSI chuẩn hơn + Pull đẹp / vừa / xấu + giữ lõi sạch")
+st.title("🐔 Scanner Gà Chiến V18.3 Clean")
+st.caption("Market + RSI slope + Pull đẹp/vừa/xấu + Top vào tiền")
 
 
 # =========================================================
@@ -159,6 +161,34 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
     return None
 
 
+def nav_suggestion(group_name: str, market_score: float) -> str:
+    if market_score < 6:
+        if group_name == "PULL ĐẸP":
+            return "10% NAV"
+        if group_name == "PULL VỪA":
+            return "5% NAV"
+        if group_name == "MUA BREAK":
+            return "5% NAV"
+        return "0-5% NAV"
+
+    if market_score < 8:
+        if group_name == "PULL ĐẸP":
+            return "20% NAV"
+        if group_name == "PULL VỪA":
+            return "10-15% NAV"
+        if group_name == "MUA BREAK":
+            return "10% NAV"
+        return "5-10% NAV"
+
+    if group_name == "PULL ĐẸP":
+        return "25-30% NAV"
+    if group_name == "PULL VỪA":
+        return "10-15% NAV"
+    if group_name == "MUA BREAK":
+        return "15-20% NAV"
+    return "10% NAV"
+
+
 # =========================================================
 # DATA
 # =========================================================
@@ -220,9 +250,6 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     x["vol_ma20"] = sma(x["volume"], 20)
 
-    x["highest_20"] = x["high"].rolling(20).max()
-    x["lowest_20"] = x["low"].rolling(20).min()
-
     return x
 
 
@@ -256,6 +283,30 @@ def calc_obv_score(obv_, obv_ema9_, obv_prev):
     return 0
 
 
+# =========================================================
+# PULL CLASSIFICATION
+# =========================================================
+def classify_pull_label(dist_from_ema9, rsi_, rsi_slope_, obv_, obv_ema9_):
+    if not pd.notna(dist_from_ema9):
+        return ""
+
+    obv_ok = pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_
+    rsi_ok = pd.notna(rsi_) and rsi_ > 55
+    rsi_strong = pd.notna(rsi_) and rsi_ > 60
+    slope_up = pd.notna(rsi_slope_) and rsi_slope_ > 0
+
+    if -1.0 <= dist_from_ema9 <= 1.0 and rsi_strong and slope_up and obv_ok:
+        return "PULL ĐẸP"
+
+    if -2.5 <= dist_from_ema9 <= 2.0 and rsi_ok and obv_ok:
+        return "PULL VỪA"
+
+    return "PULL XẤU"
+
+
+# =========================================================
+# WARNING / STATUS
+# =========================================================
 def build_warning(close_, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label):
     warnings = []
 
@@ -277,7 +328,9 @@ def build_warning(close_, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label):
     return " | ".join(dict.fromkeys(warnings))
 
 
-def build_status(total_score, warning):
+def build_status(total_score, warning, group_name):
+    if group_name == "PULL ĐẸP":
+        return "🟢"
     if total_score >= 5 and warning == "":
         return "🟢"
     if total_score >= 3:
@@ -286,37 +339,12 @@ def build_status(total_score, warning):
 
 
 # =========================================================
-# PULL LABEL
-# =========================================================
-def classify_pull_label(dist_from_ema9, rsi_, rsi_slope_, obv_, obv_ema9_):
-    if not pd.notna(dist_from_ema9):
-        return ""
-
-    obv_ok = pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_
-    rsi_ok = pd.notna(rsi_) and rsi_ > 55
-    rsi_strong = pd.notna(rsi_) and rsi_ > 60
-    slope_up = pd.notna(rsi_slope_) and rsi_slope_ > 0
-
-    if -1.0 <= dist_from_ema9 <= 1.0 and rsi_strong and slope_up and obv_ok:
-        return "PULL ĐẸP"
-
-    if -2.5 <= dist_from_ema9 <= 2.0 and rsi_ok and obv_ok:
-        return "PULL VỪA"
-
-    return "PULL XẤU"
-
-
-# =========================================================
-# CLASSIFY
+# GROUP CLASSIFICATION
 # =========================================================
 def classify_group(row: dict) -> str:
     price = row["price"]
     ema9_ = row["ema9"]
     ma20_ = row["ma20"]
-    rsi_ = row["rsi14"]
-    rsi_slope_ = row["rsi_slope"]
-    obv_ = row["obv"]
-    obv_ema9_ = row["obv_ema9"]
     vol_ = row["volume"]
     vol_ma20_ = row["vol_ma20"]
     total = row["total_score"]
@@ -344,20 +372,18 @@ def classify_group(row: dict) -> str:
         return "MUA EARLY"
 
     if (
-        pd.notna(dist_from_ema9)
+        pull_label == "PULL ĐẸP"
         and pd.notna(price)
         and pd.notna(ma20_)
         and price >= ma20_
-        and pull_label == "PULL ĐẸP"
     ):
         return "PULL ĐẸP"
 
     if (
-        pd.notna(dist_from_ema9)
+        pull_label == "PULL VỪA"
         and pd.notna(price)
         and pd.notna(ma20_)
         and price >= ma20_
-        and pull_label == "PULL VỪA"
     ):
         return "PULL VỪA"
 
@@ -382,13 +408,7 @@ def classify_group(row: dict) -> str:
     ):
         return "CP MẠNH"
 
-    if (
-        pd.notna(rsi_) and rsi_ > 55
-        and pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ > obv_ema9_
-    ):
-        return "MUA EARLY"
-
-    return "TÍCH LŨY"
+    return "MUA EARLY"
 
 
 # =========================================================
@@ -421,7 +441,7 @@ def analyze_symbol(symbol: str) -> dict | None:
     vol_ = to_float(last["volume"])
     vol_ma20_ = to_float(last["vol_ma20"])
 
-    high20_prev = to_float(df["high"].iloc[-21:-1].max())
+    breakout_ref = to_float(df["high"].iloc[-21:-1].max())
 
     dist_from_ema9 = np.nan
     if pd.notna(price) and pd.notna(ema9_) and ema9_ != 0:
@@ -440,9 +460,6 @@ def analyze_symbol(symbol: str) -> dict | None:
         obv_ema9_=obv_ema9_,
     )
 
-    warning = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label)
-    status = build_status(total_score, warning)
-
     row = {
         "symbol": symbol,
         "price": round(price, 0) if pd.notna(price) else np.nan,
@@ -454,18 +471,18 @@ def analyze_symbol(symbol: str) -> dict | None:
         "obv_ema9": round(obv_ema9_, 0) if pd.notna(obv_ema9_) else np.nan,
         "volume": round(vol_, 0) if pd.notna(vol_) else np.nan,
         "vol_ma20": round(vol_ma20_, 0) if pd.notna(vol_ma20_) else np.nan,
-        "breakout_ref": round(high20_prev, 2) if pd.notna(high20_prev) else np.nan,
+        "breakout_ref": round(breakout_ref, 2) if pd.notna(breakout_ref) else np.nan,
         "dist_from_ema9_pct": round(dist_from_ema9, 2) if pd.notna(dist_from_ema9) else np.nan,
         "pull_label": pull_label,
         "E": E,
         "R": R,
         "O": O,
         "total_score": total_score,
-        "status": status,
-        "warning": warning,
     }
 
     row["group"] = classify_group(row)
+    row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label)
+    row["status"] = build_status(total_score, row["warning"], row["group"])
     return row
 
 
@@ -489,9 +506,20 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
 
     df = pd.DataFrame(rows)
 
+    group_priority = {
+        "PULL ĐẸP": 1,
+        "MUA BREAK": 2,
+        "PULL VỪA": 3,
+        "CP MẠNH": 4,
+        "MUA EARLY": 5,
+        "TÍCH LŨY": 6,
+        "THEO DÕI": 7,
+    }
+    df["group_rank"] = df["group"].map(group_priority).fillna(99)
+
     df = df.sort_values(
-        by=["total_score", "E", "O", "R", "dist_from_ema9_pct"],
-        ascending=[False, False, False, False, True],
+        by=["group_rank", "total_score", "E", "O", "R", "dist_from_ema9_pct"],
+        ascending=[True, False, False, False, False, True],
     ).reset_index(drop=True)
 
     return df
@@ -535,6 +563,52 @@ def market_status_text(score: float) -> tuple[str, str]:
     if score >= 6:
         return "🟡 TRUNG TÍNH", "⚠️ Chỉ nên test nhỏ"
     return "🔴 THỊ TRƯỜNG YẾU", "⛔ Không nên vào tiền"
+
+
+# =========================================================
+# TOP PICKS
+# =========================================================
+def build_top_picks(df: pd.DataFrame, market_score: float) -> pd.DataFrame:
+    picks = []
+
+    pull_good = df[df["group"] == "PULL ĐẸP"].head(2)
+    for _, row in pull_good.iterrows():
+        picks.append({
+            "symbol": row["symbol"],
+            "group": row["group"],
+            "price": row["price"],
+            "score": row["total_score"],
+            "dist_from_ema9_pct": row["dist_from_ema9_pct"],
+            "nav": nav_suggestion(row["group"], market_score),
+        })
+
+    pull_ok = df[df["group"] == "PULL VỪA"].head(2)
+    for _, row in pull_ok.iterrows():
+        picks.append({
+            "symbol": row["symbol"],
+            "group": row["group"],
+            "price": row["price"],
+            "score": row["total_score"],
+            "dist_from_ema9_pct": row["dist_from_ema9_pct"],
+            "nav": nav_suggestion(row["group"], market_score),
+        })
+
+    breaks = df[df["group"] == "MUA BREAK"].head(1)
+    for _, row in breaks.iterrows():
+        picks.append({
+            "symbol": row["symbol"],
+            "group": row["group"],
+            "price": row["price"],
+            "score": row["total_score"],
+            "dist_from_ema9_pct": row["dist_from_ema9_pct"],
+            "nav": nav_suggestion(row["group"], market_score),
+        })
+
+    if not picks:
+        return pd.DataFrame()
+
+    top_df = pd.DataFrame(picks).drop_duplicates(subset=["symbol"]).head(4)
+    return top_df
 
 
 # =========================================================
@@ -605,6 +679,25 @@ elif market_score < 8:
     st.info(market_action)
 else:
     st.success(market_action)
+
+
+# =========================================================
+# TOP PICKS
+# =========================================================
+st.markdown("## 🎯 TOP VÀO TIỀN HÔM NAY")
+
+top_df = build_top_picks(scan_df, market_score)
+
+if top_df.empty:
+    st.warning("Không có cổ phiếu đủ chuẩn để vào tiền.")
+else:
+    for _, row in top_df.iterrows():
+        st.markdown(
+            f"""
+**{row['symbol']}** — {row['group']}  
+Giá: **{row['price']}** | Score: **{row['score']}** | Dist EMA9: **{row['dist_from_ema9_pct']}%** | Gợi ý NAV: **{row['nav']}**
+"""
+        )
 
 
 # =========================================================
@@ -686,5 +779,6 @@ st.caption(
     "Đọc nhanh: "
     "R dùng RSI zone + slope. "
     "Pull đẹp = gần EMA9, RSI > 60, slope dương, OBV không gãy. "
+    "Top picks ưu tiên Pull đẹp → Pull vừa → Break. "
     "Market ≥ 8 mới đánh mạnh."
 )
