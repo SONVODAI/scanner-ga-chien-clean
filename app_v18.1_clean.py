@@ -1,6 +1,9 @@
 # =========================================================
-# SCANNER GÀ CHIẾN V18.1 CLEAN
-# GIỮ NGUYÊN LOGIC V18 + THÊM MARKET SCORE
+# SCANNER GÀ CHIẾN V18.2 CLEAN
+# Nâng cấp từ V18.1 clean:
+# - RSI dùng zone + slope
+# - Pull phân loại: ĐẸP / VỪA / XẤU
+# - Giữ cách xử lý dữ liệu an toàn như V18.1 clean
 # =========================================================
 
 import time
@@ -16,13 +19,13 @@ import yfinance as yf
 # PAGE
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V18.1 Clean",
+    page_title="Scanner Gà Chiến V18.2 Clean",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V18.1 Clean")
-st.caption("Giữ nguyên V18 + thêm Market Score")
+st.title("🐔 Scanner Gà Chiến V18.2 Clean")
+st.caption("RSI chuẩn hơn + Pull đẹp / vừa / xấu + giữ lõi sạch")
 
 
 # =========================================================
@@ -143,6 +146,7 @@ def flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
     lower_map = {str(c).lower(): c for c in df.columns}
+
     for cand in candidates:
         if cand.lower() in lower_map:
             return lower_map[cand.lower()]
@@ -209,7 +213,7 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["ma20"] = sma(x["close"], 20)
 
     x["rsi14"] = calc_rsi(x["close"], 14)
-    x["rsi_ema9"] = ema(x["rsi14"], 9)
+    x["rsi_slope"] = x["rsi14"].diff()
 
     x["obv"] = calc_obv(x["close"], x["volume"])
     x["obv_ema9"] = ema(x["obv"], 9)
@@ -234,9 +238,9 @@ def calc_price_score(close_, ema9_, ma20_, ema9_prev):
     return 0
 
 
-def calc_rsi_score(rsi_, rsi_ema9_):
-    if pd.notna(rsi_) and pd.notna(rsi_ema9_):
-        if rsi_ > 60 and rsi_ > rsi_ema9_:
+def calc_rsi_score(rsi_, rsi_slope_):
+    if pd.notna(rsi_) and pd.notna(rsi_slope_):
+        if rsi_ > 65 and rsi_slope_ > 0:
             return 2
         if rsi_ > 55:
             return 1
@@ -252,19 +256,25 @@ def calc_obv_score(obv_, obv_ema9_, obv_prev):
     return 0
 
 
-def build_warning(close_, ema9_, rsi_, rsi_ema9_, obv_, obv_ema9_):
+def build_warning(close_, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label):
     warnings = []
 
     if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ < obv_ema9_:
         warnings.append("OBV gãy")
 
-    if pd.notna(rsi_) and pd.notna(rsi_ema9_) and rsi_ < rsi_ema9_:
+    if pd.notna(rsi_) and rsi_ < 55:
         warnings.append("RSI yếu")
+
+    if pd.notna(rsi_slope_) and rsi_slope_ < 0:
+        warnings.append("RSI chững")
 
     if pd.notna(close_) and pd.notna(ema9_) and close_ < ema9_:
         warnings.append("Giá dưới EMA9")
 
-    return " | ".join(warnings)
+    if pull_label == "PULL XẤU":
+        warnings.append("Pull xấu")
+
+    return " | ".join(dict.fromkeys(warnings))
 
 
 def build_status(total_score, warning):
@@ -276,14 +286,35 @@ def build_status(total_score, warning):
 
 
 # =========================================================
-# CLASSIFY - GIỮ NGUYÊN V18
+# PULL LABEL
+# =========================================================
+def classify_pull_label(dist_from_ema9, rsi_, rsi_slope_, obv_, obv_ema9_):
+    if not pd.notna(dist_from_ema9):
+        return ""
+
+    obv_ok = pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_
+    rsi_ok = pd.notna(rsi_) and rsi_ > 55
+    rsi_strong = pd.notna(rsi_) and rsi_ > 60
+    slope_up = pd.notna(rsi_slope_) and rsi_slope_ > 0
+
+    if -1.0 <= dist_from_ema9 <= 1.0 and rsi_strong and slope_up and obv_ok:
+        return "PULL ĐẸP"
+
+    if -2.5 <= dist_from_ema9 <= 2.0 and rsi_ok and obv_ok:
+        return "PULL VỪA"
+
+    return "PULL XẤU"
+
+
+# =========================================================
+# CLASSIFY
 # =========================================================
 def classify_group(row: dict) -> str:
     price = row["price"]
     ema9_ = row["ema9"]
     ma20_ = row["ma20"]
     rsi_ = row["rsi14"]
-    rsi_ema9_ = row["rsi_ema9"]
+    rsi_slope_ = row["rsi_slope"]
     obv_ = row["obv"]
     obv_ema9_ = row["obv_ema9"]
     vol_ = row["volume"]
@@ -294,6 +325,7 @@ def classify_group(row: dict) -> str:
     o = row["O"]
     dist_from_ema9 = row["dist_from_ema9_pct"]
     breakout_ref = row["breakout_ref"]
+    pull_label = row["pull_label"]
 
     leader = (
         total >= 5
@@ -313,13 +345,21 @@ def classify_group(row: dict) -> str:
 
     if (
         pd.notna(dist_from_ema9)
-        and -3.0 <= dist_from_ema9 <= 1.5
         and pd.notna(price)
         and pd.notna(ma20_)
         and price >= ma20_
-        and o >= 1
+        and pull_label == "PULL ĐẸP"
     ):
-        return "MUA PULL"
+        return "PULL ĐẸP"
+
+    if (
+        pd.notna(dist_from_ema9)
+        and pd.notna(price)
+        and pd.notna(ma20_)
+        and price >= ma20_
+        and pull_label == "PULL VỪA"
+    ):
+        return "PULL VỪA"
 
     if (
         pd.notna(breakout_ref)
@@ -343,7 +383,7 @@ def classify_group(row: dict) -> str:
         return "CP MẠNH"
 
     if (
-        pd.notna(rsi_) and pd.notna(rsi_ema9_) and rsi_ > rsi_ema9_
+        pd.notna(rsi_) and rsi_ > 55
         and pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ > obv_ema9_
     ):
         return "MUA EARLY"
@@ -372,7 +412,7 @@ def analyze_symbol(symbol: str) -> dict | None:
     ema9_prev = to_float(prev["ema9"])
 
     rsi_ = to_float(last["rsi14"])
-    rsi_ema9_ = to_float(last["rsi_ema9"])
+    rsi_slope_ = to_float(last["rsi_slope"])
 
     obv_ = to_float(last["obv"])
     obv_ema9_ = to_float(last["obv_ema9"])
@@ -388,11 +428,19 @@ def analyze_symbol(symbol: str) -> dict | None:
         dist_from_ema9 = (price / ema9_ - 1) * 100
 
     E = calc_price_score(price, ema9_, ma20_, ema9_prev)
-    R = calc_rsi_score(rsi_, rsi_ema9_)
+    R = calc_rsi_score(rsi_, rsi_slope_)
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
     total_score = E + R + O
 
-    warning = build_warning(price, ema9_, rsi_, rsi_ema9_, obv_, obv_ema9_)
+    pull_label = classify_pull_label(
+        dist_from_ema9=dist_from_ema9,
+        rsi_=rsi_,
+        rsi_slope_=rsi_slope_,
+        obv_=obv_,
+        obv_ema9_=obv_ema9_,
+    )
+
+    warning = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label)
     status = build_status(total_score, warning)
 
     row = {
@@ -401,13 +449,14 @@ def analyze_symbol(symbol: str) -> dict | None:
         "ema9": round(ema9_, 2) if pd.notna(ema9_) else np.nan,
         "ma20": round(ma20_, 2) if pd.notna(ma20_) else np.nan,
         "rsi14": round(rsi_, 2) if pd.notna(rsi_) else np.nan,
-        "rsi_ema9": round(rsi_ema9_, 2) if pd.notna(rsi_ema9_) else np.nan,
+        "rsi_slope": round(rsi_slope_, 2) if pd.notna(rsi_slope_) else np.nan,
         "obv": round(obv_, 0) if pd.notna(obv_) else np.nan,
         "obv_ema9": round(obv_ema9_, 0) if pd.notna(obv_ema9_) else np.nan,
         "volume": round(vol_, 0) if pd.notna(vol_) else np.nan,
         "vol_ma20": round(vol_ma20_, 0) if pd.notna(vol_ma20_) else np.nan,
         "breakout_ref": round(high20_prev, 2) if pd.notna(high20_prev) else np.nan,
         "dist_from_ema9_pct": round(dist_from_ema9, 2) if pd.notna(dist_from_ema9) else np.nan,
+        "pull_label": pull_label,
         "E": E,
         "R": R,
         "O": O,
@@ -449,7 +498,7 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
 
 
 # =========================================================
-# MARKET SCORE - THÊM MỚI
+# MARKET SCORE
 # =========================================================
 def calc_market_score(df: pd.DataFrame) -> float:
     total = len(df)
@@ -462,16 +511,19 @@ def calc_market_score(df: pd.DataFrame) -> float:
 
     strong = len(df[df["group"] == "CP MẠNH"])
     breakout = len(df[df["group"] == "MUA BREAK"])
+    pull_good = len(df[df["group"] == "PULL ĐẸP"])
 
-    strong_score = min(strong / 10, 1) * 3
-    breakout_score = min(breakout / 8, 1) * 2
+    strong_score = min(strong / 10, 1) * 2.5
+    breakout_score = min(breakout / 8, 1) * 1.5
+    pull_score = min(pull_good / 6, 1) * 1.0
 
     score = (
         e_ratio * 3
         + r_ratio * 3
-        + o_ratio * 3
+        + o_ratio * 2
         + strong_score
         + breakout_score
+        + pull_score
     )
 
     return round(score, 1)
@@ -558,9 +610,9 @@ else:
 # =========================================================
 # SUMMARY
 # =========================================================
-GROUP_ORDER = ["CP MẠNH", "MUA BREAK", "MUA PULL", "MUA EARLY", "TÍCH LŨY", "THEO DÕI"]
+GROUP_ORDER = ["CP MẠNH", "MUA BREAK", "PULL ĐẸP", "PULL VỪA", "MUA EARLY", "TÍCH LŨY", "THEO DÕI"]
 
-sum_cols = st.columns(6)
+sum_cols = st.columns(len(GROUP_ORDER))
 for i, group_name in enumerate(GROUP_ORDER):
     cnt = int((scan_df["group"] == group_name).sum())
     with sum_cols[i]:
@@ -578,8 +630,8 @@ def show_group_table(df: pd.DataFrame, group_name: str):
         st.info("Không có mã")
         return
 
-    if group_name == "MUA PULL":
-        cols = ["symbol", "price", "E", "R", "O", "total_score", "dist_from_ema9_pct", "status"]
+    if group_name in ["PULL ĐẸP", "PULL VỪA"]:
+        cols = ["symbol", "price", "E", "R", "O", "total_score", "dist_from_ema9_pct", "rsi_slope", "status"]
     elif group_name == "MUA BREAK":
         cols = ["symbol", "price", "E", "R", "O", "total_score", "breakout_ref", "status"]
     else:
@@ -597,7 +649,7 @@ def show_group_table(df: pd.DataFrame, group_name: str):
 
 st.markdown("---")
 
-cols = st.columns(6)
+cols = st.columns(len(GROUP_ORDER))
 for i, group_name in enumerate(GROUP_ORDER):
     with cols[i]:
         st.subheader(group_name)
@@ -614,9 +666,9 @@ if show_detail:
     detail_cols = [
         "symbol", "group", "price",
         "ema9", "ma20",
-        "rsi14", "rsi_ema9",
+        "rsi14", "rsi_slope",
         "E", "R", "O", "total_score",
-        "dist_from_ema9_pct", "breakout_ref",
+        "dist_from_ema9_pct", "pull_label", "breakout_ref",
         "status", "warning"
     ]
 
@@ -632,9 +684,7 @@ if show_detail:
 st.markdown("---")
 st.caption(
     "Đọc nhanh: "
-    "E = trục giá, R = RSI, O = OBV. "
-    "Pull = leader đang về gần EMA9. "
-    "Break = leader vượt vùng gần nhất kèm vol. "
+    "R dùng RSI zone + slope. "
+    "Pull đẹp = gần EMA9, RSI > 60, slope dương, OBV không gãy. "
     "Market ≥ 8 mới đánh mạnh."
 )
-
