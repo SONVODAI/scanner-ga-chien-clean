@@ -48,7 +48,7 @@ WATCHLIST = sorted(list(set([
 
     # Đầu tư công & vật liệu
     "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
-    "NKG", "VGS", "CTD", "HHV", "VCG",
+    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "VGS" 
 
     # Bán lẻ & chăn nuôi
     "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
@@ -61,11 +61,17 @@ WATCHLIST = sorted(list(set([
     "AGR", "VCI",
 
     # Công nghệ & logistic
-    "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
+    "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX", 
 
     # Cổ phiếu lẻ
-    "HVN", "VJC", "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
+     "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
     "TNH",
+
+    # Bất động sản công nghiệp & cao su
+    "VGC", "SZC", "IDC", "LHG", "KBC", "IJC", "DTD", "GVR", "SIP","PHR","DPR","DRI"
+
+    # Bất động sản nhà ở
+    "CII", "TCH", "HHS", "DXG", "CEO", "DXS", "DPG", "HDC", "NTL", "NVL", "NLG", "HUT", "HDG", "DIG","PDR", 
 
     # BĐS / mã hay xem
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
