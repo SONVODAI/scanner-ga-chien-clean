@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import yfinance as yf
+
 
 st.set_page_config(layout="wide")
 
@@ -40,12 +40,17 @@ def fetch_data(symbol):
         if df is None or df.empty:
             return pd.DataFrame()
 
+        df = df.rename(columns={
+            "close": "close",
+            "volume": "volume"
+        })
+
         return df
 
-    except:
+    except Exception:
         return pd.DataFrame()
-# ================= INDICATORS =================
-# ============== DATA ==============
+        # ================= INDICATORS =================
+
 @st.cache_data(ttl=600)
 def fetch_data(symbol):
     try:
