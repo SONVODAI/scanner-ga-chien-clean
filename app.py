@@ -8,17 +8,20 @@ st.set_page_config(layout="wide")
 
 # ================= WATCHLIST =================
 WATCHLIST = [
-"VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB",
-"SSI","VIX","SHS","HCM","VCI","VND",
-"VHM","VIC","DXG","DIG","NVL",
-"MWG","FRT","PNJ",
-"REE","GEX","PC1",
-"DGC","DCM","DPM",
-"BSR","PVS","GAS",
-"GMD","HAH","VSC",
-"FPT","CTR",
-"VHC","ANV",
-"HPG","HSG","NKG"
+"VCB","BID","CTG","TCB","MBB","VPB","STB","HDB","ACB","SHB","VPB", "VIB", "MSB", 'TPB","ABB","LPB",:EIB","ACB","EVF","KLB","OCB"
+"SSI","VIX","SHS","HCM","VCI","VND","CTS",FTS","MBS","BSI","BVS","ORS","AGR","TCX","VPX","VCK","VDS"
+"VHM","VIC","DXG","DIG","NVL","VPL","VRE","NLG","KDH","CII","HHS","TCH","CEO","DIG","PDR","HDG","HDC","NHA","NTL","DPG""DXS","HUT"
+"MWG","FRT","PNJ","DGW","PET","MSN","MCH","MML","DBC","HAG","MML","SAB","PAN","FMC","BAF","HPA',"TLG","SBT"
+"REE","GEX","PC1","NT2","GEG","POW"
+"DGC","DCM","DPM","CSV","BFC","LAS","MSR","BMP","NTP","DDV",
+"BSR","PVS","GAS","OIL","GAS","PLX","PVD","PVB","PVC","PVT",
+"GMD","HAH","VSC","HVN","ACV","VJC","VOS","VTO",
+"FPT","CTR","VTP","VGI","FOX","CMG","MFS","ELC"
+"VHC","ANV","MSH","TNG","TCM","VGT","VCS","PTB",
+"HPG","HSG","NKG","CTD","HHV","FCN","KSB","LCG","C4G","CTI","DHA","PLC","HT1"
+"VGC","IDC","SZC","LHG","KBC","DTD","IJC","GVR","SIP","PHR","DPR","DRI","TRC"
+"BVH","MIG","BMI"
+"DCL","TNH","DVN","IMP","DBD"
 ]
 
 # ================= DATA =================
