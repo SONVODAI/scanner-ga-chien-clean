@@ -1,171 +1,127 @@
-# app_v19_clean.py
+# app.py
 # -*- coding: utf-8 -*-
 
 import math
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 import streamlit as st
 
+# =========================================================
+# CẤU HÌNH GIAO DIỆN
+# =========================================================
+st.set_page_config(page_title="Scanner Gà Chiến V20", layout="wide")
+
+st.markdown("""
+<style>
+    .main-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    .sub-note {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 14px;
+    }
+    .section-title {
+        font-size: 20px;
+        font-weight: 800;
+        margin-top: 20px;
+        margin-bottom: 12px;
+    }
+    .tiny-note {
+        color: #666;
+        font-size: 12px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="main-title">SCANNER GÀ CHIẾN V20 – GIỮ FORM CŨ, SỬA LOGIC EARLY + 222</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="sub-note">222 = tín hiệu momentum mạnh | Risk chỉ để cảnh báo hành động, không dùng để loại cổ phiếu</div>',
+    unsafe_allow_html=True
+)
 
 # =========================================================
-# V19 CORE
-# - Tách riêng EARLY / ENTRY / LATE
-# - 222 = MOMENTUM, KHÔNG phải risk thấp
-# - Có thêm R-ENTRY để đánh giá có nên mua ngay không
+# SIDEBAR
 # =========================================================
+with st.sidebar:
+    st.header("Nguồn dữ liệu")
+    mode = st.radio("Chọn dữ liệu", ["Demo", "Upload CSV/XLSX"], index=0)
 
-st.set_page_config(page_title="V19 - Early / 222 / Risk", layout="wide")
+    st.markdown("---")
+    st.markdown("### Ý nghĩa")
+    st.write("- **EARLY** = chuẩn bị chạy, chưa phải mạnh hẳn")
+    st.write("- **CP MẠNH** = đang vận động tốt, có thể mua/pull/chờ")
+    st.write("- **222** = có momentum mạnh")
+    st.write("- **Risk** = chỉ để nhắc có nên đuổi hay chờ pull")
 
-st.title("V19 – Tách EARLY chuẩn + 222 + Risk Entry")
-st.caption("222 = Momentum mạnh | Quyết định mua = Stage + Risk Entry")
-
+    st.markdown("---")
+    show_only_focus = st.checkbox("Chỉ hiện các mã đáng chú ý", value=False)
 
 # =========================================================
-# 1) CẤU HÌNH NGƯỠNG
+# NGƯỠNG LOGIC
 # =========================================================
 CFG = {
-    # ----- EARLY -----
-    "early_rsi_min": 40,
-    "early_rsi_max": 55,
-    "early_max_price_vs_ma20_pct": 3.0,      # giá không được vượt MA20 quá xa
-    "early_max_ema9_ma20_gap_pct": 3.5,      # EMA9 không được xa MA20 quá nhiều
-    "early_max_obv_slope_pct": 3.0,          # OBV chỉ được đi ngang / nhích nhẹ
-    "early_max_vol_ratio": 1.05,             # vol thấp / cạn cung
-    "early_need_green_small_candle": True,
+    # ---- EARLY (nới để không quá cứng) ----
+    "early_rsi_min": 40.0,
+    "early_rsi_max": 60.0,
+    "early_dist_from_ema9_max": 2.8,
+    "early_ema9_ma20_gap_max": 5.0,
+    "early_obv_drop_tol_pct": -3.5,
+    "early_vol_ratio_max": 1.15,
 
-    # ----- ENTRY / BREAK / PULL -----
-    "entry_rsi_min": 55,
-    "entry_rsi_max": 70,
-    "entry_max_price_vs_ema9_pct": 4.0,      # mua đẹp khi giá chưa xa EMA9 quá
-    "entry_max_ema9_ma20_gap_pct": 7.0,      # EMA9 bắt đầu tách MA20 vừa phải
-    "entry_min_vol_ratio": 0.95,             # vol không được quá kiệt nếu là break
+    # ---- CP MẠNH / ENTRY ----
+    "strong_rsi_min": 55.0,
+    "strong_rsi_max": 72.0,
+    "strong_dist_from_ema9_max": 5.5,
+    "strong_ema9_ma20_gap_max": 9.0,
 
-    # ----- LATE / HOT -----
-    "late_rsi_warn": 70,
-    "late_rsi_hot": 75,
-    "late_ema9_ma20_gap_pct": 8.0,
-    "late_price_vs_ema9_pct": 5.0,
-    "late_bb_expand_pct": 18.0,              # BB width % giá tương đối lớn
+    # ---- HOT / LATE ----
+    "late_rsi_warn": 72.0,
+    "late_rsi_hot": 75.0,
+    "late_dist_from_ema9_warn": 4.5,
+    "late_dist_from_ema9_hot": 6.5,
+    "late_ema9_ma20_gap_warn": 7.0,
+    "late_ema9_ma20_gap_hot": 10.0,
 
-    # ----- 222 -----
-    "signal_222_need_price_above_ema9": True,
-    "signal_222_need_rsi_above_rsi_ema9": True,
-    "signal_222_need_obv_above_obv_ema9": True,
+    # ---- Risk phạt nhẹ, KHÔNG giết cp ----
+    "risk_rsi_mid": 75.0,
+    "risk_rsi_high": 80.0,
+    "risk_dist_mid": 3.0,
+    "risk_dist_high": 6.0,
+    "risk_gap_mid": 6.0,
+    "risk_gap_high": 10.0,
+    "risk_atr_mid": 3.8,
+    "risk_atr_high": 5.2,
 
-    # ----- RISK ENTRY -----
-    "risk_rsi_mid": 70,
-    "risk_rsi_high": 75,
-    "risk_price_vs_ema9_mid": 3.5,
-    "risk_price_vs_ema9_high": 5.0,
-    "risk_ema9_ma20_gap_mid": 6.0,
-    "risk_ema9_ma20_gap_high": 8.0,
-    "risk_bb_width_mid": 14.0,
-    "risk_bb_width_high": 18.0,
-    "risk_atr_pct_mid": 3.5,
-    "risk_atr_pct_high": 5.0,
+    # ---- Pull ----
+    "pull_beauty_max_dist": 2.2,
+    "pull_medium_max_dist": 4.0,
 
-    # ----- XẾP HẠNG / HIỂN THỊ -----
-    "min_close": 3,
+    # ---- Hiển thị ----
+    "min_price": 3.0,
 }
 
-
 # =========================================================
-# 2) HÀM TIỆN ÍCH
+# HÀM TIỆN ÍCH
 # =========================================================
-def safe_float(x, default=np.nan):
+def to_float(x, default=np.nan):
     try:
         if x is None:
             return default
         return float(x)
-    except Exception:
+    except:
         return default
 
-
-def pct_diff(a, b) -> float:
-    a = safe_float(a)
-    b = safe_float(b)
+def safe_pct(a, b):
+    a = to_float(a)
+    b = to_float(b)
     if pd.isna(a) or pd.isna(b) or b == 0:
         return np.nan
     return (a - b) / abs(b) * 100.0
 
-
-def is_up(a, b) -> bool:
-    a = safe_float(a)
-    b = safe_float(b)
-    if pd.isna(a) or pd.isna(b):
-        return False
-    return a > b
-
-
-def is_flat_or_up(cur, prev, tol_pct=0.2) -> bool:
-    cur = safe_float(cur)
-    prev = safe_float(prev)
-    if pd.isna(cur) or pd.isna(prev) or prev == 0:
-        return False
-    change = (cur - prev) / abs(prev) * 100.0
-    return change >= -tol_pct
-
-
-def candle_body_pct(open_, close_, ref_price) -> float:
-    open_ = safe_float(open_)
-    close_ = safe_float(close_)
-    ref_price = safe_float(ref_price)
-    if pd.isna(open_) or pd.isna(close_) or pd.isna(ref_price) or ref_price == 0:
-        return np.nan
-    return abs(close_ - open_) / ref_price * 100.0
-
-
-def candle_is_green(open_, close_) -> bool:
-    open_ = safe_float(open_)
-    close_ = safe_float(close_)
-    if pd.isna(open_) or pd.isna(close_):
-        return False
-    return close_ > open_
-
-
-def classify_candle_size(body_pct: float) -> str:
-    if pd.isna(body_pct):
-        return "?"
-    if body_pct <= 1.5:
-        return "small"
-    if body_pct <= 3.0:
-        return "medium"
-    return "large"
-
-
-def score_to_light(stage: str, risk: str, signal_222: bool) -> str:
-    if stage == "ENTRY" and risk == "LOW":
-        return "🟩"
-    if stage == "EARLY" and risk in ["LOW", "MID"]:
-        return "🟨"
-    if signal_222 and risk == "HIGH":
-        return "🟥"
-    if stage == "LATE":
-        return "🟥"
-    return "🟨"
-
-
-# =========================================================
-# 3) CHUẨN HÓA DỮ LIỆU
-# =========================================================
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Kỳ vọng tối thiểu có các cột sau.
-    Nếu nguồn dữ liệu anh đang dùng tên khác, chỉ cần sửa map ở đây.
-
-    symbol, close, open, high, low, volume,
-    ema9, ma20, wma45, ma100,
-    rsi, rsi_ema9,
-    obv, obv_ema9,
-    macd, macd_signal, macd_hist,
-    atr,
-    bb_upper, bb_lower,
-    vol_sma20,
-    close_prev, rsi_prev, obv_prev, atr_prev
-    """
-
     df = df.copy()
 
     rename_map = {
@@ -173,613 +129,640 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
         "code": "symbol",
         "stock": "symbol",
 
-        "Close": "close",
+        "Close": "price",
+        "close": "price",
+        "price_close": "price",
+
         "Open": "open",
+        "open_price": "open",
+
         "High": "high",
         "Low": "low",
+
         "Volume": "volume",
+        "vol": "volume",
 
         "EMA9": "ema9",
-        "MA20": "ma20",
-        "WMA45": "wma45",
-        "MA100": "ma100",
+        "ema_9": "ema9",
 
-        "RSI": "rsi",
+        "MA20": "ma20",
+        "ma_20": "ma20",
+
+        "WMA45": "wma45",
+        "wma_45": "wma45",
+
+        "MA100": "ma100",
+        "ma_100": "ma100",
+
+        "RSI": "rsi14",
+        "rsi": "rsi14",
+        "rsi14": "rsi14",
+
         "RSI_EMA9": "rsi_ema9",
+        "rsi_ema9": "rsi_ema9",
 
         "OBV": "obv",
+        "obv_value": "obv",
+
         "OBV_EMA9": "obv_ema9",
+        "obv_ema9": "obv_ema9",
 
         "MACD": "macd",
+        "macd_value": "macd",
+
         "MACD_SIGNAL": "macd_signal",
+        "macd_signal_line": "macd_signal",
+
         "MACD_HIST": "macd_hist",
+        "hist": "macd_hist",
 
         "ATR": "atr",
+        "atr14": "atr",
 
         "BB_UPPER": "bb_upper",
+        "bb_upper": "bb_upper",
+
         "BB_LOWER": "bb_lower",
+        "bb_lower": "bb_lower",
 
         "VOL_SMA20": "vol_sma20",
-        "close_yday": "close_prev",
-        "rsi_yday": "rsi_prev",
-        "obv_yday": "obv_prev",
-        "atr_yday": "atr_prev",
+        "vol_ma20": "vol_sma20",
+
+        "close_prev": "price_prev",
+        "rsi_prev": "rsi_prev",
+        "obv_prev": "obv_prev",
+        "atr_prev": "atr_prev",
     }
+
     df = df.rename(columns=rename_map)
 
-    required_cols = [
-        "symbol", "close", "open", "high", "low", "volume",
+    needed = [
+        "symbol", "price", "open", "high", "low", "volume",
         "ema9", "ma20", "wma45", "ma100",
-        "rsi", "rsi_ema9", "obv", "obv_ema9",
+        "rsi14", "rsi_ema9",
+        "obv", "obv_ema9",
         "macd", "macd_signal", "macd_hist",
         "atr", "bb_upper", "bb_lower", "vol_sma20",
+        "price_prev", "rsi_prev", "obv_prev", "atr_prev"
     ]
 
-    for c in required_cols:
+    for c in needed:
         if c not in df.columns:
             df[c] = np.nan
 
-    # Nếu chưa có prev -> tạm dùng current để tránh crash
-    for c in ["close_prev", "rsi_prev", "obv_prev", "atr_prev"]:
-        if c not in df.columns:
-            df[c] = df.get(c.replace("_prev", ""), np.nan)
-
-    # Ép kiểu
     num_cols = [c for c in df.columns if c != "symbol"]
     for c in num_cols:
         df[c] = pd.to_numeric(df[c], errors="coerce")
 
+    # fallback prev
+    if df["price_prev"].isna().all():
+        df["price_prev"] = df["price"]
+    if df["rsi_prev"].isna().all():
+        df["rsi_prev"] = df["rsi14"]
+    if df["obv_prev"].isna().all():
+        df["obv_prev"] = df["obv"]
+    if df["atr_prev"].isna().all():
+        df["atr_prev"] = df["atr"]
+
     return df
 
-
-# =========================================================
-# 4) TÍNH CHỈ SỐ PHỤ
-# =========================================================
-def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
+def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    df["price_vs_ema9_pct"] = (df["close"] - df["ema9"]) / df["ema9"] * 100
-    df["price_vs_ma20_pct"] = (df["close"] - df["ma20"]) / df["ma20"] * 100
-    df["ema9_ma20_gap_pct"] = (df["ema9"] - df["ma20"]) / df["ma20"] * 100
+    df["dist_from_ema9_pct"] = (df["price"] - df["ema9"]) / df["ema9"].replace(0, np.nan) * 100
+    df["dist_from_ma20_pct"] = (df["price"] - df["ma20"]) / df["ma20"].replace(0, np.nan) * 100
+    df["ema9_ma20_gap_pct"] = (df["ema9"] - df["ma20"]) / df["ma20"].replace(0, np.nan) * 100
 
-    df["vol_ratio"] = df["volume"] / df["vol_sma20"].replace(0, np.nan)
-    df["atr_pct"] = df["atr"] / df["close"].replace(0, np.nan) * 100
-
-    df["bb_width_pct"] = (df["bb_upper"] - df["bb_lower"]) / df["close"].replace(0, np.nan) * 100
-
-    df["rsi_slope"] = df["rsi"] - df["rsi_prev"]
-    # obv đổi theo % tương đối để dễ so
+    df["rsi_slope"] = df["rsi14"] - df["rsi_prev"]
     df["obv_slope_pct"] = (df["obv"] - df["obv_prev"]) / df["obv_prev"].replace(0, np.nan) * 100
-    df["atr_slope"] = df["atr"] - df["atr_prev"]
+    df["atr_pct"] = df["atr"] / df["price"].replace(0, np.nan) * 100
+    df["vol_ratio"] = df["volume"] / df["vol_sma20"].replace(0, np.nan)
 
-    df["body_pct"] = (df["close"] - df["open"]).abs() / df["close"].replace(0, np.nan) * 100
-    df["is_green"] = df["close"] > df["open"]
-    df["candle_size"] = df["body_pct"].apply(classify_candle_size)
-
-    # Cấu trúc tương đối cơ bản
-    df["price_above_ema9"] = df["close"] > df["ema9"]
-    df["price_above_ma20"] = df["close"] > df["ma20"]
-    df["ema9_above_ma20"] = df["ema9"] > df["ma20"]
-    df["rsi_above_rsi_ema9"] = df["rsi"] > df["rsi_ema9"]
-    df["obv_above_obv_ema9"] = df["obv"] > df["obv_ema9"]
+    df["price_above_ema9"] = df["price"] > df["ema9"]
+    df["price_above_ma20"] = df["price"] > df["ma20"]
+    df["ema9_above_ma20"] = df["ema9"] >= df["ma20"]
+    df["rsi_above_ema9"] = df["rsi14"] > df["rsi_ema9"]
+    df["obv_above_ema9"] = df["obv"] > df["obv_ema9"]
     df["macd_above_signal"] = df["macd"] > df["macd_signal"]
     df["hist_positive"] = df["macd_hist"] > 0
 
+    # nến
+    df["body_pct"] = (df["price"] - df["open"]).abs() / df["price"].replace(0, np.nan) * 100
+    df["is_green"] = df["price"] > df["open"]
+
     return df
 
+# =========================================================
+# SIGNAL 222
+# =========================================================
+def compute_E_score(row):
+    score = 0
+    if row["price_above_ema9"]:
+        score += 1
+    if row["rsi_above_ema9"]:
+        score += 1
+    if row["obv_above_ema9"]:
+        score += 1
+    return min(score, 2) if score >= 2 else score
+
+def has_222(row):
+    return bool(row["price_above_ema9"] and row["rsi_above_ema9"] and row["obv_above_ema9"])
 
 # =========================================================
-# 5) SIGNAL 222 = MOMENTUM
+# STAGE / GROUP
 # =========================================================
-def detect_222(row: pd.Series) -> bool:
-    conds = []
-
-    if CFG["signal_222_need_price_above_ema9"]:
-        conds.append(bool(row["price_above_ema9"]))
-
-    if CFG["signal_222_need_rsi_above_rsi_ema9"]:
-        conds.append(bool(row["rsi_above_rsi_ema9"]))
-
-    if CFG["signal_222_need_obv_above_obv_ema9"]:
-        conds.append(bool(row["obv_above_obv_ema9"]))
-
-    return all(conds)
-
-
-# =========================================================
-# 6) PHÂN LOẠI STAGE: EARLY / ENTRY / LATE / OTHER
-# =========================================================
-def classify_stage(row: pd.Series) -> str:
-    rsi = row["rsi"]
-    price_vs_ma20 = row["price_vs_ma20_pct"]
-    price_vs_ema9 = row["price_vs_ema9_pct"]
+def classify_stage(row):
+    rsi = row["rsi14"]
+    dist = row["dist_from_ema9_pct"]
     gap = row["ema9_ma20_gap_pct"]
     obv_slope = row["obv_slope_pct"]
     vol_ratio = row["vol_ratio"]
-    is_green = bool(row["is_green"])
-    candle_size = row["candle_size"]
 
-    # -------- EARLY chuẩn --------
-    early_ok = (
+    # EARLY: nới hơn, không bắt buộc nến xanh nhỏ
+    early_cond = (
         (CFG["early_rsi_min"] <= rsi <= CFG["early_rsi_max"])
-        and (price_vs_ma20 <= CFG["early_max_price_vs_ma20_pct"])
-        and (abs(gap) <= CFG["early_max_ema9_ma20_gap_pct"])
-        and (pd.isna(obv_slope) or abs(obv_slope) <= CFG["early_max_obv_slope_pct"])
-        and (pd.isna(vol_ratio) or vol_ratio <= CFG["early_max_vol_ratio"])
-        and (not row["price_vs_ema9_pct"] > 5.0)
-        and (not row["price_above_ma20"] or price_vs_ma20 <= CFG["early_max_price_vs_ma20_pct"])
-        and bool(row["rsi_above_rsi_ema9"])
+        and (abs(dist) <= CFG["early_dist_from_ema9_max"])
+        and (abs(gap) <= CFG["early_ema9_ma20_gap_max"])
+        and (pd.isna(obv_slope) or obv_slope >= CFG["early_obv_drop_tol_pct"])
+        and (pd.isna(vol_ratio) or vol_ratio <= CFG["early_vol_ratio_max"])
     )
 
-    if CFG["early_need_green_small_candle"]:
-        early_ok = early_ok and is_green and (candle_size == "small")
-
-    if early_ok:
+    if early_cond:
         return "EARLY"
 
-    # -------- ENTRY đẹp --------
-    entry_ok = (
+    # CP MẠNH / ENTRY: nới để không loại leader đẹp
+    strong_cond = (
         row["price_above_ema9"]
-        and row["price_above_ma20"]
         and row["ema9_above_ma20"]
-        and (CFG["entry_rsi_min"] <= rsi <= CFG["entry_rsi_max"])
-        and (price_vs_ema9 <= CFG["entry_max_price_vs_ema9_pct"])
-        and (gap <= CFG["entry_max_ema9_ma20_gap_pct"])
-        and row["rsi_above_rsi_ema9"]
-        and row["obv_above_obv_ema9"]
-        and (pd.isna(vol_ratio) or vol_ratio >= CFG["entry_min_vol_ratio"])
+        and (CFG["strong_rsi_min"] <= rsi <= CFG["strong_rsi_max"])
+        and (dist <= CFG["strong_dist_from_ema9_max"])
+        and (gap <= CFG["strong_ema9_ma20_gap_max"])
+        and row["rsi_above_ema9"]
     )
-    if entry_ok:
-        return "ENTRY"
+    if strong_cond:
+        return "STRONG"
 
-    # -------- LATE / HOT --------
-    late_ok = (
+    # HOT / LATE
+    late_cond = (
         row["price_above_ema9"]
         and row["ema9_above_ma20"]
         and (
-            (rsi >= CFG["late_rsi_warn"])
-            or (gap >= CFG["late_ema9_ma20_gap_pct"])
-            or (price_vs_ema9 >= CFG["late_price_vs_ema9_pct"])
-            or (row["bb_width_pct"] >= CFG["late_bb_expand_pct"])
+            rsi >= CFG["late_rsi_warn"]
+            or dist >= CFG["late_dist_from_ema9_warn"]
+            or gap >= CFG["late_ema9_ma20_gap_warn"]
         )
     )
-    if late_ok:
+    if late_cond:
         return "LATE"
 
-    return "OTHER"
+    return "WATCH"
 
+def classify_group(row, stage):
+    dist = row["dist_from_ema9_pct"]
+    rsi = row["rsi14"]
+
+    if stage == "EARLY":
+        return "MUA EARLY"
+
+    if stage == "STRONG":
+        if abs(dist) <= CFG["pull_beauty_max_dist"]:
+            return "PULL VỪA"
+        return "CP MẠNH"
+
+    if stage == "LATE":
+        return "CP MẠNH"
+
+    if has_222(row):
+        return "CP MẠNH"
+
+    if rsi >= 50:
+        return "THEO DÕI"
+
+    return "WATCHLIST"
 
 # =========================================================
-# 7) CHẤM RISK ENTRY
+# RISK CHỈ CẢNH BÁO, KHÔNG DÙNG ĐỂ LOẠI
 # =========================================================
-def classify_risk_entry(row: pd.Series, stage: str, signal_222: bool) -> tuple[str, int, str]:
-    """
-    Risk càng cao thì càng không nên mua ngay.
-    Trả về:
-      risk_label, penalty_points, note
-    """
-    penalty = 0
-    notes = []
-
-    rsi = row["rsi"]
-    price_vs_ema9 = row["price_vs_ema9_pct"]
+def compute_R_score(row, stage):
+    rsi = row["rsi14"]
+    dist = row["dist_from_ema9_pct"]
     gap = row["ema9_ma20_gap_pct"]
-    bb = row["bb_width_pct"]
     atr_pct = row["atr_pct"]
 
-    # 1) RSI nóng
+    penalty = 0
+
     if rsi >= CFG["risk_rsi_high"]:
-        penalty += 3
-        notes.append("RSI quá cao")
+        penalty += 2
     elif rsi >= CFG["risk_rsi_mid"]:
         penalty += 1
-        notes.append("RSI bắt đầu nóng")
 
-    # 2) Giá xa EMA9
-    if price_vs_ema9 >= CFG["risk_price_vs_ema9_high"]:
-        penalty += 3
-        notes.append("Giá xa EMA9")
-    elif price_vs_ema9 >= CFG["risk_price_vs_ema9_mid"]:
-        penalty += 1
-        notes.append("Giá hơi xa EMA9")
-
-    # 3) EMA9 xa MA20
-    if gap >= CFG["risk_ema9_ma20_gap_high"]:
-        penalty += 3
-        notes.append("EMA9 xa MA20")
-    elif gap >= CFG["risk_ema9_ma20_gap_mid"]:
-        penalty += 1
-        notes.append("EMA9 tách MA20 vừa")
-
-    # 4) BB bung mạnh
-    if bb >= CFG["risk_bb_width_high"]:
+    if dist >= CFG["risk_dist_high"]:
         penalty += 2
-        notes.append("BB bung mạnh")
-    elif bb >= CFG["risk_bb_width_mid"]:
+    elif dist >= CFG["risk_dist_mid"]:
         penalty += 1
-        notes.append("BB bắt đầu nở")
 
-    # 5) ATR cao
-    if atr_pct >= CFG["risk_atr_pct_high"]:
+    if gap >= CFG["risk_gap_high"]:
         penalty += 2
-        notes.append("ATR cao")
-    elif atr_pct >= CFG["risk_atr_pct_mid"]:
+    elif gap >= CFG["risk_gap_mid"]:
         penalty += 1
-        notes.append("ATR tăng")
 
-    # 6) Stage điều chỉnh risk
+    if atr_pct >= CFG["risk_atr_high"]:
+        penalty += 2
+    elif atr_pct >= CFG["risk_atr_mid"]:
+        penalty += 1
+
+    # stage chỉ nhắc nhẹ
     if stage == "EARLY":
-        penalty -= 1
-        notes.append("Stage early")
-    elif stage == "ENTRY":
-        penalty += 0
+        base = 0
+    elif stage == "STRONG":
+        base = 1
     elif stage == "LATE":
-        penalty += 2
-        notes.append("Stage late")
-
-    # 7) 222 không làm giảm risk.
-    # Chỉ xác nhận momentum, không phải điểm vào an toàn.
-    if signal_222 and stage == "LATE":
-        penalty += 1
-        notes.append("222 nhưng đã nóng")
-
-    # Chặn âm
-    penalty = max(penalty, 0)
-
-    if penalty <= 1:
-        return "LOW", penalty, " | ".join(notes) if notes else "R thấp"
-    elif penalty <= 4:
-        return "MID", penalty, " | ".join(notes) if notes else "R trung bình"
+        base = 2
     else:
-        return "HIGH", penalty, " | ".join(notes) if notes else "R cao"
+        base = 1
 
+    total = penalty + base
 
-# =========================================================
-# 8) HÀNH ĐỘNG KHUYẾN NGHỊ
-# =========================================================
-def decide_action(stage: str, risk: str, signal_222: bool, row: pd.Series) -> str:
-    if stage == "EARLY" and risk == "LOW":
-        return "Theo dõi sát / có thể gom sớm"
-    if stage == "EARLY" and risk == "MID":
-        return "Theo dõi, chờ xác nhận thêm"
-    if stage == "ENTRY" and risk == "LOW":
-        return "Mua được"
-    if stage == "ENTRY" and risk == "MID":
-        return "Mua thăm dò / ưu tiên chờ pull đẹp"
-    if stage == "LATE" and signal_222 and risk == "HIGH":
-        return "Leader mạnh nhưng không đuổi, chờ pull EMA9"
-    if stage == "LATE":
-        return "Không mua đuổi"
-    if signal_222 and risk == "MID":
-        return "Có momentum, chờ điểm vào đẹp hơn"
-    return "Quan sát"
+    # đổi sang thang R cũ kiểu 0/1/2
+    # 0 = rủi ro thấp
+    # 1 = vừa
+    # 2 = cao hơn nhưng vẫn giữ cp
+    if total <= 1:
+        return 0
+    elif total <= 4:
+        return 1
+    else:
+        return 2
 
+def risk_label_from_R(r):
+    if r == 0:
+        return "THẤP"
+    if r == 1:
+        return "VỪA"
+    return "CAO"
 
 # =========================================================
-# 9) MOMENTUM SCORE & ENTRY SCORE
+# QUALITY / Q
 # =========================================================
-def calc_momentum_score(row: pd.Series, signal_222: bool) -> int:
+def compute_Q_score(row, stage):
     score = 0
 
-    if row["price_above_ema9"]:
+    if stage == "EARLY":
+        score += 2
+    elif stage == "STRONG":
+        score += 2
+    elif stage == "LATE":
         score += 1
-    if row["ema9_above_ma20"]:
+    else:
         score += 1
-    if row["rsi_above_rsi_ema9"]:
-        score += 1
-    if row["obv_above_obv_ema9"]:
-        score += 1
+
     if row["macd_above_signal"]:
         score += 1
     if row["hist_positive"]:
         score += 1
-    if row["rsi"] >= 55:
+    if row["ema9_above_ma20"]:
         score += 1
-    if signal_222:
-        score += 2
 
-    return score  # max ~8
-
-
-def calc_entry_score(stage: str, risk: str) -> int:
-    # Score riêng cho "điểm mua"
-    base = {
-        "EARLY": 3,
-        "ENTRY": 5,
-        "LATE": 1,
-        "OTHER": 0,
-    }.get(stage, 0)
-
-    risk_adj = {
-        "LOW": 3,
-        "MID": 1,
-        "HIGH": -2,
-    }.get(risk, 0)
-
-    return base + risk_adj
-
+    # scale về 0/1/2
+    if score >= 4:
+        return 2
+    elif score >= 2:
+        return 1
+    return 0
 
 # =========================================================
-# 10) PIPELINE CHÍNH
+# PULL LABEL
 # =========================================================
-def run_v19_logic(df: pd.DataFrame) -> pd.DataFrame:
+def compute_pull_label(row, stage):
+    dist = abs(row["dist_from_ema9_pct"])
+
+    if stage == "EARLY":
+        return "EARLY"
+
+    if stage in ["STRONG", "LATE"]:
+        if dist <= CFG["pull_beauty_max_dist"]:
+            return "PULL ĐẸP"
+        elif dist <= CFG["pull_medium_max_dist"]:
+            return "PULL VỪA"
+        else:
+            return "PULL XẤU"
+
+    return "QUAN SÁT"
+
+# =========================================================
+# ACTION
+# =========================================================
+def decide_action(row, stage, group, E, R, Q):
+    if stage == "EARLY":
+        if R == 0:
+            return "THEO DÕI SỚM"
+        return "CANH XÁC NHẬN"
+
+    if stage == "STRONG":
+        if abs(row["dist_from_ema9_pct"]) <= CFG["pull_beauty_max_dist"] and R <= 1:
+            return "MUA ĐƯỢC"
+        elif R <= 1:
+            return "MUA THĂM DÒ / CHỜ PULL"
+        return "CHỜ PULL"
+
+    if stage == "LATE":
+        if has_222(row):
+            return "LEADER MẠNH - CHỜ PULL"
+        return "KHÔNG ĐUỔI"
+
+    if has_222(row):
+        return "GIỮ TRONG WATCHLIST"
+
+    return "QUAN SÁT"
+
+# =========================================================
+# ĐÈN
+# =========================================================
+def light_icon(group, action, R):
+    if action == "MUA ĐƯỢC":
+        return "🟩"
+    if group == "MUA EARLY":
+        return "🟨"
+    if "CHỜ PULL" in action or R == 2:
+        return "🟥"
+    return "🟨"
+
+# =========================================================
+# CHẠY LOGIC CHÍNH
+# =========================================================
+def run_scanner(df):
     df = normalize_columns(df)
-    df = add_derived_features(df)
+    df = add_features(df)
 
-    results = []
+    rows = []
     for _, row in df.iterrows():
-        if pd.isna(row["close"]) or row["close"] < CFG["min_close"]:
+        if pd.isna(row["price"]) or row["price"] < CFG["min_price"]:
             continue
 
-        signal_222 = detect_222(row)
         stage = classify_stage(row)
-        risk, penalty, risk_note = classify_risk_entry(row, stage, signal_222)
-        action = decide_action(stage, risk, signal_222, row)
-        momentum_score = calc_momentum_score(row, signal_222)
-        entry_score = calc_entry_score(stage, risk)
-        light = score_to_light(stage, risk, signal_222)
+        group = classify_group(row, stage)
 
-        results.append({
-            "Mã": row["symbol"],
-            "Giá": round(row["close"], 2) if pd.notna(row["close"]) else np.nan,
-            "Stage": stage,
-            "222": "YES" if signal_222 else "",
-            "Risk": risk,
-            "Đèn": light,
-            "Action": action,
+        E = compute_E_score(row)
+        R = compute_R_score(row, stage)
+        Q = compute_Q_score(row, stage)
 
-            "MomentumScore": momentum_score,
-            "EntryScore": entry_score,
-            "RiskPenalty": penalty,
+        total_score = E + (2 - R) + Q
+        pull_label = compute_pull_label(row, stage)
+        action = decide_action(row, stage, group, E, R, Q)
+        icon = light_icon(group, action, R)
 
-            "RSI": round(row["rsi"], 2) if pd.notna(row["rsi"]) else np.nan,
-            "RSI_EMA9": round(row["rsi_ema9"], 2) if pd.notna(row["rsi_ema9"]) else np.nan,
-            "OBV>EMA9": bool(row["obv_above_obv_ema9"]),
-            "MACD>Signal": bool(row["macd_above_signal"]),
-            "Hist+": bool(row["hist_positive"]),
+        obv_status = "🟢" if row["obv_above_ema9"] else "🔴"
+        signal_222 = "222" if has_222(row) else ""
 
-            "Price_vs_EMA9_%": round(row["price_vs_ema9_pct"], 2) if pd.notna(row["price_vs_ema9_pct"]) else np.nan,
-            "EMA9_MA20_Gap_%": round(row["ema9_ma20_gap_pct"], 2) if pd.notna(row["ema9_ma20_gap_pct"]) else np.nan,
-            "BB_Width_%": round(row["bb_width_pct"], 2) if pd.notna(row["bb_width_pct"]) else np.nan,
-            "ATR_%": round(row["atr_pct"], 2) if pd.notna(row["atr_pct"]) else np.nan,
-            "Vol_Ratio": round(row["vol_ratio"], 2) if pd.notna(row["vol_ratio"]) else np.nan,
-
-            "RiskNote": risk_note,
+        rows.append({
+            "đèn": icon,
+            "symbol": row["symbol"],
+            "group": group,
+            "price": round(row["price"], 2),
+            "ema9": round(row["ema9"], 2) if pd.notna(row["ema9"]) else np.nan,
+            "ma20": round(row["ma20"], 2) if pd.notna(row["ma20"]) else np.nan,
+            "rsi14": round(row["rsi14"], 2) if pd.notna(row["rsi14"]) else np.nan,
+            "rsi_slope": round(row["rsi_slope"], 2) if pd.notna(row["rsi_slope"]) else np.nan,
+            "obv": round(row["obv"], 0) if pd.notna(row["obv"]) else np.nan,
+            "obv_ema9": round(row["obv_ema9"], 0) if pd.notna(row["obv_ema9"]) else np.nan,
+            "obv_status": obv_status,
+            "222": signal_222,
+            "E": E,
+            "R": R,
+            "Q": Q,
+            "total_score": total_score,
+            "dist_from_ema9_pct": round(row["dist_from_ema9_pct"], 2) if pd.notna(row["dist_from_ema9_pct"]) else np.nan,
+            "pull_label": pull_label,
+            "stage": stage,
+            "action": action,
+            "risk_text": risk_label_from_R(R),
+            "ema9_ma20_gap_pct": round(row["ema9_ma20_gap_pct"], 2) if pd.notna(row["ema9_ma20_gap_pct"]) else np.nan,
+            "atr_pct": round(row["atr_pct"], 2) if pd.notna(row["atr_pct"]) else np.nan,
+            "vol_ratio": round(row["vol_ratio"], 2) if pd.notna(row["vol_ratio"]) else np.nan,
         })
 
-    out = pd.DataFrame(results)
+    out = pd.DataFrame(rows)
 
-    if not out.empty:
-        out = out.sort_values(
-            by=["EntryScore", "MomentumScore", "RiskPenalty"],
-            ascending=[False, False, True]
-        ).reset_index(drop=True)
+    if out.empty:
+        return out
+
+    # giữ form cũ: mã mua được / cp mạnh / early lên trên
+    group_order = {
+        "PULL VỪA": 0,
+        "CP MẠNH": 1,
+        "MUA EARLY": 2,
+        "THEO DÕI": 3,
+        "WATCHLIST": 4,
+    }
+    out["group_order"] = out["group"].map(group_order).fillna(9)
+
+    out = out.sort_values(
+        by=["group_order", "total_score", "E", "Q", "R", "dist_from_ema9_pct"],
+        ascending=[True, False, False, False, True, True]
+    ).reset_index(drop=True)
 
     return out
 
-
 # =========================================================
-# 11) DEMO DATA / LOAD DATA
+# DEMO DATA
 # =========================================================
-def make_demo_data() -> pd.DataFrame:
-    # Demo để app không trắng.
-    # Khi dùng thật, anh thay bằng data fetch thật của anh.
-    demo = pd.DataFrame([
+def demo_data():
+    return pd.DataFrame([
         {
-            "symbol": "VIC", "close": 207.2, "open": 193.7, "high": 208, "low": 192,
-            "volume": 4_714_000, "ema9": 182.95, "ma20": 157.99, "wma45": 157.99, "ma100": 151.71,
-            "rsi": 81.96, "rsi_ema9": 72.72, "obv": 319.774, "obv_ema9": 307.433,
-            "macd": 14058, "macd_signal": 7951, "macd_hist": 6107,
-            "atr": 9.4, "bb_upper": 215, "bb_lower": 160, "vol_sma20": 4_200_000,
-            "close_prev": 193.7, "rsi_prev": 77, "obv_prev": 311, "atr_prev": 8.9
+            "symbol": "TLG", "price": 51200, "open": 50800, "high": 51500, "low": 50500, "volume": 1200000,
+            "ema9": 50728.57, "ma20": 49710, "wma45": 48500, "ma100": 47000,
+            "rsi14": 56.51, "rsi_ema9": 55.57, "obv": 6746876, "obv_ema9": 6459698,
+            "macd": 12, "macd_signal": 10, "macd_hist": 2, "atr": 1100,
+            "bb_upper": 52000, "bb_lower": 49000, "vol_sma20": 1300000,
+            "price_prev": 50900, "rsi_prev": 55.57, "obv_prev": 6680000, "atr_prev": 1080
         },
         {
-            "symbol": "MSB", "close": 12.75, "open": 12.45, "high": 12.85, "low": 12.35,
-            "volume": 14_152_000, "ema9": 12.49, "ma20": 12.18, "wma45": 12.06, "ma100": 11.90,
-            "rsi": 66.42, "rsi_ema9": 64.04, "obv": 459.17, "obv_ema9": 448.81,
-            "macd": 293, "macd_signal": 232, "macd_hist": 62,
-            "atr": 0.35, "bb_upper": 13.20, "bb_lower": 10.91, "vol_sma20": 12_800_000,
-            "close_prev": 12.45, "rsi_prev": 64.8, "obv_prev": 455.0, "atr_prev": 0.33
+            "symbol": "MSB", "price": 12650, "open": 12500, "high": 12700, "low": 12480, "volume": 14000000,
+            "ema9": 12471.24, "ma20": 12052.5, "wma45": 11897, "ma100": 11750,
+            "rsi14": 64.78, "rsi_ema9": 60.96, "obv": -292767545, "obv_ema9": -292972625,
+            "macd": 200, "macd_signal": 150, "macd_hist": 50, "atr": 330,
+            "bb_upper": 13200, "bb_lower": 10900, "vol_sma20": 12000000,
+            "price_prev": 12400, "rsi_prev": 60.96, "obv_prev": -293500000, "atr_prev": 320
         },
         {
-            "symbol": "DGC", "close": 54.8, "open": 53.5, "high": 55.2, "low": 53.4,
-            "volume": 4_246_000, "ema9": 54.25, "ma20": 53.51, "wma45": 53.51, "ma100": 49.68,
-            "rsi": 45.41, "rsi_ema9": 42.77, "obv": -80.49, "obv_ema9": -83.8,
-            "macd": -2177, "macd_signal": -2837, "macd_hist": 661,
-            "atr": 2.0, "bb_upper": 57.34, "bb_lower": 49.68, "vol_sma20": 4_500_000,
-            "close_prev": 53.3, "rsi_prev": 44.6, "obv_prev": -81.0, "atr_prev": 2.05
+            "symbol": "NAB", "price": 13700, "open": 13550, "high": 13900, "low": 13500, "volume": 3500000,
+            "ema9": 13493.83, "ma20": 13290, "wma45": 13050, "ma100": 12850,
+            "rsi14": 64.78, "rsi_ema9": 58.35, "obv": -790209, "obv_ema9": -1837054,
+            "macd": 110, "macd_signal": 75, "macd_hist": 35, "atr": 280,
+            "bb_upper": 14400, "bb_lower": 12700, "vol_sma20": 3100000,
+            "price_prev": 13300, "rsi_prev": 58.35, "obv_prev": -1200000, "atr_prev": 270
+        },
+        {
+            "symbol": "GEX", "price": 40600, "open": 40100, "high": 40750, "low": 39950, "volume": 5200000,
+            "ema9": 39966.04, "ma20": 38472.5, "wma45": 37500, "ma100": 36000,
+            "rsi14": 59.37, "rsi_ema9": 58.42, "obv": -62053871, "obv_ema9": -63307186,
+            "macd": 115, "macd_signal": 100, "macd_hist": 15, "atr": 1050,
+            "bb_upper": 42000, "bb_lower": 36500, "vol_sma20": 5000000,
+            "price_prev": 40200, "rsi_prev": 58.42, "obv_prev": -62500000, "atr_prev": 1040
+        },
+        {
+            "symbol": "VHC", "price": 62500, "open": 62200, "high": 62800, "low": 62000, "volume": 850000,
+            "ema9": 61512.77, "ma20": 60050, "wma45": 59200, "ma100": 56900,
+            "rsi14": 60.92, "rsi_ema9": 60.16, "obv": 8446001, "obv_ema9": 7690749,
+            "macd": 130, "macd_signal": 118, "macd_hist": 12, "atr": 1500,
+            "bb_upper": 64000, "bb_lower": 54000, "vol_sma20": 900000,
+            "price_prev": 62000, "rsi_prev": 60.16, "obv_prev": 8350000, "atr_prev": 1480
+        },
+        {
+            "symbol": "NVL", "price": 18200, "open": 17650, "high": 18400, "low": 17500, "volume": 41000000,
+            "ema9": 17138.49, "ma20": 15815, "wma45": 14964, "ma100": 13618,
+            "rsi14": 76.81, "rsi_ema9": 74.42, "obv": 370524919, "obv_ema9": 287857733,
+            "macd": 420, "macd_signal": 300, "macd_hist": 120, "atr": 1050,
+            "bb_upper": 18900, "bb_lower": 12700, "vol_sma20": 30000000,
+            "price_prev": 17150, "rsi_prev": 74.42, "obv_prev": 340000000, "atr_prev": 980
+        },
+        {
+            "symbol": "VNM", "price": 61800, "open": 61700, "high": 62000, "low": 61500, "volume": 1800000,
+            "ema9": 61614.81, "ma20": 61410, "wma45": 61410, "ma100": 59957,
+            "rsi14": 48.77, "rsi_ema9": 47.38, "obv": -128959550, "obv_ema9": -132171786,
+            "macd": 20, "macd_signal": 10, "macd_hist": 10, "atr": 950,
+            "bb_upper": 62800, "bb_lower": 59900, "vol_sma20": 1900000,
+            "price_prev": 61700, "rsi_prev": 47.38, "obv_prev": -130000000, "atr_prev": 940
+        },
+        {
+            "symbol": "LHG", "price": 28450, "open": 28250, "high": 28550, "low": 28100, "volume": 980000,
+            "ema9": 28362.04, "ma20": 28270, "wma45": 27600, "ma100": 27000,
+            "rsi14": 52.58, "rsi_ema9": 51.61, "obv": -423994, "obv_ema9": -474268,
+            "macd": 12, "macd_signal": 11, "macd_hist": 1, "atr": 650,
+            "bb_upper": 29000, "bb_lower": 27000, "vol_sma20": 1050000,
+            "price_prev": 28300, "rsi_prev": 51.61, "obv_prev": -450000, "atr_prev": 640
+        },
+        {
+            "symbol": "DGC", "price": 55100, "open": 54600, "high": 55300, "low": 54400, "volume": 4200000,
+            "ema9": 54309.38, "ma20": 53525, "wma45": 53510, "ma100": 49680,
+            "rsi14": 46.11, "rsi_ema9": 41.64, "obv": -70781713, "obv_ema9": -73260846,
+            "macd": 18, "macd_signal": 11, "macd_hist": 7, "atr": 1650,
+            "bb_upper": 57700, "bb_lower": 49700, "vol_sma20": 4500000,
+            "price_prev": 54200, "rsi_prev": 41.64, "obv_prev": -72000000, "atr_prev": 1620
         },
     ])
-    return demo
 
-
-def load_uploaded_csv(uploaded_file) -> Optional[pd.DataFrame]:
+# =========================================================
+# LOAD DATA
+# =========================================================
+def load_uploaded_file(uploaded_file):
     try:
-        df = pd.read_csv(uploaded_file)
-        return df
-    except Exception:
-        try:
-            uploaded_file.seek(0)
-            df = pd.read_excel(uploaded_file)
-            return df
-        except Exception as e:
-            st.error(f"Lỗi đọc file: {e}")
-            return None
+        if uploaded_file.name.lower().endswith(".csv"):
+            return pd.read_csv(uploaded_file)
+        return pd.read_excel(uploaded_file)
+    except Exception as e:
+        st.error(f"Lỗi đọc file: {e}")
+        return None
 
-
-# =========================================================
-# 12) SIDEBAR
-# =========================================================
-with st.sidebar:
-    st.header("Nguồn dữ liệu")
-    data_mode = st.radio(
-        "Chọn dữ liệu",
-        ["Demo", "Upload CSV/XLSX"],
-        index=0
-    )
-
-    st.markdown("---")
-    st.subheader("Ý nghĩa")
-    st.write("• EARLY = chuẩn bị chạy")
-    st.write("• ENTRY = vùng mua đẹp")
-    st.write("• LATE = đang mạnh nhưng không còn điểm vào đẹp")
-    st.write("• 222 = momentum mạnh, không phải risk thấp")
-
-    st.markdown("---")
-    st.subheader("Bộ lọc nhanh")
-    show_only_watch = st.checkbox("Chỉ hiện mã mua được / theo dõi", value=False)
-
-
-# =========================================================
-# 13) LOAD DATA
-# =========================================================
-if data_mode == "Demo":
-    raw_df = make_demo_data()
+if mode == "Demo":
+    raw_df = demo_data()
 else:
-    uploaded = st.file_uploader("Upload file CSV hoặc Excel", type=["csv", "xlsx"])
+    uploaded = st.file_uploader("Upload file CSV/XLSX", type=["csv", "xlsx"])
     if uploaded is not None:
-        raw_df = load_uploaded_csv(uploaded)
+        raw_df = load_uploaded_file(uploaded)
     else:
         raw_df = None
 
-
-# =========================================================
-# 14) RUN
-# =========================================================
 if raw_df is None:
-    st.info("Anh upload file dữ liệu hoặc để chế độ Demo.")
+    st.info("Anh chọn Demo hoặc upload file dữ liệu.")
     st.stop()
 
-result_df = run_v19_logic(raw_df)
+# =========================================================
+# CHẠY SCAN
+# =========================================================
+result_df = run_scanner(raw_df)
 
 if result_df.empty:
     st.warning("Không có dữ liệu hợp lệ.")
     st.stop()
 
-if show_only_watch:
-    result_df = result_df[result_df["Action"].isin([
-        "Theo dõi sát / có thể gom sớm",
-        "Theo dõi, chờ xác nhận thêm",
-        "Mua được",
-        "Mua thăm dò / ưu tiên chờ pull đẹp",
-    ])].copy()
+# bộ lọc phụ
+if show_only_focus:
+    result_df = result_df[
+        result_df["group"].isin(["PULL VỪA", "CP MẠNH", "MUA EARLY"])
+    ].copy()
 
 # =========================================================
-# 15) TÓM TẮT
+# TÓM TẮT
 # =========================================================
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5 = st.columns(5)
 with c1:
-    st.metric("EARLY", int((result_df["Stage"] == "EARLY").sum()))
+    st.metric("PULL VỪA", int((result_df["group"] == "PULL VỪA").sum()))
 with c2:
-    st.metric("ENTRY", int((result_df["Stage"] == "ENTRY").sum()))
+    st.metric("CP MẠNH", int((result_df["group"] == "CP MẠNH").sum()))
 with c3:
-    st.metric("LATE", int((result_df["Stage"] == "LATE").sum()))
+    st.metric("MUA EARLY", int((result_df["group"] == "MUA EARLY").sum()))
 with c4:
-    st.metric("Có 222", int((result_df["222"] == "YES").sum()))
-
-st.markdown("---")
+    st.metric("Có 222", int((result_df["222"] == "222").sum()))
+with c5:
+    st.metric("Mua được", int((result_df["action"] == "MUA ĐƯỢC").sum()))
 
 # =========================================================
-# 16) BẢNG CHÍNH
+# BẢNG TỔNG CHI TIẾT
 # =========================================================
-display_cols = [
-    "Đèn", "Mã", "Giá", "Stage", "222", "Risk", "Action",
-    "MomentumScore", "EntryScore", "RiskPenalty",
-    "RSI", "RSI_EMA9",
-    "Price_vs_EMA9_%", "EMA9_MA20_Gap_%", "BB_Width_%", "ATR_%", "Vol_Ratio",
-    "RiskNote"
+st.markdown('<div class="section-title">BẢNG TỔNG CHI TIẾT</div>', unsafe_allow_html=True)
+
+detail_cols = [
+    "symbol", "group", "price", "ema9", "ma20",
+    "rsi14", "rsi_slope", "obv", "obv_ema9", "obv_status",
+    "E", "R", "Q", "total_score",
+    "dist_from_ema9_pct", "pull_label",
+    "222", "stage", "action", "risk_text",
+    "ema9_ma20_gap_pct", "atr_pct", "vol_ratio"
 ]
 
-st.subheader("Bảng tổng hợp V19")
 st.dataframe(
-    result_df[display_cols],
+    result_df[detail_cols],
     use_container_width=True,
-    hide_index=True
+    hide_index=True,
+    height=540
 )
 
 # =========================================================
-# 17) TÁCH NHÓM RÕ RÀNG
+# TOP LIST GIỐNG KIỂU CŨ
 # =========================================================
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.subheader("🟢 EARLY chuẩn")
-    early_df = result_df[result_df["Stage"] == "EARLY"].copy()
+    st.markdown('<div class="section-title">TOP PULL / MUA ĐƯỢC</div>', unsafe_allow_html=True)
+    df1 = result_df[
+        (result_df["group"].isin(["PULL VỪA", "CP MẠNH"])) &
+        (result_df["action"].isin(["MUA ĐƯỢC", "MUA THĂM DÒ / CHỜ PULL", "CHỜ PULL", "LEADER MẠNH - CHỜ PULL"]))
+    ].head(15)
     st.dataframe(
-        early_df[["Đèn", "Mã", "Giá", "Risk", "Action", "RSI", "Price_vs_EMA9_%", "EMA9_MA20_Gap_%", "RiskNote"]],
+        df1[["symbol", "group", "price", "E", "R", "Q", "total_score", "pull_label", "action"]],
         use_container_width=True,
         hide_index=True
     )
 
 with col2:
-    st.subheader("🟡 ENTRY / Mua được")
-    entry_df = result_df[result_df["Stage"] == "ENTRY"].copy()
+    st.markdown('<div class="section-title">TOP EARLY</div>', unsafe_allow_html=True)
+    df2 = result_df[result_df["group"] == "MUA EARLY"].head(15)
     st.dataframe(
-        entry_df[["Đèn", "Mã", "Giá", "222", "Risk", "Action", "RSI", "Price_vs_EMA9_%", "EMA9_MA20_Gap_%", "RiskNote"]],
+        df2[["symbol", "group", "price", "E", "R", "Q", "total_score", "pull_label", "action"]],
         use_container_width=True,
         hide_index=True
     )
 
 with col3:
-    st.subheader("🔴 LEADER nóng / Không đuổi")
-    late_df = result_df[(result_df["Stage"] == "LATE") | ((result_df["222"] == "YES") & (result_df["Risk"] == "HIGH"))].copy()
+    st.markdown('<div class="section-title">TOP 222 / LEADER</div>', unsafe_allow_html=True)
+    df3 = result_df[result_df["222"] == "222"].head(15)
     st.dataframe(
-        late_df[["Đèn", "Mã", "Giá", "222", "Risk", "Action", "RSI", "Price_vs_EMA9_%", "EMA9_MA20_Gap_%", "RiskNote"]],
+        df3[["symbol", "group", "price", "E", "R", "Q", "total_score", "pull_label", "action"]],
         use_container_width=True,
         hide_index=True
     )
 
 # =========================================================
-# 18) TOP LIST
-# =========================================================
-st.markdown("---")
-a, b, c = st.columns(3)
-
-with a:
-    st.subheader("Top EARLY")
-    top_early = result_df[result_df["Stage"] == "EARLY"].sort_values(
-        by=["RiskPenalty", "MomentumScore"],
-        ascending=[True, False]
-    ).head(10)
-    st.dataframe(
-        top_early[["Mã", "Giá", "Risk", "Action", "RSI", "RiskNote"]],
-        use_container_width=True,
-        hide_index=True
-    )
-
-with b:
-    st.subheader("Top ENTRY")
-    top_entry = result_df[result_df["Stage"] == "ENTRY"].sort_values(
-        by=["EntryScore", "MomentumScore"],
-        ascending=[False, False]
-    ).head(10)
-    st.dataframe(
-        top_entry[["Mã", "Giá", "222", "Risk", "Action", "RSI", "RiskNote"]],
-        use_container_width=True,
-        hide_index=True
-    )
-
-with c:
-    st.subheader("Top 222 nhưng không đuổi")
-    top_hot = result_df[(result_df["222"] == "YES") & (result_df["Risk"] == "HIGH")].sort_values(
-        by=["MomentumScore", "RiskPenalty"],
-        ascending=[False, False]
-    ).head(10)
-    st.dataframe(
-        top_hot[["Mã", "Giá", "Stage", "Risk", "Action", "RSI", "Price_vs_EMA9_%", "EMA9_MA20_Gap_%"]],
-        use_container_width=True,
-        hide_index=True
-    )
-
-# =========================================================
-# 19) GHI CHÚ CUỐI
+# GHI CHÚ
 # =========================================================
 st.markdown("---")
 st.markdown("""
-### Cách hiểu V19
-- **EARLY**: cổ phiếu chuẩn bị chạy, chưa mạnh rõ
-- **ENTRY**: vùng mua đẹp nhất
-- **LATE**: đang rất mạnh nhưng không còn điểm mua đẹp
-- **222**: xác nhận momentum mạnh, **không được hiểu là risk thấp**
-- **Risk Entry** mới là phần quyết định có mua ngay hay chờ pull
+**Cách đọc bản V20**
+- **E** = lực momentum ngắn hạn (222 nằm ở đây)
+- **R** = mức rủi ro điểm vào hiện tại, chỉ để cảnh báo
+- **Q** = chất lượng vận động tổng thể
+- **total_score** = điểm tổng để xếp thứ tự
+- **group** giữ form cũ: `PULL VỪA / CP MẠNH / MUA EARLY`
+- **Risk không dùng để loại cổ phiếu mạnh**
 """)
