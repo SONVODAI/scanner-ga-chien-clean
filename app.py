@@ -1,4 +1,4 @@
-import math
+import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -10,7 +10,7 @@ from vnstock import Quote
 # =========================================================
 # CONFIG UI
 # =========================================================
-st.set_page_config(page_title="Scanner Gà Chiến V27", layout="wide")
+st.set_page_config(page_title="Scanner Gà Chiến V28", layout="wide")
 
 st.markdown("""
 <style>
@@ -50,7 +50,7 @@ WATCHLIST = [
 ]
 
 # =========================================================
-# INDICATORS - KHÔNG DÙNG pandas_ta
+# INDICATORS - THUẦN PANDAS
 # =========================================================
 def ema(series: pd.Series, length: int) -> pd.Series:
     return series.ewm(span=length, adjust=False).mean()
@@ -68,7 +68,7 @@ def rsi_wilder(close: pd.Series, length: int = 14) -> pd.Series:
 
     rs = avg_gain / avg_loss.replace(0, np.nan)
     rsi = 100 - (100 / (1 + rs))
-    return rsi.fillna(method="bfill")
+    return rsi.bfill()
 
 def obv(close: pd.Series, volume: pd.Series) -> pd.Series:
     direction = np.sign(close.diff().fillna(0))
@@ -76,20 +76,21 @@ def obv(close: pd.Series, volume: pd.Series) -> pd.Series:
     return (direction * volume).cumsum()
 
 # =========================================================
-# FETCH DỮ LIỆU VNSTOCK
-# Docs Vnstock hiện dùng Quote(symbol, source).history(...)
-# và hỗ trợ source VCI/KBS. VCI đầy đủ hơn. 
+# LẤY DỮ LIỆU VNSTOCK
 # =========================================================
 @st.cache_data(ttl=180)
-def fetch_symbol_history(symbol: str, source: str = "VCI", length: str = "6M") -> pd.DataFrame:
+def fetch_symbol_history(symbol: str, source: str, start_date: str, end_date: str) -> pd.DataFrame:
+    """
+    Dùng API lịch sử giá của vnstock.
+    """
     quote = Quote(symbol=symbol, source=source)
-    df = quote.history(length=length, interval="1D")
+    df = quote.history(start=start_date, end=end_date, interval="1D")
     if df is None or len(df) == 0:
         return pd.DataFrame()
 
     df = df.copy()
-    # Chuẩn hóa tên cột
-    cols = {c.lower(): c for c in df.columns}
+
+    # chuẩn hóa cột
     rename_map = {}
     for c in df.columns:
         cl = c.lower()
@@ -105,17 +106,18 @@ def fetch_symbol_history(symbol: str, source: str = "VCI", length: str = "6M") -
             rename_map[c] = "close"
         elif cl == "volume":
             rename_map[c] = "volume"
+
     df = df.rename(columns=rename_map)
 
     needed = ["time", "open", "high", "low", "close", "volume"]
-    for c in needed:
-        if c not in df.columns:
-            return pd.DataFrame()
+    if any(col not in df.columns for col in needed):
+        return pd.DataFrame()
 
     df = df[needed].copy()
     df["time"] = pd.to_datetime(df["time"])
     for c in ["open", "high", "low", "close", "volume"]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
+
     df = df.dropna().reset_index(drop=True)
     return df
 
@@ -141,29 +143,29 @@ def classify_group(row: pd.Series) -> str:
     obv_ok = row["obv"] > row["obv_ema9"]
     dist = row["dist_from_ema9_pct"]
     vol_ratio = row["vol_ratio"]
-    price_green = row["price_green_today"]
+    green = row["price_green_today"]
 
-    # CP MẠNH = leader thật, không phải điểm mua
-    if price > ema9_v > ma20_v and rsi >= 58 and obv_ok:
+    # 1) CP MẠNH = leader thật, không ép phải là điểm mua
+    if price > ema9_v >= ma20_v and rsi >= 60 and obv_ok:
         return "CP MẠNH"
 
-    # MUA BREAK = break thật có volume
-    if row["price"] > row["high_3_prev"] and rsi >= 60 and vol_ratio >= 1.3 and price_green:
+    # 2) MUA BREAK = break thật
+    if price > row["high_3_prev"] and rsi >= 60 and vol_ratio >= 1.3 and green:
         return "MUA BREAK"
 
-    # PULL ĐẸP = pull sát EMA9, vẫn giữ trục
+    # 3) PULL ĐẸP
     if price > ema9_v >= ma20_v and 55 <= rsi <= 70 and abs(dist) <= 1.5 and obv_ok:
         return "PULL ĐẸP"
 
-    # PULL VỪA
+    # 4) PULL VỪA
     if price > ema9_v >= ma20_v and rsi >= 50 and 1.5 < abs(dist) <= 3.0:
         return "PULL VỪA"
 
-    # EARLY
+    # 5) EARLY
     if 45 <= rsi <= 55 and abs(dist) <= 2.0 and abs(row["ema9_ma20_gap_pct"]) <= 4.0:
         return "MUA EARLY"
 
-    # Tích lũy
+    # 6) TÍCH LŨY
     if 45 <= rsi <= 60:
         return "TÍCH LŨY"
 
@@ -191,50 +193,65 @@ def calc_ero(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 def calc_market_score(df: pd.DataFrame) -> tuple[float, float]:
-    n = max(len(df), 1)
-
+    """
+    Chấm kiểu trader hơn, tránh bị quá cao:
+    Xu hướng (0-4), Động lượng (0-3), Dòng tiền (0-4), Rủi ro (-2)
+    """
     pct_above_ema9 = (df["price"] > df["ema9"]).mean()
     pct_above_ma20 = (df["price"] > df["ma20"]).mean()
     avg_rsi = df["rsi14"].mean()
     avg_rsi_accel = df["rsi_accel"].mean()
     pct_obv_ok = (df["obv"] > df["obv_ema9"]).mean()
-    avg_obv_flow_pos = (df["obv_flow"] > 0).mean()
-
+    pct_obv_flow_pos = (df["obv_flow"] > 0).mean()
     pct_hot_rsi = (df["rsi14"] >= 75).mean()
     pct_far_ema = (df["dist_from_ema9_pct"].abs() >= 5).mean()
 
     trend = 0
-    if pct_above_ema9 > 0.60: trend += 2
-    elif pct_above_ema9 > 0.45: trend += 1
-    if pct_above_ma20 > 0.50: trend += 2
-    elif pct_above_ma20 > 0.35: trend += 1
+    if pct_above_ema9 > 0.65:
+        trend += 2
+    elif pct_above_ema9 > 0.50:
+        trend += 1
+    if pct_above_ma20 > 0.55:
+        trend += 2
+    elif pct_above_ma20 > 0.40:
+        trend += 1
 
     momentum = 0
-    if avg_rsi > 55: momentum += 2
-    elif avg_rsi > 50: momentum += 1
-    if avg_rsi_accel > 0: momentum += 1
+    if avg_rsi > 57:
+        momentum += 2
+    elif avg_rsi > 52:
+        momentum += 1
+    if avg_rsi_accel > 0:
+        momentum += 1
 
     money = 0
-    if pct_obv_ok > 0.60: money += 2
-    elif pct_obv_ok > 0.45: money += 1
-    if avg_obv_flow_pos > 0.55: money += 2
-    elif avg_obv_flow_pos > 0.45: money += 1
+    if pct_obv_ok > 0.65:
+        money += 2
+    elif pct_obv_ok > 0.50:
+        money += 1
+    if pct_obv_flow_pos > 0.55:
+        money += 2
+    elif pct_obv_flow_pos > 0.45:
+        money += 1
 
     risk_penalty = 0
-    if pct_hot_rsi > 0.20: risk_penalty += 1
-    if pct_far_ema > 0.20: risk_penalty += 1
+    if pct_hot_rsi > 0.20:
+        risk_penalty += 1
+    if pct_far_ema > 0.20:
+        risk_penalty += 1
 
-    real_score = trend + momentum + money - risk_penalty
-    real_score = round(max(0, min(13, real_score)), 1)
-    live_score = round(max(0, real_score - 0.7), 1)
-    return real_score, live_score
+    real = trend + momentum + money - risk_penalty
+    real = round(float(max(0, min(13, real))), 1)
+    live = round(max(0.0, real - 0.7), 1)
+    return real, live
 
 def pick_top_money(df: pd.DataFrame) -> pd.DataFrame:
     entry_groups = ["PULL ĐẸP", "PULL VỪA", "MUA BREAK"]
     top = df[
         (df["group"].isin(entry_groups)) &
         (df["vol_ratio"] >= 1.0) &
-        (df["rsi_accel"] > 0)
+        (df["rsi_accel"] > 0) &
+        (df["price_green_today"])
     ].copy()
 
     top = top.sort_values(
@@ -244,51 +261,64 @@ def pick_top_money(df: pd.DataFrame) -> pd.DataFrame:
     return top
 
 # =========================================================
-# PIPELINE
+# BUILD TABLE - BATCH + SLEEP
 # =========================================================
 @st.cache_data(ttl=180)
 def build_scanner_table(symbols: list[str], source: str) -> pd.DataFrame:
     rows = []
 
-    for symbol in symbols:
-        try:
-            raw = fetch_symbol_history(symbol, source=source, length="6M")
-            if raw.empty or len(raw) < 30:
+    end_date = now_vn.strftime("%Y-%m-%d")
+    start_date = (now_vn - timedelta(days=220)).strftime("%Y-%m-%d")
+
+    # chia batch nhỏ để tránh treo / rate limit
+    batch_size = 12
+
+    for batch_start in range(0, len(symbols), batch_size):
+        batch = symbols[batch_start: batch_start + batch_size]
+
+        for symbol in batch:
+            try:
+                raw = fetch_symbol_history(symbol, source=source, start_date=start_date, end_date=end_date)
+                if raw.empty or len(raw) < 30:
+                    continue
+
+                x = enrich_indicators(raw)
+                x = x.dropna().reset_index(drop=True)
+                if len(x) < 25:
+                    continue
+
+                latest = x.iloc[-1]
+                prev = x.iloc[-2]
+                high_3_prev = x.iloc[-4:-1]["high"].max() if len(x) >= 4 else prev["high"]
+
+                row = {
+                    "symbol": symbol,
+                    "price": float(latest["close"]),
+                    "open": float(latest["open"]),
+                    "ema9": float(latest["ema9"]),
+                    "ma20": float(latest["ma20"]),
+                    "rsi14": float(latest["rsi14"]),
+                    "rsi_prev": float(prev["rsi14"]),
+                    "rsi_accel": float(latest["rsi14"] - prev["rsi14"]),
+                    "obv": float(latest["obv"]),
+                    "obv_prev": float(prev["obv"]),
+                    "obv_ema9": float(latest["obv_ema9"]),
+                    "obv_status": "🟢" if latest["obv"] > latest["obv_ema9"] else "🔴",
+                    "volume": float(latest["volume"]),
+                    "vol_sma20": float(latest["vol_sma20"]),
+                    "vol_ratio": float(latest["volume"] / latest["vol_sma20"]) if latest["vol_sma20"] else np.nan,
+                    "price_green_today": bool(latest["close"] > latest["open"]),
+                    "dist_from_ema9_pct": float((latest["close"] - latest["ema9"]) / latest["ema9"] * 100),
+                    "ema9_ma20_gap_pct": float((latest["ema9"] - latest["ma20"]) / latest["ma20"] * 100),
+                    "obv_flow": float(latest["obv"] - prev["obv"]),
+                    "high_3_prev": float(high_3_prev),
+                }
+                rows.append(row)
+            except Exception:
                 continue
 
-            x = enrich_indicators(raw)
-            x = x.dropna().reset_index(drop=True)
-            if len(x) < 25:
-                continue
-
-            latest = x.iloc[-1]
-            prev = x.iloc[-2]
-            high_3_prev = x.iloc[-4:-1]["high"].max() if len(x) >= 4 else prev["high"]
-
-            row = {
-                "symbol": symbol,
-                "price": float(latest["close"]),
-                "open": float(latest["open"]),
-                "ema9": float(latest["ema9"]),
-                "ma20": float(latest["ma20"]),
-                "rsi14": float(latest["rsi14"]),
-                "rsi_prev": float(prev["rsi14"]),
-                "rsi_accel": float(latest["rsi14"] - prev["rsi14"]),
-                "obv": float(latest["obv"]),
-                "obv_prev": float(prev["obv"]),
-                "obv_ema9": float(latest["obv_ema9"]),
-                "obv_status": "🟢" if latest["obv"] > latest["obv_ema9"] else "🔴",
-                "volume": float(latest["volume"]),
-                "vol_sma20": float(latest["vol_sma20"]),
-                "vol_ratio": float(latest["volume"] / latest["vol_sma20"]) if latest["vol_sma20"] else np.nan,
-                "price_green_today": bool(latest["close"] > latest["open"]),
-                "dist_from_ema9_pct": float((latest["close"] - latest["ema9"]) / latest["ema9"] * 100),
-                "ema9_ma20_gap_pct": float((latest["ema9"] - latest["ma20"]) / latest["ma20"] * 100),
-                "high_3_prev": float(high_3_prev),
-            }
-            rows.append(row)
-        except Exception:
-            continue
+        # nghỉ ngắn giữa các batch
+        time.sleep(1.0)
 
     df = pd.DataFrame(rows)
     if df.empty:
@@ -305,7 +335,7 @@ def build_scanner_table(symbols: list[str], source: str) -> pd.DataFrame:
 # =========================================================
 # HEADER
 # =========================================================
-st.markdown('<div class="main-title">📊 SCANNER GÀ CHIẾN V27</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📊 SCANNER GÀ CHIẾN V28</div>', unsafe_allow_html=True)
 
 c1, c2 = st.columns(2)
 with c1:
@@ -313,28 +343,28 @@ with c1:
 with c2:
     st.markdown(f"⏰ **Giờ VN:** {now_vn.strftime('%H:%M:%S')}")
 
-source = st.selectbox("Nguồn dữ liệu Vnstock", ["VCI", "KBS"], index=0)
+source = st.selectbox("Nguồn dữ liệu Vnstock", ["KBS", "VCI"], index=0)
 scan = st.button("🔄 SCAN")
 st.markdown(
-    '<div class="small-note">Bản này dùng Vnstock Quote.history(), không dùng pandas_ta. '
-    'VCI thường đầy đủ hơn; KBS hợp Colab/Kaggle hơn theo tài liệu Vnstock.</div>',
+    '<div class="small-note">V28 dùng Vnstock Quote.history() + batch scan để giảm treo app. '
+    'KBS mặc định ổn định hơn cho cloud; VCI có thể đầy đủ hơn ở vài trường hợp.</div>',
     unsafe_allow_html=True
 )
 
 # =========================================================
 # SESSION
 # =========================================================
-if "scanner_df_v27" not in st.session_state:
-    st.session_state["scanner_df_v27"] = pd.DataFrame()
+if "scanner_df_v28" not in st.session_state:
+    st.session_state["scanner_df_v28"] = pd.DataFrame()
 
-if scan or st.session_state["scanner_df_v27"].empty:
+if scan or st.session_state["scanner_df_v28"].empty:
     with st.spinner("Đang tải dữ liệu thật từ Vnstock..."):
-        st.session_state["scanner_df_v27"] = build_scanner_table(WATCHLIST, source=source)
+        st.session_state["scanner_df_v28"] = build_scanner_table(WATCHLIST, source=source)
 
-df = st.session_state["scanner_df_v27"]
+df = st.session_state["scanner_df_v28"]
 
 if df.empty:
-    st.error("Không lấy được dữ liệu. Kiểm tra lại requirements.txt, mạng, hoặc đổi source từ VCI sang KBS.")
+    st.error("Không lấy được dữ liệu. Đổi source KBS/VCI hoặc scan lại sau.")
     st.stop()
 
 # =========================================================
@@ -368,7 +398,7 @@ else:
 st.caption("Market REAL = quyết định. Market LIVE = quan sát trong phiên.")
 
 # =========================================================
-# TOP VÀO TIỀN HÔM NAY
+# TOP VÀO TIỀN
 # =========================================================
 st.markdown("---")
 st.markdown('<div class="section-title">🎯 TOP VÀO TIỀN HÔM NAY</div>', unsafe_allow_html=True)
@@ -424,7 +454,7 @@ ero_cols = [
 st.dataframe(top20[ero_cols], use_container_width=True, height=420, hide_index=False)
 
 # =========================================================
-# FULL DETAIL TABLE
+# BẢNG TỔNG CHI TIẾT
 # =========================================================
 st.markdown("---")
 st.markdown('<div class="section-title">BẢNG TỔNG CHI TIẾT</div>', unsafe_allow_html=True)
