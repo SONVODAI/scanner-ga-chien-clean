@@ -7,17 +7,44 @@ from vnstock import Vnstock
 # WATCHLIST FULL
 # ========================
 
-WATCHLIST = [
-"VCB","BID","CTG","TCB","VPB","MBB","ACB","STB","HDB","TPB","VIB","LPB","MSB","EIB",
-"SSI","VND","HCM","SHS","VIX","BSI","FTS",
-"HPG","HSG","NKG",
-"VHM","VIC","VRE","DXG","DIG","CEO","TCH",
-"GAS","PVS","PVD","BSR","PLX",
-"GMD","VSC","HAH","VTO","VOS",
-"MWG","FRT","DGW","PET","MSN",
-"FPT","CTR","VTP",
-"DGC","DCM","DPM","LAS","BFC"
-]
+WATCHLIST = sorted(list(set([
+    # Dầu khí & Vận tải
+    "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
+    "HAH", "VSC", "GMD", "VOS", "VTO", "ACV",
+
+    # Xuất khẩu
+    "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB",
+
+    # Điện & Hóa chất
+    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", "AAA",
+    "PAC", "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
+    "TV2", "DGC",
+
+    # Đầu tư công & vật liệu
+    "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
+    "NKG", "VGS", "CTD", "HHV", "VCG",
+
+    # Bán lẻ & chăn nuôi
+    "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
+    "MCH", "PAN", "VNM", "MML",
+
+    # Ngân hàng & tài chính
+    "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
+    "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
+    "VND", "SSI", "HCM", "SHS", "VIX", "BSI", "FTS", "TVS", "APS",
+    "AGR", "VCI",
+
+    # Công nghệ & logistic
+    "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
+
+    # Cổ phiếu lẻ
+    "HVN", "VJC", "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
+    "TNH",
+
+    # BĐS / mã hay xem
+    "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
+    "KBC", "IJC", "EVF", "LHG", "SAB"
+])))
 
 # ========================
 # INDICATOR (CHUẨN 5 TRỤC)
