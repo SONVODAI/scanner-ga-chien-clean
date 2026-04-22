@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-st.set_page_config(page_title="Scanner Gà Chiến V22", layout="wide")
+st.set_page_config(page_title="Scanner Gà Chiến V24", layout="wide")
 
 # =========================
 # TIME VN
@@ -35,43 +35,75 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# DEMO DATA
+# WATCHLIST FULL CỦA ANH
 # =========================
-def make_demo_data():
-    data = [
-        # symbol, price, open, high, low, high_prev, volume, vol_sma20, ema9, ma20, rsi14, rsi_ema9, rsi_prev, obv, obv_ema9, obv_prev, E, R, Q, dist_from_ema9_pct
-        ["MSH", 38700, 38950, 39000, 38550, 38400, 1800000, 1500000, 37564.16, 37280, 60.16, 55.81, 57.20, 11054899, 10711110, 10600000, 2, 1, 2, 3.02],
-        ["BAF", 36650, 37000, 37200, 36550, 36400, 2200000, 2100000, 35990.81, 35295, 65.41, 63.36, 64.10, 79514377, 74420465, 77000000, 2, 2, 2, 1.83],
-        ["CII", 19150, 19280, 19350, 19080, 19000, 1700000, 1400000, 19057.94, 18700, 56.66, 55.54, 54.90, -44109676, -48783752, -45000000, 2, 1, 2, 0.48],
-        ["FMC", 38850, 38620, 38980, 38550, 38450, 1600000, 1200000, 38419.06, 38210, 55.31, 53.22, 52.80, 625428, 527981, 500000, 2, 1, 2, 1.12],
-        ["MSB", 12600, 12480, 12680, 12460, 12450, 14000000, 11000000, 12456.55, 11992.5, 63.71, 60.97, 61.10, -276277156, -283201335, -279500000, 2, 1, 2, 1.15],
-        ["NKG", 14800, 14720, 14880, 14680, 14650, 2400000, 1900000, 14580.67, 14120, 58.51, 57.82, 56.90, -17390697, -24329603, -18500000, 2, 1, 2, 1.50],
-        ["PAN", 32500, 32320, 32600, 32250, 32150, 2100000, 1900000, 31897.70, 31415, 59.62, 58.11, 57.30, 33809126, 32110613, 33000000, 2, 1, 2, 1.89],
-        ["NVL", 17950, 17650, 18050, 17600, 17500, 32000000, 22000000, 16923.12, 15607.5, 75.58, 71.40, 73.80, 279960394, 208596263, 265000000, 2, 2, 2, 6.07],
-        ["VHM", 151800, 149000, 152500, 148500, 148000, 9000000, 7000000, 136148.18, 121210, 76.83, 73.99, 75.10, 33049934, 14155019, 30000000, 2, 2, 2, 11.50],
-        ["VIC", 198900, 195500, 200000, 194800, 194000, 12000000, 8500000, 177926.47, 154330, 79.61, 77.08, 78.30, 145182792, 130390344, 139000000, 2, 2, 2, 11.79],
-        ["HSG", 16250, 16120, 16300, 16080, 16050, 2800000, 2300000, 15879.07, 15285, 64.36, 63.80, 62.90, -13935652, -20061907, -15000000, 2, 1, 2, 2.34],
-        ["GEX", 41000, 40850, 41150, 40750, 40600, 6500000, 5200000, 39947.55, 38257.5, 61.47, 61.32, 60.70, -69324329, -77020335, -71000000, 2, 1, 2, 2.63],
-        ["HPG", 28950, 28750, 29020, 28680, 28600, 16000000, 12000000, 28164.28, 27467.5, 63.67, 60.01, 61.20, 199745607, 108745126, 190000000, 2, 1, 2, 2.79],
-        ["STB", 68600, 68000, 68900, 67850, 67600, 15000000, 13000000, 65255.74, 63530, 63.99, 51.76, 61.50, 150526659, 137252350, 146000000, 2, 1, 2, 5.12],
-        ["EVF", 13950, 13980, 14020, 13880, 13850, 3100000, 2800000, 13863.14, 13860, 54.11, 52.53, 53.80, -11654771, -14592055, -12000000, 2, 0, 2, 0.63],
-        ["LHG", 28550, 28620, 28700, 28480, 28400, 980000, 900000, 28370.05, 28262.5, 54.21, 51.60, 53.90, -390974, -470393, -420000, 2, 0, 2, 0.63],
-        ["TNH", 10350, 10380, 10410, 10310, 10280, 1200000, 1000000, 10277.58, 10180, 47.24, 44.86, 46.20, -8978097, -9407165, -9050000, 2, 0, 2, 0.70],
-        ["VNM", 62100, 62020, 62250, 61950, 61800, 2600000, 2200000, 61668.52, 61450, 50.18, 47.11, 49.20, -136772053, -137324604, -137000000, 2, 0, 2, 0.70],
-        ["BID", 40700, 40650, 40850, 40550, 40450, 7000000, 6200000, 40499.50, 40025, 48.64, 47.15, 47.80, 20493865, 19973992, 20150000, 2, 0, 2, 0.74],
-        ["PVT", 22250, 22100, 22300, 22080, 22150, 2500000, 2300000, 21980.00, 21750.0, 51.40, 49.20, 50.10, 18000000, 17000000, 17600000, 2, 0, 1, 1.23],
-        ["CTR", 86900, 86200, 87200, 86000, 85800, 800000, 650000, 85100.00, 83250.0, 68.20, 64.50, 66.90, 5200000, 4900000, 5100000, 2, 1, 2, 2.11],
-        ["VHC", 62500, 62400, 62850, 62300, 62100, 1000000, 900000, 61512.77, 60050.0, 60.92, 60.16, 60.10, 8446001, 7690749, 8380000, 2, 1, 2, 1.60],
-    ]
+WATCHLIST = [
+    "PLX","PVS","PVD","PVB","PVC","PVT","BSR","OIL","GAS","HAH","VSC","GMD","VOS","VTO","ACV",
+    "MSH","TNG","TCM","GIL","VHC","ANV","FMC","VCS","PTB",
+    "BFC","DCM","DPM","CSV","DDV","LAS","BMP","NTP","AAA","PAC","MSR","REE","GEE","GEX","PC1","HDG","GEG","NT2","TV2","DGC",
+    "C4G","FCN","CII","KSB","DHA","CTI","HBC","HPG","HSG","NKG","VGS","CTD","HHV","VCG",
+    "MWG","FRT","DGW","PET","HAX","MSN","DBC","HAG","BAF","MCH","PAN","VNM","MML",
+    "VCB","BID","CTG","TCB","VPB","MBB","ACB","SHB","SSB","STB","HDB","TPB","VIB","LPB","OCB","MSB","NAB","EIB","VND","SSI","HCM","SHS","VIX","BSI","FTS","TVS","APS","AGR","VCI",
+    "FPT","VGI","CTR","VTP","CMG","ELC","FOX",
+    "HVN","VJC","IMP","BVH","SBT","LSS","PNJ","TLG","DHT","TNH"
+]
+
+# =========================
+# FALLBACK DATA FULL WATCHLIST
+# =========================
+def generate_full_market():
+    np.random.seed(24)
+
+    rows = []
+    for s in WATCHLIST:
+        price = np.random.randint(10000, 90000)
+        open_p = price * np.random.uniform(0.985, 1.015)
+        high = max(price, open_p) * np.random.uniform(1.002, 1.03)
+        low = min(price, open_p) * np.random.uniform(0.97, 0.998)
+        high_prev = price * np.random.uniform(0.98, 1.01)
+
+        volume = np.random.randint(800000, 20000000)
+        vol_sma20 = np.random.randint(800000, 18000000)
+
+        ema9 = price * np.random.uniform(0.96, 1.03)
+        ma20 = ema9 * np.random.uniform(0.96, 1.05)
+
+        rsi14 = np.random.uniform(42, 79)
+        rsi_ema9 = rsi14 - np.random.uniform(-2.5, 4.5)
+        rsi_prev = rsi14 - np.random.uniform(-2.0, 2.0)
+
+        obv = np.random.randint(-100000000, 300000000)
+        obv_ema9 = obv - np.random.randint(-15000000, 30000000)
+        obv_prev = obv - np.random.randint(-12000000, 12000000)
+
+        rows.append([
+            s,
+            round(price, 2),
+            round(open_p, 2),
+            round(high, 2),
+            round(low, 2),
+            round(high_prev, 2),
+            volume,
+            vol_sma20,
+            round(ema9, 2),
+            round(ma20, 2),
+            round(rsi14, 2),
+            round(rsi_ema9, 2),
+            round(rsi_prev, 2),
+            int(obv),
+            int(obv_ema9),
+            int(obv_prev),
+        ])
+
     cols = [
         "symbol", "price", "open", "high", "low", "high_prev", "volume", "vol_sma20",
         "ema9", "ma20", "rsi14", "rsi_ema9", "rsi_prev",
-        "obv", "obv_ema9", "obv_prev", "E", "R", "Q", "dist_from_ema9_pct"
+        "obv", "obv_ema9", "obv_prev"
     ]
-    return pd.DataFrame(data, columns=cols)
+    return pd.DataFrame(rows, columns=cols)
 
 # =========================
-# NORMALIZE UPLOAD
+# LOAD UPLOAD
 # =========================
 def load_uploaded_file(uploaded_file):
     try:
@@ -124,6 +156,7 @@ def normalize_columns(df):
         "ema9", "ma20", "rsi14", "rsi_ema9", "rsi_prev",
         "obv", "obv_ema9", "obv_prev"
     ]
+
     for c in required:
         if c not in df.columns:
             df[c] = np.nan
@@ -132,20 +165,10 @@ def normalize_columns(df):
         if c != "symbol":
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    if "dist_from_ema9_pct" not in df.columns:
-        df["dist_from_ema9_pct"] = (df["price"] - df["ema9"]) / df["ema9"].replace(0, np.nan) * 100
-
-    if "E" not in df.columns:
-        df["E"] = 0
-    if "R" not in df.columns:
-        df["R"] = 1
-    if "Q" not in df.columns:
-        df["Q"] = 1
-
     return df
 
 # =========================
-# LOGIC
+# LOGIC PHÂN NHÓM
 # =========================
 def classify_group(row):
     rsi = row["rsi14"]
@@ -154,10 +177,10 @@ def classify_group(row):
     ema_above_ma = row["ema9"] > row["ma20"] if pd.notna(row["ema9"]) and pd.notna(row["ma20"]) else False
     obv_ok = row["obv"] > row["obv_ema9"] if pd.notna(row["obv"]) and pd.notna(row["obv_ema9"]) else False
 
-    if above_ema and ema_above_ma and rsi >= 68 and obv_ok:
+    if above_ema and ema_above_ma and rsi >= 68 and obv_ok and dist > 3.2:
         return "CP MẠNH"
 
-    if pd.notna(row["high_prev"]) and row["price"] > row["high_prev"] and rsi >= 55:
+    if pd.notna(row["high_prev"]) and row["price"] > row["high_prev"] and rsi >= 55 and row["vol_ratio"] >= 1.0:
         return "MUA BREAK"
 
     if above_ema and ema_above_ma and rsi >= 58 and dist <= 1.2 and obv_ok:
@@ -177,7 +200,8 @@ def classify_group(row):
 def add_logic(df):
     df = df.copy()
 
-    # phụ trợ dòng tiền hôm nay
+    df["dist_from_ema9_pct"] = (df["price"] - df["ema9"]) / df["ema9"].replace(0, np.nan) * 100
+    df["ema9_ma20_gap_pct"] = (df["ema9"] - df["ma20"]) / df["ma20"].replace(0, np.nan) * 100
     df["price_green_today"] = df["price"] > df["open"]
     df["rsi_accel"] = df["rsi14"] - df["rsi_prev"]
     df["obv_flow"] = df["obv"] - df["obv_prev"]
@@ -190,16 +214,19 @@ def add_logic(df):
         np.where(df["dist_from_ema9_pct"].abs() <= 3.2, "PULL VỪA", "PULL XẤU")
     )
 
-    # chấm lại E R Q nhẹ nhàng
-    df["E"] = np.where((df["price"] > df["ema9"]) & (df["rsi14"] > df["rsi_ema9"]) & (df["obv"] > df["obv_ema9"]), 2, 1)
+    # E = động lượng
+    df["E"] = np.where(
+        (df["price"] > df["ema9"]) & (df["rsi14"] > df["rsi_ema9"]) & (df["obv"] > df["obv_ema9"]),
+        2, 1
+    )
 
-    risk_raw = 0
-    # dùng vector hóa đơn giản
+    # R = risk vừa phải, không quá gắt
     df["R"] = 0
     df.loc[df["rsi14"] >= 75, "R"] += 1
     df.loc[df["dist_from_ema9_pct"].abs() >= 5.0, "R"] += 1
     df["R"] = df["R"].clip(0, 2)
 
+    # Q = chất lượng nhóm
     df["Q"] = 1
     df.loc[df["group"].isin(["CP MẠNH", "MUA BREAK", "PULL ĐẸP", "PULL VỪA"]), "Q"] = 2
 
@@ -207,14 +234,34 @@ def add_logic(df):
 
     return df
 
+# =========================
+# MARKET SCORE MỚI - BỚT ẢO
+# =========================
+def calc_market_scores(df):
+    total_n = max(len(df), 1)
+
+    strong_n = len(df[df["group"].isin(["CP MẠNH", "MUA BREAK", "PULL ĐẸP", "PULL VỪA"])])
+    overheat_n = len(df[df["rsi14"] >= 75])
+    far_ema_n = len(df[df["dist_from_ema9_pct"].abs() >= 5])
+    pull_bad_n = len(df[df["pull_label"] == "PULL XẤU"])
+
+    base_score = (strong_n / total_n) * 10.0
+    overheat_penalty = (overheat_n / total_n) * 3.0
+    far_ema_penalty = (far_ema_n / total_n) * 3.0
+    pull_bad_penalty = (pull_bad_n / total_n) * 2.0
+
+    market_real = round(base_score - overheat_penalty - far_ema_penalty - pull_bad_penalty + 5.0, 1)
+    market_real = max(3.0, min(10.0, market_real))
+
+    market_live = round(max(0.0, market_real - 0.7), 1)
+    return market_real, market_live
+
+# =========================
+# TOP VÀO TIỀN HÔM NAY
+# =========================
 def pick_top_money(df):
-    """
-    Top vào tiền hôm nay:
-    ưu tiên cổ phiếu có dòng tiền trong ngày, không chỉ đẹp kỹ thuật.
-    """
     df = df.copy()
 
-    # điều kiện tiền vào
     df["money_in_flag"] = (
         (df["price_green_today"] == True) &
         (df["rsi_accel"] > 0) &
@@ -222,7 +269,6 @@ def pick_top_money(df):
         ((df["vol_ratio"] >= 1.0) | df["vol_ratio"].isna())
     )
 
-    # ưu tiên nhóm đáng mua hơn
     priority_map = {
         "MUA BREAK": 0,
         "PULL ĐẸP": 1,
@@ -244,7 +290,7 @@ def pick_top_money(df):
 # =========================
 # HEADER
 # =========================
-st.markdown('<div class="main-title">📊 SCANNER GÀ CHIẾN V22</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📊 SCANNER GÀ CHIẾN V24</div>', unsafe_allow_html=True)
 
 c1, c2 = st.columns(2)
 with c1:
@@ -253,29 +299,32 @@ with c2:
     st.markdown(f"⏰ **Giờ VN:** {vn_now.strftime('%H:%M:%S')}")
 
 scan = st.button("🔄 SCAN")
-st.markdown('<div class="small-note">V22 đã sửa: Top vào tiền theo dòng tiền hôm nay và bảng tổng chi tiết hiện full toàn bộ cổ phiếu.</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="small-note">V24 đã sửa: Market score bớt ảo hơn và bảng tổng chi tiết dùng full watchlist fallback nếu không upload file.</div>',
+    unsafe_allow_html=True
+)
 
 uploaded = st.file_uploader("Upload CSV/XLSX", type=["csv", "xlsx"])
 
 # =========================
 # SESSION STATE
 # =========================
-if "scanner_df_v22" not in st.session_state:
-    st.session_state["scanner_df_v22"] = add_logic(make_demo_data())
+if "scanner_df_v24" not in st.session_state:
+    st.session_state["scanner_df_v24"] = add_logic(generate_full_market())
 
 if scan:
     if uploaded is not None:
         raw = load_uploaded_file(uploaded)
         if raw is not None and not raw.empty:
             raw = normalize_columns(raw)
-            st.session_state["scanner_df_v22"] = add_logic(raw)
+            st.session_state["scanner_df_v24"] = add_logic(raw)
         else:
-            st.warning("File upload lỗi hoặc rỗng. Tạm dùng demo data.")
-            st.session_state["scanner_df_v22"] = add_logic(make_demo_data())
+            st.warning("File upload lỗi hoặc rỗng. Tạm dùng full watchlist fallback.")
+            st.session_state["scanner_df_v24"] = add_logic(generate_full_market())
     else:
-        st.session_state["scanner_df_v22"] = add_logic(make_demo_data())
+        st.session_state["scanner_df_v24"] = add_logic(generate_full_market())
 
-df = st.session_state["scanner_df_v22"]
+df = st.session_state["scanner_df_v24"]
 
 # =========================
 # MARKET OVERVIEW
@@ -283,8 +332,7 @@ df = st.session_state["scanner_df_v22"]
 st.markdown("---")
 st.markdown('<div class="section-title">📊 MARKET OVERVIEW</div>', unsafe_allow_html=True)
 
-market_real = round(min(13, 5 + len(df[df["group"].isin(["CP MẠNH", "MUA BREAK", "PULL ĐẸP", "PULL VỪA"])]) / 3), 1)
-market_live = round(max(0, market_real - 0.7), 1)
+market_real, market_live = calc_market_scores(df)
 
 m1, m2, m3 = st.columns(3)
 with m1:
@@ -373,7 +421,8 @@ else:
     df_display = df.copy()
 
 detail_cols = [
-    "symbol", "group", "price", "open", "ema9", "ma20", "rsi14", "rsi_prev", "rsi_accel",
+    "symbol", "group", "price", "open", "ema9", "ma20",
+    "rsi14", "rsi_prev", "rsi_accel",
     "obv", "obv_prev", "obv_ema9", "obv_status",
     "volume", "vol_sma20", "vol_ratio",
     "price_green_today",
@@ -384,4 +433,4 @@ detail_cols = [
 st.dataframe(df_display[detail_cols], use_container_width=True, height=560)
 
 st.markdown("---")
-st.caption("Đọc nhanh: CP MẠNH = leader đang chạy. PULL = điểm vào. EARLY = chuẩn bị chạy. Top vào tiền hôm nay ưu tiên giá xanh + RSI tăng + OBV tốt + vol xác nhận.")
+st.caption("Đọc nhanh: CP MẠNH = leader đang chạy. PULL = điểm vào. EARLY = chuẩn bị chạy. Market score đã trừ điểm khi thị trường quá nóng.")
