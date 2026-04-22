@@ -1,10 +1,14 @@
+import streamlit as st
 import pandas as pd
 import numpy as np
 import yfinance as yf
 import time
+from datetime import datetime
+
+st.set_page_config(layout="wide")
 
 # ========================
-# WATCHLIST (GIỮ NGUYÊN)
+# WATCHLIST
 # ========================
 WATCHLIST = [
 "VCB","BID","CTG","TCB","VPB","MBB","ACB","STB","HDB","TPB","VIB","LPB","MSB","EIB",
@@ -19,28 +23,27 @@ WATCHLIST = [
 ]
 
 # ========================
-# LOAD DATA (FIX LỖI)
+# LOAD DATA (ỔN ĐỊNH)
 # ========================
-def load_data(symbol):
+@st.cache_data(ttl=600)
+def load_symbol(symbol):
     try:
         df = yf.download(symbol + ".VN", period="6mo", interval="1d", progress=False)
 
-        # 🔥 FIX LỖI MULTI COLUMN (QUAN TRỌNG)
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
 
-        if df is None or len(df) < 50:
+        if df is None or df.empty or len(df) < 50:
             return None
 
         return df
-
     except:
         return None
 
 # ========================
-# INDICATORS (GIỮ NGUYÊN 18.4)
+# INDICATORS
 # ========================
-def calc_indicators(df):
+def calc(df):
     df["ema9"] = df["Close"].ewm(span=9).mean()
     df["ma20"] = df["Close"].rolling(20).mean()
 
@@ -58,9 +61,9 @@ def calc_indicators(df):
     return df
 
 # ========================
-# SCORE (GIỮ NGUYÊN)
+# SCORE (18.4 CORE)
 # ========================
-def score_row(row):
+def score(row):
     E = 0
     if row["Close"] > row["ema9"]: E += 1
     if row["ema9"] > row["ma20"]: E += 1
@@ -75,10 +78,7 @@ def score_row(row):
     total = E + R + O
     return E, R, O, total
 
-# ========================
-# CLASSIFY (GIỮ NGUYÊN CORE)
-# ========================
-def classify(E, R, O, total):
+def classify(E,R,O,total):
     if total >= 5 and O >= 2 and E >= 1:
         return "CP_MẠNH"
     elif total >= 4:
@@ -89,77 +89,63 @@ def classify(E, R, O, total):
         return "THEO_DÕI"
 
 # ========================
-# MAIN SCAN
+# UI
 # ========================
-data = []
+st.title("🐔 SCANNER GÀ CHIẾN V32.2")
 
-print("🚀 SCANNING...")
+col1, col2 = st.columns(2)
+with col1:
+    st.write("📅 Ngày:", datetime.now().strftime("%d/%m/%Y"))
+with col2:
+    st.write("⏰ Giờ VN:", datetime.now().strftime("%H:%M:%S"))
 
-for symbol in WATCHLIST:
-    df = load_data(symbol)
+if st.button("🚀 SCAN NGAY"):
 
-    if df is None:
-        print(f"❌ {symbol}")
-        continue
+    data = []
+    progress = st.progress(0)
 
-    df = calc_indicators(df)
-    last = df.iloc[-1]
+    for i, symbol in enumerate(WATCHLIST):
+        df = load_symbol(symbol)
 
-    # đảm bảo là số (tránh lỗi so sánh)
-    last = last.astype(float)
+        if df is None:
+            continue
 
-    E, R, O, total = score_row(last)
-    group = classify(E, R, O, total)
+        df = calc(df)
+        last = df.iloc[-1].astype(float)
 
-    data.append({
-        "symbol": symbol,
-        "price": round(last["Close"],2),
-        "E": E,
-        "R": R,
-        "O": O,
-        "score": total,
-        "group": group,
-        "rsi": round(last["rsi"],1),
-        "ema9": round(last["ema9"],2),
-        "ma20": round(last["ma20"],2)
-    })
+        E,R,O,total = score(last)
+        group = classify(E,R,O,total)
 
-    print(f"✔ {symbol} | {group} | {total}")
+        data.append({
+            "symbol": symbol,
+            "price": round(last["Close"],2),
+            "E": E,
+            "R": R,
+            "O": O,
+            "score": total,
+            "group": group
+        })
 
-    time.sleep(0.2)
+        progress.progress((i+1)/len(WATCHLIST))
+        time.sleep(0.2)
 
-# ========================
-# DATAFRAME
-# ========================
-df = pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-# ========================
-# MARKET (CHỈ CHỈNH NHẸ)
-# ========================
-market = round(df["score"].mean() * 1.6, 1)
+    if df.empty:
+        st.error("❌ Không lấy được dữ liệu (yfinance lag). Bấm lại lần nữa.")
+        st.stop()
 
-print("\n📊 MARKET:", market)
+    # MARKET
+    market = round(df["score"].mean()*1.6,1)
 
-# ========================
-# SORT (GIỮ NGUYÊN TƯ DUY)
-# ========================
-rank_map = {
-    "CP_MẠNH": 0,
-    "PULL_ĐẸP": 1,
-    "PULL_VỪA": 2,
-    "THEO_DÕI": 3
-}
+    st.subheader("📊 MARKET OVERVIEW")
+    st.write("Market:", market)
 
-df["rank"] = df["group"].map(rank_map)
+    # SORT
+    rank_map = {"CP_MẠNH":0,"PULL_ĐẸP":1,"PULL_VỪA":2,"THEO_DÕI":3}
+    df["rank"] = df["group"].map(rank_map)
 
-df = df.sort_values(
-    by=["rank","score","O","E","R"],
-    ascending=[True, False, False, False, False]
-)
+    df = df.sort_values(by=["rank","score","O"], ascending=[True,False,False])
 
-# ========================
-# SAVE
-# ========================
-df.to_csv("data_full.csv", index=False)
-
-print("✅ DONE → data_full.csv")
+    st.subheader("🔥 TOP CỔ PHIẾU")
+    st.dataframe(df, use_container_width=True)
