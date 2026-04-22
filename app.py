@@ -1,64 +1,158 @@
-import streamlit as st
 import pandas as pd
-
-st.set_page_config(layout="wide")
-
-st.title("🐔 SCANNER GÀ CHIẾN V31 FINAL")
-
-# ========================
-# LOAD DATA AN TOÀN
-# ========================
-
-try:
-    df = pd.read_csv("data_full.csv")
-except:
-    st.error("❌ Chưa có file data_full.csv. Anh chạy scanner trước.")
-    st.stop()
+import numpy as np
+import time
+from vnstock import Vnstock
 
 # ========================
-# CHECK CỘT
+# WATCHLIST FULL
 # ========================
 
-required_cols = ["symbol", "price", "score", "group"]
-
-for col in required_cols:
-    if col not in df.columns:
-        st.error(f"❌ Thiếu cột: {col} → file scan chưa chuẩn")
-        st.stop()
-
-# ========================
-# MARKET
-# ========================
-
-market = round(df["score"].mean() * 2, 1)
-
-st.subheader("📊 MARKET")
-st.write("Score:", market)
+WATCHLIST = [
+"VCB","BID","CTG","TCB","VPB","MBB","ACB","STB","HDB","TPB","VIB","LPB","MSB","EIB",
+"SSI","VND","HCM","SHS","VIX","BSI","FTS",
+"HPG","HSG","NKG",
+"VHM","VIC","VRE","DXG","DIG","CEO","TCH",
+"GAS","PVS","PVD","BSR","PLX",
+"GMD","VSC","HAH","VTO","VOS",
+"MWG","FRT","DGW","PET","MSN",
+"FPT","CTR","VTP",
+"DGC","DCM","DPM","LAS","BFC"
+]
 
 # ========================
-# GROUP
+# INDICATOR (CHUẨN 5 TRỤC)
 # ========================
 
-st.subheader("🔥 CP MẠNH")
-st.dataframe(df[df["group"]=="CP_MẠNH"])
+def calc_indicators(df):
+    df["ema9"] = df["close"].ewm(span=9).mean()
+    df["ma20"] = df["close"].rolling(20).mean()
 
-col1, col2, col3 = st.columns(3)
+    delta = df["close"].diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
 
-with col1:
-    st.write("PULL ĐẸP")
-    st.dataframe(df[df["group"]=="PULL_ĐẸP"])
+    rs = gain.rolling(14).mean() / loss.rolling(14).mean()
+    df["rsi"] = 100 - (100 / (1 + rs))
 
-with col2:
-    st.write("PULL VỪA")
-    st.dataframe(df[df["group"]=="PULL_VỪA"])
+    df["rsi_ema"] = df["rsi"].ewm(span=9).mean()
 
-with col3:
-    st.write("THEO DÕI")
-    st.dataframe(df[df["group"]=="THEO_DÕI"])
+    df["obv"] = (np.sign(df["close"].diff()) * df["volume"]).fillna(0).cumsum()
+    df["obv_ema"] = df["obv"].ewm(span=9).mean()
+
+    return df
 
 # ========================
-# FULL TABLE
+# CHẤM ĐIỂM CHUẨN
 # ========================
 
-st.subheader("📋 TOÀN BỘ")
-st.dataframe(df.sort_values("score", ascending=False))
+def score_stock(row):
+    score = 0
+
+    # TRỤC GIÁ
+    if row["close"] > row["ema9"]: score += 1
+    if row["ema9"] > row["ma20"]: score += 1
+
+    # TRỤC RSI
+    if row["rsi"] > 55: score += 1
+    if row["rsi"] > row["rsi_ema"]: score += 1
+
+    # TRỤC OBV
+    if row["obv"] > row["obv_ema"]: score += 2
+
+    return score
+
+# ========================
+# PHÂN LOẠI THỰC CHIẾN
+# ========================
+
+def classify(row):
+    if row["score"] >= 5 and row["rsi"] > 60:
+        return "CP_MẠNH"
+    elif row["score"] >= 4:
+        return "MUA_BREAK"
+    elif row["score"] >= 3:
+        return "PULL_ĐẸP"
+    elif row["score"] >= 2:
+        return "PULL_VỪA"
+    else:
+        return "THEO_DÕI"
+
+# ========================
+# LOAD DATA (CÓ RETRY)
+# ========================
+
+def load_stock(symbol):
+    for i in range(3):
+        try:
+            stock = Vnstock().stock(symbol=symbol, source="VCI")
+            df = stock.quote.history(period="1y", interval="1D")
+            return df
+        except:
+            time.sleep(1)
+    return None
+
+# ========================
+# MAIN
+# ========================
+
+data = []
+
+print("🚀 Bắt đầu scan...")
+
+for symbol in WATCHLIST:
+    df = load_stock(symbol)
+
+    if df is None or len(df) < 50:
+        print(f"❌ bỏ {symbol}")
+        continue
+
+    df = calc_indicators(df)
+    last = df.iloc[-1]
+
+    row = {
+        "symbol": symbol,
+        "price": last["close"],
+        "ema9": last["ema9"],
+        "ma20": last["ma20"],
+        "rsi": last["rsi"],
+        "rsi_ema": last["rsi_ema"],
+        "obv": last["obv"],
+        "obv_ema": last["obv_ema"],
+    }
+
+    row["score"] = score_stock(row)
+    row["group"] = classify(row)
+
+    data.append(row)
+
+    print(f"✔ {symbol} | score {row['score']}")
+
+    time.sleep(0.3)
+
+# ========================
+# DATAFRAME
+# ========================
+
+df_all = pd.DataFrame(data)
+
+# ========================
+# MARKET CHUẨN
+# ========================
+
+market_score = round(df_all["score"].mean() * 1.8, 1)
+
+print("\n📊 MARKET:", market_score)
+
+# ========================
+# SORT
+# ========================
+
+df_all = df_all.sort_values("score", ascending=False)
+
+# ========================
+# SAVE
+# ========================
+
+df_all.to_csv("data_full.csv", index=False)
+
+print("✅ DONE → data_full.csv")
