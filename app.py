@@ -781,7 +781,100 @@ def show_group_table(df: pd.DataFrame, group_name: str):
 # =========================================================
 # EARLY SẠCH – GOM HÀNG
 # =========================================================
+# =========================================================
+# TRIGGER VÀO TIỀN – NẾN XANH ĐẦU TIÊN
+# =========================================================
 
+st.markdown("---")
+st.markdown("🎯 TRIGGER VÀO TIỀN – NẾN XANH ĐẦU TIÊN")
+
+def check_first_green_trigger(symbol: str):
+    raw = download_symbol_data(symbol)
+    if raw.empty or len(raw) < 40:
+        return None
+
+    df = build_indicators(raw)
+    if len(df) < 25:
+        return None
+
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+
+    open_ = to_float(last["open"])
+    close_ = to_float(last["close"])
+    volume_ = to_float(last["volume"])
+    prev_volume = to_float(prev["volume"])
+
+    rsi_ = to_float(last["rsi14"])
+    rsi_prev = to_float(prev["rsi14"])
+    rsi_slope = to_float(last["rsi_slope"])
+
+    obv_ = to_float(last["obv"])
+    obv_prev = to_float(prev["obv"])
+    obv_ema9 = to_float(last["obv_ema9"])
+
+    ema9_ = to_float(last["ema9"])
+    ma20_ = to_float(last["ma20"])
+
+    green_candle = close_ > open_
+    vol_up = volume_ > prev_volume
+    rsi_turn = rsi_ > rsi_prev and rsi_slope > 0
+    obv_turn = obv_ > obv_prev and obv_ >= obv_ema9
+    price_near_ema9 = abs(close_ / ema9_ - 1) <= 0.04 if ema9_ else False
+    not_overheat = rsi_ <= 60
+
+    trigger_score = sum([
+        green_candle,
+        vol_up,
+        rsi_turn,
+        obv_turn,
+        price_near_ema9,
+        not_overheat
+    ])
+
+    if trigger_score >= 5:
+        return {
+            "symbol": symbol,
+            "price": round(close_, 0),
+            "rsi14": round(rsi_, 2),
+            "rsi_slope": round(rsi_slope, 2),
+            "volume": round(volume_, 0),
+            "prev_volume": round(prev_volume, 0),
+            "obv_status": "🟢" if obv_ >= obv_ema9 else "🔴",
+            "trigger_score": trigger_score,
+            "action": "TEST 5-10% NAV"
+        }
+
+    return None
+
+
+def build_trigger_table(early_df):
+    rows = []
+
+    if early_df.empty:
+        return pd.DataFrame()
+
+    for symbol in early_df["symbol"].tolist():
+        try:
+            item = check_first_green_trigger(symbol)
+            if item is not None:
+                rows.append(item)
+        except Exception:
+            continue
+
+    return pd.DataFrame(rows)
+
+
+trigger_df = build_trigger_table(early_df)
+
+if trigger_df.empty:
+    st.info("Chưa có mã kích hoạt trigger vào tiền")
+else:
+    st.dataframe(
+        trigger_df,
+        use_container_width=True,
+        height=300
+    )
 st.markdown("---")
 st.markdown("🐣 EARLY SẠCH – GOM HÀNG (STAGE 1)")
 
