@@ -53,8 +53,14 @@ WATCHLIST = sorted(list(set([
     "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
     "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
     "VND", "SSI", "HCM", "SHS", "VIX", "BSI", "FTS", "TVS", "APS",
-    "AGR", "VCI",
+    "AGR", "VCI", "TCX", "VCK", "VPX",
+    
+    # Bất động sản khu công nghiệp
+    "VGC", "SZC", "IDC", "KBC", "LHG", "IJC", "DTD", "BCM",
 
+    # Cao su
+    "GVR", "SIP", "DPR", "PHR" , "DRI",
+    
     # Công nghệ & logistic
     "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
 
