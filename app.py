@@ -779,7 +779,99 @@ def show_group_table(df: pd.DataFrame, group_name: str):
         height=min(520, 80 + len(out) * 35)
     )
 
+# =========================================================
+# >>> THÊM SAU PHẦN TOP PICKS (KHÔNG SỬA CODE CŨ)
+# =========================================================
 
+st.markdown("---")
+st.markdown("## 🐔 GÀ CHIẾN (LEVEL 1–2–3)")
+
+def classify_ga_chien(df):
+    level1 = []
+    level2 = []
+    level3 = []
+
+    for _, row in df.iterrows():
+        rsi = row["rsi14"]
+        obv = row["obv"]
+        obv_ema9 = row["obv_ema9"]
+        price = row["price"]
+        ema9 = row["ema9"]
+        ma20 = row["ma20"]
+        score = row["total_score"]
+        warning = row["warning"]
+
+        obv_ok = pd.notna(obv) and pd.notna(obv_ema9) and obv >= obv_ema9
+        price_ok = pd.notna(price) and pd.notna(ema9) and pd.notna(ma20) and price > ema9 > ma20
+
+        # ===== LEVEL 1 =====
+        if (
+            pd.notna(rsi)
+            and 60 <= rsi <= 70
+            and obv_ok
+            and price_ok
+            and score >= 5
+            and warning == ""
+        ):
+            level1.append(row)
+            continue
+
+        # ===== LEVEL 2 =====
+        if (
+            pd.notna(rsi)
+            and 55 <= rsi < 60
+            and obv_ok
+            and price >= ema9
+            and score >= 4
+        ):
+            level2.append(row)
+            continue
+
+        # ===== LEVEL 3 =====
+        if (
+            pd.notna(rsi)
+            and rsi > 50
+            and obv_ok
+            and score >= 3
+        ):
+            level3.append(row)
+
+    return (
+        pd.DataFrame(level1),
+        pd.DataFrame(level2),
+        pd.DataFrame(level3),
+    )
+
+
+lv1, lv2, lv3 = classify_ga_chien(scan_df)
+
+
+def show_ga_table(df, title, color):
+    st.markdown(f"### {title}")
+
+    if df.empty:
+        st.info("Không có mã")
+        return
+
+    out = df[[
+        "symbol", "price", "rsi14", "E", "R", "O", "total_score", "obv_status"
+    ]].copy()
+
+    out.index = range(len(out))
+
+    st.dataframe(out, use_container_width=True, height=300)
+
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    show_ga_table(lv1, "🟢 LEVEL 1 – GÀ CHIẾN XỊN", "green")
+
+with col2:
+    show_ga_table(lv2, "🟡 LEVEL 2 – GÀ KHỎE", "orange")
+
+with col3:
+    show_ga_table(lv3, "🔵 LEVEL 3 – GÀ TIỀM NĂNG", "blue")
 st.markdown("---")
 
 cols = st.columns(len(GROUP_ORDER))
