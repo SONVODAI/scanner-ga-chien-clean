@@ -778,7 +778,64 @@ def show_group_table(df: pd.DataFrame, group_name: str):
         use_container_width=True,
         height=min(520, 80 + len(out) * 35)
     )
+# =========================================================
+# EARLY SẠCH – GOM HÀNG
+# =========================================================
 
+st.markdown("---")
+st.markdown("🐣 EARLY SẠCH – GOM HÀNG (STAGE 1)")
+
+def filter_early_clean(df):
+    rows = []
+
+    for _, row in df.iterrows():
+        rsi = row["rsi14"]
+        rsi_slope = row["rsi_slope"]
+        obv = row["obv"]
+        obv_ema9 = row["obv_ema9"]
+        price = row["price"]
+        ema9 = row["ema9"]
+        vol = row["volume"]
+        vol_ma20 = row["vol_ma20"]
+        score = row["total_score"]
+
+        if not pd.notna(rsi):
+            continue
+
+        # ===== ĐIỀU KIỆN =====
+        cond_rsi = 45 <= rsi <= 55
+        cond_slope = pd.notna(rsi_slope) and rsi_slope >= -0.5
+        cond_obv = pd.notna(obv) and pd.notna(obv_ema9) and obv >= obv_ema9 * 0.98
+        cond_price = pd.notna(price) and pd.notna(ema9) and abs(price / ema9 - 1) <= 0.03
+        cond_vol = pd.notna(vol) and pd.notna(vol_ma20) and vol <= vol_ma20
+        cond_score = score >= 3
+
+        if (
+            cond_rsi
+            and cond_slope
+            and cond_obv
+            and cond_price
+            and cond_vol
+            and cond_score
+        ):
+            rows.append(row)
+
+    return pd.DataFrame(rows)
+
+
+early_df = filter_early_clean(scan_df)
+
+if early_df.empty:
+    st.info("Không có mã EARLY sạch")
+else:
+    out = early_df[[
+        "symbol", "price", "rsi14", "rsi_slope",
+        "E", "R", "O", "total_score", "obv_status"
+    ]].copy()
+
+    out.index = range(len(out))
+
+    st.dataframe(out, use_container_width=True, height=300)
 # =========================================================
 # >>> THÊM SAU PHẦN TOP PICKS (KHÔNG SỬA CODE CŨ)
 # =========================================================
