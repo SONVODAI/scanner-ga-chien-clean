@@ -933,6 +933,31 @@ else:
         use_container_width=True,
         height=300
     )
+ # =========================
+# 🔵 PULL TRIGGER TABLE
+# =========================
+
+pull_rows = []
+
+for symbol in early_df["symbol"].tolist():
+    try:
+        item = check_pull_trigger(symbol)
+        if item is not None:
+            pull_rows.append(item)
+    except:
+        continue
+
+pull_df = pd.DataFrame(pull_rows)
+
+if pull_df.empty:
+    st.info("Chưa có mã PULL đẹp")
+else:
+    st.markdown("## 🔵 PULL TRIGGER")
+    st.dataframe(
+        pull_df,
+        use_container_width=True,
+        height=300
+    )   
 # =========================
 # 🔵 PULL TRIGGER (CHUẨN HỆ THỐNG)
 # =========================
