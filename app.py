@@ -957,7 +957,32 @@ else:
         pull_df,
         use_container_width=True,
         height=300
-    )   
+    )  
+# =========================
+# 🔴 BREAK TRIGGER TABLE
+# =========================
+
+break_rows = []
+
+for symbol in early_df["symbol"].tolist():
+    try:
+        item = check_break_trigger(symbol)
+        if item is not None:
+            break_rows.append(item)
+    except:
+        continue
+
+break_df = pd.DataFrame(break_rows)
+
+if break_df.empty:
+    st.info("Chưa có mã BREAK đẹp")
+else:
+    st.markdown("## 🔴 BREAK TRIGGER")
+    st.dataframe(
+        break_df,
+        use_container_width=True,
+        height=300
+    )    
 # =========================
 # 🔵 PULL TRIGGER (CHUẨN HỆ THỐNG)
 # =========================
