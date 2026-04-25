@@ -933,33 +933,63 @@ else:
         use_container_width=True,
         height=300
     )
+# =========================
+# 🔵 PULL TRIGGER (CHUẨN HỆ THỐNG)
+# =========================
+
+def check_pull_trigger(symbol: str):
+    raw = download_symbol_data(symbol)
+    if raw.empty or len(raw) < 40:
+        return None
+
+    df = build_indicators(raw)
+    if len(df) < 25:
+        return None
+
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+
+    close_ = to_float(last["close"])
+    volume_ = to_float(last["volume"])
+    prev_volume = to_float(prev["volume"])
+
+    rsi_ = to_float(last["rsi14"])
+    obv_ = to_float(last["obv"])
+    obv_ema9 = to_float(last["obv_ema9"])
+
+    ema9_ = to_float(last["ema9"])
+    ma20_ = to_float(last["ma20"])
+
+    # ===== LOGIC PULL =====
+    near_ema9 = abs(close_ / ema9_ - 1) <= 0.03 if ema9_ else False
+    near_ma20 = abs(close_ / ma20_ - 1) <= 0.04 if ma20_ else False
+
+    vol_dry = volume_ < prev_volume
+    rsi_ok = rsi_ > 50
+    obv_ok = obv_ >= obv_ema9
+
+    pull_score = sum([
+        near_ema9 or near_ma20,
+        vol_dry,
+        rsi_ok,
+        obv_ok
+    ])
+
+    if pull_score >= 3:
+        return {
+            "symbol": symbol,
+            "price": round(close_, 0),
+            "rsi14": round(rsi_, 2),
+            "volume": round(volume_, 0),
+            "obv_status": "🟢" if obv_ok else "🔴",
+            "score": pull_score,
+            "action": "PULL BUY 30% NAV"
+        }
+
+    return None    
 st.markdown("---")
 st.markdown("## 🐔 GÀ CHIẾN (LEVEL 1–2–3)")
 # =========================
-# 🔵 PULL TRIGGER
-# =========================
-
-df["dist_to_ema9"] = (df["close"] - df["ema9"]) / df["ema9"] * 100
-df["dist_to_ma20"] = (df["close"] - df["ma20"]) / df["ma20"] * 100
-
-pull_condition = (
-    (df["dist_to_ema9"].abs() <= 2.5) | (df["dist_to_ma20"].abs() <= 3)
-) & (df["rsi"] > 50) \
-  & (df["obv"] >= df["obv_ema9"]) \
-  & (df["volume"] < df["volume"].rolling(5).mean())
-
-df["pull_trigger"] = pull_condition
-
-# Giá mua gợi ý (tại EMA9 hoặc close)
-df["pull_buy_price"] = df["close"]
-
-# Tỷ lệ mua
-df["pull_nav"] = df["pull_trigger"].apply(lambda x: 0.3 if x else 0)
-
-# Bảng pull trigger
-pull_trigger_table = df[df["pull_trigger"] == True][[
-    "ticker", "close", "ema9", "ma20", "rsi", "obv", "pull_buy_price", "pull_nav"
-]]
 def classify_ga_chien(df):
     level1 = []
     level2 = []
