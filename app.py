@@ -934,6 +934,64 @@ else:
         height=300
     )
  # =========================
+# 🔴 BREAK TRIGGER (CHUẨN HỆ THỐNG)
+# =========================
+
+def check_break_trigger(symbol: str):
+    raw = download_symbol_data(symbol)
+    if raw.empty or len(raw) < 50:
+        return None
+
+    df = build_indicators(raw)
+    if len(df) < 30:
+        return None
+
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+
+    close_ = to_float(last["close"])
+    prev_close = to_float(prev["close"])
+
+    volume_ = to_float(last["volume"])
+    prev_volume = to_float(prev["volume"])
+
+    rsi_ = to_float(last["rsi14"])
+    rsi_prev = to_float(prev["rsi14"])
+
+    obv_ = to_float(last["obv"])
+    obv_prev = to_float(prev["obv"])
+    obv_ema9 = to_float(last["obv_ema9"])
+
+    # ===== LOGIC BREAK =====
+
+    # Break đỉnh 5 phiên
+    recent_high = df["close"].rolling(5).max().iloc[-2]
+    break_price = close_ > recent_high
+
+    vol_up = volume_ > prev_volume
+    rsi_ok = rsi_ > 55 and rsi_ > rsi_prev
+    obv_ok = obv_ > obv_prev and obv_ >= obv_ema9
+
+    break_score = sum([
+        break_price,
+        vol_up,
+        rsi_ok,
+        obv_ok
+    ])
+
+    if break_score >= 3:
+        return {
+            "symbol": symbol,
+            "price": round(close_, 0),
+            "rsi14": round(rsi_, 2),
+            "volume": round(volume_, 0),
+            "obv_status": "🟢" if obv_ok else "🔴",
+            "score": break_score,
+            "action": "BREAK BUY 20-30% NAV"
+        }
+
+    return None   
+ # =========================
 # 🔵 PULL TRIGGER TABLE
 # =========================
 
