@@ -935,7 +935,31 @@ else:
     )
 st.markdown("---")
 st.markdown("## 🐔 GÀ CHIẾN (LEVEL 1–2–3)")
+# =========================
+# 🔵 PULL TRIGGER
+# =========================
 
+df["dist_to_ema9"] = (df["close"] - df["ema9"]) / df["ema9"] * 100
+df["dist_to_ma20"] = (df["close"] - df["ma20"]) / df["ma20"] * 100
+
+pull_condition = (
+    (df["dist_to_ema9"].abs() <= 2.5) | (df["dist_to_ma20"].abs() <= 3)
+) & (df["rsi"] > 50) \
+  & (df["obv"] >= df["obv_ema9"]) \
+  & (df["volume"] < df["volume"].rolling(5).mean())
+
+df["pull_trigger"] = pull_condition
+
+# Giá mua gợi ý (tại EMA9 hoặc close)
+df["pull_buy_price"] = df["close"]
+
+# Tỷ lệ mua
+df["pull_nav"] = df["pull_trigger"].apply(lambda x: 0.3 if x else 0)
+
+# Bảng pull trigger
+pull_trigger_table = df[df["pull_trigger"] == True][[
+    "ticker", "close", "ema9", "ma20", "rsi", "obv", "pull_buy_price", "pull_nav"
+]]
 def classify_ga_chien(df):
     level1 = []
     level2 = []
