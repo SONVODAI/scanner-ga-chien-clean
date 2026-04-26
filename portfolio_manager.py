@@ -1,51 +1,27 @@
 import streamlit as st
 import pandas as pd
-import yfinance as yf
 import os
+from vnstock import stock_historical_data
 
-st.set_page_config(page_title="Portfolio Manager PRO V11", layout="wide")
-
-st.title("🐔 Portfolio Manager PRO V11 – Trading Tool")
+# ================== CONFIG ==================
+st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
 
 DATA_FILE = "portfolio.csv"
 
-# ================= LOAD =================
-def load_data():
-    try:
-        if os.path.exists(DATA_FILE):
-            df = pd.read_csv(DATA_FILE)
+st.title("🐔 Portfolio Manager PRO V12 – Stable Clean")
 
-            if df.empty or "Mã" not in df.columns:
-                return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
+# ================== HÀM ==================
 
-            return df
-
-        return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
-
-    except:
-        return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
-
-# ================= SAVE =================
-def save_data(df):
-    try:
-        if not df.empty:
-            df.to_csv(DATA_FILE, index=False)
-    except:
-        st.error("Lỗi lưu dữ liệu")
-
-# ================= PRICE =================
-@st.cache_data(ttl=300)
 def get_price(code):
     try:
-        ticker = yf.Ticker(code + ".VN")
-        df = ticker.history(period="1d")
-        if df.empty:
-            return None
-        return float(df["Close"].iloc[-1])
+        df = stock_historical_data(code, "2024-01-01", "2025-12-31", "1D")
+        if df is not None and len(df) > 0:
+            return df.iloc[-1]["close"]
     except:
         return None
+    return None
 
-# ================= LOGIC =================
+
 def classify(pct):
     if pct >= 5:
         return "🟢 Gà chạy", "Giữ + trailing", "Thấp"
@@ -54,93 +30,99 @@ def classify(pct):
     else:
         return "🔴 Gà gãy", "BÁN NGAY", "Cao"
 
-# ================= SIDEBAR =================
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        try:
+            return pd.read_csv(DATA_FILE)
+        except:
+            return pd.DataFrame()
+    return pd.DataFrame()
+
+
+def save_data(df):
+    df.to_csv(DATA_FILE, index=False)
+
+
+# ================== INPUT ==================
+
 st.sidebar.header("📥 Nhập danh mục")
 
-input_text = st.sidebar.text_area(
-    "Format: Mã, Giá mua, %NAV\nVD:\nVIC,172,6",
-    height=150
+raw = st.sidebar.text_area(
+    "Format: Mã, Giá mua, %NAV\nVD:\nMBB,22,5\nVND,18,3"
 )
 
 if st.sidebar.button("💾 Lưu danh mục"):
-    lines = input_text.strip().split("\n")
-    data = []
+    rows = []
+    for line in raw.split("\n"):
+        try:
+            code, buy, nav = line.split(",")
+            rows.append({
+                "Mã": code.strip().upper(),
+                "Giá mua": float(buy),
+                "%NAV": float(nav)
+            })
+        except:
+            st.sidebar.error(f"Lỗi dòng: {line}")
 
-    for line in lines:
-        parts = line.split(",")
-        if len(parts) == 3:
-            try:
-                code = parts[0].strip().upper()
-                buy = float(parts[1])
-                nav = float(parts[2])
-                data.append({"Mã": code, "Giá mua": buy, "%NAV": nav})
-            except:
-                pass
+    df_save = pd.DataFrame(rows)
+    save_data(df_save)
+    st.sidebar.success("Đã lưu danh mục!")
 
-    df_save = pd.DataFrame(data)
+# ================== LOAD ==================
 
-    if not df_save.empty:
-        save_data(df_save)
-        st.sidebar.success("✅ Đã lưu danh mục")
-    else:
-        st.sidebar.warning("⚠️ Dữ liệu không hợp lệ")
+df_input = load_data()
 
-# ================= LOAD =================
-df = load_data()
+# ================== XỬ LÝ ==================
 
-# ================= PROCESS =================
-rows = []
-
-for _, r in df.iterrows():
-    code = r["Mã"]
-    buy = r["Giá mua"]
-    nav = r["%NAV"]
-
-  price = get_price(code)
-
-if price:
-    price = price / 1000 
-    if price:
-        pct = (price - buy) / buy * 100
-        state, action, risk = classify(pct)
-    else:
-        pct = 0
-        state, action, risk = "⚠️ Lỗi data", "Check", "?"
-
-    rows.append({
-        "Mã": code,
-        "Giá mua": buy,
-        "Giá hiện tại": round(price, 2) if price else None,
-        "%NAV": nav,
-        "% Lãi/Lỗ": round(pct, 2),
-        "Trạng thái": state,
-        "Hành động": action,
-        "Rủi ro": risk
-    })
-
-result = pd.DataFrame(rows)
-
-# ================= DISPLAY =================
-st.subheader("📊 Danh mục hiện tại")
-
-if result.empty:
+if df_input.empty:
     st.info("👉 Chưa có danh mục")
 else:
-    st.dataframe(result, use_container_width=True)
+    rows = []
 
-    avg = result["% Lãi/Lỗ"].mean()
+    for _, r in df_input.iterrows():
+        code = r["Mã"]
+        buy = r["Giá mua"]
+        nav = r["%NAV"]
+
+        price = get_price(code)
+        price = price / 1000 if price else None  # FIX đơn vị
+
+        if price:
+            pct = (price - buy) / buy * 100
+            state, action, risk = classify(pct)
+        else:
+            pct = 0
+            state, action, risk = "⚠️ Lỗi data", "Check", "?"
+
+        rows.append({
+            "Mã": code,
+            "Giá mua": buy,
+            "Giá hiện tại": round(price, 2) if price else None,
+            "%NAV": nav,
+            "% Lãi/Lỗ": round(pct, 2),
+            "Trạng thái": state,
+            "Hành động": action,
+            "Rủi ro": risk
+        })
+
+    df = pd.DataFrame(rows)
+
+    # ================== HIỂN THỊ ==================
+
+    st.subheader("📊 Danh mục hiện tại")
+    st.dataframe(df, use_container_width=True)
+
+    # ================== SUMMARY ==================
+
+    avg = df["% Lãi/Lỗ"].mean()
     st.metric("📈 Lãi/Lỗ trung bình (%)", round(avg, 2))
 
-    # ALERT
-    alerts = result[result["Trạng thái"].str.contains("Gà gãy", na=False)]
+    # ================== ALERT ==================
 
-    if not alerts.empty:
-        st.error("🚨 CẢNH BÁO: CÓ MÃ CẦN BÁN NGAY")
-        for c in alerts["Mã"]:
-            st.write(f"❌ {c}")
+    alert = df[df["Trạng thái"].str.contains("gãy", case=False, na=False)]
 
-# ================= BACKUP =================
-if st.button("📂 Backup danh mục"):
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "rb") as f:
-            st.download_button("📥 Tải file backup", f, file_name="portfolio_backup.csv")
+    if not alert.empty:
+        st.error("🚨 Cảnh báo: Có cổ phiếu cần xử lý!")
+        for _, row in alert.iterrows():
+            st.write(f"{row['Mã']} → BÁN NGAY")
