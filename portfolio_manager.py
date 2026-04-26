@@ -1,153 +1,126 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from vnstock import stock_historical_data
+from vnstock import Vnstock
+import os
+import json
 
-st.set_page_config(layout="wide")
-st.title("🐔 GÀ CHIẾN TERMINAL V7 (Scanner + Portfolio)")
+# ================= CONFIG =================
+st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
+st.title("🐔 Portfolio Manager PRO V7 – Full Auto Scanner")
 
-# ================= SCANNER =================
-@st.cache_data(ttl=300)
-def get_data(symbol):
+DATA_FILE = "portfolio_data.json"
+
+# ================= LOAD DATA =================
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_data(data):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+portfolio = load_data()
+
+# ================= INPUT =================
+st.sidebar.header("1️⃣ Nhập danh mục")
+
+input_data = st.sidebar.text_area(
+    "Format: Mã, Giá mua, %NAV\nVí dụ:\nMBB,22,10\nVND,18,20"
+)
+
+if st.sidebar.button("💾 Lưu danh mục"):
+    new_port = []
+    lines = input_data.strip().split("\n")
+    for line in lines:
+        try:
+            symbol, buy, nav = line.split(",")
+            new_port.append({
+                "symbol": symbol.strip().upper(),
+                "buy": float(buy),
+                "nav": float(nav)
+            })
+        except:
+            pass
+    save_data(new_port)
+    st.sidebar.success("Đã lưu danh mục")
+
+portfolio = load_data()
+
+# ================= GET REALTIME DATA =================
+def get_price(symbol):
     try:
-        df = stock_historical_data(symbol, "2024-01-01")
-        return df
+        stock = Vnstock().stock(symbol=symbol, source="VCI")
+        df = stock.quote.history(start="2024-01-01")
+        return df["close"].iloc[-1]
     except:
         return None
 
-def calc_indicator(df):
-    if df is None or len(df) < 30:
-        return None
-
-    close = df["close"]
-    volume = df["volume"]
-
-    # EMA9
-    ema9 = close.ewm(span=9).mean()
-
-    # RSI
-    delta = close.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-    rs = gain / loss
-    rsi = 100 - (100 / (1 + rs))
-
-    # OBV
-    obv = (np.sign(close.diff()) * volume).fillna(0).cumsum()
-    obv_ema = obv.ewm(span=9).mean()
-
-    # MACD
-    ema12 = close.ewm(span=12).mean()
-    ema26 = close.ewm(span=26).mean()
-    macd = ema12 - ema26
-    signal = macd.ewm(span=9).mean()
-
-    return {
-        "Giá_OK": int(close.iloc[-1] > ema9.iloc[-1]),
-        "RSI": round(rsi.iloc[-1], 1),
-        "RSI_OK": int(rsi.iloc[-1] > rsi.ewm(span=9).mean().iloc[-1]),
-        "OBV_OK": int(obv.iloc[-1] > obv_ema.iloc[-1]),
-        "MACD_OK": int(macd.iloc[-1] > signal.iloc[-1]),
-        "VOL_OK": int(volume.iloc[-1] > volume.rolling(20).mean().iloc[-1])
-    }
-
-# ================= TAB =================
-tab1, tab2 = st.tabs(["🧠 Scanner", "💰 Portfolio"])
-
-# ================= TAB 1 =================
-with tab1:
-    st.subheader("Quét nhanh cổ phiếu")
-
-    symbols = st.text_input("Nhập mã (cách nhau dấu phẩy)", "VJC,VNM,VSC,MSB")
-
-    if st.button("SCAN"):
-        result = []
-        for code in symbols.split(","):
-            code = code.strip().upper()
-            df = get_data(code)
-            ind = calc_indicator(df)
-
-            if ind:
-                ind["Mã"] = code
-                result.append(ind)
-
-        scanner_df = pd.DataFrame(result)
-        st.session_state["scanner"] = scanner_df
-        st.dataframe(scanner_df, use_container_width=True)
-
-# ================= SCORE =================
-def score(row):
-    s = 0
-    if row["Giá_OK"]: s += 2
-    if row["RSI"] >= 55: s += 2
-    if row["RSI_OK"]: s += 1
-    if row["OBV_OK"]: s += 3
-    if row["MACD_OK"]: s += 1.5
-    if row["VOL_OK"]: s += 0.5
-    return round(s,2)
-
-def classify(s):
-    if s >= 8.5: return "🟩 Gà chiến"
-    elif s >= 7: return "🟦 Sắp chạy"
-    elif s >= 5.5: return "🟨 Nghỉ"
-    elif s >= 4: return "⚠️ Yếu"
-    else: return "🟥 Gãy"
-
-# ================= TAB 2 =================
-with tab2:
-    st.subheader("Danh mục của anh")
-
-    input_text = st.text_area(
-        "Nhập: Mã, Giá mua, %NAV",
-        "VJC,172.8,5\nVSC,25.3,3"
-    )
-
-    if "scanner" not in st.session_state:
-        st.warning("👉 Chưa scan dữ liệu ở tab Scanner")
+# ================= LOGIC GÀ =================
+def classify(pct):
+    if pct > 5:
+        return "🟢 Gà chạy", "Giữ + trailing"
+    elif pct > 0:
+        return "🟡 Gà nghỉ", "Theo dõi"
     else:
-        scanner_df = st.session_state["scanner"]
+        return "🔴 Gà gãy", "BÁN NGAY"
 
-        rows = []
-        for line in input_text.split("\n"):
-            try:
-                code, buy, nav = line.split(",")
-                code = code.strip().upper()
-                buy = float(buy)
+# ================= STOP ENGINE 2.0 =================
+def stop_engine(price, pct):
+    if pct > 5:
+        return round(price * 0.95, 2)
+    elif pct > 0:
+        return round(price * 0.9, 2)
+    else:
+        return "-"
 
-                sc = scanner_df[scanner_df["Mã"] == code]
+# ================= PROCESS =================
+rows = []
 
-                if len(sc) == 0:
-                    continue
+for item in portfolio:
+    symbol = item["symbol"]
+    buy = item["buy"]
+    nav = item["nav"]
 
-                sc = sc.iloc[0]
+    current = get_price(symbol)
 
-                price = buy  # tạm, có thể nâng cấp lấy realtime
+    if current:
+        pct = round((current - buy) / buy * 100, 2)
+        state, action = classify(pct)
+        stop = stop_engine(current, pct)
+    else:
+        pct = 0
+        state = "❌ Không có dữ liệu"
+        action = "Check mã"
+        stop = "-"
 
-                pnl = (price - buy)/buy*100
-                sc_score = score(sc)
-                status = classify(sc_score)
+    rows.append({
+        "Mã": symbol,
+        "Giá mua": buy,
+        "Giá hiện tại": current,
+        "%NAV": nav,
+        "% Lãi/Lỗ": pct,
+        "Trạng thái": state,
+        "Hành động": action,
+        "Stop": stop
+    })
 
-                if "🟥" in status:
-                    action = "BÁN NGAY"
-                elif "⚠️" in status:
-                    action = "SIẾT STOP"
-                elif "🟦" in status:
-                    action = "CANH MUA"
-                elif "🟩" in status:
-                    action = "GIỮ"
-                else:
-                    action = "THEO DÕI"
+df = pd.DataFrame(rows)
 
-                rows.append({
-                    "Mã": code,
-                    "Giá mua": buy,
-                    "Điểm": sc_score,
-                    "Trạng thái": status,
-                    "Hành động": action
-                })
+# ================= DISPLAY =================
+st.subheader("📊 Danh mục hiện tại")
+st.dataframe(df, use_container_width=True)
 
-            except:
-                continue
+# ================= SUMMARY =================
+if not df.empty:
+    avg = df["% Lãi/Lỗ"].mean()
+    st.metric("📉 Lãi/Lỗ trung bình (%)", round(avg, 2))
 
-        df = pd.DataFrame(rows)
-        st.dataframe(df, use_container_width=True)
+# ================= ALERT =================
+alerts = df[df["Trạng thái"].str.contains("Gãy")]
+
+if not alerts.empty:
+    st.error("🚨 CẢNH BÁO: Có cổ phiếu cần xử lý ngay!")
+    st.write(alerts[["Mã", "Hành động"]])
