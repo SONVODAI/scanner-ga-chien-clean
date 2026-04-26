@@ -7,15 +7,14 @@ st.set_page_config(page_title="Portfolio Manager", layout="wide")
 
 st.title("🐔 Portfolio Manager – Nuôi & Bán Gà")
 
-# ===== Nhập danh mục =====
+# ===== INPUT =====
 st.sidebar.header("Nhập danh mục")
-
 portfolio = st.sidebar.text_area(
     "Nhập (mã, giá mua, %NAV) - mỗi dòng 1 mã",
     "MBB,22,30\nVND,18,20\nDIG,25,10"
 )
 
-# ===== Parse dữ liệu =====
+# ===== PARSE =====
 rows = []
 for line in portfolio.split("\n"):
     try:
@@ -30,14 +29,15 @@ for line in portfolio.split("\n"):
 
 df = pd.DataFrame(rows)
 
-# ===== Hàm phân tích =====
-def analyze_stock(ticker):
+# ===== DATA =====
+def get_price(ticker):
     try:
-        data = stock_historical_data(ticker, "2024-01-01")
-        data = data.tail(50)
+        data = yf.download(ticker + ".VN", period="3mo", interval="1d", progress=False)
+        if data is None or data.empty:
+            return None
 
-        close = data['close']
-        volume = data['volume']
+        close = data["Close"]
+        volume = data["Volume"]
 
         ema9 = close.ewm(span=9).mean()
 
@@ -47,7 +47,6 @@ def analyze_stock(ticker):
         loss = -delta.clip(upper=0)
         rs = gain.rolling(14).mean() / loss.rolling(14).mean()
         rsi = 100 - (100 / (1 + rs))
-
         rsi_ema9 = rsi.ewm(span=9).mean()
 
         # OBV
@@ -55,64 +54,78 @@ def analyze_stock(ticker):
         obv_ema9 = obv.ewm(span=9).mean()
 
         return {
-            "price": close.iloc[-1],
-            "ema9": ema9.iloc[-1],
-            "rsi": rsi.iloc[-1],
-            "rsi_ema9": rsi_ema9.iloc[-1],
-            "obv": obv.iloc[-1],
-            "obv_ema9": obv_ema9.iloc[-1]
+            "price": float(close.iloc[-1]),
+            "ema9": float(ema9.iloc[-1]),
+            "rsi": float(rsi.iloc[-1]),
+            "rsi_ema9": float(rsi_ema9.iloc[-1]),
+            "obv": float(obv.iloc[-1]),
+            "obv_ema9": float(obv_ema9.iloc[-1])
         }
     except:
         return None
 
-# ===== Xử lý =====
+# ===== LOGIC GÀ =====
+def classify(info):
+    price = info["price"]
+    ema9 = info["ema9"]
+    rsi = info["rsi"]
+    rsi_ema9 = info["rsi_ema9"]
+    obv = info["obv"]
+    obv_ema9 = info["obv_ema9"]
+
+    # Gà chạy
+    if price > ema9 and obv > obv_ema9 and rsi > rsi_ema9:
+        return "🟩 Gà chạy", "Giữ + trailing"
+
+    # Gà yếu
+    if price < ema9 and obv < obv_ema9:
+        return "🟥 Gà yếu", "Bán ngay"
+
+    # Gà nghỉ
+    return "🟨 Gà nghỉ", "Theo dõi"
+
+# ===== MAIN =====
 results = []
 
 for _, row in df.iterrows():
-    ticker = row['ticker']
-    buy_price = row['buy_price']
+    ticker = row["ticker"]
+    buy = row["buy_price"]
 
-    info = analyze_stock(ticker)
+    info = get_price(ticker)
 
     if info is None:
+        results.append({
+            "Mã": ticker,
+            "Giá mua": buy,
+            "Trạng thái": "❌ Không có dữ liệu",
+            "Hành động": "Check mã"
+        })
         continue
 
-    price = info['price']
-    pnl = (price - buy_price) / buy_price * 100
+    price = info["price"]
+    pnl = (price - buy) / buy * 100
 
-    # ===== Xác định trạng thái gà =====
-    if price > info['ema9'] and info['obv'] > info['obv_ema9'] and info['rsi'] > info['rsi_ema9']:
-        status = "🟩 Gà chạy"
-        action = "Giữ + trailing EMA9"
+    status, action = classify(info)
 
-    elif price < info['ema9'] and info['obv'] < info['obv_ema9']:
-        status = "🟥 Gà yếu"
-        action = "Bán / giảm tỷ trọng"
-
-    else:
-        status = "🟨 Gà nghỉ"
-        action = "Theo dõi"
+    stop = info["ema9"] * 0.98
 
     results.append({
         "Mã": ticker,
-        "Giá mua": buy_price,
+        "Giá mua": round(buy,2),
         "Giá hiện tại": round(price,2),
         "% Lãi/Lỗ": round(pnl,2),
         "Trạng thái": status,
-        "Hành động": action
+        "Hành động": action,
+        "Stop gợi ý": round(stop,2)
     })
 
 result_df = pd.DataFrame(results)
 
-# ===== Hiển thị =====
+# ===== DISPLAY =====
 st.subheader("📊 Danh mục hiện tại")
-
 st.dataframe(result_df, use_container_width=True)
 
-# ===== Tổng kết =====
-if not result_df.empty:
-    st.subheader("📈 Tổng quan")
-
-    avg_pnl = result_df["% Lãi/Lỗ"].mean()
-
-    st.metric("Lãi/Lỗ trung bình (%)", round(avg_pnl,2))
+# ===== SUMMARY =====
+if not result_df.empty and "% Lãi/Lỗ" in result_df.columns:
+    avg = result_df["% Lãi/Lỗ"].mean()
+    st.metric("📈 Lãi/Lỗ trung bình (%)", round(avg,2))
