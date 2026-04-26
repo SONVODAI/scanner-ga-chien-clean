@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Portfolio Manager", layout="wide")
+st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
 
-st.title("🐔 Portfolio Manager – Nuôi & Bán Gà")
+st.title("🐔 Portfolio Manager PRO – Nuôi Gà Chiến")
 
 # ===== INPUT =====
 st.sidebar.header("Nhập danh mục")
@@ -30,31 +30,50 @@ for line in portfolio.split("\n"):
 
 df = pd.DataFrame(rows)
 
-# ===== LOGIC GÀ =====
+# ===== CORE LOGIC GÀ CHIẾN =====
 def classify(row):
     buy = row["Giá mua"]
     price = row["Giá hiện tại"]
 
     pnl = (price - buy) / buy * 100
 
-    # 🟩 Gà chạy
-    if pnl > 5:
-        return "🟩 Gà chạy", "Giữ + trailing"
+    # 🟩 GÀ CHẠY (có lợi nhuận rõ)
+    if pnl >= 5:
+        status = "🟩 Gà chạy"
+        action = "Giữ + trailing"
+        stop = price * 0.97   # trailing sát
+        note = "Đang có lãi → ưu tiên giữ, không bán sớm"
 
-    # 🟥 Gà yếu
-    if pnl < -5:
-        return "🟥 Gà yếu", "Bán ngay"
+    # 🟨 GÀ NGHỈ (dao động nhẹ)
+    elif -3 <= pnl < 5:
+        status = "🟨 Gà nghỉ"
+        action = "Theo dõi"
+        stop = buy * 0.95
+        note = "Chưa rõ xu hướng → quan sát"
 
-    # 🟨 Gà nghỉ
-    return "🟨 Gà nghỉ", "Theo dõi"
+    # ⚠️ GÀ YẾU SỚM (cảnh báo trước)
+    elif -6 <= pnl < -3:
+        status = "⚠️ Yếu dần"
+        action = "Siết stop"
+        stop = price * 0.98
+        note = "Bắt đầu nguy hiểm → giảm rủi ro"
+
+    # 🟥 GÀ GÃY (bán)
+    else:
+        status = "🟥 Gà gãy"
+        action = "BÁN NGAY"
+        stop = None
+        note = "Gãy cấu trúc → không giữ"
+
+    return pnl, status, action, stop, note
+
 
 # ===== XỬ LÝ =====
 results = []
 
 for _, row in df.iterrows():
-    pnl = (row["Giá hiện tại"] - row["Giá mua"]) / row["Giá mua"] * 100
 
-    status, action = classify(row)
+    pnl, status, action, stop, note = classify(row)
 
     results.append({
         "Mã": row["Mã"],
@@ -62,7 +81,9 @@ for _, row in df.iterrows():
         "Giá hiện tại": row["Giá hiện tại"],
         "% Lãi/Lỗ": round(pnl,2),
         "Trạng thái": status,
-        "Hành động": action
+        "Hành động": action,
+        "Stop gợi ý": "-" if stop is None else round(stop,2),
+        "Ghi chú": note
     })
 
 result_df = pd.DataFrame(results)
@@ -75,3 +96,14 @@ st.dataframe(result_df, use_container_width=True)
 if not result_df.empty:
     avg = result_df["% Lãi/Lỗ"].mean()
     st.metric("📈 Lãi/Lỗ trung bình (%)", round(avg,2))
+
+# ===== ALERT BOX =====
+st.subheader("🚨 Cảnh báo nhanh")
+
+for _, row in result_df.iterrows():
+    if "🟥" in row["Trạng thái"]:
+        st.error(f"{row['Mã']} → GÀ GÃY → BÁN NGAY")
+    elif "⚠️" in row["Trạng thái"]:
+        st.warning(f"{row['Mã']} → YẾU DẦN → SIẾT STOP")
+    elif "🟩" in row["Trạng thái"]:
+        st.success(f"{row['Mã']} → GÀ CHẠY → GIỮ")
