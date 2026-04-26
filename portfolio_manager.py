@@ -1,27 +1,28 @@
 import streamlit as st
 import pandas as pd
 import os
-from vnstock import *
+import requests
 
-# ================== CONFIG ==================
+# ================= CONFIG =================
 st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
-
 DATA_FILE = "portfolio.csv"
 
-st.title("🐔 Portfolio Manager PRO V12 – Stable Clean")
+st.title("🐔 Portfolio Manager PRO V13 – Auto Stable")
 
-# ================== HÀM ==================
-
+# ================= API GIÁ =================
 def get_price(code):
     try:
-        df = stock_historical_data(code, "2024-01-01", "2025-12-31", "1D")
-        if df is not None and len(df) > 0:
-            return df.iloc[-1]["close"]
+        url = f"https://price-api.vndirect.com.vn/prices?q=code:{code}~floor:HOSE"
+        res = requests.get(url).json()
+
+        if "data" in res and len(res["data"]) > 0:
+            price = res["data"][0]["matchPrice"]
+            return price / 1000  # chuẩn hóa về đơn vị giống giá mua
     except:
         return None
     return None
 
-
+# ================= LOGIC =================
 def classify(pct):
     if pct >= 5:
         return "🟢 Gà chạy", "Giữ + trailing", "Thấp"
@@ -30,7 +31,7 @@ def classify(pct):
     else:
         return "🔴 Gà gãy", "BÁN NGAY", "Cao"
 
-
+# ================= LOAD/SAVE =================
 def load_data():
     if os.path.exists(DATA_FILE):
         try:
@@ -39,13 +40,10 @@ def load_data():
             return pd.DataFrame()
     return pd.DataFrame()
 
-
 def save_data(df):
     df.to_csv(DATA_FILE, index=False)
 
-
-# ================== INPUT ==================
-
+# ================= INPUT =================
 st.sidebar.header("📥 Nhập danh mục")
 
 raw = st.sidebar.text_area(
@@ -69,12 +67,10 @@ if st.sidebar.button("💾 Lưu danh mục"):
     save_data(df_save)
     st.sidebar.success("Đã lưu danh mục!")
 
-# ================== LOAD ==================
-
+# ================= LOAD =================
 df_input = load_data()
 
-# ================== XỬ LÝ ==================
-
+# ================= PROCESS =================
 if df_input.empty:
     st.info("👉 Chưa có danh mục")
 else:
@@ -86,7 +82,6 @@ else:
         nav = r["%NAV"]
 
         price = get_price(code)
-        price = price / 1000 if price else None  # FIX đơn vị
 
         if price:
             pct = (price - buy) / buy * 100
@@ -108,18 +103,15 @@ else:
 
     df = pd.DataFrame(rows)
 
-    # ================== HIỂN THỊ ==================
-
+    # ===== DISPLAY =====
     st.subheader("📊 Danh mục hiện tại")
     st.dataframe(df, use_container_width=True)
 
-    # ================== SUMMARY ==================
-
+    # ===== SUMMARY =====
     avg = df["% Lãi/Lỗ"].mean()
     st.metric("📈 Lãi/Lỗ trung bình (%)", round(avg, 2))
 
-    # ================== ALERT ==================
-
+    # ===== ALERT =====
     alert = df[df["Trạng thái"].str.contains("gãy", case=False, na=False)]
 
     if not alert.empty:
