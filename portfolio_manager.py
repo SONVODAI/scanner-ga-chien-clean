@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import os
-import requests
 import yfinance as yf
 
 # ================= CONFIG =================
@@ -10,10 +9,22 @@ DATA_FILE = "portfolio.csv"
 
 st.title("🐔 Portfolio Manager PRO V13 – Auto Stable")
 
-# ================= API GIÁ =================
+# ================= LOAD / SAVE =================
+def load_data():
+    if os.path.exists(DATA_FILE):
+        try:
+            df = pd.read_csv(DATA_FILE)
+            return df
+        except:
+            return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
+    return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
+
+def save_data(df):
+    df.to_csv(DATA_FILE, index=False)
+
+# ================= GET PRICE (YAHOO) =================
 def get_price(code):
     try:
-        # Yahoo dùng .VN cho HOSE
         ticker = yf.Ticker(f"{code}.VN")
         data = ticker.history(period="1d")
 
@@ -22,6 +33,7 @@ def get_price(code):
     except:
         return None
     return None
+
 # ================= LOGIC =================
 def classify(pct):
     if pct >= 5:
@@ -31,52 +43,43 @@ def classify(pct):
     else:
         return "🔴 Gà gãy", "BÁN NGAY", "Cao"
 
-# ================= LOAD/SAVE =================
-def load_data():
-    if os.path.exists(DATA_FILE):
-        try:
-            return pd.read_csv(DATA_FILE)
-        except:
-            return pd.DataFrame()
-    return pd.DataFrame()
-
-def save_data(df):
-    df.to_csv(DATA_FILE, index=False)
-
-# ================= INPUT =================
+# ================= UI =================
 st.sidebar.header("📥 Nhập danh mục")
 
 raw = st.sidebar.text_area(
-    "Format: Mã, Giá mua, %NAV\nVD:\nMBB,22,5\nVND,18,3"
+    "Format: Mã, Giá mua, %NAV\nVD:\nMBB,22,5",
+    height=150
 )
 
 if st.sidebar.button("💾 Lưu danh mục"):
     rows = []
     for line in raw.split("\n"):
-        try:
-            code, buy, nav = line.split(",")
-            rows.append({
-                "Mã": code.strip().upper(),
-                "Giá mua": float(buy),
-                "%NAV": float(nav)
-            })
-        except:
-            st.sidebar.error(f"Lỗi dòng: {line}")
+        parts = line.split(",")
+        if len(parts) == 3:
+            try:
+                code = parts[0].strip().upper()
+                buy = float(parts[1])
+                nav = float(parts[2])
+                rows.append([code, buy, nav])
+            except:
+                pass
 
-    df_save = pd.DataFrame(rows)
+    df_save = pd.DataFrame(rows, columns=["Mã", "Giá mua", "%NAV"])
     save_data(df_save)
-    st.sidebar.success("Đã lưu danh mục!")
+    st.sidebar.success("✅ Đã lưu danh mục")
 
-# ================= LOAD =================
-df_input = load_data()
+# ================= LOAD DATA =================
+df = load_data()
 
-# ================= PROCESS =================
-if df_input.empty:
+# ================= MAIN =================
+st.subheader("📊 Danh mục hiện tại")
+
+if df.empty:
     st.info("👉 Chưa có danh mục")
 else:
     rows = []
 
-    for _, r in df_input.iterrows():
+    for _, r in df.iterrows():
         code = r["Mã"]
         buy = r["Giá mua"]
         nav = r["%NAV"]
@@ -101,20 +104,10 @@ else:
             "Rủi ro": risk
         })
 
-    df = pd.DataFrame(rows)
+    df_show = pd.DataFrame(rows)
 
-    # ===== DISPLAY =====
-    st.subheader("📊 Danh mục hiện tại")
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df_show, use_container_width=True)
 
     # ===== SUMMARY =====
-    avg = df["% Lãi/Lỗ"].mean()
+    avg = df_show["% Lãi/Lỗ"].mean()
     st.metric("📈 Lãi/Lỗ trung bình (%)", round(avg, 2))
-
-    # ===== ALERT =====
-    alert = df[df["Trạng thái"].str.contains("gãy", case=False, na=False)]
-
-    if not alert.empty:
-        st.error("🚨 Cảnh báo: Có cổ phiếu cần xử lý!")
-        for _, row in alert.iterrows():
-            st.write(f"{row['Mã']} → BÁN NGAY")
