@@ -1,260 +1,153 @@
 import streamlit as st
 import pandas as pd
-import os
+import numpy as np
+from vnstock import stock_historical_data
 
-st.set_page_config(page_title="Portfolio Manager PRO V6", layout="wide")
-st.title("🐔 Portfolio Manager PRO V6 – Nuôi Gà Chiến Full Logic")
+st.set_page_config(layout="wide")
+st.title("🐔 GÀ CHIẾN TERMINAL V7 (Scanner + Portfolio)")
 
-DATA_FILE = "portfolio.csv"
+# ================= SCANNER =================
+@st.cache_data(ttl=300)
+def get_data(symbol):
+    try:
+        df = stock_historical_data(symbol, "2024-01-01")
+        return df
+    except:
+        return None
 
-COLUMNS = [
-    "Mã", "Giá mua", "Giá hiện tại", "%NAV",
-    "Giá_OK", "RSI", "RSI_OK", "OBV_OK", "MACD_OK", "VOL_OK"
-]
+def calc_indicator(df):
+    if df is None or len(df) < 30:
+        return None
 
-def load_data():
-    if os.path.exists(DATA_FILE):
-        df = pd.read_csv(DATA_FILE)
-        for col in COLUMNS:
-            if col not in df.columns:
-                df[col] = 0
-        return df[COLUMNS]
-    return pd.DataFrame(columns=COLUMNS)
+    close = df["close"]
+    volume = df["volume"]
 
-def save_data(df):
-    df.to_csv(DATA_FILE, index=False)
+    # EMA9
+    ema9 = close.ewm(span=9).mean()
 
-def to_bool(x):
-    return str(x).strip().lower() in ["1", "yes", "y", "true", "ok", "đúng", "co", "có"]
+    # RSI
+    delta = close.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
 
-def parse_full_input(text):
-    rows = []
-    for line in text.split("\n"):
-        if not line.strip():
-            continue
-        try:
-            parts = [x.strip() for x in line.split(",")]
+    # OBV
+    obv = (np.sign(close.diff()) * volume).fillna(0).cumsum()
+    obv_ema = obv.ewm(span=9).mean()
 
-            code = parts[0].upper()
-            buy = float(parts[1])
-            price = float(parts[2])
-            nav = float(parts[3])
-
-            gia_ok = int(to_bool(parts[4]))
-            rsi = float(parts[5])
-            rsi_ok = int(to_bool(parts[6]))
-            obv_ok = int(to_bool(parts[7]))
-            macd_ok = int(to_bool(parts[8]))
-            vol_ok = int(to_bool(parts[9]))
-
-            rows.append({
-                "Mã": code,
-                "Giá mua": buy,
-                "Giá hiện tại": price,
-                "%NAV": nav,
-                "Giá_OK": gia_ok,
-                "RSI": rsi,
-                "RSI_OK": rsi_ok,
-                "OBV_OK": obv_ok,
-                "MACD_OK": macd_ok,
-                "VOL_OK": vol_ok
-            })
-        except:
-            continue
-
-    return pd.DataFrame(rows, columns=COLUMNS)
-
-def update_prices(df, text):
-    for line in text.split("\n"):
-        if not line.strip():
-            continue
-        try:
-            code, price = line.split(",")
-            code = code.strip().upper()
-            price = float(price)
-            df.loc[df["Mã"] == code, "Giá hiện tại"] = price
-        except:
-            continue
-    return df
-
-def score_stock(row):
-    score = 0
-
-    # Trục 1: Giá / EMA9 / cấu trúc
-    if row["Giá_OK"] == 1:
-        score += 2
-
-    # Trục 2: RSI
-    if row["RSI"] >= 55:
-        score += 2
-    elif row["RSI"] >= 50:
-        score += 1
-
-    if row["RSI_OK"] == 1:
-        score += 1
-
-    # Trục 3: OBV – trọng số cao nhất
-    if row["OBV_OK"] == 1:
-        score += 3
-
-    # Trục 4: MACD
-    if row["MACD_OK"] == 1:
-        score += 1.5
-
-    # Trục 5: Volume
-    if row["VOL_OK"] == 1:
-        score += 0.5
-
-    return round(score, 2)
-
-def technical_status(score):
-    if score >= 8.5:
-        return "🟩 Gà chiến"
-    elif score >= 7:
-        return "🟦 Gà sắp chạy"
-    elif score >= 5.5:
-        return "🟨 Gà nghỉ khỏe"
-    elif score >= 4:
-        return "⚠️ Yếu dần"
-    else:
-        return "🟥 Gãy kỹ thuật"
-
-def decision_engine(row):
-    buy = float(row["Giá mua"])
-    price = float(row["Giá hiện tại"])
-    pnl = (price - buy) / buy * 100
-
-    score = score_stock(row)
-    tech = technical_status(score)
-
-    # Stop Engine 2.0 + Technical Logic
-    if "🟩" in tech and pnl >= 0:
-        action = "GIỮ / CÓ THỂ TĂNG"
-        nav_action = "Tăng NAV nếu thị trường ủng hộ"
-        stop = price * 0.97
-        risk = "Thấp"
-        note = "Kỹ thuật mạnh + không âm → ưu tiên giữ"
-
-    elif "🟦" in tech and pnl > -3:
-        action = "SOI CHART / CANH TĂNG"
-        nav_action = "Tăng nhẹ nếu chart xác nhận"
-        stop = buy * 0.98
-        risk = "Thấp-Trung bình"
-        note = "Gần chuyển pha chạy → theo dõi sát"
-
-    elif "🟨" in tech and -5 < pnl < 5:
-        action = "THEO DÕI"
-        nav_action = "Giữ nguyên"
-        stop = buy * 0.95
-        risk = "Trung bình"
-        note = "Chưa đủ mạnh để tăng, chưa yếu để bán"
-
-    elif "⚠️" in tech or (-6 <= pnl <= -3):
-        action = "SIẾT STOP / GIẢM"
-        nav_action = "Giảm 1/2 nếu không hồi"
-        stop = price * 0.98
-        risk = "Cao"
-        note = "Có dấu hiệu yếu → không bình quân giá"
-
-    else:
-        action = "BÁN NGAY"
-        nav_action = "Thoát toàn bộ"
-        stop = "-"
-        risk = "Rất cao"
-        note = "Gãy kỹ thuật hoặc lỗ sâu → ưu tiên bảo vệ vốn"
+    # MACD
+    ema12 = close.ewm(span=12).mean()
+    ema26 = close.ewm(span=26).mean()
+    macd = ema12 - ema26
+    signal = macd.ewm(span=9).mean()
 
     return {
-        "Mã": row["Mã"],
-        "Giá mua": buy,
-        "Giá hiện tại": price,
-        "%NAV": row["%NAV"],
-        "% Lãi/Lỗ": round(pnl, 2),
-        "Điểm 5 trục": score,
-        "Trạng thái kỹ thuật": tech,
-        "Hành động": action,
-        "Stop gợi ý": "-" if stop == "-" else round(stop, 2),
-        "NAV đề xuất": nav_action,
-        "Rủi ro": risk,
-        "Ghi chú": note
+        "Giá_OK": int(close.iloc[-1] > ema9.iloc[-1]),
+        "RSI": round(rsi.iloc[-1], 1),
+        "RSI_OK": int(rsi.iloc[-1] > rsi.ewm(span=9).mean().iloc[-1]),
+        "OBV_OK": int(obv.iloc[-1] > obv_ema.iloc[-1]),
+        "MACD_OK": int(macd.iloc[-1] > signal.iloc[-1]),
+        "VOL_OK": int(volume.iloc[-1] > volume.rolling(20).mean().iloc[-1])
     }
 
-df = load_data()
+# ================= TAB =================
+tab1, tab2 = st.tabs(["🧠 Scanner", "💰 Portfolio"])
 
-st.sidebar.header("1️⃣ Nhập / Lưu danh mục full")
+# ================= TAB 1 =================
+with tab1:
+    st.subheader("Quét nhanh cổ phiếu")
 
-full_text = st.sidebar.text_area(
-    "Format: Mã, Giá mua, Giá hiện tại, %NAV, Giá_OK, RSI, RSI_OK, OBV_OK, MACD_OK, VOL_OK",
-    "VJC,172.8,180.5,6,1,62,1,1,1,1\nVSC,25.3,22.2,3,0,42,0,0,0,0",
-    height=150
-)
+    symbols = st.text_input("Nhập mã (cách nhau dấu phẩy)", "VJC,VNM,VSC,MSB")
 
-if st.sidebar.button("💾 Lưu danh mục"):
-    new_df = parse_full_input(full_text)
-    if not new_df.empty:
-        save_data(new_df)
-        df = new_df
-        st.sidebar.success("Đã lưu danh mục.")
+    if st.button("SCAN"):
+        result = []
+        for code in symbols.split(","):
+            code = code.strip().upper()
+            df = get_data(code)
+            ind = calc_indicator(df)
+
+            if ind:
+                ind["Mã"] = code
+                result.append(ind)
+
+        scanner_df = pd.DataFrame(result)
+        st.session_state["scanner"] = scanner_df
+        st.dataframe(scanner_df, use_container_width=True)
+
+# ================= SCORE =================
+def score(row):
+    s = 0
+    if row["Giá_OK"]: s += 2
+    if row["RSI"] >= 55: s += 2
+    if row["RSI_OK"]: s += 1
+    if row["OBV_OK"]: s += 3
+    if row["MACD_OK"]: s += 1.5
+    if row["VOL_OK"]: s += 0.5
+    return round(s,2)
+
+def classify(s):
+    if s >= 8.5: return "🟩 Gà chiến"
+    elif s >= 7: return "🟦 Sắp chạy"
+    elif s >= 5.5: return "🟨 Nghỉ"
+    elif s >= 4: return "⚠️ Yếu"
+    else: return "🟥 Gãy"
+
+# ================= TAB 2 =================
+with tab2:
+    st.subheader("Danh mục của anh")
+
+    input_text = st.text_area(
+        "Nhập: Mã, Giá mua, %NAV",
+        "VJC,172.8,5\nVSC,25.3,3"
+    )
+
+    if "scanner" not in st.session_state:
+        st.warning("👉 Chưa scan dữ liệu ở tab Scanner")
     else:
-        st.sidebar.warning("Dữ liệu chưa hợp lệ.")
+        scanner_df = st.session_state["scanner"]
 
-st.sidebar.header("2️⃣ Cập nhật giá mới")
+        rows = []
+        for line in input_text.split("\n"):
+            try:
+                code, buy, nav = line.split(",")
+                code = code.strip().upper()
+                buy = float(buy)
 
-price_text = st.sidebar.text_area(
-    "Chỉ nhập: Mã, Giá hiện tại",
-    "",
-    height=100
-)
+                sc = scanner_df[scanner_df["Mã"] == code]
 
-if st.sidebar.button("🔄 Cập nhật giá"):
-    df = update_prices(df, price_text)
-    save_data(df)
-    st.sidebar.success("Đã cập nhật giá.")
+                if len(sc) == 0:
+                    continue
 
-results = []
-for _, row in df.iterrows():
-    try:
-        results.append(decision_engine(row))
-    except:
-        continue
+                sc = sc.iloc[0]
 
-result_df = pd.DataFrame(results)
+                price = buy  # tạm, có thể nâng cấp lấy realtime
 
-st.subheader("📊 Danh mục hiện tại – Full Logic Scanner")
-st.dataframe(result_df, use_container_width=True)
+                pnl = (price - buy)/buy*100
+                sc_score = score(sc)
+                status = classify(sc_score)
 
-if not result_df.empty:
-    col1, col2, col3 = st.columns(3)
-    col1.metric("📈 Lãi/Lỗ TB (%)", round(result_df["% Lãi/Lỗ"].mean(), 2))
-    col2.metric("🔥 Điểm kỹ thuật TB", round(result_df["Điểm 5 trục"].mean(), 2))
-    col3.metric("💰 Tổng %NAV", round(result_df["%NAV"].sum(), 2))
+                if "🟥" in status:
+                    action = "BÁN NGAY"
+                elif "⚠️" in status:
+                    action = "SIẾT STOP"
+                elif "🟦" in status:
+                    action = "CANH MUA"
+                elif "🟩" in status:
+                    action = "GIỮ"
+                else:
+                    action = "THEO DÕI"
 
-st.subheader("🚨 Cảnh báo nhanh")
+                rows.append({
+                    "Mã": code,
+                    "Giá mua": buy,
+                    "Điểm": sc_score,
+                    "Trạng thái": status,
+                    "Hành động": action
+                })
 
-for _, row in result_df.iterrows():
-    code = row["Mã"]
-    tech = row["Trạng thái kỹ thuật"]
-    action = row["Hành động"]
+            except:
+                continue
 
-    if "BÁN" in action:
-        st.error(f"{code} → {tech} → {action}")
-    elif "SIẾT" in action:
-        st.warning(f"{code} → {tech} → {action}")
-    elif "SOI" in action:
-        st.info(f"{code} → {tech} → {action}")
-    elif "GIỮ" in action:
-        st.success(f"{code} → {tech} → {action}")
-
-st.subheader("📌 Hướng dẫn nhập dữ liệu")
-st.write("""
-Format đầy đủ:
-
-**Mã, Giá mua, Giá hiện tại, %NAV, Giá_OK, RSI, RSI_OK, OBV_OK, MACD_OK, VOL_OK**
-
-Trong đó:
-- **Giá_OK**: giá trên EMA9 / cấu trúc còn tốt = 1, không = 0
-- **RSI**: nhập số RSI hiện tại
-- **RSI_OK**: RSI trên EMA9 RSI = 1, không = 0
-- **OBV_OK**: OBV trên EMA9 OBV = 1, không = 0
-- **MACD_OK**: MACD / Histogram tốt = 1, không = 0
-- **VOL_OK**: volume ủng hộ = 1, không = 0
-""")
+        df = pd.DataFrame(rows)
+        st.dataframe(df, use_container_width=True)
