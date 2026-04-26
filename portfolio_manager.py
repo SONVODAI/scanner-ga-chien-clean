@@ -98,6 +98,9 @@ for _, r in df.iterrows():
 
     price = get_price(code)
 
+if price:
+    price = price / 1000
+
     if price:
         pct = (price - buy) / buy * 100
         state, action, risk = classify(pct)
