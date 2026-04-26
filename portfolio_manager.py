@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-from vnstock import stock_historical_data
+from vnstock import *
 
 # ================== CONFIG ==================
 st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
