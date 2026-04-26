@@ -119,8 +119,12 @@ if not df.empty:
     st.metric("📉 Lãi/Lỗ trung bình (%)", round(avg, 2))
 
 # ================= ALERT =================
-alerts = df[df["Trạng thái"].str.contains("Gãy")]
+# ALERT
+if not df.empty and "Trạng thái" in df.columns:
+    alerts = df[df["Trạng thái"].str.contains("Gãy")]
 
-if not alerts.empty:
+    if not alerts.empty:
+        st.error("🚨 CẢNH BÁO: Có cổ phiếu cần xử lý ngay!")
+        st.write(alerts[["Mã", "Hành động"]])
     st.error("🚨 CẢNH BÁO: Có cổ phiếu cần xử lý ngay!")
     st.write(alerts[["Mã", "Hành động"]])
