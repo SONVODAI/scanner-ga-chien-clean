@@ -1,4 +1,4 @@
 streamlit
 pandas
 numpy
-vnstock>=0.2.9
+requests
