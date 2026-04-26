@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from vnstock import stock_historical_data
+import yfinance as yf
 
 st.set_page_config(page_title="Portfolio Manager", layout="wide")
 
