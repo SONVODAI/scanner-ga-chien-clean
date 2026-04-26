@@ -1,40 +1,41 @@
 import streamlit as st
 import pandas as pd
+import yfinance as yf
 import os
-from vnstock import stock_historical_data
 
 st.set_page_config(page_title="Portfolio Manager PRO V10", layout="wide")
 
-st.title("🐔 Portfolio Manager PRO V10 – Auto Scanner + Save")
+st.title("🐔 Portfolio Manager PRO V10 – Stable Version")
 
 DATA_FILE = "portfolio.csv"
 
-# ================= LOAD DATA =================
-def load_portfolio():
+# ================= LOAD =================
+def load_data():
     if os.path.exists(DATA_FILE):
         return pd.read_csv(DATA_FILE)
     return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
 
-# ================= SAVE DATA =================
-def save_portfolio(df):
+# ================= SAVE =================
+def save_data(df):
     df.to_csv(DATA_FILE, index=False)
 
 # ================= GET PRICE =================
 def get_price(code):
     try:
-        df = stock_historical_data(symbol=code, start_date="2024-01-01", end_date="2025-12-31")
-        return df["close"].iloc[-1]
+        ticker = yf.Ticker(code + ".VN")
+        df = ticker.history(period="1d")
+        return float(df["Close"].iloc[-1])
     except:
         return None
 
-# ================= LOGIC GÀ =================
+# ================= LOGIC =================
 def classify(pct):
     if pct >= 5:
-        return "Gà chạy", "Giữ + trailing"
+        return "🟢 Gà chạy", "Giữ + trailing"
     elif pct >= 0:
-        return "Gà nghỉ", "Theo dõi"
+        return "🟡 Gà nghỉ", "Theo dõi"
     else:
-        return "Gà gãy", "BÁN NGAY"
+        return "🔴 Gà gãy", "BÁN NGAY"
 
 # ================= UI =================
 st.sidebar.header("📥 Nhập danh mục")
@@ -57,20 +58,19 @@ if st.sidebar.button("💾 Lưu danh mục"):
             data.append({"Mã": code, "Giá mua": buy, "%NAV": nav})
 
     df = pd.DataFrame(data)
-    save_portfolio(df)
-
-    st.sidebar.success("✅ Đã lưu danh mục")
+    save_data(df)
+    st.sidebar.success("✅ Đã lưu")
 
 # ================= LOAD =================
-df = load_portfolio()
+df = load_data()
 
 # ================= PROCESS =================
 rows = []
 
-for _, row in df.iterrows():
-    code = row["Mã"]
-    buy = row["Giá mua"]
-    nav = row["%NAV"]
+for _, r in df.iterrows():
+    code = r["Mã"]
+    buy = r["Giá mua"]
+    nav = r["%NAV"]
 
     price = get_price(code)
 
@@ -79,7 +79,7 @@ for _, row in df.iterrows():
         state, action = classify(pct)
     else:
         pct = 0
-        state, action = "Lỗi data", "Check"
+        state, action = "⚠️ Lỗi data", "Check"
 
     rows.append({
         "Mã": code,
@@ -104,10 +104,9 @@ else:
     avg = result["% Lãi/Lỗ"].mean()
     st.metric("📈 Lãi/Lỗ trung bình (%)", round(avg, 2))
 
-    # ALERT
-    alerts = result[result["Trạng thái"] == "Gà gãy"]
+    alerts = result[result["Trạng thái"].str.contains("gãy")]
 
     if not alerts.empty:
-        st.error("🚨 CẢNH BÁO: Có mã cần bán ngay")
-        for code in alerts["Mã"]:
-            st.write(f"❌ {code} → BÁN NGAY")
+        st.error("🚨 CÓ MÃ CẦN BÁN NGAY")
+        for c in alerts["Mã"]:
+            st.write(f"❌ {c}")
