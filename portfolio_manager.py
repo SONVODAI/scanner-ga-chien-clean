@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import requests
+import yfinance as yf
 
 # ================= CONFIG =================
 st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
@@ -12,12 +13,12 @@ st.title("🐔 Portfolio Manager PRO V13 – Auto Stable")
 # ================= API GIÁ =================
 def get_price(code):
     try:
-        url = f"https://api-finfo.vndirect.com.vn/v4/stock_prices?q=code:{code}"
-        res = requests.get(url).json()
+        # Yahoo dùng .VN cho HOSE
+        ticker = yf.Ticker(f"{code}.VN")
+        data = ticker.history(period="1d")
 
-        if "data" in res and len(res["data"]) > 0:
-            price = res["data"][0]["lastPrice"]
-            return float(price)
+        if not data.empty:
+            return float(data["Close"].iloc[-1])
     except:
         return None
     return None
