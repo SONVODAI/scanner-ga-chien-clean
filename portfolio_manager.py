@@ -2,20 +2,30 @@ import streamlit as st
 import pandas as pd
 import os
 
-# ================= CONFIG =================
-st.set_page_config(page_title="Portfolio Manager PRO V5", layout="wide")
-st.title("🐔 Portfolio Manager PRO V5 – Nuôi Gà Chiến")
+st.set_page_config(page_title="Portfolio Manager PRO V6", layout="wide")
+st.title("🐔 Portfolio Manager PRO V6 – Nuôi Gà Chiến Full Logic")
 
 DATA_FILE = "portfolio.csv"
 
-# ================= DATA =================
+COLUMNS = [
+    "Mã", "Giá mua", "Giá hiện tại", "%NAV",
+    "Giá_OK", "RSI", "RSI_OK", "OBV_OK", "MACD_OK", "VOL_OK"
+]
+
 def load_data():
     if os.path.exists(DATA_FILE):
-        return pd.read_csv(DATA_FILE)
-    return pd.DataFrame(columns=["Mã", "Giá mua", "Giá hiện tại", "%NAV"])
+        df = pd.read_csv(DATA_FILE)
+        for col in COLUMNS:
+            if col not in df.columns:
+                df[col] = 0
+        return df[COLUMNS]
+    return pd.DataFrame(columns=COLUMNS)
 
 def save_data(df):
     df.to_csv(DATA_FILE, index=False)
+
+def to_bool(x):
+    return str(x).strip().lower() in ["1", "yes", "y", "true", "ok", "đúng", "co", "có"]
 
 def parse_full_input(text):
     rows = []
@@ -23,16 +33,36 @@ def parse_full_input(text):
         if not line.strip():
             continue
         try:
-            code, buy, price, nav = line.split(",")
+            parts = [x.strip() for x in line.split(",")]
+
+            code = parts[0].upper()
+            buy = float(parts[1])
+            price = float(parts[2])
+            nav = float(parts[3])
+
+            gia_ok = int(to_bool(parts[4]))
+            rsi = float(parts[5])
+            rsi_ok = int(to_bool(parts[6]))
+            obv_ok = int(to_bool(parts[7]))
+            macd_ok = int(to_bool(parts[8]))
+            vol_ok = int(to_bool(parts[9]))
+
             rows.append({
-                "Mã": code.strip().upper(),
-                "Giá mua": float(buy),
-                "Giá hiện tại": float(price),
-                "%NAV": float(nav)
+                "Mã": code,
+                "Giá mua": buy,
+                "Giá hiện tại": price,
+                "%NAV": nav,
+                "Giá_OK": gia_ok,
+                "RSI": rsi,
+                "RSI_OK": rsi_ok,
+                "OBV_OK": obv_ok,
+                "MACD_OK": macd_ok,
+                "VOL_OK": vol_ok
             })
         except:
             continue
-    return pd.DataFrame(rows)
+
+    return pd.DataFrame(rows, columns=COLUMNS)
 
 def update_prices(df, text):
     for line in text.split("\n"):
@@ -47,89 +77,115 @@ def update_prices(df, text):
             continue
     return df
 
-# ================= ENGINE =================
-def evaluate(row):
+def score_stock(row):
+    score = 0
+
+    # Trục 1: Giá / EMA9 / cấu trúc
+    if row["Giá_OK"] == 1:
+        score += 2
+
+    # Trục 2: RSI
+    if row["RSI"] >= 55:
+        score += 2
+    elif row["RSI"] >= 50:
+        score += 1
+
+    if row["RSI_OK"] == 1:
+        score += 1
+
+    # Trục 3: OBV – trọng số cao nhất
+    if row["OBV_OK"] == 1:
+        score += 3
+
+    # Trục 4: MACD
+    if row["MACD_OK"] == 1:
+        score += 1.5
+
+    # Trục 5: Volume
+    if row["VOL_OK"] == 1:
+        score += 0.5
+
+    return round(score, 2)
+
+def technical_status(score):
+    if score >= 8.5:
+        return "🟩 Gà chiến"
+    elif score >= 7:
+        return "🟦 Gà sắp chạy"
+    elif score >= 5.5:
+        return "🟨 Gà nghỉ khỏe"
+    elif score >= 4:
+        return "⚠️ Yếu dần"
+    else:
+        return "🟥 Gãy kỹ thuật"
+
+def decision_engine(row):
     buy = float(row["Giá mua"])
     price = float(row["Giá hiện tại"])
-    nav = float(row["%NAV"])
-
     pnl = (price - buy) / buy * 100
 
-    # 1) GÀ CHẠY
-    if pnl >= 5:
-        status = "🟩 Gà chạy"
-        action = "Giữ + trailing"
+    score = score_stock(row)
+    tech = technical_status(score)
+
+    # Stop Engine 2.0 + Technical Logic
+    if "🟩" in tech and pnl >= 0:
+        action = "GIỮ / CÓ THỂ TĂNG"
+        nav_action = "Tăng NAV nếu thị trường ủng hộ"
         stop = price * 0.97
         risk = "Thấp"
-        nav_action = "Có thể tăng"
-        early = "Đã chạy"
-        note = "Đang có lãi rõ → ưu tiên giữ, không bán sớm"
+        note = "Kỹ thuật mạnh + không âm → ưu tiên giữ"
 
-    # 2) EARLY SIGNAL – GÀ SẮP CHẠY
-    elif 3 <= pnl < 5:
-        status = "🟦 Gà sắp chạy"
-        action = "Canh tăng NAV"
+    elif "🟦" in tech and pnl > -3:
+        action = "SOI CHART / CANH TĂNG"
+        nav_action = "Tăng nhẹ nếu chart xác nhận"
         stop = buy * 0.98
         risk = "Thấp-Trung bình"
-        nav_action = "Tăng nhẹ nếu chart xác nhận"
-        early = "EARLY BUY"
-        note = "Sát ngưỡng chạy → soi chart, nếu đẹp có thể tăng tỷ trọng"
+        note = "Gần chuyển pha chạy → theo dõi sát"
 
-    # 3) GÀ NGHỈ
-    elif -3 <= pnl < 3:
-        status = "🟨 Gà nghỉ"
-        action = "Theo dõi"
+    elif "🟨" in tech and -5 < pnl < 5:
+        action = "THEO DÕI"
+        nav_action = "Giữ nguyên"
         stop = buy * 0.95
         risk = "Trung bình"
-        nav_action = "Giữ nguyên"
-        early = "Chưa có"
-        note = "Chưa rõ xu hướng → quan sát"
+        note = "Chưa đủ mạnh để tăng, chưa yếu để bán"
 
-    # 4) YẾU DẦN
-    elif -6 <= pnl < -3:
-        status = "⚠️ Yếu dần"
-        action = "Siết stop"
+    elif "⚠️" in tech or (-6 <= pnl <= -3):
+        action = "SIẾT STOP / GIẢM"
+        nav_action = "Giảm 1/2 nếu không hồi"
         stop = price * 0.98
         risk = "Cao"
-        nav_action = "Giảm 1/2"
-        early = "Không"
-        note = "Nguy hiểm → chuẩn bị thoát, không bình quân giá"
+        note = "Có dấu hiệu yếu → không bình quân giá"
 
-    # 5) GÀ GÃY
     else:
-        status = "🟥 Gà gãy"
         action = "BÁN NGAY"
-        stop = None
-        risk = "Rất cao"
         nav_action = "Thoát toàn bộ"
-        early = "Không"
-        note = "Gãy cấu trúc → không giữ"
+        stop = "-"
+        risk = "Rất cao"
+        note = "Gãy kỹ thuật hoặc lỗ sâu → ưu tiên bảo vệ vốn"
 
     return {
         "Mã": row["Mã"],
         "Giá mua": buy,
         "Giá hiện tại": price,
-        "%NAV": nav,
+        "%NAV": row["%NAV"],
         "% Lãi/Lỗ": round(pnl, 2),
-        "Trạng thái": status,
-        "Early Signal": early,
+        "Điểm 5 trục": score,
+        "Trạng thái kỹ thuật": tech,
         "Hành động": action,
-        "Stop gợi ý": "-" if stop is None else round(stop, 2),
-        "Rủi ro": risk,
+        "Stop gợi ý": "-" if stop == "-" else round(stop, 2),
         "NAV đề xuất": nav_action,
+        "Rủi ro": risk,
         "Ghi chú": note
     }
 
-# ================= LOAD =================
 df = load_data()
 
-# ================= SIDEBAR =================
-st.sidebar.header("1️⃣ Nhập / Lưu danh mục")
+st.sidebar.header("1️⃣ Nhập / Lưu danh mục full")
 
 full_text = st.sidebar.text_area(
-    "Nhập full: Mã, Giá mua, Giá hiện tại, %NAV",
-    "",
-    height=130
+    "Format: Mã, Giá mua, Giá hiện tại, %NAV, Giá_OK, RSI, RSI_OK, OBV_OK, MACD_OK, VOL_OK",
+    "VJC,172.8,180.5,6,1,62,1,1,1,1\nVSC,25.3,22.2,3,0,42,0,0,0,0",
+    height=150
 )
 
 if st.sidebar.button("💾 Lưu danh mục"):
@@ -139,70 +195,66 @@ if st.sidebar.button("💾 Lưu danh mục"):
         df = new_df
         st.sidebar.success("Đã lưu danh mục.")
     else:
-        st.sidebar.warning("Chưa có dữ liệu hợp lệ.")
+        st.sidebar.warning("Dữ liệu chưa hợp lệ.")
 
 st.sidebar.header("2️⃣ Cập nhật giá mới")
 
 price_text = st.sidebar.text_area(
     "Chỉ nhập: Mã, Giá hiện tại",
     "",
-    height=110
+    height=100
 )
 
 if st.sidebar.button("🔄 Cập nhật giá"):
-    if not df.empty:
-        df = update_prices(df, price_text)
-        save_data(df)
-        st.sidebar.success("Đã cập nhật giá.")
-    else:
-        st.sidebar.warning("Chưa có danh mục để cập nhật.")
+    df = update_prices(df, price_text)
+    save_data(df)
+    st.sidebar.success("Đã cập nhật giá.")
 
-# ================= PROCESS =================
 results = []
 for _, row in df.iterrows():
     try:
-        results.append(evaluate(row))
+        results.append(decision_engine(row))
     except:
         continue
 
 result_df = pd.DataFrame(results)
 
-# ================= DISPLAY =================
-st.subheader("📊 Danh mục hiện tại")
+st.subheader("📊 Danh mục hiện tại – Full Logic Scanner")
 st.dataframe(result_df, use_container_width=True)
 
 if not result_df.empty:
-    avg_pnl = result_df["% Lãi/Lỗ"].mean()
-    total_nav = result_df["%NAV"].sum()
-
     col1, col2, col3 = st.columns(3)
-    col1.metric("📈 Lãi/Lỗ trung bình (%)", round(avg_pnl, 2))
-    col2.metric("💰 Tổng %NAV đang dùng", round(total_nav, 2))
-    col3.metric("🧺 Số mã đang nắm", len(result_df))
+    col1.metric("📈 Lãi/Lỗ TB (%)", round(result_df["% Lãi/Lỗ"].mean(), 2))
+    col2.metric("🔥 Điểm kỹ thuật TB", round(result_df["Điểm 5 trục"].mean(), 2))
+    col3.metric("💰 Tổng %NAV", round(result_df["%NAV"].sum(), 2))
 
-# ================= ALERT =================
 st.subheader("🚨 Cảnh báo nhanh")
 
-if result_df.empty:
-    st.info("Chưa có dữ liệu danh mục.")
-else:
-    for _, row in result_df.iterrows():
-        code = row["Mã"]
+for _, row in result_df.iterrows():
+    code = row["Mã"]
+    tech = row["Trạng thái kỹ thuật"]
+    action = row["Hành động"]
 
-        if "🟥" in row["Trạng thái"]:
-            st.error(f"{code} → GÀ GÃY → BÁN NGAY / THOÁT TOÀN BỘ")
-        elif "⚠️" in row["Trạng thái"]:
-            st.warning(f"{code} → YẾU DẦN → SIẾT STOP / GIẢM 1/2")
-        elif "🟦" in row["Trạng thái"]:
-            st.info(f"{code} → GÀ SẮP CHẠY → SOI CHART, CÓ THỂ TĂNG NAV")
-        elif "🟩" in row["Trạng thái"]:
-            st.success(f"{code} → GÀ CHẠY → GIỮ + TRAILING")
+    if "BÁN" in action:
+        st.error(f"{code} → {tech} → {action}")
+    elif "SIẾT" in action:
+        st.warning(f"{code} → {tech} → {action}")
+    elif "SOI" in action:
+        st.info(f"{code} → {tech} → {action}")
+    elif "GIỮ" in action:
+        st.success(f"{code} → {tech} → {action}")
 
-# ================= GUIDE =================
-st.subheader("📌 Quy tắc dùng nhanh")
+st.subheader("📌 Hướng dẫn nhập dữ liệu")
 st.write("""
-- Lần đầu: nhập đầy đủ **Mã, Giá mua, Giá hiện tại, %NAV** rồi bấm **Lưu danh mục**.
-- Mỗi ngày: chỉ nhập **Mã, Giá hiện tại** ở ô cập nhật giá rồi bấm **Cập nhật giá**.
-- 🟦 Gà sắp chạy = chưa mua/tăng vội, phải soi chart xác nhận.
-- 🟥 Gà gãy = ưu tiên xử lý trước.
+Format đầy đủ:
+
+**Mã, Giá mua, Giá hiện tại, %NAV, Giá_OK, RSI, RSI_OK, OBV_OK, MACD_OK, VOL_OK**
+
+Trong đó:
+- **Giá_OK**: giá trên EMA9 / cấu trúc còn tốt = 1, không = 0
+- **RSI**: nhập số RSI hiện tại
+- **RSI_OK**: RSI trên EMA9 RSI = 1, không = 0
+- **OBV_OK**: OBV trên EMA9 OBV = 1, không = 0
+- **MACD_OK**: MACD / Histogram tốt = 1, không = 0
+- **VOL_OK**: volume ủng hộ = 1, không = 0
 """)
