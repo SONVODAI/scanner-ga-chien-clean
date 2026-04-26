@@ -12,16 +12,15 @@ st.title("🐔 Portfolio Manager PRO V13 – Auto Stable")
 # ================= API GIÁ =================
 def get_price(code):
     try:
-        url = f"https://price-api.vndirect.com.vn/prices?q=code:{code}~floor:HOSE"
+        url = f"https://api-finfo.vndirect.com.vn/v4/stock_prices?q=code:{code}"
         res = requests.get(url).json()
 
         if "data" in res and len(res["data"]) > 0:
-            price = res["data"][0]["matchPrice"]
-            return price / 1000  # chuẩn hóa về đơn vị giống giá mua
+            price = res["data"][0]["lastPrice"]
+            return float(price)
     except:
         return None
     return None
-
 # ================= LOGIC =================
 def classify(pct):
     if pct >= 5:
