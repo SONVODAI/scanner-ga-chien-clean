@@ -1,17 +1,15 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from vnstock import Vnstock
-import os
 import json
+import os
 
 # ================= CONFIG =================
 st.set_page_config(page_title="Portfolio Manager PRO", layout="wide")
-st.title("🐔 Portfolio Manager PRO V7 – Full Auto Scanner")
+st.title("🐔 Portfolio Manager PRO V8 – Trading System")
 
-DATA_FILE = "portfolio_data.json"
+DATA_FILE = "portfolio.json"
 
-# ================= LOAD DATA =================
+# ================= LOAD / SAVE =================
 def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r") as f:
@@ -24,41 +22,57 @@ def save_data(data):
 
 portfolio = load_data()
 
-# ================= INPUT =================
-st.sidebar.header("1️⃣ Nhập danh mục")
+# ================= SIDEBAR =================
+st.sidebar.header("1️⃣ Nhập danh mục (chỉ 1 lần)")
 
 input_data = st.sidebar.text_area(
-    "Format: Mã, Giá mua, %NAV\nVí dụ:\nMBB,22,10\nVND,18,20"
+    "Format: Mã, Giá mua, %NAV\nVD:\nMBB,22,10\nVND,18,20"
 )
 
 if st.sidebar.button("💾 Lưu danh mục"):
     new_port = []
-    lines = input_data.strip().split("\n")
-    for line in lines:
+    for line in input_data.strip().split("\n"):
         try:
             symbol, buy, nav = line.split(",")
             new_port.append({
                 "symbol": symbol.strip().upper(),
                 "buy": float(buy),
-                "nav": float(nav)
+                "nav": float(nav),
+                "current": None
             })
         except:
             pass
+
     save_data(new_port)
     st.sidebar.success("Đã lưu danh mục")
 
+# ================= UPDATE PRICE =================
+st.sidebar.header("2️⃣ Cập nhật giá mỗi ngày")
+
+update_data = st.sidebar.text_area(
+    "Chỉ nhập: Mã, Giá hiện tại\nVD:\nMBB,23.5\nVND,17.8"
+)
+
+if st.sidebar.button("🔄 Cập nhật giá"):
+    data = load_data()
+
+    for line in update_data.strip().split("\n"):
+        try:
+            symbol, price = line.split(",")
+            symbol = symbol.strip().upper()
+
+            for item in data:
+                if item["symbol"] == symbol:
+                    item["current"] = float(price)
+        except:
+            pass
+
+    save_data(data)
+    st.sidebar.success("Đã cập nhật giá")
+
 portfolio = load_data()
 
-# ================= GET REALTIME DATA =================
-def get_price(symbol):
-    try:
-        stock = Vnstock().stock(symbol=symbol, source="VCI")
-        df = stock.quote.history(start="2024-01-01")
-        return df["close"].iloc[-1]
-    except:
-        return None
-
-# ================= LOGIC GÀ =================
+# ================= LOGIC =================
 def classify(pct):
     if pct > 5:
         return "🟢 Gà chạy", "Giữ + trailing"
@@ -67,7 +81,6 @@ def classify(pct):
     else:
         return "🔴 Gà gãy", "BÁN NGAY"
 
-# ================= STOP ENGINE 2.0 =================
 def stop_engine(price, pct):
     if pct > 5:
         return round(price * 0.95, 2)
@@ -83,8 +96,7 @@ for item in portfolio:
     symbol = item["symbol"]
     buy = item["buy"]
     nav = item["nav"]
-
-    current = get_price(symbol)
+    current = item.get("current")
 
     if current:
         pct = round((current - buy) / buy * 100, 2)
@@ -92,8 +104,8 @@ for item in portfolio:
         stop = stop_engine(current, pct)
     else:
         pct = 0
-        state = "❌ Không có dữ liệu"
-        action = "Check mã"
+        state = "⚠️ Chưa có giá"
+        action = "Cập nhật giá"
         stop = "-"
 
     rows.append({
@@ -111,7 +123,11 @@ df = pd.DataFrame(rows)
 
 # ================= DISPLAY =================
 st.subheader("📊 Danh mục hiện tại")
-st.dataframe(df, use_container_width=True)
+
+if df.empty:
+    st.info("👉 Chưa có danh mục")
+else:
+    st.dataframe(df, use_container_width=True)
 
 # ================= SUMMARY =================
 if not df.empty:
@@ -119,12 +135,9 @@ if not df.empty:
     st.metric("📉 Lãi/Lỗ trung bình (%)", round(avg, 2))
 
 # ================= ALERT =================
-# ALERT
 if not df.empty and "Trạng thái" in df.columns:
     alerts = df[df["Trạng thái"].str.contains("Gãy")]
 
     if not alerts.empty:
         st.error("🚨 CẢNH BÁO: Có cổ phiếu cần xử lý ngay!")
         st.write(alerts[["Mã", "Hành động"]])
-    st.error("🚨 CẢNH BÁO: Có cổ phiếu cần xử lý ngay!")
-    st.write(alerts[["Mã", "Hành động"]])
