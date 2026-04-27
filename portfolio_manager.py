@@ -39,15 +39,21 @@ def parse_input(text):
 
 # ================== FAKE PRICE (TẠM) ==================
 # 👉 Sau này sẽ thay bằng API VN
-
 def get_price(ticker):
     try:
-        url = f"https://priceapi.vietcap.com.vn/getStockPrice?symbol={ticker}"
-        res = requests.get(url)
-        data = res.json()
+        from vnstock import stock_historical_data
 
-        if "data" in data and len(data["data"]) > 0:
-            return float(data["data"][0]["matchPrice"])
+        df = stock_historical_data(
+            symbol=ticker,
+            start_date="2024-01-01",
+            end_date="2026-12-31",
+            resolution="1D",
+            type="stock",
+            beautify=True
+        )
+
+        if df is not None and not df.empty:
+            return float(df["close"].iloc[-1])
         else:
             return None
     except:
