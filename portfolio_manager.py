@@ -39,24 +39,27 @@ def parse_input(text):
 
 # ================== FAKE PRICE (TẠM) ==================
 # 👉 Sau này sẽ thay bằng API VN
-def get_price(ticker):
-    try:
-        import requests
 
+def get_price(ticker):
+    import requests
+    import streamlit as st
+
+    try:
         url = f"https://finance.vietstock.vn/data/stockhistory?symbol={ticker}"
         res = requests.get(url, timeout=5)
 
-        if res.status_code != 200:
-            return None
+        st.write("DEBUG status:", res.status_code)
 
         data = res.json()
+        st.write("DEBUG data:", data)
 
         if "data" in data and len(data["data"]) > 0:
             return float(data["data"][-1]["Close"])
 
         return None
 
-    except:
+    except Exception as e:
+        st.error(f"Lỗi get_price: {e}")
         return None
 # ================== MAIN ==================
 st.subheader("📊 Danh mục hiện tại – V15")
