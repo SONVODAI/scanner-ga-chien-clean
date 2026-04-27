@@ -43,14 +43,18 @@ def get_price(ticker):
     try:
         import requests
 
-        url = f"https://priceapi.vietcap.com.vn/getStockPrice?symbol={ticker}"
+        url = f"https://finance.vietstock.vn/data/stockhistory?symbol={ticker}"
         res = requests.get(url, timeout=5)
+
+        if res.status_code != 200:
+            return None
+
         data = res.json()
 
         if "data" in data and len(data["data"]) > 0:
-            return float(data["data"][0]["matchPrice"])
-        else:
-            return None
+            return float(data["data"][-1]["Close"])
+
+        return None
 
     except:
         return None
