@@ -4,12 +4,11 @@ import numpy as np
 import yfinance as yf
 import os
 
-st.set_page_config(page_title="Portfolio PRO V16", layout="wide")
-st.title("🐔 Portfolio PRO V16 – Nuôi Gà Chiến Full Hệ")
+st.set_page_config(page_title="Portfolio PRO V17", layout="wide")
+st.title("🐔 Portfolio PRO V17 – Nuôi Gà Chiến + Stop Engine + NAV")
 
 DATA_FILE = "portfolio.csv"
 
-# ================= LOAD / SAVE =================
 def load_data():
     if os.path.exists(DATA_FILE):
         try:
@@ -23,32 +22,22 @@ def load_data():
 def save_data(df):
     df.to_csv(DATA_FILE, index=False)
 
-# ================= DATA =================
 @st.cache_data(ttl=300)
 def get_history(code):
     try:
         df = yf.Ticker(f"{code}.VN").history(period="9mo", interval="1d")
         if df is None or df.empty or len(df) < 40:
             return None
-
         df = df.rename(columns={
-            "Open": "open",
-            "High": "high",
-            "Low": "low",
-            "Close": "close",
-            "Volume": "volume"
+            "Open": "open", "High": "high", "Low": "low",
+            "Close": "close", "Volume": "volume"
         })
-
         return df[["open", "high", "low", "close", "volume"]].dropna()
     except:
         return None
 
-# ================= INDICATORS =================
 def calc_indicators(df):
-    close = df["close"]
-    high = df["high"]
-    low = df["low"]
-    volume = df["volume"]
+    close, high, low, volume = df["close"], df["high"], df["low"], df["volume"]
 
     ema9 = close.ewm(span=9, adjust=False).mean()
     ema20 = close.ewm(span=20, adjust=False).mean()
@@ -96,27 +85,16 @@ def calc_indicators(df):
         "low_recent": float(low.tail(10).min())
     }
 
-# ================= UNIT FIX =================
 def normalize_units(ind, buy):
     price = ind["price"]
     if price > 1000 and buy < 1000:
-        factor = 1000
-    elif price < 1000 and buy > 1000:
-        factor = 1 / 1000
-    else:
-        factor = 1
-
-    if factor == 1000:
         for k in ["price", "ema9", "ema20", "atr14", "low_recent"]:
             ind[k] /= 1000
-
-    elif factor == 1 / 1000:
+    elif price < 1000 and buy > 1000:
         for k in ["price", "ema9", "ema20", "atr14", "low_recent"]:
             ind[k] *= 1000
-
     return ind
 
-# ================= SCORE =================
 def score_5_axis(ind):
     price_ok = ind["price"] > ind["ema9"] and ind["ema9"] >= ind["ema20"]
     rsi_ok = ind["rsi"] >= 55 and ind["rsi"] >= ind["rsi_ema9"]
@@ -144,20 +122,16 @@ def tech_status(score):
         return "🟠 Yếu dần"
     return "🔴 Gãy kỹ thuật"
 
-# ================= STOP ENGINE =================
 def stop_engine(ind, status, buy):
-    price = ind["price"]
-    atr = ind["atr14"]
-    ema9 = ind["ema9"]
-    ema20 = ind["ema20"]
-    low_recent = ind["low_recent"]
+    price, atr = ind["price"], ind["atr14"]
+    ema9, ema20, low_recent = ind["ema9"], ind["ema20"], ind["low_recent"]
 
     stop_atr = price - 1.2 * atr
     stop_struct = low_recent - 0.5 * atr
     stop_ma20 = ema20 - 0.8 * atr
 
     if "🟢" in status:
-        return round(max(ema9, stop_atr, stop_struct), 2), "Trailing sát theo EMA9 / ATR / đáy gần"
+        return round(max(ema9, stop_atr, stop_struct), 2), "Trailing sát: MAX(EMA9, Price-1.2ATR, đáy gần)"
     if "🔵" in status:
         return round(max(buy * 0.98, stop_atr), 2), "Sắp chạy: stop bảo vệ gần điểm mua"
     if "🟡" in status:
@@ -166,26 +140,49 @@ def stop_engine(ind, status, buy):
         return round(max(price * 0.98, stop_atr), 2), "Yếu dần: siết stop sát"
     return "-", "Gãy kỹ thuật: ưu tiên thoát"
 
-def decision(status, price, stop):
-    if stop != "-" and price <= stop:
-        return "CHẠM STOP / XỬ LÝ NGAY", "Rất cao"
+def nav_suggest(status, risk):
+    if "🟢" in status:
+        return "20–30%"
+    if "🔵" in status:
+        return "10–15%"
+    if "🟡" in status:
+        return "Giữ 5–10%"
+    if "🟠" in status:
+        return "0–5%"
+    return "0%"
 
+def early_warning(ind):
+    warnings = []
+    if ind["obv"] < ind["obv_ema9"]:
+        warnings.append("OBV yếu")
+    if ind["rsi"] < ind["rsi_ema9"]:
+        warnings.append("RSI mất lực")
+    if ind["hist"] < ind["hist_prev"]:
+        warnings.append("MACD co lại")
+    if ind["price"] < ind["ema9"]:
+        warnings.append("Giá dưới EMA9")
+    return " / ".join(warnings) if warnings else "Không"
+
+def decision(status, price, stop, warn):
+    if stop != "-" and price <= stop:
+        return "🚨 CHẠM STOP / XỬ LÝ NGAY", "Rất cao"
+    if "🔴" in status:
+        return "BÁN / THOÁT", "Rất cao"
+    if "🟠" in status:
+        return "GIẢM / SIẾT STOP", "Cao"
+    if warn != "Không" and ("OBV yếu" in warn or "Giá dưới EMA9" in warn):
+        return "GIỮ THẬN TRỌNG / SIẾT STOP", "Trung bình-Cao"
     if "🟢" in status:
         return "GIỮ / CÓ THỂ TĂNG", "Thấp"
     if "🔵" in status:
         return "SOI CHART / CANH TĂNG NHẸ", "Thấp-Trung bình"
-    if "🟡" in status:
-        return "THEO DÕI", "Trung bình"
-    if "🟠" in status:
-        return "GIẢM / SIẾT STOP", "Cao"
-    return "BÁN / THOÁT", "Rất cao"
+    return "THEO DÕI", "Trung bình"
 
-# ================= SIDEBAR =================
 st.sidebar.header("📥 Nhập danh mục")
 
 raw = st.sidebar.text_area(
-    "Format:\nMã,Giá mua,%NAV\nhoặc: Mã,Giá mua,%NAV,Giá hiện tại\n\nVD:\nMBB,27000,5\nBAF,36600,4.5,36700",
-    height=220
+    "Format:\nMã,Giá mua,%NAV\nhoặc: Mã,Giá mua,%NAV,Giá hiện tại\n\nVD:\nBAF,36600,5,36700\nMSB,12600,4.5\nVHM,141000,3",
+    height=230
 )
 
 if st.sidebar.button("💾 Lưu danh mục"):
@@ -202,13 +199,11 @@ if st.sidebar.button("💾 Lưu danh mục"):
                 })
             except:
                 pass
-
     save_data(pd.DataFrame(rows))
     st.sidebar.success("✅ Đã lưu")
 
-# ================= MAIN =================
 df_input = load_data()
-st.subheader("📊 Danh mục hiện tại – V16")
+st.subheader("📊 Danh mục hiện tại – V17")
 
 if df_input.empty:
     st.info("👉 Chưa có danh mục")
@@ -223,12 +218,10 @@ else:
 
         hist_df = get_history(code)
 
-        # Case 1: có data kỹ thuật
         if hist_df is not None:
             ind = calc_indicators(hist_df)
             ind = normalize_units(ind, buy)
 
-            # nếu có giá tay thì ưu tiên dùng giá tay cho PnL
             if not pd.isna(manual_price):
                 ind["price"] = float(manual_price)
 
@@ -236,7 +229,9 @@ else:
             score, price_ok, rsi_ok, obv_ok, macd_ok, vol_ok = score_5_axis(ind)
             status = tech_status(score)
             stop, stop_rule = stop_engine(ind, status, buy)
-            action, risk = decision(status, ind["price"], stop)
+            warn = early_warning(ind)
+            action, risk = decision(status, ind["price"], stop, warn)
+            nav_goi_y = nav_suggest(status, risk)
 
             rows.append({
                 "Mã": code,
@@ -246,6 +241,7 @@ else:
                 "% Lãi/Lỗ": round(pnl, 2),
                 "Điểm 5 trục": score,
                 "Trạng thái": status,
+                "Cảnh báo sớm": warn,
                 "Giá_OK": "✅" if price_ok else "❌",
                 "RSI": round(ind["rsi"], 1),
                 "RSI_OK": "✅" if rsi_ok else "❌",
@@ -256,10 +252,10 @@ else:
                 "Luật stop": stop_rule,
                 "Hành động": action,
                 "Rủi ro": risk,
+                "NAV gợi ý": nav_goi_y,
                 "Ghi chú": "Đủ data kỹ thuật"
             })
 
-        # Case 2: không có data kỹ thuật nhưng có giá nhập tay
         elif not pd.isna(manual_price):
             price = float(manual_price)
             pnl = (price - buy) / buy * 100
@@ -272,20 +268,15 @@ else:
                 "% Lãi/Lỗ": round(pnl, 2),
                 "Điểm 5 trục": "N/A",
                 "Trạng thái": "⚪ Thiếu data kỹ thuật",
-                "Giá_OK": "N/A",
-                "RSI": "N/A",
-                "RSI_OK": "N/A",
-                "OBV_OK": "N/A",
-                "MACD_OK": "N/A",
-                "VOL_OK": "N/A",
+                "Cảnh báo sớm": "Cần soi chart",
                 "Stop Engine 2.0": "N/A",
                 "Luật stop": "Cần soi chart thủ công",
                 "Hành động": "THEO DÕI THỦ CÔNG",
                 "Rủi ro": "Chưa xác định",
+                "NAV gợi ý": "Theo kế hoạch riêng",
                 "Ghi chú": "Yahoo thiếu mã, dùng giá nhập tay"
             })
 
-        # Case 3: không có gì
         else:
             rows.append({
                 "Mã": code,
@@ -295,31 +286,45 @@ else:
                 "% Lãi/Lỗ": "N/A",
                 "Điểm 5 trục": "N/A",
                 "Trạng thái": "⚠️ Thiếu dữ liệu",
-                "Hành động": "Nhập thêm giá hiện tại thủ công",
+                "Cảnh báo sớm": "Không có data",
+                "Stop Engine 2.0": "N/A",
+                "Luật stop": "Nhập giá tay hoặc đổi nguồn data",
+                "Hành động": "NHẬP THÊM GIÁ HIỆN TẠI",
                 "Rủi ro": "Chưa xác định",
+                "NAV gợi ý": "Không tăng",
                 "Ghi chú": "Format: Mã,Giá mua,%NAV,Giá hiện tại"
             })
 
     result = pd.DataFrame(rows)
     st.dataframe(result, use_container_width=True)
 
-    c1, c2, c3 = st.columns(3)
-
     pnl_series = pd.to_numeric(result["% Lãi/Lỗ"], errors="coerce")
     score_series = pd.to_numeric(result["Điểm 5 trục"], errors="coerce")
 
+    c1, c2, c3 = st.columns(3)
     c1.metric("📈 Lãi/Lỗ TB (%)", "N/A" if pnl_series.dropna().empty else round(pnl_series.mean(), 2))
     c2.metric("🔥 Điểm 5 trục TB", "N/A" if score_series.dropna().empty else round(score_series.mean(), 2))
     c3.metric("💰 Tổng %NAV", round(result["%NAV"].sum(), 2))
 
+    st.subheader("🏆 TOP gà chiến")
+    top = result[pd.to_numeric(result["Điểm 5 trục"], errors="coerce") >= 8.5]
+    if top.empty:
+        st.info("Chưa có gà chiến đạt chuẩn.")
+    else:
+        st.dataframe(
+            top[["Mã", "Giá hiện tại", "% Lãi/Lỗ", "Điểm 5 trục", "Trạng thái", "Stop Engine 2.0", "Hành động", "NAV gợi ý"]],
+            use_container_width=True
+        )
+
     st.subheader("🚨 Cảnh báo nhanh")
     for _, row in result.iterrows():
+        msg = f"{row['Mã']} → {row['Trạng thái']} → {row['Hành động']} | Stop: {row.get('Stop Engine 2.0', 'N/A')} | NAV: {row.get('NAV gợi ý', 'N/A')}"
         action = str(row.get("Hành động", ""))
         if "BÁN" in action or "CHẠM STOP" in action:
-            st.error(f"{row['Mã']} → {row['Trạng thái']} → {action}")
+            st.error(msg)
         elif "GIẢM" in action or "SIẾT" in action:
-            st.warning(f"{row['Mã']} → {row['Trạng thái']} → {action}")
+            st.warning(msg)
         elif "GIỮ" in action:
-            st.success(f"{row['Mã']} → {row['Trạng thái']} → {action}")
+            st.success(msg)
         else:
-            st.info(f"{row['Mã']} → {row['Trạng thái']} → {action}")
+            st.info(msg)
