@@ -41,21 +41,17 @@ def parse_input(text):
 # 👉 Sau này sẽ thay bằng API VN
 def get_price(ticker):
     try:
-        from vnstock import stock_historical_data
+        import requests
 
-        df = stock_historical_data(
-            symbol=ticker,
-            start_date="2024-01-01",
-            end_date="2026-12-31",
-            resolution="1D",
-            type="stock",
-            beautify=True
-        )
+        url = f"https://priceapi.vietcap.com.vn/getStockPrice?symbol={ticker}"
+        res = requests.get(url, timeout=5)
+        data = res.json()
 
-        if df is not None and not df.empty:
-            return float(df["close"].iloc[-1])
+        if "data" in data and len(data["data"]) > 0:
+            return float(data["data"][0]["matchPrice"])
         else:
             return None
+
     except:
         return None
 # ================== MAIN ==================
