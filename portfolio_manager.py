@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import requests
 st.set_page_config(page_title="Portfolio Manager PRO V1.5", layout="wide")
 
 st.title("🐔 Portfolio Manager PRO V15 – 5 Trục + Stop Engine 2.0")
@@ -42,10 +42,16 @@ def parse_input(text):
 
 def get_price(ticker):
     try:
-        return None  # giả lập chưa có data
+        url = f"https://priceapi.vietcap.com.vn/getStockPrice?symbol={ticker}"
+        res = requests.get(url)
+        data = res.json()
+
+        if "data" in data and len(data["data"]) > 0:
+            return float(data["data"][0]["matchPrice"])
+        else:
+            return None
     except:
         return None
-
 # ================== MAIN ==================
 st.subheader("📊 Danh mục hiện tại – V15")
 
