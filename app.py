@@ -66,7 +66,7 @@ WATCHLIST = sorted(list(set([
 
     # Cổ phiếu lẻ
     "HVN", "VJC", "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
-    "TNH", "VSC",
+    "TNH", "VSC", "YEG",
 
     # BĐS / mã hay xem
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
