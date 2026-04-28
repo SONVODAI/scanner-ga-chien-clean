@@ -486,7 +486,7 @@ if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_:
 else:
         obv_status = "🔴"
 
-    row = {
+row = {
         "symbol": symbol,
         "price": round(price, 0) if pd.notna(price) else np.nan,
         "ema9": round(ema9_, 2) if pd.notna(ema9_) else np.nan,
