@@ -1157,7 +1157,88 @@ if show_detail:
 
     st.dataframe(detail_df, use_container_width=True, height=720)
 
+# =========================================================
+# 📊 QUẢN TRỊ DANH MỤC (GẮN TRỰC TIẾP SCANNER)
+# =========================================================
 
+st.markdown("---")
+st.markdown("## 📊 QUẢN TRỊ DANH MỤC")
+
+portfolio_input = st.text_area(
+    "Nhập danh mục (Mã,Giá mua,%NAV)",
+    placeholder="BAF,36600,4.5\nGVR,33217,12"
+)
+
+def parse_portfolio(text):
+    rows = []
+    for line in text.split("\n"):
+        try:
+            parts = line.split(",")
+            if len(parts) >= 2:
+                symbol = parts[0].strip().upper()
+                buy = float(parts[1])
+                nav = float(parts[2]) if len(parts) >= 3 else 0
+                rows.append((symbol, buy, nav))
+        except:
+            continue
+    return rows
+
+def calc_stop(row):
+    if row["group"] in ["PULL ĐẸP", "CP MẠNH"]:
+        return row["ema9"]
+    elif row["group"] in ["PULL VỪA", "MUA EARLY"]:
+        return row["ema9"] * 0.98
+    else:
+        return row["ma20"]
+
+def action_logic(row, pnl):
+    if row["warning"] != "":
+        if "OBV gãy" in row["warning"]:
+            return "⚠️ GIẢM / BÁN"
+    if row["group"] == "PULL ĐẸP":
+        return "🟢 GIỮ / CANH ADD"
+    if row["group"] == "CP MẠNH":
+        return "🟢 GIỮ"
+    if row["group"] == "PULL VỪA":
+        return "🔵 GIỮ"
+    if row["group"] == "MUA EARLY":
+        return "🟡 THEO DÕI"
+    return "🔴 BÁN"
+
+portfolio_rows = parse_portfolio(portfolio_input)
+
+result = []
+
+for sym, buy, nav in portfolio_rows:
+    row = scan_df[scan_df["symbol"] == sym]
+    if row.empty:
+        continue
+
+    r = row.iloc[0]
+
+    price = r["price"]
+    pnl = (price - buy) / buy * 100
+
+    stop = calc_stop(r)
+    action = action_logic(r, pnl)
+
+    result.append({
+        "Mã": sym,
+        "Giá": price,
+        "%Lãi": round(pnl,2),
+        "Điểm": r["total_score"],
+        "Nhóm": r["group"],
+        "Trạng thái": r["status"],
+        "Cảnh báo": r["warning"],
+        "Stop": round(stop,0),
+        "Hành động": action,
+        "%NAV": nav
+    })
+
+if result:
+    st.dataframe(pd.DataFrame(result), use_container_width=True)
+else:
+    st.info("Chưa có dữ liệu danh mục")
 # =========================================================
 # FOOTER
 # =========================================================
