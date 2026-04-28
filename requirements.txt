@@ -1,5 +1,4 @@
 streamlit
 pandas
 numpy
-vnstock
-yfinance
+vnstock==0.2.9
