@@ -2,19 +2,16 @@ import streamlit as st
 import pandas as pd
 import os
 
-# =========================
-# CONFIG
-# =========================
 st.set_page_config(layout="wide")
 FILE_NAME = "portfolio.csv"
 
-st.title("🔥 Portfolio Gà Chiến – V22 (5 Trục + Stop Engine)")
+st.title("🔥 Portfolio Gà Chiến – V23 (5 Trục Chuẩn)")
 
 # =========================
-# LOAD + FIX AUTO DATA
+# LOAD DATA + AUTO FIX
 # =========================
 def load_data():
-    cols = ["Mã", "Giá mua", "Giá hiện tại", "%NAV"]
+    cols = ["Mã","Giá mua","Giá hiện tại","%NAV","RSI","OBV","MACD"]
 
     if os.path.exists(FILE_NAME):
         df = pd.read_csv(FILE_NAME)
@@ -23,20 +20,12 @@ def load_data():
             if c not in df.columns:
                 df[c] = 0
 
-        df = df[cols]
-
-        df["Giá mua"] = pd.to_numeric(df["Giá mua"], errors="coerce").fillna(0)
-        df["Giá hiện tại"] = pd.to_numeric(df["Giá hiện tại"], errors="coerce").fillna(0)
-        df["%NAV"] = pd.to_numeric(df["%NAV"], errors="coerce").fillna(0)
-
-        return df
+        return df[cols]
 
     return pd.DataFrame(columns=cols)
 
-
 def save_data(df):
     df.to_csv(FILE_NAME, index=False)
-
 
 df = load_data()
 save_data(df)
@@ -44,96 +33,108 @@ save_data(df)
 # =========================
 # INPUT
 # =========================
-st.sidebar.header("📌 Nhập danh mục")
+st.sidebar.header("📌 Nhập dữ liệu 5 trục")
 
 ma = st.sidebar.text_input("Mã").upper()
 gia_mua = st.sidebar.number_input("Giá mua", 0.0)
 gia_ht = st.sidebar.number_input("Giá hiện tại", 0.0)
 nav = st.sidebar.number_input("%NAV", 0.0)
 
+rsi = st.sidebar.number_input("RSI", 0.0)
+obv = st.sidebar.selectbox("OBV", ["Tăng", "Giảm"])
+macd = st.sidebar.selectbox("MACD", ["Dương", "Âm"])
+
 col1, col2 = st.sidebar.columns(2)
 
 with col1:
     if st.button("Lưu"):
         if ma:
+            obv_val = 1 if obv=="Tăng" else -1
+            macd_val = 1 if macd=="Dương" else -1
+
+            row = [ma,gia_mua,gia_ht,nav,rsi,obv_val,macd_val]
+
             if ma in df["Mã"].values:
-                df.loc[df["Mã"] == ma] = [ma, gia_mua, gia_ht, nav]
+                df.loc[df["Mã"]==ma] = row
             else:
-                df.loc[len(df)] = [ma, gia_mua, gia_ht, nav]
+                df.loc[len(df)] = row
+
             save_data(df)
             st.rerun()
 
 with col2:
     if st.button("Xóa"):
-        df = df[df["Mã"] != ma]
+        df = df[df["Mã"]!=ma]
         save_data(df)
         st.rerun()
 
 # =========================
-# 5 TRỤC + STOP ENGINE
+# 5 TRỤC THẬT
 # =========================
 def evaluate(row):
     buy = row["Giá mua"]
     price = row["Giá hiện tại"]
+    rsi = row["RSI"]
+    obv = row["OBV"]
+    macd = row["MACD"]
 
-    if price == 0 or buy == 0:
+    if price==0:
         return None
 
-    pnl = (price - buy) / buy * 100
+    pnl = (price-buy)/buy*100
 
     # ===== TRỤC 1: GIÁ =====
-    if pnl > 5:
-        truc_gia = 2
-    elif pnl > 0:
-        truc_gia = 1
+    if pnl > 3:
+        t1 = 2
+    elif pnl > -2:
+        t1 = 1
     else:
-        truc_gia = -1
+        t1 = -2
 
-    # ===== TRỤC 2: RSI (giả lập theo pnl) =====
-    if pnl > 5:
-        truc_rsi = 2
-    elif pnl > 0:
-        truc_rsi = 1
+    # ===== TRỤC 2: RSI =====
+    if rsi > 65:
+        t2 = 2
+    elif rsi > 55:
+        t2 = 1
     else:
-        truc_rsi = -1
+        t2 = -1
 
     # ===== TRỤC 3: OBV =====
-    truc_obv = truc_gia
+    t3 = 2 if obv==1 else -2
 
     # ===== TRỤC 4: MACD =====
-    truc_macd = truc_rsi
+    t4 = 2 if macd==1 else -1
 
     # ===== TRỤC 5: ATR =====
-    truc_atr = 1 if abs(pnl) < 7 else 0
+    t5 = 1 if abs(pnl)<7 else 0
 
-    score = truc_gia + truc_rsi + truc_obv + truc_macd + truc_atr
+    score = t1+t2+t3+t4+t5
 
-    # ===== PHÂN LOẠI GÀ =====
-    if score >= 6:
-        status = "🟢 Gà chiến"
-        action = "GIỮ / MUA THÊM"
-        stop = price * 0.97
-    elif score >= 3:
-        status = "🟡 Gà ổn"
-        action = "GIỮ"
-        stop = price * 0.95
-    elif score >= 0:
-        status = "🟠 Yếu"
-        action = "GIẢM"
-        stop = price * 0.93
+    # ===== PHÂN LOẠI =====
+    if score >=7:
+        status="🟢 Gà chiến"
+        action="GIỮ CHẶT"
+        stop=price*0.97
+    elif score>=4:
+        status="🔵 Gà khỏe"
+        action="GIỮ"
+        stop=price*0.95
+    elif score>=1:
+        status="🟡 Yếu dần"
+        action="GIẢM"
+        stop=price*0.93
     else:
-        status = "🔴 Gãy"
-        action = "BÁN"
-        stop = price
+        status="🔴 Gãy"
+        action="BÁN"
+        stop=price
 
     return {
-        "Giá": price,
-        "PNL": round(pnl,2),
-        "Điểm": score,
-        "Trạng thái": status,
-        "Stop": round(stop,0),
-        "Hành động": action,
-        "5 Trục": f"{truc_gia}/{truc_rsi}/{truc_obv}/{truc_macd}/{truc_atr}"
+        "PNL":round(pnl,2),
+        "Score":score,
+        "5Truc":f"{t1}/{t2}/{t3}/{t4}/{t5}",
+        "Status":status,
+        "Stop":round(stop,0),
+        "Action":action
     }
 
 # =========================
@@ -141,26 +142,27 @@ def evaluate(row):
 # =========================
 st.subheader("📊 Danh mục")
 
-if len(df) == 0:
-    st.info("Chưa có danh mục")
+if len(df)==0:
+    st.info("Chưa có dữ liệu")
 else:
-    result = []
+    result=[]
 
-    for _, row in df.iterrows():
+    for _,row in df.iterrows():
         e = evaluate(row)
 
         if e:
             result.append({
-                "Mã": row["Mã"],
-                "Giá mua": row["Giá mua"],
-                "Giá hiện tại": e["Giá"],
-                "% Lãi/Lỗ": e["PNL"],
-                "%NAV": row["%NAV"],
-                "Điểm": e["Điểm"],
-                "5 Trục": e["5 Trục"],
-                "Trạng thái": e["Trạng thái"],
-                "Stoploss": e["Stop"],
-                "Hành động": e["Hành động"]
+                "Mã":row["Mã"],
+                "Giá":row["Giá hiện tại"],
+                "%Lãi":e["PNL"],
+                "RSI":row["RSI"],
+                "OBV":row["OBV"],
+                "MACD":row["MACD"],
+                "Điểm":e["Score"],
+                "5 Trục":e["5Truc"],
+                "Trạng thái":e["Status"],
+                "Stop":e["Stop"],
+                "Hành động":e["Action"]
             })
 
     st.dataframe(pd.DataFrame(result), use_container_width=True)
