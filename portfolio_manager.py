@@ -1,309 +1,111 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import os
-import yfinance as yf
 
 # =========================
 # CONFIG
 # =========================
-st.set_page_config(page_title="Portfolio Gà Chiến PRO", layout="wide")
-
+st.set_page_config(layout="wide")
 FILE_NAME = "portfolio.csv"
 
-st.title("🔥 Portfolio Gà Chiến PRO – V20 Stable")
+st.title("🔥 Portfolio Gà Chiến – V21 (Thực chiến)")
 
 # =========================
-# LOAD / SAVE
+# LOAD DATA
 # =========================
-def load_portfolio():
+def load_data():
     if os.path.exists(FILE_NAME):
-        try:
-            df = pd.read_csv(FILE_NAME)
-            for col in ["Mã", "Giá mua", "%NAV"]:
-                if col not in df.columns:
-                    df[col] = ""
-            return df[["Mã", "Giá mua", "%NAV"]]
-        except:
-            return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
-    return pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
+        return pd.read_csv(FILE_NAME)
+    return pd.DataFrame(columns=["Mã", "Giá mua", "Giá hiện tại", "%NAV"])
 
-
-def save_portfolio(df):
+def save_data(df):
     df.to_csv(FILE_NAME, index=False)
 
-
-df = load_portfolio()
+df = load_data()
 
 # =========================
 # SIDEBAR INPUT
 # =========================
 st.sidebar.header("📌 Nhập / sửa danh mục")
 
-ma = st.sidebar.text_input("Mã cổ phiếu", value="").upper().strip()
+ma = st.sidebar.text_input("Mã cổ phiếu").upper()
 gia_mua = st.sidebar.number_input("Giá mua", min_value=0.0, step=100.0)
-nav = st.sidebar.number_input("%NAV", min_value=0.0, step=0.5)
+gia_hien_tai = st.sidebar.number_input("Giá hiện tại", min_value=0.0, step=100.0)
+nav = st.sidebar.number_input("% NAV", min_value=0.0, step=0.5)
 
-col_a, col_b = st.sidebar.columns(2)
+col1, col2 = st.sidebar.columns(2)
 
-with col_a:
+# SAVE
+with col1:
     if st.button("✅ Lưu mã"):
         if ma:
-            if ma in df["Mã"].astype(str).values:
-                df.loc[df["Mã"] == ma, ["Giá mua", "%NAV"]] = [gia_mua, nav]
+            if ma in df["Mã"].values:
+                df.loc[df["Mã"] == ma] = [ma, gia_mua, gia_hien_tai, nav]
             else:
-                df.loc[len(df)] = [ma, gia_mua, nav]
-            save_portfolio(df)
+                df.loc[len(df)] = [ma, gia_mua, gia_hien_tai, nav]
+            save_data(df)
             st.success(f"Đã lưu {ma}")
             st.rerun()
 
-with col_b:
+# DELETE
+with col2:
     if st.button("🗑️ Xóa mã"):
-        if ma:
-            df = df[df["Mã"] != ma]
-            save_portfolio(df)
-            st.warning(f"Đã xóa {ma}")
-            st.rerun()
+        df = df[df["Mã"] != ma]
+        save_data(df)
+        st.warning("Đã xóa")
+        st.rerun()
 
-if st.sidebar.button("❌ Xóa toàn bộ danh mục"):
-    df = pd.DataFrame(columns=["Mã", "Giá mua", "%NAV"])
-    save_portfolio(df)
-    st.warning("Đã xóa toàn bộ")
+# RESET
+if st.sidebar.button("❌ Xóa toàn bộ"):
+    df = pd.DataFrame(columns=df.columns)
+    save_data(df)
+    st.warning("Đã reset")
     st.rerun()
 
-st.sidebar.markdown("---")
-st.sidebar.info("Dữ liệu lưu trong file portfolio.csv, refresh không mất.")
+st.sidebar.info("👉 Nhập giá từ bảng điện → chính xác tuyệt đối")
 
 # =========================
-# DATA SOURCE
+# LOGIC ĐÁNH GIÁ
 # =========================
-def download_yahoo(symbol):
-    """
-    Ưu tiên thử nhiều đuôi Yahoo cho cổ phiếu Việt Nam:
-    - .VN thường dùng cho HOSE
-    - .HN thường dùng cho HNX
-    Nếu không có data thì trả None.
-    """
-    candidates = [f"{symbol}.VN", f"{symbol}.HN"]
+def evaluate(row):
+    buy = row["Giá mua"]
+    price = row["Giá hiện tại"]
 
-    for ticker in candidates:
-        try:
-            data = yf.download(
-                ticker,
-                period="8mo",
-                interval="1d",
-                progress=False,
-                auto_adjust=False,
-                threads=False
-            )
+    if price <= 0 or buy <= 0:
+        return None, None, "⚪ Chưa đủ dữ liệu", "", None, "CHỜ"
 
-            if data is not None and not data.empty and len(data) >= 40:
-                data = data.reset_index()
+    pnl = (price - buy) / buy * 100
 
-                # Xử lý MultiIndex nếu yfinance trả về dạng nhiều tầng
-                if isinstance(data.columns, pd.MultiIndex):
-                    data.columns = [c[0] for c in data.columns]
-
-                data = data.rename(columns={
-                    "Close": "close",
-                    "Volume": "volume",
-                    "High": "high",
-                    "Low": "low",
-                    "Open": "open"
-                })
-
-                needed = ["close", "volume"]
-                if all(c in data.columns for c in needed):
-                    return data, ticker
-        except:
-            continue
-
-    return None, None
-
-
-# =========================
-# INDICATORS
-# =========================
-def calc_rsi(close, period=14):
-    delta = close.diff()
-    gain = delta.where(delta > 0, 0).rolling(period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(period).mean()
-    rs = gain / loss.replace(0, np.nan)
-    rsi = 100 - (100 / (1 + rs))
-    return rsi
-
-
-def calc_obv(close, volume):
-    obv = [0]
-    for i in range(1, len(close)):
-        if close.iloc[i] > close.iloc[i - 1]:
-            obv.append(obv[-1] + volume.iloc[i])
-        elif close.iloc[i] < close.iloc[i - 1]:
-            obv.append(obv[-1] - volume.iloc[i])
-        else:
-            obv.append(obv[-1])
-    return pd.Series(obv)
-
-
-def safe_round(x, n=2):
-    try:
-        if pd.isna(x):
-            return None
-        return round(float(x), n)
-    except:
-        return None
-
-
-# =========================
-# EVALUATION
-# =========================
-def evaluate_stock(symbol, buy_price):
-    data, source = download_yahoo(symbol)
-
-    if data is None:
-        return {
-            "Mã": symbol,
-            "Nguồn": "Không có data",
-            "Giá mua": buy_price,
-            "Giá hiện tại": None,
-            "% Lãi/Lỗ": None,
-            "Điểm 13": 0,
-            "Trạng thái": "⚪ Không data",
-            "Cảnh báo": "Không lấy được dữ liệu Yahoo",
-            "Stoploss": None,
-            "Hành động": "CHECK TAY"
-        }
-
-    close = data["close"].astype(float)
-    volume = data["volume"].fillna(0).astype(float)
-
-    price = close.iloc[-1]
-    ema9 = close.ewm(span=9, adjust=False).mean()
-    ma20 = close.rolling(20).mean()
-
-    rsi = calc_rsi(close)
-    rsi_ema9 = rsi.ewm(span=9, adjust=False).mean()
-
-    obv = calc_obv(close, volume)
-    obv_ema9 = obv.ewm(span=9, adjust=False).mean()
-
-    ema12 = close.ewm(span=12, adjust=False).mean()
-    ema26 = close.ewm(span=26, adjust=False).mean()
-    macd = ema12 - ema26
-    signal = macd.ewm(span=9, adjust=False).mean()
-    hist = macd - signal
-
-    # Lấy giá trị cuối
-    ema9_now = ema9.iloc[-1]
-    ma20_now = ma20.iloc[-1]
-    rsi_now = rsi.iloc[-1]
-    rsi_ma_now = rsi_ema9.iloc[-1]
-    obv_now = obv.iloc[-1]
-    obv_ma_now = obv_ema9.iloc[-1]
-    hist_now = hist.iloc[-1]
-
-    # =========================
-    # CHẤM ĐIỂM 13
-    # =========================
+    # ===== CHẤM ĐIỂM =====
     score = 0
-    warnings = []
 
-    # OBV max 4
-    if obv_now > obv_ma_now:
+    if pnl > 0:
         score += 3
-        if len(obv) >= 3 and obv.iloc[-1] > obv.iloc[-2] > obv.iloc[-3]:
-            score += 1
-    else:
-        warnings.append("OBV dưới EMA9")
+    if pnl > 5:
+        score += 3
+    if pnl > 10:
+        score += 2
+    if pnl < -3:
+        score -= 3
 
-    # Price / EMA max 3
-    if price > ema9_now:
-        score += 1
-    else:
-        warnings.append("Giá dưới EMA9")
-
-    if ema9_now > ma20_now:
-        score += 1
-    else:
-        warnings.append("EMA9 chưa trên MA20")
-
-    if price > ma20_now:
-        score += 1
-    else:
-        warnings.append("Giá dưới MA20")
-
-    # RSI max 3
-    if rsi_now > 55:
-        score += 1
-    else:
-        warnings.append("RSI yếu")
-
-    if rsi_now > rsi_ma_now:
-        score += 1
-    else:
-        warnings.append("RSI dưới EMA9 RSI")
-
-    if 60 <= rsi_now <= 75:
-        score += 1
-
-    # MACD max 2
-    if hist_now > 0:
-        score += 1
-    else:
-        warnings.append("MACD Hist âm")
-
-    if len(hist) >= 3 and hist.iloc[-1] > hist.iloc[-2]:
-        score += 1
-    else:
-        warnings.append("MACD co lại")
-
-    # ATR đơn giản / độ ổn định max 1
-    if len(close) >= 15:
-        atr_proxy = (data["high"].astype(float) - data["low"].astype(float)).rolling(14).mean().iloc[-1] if "high" in data.columns and "low" in data.columns else None
-        if atr_proxy is not None and price > 0 and atr_proxy / price < 0.06:
-            score += 1
-
-    score = min(score, 13)
-
-    # =========================
-    # PHÂN LOẠI
-    # =========================
-    if score >= 10:
-        status = "🟢 Gà chiến"
-        action = "GIỮ / CANH GIA TĂNG"
-    elif score >= 8:
-        status = "🔵 Gà sắp chạy"
-        action = "GIỮ"
-    elif score >= 6:
-        status = "🟡 Gà nghỉ"
-        action = "GIỮ CÓ ĐIỀU KIỆN"
+    # ===== TRẠNG THÁI =====
+    if score >= 7:
+        status = "🟢 Gà chạy"
+        action = "GIỮ / CÓ THỂ MUA THÊM"
     elif score >= 4:
+        status = "🟡 Gà ổn"
+        action = "GIỮ"
+    elif score >= 1:
         status = "🟠 Yếu dần"
-        action = "GIẢM / SIẾT STOP"
+        action = "GIẢM"
     else:
-        status = "🔴 Gãy kỹ thuật"
-        action = "BÁN / LOẠI"
+        status = "🔴 Gãy"
+        action = "BÁN NGAY"
 
-    # Stoploss đơn giản theo cấu trúc
-    stoploss = min(ema9_now, ma20_now) * 0.97
+    # ===== STOP =====
+    stop = buy * 0.95
 
-    pnl = None
-    if buy_price and buy_price > 0:
-        pnl = (price - buy_price) / buy_price * 100
-
-    return {
-        "Mã": symbol,
-        "Nguồn": source,
-        "Giá mua": buy_price,
-        "Giá hiện tại": safe_round(price, 0),
-        "% Lãi/Lỗ": safe_round(pnl, 2),
-        "Điểm 13": score,
-        "Trạng thái": status,
-        "Cảnh báo": " / ".join(warnings) if warnings else "Không",
-        "Stoploss": safe_round(stoploss, 0),
-        "Hành động": action
-    }
-
+    return round(price,0), round(pnl,2), status, "", round(stop,0), action
 
 # =========================
 # DISPLAY
@@ -311,36 +113,36 @@ def evaluate_stock(symbol, buy_price):
 st.subheader("📊 Danh mục hiện tại")
 
 if len(df) == 0:
-    st.info("Chưa có danh mục. Anh nhập mã ở bên trái rồi bấm Lưu mã.")
+    st.info("Chưa có danh mục")
 else:
-    results = []
-    with st.spinner("Đang tải dữ liệu thật từ Yahoo Finance..."):
-        for _, row in df.iterrows():
-            symbol = str(row["Mã"]).upper().strip()
-            buy_price = float(row["Giá mua"]) if pd.notna(row["Giá mua"]) else 0
-            result = evaluate_stock(symbol, buy_price)
-            result["%NAV"] = row["%NAV"]
-            results.append(result)
+    result = []
 
-    result_df = pd.DataFrame(results)
+    for _, row in df.iterrows():
+        price, pnl, status, warn, stop, action = evaluate(row)
 
-    cols = [
-        "Mã", "Nguồn", "Giá mua", "Giá hiện tại", "% Lãi/Lỗ", "%NAV",
-        "Điểm 13", "Trạng thái", "Cảnh báo", "Stoploss", "Hành động"
-    ]
+        result.append({
+            "Mã": row["Mã"],
+            "Giá mua": row["Giá mua"],
+            "Giá hiện tại": price,
+            "% Lãi/Lỗ": pnl,
+            "%NAV": row["%NAV"],
+            "Trạng thái": status,
+            "Stoploss": stop,
+            "Hành động": action
+        })
 
-    st.dataframe(result_df[cols], use_container_width=True, height=420)
+    result_df = pd.DataFrame(result)
 
-    # Tổng quan
-    st.markdown("### 📌 Tổng quan nhanh")
-    c1, c2, c3 = st.columns(3)
+    st.dataframe(result_df, use_container_width=True)
+
+    # ===== SUMMARY =====
+    st.markdown("### 📌 Tổng quan")
+
+    col1, col2, col3 = st.columns(3)
 
     avg_pnl = result_df["% Lãi/Lỗ"].dropna().mean()
-    avg_score = result_df["Điểm 13"].dropna().mean()
-    total_nav = pd.to_numeric(result_df["%NAV"], errors="coerce").fillna(0).sum()
+    total_nav = result_df["%NAV"].sum()
 
-    c1.metric("Lãi/Lỗ TB (%)", safe_round(avg_pnl, 2))
-    c2.metric("Điểm 13 TB", safe_round(avg_score, 2))
-    c3.metric("Tổng %NAV", safe_round(total_nav, 2))
-
-st.success("✅ Bản V20 Stable đang dùng yfinance, không phụ thuộc vnstock.")
+    col1.metric("Lãi/Lỗ TB", f"{round(avg_pnl,2)}%")
+    col2.metric("Tổng NAV", f"{round(total_nav,2)}%")
+    col3.metric("Số mã", len(result_df))
