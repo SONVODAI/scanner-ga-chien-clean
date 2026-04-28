@@ -473,7 +473,7 @@ if pd.notna(dist_from_ema9):
 
 total_score = E + R + O + bonus_dist
 
-    pull_label = classify_pull_label(
+pull_label = classify_pull_label(
         dist_from_ema9=dist_from_ema9,
         rsi_=rsi_,
         rsi_slope_=rsi_slope_,
