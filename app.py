@@ -441,13 +441,81 @@ def analyze_symbol(symbol: str) -> dict | None:
 
     breakout_ref = to_float(df["high"].iloc[-21:-1].max())
 
+    # ===== DIST =====
     dist_from_ema9 = np.nan
     if pd.notna(price) and pd.notna(ema9_) and ema9_ != 0:
         dist_from_ema9 = (price / ema9_ - 1) * 100
 
+    # ===== SCORE =====
     E = calc_price_score(price, ema9_, ma20_, ema9_prev)
     R = calc_rsi_score(rsi_, rsi_slope_)
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
+
+    # ===== NỞ HOA =====
+    no_hoa = (
+        pd.notna(price) and pd.notna(ema9_) and pd.notna(ma20_) and
+        price > ema9_ > ma20_ and
+        pd.notna(rsi_) and rsi_ > 55 and
+        pd.notna(rsi_slope_) and rsi_slope_ >= 0 and
+        pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_
+    )
+
+    # ===== BONUS DIST =====
+    bonus_dist = 0
+    if pd.notna(dist_from_ema9):
+        if 4 <= dist_from_ema9 <= 7:
+            bonus_dist = 1
+        elif 3 <= dist_from_ema9 < 4:
+            bonus_dist = 0.5
+        elif 7 < dist_from_ema9 <= 8:
+            bonus_dist = 0.5
+
+    total_score = E + R + O + bonus_dist
+
+    # ===== PULL =====
+    pull_label = classify_pull_label(
+        dist_from_ema9=dist_from_ema9,
+        rsi_=rsi_,
+        rsi_slope_=rsi_slope_,
+        obv_=obv_,
+        obv_ema9_=obv_ema9_,
+    )
+
+    # ===== OBV STATUS =====
+    if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_:
+        obv_status = "🟢"
+    else:
+        obv_status = "🔴"
+
+    # ===== ROW =====
+    row = {
+        "symbol": symbol,
+        "price": round(price, 0) if pd.notna(price) else np.nan,
+        "ema9": round(ema9_, 2) if pd.notna(ema9_) else np.nan,
+        "ma20": round(ma20_, 2) if pd.notna(ma20_) else np.nan,
+        "rsi14": round(rsi_, 2) if pd.notna(rsi_) else np.nan,
+        "rsi_slope": round(rsi_slope_, 2) if pd.notna(rsi_slope_) else np.nan,
+        "obv": round(obv_, 0) if pd.notna(obv_) else np.nan,
+        "obv_ema9": round(obv_ema9_, 0) if pd.notna(obv_ema9_) else np.nan,
+        "obv_status": obv_status,
+        "volume": round(vol_, 0) if pd.notna(vol_) else np.nan,
+        "vol_ma20": round(vol_ma20_, 0) if pd.notna(vol_ma20_) else np.nan,
+        "breakout_ref": round(breakout_ref, 2) if pd.notna(breakout_ref) else np.nan,
+        "dist_from_ema9_pct": round(dist_from_ema9, 2) if pd.notna(dist_from_ema9) else np.nan,
+        "pull_label": pull_label,
+        "E": E,
+        "R": R,
+        "O": O,
+        "total_score": total_score,
+        "no_hoa": no_hoa
+    }
+
+    # ===== FINAL =====
+    row["group"] = classify_group(row)
+    row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label)
+    row["status"] = build_status(total_score, row["warning"], row["group"])
+
+    return row
     # =========================
 # 🌸 NỞ HOA + DIST BONUS
 # =========================
@@ -1243,7 +1311,7 @@ def check_first_green_trigger(symbol: str):
             "prev_volume": round(prev_volume, 0),
             "obv_status": "🟢" if obv_ >= obv_ema9 else "🔴",
             "trigger_score": trigger_score,
-            "no_hoa": no_hoa,
+            "no_hoa": False,
             "action": "TEST 5-10% NAV"
         }
 
