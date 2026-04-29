@@ -243,7 +243,7 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["slope_state"] = x["ema9_ma20_slope"].apply(slope_state_text)
 
     x["rsi14"] = calc_rsi(x["close"], 14)
-    x["rsi_slope"] = x["rsi14"].diff()
+    x["rsi_slope"] = x["rsi14"] - x["rsi14"].shift(3)
 
     x["obv"] = calc_obv(x["close"], x["volume"])
     x["obv_ema9"] = ema(x["obv"], 9)
