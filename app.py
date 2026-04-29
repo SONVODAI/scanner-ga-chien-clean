@@ -144,6 +144,7 @@ def flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
         ]
     else:
         df.columns = [str(c) for c in df.columns]
+        
     return df
 
 
