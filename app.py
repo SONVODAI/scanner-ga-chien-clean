@@ -242,7 +242,14 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     x["ema9"] = ema(x["close"], 9)
     x["ma20"] = sma(x["close"], 20)
+    # ===== SLOPE EMA9 vs MA20 =====
+x["ema9_ma20_slope"] = (x["ema9"] - x["ma20"]) / x["ma20"] * 100
+x["ema9_ma20_slope_change"] = x["ema9_ma20_slope"] - x["ema9_ma20_slope"].shift(3)
 
+# ===== PHÂN LOẠI =====
+
+
+x["slope_state"] = x["ema9_ma20_slope"].apply(classify_slope)
     x["rsi14"] = calc_rsi(x["close"], 14)
     x["rsi_slope"] = x["rsi14"].diff()
 
@@ -283,7 +290,15 @@ def calc_obv_score(obv_, obv_ema9_, obv_prev):
             return 1
     return 0
 
-
+def classify_slope(val):
+    if pd.isna(val):
+        return ""
+    if val > 2:
+        return "🟢 Tăng tốc"
+    elif val > 0:
+        return "🟡 Ổn định"
+    else:
+        return "🔴 Yếu"
 # =========================================================
 # PULL / WARNING / STATUS
 # =========================================================
@@ -1492,6 +1507,8 @@ if show_detail:
     detail_cols = [
         "symbol", "group", "price",
         "ema9", "ma20",
+        "ema9_ma20_slope",
+        "slope_state",
         "rsi14", "rsi_slope",
         "obv", "obv_ema9", "obv_status",
         "E", "R", "O", "total_score",
