@@ -1287,8 +1287,8 @@ def classify_obv(row):
 scan_df["OBV_POWER"] = scan_df.apply(classify_obv, axis=1)
 detail_cols = [c for c in detail_cols if c in scan_df.columns]
 
-    detail_df = scan_df[detail_cols].copy()
-    detail_df.index = range(len(detail_df))
+detail_df = scan_df[detail_cols].copy()
+detail_df.index = range(len(detail_df))
 
 st.dataframe(detail_df, use_container_width=True, height=720)
 
