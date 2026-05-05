@@ -1292,6 +1292,63 @@ detail_df.index = range(len(detail_df))
 
 st.dataframe(detail_df, use_container_width=True, height=720)
 # ============================================
+# GÀ 1KG – AUTO SELECT + XẾP HẠNG + NAV
+# ============================================
+
+st.markdown("---")
+st.markdown("## 🐔 GÀ 1KG - TỰ ĐỘNG (CHỈ LẤY HÀNG CHUẨN)")
+
+ga_1kg_df = scan_df[
+    (scan_df["OBV_POWER"].fillna("").str.contains("MẠNH")) &
+    (scan_df["rsi14"] >= 60) &
+    (scan_df["rsi14"] <= 70) &
+    (scan_df["ema9_ma20_slope"] > 2) &
+    (scan_df["ema9"] > scan_df["ma20"])
+].copy()
+
+if ga_1kg_df.empty:
+    st.warning("Không có gà 1kg đạt chuẩn")
+else:
+    # ===== SORT THEO SỨC MẠNH =====
+    ga_1kg_df = ga_1kg_df.sort_values(by="total_score", ascending=False).reset_index(drop=True)
+
+    # ===== NAV GỢI Ý =====
+    def nav_goi_y(i):
+        if i == 0:
+            return "30%"
+        elif i == 1:
+            return "25%"
+        elif i == 2:
+            return "20%"
+        else:
+            return "10%"
+
+    # ===== HÀNH ĐỘNG =====
+    def action_goi_y(row, i):
+        if i == 0:
+            return "🔥 MUA MẠNH"
+        elif i <= 2:
+            return "🟢 MUA"
+        else:
+            return "🟡 THEO DÕI"
+
+    ga_1kg_df["NAV_%"] = [nav_goi_y(i) for i in range(len(ga_1kg_df))]
+    ga_1kg_df["ACTION"] = [action_goi_y(row, i) for i, row in ga_1kg_df.iterrows()]
+
+    # ===== CỘT HIỂN THỊ =====
+    cols_show = [
+        "symbol", "price",
+        "rsi14", "ema9_ma20_slope",
+        "obv_status", "OBV_POWER",
+        "E", "R", "O", "S",
+        "total_score",
+        "NAV_%", "ACTION"
+    ]
+
+    cols_show = [c for c in cols_show if c in ga_1kg_df.columns]
+
+    st.dataframe(ga_1kg_df[cols_show], use_container_width=True, height=400)
+# ============================================
 # GÀ 1KG - AUTO SELECT
 # ============================================
 
