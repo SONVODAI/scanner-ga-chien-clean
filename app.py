@@ -1291,38 +1291,24 @@ detail_df.index = range(len(detail_df))
 
 st.dataframe(detail_df, use_container_width=True, height=720)
 # ============================================
+# ============================================
 # GÀ 1KG – AUTO SELECT + XẾP HẠNG + NAV
 # ============================================
 
 st.markdown("---")
 st.markdown("## 🐔 GÀ 1KG - TỰ ĐỘNG (CHỈ LẤY HÀNG CHUẨN)")
 
+# ===== FILTER GÀ 1KG =====
 ga_1kg_df = scan_df[
     (scan_df["OBV_POWER"].fillna("").str.contains("MẠNH")) &
     (scan_df["rsi14"] >= 60) &
     (scan_df["rsi14"] <= 70) &
     (scan_df["ema9_ma20_slope"] > 2) &
-    (scan_df["ema9"] > scan_df["ma20"])].copy()
-if row["ENTRY_TYPE"] == "BREAK":
- def entry_signal(row):
-    if row["ENTRY_TYPE"] == "BREAK":
-        if row["rsi14"] <= 70:
-            return "🔥 MUA NGAY"
-        else:
-            return "🔵 CHỜ PULL"
-    elif row["ENTRY_TYPE"] == "PULL":
-        return "🟢 CANH MUA"
-    else:
-        return "🔵 CHỜ XÁC NHẬN"       
-ga_1kg_df["ENTRY_TYPE"] = ga_1kg_df.apply(entry_type, axis=1)
-ga_1kg_df["ENTRY_SIGNAL"] = ga_1kg_df.apply(entry_signal, axis=1)
+    (scan_df["ema9"] > scan_df["ma20"])
+].copy()
 
-if ga_1kg_df.empty:
-    st.warning("Không có gà 1kg đạt chuẩn")
-else:
-    # ===== SORT THEO SỨC MẠNH =====
-    ga_1kg_df = ga_1kg_df.sort_values(by="total_score", ascending=False).reset_index(drop=True)
-    # ===== AUTO ENTRY TIMING =====
+
+# ===== AUTO ENTRY TYPE =====
 def entry_type(row):
     if row["rsi14"] >= 65 and row["ema9_ma20_slope"] > 3:
         return "BREAK"
@@ -1331,19 +1317,67 @@ def entry_type(row):
     else:
         return "EARLY"
 
-def entry_signal(row):
-        # ===== NAV GỢI Ý =====
-def nav_goi_y(i):
-        if i == 0:
-            return "30%"
-        elif i == 1:
-            return "25%"
-        elif i == 2:
-            return "20%"
-        else:
-            return "10%"
 
-    # ===== HÀNH ĐỘNG =====
+# ===== AUTO ENTRY SIGNAL =====
+def entry_signal(row):
+    if row["ENTRY_TYPE"] == "BREAK":
+        if row["rsi14"] <= 70:
+            return "🔥 MUA NGAY"
+        else:
+            return "🔵 CHỜ PULL"
+    elif row["ENTRY_TYPE"] == "PULL":
+        return "🟢 CANH MUA"
+    else:
+        return "🔵 CHỜ XÁC NHẬN"
+
+
+# ===== NAV GỢI Ý =====
+def nav_goi_y(i):
+    if i == 0:
+        return "30%"
+    elif i == 1:
+        return "25%"
+    elif i == 2:
+        return "20%"
+    else:
+        return "10%"
+
+
+# ===== HÀNH ĐỘNG =====
+def action_goi_y(row, i):
+    if i == 0:
+        return "🔥 MUA MẠNH"
+    elif i <= 2:
+        return "🟢 MUA"
+    else:
+        return "🟡 THEO DÕI"
+
+
+# ===== XỬ LÝ DATA =====
+if ga_1kg_df.empty:
+    st.warning("Không có gà 1kg đạt chuẩn")
+else:
+    # sort
+    ga_1kg_df = ga_1kg_df.sort_values(by="total_score", ascending=False).reset_index(drop=True)
+
+    # apply
+    ga_1kg_df["ENTRY_TYPE"] = ga_1kg_df.apply(entry_type, axis=1)
+    ga_1kg_df["ENTRY_SIGNAL"] = ga_1kg_df.apply(entry_signal, axis=1)
+
+    ga_1kg_df["NAV_%"] = [nav_goi_y(i) for i in range(len(ga_1kg_df))]
+    ga_1kg_df["ACTION"] = [action_goi_y(row, i) for i, row in ga_1kg_df.iterrows()]
+
+    # hiển thị
+    cols_show = [
+        "symbol", "price", "rsi14", "ema9_ma20_slope",
+        "OBV_POWER", "ENTRY_TYPE", "ENTRY_SIGNAL",
+        "total_score", "NAV_%", "ACTION"
+    ]
+
+    cols_show = [c for c in cols_show if c in ga_1kg_df.columns]
+
+    st.dataframe(ga_1kg_df[cols_show], use_container_width=True)
+
   # ===== HÀNH ĐỘNG =====
 def action_goi_y(row, i):
     if i == 0:
