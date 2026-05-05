@@ -34,17 +34,17 @@ WATCHLIST = sorted(list(set([
     "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
     "HAH", "VSC", "GMD", "VOS", "VTO", "ACV",
 
-    "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB",
+    "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB", "VGT",
 
     "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", "AAA",
     "PAC", "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
-    "TV2", "DGC",
+    "TV2", "DGC", "POW",
 
     "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
-    "NKG", "VGS", "CTD", "HHV", "VCG",
+    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "TLH", "TVN",
 
     "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
-    "MCH", "PAN", "VNM", "MML",
+    "MCH", "PAN", "VNM", "MML", "FMC", "MCH", "TLG",
 
     "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
     "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
@@ -61,7 +61,7 @@ WATCHLIST = sorted(list(set([
     "TNH", "YEG",
 
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
-    "EVF", "SAB"
+    "EVF", "SAB", "VPL", "PDR", "CEO", "DPG", "NHA", "HDC", "NTL", "CII", "HDG","HHS", "NLG", "KDH", "HUT",
 ])))
 
 DEFAULT_SUFFIX = ".VN"
