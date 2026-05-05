@@ -1342,12 +1342,48 @@ else:
         "obv_status", "OBV_POWER",
         "E", "R", "O", "S",
         "total_score",
+        "AUTO_BUY",
         "NAV_%", "ACTION"
     ]
 
     cols_show = [c for c in cols_show if c in ga_1kg_df.columns]
 
     st.dataframe(ga_1kg_df[cols_show], use_container_width=True, height=400)
+    # ============================================
+# AUTO ĐIỂM MUA - PULL / BREAK / EARLY
+# ============================================
+def auto_buy_signal(row):
+    # PULL ĐẸP
+    if (
+        row.get("pull_label", "") == "PULL ĐẸP"
+        and row.get("OBV_POWER", "").find("MẠNH") >= 0
+        and row.get("rsi14", 0) >= 55
+        and row.get("ema9_ma20_slope", 0) > 1
+    ):
+        return "🟢 MUA PULL"
+
+    # BREAK ĐẸP
+    if (
+        row.get("price", 0) >= row.get("breakout_ref", 0)
+        and row.get("dist_from_ema9_pct", 999) <= 5
+        and row.get("OBV_POWER", "").find("MẠNH") >= 0
+        and 55 <= row.get("rsi14", 0) <= 70
+    ):
+        return "🟢 MUA BREAK"
+
+    # EARLY SẠCH
+    if (
+        row.get("group", "") == "MUA EARLY"
+        and row.get("OBV_POWER", "").find("MẠNH") >= 0
+        and row.get("rsi14", 0) >= 50
+        and row.get("ema9_ma20_slope", 0) >= 0
+    ):
+        return "🟡 TEST EARLY"
+
+    return "⚪ CHỜ"
+
+scan_df["AUTO_BUY"] = scan_df.apply(auto_buy_signal, axis=1)
+
 # ============================================
 # GÀ 1KG - AUTO SELECT
 # ============================================
