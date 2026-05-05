@@ -1304,7 +1304,6 @@ ga_1kg_df = scan_df[
     (scan_df["rsi14"] <= 70) &
     (scan_df["ema9_ma20_slope"] > 2) &
     (scan_df["ema9"] > scan_df["ma20"])
-]
 ].copy()
 
 if ga_1kg_df.empty:
