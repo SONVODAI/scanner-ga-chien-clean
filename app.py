@@ -1172,7 +1172,7 @@ else:
     ]
 
     early_cols = [c for c in early_cols if c in early_df.columns]
-    out = early_df[early_cols].copy()
+    out = early_df.copy()
     out.index = range(len(out))
 # ===== OBV POWER (SAFE - DÙNG CHO EARLY TABLE) =====
 
@@ -1192,6 +1192,7 @@ if "OBV" in early_df.columns and "EMA9_OBV" in early_df.columns:
             return "🟡 OBV TRUNG TÍNH"
 
     out["OBV_POWER"] = out.apply(classify_obv, axis=1)
+    out = out[early_cols]
     st.dataframe(out, use_container_width=True, height=300)
 
 
