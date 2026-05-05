@@ -1272,12 +1272,20 @@ if show_detail:
         "ema9", "ma20",
         "ema9_ma20_slope", "ema9_ma20_slope_change", "slope_state",
         "rsi14", "rsi_slope",
-        "obv", "obv_ema9", "obv_status",
+        "obv", "obv_ema9", "obv_status", "OBV_POWER",
         "E", "R", "O", "S", "total_score",
         "dist_from_ema9_pct", "pull_label", "breakout_ref",
         "status", "warning"
     ]
+    def classify_obv(row):
+    if row["obv"] < row["obv_ema9"]:
+        return "🔴 OBV YẾU"
+    elif (row["obv"] - row["obv_ema9"]) / abs(row["obv_ema9"]) * 100 > 2:
+        return "🟢 OBV MẠNH"
+    else:
+        return "🟡 OBV TRUNG TÍNH"
 
+scan_df["OBV_POWER"] = scan_df.apply(classify_obv, axis=1)
     detail_cols = [c for c in detail_cols if c in scan_df.columns]
 
     detail_df = scan_df[detail_cols].copy()
