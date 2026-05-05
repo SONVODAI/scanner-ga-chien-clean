@@ -1343,14 +1343,14 @@ def nav_goi_y(i):
             return "10%"
 
     # ===== HÀNH ĐỘNG =====
-    def action_goi_y(row, i):
-        if i == 0:
-            return "🔥 MUA MẠNH"
-        elif i <= 2:
-            return "🟢 MUA"
-        else:
-            return "🟡 THEO DÕI"
-
+  # ===== HÀNH ĐỘNG =====
+def action_goi_y(row, i):
+    if i == 0:
+        return "🔥 MUA MẠNH"
+    elif i <= 2:
+        return "🟢 MUA"
+    else:
+        return "🟡 THEO DÕI" 
     ga_1kg_df["NAV_%"] = [nav_goi_y(i) for i in range(len(ga_1kg_df))]
     ga_1kg_df["ACTION"] = [action_goi_y(row, i) for i, row in ga_1kg_df.iterrows()]
 
