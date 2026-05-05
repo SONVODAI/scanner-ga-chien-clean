@@ -1284,7 +1284,6 @@ if show_detail:
         return "🟢 OBV MẠNH"
     else:
         return "🟡 OBV TRUNG TÍNH"
-
 scan_df["OBV_POWER"] = scan_df.apply(classify_obv, axis=1)
     detail_cols = [c for c in detail_cols if c in scan_df.columns]
 
