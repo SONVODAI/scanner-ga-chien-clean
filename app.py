@@ -1277,7 +1277,7 @@ if show_detail:
         "dist_from_ema9_pct", "pull_label", "breakout_ref",
         "status", "warning"
     ]
-    def classify_obv(row):
+def classify_obv(row):
     if row["obv"] < row["obv_ema9"]:
         return "🔴 OBV YẾU"
     elif (row["obv"] - row["obv_ema9"]) / abs(row["obv_ema9"]) * 100 > 2:
