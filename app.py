@@ -1332,7 +1332,7 @@ def entry_signal(row):
 ga_1kg_df["ENTRY_TYPE"] = ga_1kg_df.apply(entry_type, axis=1)
 ga_1kg_df["ENTRY_SIGNAL"] = ga_1kg_df.apply(entry_signal, axis=1)
     # ===== NAV GỢI Ý =====
-    def nav_goi_y(i):
+def nav_goi_y(i):
         if i == 0:
             return "30%"
         elif i == 1:
