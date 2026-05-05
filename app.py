@@ -4,7 +4,6 @@
 # Có: Market REAL/LIVE, EMA9/MA20 slope, RSI, OBV, nhóm CP,
 # khuyến nghị mua, bảng gà tăng tốc, quản trị danh mục.
 # =========================================================
-
 import time
 from datetime import datetime
 
@@ -1304,6 +1303,20 @@ ga_1kg_df = scan_df[
     (scan_df["rsi14"] <= 70) &
     (scan_df["ema9_ma20_slope"] > 2) &
     (scan_df["ema9"] > scan_df["ma20"])].copy()
+if row["ENTRY_TYPE"] == "BREAK":
+ def entry_signal(row):
+    if row["ENTRY_TYPE"] == "BREAK":
+        if row["rsi14"] <= 70:
+            return "🔥 MUA NGAY"
+        else:
+            return "🔵 CHỜ PULL"
+    elif row["ENTRY_TYPE"] == "PULL":
+        return "🟢 CANH MUA"
+    else:
+        return "🔵 CHỜ XÁC NHẬN"       
+ga_1kg_df["ENTRY_TYPE"] = ga_1kg_df.apply(entry_type, axis=1)
+ga_1kg_df["ENTRY_SIGNAL"] = ga_1kg_df.apply(entry_signal, axis=1)
+
 if ga_1kg_df.empty:
     st.warning("Không có gà 1kg đạt chuẩn")
 else:
@@ -1319,19 +1332,7 @@ def entry_type(row):
         return "EARLY"
 
 def entry_signal(row):
-    if row["ENTRY_TYPE"] == "BREAK":
-        if row["rsi14"] <= 70:
-            return "🔥 MUA NGAY"
-        else:
-            return "🔵 CHỜ PULL"
-    elif row["ENTRY_TYPE"] == "PULL":
-        return "🟢 CANH MUA"
-    else:
-        return "🔵 CHỜ XÁC NHẬN"
-
-ga_1kg_df["ENTRY_TYPE"] = ga_1kg_df.apply(entry_type, axis=1)
-ga_1kg_df["ENTRY_SIGNAL"] = ga_1kg_df.apply(entry_signal, axis=1)
-    # ===== NAV GỢI Ý =====
+        # ===== NAV GỢI Ý =====
 def nav_goi_y(i):
         if i == 0:
             return "30%"
