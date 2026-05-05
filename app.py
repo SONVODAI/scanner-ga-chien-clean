@@ -1167,13 +1167,29 @@ else:
     early_cols = [
         "symbol", "price", "rsi14", "rsi_slope",
         "ema9_ma20_slope", "slope_state",
-        "E", "R", "O", "S", "total_score", "obv_status"
+        "E", "R", "O", "S", "total_score", "obv_status",
+        "OBV_POWER"
     ]
 
     early_cols = [c for c in early_cols if c in early_df.columns]
     out = early_df[early_cols].copy()
     out.index = range(len(out))
+# ===== OBV POWER (SAFE - DÙNG CHO EARLY TABLE) =====
 
+if "OBV" in early_df.columns and "EMA9_OBV" in early_df.columns:
+
+    out["obv_diff_pct"] = (early_df["OBV"] - early_df["EMA9_OBV"]) / early_df["EMA9_OBV"].abs() * 100
+    out["ema9_obv_slope"] = early_df["EMA9_OBV"].diff()
+
+    def classify_obv(row):
+        if row["OBV"] < row["EMA9_OBV"]:
+            return "🔴 OBV YẾU"
+        elif row["obv_diff_pct"] > 2:
+            return "🟢 OBV MẠNH"
+        else:
+            return "🟡 OBV TRUNG TÍNH"
+
+    out["OBV_POWER"] = out.apply(classify_obv, axis=1)
     st.dataframe(out, use_container_width=True, height=300)
 
 
