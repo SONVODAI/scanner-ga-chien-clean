@@ -250,7 +250,100 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["vol_ma20"] = sma(x["volume"], 20)
 
     return x
+# =========================================================
+# DRY-UP ENGINE
+# =========================================================
+def calculate_dryup_score(df):
+    try:
+        score = 0
 
+        # =========================
+        # Volume MA20
+        # =========================
+        vol_ma20 = df["volume"].rolling(20).mean()
+
+        vol_now = df["volume"].iloc[-1]
+        vol_ma_now = vol_ma20.iloc[-1]
+
+        dry_ratio = vol_now / vol_ma_now
+
+        # =========================
+        # Low Vol Days
+        # =========================
+        low_vol_days = (
+            df["volume"] < vol_ma20 * 0.7
+        ).tail(20).sum()
+
+        # =========================
+        # Vol Slope
+        # =========================
+        vol_20 = df["volume"].tail(20).values
+        x = np.arange(len(vol_20))
+
+        vol_slope = np.polyfit(x, vol_20, 1)[0]
+
+        # =========================
+        # Range Compression
+        # =========================
+        range_pct = (
+            (df["high"] - df["low"]) / df["close"]
+        ).tail(10).mean()
+
+        # =========================
+        # RSI giữ nền
+        # =========================
+        rsi_now = df["rsi14"].iloc[-1]
+
+        # =========================
+        # OBV giữ nền
+        # =========================
+        obv_now = df["obv"].iloc[-1]
+        obv_ema9 = df["obv_ema9"].iloc[-1]
+
+        # =========================
+        # CHẤM ĐIỂM
+        # =========================
+
+        if dry_ratio < 0.5:
+            score += 1.5
+        elif dry_ratio < 0.8:
+            score += 1
+
+        if low_vol_days > 12:
+            score += 1.5
+        elif low_vol_days > 7:
+            score += 1
+
+        if vol_slope < 0:
+            score += 0.5
+
+        if range_pct < 0.02:
+            score += 1
+        elif range_pct < 0.03:
+            score += 0.5
+
+        if rsi_now > 45:
+            score += 0.5
+
+        if obv_now >= obv_ema9:
+            score += 1
+
+        # =========================
+        # LABEL
+        # =========================
+        if score >= 5:
+            label = "🟢🟢 SIÊU CẠN"
+        elif score >= 4:
+            label = "🟢 CẠN ĐẸP"
+        elif score >= 2.5:
+            label = "🟡 CẠN NHẸ"
+        else:
+            label = "🔴 KHÔNG CẠN"
+
+        return round(score, 2), label
+
+    except:
+        return 0, "ERROR"
 
 # =========================================================
 # SCORE
@@ -510,7 +603,8 @@ def analyze_symbol(symbol: str) -> dict | None:
         "S": S,
         "total_score": total_score,
     }
-
+    "dry_score": dry_score,
+    "dry_label": dry_label,
     row["group"] = classify_group(row)
     row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label, slope_)
     row["status"] = build_status(total_score, row["warning"], row["group"])
@@ -560,7 +654,10 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
         "R",
         "ema9_ma20_slope",
     ]
-
+        # =========================
+    # DRY-UP ENGINE
+    # =========================
+    dry_score, dry_label = calculate_dryup_score(df)
     existing_sort_cols = [c for c in sort_cols if c in df.columns]
 
     if existing_sort_cols:
@@ -1073,6 +1170,7 @@ for i, group_name in enumerate(GROUP_ORDER):
 # =========================================================
 DISPLAY_COLUMNS = [
     "symbol", "price", "E", "R", "O", "S", "total_score",
+    "dry_score", "dry_label",
     "ema9_ma20_slope", "slope_state", "obv_status", "status"
 ]
 
@@ -1273,6 +1371,7 @@ if show_detail:
         "rsi14", "rsi_slope",
         "obv", "obv_ema9", "obv_status", "OBV_POWER",
         "E", "R", "O", "S", "total_score",
+        "dry_score", "dry_label",
         "dist_from_ema9_pct", "pull_label", "breakout_ref",
         "status", "warning"
     ]
