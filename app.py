@@ -614,8 +614,6 @@ def analyze_symbol(symbol: str) -> dict | None:
         "O": O,
         "S": S,
         "total_score": total_score,
-        "dry_score": dry_score,
-        "dry_label": dry_label,
     }
    
     row["group"] = classify_group(row)
