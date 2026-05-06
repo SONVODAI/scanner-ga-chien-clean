@@ -307,8 +307,6 @@ def calculate_dryup_score(df):
         obv_ema9 = df["obv_ema9"].iloc[-1]
 else:
         obv_ema9 = obv_now
-else:
-        obv_ema9 = obv_now
 
         # =========================
         # CHẤM ĐIỂM
