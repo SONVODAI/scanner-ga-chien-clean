@@ -270,27 +270,27 @@ def calculate_dryup_score(df):
         # =========================
         # Low Vol Days
         # =========================
-        low_vol_days = (
-            df["volume"] < vol_ma20 * 0.7
-        ).tail(20).sum()
-
-        # =========================
-        # Vol Slope
-        # =========================
-    vol_20 = pd.to_numeric(
-        df["volume"].tail(20),
-        errors="coerce"
-    ).dropna().values
+            low_vol_days = (
+                df["volume"] < vol_ma20 * 0.7
+            ).tail(20).sum()
     
-    if len(vol_20) < 5:
-        vol_slope = 0
-    else:
-        x = np.arange(len(vol_20))
-        vol_slope = np.polyfit(x, vol_20, 1)[0]
-        # =========================
-        # Range Compression
-        # =========================
-        range_pct = (
+            # =========================
+            # Vol Slope
+            # =========================
+        vol_20 = pd.to_numeric(
+            df["volume"].tail(20),
+            errors="coerce"
+        ).dropna().values
+        
+        if len(vol_20) < 5:
+            vol_slope = 0
+        else:
+            x = np.arange(len(vol_20))
+            vol_slope = np.polyfit(x, vol_20, 1)[0]
+            # =========================
+            # Range Compression
+            # =========================
+            range_pct = (
             (df["high"] - df["low"]) / df["close"]
         ).tail(10).mean()
 
