@@ -270,7 +270,7 @@ def calculate_dryup_score(df):
         # =========================
         # Low Vol Days
         # =========================
-            low_vol_days = (
+        low_vol_days = (
                 df["volume"] < vol_ma20 * 0.7
             ).tail(20).sum()
     
