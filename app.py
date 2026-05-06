@@ -304,7 +304,6 @@ def calculate_dryup_score(df):
         # =========================
         obv_now = df["obv"].iloc[-1]
         if "obv_ema9" in df.columns:
-        if "obv_ema9" in df.columns:
         obv_ema9 = df["obv_ema9"].iloc[-1]
 else:
         obv_ema9 = obv_now
