@@ -638,7 +638,7 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
             if item is not None:
                 rows.append(item)
         except Exception as e:
-    st.write(symbol, e)
+            st.write(symbol, e)
     if not rows:
         return pd.DataFrame()
 
