@@ -1544,8 +1544,11 @@ if ga_1kg_df.empty:
     st.warning("Không có gà 1kg đạt chuẩn")
 else:
     # sort
-    ga_1kg_df = ga_1kg_df.sort_values(by="total_score", ascending=False).reset_index(drop=True)
-
+    ga_1kg_df["ENTRY_Q"] = ga_1kg_df.apply(entry_quality_score, axis=1)
+    ga_1kg_df = ga_1kg_df.sort_values(
+    by=["ENTRY_Q", "total_score", "RS"],
+    ascending=False
+    ).reset_index(drop=True)
     # apply
     ga_1kg_df["ENTRY_TYPE"] = ga_1kg_df.apply(entry_type, axis=1)
     ga_1kg_df["ENTRY_SIGNAL"] = ga_1kg_df.apply(entry_signal, axis=1)
@@ -1572,6 +1575,10 @@ def action_goi_y(row, i):
         return "🟢 MUA"
     else:
         return "🟡 THEO DÕI" 
+        # =====================================================
+# ENTRY QUALITY SCORE
+# =====================================================
+    ga_1kg_df["ENTRY_Q"] = ga_1kg_df.apply(entry_quality_score, axis=1)
     ga_1kg_df["NAV_%"] = [nav_goi_y(i) for i in range(len(ga_1kg_df))]
     ga_1kg_df["ACTION"] = [action_goi_y(row, i) for i, row in ga_1kg_df.iterrows()]
 
