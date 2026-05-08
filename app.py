@@ -599,7 +599,7 @@ def analyze_symbol(symbol: str) -> dict | None:
     E = calc_price_score(price, ema9_, ma20_, ema9_prev)
     R = calc_rsi_score(rsi_, rsi_slope_)
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
-        S = calc_slope_score(slope_, slope_change_)
+    S = calc_slope_score(slope_, slope_change_)
 
     # =====================================================
     # RS SCORE
