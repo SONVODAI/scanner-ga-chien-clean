@@ -793,6 +793,45 @@ def market_status_text(score: float) -> tuple[str, str]:
 # =========================================================
 # NAV / BUY RECOMMENDATION
 # =========================================================
+# ===== ENTRY QUALITY SCORE - ƯU TIÊN ĐIỂM MUA ĐẸP =====
+def entry_quality_score(row):
+    dist = row.get("dist_from_ema9_pct", 999)
+    pull = str(row.get("pull_label", ""))
+    rs = row.get("RS", 0)
+    score = row.get("total_score", 0)
+
+    q = 0
+
+    # 1. Vị trí so với EMA9
+    if pd.notna(dist):
+        if 0 <= dist <= 3:
+            q += 3
+        elif 3 < dist <= 5:
+            q += 2
+        elif 5 < dist <= 8:
+            q += 1
+        elif dist > 8:
+            q -= 2
+
+    # 2. Pull label
+    if pull == "PULL ĐẸP":
+        q += 3
+    elif pull == "PULL VỪA":
+        q += 2
+    elif pull == "PULL XẤU":
+        q -= 1
+
+    # 3. RS vẫn phải có sức mạnh
+    if rs >= 2:
+        q += 1
+    elif rs <= 0:
+        q -= 1
+
+    # 4. Tổng điểm nền tảng
+    if score >= 8:
+        q += 1
+
+    return q
 def nav_suggestion(action: str, market_real: float) -> str:
     if market_real < 6:
         return "0%"
