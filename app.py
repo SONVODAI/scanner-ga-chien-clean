@@ -1559,9 +1559,14 @@ else:
     # hiển thị
     cols_show = [
         "symbol", "price", "rsi14", "ema9_ma20_slope",
-        "OBV_POWER", "ENTRY_TYPE", "ENTRY_SIGNAL",
-        "total_score", "NAV_%", "ACTION"
-    ]
+        "OBV_POWER",
+        "ENTRY_Q",
+        "ENTRY_TYPE",
+        "ENTRY_SIGNAL",
+
+        "total_score",
+        "NAV_%",
+        "ACTION"    ]
 
     cols_show = [c for c in cols_show if c in ga_1kg_df.columns]
 
