@@ -1214,7 +1214,7 @@ for i, group_name in enumerate(GROUP_ORDER):
 # DISPLAY GROUP TABLES
 # =========================================================
 DISPLAY_COLUMNS = [
-    "symbol", "price", "E", "R", "O", "S", "total_score",
+    "symbol", "price", "E", "R", "O", "S", "RS", "total_score",
     "dry_score", "dry_label",
     "ema9_ma20_slope", "slope_state", "obv_status", "status"
 ]
