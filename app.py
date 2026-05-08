@@ -1540,7 +1540,9 @@ def action_goi_y(row, i):
         "symbol", "price",
         "rsi14", "ema9_ma20_slope",
         "obv_status", "OBV_POWER",
-        "E", "R", "O", "S",
+        "E", "R", "O", "S", "RS",
+        "rs5", "rs10",
+        "total_score",
         "total_score",
         "AUTO_BUY",
         "NAV_%", "ACTION"
