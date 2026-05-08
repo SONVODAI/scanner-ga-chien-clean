@@ -1415,7 +1415,9 @@ if show_detail:
         "ema9_ma20_slope", "ema9_ma20_slope_change", "slope_state",
         "rsi14", "rsi_slope",
         "obv", "obv_ema9", "obv_status", "OBV_POWER",
-        "E", "R", "O", "S", "total_score",
+        "E", "R", "O", "S", "RS",
+        "rs5", "rs10",
+        "total_score",
         "dry_score", "dry_label",
         "dist_from_ema9_pct", "pull_label", "breakout_ref",
         "status", "warning"
