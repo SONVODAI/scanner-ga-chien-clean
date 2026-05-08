@@ -248,7 +248,19 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["obv_ema9"] = ema(x["obv"], 9)
 
     x["vol_ma20"] = sma(x["volume"], 20)
+    # =====================================================
+    # RS - RELATIVE STRENGTH NGẮN HẠN
+    # =====================================================
 
+    # % thay đổi giá so với 5 phiên trước
+    x["rs5"] = (
+        (x["close"] / x["close"].shift(5)) - 1
+    ) * 100
+
+    # % thay đổi giá so với 10 phiên trước
+    x["rs10"] = (
+        (x["close"] / x["close"].shift(10)) - 1
+    ) * 100
     return x
 # =========================================================
 # DRY-UP ENGINE
@@ -394,7 +406,19 @@ def calc_slope_score(slope_, slope_change_):
         if slope_ > 0:
             return 1
     return 0
-
+def calc_rs_score(rs5_, rs10_):
+    """
+    RS = sức mạnh giá ngắn hạn so với chính nó 5-10 phiên trước.
+    2 điểm: tăng tốt cả 5 phiên và 10 phiên
+    1 điểm: có sức mạnh vừa
+    0 điểm: yếu / chưa rõ
+    """
+    if pd.notna(rs5_) and pd.notna(rs10_):
+        if rs5_ >= 3 and rs10_ >= 5:
+            return 2
+        if rs5_ >= 1 or rs10_ >= 2:
+            return 1
+    return 0
 
 # =========================================================
 # PULL / WARNING / STATUS
@@ -554,7 +578,11 @@ def analyze_symbol(symbol: str) -> dict | None:
 
     rsi_ = to_float(last["rsi14"])
     rsi_slope_ = to_float(last["rsi_slope"])
-
+    # =====================================================
+    # RS NGẮN HẠN
+    # =====================================================
+    rs5_ = to_float(last["rs5"])
+    rs10_ = to_float(last["rs10"])
     obv_ = to_float(last["obv"])
     obv_ema9_ = to_float(last["obv_ema9"])
     obv_prev = to_float(prev["obv"])
@@ -571,10 +599,14 @@ def analyze_symbol(symbol: str) -> dict | None:
     E = calc_price_score(price, ema9_, ma20_, ema9_prev)
     R = calc_rsi_score(rsi_, rsi_slope_)
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
-    S = calc_slope_score(slope_, slope_change_)
+        S = calc_slope_score(slope_, slope_change_)
 
-    total_score = E + R + O + S
+    # =====================================================
+    # RS SCORE
+    # =====================================================
+    RS = calc_rs_score(rs5_, rs10_)
 
+    total_score = E + R + O + S + RS
     pull_label = classify_pull_label(
         dist_from_ema9=dist_from_ema9,
         rsi_=rsi_,
@@ -608,12 +640,15 @@ def analyze_symbol(symbol: str) -> dict | None:
         "breakout_ref": safe_round(breakout_ref, 2),
         "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
         "pull_label": pull_label,
+"O": O,
+"S": S,
+"RS": RS,
 
-        "E": E,
-        "R": R,
-        "O": O,
-        "S": S,
-        "total_score": total_score,
+"rs5": safe_round(rs5_, 2),
+"rs10": safe_round(rs10_, 2),
+
+"total_score": total_score,
+    
     }
    
     row["group"] = classify_group(row)
