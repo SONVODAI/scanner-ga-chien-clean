@@ -640,6 +640,7 @@ def analyze_symbol(symbol: str) -> dict | None:
         "breakout_ref": safe_round(breakout_ref, 2),
         "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
         "pull_label": pull_label,
+"e": e,
 "O": O,
 "S": S,
 "RS": RS,
