@@ -640,16 +640,16 @@ def analyze_symbol(symbol: str) -> dict | None:
         "breakout_ref": safe_round(breakout_ref, 2),
         "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
         "pull_label": pull_label,
-"E": E,
-"O": O,
-"S": S,
-"RS": RS,
+        "E": E,
+        "R": R,
+        "O": O,
+        "S": S,
+        "RS": RS,
 
-"rs5": safe_round(rs5_, 2),
-"rs10": safe_round(rs10_, 2),
+        "rs5": safe_round(rs5_, 2),
+        "rs10": safe_round(rs10_, 2),
 
-"total_score": total_score,
-    
+        "total_score": total_score,    
     }
    
     row["group"] = classify_group(row)
