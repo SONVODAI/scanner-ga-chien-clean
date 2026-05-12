@@ -1650,7 +1650,27 @@ st.caption(
     "Market REAL ≥ 8 mới đánh mạnh."
 )
 st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
+# =========================================
+# LOAD VNINDEX DATA
+# =========================================
 
+try:
+
+    vnindex = yf.download(
+        "^VNINDEX",
+        period="10y",
+        interval="1d"
+    )
+
+    vnindex = vnindex.reset_index()
+
+    st.success("Đã tải dữ liệu VNINDEX thành công")
+
+    st.write(vnindex.tail())
+
+except Exception as e:
+
+    st.error(f"Lỗi tải VNINDEX: {e}")
 st.info("Engine đã sẵn sàng. Bước tiếp theo là kết nối dữ liệu VNINDEX thật.")
 
 
