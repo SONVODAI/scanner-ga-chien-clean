@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import yfinance as yf
-from market_analog_engine import test_market_engine
+from market_analog_engine import find_similar_periods, generate_market_prediction
 
 # =========================================================
 # PAGE CONFIG
@@ -1649,8 +1649,8 @@ st.caption(
     "Slope > 2% + OBV xanh + RSI tốt = gà tăng tốc. "
     "Market REAL ≥ 8 mới đánh mạnh."
 )
-st.subheader("🔮 TEST MARKET ENGINE")
+st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 
-st.success(test_market_engine())
+st.info("Engine đã sẵn sàng. Bước tiếp theo là kết nối dữ liệu VNINDEX thật.")
 
 
