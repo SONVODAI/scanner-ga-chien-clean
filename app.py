@@ -31,7 +31,7 @@ st.caption("Bản viết lại sạch: giữ lõi V18.4 + thêm độ dốc EMA9
 # =========================================================
 WATCHLIST = sorted(list(set([
     "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
-    "HAH", "VSC", "GMD", "VOS", "VTO", "ACV",
+    "HAH", "VSC", "GMD", "VOS", "VTO", "ACV", "HVN", "VJC", 
 
     "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB", "VGT",
 
@@ -47,7 +47,7 @@ WATCHLIST = sorted(list(set([
 
     "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
     "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
-    "VND", "SSI", "HCM", "SHS", "VIX", "BSI", "FTS", "TVS", "APS",
+    "VND", "SSI", "HCM", "VIX", "BSI", "FTS", "TVS", "SHS",
     "AGR", "VCI", "TCX", "VCK", "VPX", "ORS", "BVS", "VDS", "MBS",
 
     "VGC", "SZC", "IDC", "KBC", "LHG", "IJC", "DTD", "BCM",
@@ -56,7 +56,7 @@ WATCHLIST = sorted(list(set([
 
     "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
 
-    "HVN", "VJC", "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
+    "IMP", "BVH", "SBT", "LSS", "PNJ", "TLG", "DHT",
     "TNH", "YEG",
 
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
