@@ -1688,7 +1688,6 @@ try:
     # RUN ANALOG ENGINE
     # =========================================
     
-try:
     
     similar_df = find_similar_periods(
             vnindex,
