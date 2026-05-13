@@ -1655,13 +1655,9 @@ st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 # =========================================
 
 try:
-
-    vnindex = yf.download(
-        "VNINDEX",
-        period="10y",
-        interval="1d"
-    )
-    
+    vnindex = pd.read_csv("vnindex_history.csv")
+    vnindex["Date"] = pd.to_datetime(vnindex["Date"]) 
+        
     vnindex = vnindex.reset_index()
 # =========================================
 # CHUẨN HÓA CỘT
