@@ -1699,7 +1699,7 @@ try:
             similar_df
         )
     
-        st.success("Đã chạy similarity engine thành công")
+    st.success("Đã chạy similarity engine thành công")
     
         col1, col2, col3 = st.columns(3)
     
