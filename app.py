@@ -1719,3 +1719,4 @@ vnindex = vnindex.dropna(subset=["Date"])
     st.dataframe(similar_df)
 except Exception as e:
     st.error(f"Lỗi similarity engine: {e}")
+    st.error(f"Lỗi similarity engine: {e}")
