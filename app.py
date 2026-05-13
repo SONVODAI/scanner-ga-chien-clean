@@ -1656,15 +1656,15 @@ st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 
 try:
 
-   from vnstock import Vnstock
-
-stock = Vnstock().stock(symbol="VNINDEX", source="VCI")
-
-vnindex = stock.quote.history(
-    start='2015-01-01',
-    end='2026-12-31',
-    interval='1D'
-)
+    from vnstock import Vnstock
+    
+    stock = Vnstock().stock(symbol="VNINDEX", source="VCI")
+    
+    vnindex = stock.quote.history(
+        start='2015-01-01',
+        end='2026-12-31',
+        interval='1D'
+    )
 
     vnindex = vnindex.reset_index()
 # =========================================
