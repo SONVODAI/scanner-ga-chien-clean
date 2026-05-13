@@ -1724,5 +1724,5 @@ try:
     st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
     
     st.dataframe(similar_df)
-    except Exception as e:
+except Exception as e:
     st.error(f"Lỗi similarity engine: {e}")
