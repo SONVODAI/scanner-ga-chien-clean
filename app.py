@@ -1701,7 +1701,7 @@ try:
     
     st.success("Đã chạy similarity engine thành công")
     
-        col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
     
         col1.metric(
             "REGIME",
