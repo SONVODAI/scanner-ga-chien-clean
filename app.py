@@ -1670,11 +1670,11 @@ try:
 # =========================================
 
         
-    vnindex = vnindex[[
-        "Date",
-        "Close",
-        "Volume"
-    ]]
+vnindex = vnindex[[
+    "Date",
+    "Close",
+    "Volume"
+]]
     if vnindex.empty or len(vnindex) < 100:
         st.error("VNINDEX tải về bị rỗng hoặc quá ít dữ liệu. Chưa thể chạy Market Analog Engine.")
         st.stop()
