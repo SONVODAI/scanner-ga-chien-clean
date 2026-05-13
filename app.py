@@ -1656,13 +1656,13 @@ st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 
 try:
 
-   vnindex = yf.download(
-    "VNINDEX.VN",
-    period="10y",
-    interval="1d"
-)
-
-vnindex = vnindex.reset_index()
+       vnindex = yf.download(
+        "VNINDEX.VN",
+        period="10y",
+        interval="1d"
+    )
+    
+    vnindex = vnindex.reset_index()
 # =========================================
 # CHUẨN HÓA CỘT
 # =========================================
