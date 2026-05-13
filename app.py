@@ -1662,7 +1662,7 @@ try:
         interval="1d"
     )
     
-    vnindex = vnindex.reset_index()
+vnindex = vnindex.reset_index()
 # =========================================
 # CHUẨN HÓA CỘT
 # =========================================
