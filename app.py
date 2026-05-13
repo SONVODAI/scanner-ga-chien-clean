@@ -1655,16 +1655,16 @@ st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 # =========================================
 
 try:
-    vnindex = pd.read_csv("vnindex_history.csv")
-    vnindex["Date"] = pd.to_datetime(
-    vnindex["Date"],
-    dayfirst=True,
-    errors="coerce"
-)
-
-vnindex = vnindex.dropna(subset=["Date"])
-        
-    vnindex = vnindex.reset_index()
+        vnindex = pd.read_csv("vnindex_history.csv")
+        vnindex["Date"] = pd.to_datetime(
+        vnindex["Date"],
+        dayfirst=True,
+        errors="coerce"
+    )
+    
+        vnindex = vnindex.dropna(subset=["Date"])
+            
+        vnindex = vnindex.reset_index()
 # =========================================
 # CHUẨN HÓA CỘT
 # =========================================
