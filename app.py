@@ -1703,7 +1703,7 @@ try:
     
     col1, col2, col3 = st.columns(3)
     
-        col1.metric(
+    col1.metric(
             "REGIME",
             prediction["regime"]
         )
