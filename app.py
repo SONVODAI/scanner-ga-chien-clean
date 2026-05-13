@@ -1708,7 +1708,7 @@ try:
             prediction["regime"]
         )
     
-        col2.metric(
+    col2.metric(
             "NAV GỢI Ý",
             prediction["nav"]
         )
