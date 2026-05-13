@@ -1663,16 +1663,7 @@ try:
 # CHUẨN HÓA CỘT
 # =========================================
 
-    vnindex.columns = [
-        "Date",
-        "Adj Close",
-        "Close",
-        "High",
-        "Low",
-        "Open",
-        "Volume"
-    ]
-    
+        
     vnindex = vnindex[[
         "Date",
         "Close",
