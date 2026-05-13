@@ -1718,7 +1718,7 @@ try:
             f'{prediction["confidence"]}%'
         )
     
-st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
+    st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
     
         st.dataframe(similar_df)
     
