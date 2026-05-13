@@ -1726,7 +1726,3 @@ try:
     st.dataframe(similar_df)
     except Exception as e:
     st.error(f"Lỗi similarity engine: {e}")
-except Exception as e:
-
-    st.error(f"Lỗi similarity engine: {e}")
-
