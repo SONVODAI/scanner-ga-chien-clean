@@ -1653,72 +1653,47 @@ st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 # =========================================
 # LOAD VNINDEX DATA
 # =========================================
-
 try:
-        vnindex = pd.read_csv("vnindex_history.csv")
-        vnindex["Date"] = pd.to_datetime(
+    vnindex = pd.read_csv("vnindex_history.csv")
+
+    vnindex["Date"] = pd.to_datetime(
         vnindex["Date"],
         dayfirst=True,
         errors="coerce"
     )
-    
-        vnindex = vnindex.dropna(subset=["Date"])
-            
-        vnindex = vnindex.reset_index()
-# =========================================
-# CHUẨN HÓA CỘT
-# =========================================
 
-        
-vnindex = vnindex[[
-"Date",
-"Close",
-"Volume"
-]]
+    vnindex = vnindex.dropna(subset=["Date"])
+
+    vnindex = vnindex[[
+        "Date",
+        "Close",
+        "Volume"
+    ]]
+
     if vnindex.empty or len(vnindex) < 100:
         st.error("VNINDEX tải về bị rỗng hoặc quá ít dữ liệu. Chưa thể chạy Market Analog Engine.")
         st.stop()
+
     st.success("Đã tải dữ liệu VNINDEX thành công")
-    
-        # =========================================
-    # RUN ANALOG ENGINE
-    # =========================================
-    
-    
+
     similar_df = find_similar_periods(
-            vnindex,
-            window=40,
-            top_k=5
-        )
-    
-    prediction = generate_market_prediction(
-            similar_df
-        )
-    
+        vnindex,
+        window=40,
+        top_k=5
+    )
+
+    prediction = generate_market_prediction(similar_df)
+
     st.success("Đã chạy similarity engine thành công")
-    except Exception as e:
-    st.error(f"Lỗi tải VNINDEX: {e}")
-    st.stop()
+
     col1, col2, col3 = st.columns(3)
-    
-    col1.metric(
-            "REGIME",
-            prediction["regime"]
-        )
-    
-    col2.metric(
-            "NAV GỢI Ý",
-            prediction["nav"]
-        )
-    
-    col3.metric(
-            "CONFIDENCE",
-            f'{prediction["confidence"]}%'
-        )
-    
+
+    col1.metric("REGIME", prediction["regime"])
+    col2.metric("NAV GỢI Ý", prediction["nav"])
+    col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
+
     st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
-    
     st.dataframe(similar_df)
+
 except Exception as e:
-    st.error(f"Lỗi similarity engine: {e}")
     st.error(f"Lỗi similarity engine: {e}")
