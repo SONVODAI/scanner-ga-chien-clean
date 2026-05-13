@@ -1720,7 +1720,7 @@ try:
     
     st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
     
-        st.dataframe(similar_df)
+    st.dataframe(similar_df)
     
 except Exception as e:
 
