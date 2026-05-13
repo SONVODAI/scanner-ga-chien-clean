@@ -1713,7 +1713,7 @@ try:
             prediction["nav"]
         )
     
-        col3.metric(
+    col3.metric(
             "CONFIDENCE",
             f'{prediction["confidence"]}%'
         )
