@@ -1663,10 +1663,69 @@ try:
     )
 
     vnindex = vnindex.reset_index()
+# =========================================
+# CHUẨN HÓA CỘT
+# =========================================
 
+vnindex.columns = [
+    "Date",
+    "Adj Close",
+    "Close",
+    "High",
+    "Low",
+    "Open",
+    "Volume"
+]
+
+vnindex = vnindex[[
+    "Date",
+    "Close",
+    "Volume"
+]]
     st.success("Đã tải dữ liệu VNINDEX thành công")
 
-    st.write(vnindex.tail())
+    # =========================================
+# RUN ANALOG ENGINE
+# =========================================
+
+try:
+
+    similar_df = find_similar_periods(
+        vnindex,
+        window=40,
+        top_k=5
+    )
+
+    prediction = generate_market_prediction(
+        similar_df
+    )
+
+    st.success("Đã chạy similarity engine thành công")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric(
+        "REGIME",
+        prediction["regime"]
+    )
+
+    col2.metric(
+        "NAV GỢI Ý",
+        prediction["nav"]
+    )
+
+    col3.metric(
+        "CONFIDENCE",
+        f'{prediction["confidence"]}%'
+    )
+
+    st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
+
+    st.dataframe(similar_df)
+
+except Exception as e:
+
+    st.error(f"Lỗi similarity engine: {e}")
 
 except Exception as e:
 
