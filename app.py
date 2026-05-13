@@ -1695,7 +1695,7 @@ try:
             top_k=5
         )
     
-        prediction = generate_market_prediction(
+    prediction = generate_market_prediction(
             similar_df
         )
     
