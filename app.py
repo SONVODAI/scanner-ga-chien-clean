@@ -1724,14 +1724,9 @@ try:
     st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
     
     st.dataframe(similar_df)
-    
+    except Exception as e:
+    st.error(f"Lỗi similarity engine: {e}")
 except Exception as e:
 
     st.error(f"Lỗi similarity engine: {e}")
-
-except Exception as e:
-
-    st.error(f"Lỗi tải VNINDEX: {e}")
-st.info("Engine đã sẵn sàng. Bước tiếp theo là kết nối dữ liệu VNINDEX thật.")
-
 
