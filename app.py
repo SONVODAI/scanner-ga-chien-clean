@@ -1696,7 +1696,9 @@ vnindex = vnindex[[
         )
     
     st.success("Đã chạy similarity engine thành công")
-    
+    except Exception as e:
+    st.error(f"Lỗi tải VNINDEX: {e}")
+    st.stop()
     col1, col2, col3 = st.columns(3)
     
     col1.metric(
