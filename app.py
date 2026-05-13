@@ -1682,15 +1682,15 @@ try:
         "Close",
         "Volume"
     ]]
-        st.success("Đã tải dữ liệu VNINDEX thành công")
+    st.success("Đã tải dữ liệu VNINDEX thành công")
     
         # =========================================
     # RUN ANALOG ENGINE
     # =========================================
     
-    try:
+try:
     
-        similar_df = find_similar_periods(
+    similar_df = find_similar_periods(
             vnindex,
             window=40,
             top_k=5
