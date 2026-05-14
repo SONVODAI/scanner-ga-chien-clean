@@ -473,7 +473,83 @@ def build_status(total_score, warning, group_name):
     if total_score >= 3:
         return "🟡"
     return "🔴"
+# =========================================================
+# BREAK QUALITY COMMENT
+# =========================================================
+def break_quality_comment(df, row):
+    comments = []
 
+    try:
+        # =========================
+        # Độ dài nền
+        # =========================
+        recent = df.tail(20)
+
+        hh = recent["high"].max()
+        ll = recent["low"].min()
+
+        base_range = ((hh - ll) / ll) * 100 if ll != 0 else 999
+
+        if base_range <= 8:
+            comments.append("nền tích lũy chặt")
+        elif base_range <= 15:
+            comments.append("nền tích lũy trung bình")
+        else:
+            comments.append("nền còn rộng")
+
+        # =========================
+        # Volume co hẹp
+        # =========================
+        vol_now = row.get("volume", np.nan)
+        vol_ma20 = row.get("vol_ma20", np.nan)
+
+        if pd.notna(vol_now) and pd.notna(vol_ma20):
+            if vol_now < vol_ma20 * 0.8:
+                comments.append("volume co hẹp tốt")
+            elif vol_now > vol_ma20 * 1.5:
+                comments.append("volume breakout mạnh")
+
+        # =========================
+        # RSI
+        # =========================
+        rsi = row.get("rsi14", np.nan)
+
+        if pd.notna(rsi):
+            if 55 <= rsi <= 70:
+                comments.append("RSI khỏe")
+            elif rsi > 75:
+                comments.append("RSI hơi nóng")
+
+        # =========================
+        # OBV
+        # =========================
+        obv = row.get("obv", np.nan)
+        obv_ema9 = row.get("obv_ema9", np.nan)
+
+        if pd.notna(obv) and pd.notna(obv_ema9):
+            if obv >= obv_ema9:
+                comments.append("OBV xác nhận")
+            else:
+                comments.append("OBV chưa xác nhận rõ")
+
+        # =========================
+        # Khoảng cách EMA9
+        # =========================
+        dist = row.get("dist_from_ema9_pct", np.nan)
+
+        if pd.notna(dist):
+            if dist <= 3:
+                comments.append("break còn gần EMA9")
+            elif dist >= 7:
+                comments.append("break hơi nóng")
+
+        if len(comments) == 0:
+            return "Break cần theo dõi thêm"
+
+        return " | ".join(comments)
+
+    except:
+        return "Break chưa đủ dữ liệu"
 
 # =========================================================
 # GROUP CLASSIFY
