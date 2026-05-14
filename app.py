@@ -1374,7 +1374,7 @@ def show_group_table(df: pd.DataFrame, group_name: str):
     elif group_name == "MUA BREAK":
         cols = [
             "symbol", "price", "E", "R", "O", "S", "total_score",
-            "breakout_ref", "ema9_ma20_slope", "slope_state",
+            "breakout_ref", "BREAK_COMMENT", "ema9_ma20_slope", "slope_state",
             "obv_status", "status"
         ]
 
