@@ -1269,7 +1269,28 @@ buy_signal_cols = scan_df.apply(
 )
 
 scan_df = pd.concat([scan_df, buy_signal_cols], axis=1)
+# =====================================================
+# BREAK QUALITY COMMENT
+# =====================================================
+break_comments = []
 
+for _, row in scan_df.iterrows():
+
+    symbol = row["symbol"]
+
+    raw_df = download_symbol_data(symbol)
+
+    if raw_df.empty:
+        break_comments.append("")
+        continue
+
+    raw_df = build_indicators(raw_df)
+
+    comment = break_quality_comment(raw_df, row)
+
+    break_comments.append(comment)
+
+scan_df["BREAK_COMMENT"] = break_comments
 st.markdown("---")
 st.markdown("## 🚦 KHUYẾN NGHỊ MUA")
 
