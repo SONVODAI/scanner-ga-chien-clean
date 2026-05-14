@@ -1300,7 +1300,7 @@ market_status, market_action = market_status_text(market_real)
 
 st.markdown("## 📊 MARKET OVERVIEW")
 
-m1, m2, m3 = st.columns([1, 1, 2])
+m1, m2, m3, m4 = st.columns([1,1,1,2])
 
 with m1:
     st.metric("Market REAL", f"{market_real}/13")
