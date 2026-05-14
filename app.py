@@ -1295,6 +1295,7 @@ if scan_df.empty:
 # =========================================================
 market_live = calc_market_live(scan_df)
 market_real = calc_market_real(scan_df)
+market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
 
 st.markdown("## 📊 MARKET OVERVIEW")
