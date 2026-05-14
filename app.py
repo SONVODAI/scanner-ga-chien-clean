@@ -1,4 +1,67 @@
 # =========================================================
+# MARKET FORECAST ENGINE
+# =========================================================
+def calc_market_forecast(df: pd.DataFrame):
+
+    total = len(df)
+
+    if total == 0:
+        return 0, "Không có dữ liệu"
+
+    # =========================
+    # Đếm nhóm khỏe
+    # =========================
+    strong = len(df[df["group"] == "CP MẠNH"])
+    accel = len(df[df["group"] == "GÀ TĂNG TỐC"])
+    breakout = len(df[df["group"] == "MUA BREAK"])
+    pull_good = len(df[df["group"] == "PULL ĐẸP"])
+
+    # =========================
+    # Đếm nhóm yếu
+    # =========================
+    weak = len(df[df["group"] == "THEO DÕI"])
+
+    # =========================
+    # Breadth khỏe
+    # =========================
+    obv_good = len(df[df["obv_status"] == "🟢"]) / total
+
+    # =========================
+    # Slope market
+    # =========================
+    slope_good = len(df[df["ema9_ma20_slope"] > 0]) / total
+
+    # =========================
+    # Forecast score
+    # =========================
+    score = 0
+
+    score += min(accel / 5, 2)
+    score += min(strong / 10, 2)
+    score += min(breakout / 8, 2)
+    score += min(pull_good / 8, 2)
+
+    score += obv_good * 1
+    score += slope_good * 1
+
+    score -= min(weak / 15, 2)
+
+    score = round(max(min(score, 10), 0), 1)
+
+    # =========================
+    # TEXT
+    # =========================
+    if score >= 8:
+        text = "🟢 Forecast tốt 5-10 ngày"
+    elif score >= 6:
+        text = "🟡 Forecast trung tính-khá"
+    elif score >= 4:
+        text = "🟠 Forecast yếu"
+    else:
+        text = "🔴 Forecast rủi ro"
+
+    return score, text
+# =========================================================
 # SCANNER GÀ CHIẾN V18.4 + SLOPE CLEAN REWRITE
 # Full app.py - viết lại sạch từ đầu
 # Có: Market REAL/LIVE, EMA9/MA20 slope, RSI, OBV, nhóm CP,
