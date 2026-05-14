@@ -1309,7 +1309,11 @@ with m2:
     st.metric("Market LIVE", f"{market_live}/13")
 
 with m3:
+    st.metric("Forecast 5-10D", f"{market_forecast}/10")
+
+with m4:
     st.subheader(market_status)
+    st.caption(market_forecast_text)
 
 if market_real < 6:
     st.error(market_action)
