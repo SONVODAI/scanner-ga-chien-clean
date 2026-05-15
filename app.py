@@ -1887,7 +1887,7 @@ evolution_rows = []
 
 for _, r in scan_df.iterrows():
 
-    if r["group"] in GROUPS_TO_TRACK:
+    if pd.notna(r["group"]):
 
         evolution_rows.append({
             "date": today_str,
