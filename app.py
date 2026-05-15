@@ -1961,6 +1961,4 @@ else:
 
 # SAVE
 full_df.to_csv(EVOLUTION_FILE, index=False)
-
     
-    st.error(f"Lỗi similarity engine: {e}")
