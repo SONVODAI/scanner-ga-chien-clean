@@ -1,4 +1,67 @@
 # =========================================================
+# MARKET FORECAST ENGINE
+# =========================================================
+def calc_market_forecast(df: pd.DataFrame):
+
+    total = len(df)
+
+    if total == 0:
+        return 0, "Không có dữ liệu"
+
+    # =========================
+    # Đếm nhóm khỏe
+    # =========================
+    strong = len(df[df["group"] == "CP MẠNH"])
+    accel = len(df[df["group"] == "GÀ TĂNG TỐC"])
+    breakout = len(df[df["group"] == "MUA BREAK"])
+    pull_good = len(df[df["group"] == "PULL ĐẸP"])
+
+    # =========================
+    # Đếm nhóm yếu
+    # =========================
+    weak = len(df[df["group"] == "THEO DÕI"])
+
+    # =========================
+    # Breadth khỏe
+    # =========================
+    obv_good = len(df[df["obv_status"] == "🟢"]) / total
+
+    # =========================
+    # Slope market
+    # =========================
+    slope_good = len(df[df["ema9_ma20_slope"] > 0]) / total
+
+    # =========================
+    # Forecast score
+    # =========================
+    score = 0
+
+    score += min(accel / 5, 2)
+    score += min(strong / 10, 2)
+    score += min(breakout / 8, 2)
+    score += min(pull_good / 8, 2)
+
+    score += obv_good * 1
+    score += slope_good * 1
+
+    score -= min(weak / 15, 2)
+
+    score = round(max(min(score, 10), 0), 1)
+
+    # =========================
+    # TEXT
+    # =========================
+    if score >= 8:
+        text = "🟢 Forecast tốt 5-10 ngày"
+    elif score >= 6:
+        text = "🟡 Forecast trung tính-khá"
+    elif score >= 4:
+        text = "🟠 Forecast yếu"
+    else:
+        text = "🔴 Forecast rủi ro"
+
+    return score, text
+# =========================================================
 # SCANNER GÀ CHIẾN V18.4 + SLOPE CLEAN REWRITE
 # Full app.py - viết lại sạch từ đầu
 # Có: Market REAL/LIVE, EMA9/MA20 slope, RSI, OBV, nhóm CP,
@@ -473,7 +536,83 @@ def build_status(total_score, warning, group_name):
     if total_score >= 3:
         return "🟡"
     return "🔴"
+# =========================================================
+# BREAK QUALITY COMMENT
+# =========================================================
+def break_quality_comment(df, row):
+    comments = []
 
+    try:
+        # =========================
+        # Độ dài nền
+        # =========================
+        recent = df.tail(20)
+
+        hh = recent["high"].max()
+        ll = recent["low"].min()
+
+        base_range = ((hh - ll) / ll) * 100 if ll != 0 else 999
+
+        if base_range <= 8:
+            comments.append("nền tích lũy chặt")
+        elif base_range <= 15:
+            comments.append("nền tích lũy trung bình")
+        else:
+            comments.append("nền còn rộng")
+
+        # =========================
+        # Volume co hẹp
+        # =========================
+        vol_now = row.get("volume", np.nan)
+        vol_ma20 = row.get("vol_ma20", np.nan)
+
+        if pd.notna(vol_now) and pd.notna(vol_ma20):
+            if vol_now < vol_ma20 * 0.8:
+                comments.append("volume co hẹp tốt")
+            elif vol_now > vol_ma20 * 1.5:
+                comments.append("volume breakout mạnh")
+
+        # =========================
+        # RSI
+        # =========================
+        rsi = row.get("rsi14", np.nan)
+
+        if pd.notna(rsi):
+            if 55 <= rsi <= 70:
+                comments.append("RSI khỏe")
+            elif rsi > 75:
+                comments.append("RSI hơi nóng")
+
+        # =========================
+        # OBV
+        # =========================
+        obv = row.get("obv", np.nan)
+        obv_ema9 = row.get("obv_ema9", np.nan)
+
+        if pd.notna(obv) and pd.notna(obv_ema9):
+            if obv >= obv_ema9:
+                comments.append("OBV xác nhận")
+            else:
+                comments.append("OBV chưa xác nhận rõ")
+
+        # =========================
+        # Khoảng cách EMA9
+        # =========================
+        dist = row.get("dist_from_ema9_pct", np.nan)
+
+        if pd.notna(dist):
+            if dist <= 3:
+                comments.append("break còn gần EMA9")
+            elif dist >= 7:
+                comments.append("break hơi nóng")
+
+        if len(comments) == 0:
+            return "Break cần theo dõi thêm"
+
+        return " | ".join(comments)
+
+    except:
+        return "Break chưa đủ dữ liệu"
 
 # =========================================================
 # GROUP CLASSIFY
@@ -1156,11 +1295,12 @@ if scan_df.empty:
 # =========================================================
 market_live = calc_market_live(scan_df)
 market_real = calc_market_real(scan_df)
+market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
 
 st.markdown("## 📊 MARKET OVERVIEW")
 
-m1, m2, m3 = st.columns([1, 1, 2])
+m1, m2, m3, m4 = st.columns([1,1,1,2])
 
 with m1:
     st.metric("Market REAL", f"{market_real}/13")
@@ -1169,7 +1309,11 @@ with m2:
     st.metric("Market LIVE", f"{market_live}/13")
 
 with m3:
+    st.metric("Forecast 5-10D", f"{market_forecast}/10")
+
+with m4:
     st.subheader(market_status)
+    st.caption(market_forecast_text)
 
 if market_real < 6:
     st.error(market_action)
@@ -1193,7 +1337,28 @@ buy_signal_cols = scan_df.apply(
 )
 
 scan_df = pd.concat([scan_df, buy_signal_cols], axis=1)
+# =====================================================
+# BREAK QUALITY COMMENT
+# =====================================================
+break_comments = []
 
+for _, row in scan_df.iterrows():
+
+    symbol = row["symbol"]
+
+    raw_df = download_symbol_data(symbol)
+
+    if raw_df.empty:
+        break_comments.append("")
+        continue
+
+    raw_df = build_indicators(raw_df)
+
+    comment = break_quality_comment(raw_df, row)
+
+    break_comments.append(comment)
+
+scan_df["BREAK_COMMENT"] = break_comments
 st.markdown("---")
 st.markdown("## 🚦 KHUYẾN NGHỊ MUA")
 
@@ -1277,7 +1442,7 @@ def show_group_table(df: pd.DataFrame, group_name: str):
     elif group_name == "MUA BREAK":
         cols = [
             "symbol", "price", "E", "R", "O", "S", "total_score",
-            "breakout_ref", "ema9_ma20_slope", "slope_state",
+            "breakout_ref", "BREAK_COMMENT", "ema9_ma20_slope", "slope_state",
             "obv_status", "status"
         ]
 
@@ -1697,4 +1862,3 @@ try:
 
 except Exception as e:
     st.error(f"Lỗi similarity engine: {e}")
-
