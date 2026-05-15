@@ -1895,6 +1895,7 @@ try:
 except Exception as e:
 
     st.warning(f"Lỗi evolution tracker: {e}")
+    st.error(f"Lỗi similarity engine: {e}")
 # 🧬 STOCK GROUP EVOLUTION TRACKER - V1
 # Theo dõi cổ phiếu chuyển nhóm theo ngày
 # =====================================================
@@ -1960,9 +1961,6 @@ else:
 
 # SAVE
 full_df.to_csv(EVOLUTION_FILE, index=False)
-
-
-
 
     
     st.error(f"Lỗi similarity engine: {e}")
