@@ -1864,6 +1864,37 @@ try:
 except Exception as e:
         st.error(e)
     # =====================================================
+# =====================================================
+# HIỂN THỊ TIẾN HÓA 5 NGÀY
+# =====================================================
+
+st.markdown("---")
+st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU")
+
+try:
+
+    latest_days = sorted(full_df["date"].unique())[-5:]
+
+    recent_df = full_df[
+        full_df["date"].isin(latest_days)
+    ]
+
+    pivot_df = recent_df.pivot_table(
+        index="symbol",
+        columns="date",
+        values="group",
+        aggfunc="first"
+    )
+
+    st.dataframe(
+        pivot_df,
+        use_container_width=True,
+        height=500
+    )
+
+except Exception as e:
+
+    st.warning(f"Lỗi evolution tracker: {e}")
 # 🧬 STOCK GROUP EVOLUTION TRACKER - V1
 # Theo dõi cổ phiếu chuyển nhóm theo ngày
 # =====================================================
@@ -1930,37 +1961,6 @@ else:
 # SAVE
 full_df.to_csv(EVOLUTION_FILE, index=False)
 
-# =====================================================
-# HIỂN THỊ TIẾN HÓA 5 NGÀY
-# =====================================================
-
-st.markdown("---")
-st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU")
-
-try:
-
-    latest_days = sorted(full_df["date"].unique())[-5:]
-
-    recent_df = full_df[
-        full_df["date"].isin(latest_days)
-    ]
-
-    pivot_df = recent_df.pivot_table(
-        index="symbol",
-        columns="date",
-        values="group",
-        aggfunc="first"
-    )
-
-    st.dataframe(
-        pivot_df,
-        use_container_width=True,
-        height=500
-    )
-
-except Exception as e:
-
-    st.warning(f"Lỗi evolution tracker: {e}")
 
 
 
