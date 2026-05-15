@@ -1884,15 +1884,22 @@ today_str = datetime.now().strftime("%Y-%m-%d")
 
 evolution_rows = []
 
-for group_name in GROUPS_TO_TRACK:
+evo_today_df = pd.DataFrame(evolution_rows)
+GROUP_MAP = {
+    "GÀ TĂNG TỐC": ga_tang_toc_df,
+    "CP MẠNH": cp_manh_df,
+    "MUA BREAK": mua_break_df,
+    "PULL ĐẸP": pull_dep_df,
+    "PULL VỪA": pull_vua_df,
+    "MUA EARLY": mua_early_df,
+    "TÍCH LŨY": tich_luy_df
+}
+
+for group_name, temp_df in GROUP_MAP.items():
 
     try:
 
-        temp_df = scan_df[
-            scan_df["group"] == group_name
-        ].copy()
-
-        if len(temp_df) > 0:
+        if temp_df is not None and len(temp_df) > 0:
 
             for _, r in temp_df.iterrows():
 
@@ -1904,8 +1911,6 @@ for group_name in GROUPS_TO_TRACK:
 
     except:
         pass
-evo_today_df = pd.DataFrame(evolution_rows)
-
 # LOAD FILE CŨ
 if os.path.exists(EVOLUTION_FILE):
 
