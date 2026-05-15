@@ -1871,13 +1871,13 @@ except Exception as e:
 EVOLUTION_FILE = "group_evolution_history.csv"
 
 GROUPS_TO_TRACK = [
-    "🚀 GÀ TĂNG TỐC",
-    "💪 CP MẠNH",
-    "🔥 MUA BREAK",
-    "🎯 PULL ĐẸP",
-    "🟡 PULL VỪA",
-    "🐣 MUA EARLY",
-    "📦 TÍCH LŨY"
+    "GÀ TĂNG TỐC",
+    "CP MẠNH",
+    "MUA BREAK",
+    "PULL ĐẸP",
+    "PULL VỪA",
+    "MUA EARLY",
+    "TÍCH LŨY"
 ]
 
 today_str = datetime.now().strftime("%Y-%m-%d")
