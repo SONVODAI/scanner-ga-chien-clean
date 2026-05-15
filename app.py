@@ -1426,9 +1426,10 @@ DISPLAY_COLUMNS = [
 ]
 
 
-def show_group_table(df: pd.DataFrame, group_name: str):
+def show_group_table(df: pd.DataFrame, group_name: str, return_df=False):
     sub = df[df["group"] == group_name].copy()
-
+    if return_df:
+        return sub
     if sub.empty:
         st.info("Không có mã")
         return
