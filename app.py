@@ -1887,9 +1887,12 @@ evolution_rows = []
 for group_name in GROUPS_TO_TRACK:
 
     try:
-        temp_df = show_group_table(scan_df, group_name, return_df=True)
 
-        if temp_df is not None and len(temp_df) > 0:
+        temp_df = scan_df[
+            scan_df["group"] == group_name
+        ].copy()
+
+        if len(temp_df) > 0:
 
             for _, r in temp_df.iterrows():
 
@@ -1901,7 +1904,6 @@ for group_name in GROUPS_TO_TRACK:
 
     except:
         pass
-
 evo_today_df = pd.DataFrame(evolution_rows)
 
 # LOAD FILE CŨ
