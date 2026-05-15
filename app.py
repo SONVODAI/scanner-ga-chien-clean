@@ -1884,7 +1884,7 @@ today_str = datetime.now().strftime("%Y-%m-%d")
 
 evolution_rows = []
 
-evo_today_df = pd.DataFrame(evolution_rows)
+
 GROUP_MAP = {
     "GÀ TĂNG TỐC": ga_tang_toc_df,
     "CP MẠNH": cp_manh_df,
@@ -1911,6 +1911,8 @@ for group_name, temp_df in GROUP_MAP.items():
 
     except:
         pass
+
+evo_today_df = pd.DataFrame(evolution_rows)
 # LOAD FILE CŨ
 if os.path.exists(EVOLUTION_FILE):
 
@@ -1959,4 +1961,8 @@ try:
 except Exception as e:
 
     st.warning(f"Lỗi evolution tracker: {e}")
+
+
+
+    
     st.error(f"Lỗi similarity engine: {e}")
