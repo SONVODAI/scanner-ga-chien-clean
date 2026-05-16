@@ -1915,23 +1915,20 @@ else:
 st.markdown("---")
 st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU")
 
-try:
+latest_days = sorted(full_df["date"].unique())[-5:]
 
-    latest_days = sorted(full_df["date"].unique())[-5:]
+recent_df = full_df[
+    full_df["date"].isin(latest_days)
+]
 
-    recent_df = full_df[
-        full_df["date"].isin(latest_days)
-    ]
-
-    pivot_df = recent_df.pivot_table(
-        index="symbol",
-        columns="date",
-        values="group",
-        aggfunc="first"
-    )
+pivot_df = recent_df.pivot_table(
+    index="symbol",
+    columns="date",
+    values="group",
+    aggfunc="first"
+)
 
 def color_group(val):
-
     if pd.isna(val):
         return ""
 
@@ -1946,9 +1943,7 @@ def color_group(val):
     }
 
     color = color_map.get(val, "#ffffff")
-
     return f"background-color: {color}; color: black"
-
 
 styled_df = pivot_df.style.map(color_group)
 
