@@ -1881,9 +1881,41 @@ GROUPS_TO_TRACK = [
 ]
 
 today_str = datetime.now().strftime("%Y-%m-%d")
+# =========================================
+# VNINDEX GROUP CLASSIFICATION
+# =========================================
 
+def classify_vnindex(prediction):
+
+    confidence = prediction.get("confidence", 0)
+
+    regime = prediction.get("regime", "")
+
+    nav = prediction.get("nav", "")
+
+    if confidence >= 70 and "BULL" in regime.upper():
+        return "GÀ TĂNG TỐC"
+
+    elif confidence >= 60 and "BULL" in regime.upper():
+        return "CP MẠNH"
+
+    elif confidence >= 55:
+        return "MUA EARLY"
+
+    elif confidence >= 45:
+        return "TÍCH LŨY"
+
+    else:
+        return "THEO DÕI"
 evolution_rows = []
+# THÊM VNINDEX
+vnindex_group = classify_vnindex(prediction)
 
+evolution_rows.append({
+    "date": today_str,
+    "symbol": "VNINDEX",
+    "group": vnindex_group
+})
 
 for _, r in scan_df.iterrows():
 
