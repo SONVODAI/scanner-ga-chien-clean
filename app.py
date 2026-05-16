@@ -1931,14 +1931,15 @@ try:
     )
 
     # =========================
+# =========================
 # COLOR MAP
 # =========================
 
 def color_group(val):
 
     if pd.isna(val):
-            return ""
-    
+        return ""
+
     color_map = {
 
         "GÀ TĂNG TỐC": "#00cc66",
@@ -1963,8 +1964,6 @@ st.dataframe(
     use_container_width=True,
     height=600
 )
-    
-
 # SAVE
 full_df.to_csv(EVOLUTION_FILE, index=False)
     
