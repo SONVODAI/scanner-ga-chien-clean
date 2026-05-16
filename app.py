@@ -1930,40 +1930,37 @@ try:
         aggfunc="first"
     )
 
-    # =========================
+# =========================
 # =========================
 # COLOR MAP
 # =========================
 
 def color_group(val):
 
-    if pd.isna(val):
-        return ""
+        if pd.isna(val):
+            return ""
 
-    color_map = {
+        color_map = {
+            "GÀ TĂNG TỐC": "#00cc66",
+            "CP MẠNH": "#66ff99",
+            "MUA BREAK": "#99ffcc",
+            "PULL ĐẸP": "#ffe066",
+            "PULL VỪA": "#fff299",
+            "MUA EARLY": "#99ccff",
+            "TÍCH LŨY": "#d9d9d9"
+        }
 
-        "GÀ TĂNG TỐC": "#00cc66",
-        "CP MẠNH": "#66ff99",
-        "MUA BREAK": "#99ffcc",
-        "PULL ĐẸP": "#ffe066",
-        "PULL VỪA": "#fff299",
-        "MUA EARLY": "#99ccff",
-        "TÍCH LŨY": "#d9d9d9"
+        color = color_map.get(val, "#ffffff")
 
-    }
+        return f"background-color: {color}; color: black"
 
-    color = color_map.get(val, "#ffffff")
+    styled_df = pivot_df.style.map(color_group)
 
-    return f"background-color: {color}; color: black"
-
-
-styled_df = pivot_df.style.map(color_group)
-
-st.dataframe(
-    styled_df,
-    use_container_width=True,
-    height=600
-)
+    st.dataframe(
+        styled_df,
+        use_container_width=True,
+        height=600
+    )
 # SAVE
 full_df.to_csv(EVOLUTION_FILE, index=False)
     
