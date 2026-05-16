@@ -1963,9 +1963,6 @@ def color_group(val):
     use_container_width=True,
     height=600
 )
-except Exception as e:
-
-    st.warning(f"Lỗi evolution tracker: {e}")
     
 
 # SAVE
