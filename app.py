@@ -1853,6 +1853,13 @@ try:
 
     st.success("Đã chạy similarity engine thành công")
 # =========================================
+col1, col2, col3 = st.columns(3)
+
+col1.metric("REGIME", prediction["regime"])
+col2.metric("NAV GỢI Ý", prediction["nav"])
+col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
+
+# =========================================
 # VNINDEX EVOLUTION STATUS
 # =========================================
 
@@ -1876,17 +1883,13 @@ else:
     status_icon = "↓"
 
 st.info(f"VNINDEX {status_icon} | {vnindex_status}")
-    col1, col2, col3 = st.columns(3)
 
-    col1.metric("REGIME", prediction["regime"])
-    col2.metric("NAV GỢI Ý", prediction["nav"])
-    col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
+st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
+st.dataframe(similar_df)
 
-    st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
-    st.dataframe(similar_df)
 except Exception as e:
-        st.error(e)
-    # =====================================================
+    st.error(e)    
+# =====================================================
 # 🧬 STOCK GROUP EVOLUTION TRACKER - V1
 # Theo dõi cổ phiếu chuyển nhóm theo ngày
 # =====================================================
