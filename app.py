@@ -1934,7 +1934,7 @@ try:
 # COLOR MAP
 # =========================
 
-def color_group(val):
+    def color_group(val):
 
     if pd.isna(val):
         return ""
