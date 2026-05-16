@@ -68,6 +68,7 @@ def calc_market_forecast(df: pd.DataFrame):
 # khuyến nghị mua, bảng gà tăng tốc, quản trị danh mục.
 # =========================================================
 import time
+import os
 from datetime import datetime
 
 import numpy as np
@@ -1425,9 +1426,10 @@ DISPLAY_COLUMNS = [
 ]
 
 
-def show_group_table(df: pd.DataFrame, group_name: str):
+def show_group_table(df: pd.DataFrame, group_name: str, return_df=False):
     sub = df[df["group"] == group_name].copy()
-
+    if return_df:
+        return sub
     if sub.empty:
         st.info("Không có mã")
         return
@@ -1859,6 +1861,86 @@ try:
 
     st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
     st.dataframe(similar_df)
+except Exception as e:
+        st.error(e)
+    # =====================================================
+# 🧬 STOCK GROUP EVOLUTION TRACKER - V1
+# Theo dõi cổ phiếu chuyển nhóm theo ngày
+# =====================================================
+
+EVOLUTION_FILE = "group_evolution_history.csv"
+
+GROUPS_TO_TRACK = [
+    "GÀ TĂNG TỐC",
+    "CP MẠNH",
+    "MUA BREAK",
+    "PULL ĐẸP",
+    "PULL VỪA",
+    "MUA EARLY",
+    "TÍCH LŨY"
+]
+
+today_str = datetime.now().strftime("%Y-%m-%d")
+
+evolution_rows = []
+
+
+for _, r in scan_df.iterrows():
+
+    if pd.notna(r["group"]):
+
+        evolution_rows.append({
+            "date": today_str,
+            "symbol": r["symbol"],
+            "group": r["group"]
+        })
+evo_today_df = pd.DataFrame(evolution_rows)
+# LOAD FILE CŨ
+if os.path.exists(EVOLUTION_FILE):
+
+    old_df = pd.read_csv(EVOLUTION_FILE)
+
+    full_df = pd.concat([old_df, evo_today_df], ignore_index=True)
+
+    full_df = full_df.drop_duplicates(
+        subset=["date", "symbol", "group"]
+    )
+
+else:
+    full_df = evo_today_df.copy()
+# =====================================================
+# HIỂN THỊ TIẾN HÓA 5 NGÀY
+# =====================================================
+
+st.markdown("---")
+st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU")
+
+try:
+
+    latest_days = sorted(full_df["date"].unique())[-5:]
+
+    recent_df = full_df[
+        full_df["date"].isin(latest_days)
+    ]
+
+    pivot_df = recent_df.pivot_table(
+        index="symbol",
+        columns="date",
+        values="group",
+        aggfunc="first"
+    )
+
+    st.dataframe(
+        pivot_df,
+        use_container_width=True,
+        height=500
+    )
 
 except Exception as e:
+
+    st.warning(f"Lỗi evolution tracker: {e}")
     st.error(f"Lỗi similarity engine: {e}")
+
+# SAVE
+full_df.to_csv(EVOLUTION_FILE, index=False)
+    
