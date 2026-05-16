@@ -1956,9 +1956,9 @@ try:
     return f"background-color: {color}; color: black"
 
 
-styled_df = pivot_df.style.map(color_group)
+    styled_df = pivot_df.style.map(color_group)
 
-st.dataframe(
+    st.dataframe(
     styled_df,
     use_container_width=True,
     height=600
@@ -1966,7 +1966,7 @@ st.dataframe(
 except Exception as e:
 
     st.warning(f"Lỗi evolution tracker: {e}")
-    st.error(f"Lỗi similarity engine: {e}")
+    
 
 # SAVE
 full_df.to_csv(EVOLUTION_FILE, index=False)
