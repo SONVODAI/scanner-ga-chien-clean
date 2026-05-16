@@ -1956,9 +1956,9 @@ def color_group(val):
     return f"background-color: {color}; color: black"
 
 
-    styled_df = pivot_df.style.map(color_group)
+styled_df = pivot_df.style.map(color_group)
 
-    st.dataframe(
+st.dataframe(
     styled_df,
     use_container_width=True,
     height=600
