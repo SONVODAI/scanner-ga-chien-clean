@@ -1936,10 +1936,10 @@ try:
 
     def color_group(val):
 
-    if pd.isna(val):
-        return ""
-
-    color_map = {
+        if pd.isna(val):
+            return ""
+    
+        color_map = {
 
         "GÀ TĂNG TỐC": "#00cc66",
         "CP MẠNH": "#66ff99",
