@@ -1851,42 +1851,42 @@ try:
 
     prediction = generate_market_prediction(similar_df)
 
-    st.success("Đã chạy similarity engine thành công")
-# =========================================
-col1, col2, col3 = st.columns(3)
+st.success("Đã chạy similarity engine thành công")
+    # =========================================
+    col1, col2, col3 = st.columns(3)
+    
+    col1.metric("REGIME", prediction["regime"])
+    col2.metric("NAV GỢI Ý", prediction["nav"])
+    col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
+    
+    # =========================================
+    # VNINDEX EVOLUTION STATUS
+    # =========================================
 
-col1.metric("REGIME", prediction["regime"])
-col2.metric("NAV GỢI Ý", prediction["nav"])
-col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
-
-# =========================================
-# VNINDEX EVOLUTION STATUS
-# =========================================
-
-vnindex_status = classify_vnindex(prediction)
-
-status_icon = "→"
-
-if vnindex_status == "GÀ TĂNG TỐC":
-    status_icon = "🔥 ↑"
-
-elif vnindex_status == "CP MẠNH":
-    status_icon = "↑"
-
-elif vnindex_status == "MUA EARLY":
-    status_icon = "🟦"
-
-elif vnindex_status == "TÍCH LŨY":
-    status_icon = "🟨"
-
-else:
-    status_icon = "↓"
-
-st.info(f"VNINDEX {status_icon} | {vnindex_status}")
-
-st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
-st.dataframe(similar_df)
-
+    vnindex_status = classify_vnindex(prediction)
+    
+    status_icon = "→"
+    
+    if vnindex_status == "GÀ TĂNG TỐC":
+        status_icon = "🔥 ↑"
+    
+    elif vnindex_status == "CP MẠNH":
+        status_icon = "↑"
+    
+    elif vnindex_status == "MUA EARLY":
+        status_icon = "🟦"
+    
+    elif vnindex_status == "TÍCH LŨY":
+        status_icon = "🟨"
+    
+    else:
+        status_icon = "↓"
+    
+    st.info(f"VNINDEX {status_icon} | {vnindex_status}")
+    
+    st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
+    st.dataframe(similar_df)
+    
 except Exception as e:
     st.error(e)    
 # =====================================================
