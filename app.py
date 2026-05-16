@@ -1852,7 +1852,30 @@ try:
     prediction = generate_market_prediction(similar_df)
 
     st.success("Đã chạy similarity engine thành công")
+# =========================================
+# VNINDEX EVOLUTION STATUS
+# =========================================
 
+vnindex_status = classify_vnindex(prediction)
+
+status_icon = "→"
+
+if vnindex_status == "GÀ TĂNG TỐC":
+    status_icon = "🔥 ↑"
+
+elif vnindex_status == "CP MẠNH":
+    status_icon = "↑"
+
+elif vnindex_status == "MUA EARLY":
+    status_icon = "🟦"
+
+elif vnindex_status == "TÍCH LŨY":
+    status_icon = "🟨"
+
+else:
+    status_icon = "↓"
+
+st.info(f"VNINDEX {status_icon} | {vnindex_status}")
     col1, col2, col3 = st.columns(3)
 
     col1.metric("REGIME", prediction["regime"])
