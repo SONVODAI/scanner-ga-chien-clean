@@ -1930,12 +1930,39 @@ try:
         aggfunc="first"
     )
 
-    st.dataframe(
-        pivot_df,
-        use_container_width=True,
-        height=500
-    )
+    # =========================
+# COLOR MAP
+# =========================
 
+def color_group(val):
+
+    if pd.isna(val):
+        return ""
+
+    color_map = {
+
+        "GÀ TĂNG TỐC": "#00cc66",
+        "CP MẠNH": "#66ff99",
+        "MUA BREAK": "#99ffcc",
+        "PULL ĐẸP": "#ffe066",
+        "PULL VỪA": "#fff299",
+        "MUA EARLY": "#99ccff",
+        "TÍCH LŨY": "#d9d9d9"
+
+    }
+
+    color = color_map.get(val, "#ffffff")
+
+    return f"background-color: {color}; color: black"
+
+
+styled_df = pivot_df.style.map(color_group)
+
+st.dataframe(
+    styled_df,
+    use_container_width=True,
+    height=600
+)
 except Exception as e:
 
     st.warning(f"Lỗi evolution tracker: {e}")
