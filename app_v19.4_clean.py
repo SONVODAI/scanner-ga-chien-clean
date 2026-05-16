@@ -1915,32 +1915,40 @@ else:
 st.markdown("---")
 st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU")
 
-try:
+latest_days = sorted(full_df["date"].unique())[-5:]
 
-    latest_days = sorted(full_df["date"].unique())[-5:]
+recent_df = full_df[
+    full_df["date"].isin(latest_days)
+]
 
-    recent_df = full_df[
-        full_df["date"].isin(latest_days)
-    ]
+pivot_df = recent_df.pivot_table(
+    index="symbol",
+    columns="date",
+    values="group",
+    aggfunc="first"
+)
 
-    pivot_df = recent_df.pivot_table(
-        index="symbol",
-        columns="date",
-        values="group",
-        aggfunc="first"
-    )
+def color_group(val):
+    if pd.isna(val):
+        return ""
 
-    st.dataframe(
-        pivot_df,
-        use_container_width=True,
-        height=500
-    )
+    color_map = {
+        "GÀ TĂNG TỐC": "#00cc66",
+        "CP MẠNH": "#66ff99",
+        "MUA BREAK": "#99ffcc",
+        "PULL ĐẸP": "#ffe066",
+        "PULL VỪA": "#fff299",
+        "MUA EARLY": "#99ccff",
+        "TÍCH LŨY": "#d9d9d9"
+    }
 
-except Exception as e:
+    color = color_map.get(val, "#ffffff")
+    return f"background-color: {color}; color: black"
 
-    st.warning(f"Lỗi evolution tracker: {e}")
-    st.error(f"Lỗi similarity engine: {e}")
+styled_df = pivot_df.style.map(color_group)
 
-# SAVE
-full_df.to_csv(EVOLUTION_FILE, index=False)
-    
+st.dataframe(
+    styled_df,
+    use_container_width=True,
+    height=600
+)
