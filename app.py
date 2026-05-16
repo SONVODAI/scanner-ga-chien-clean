@@ -1944,7 +1944,48 @@ def color_group(val):
 
     color = color_map.get(val, "#ffffff")
     return f"background-color: {color}; color: black"
+# =========================
+# TIẾN HÓA ↑ ↓ →
+# =========================
 
+status_rank = {
+    "THEO DÕI": 0,
+    "TÍCH LŨY": 1,
+    "MUA EARLY": 2,
+    "PULL VỪA": 3,
+    "PULL ĐẸP": 4,
+    "CP MẠNH": 5,
+    "GÀ TĂNG TỐC": 6
+}
+
+if len(latest_days) >= 2:
+
+    today_col = latest_days[-1]
+    prev_col = latest_days[-2]
+
+    pivot_df["TIẾN HÓA"] = ""
+
+    for idx in pivot_df.index:
+
+        today_val = pivot_df.loc[idx, today_col]
+        prev_val = pivot_df.loc[idx, prev_col]
+
+        today_rank = status_rank.get(today_val, 0)
+        prev_rank = status_rank.get(prev_val, 0)
+
+        if today_rank > prev_rank:
+
+            if today_val == "GÀ TĂNG TỐC":
+                pivot_df.loc[idx, "TIẾN HÓA"] = "🔥 ↑"
+
+            else:
+                pivot_df.loc[idx, "TIẾN HÓA"] = "↑"
+
+        elif today_rank < prev_rank:
+            pivot_df.loc[idx, "TIẾN HÓA"] = "↓"
+
+        else:
+            pivot_df.loc[idx, "TIẾN HÓA"] = "→"
 styled_df = pivot_df.style.map(color_group)
 
 st.dataframe(
