@@ -1820,6 +1820,32 @@ st.subheader("🔮 DỰ BÁO THỊ TRƯỜNG - MARKET ANALOG V1")
 # =========================================
 # LOAD VNINDEX DATA
 # =========================================
+# =========================================
+# VNINDEX GROUP CLASSIFICATION
+# =========================================
+
+def classify_vnindex(prediction):
+
+    confidence = prediction.get("confidence", 0)
+
+    regime = prediction.get("regime", "")
+
+    nav = prediction.get("nav", "")
+
+    if confidence >= 70 and "BULL" in regime.upper():
+        return "GÀ TĂNG TỐC"
+
+    elif confidence >= 60 and "BULL" in regime.upper():
+        return "CP MẠNH"
+
+    elif confidence >= 55:
+        return "MUA EARLY"
+
+    elif confidence >= 45:
+        return "TÍCH LŨY"
+
+    else:
+        return "THEO DÕI"    
 try:
     vnindex = pd.read_csv("vnindex_history.csv")
 
@@ -1852,18 +1878,44 @@ try:
     prediction = generate_market_prediction(similar_df)
 
     st.success("Đã chạy similarity engine thành công")
-
+    # =========================================
     col1, col2, col3 = st.columns(3)
-
+    
     col1.metric("REGIME", prediction["regime"])
     col2.metric("NAV GỢI Ý", prediction["nav"])
     col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
+    
+    # =========================================
+    # VNINDEX EVOLUTION STATUS
+    # =========================================
 
+    vnindex_status = classify_vnindex(prediction)
+    
+    status_icon = "→"
+    
+    if vnindex_status == "GÀ TĂNG TỐC":
+        status_icon = "🔥 ↑"
+    
+    elif vnindex_status == "CP MẠNH":
+        status_icon = "↑"
+    
+    elif vnindex_status == "MUA EARLY":
+        status_icon = "🟦"
+    
+    elif vnindex_status == "TÍCH LŨY":
+        status_icon = "🟨"
+    
+    else:
+        status_icon = "↓"
+    
+    st.info(f"VNINDEX {status_icon} | {vnindex_status}")
+    
     st.write("### TOP ĐOẠN LỊCH SỬ GIỐNG NHẤT")
     st.dataframe(similar_df)
+    
 except Exception as e:
-        st.error(e)
-    # =====================================================
+    st.error(e)    
+# =====================================================
 # 🧬 STOCK GROUP EVOLUTION TRACKER - V1
 # Theo dõi cổ phiếu chuyển nhóm theo ngày
 # =====================================================
@@ -1881,9 +1933,15 @@ GROUPS_TO_TRACK = [
 ]
 
 today_str = datetime.now().strftime("%Y-%m-%d")
-
 evolution_rows = []
+# THÊM VNINDEX
+vnindex_group = classify_vnindex(prediction)
 
+evolution_rows.append({
+    "date": today_str,
+    "symbol": "VNINDEX",
+    "group": vnindex_group
+})
 
 for _, r in scan_df.iterrows():
 
