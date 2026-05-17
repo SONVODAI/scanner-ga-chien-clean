@@ -2010,7 +2010,7 @@ def build_evolution_leaders(evo_df):
             
             vol_status = "⚪"
 
-if not sub_scan.empty:
+    if not sub_scan.empty:
 
     scan_row = sub_scan.iloc[0]
 
