@@ -696,7 +696,7 @@ def classify_group(row: dict) -> str:
     ):
         return "GÀ TĂNG TỐC"
 
-    if pull_label == "PULL ĐẸP":
+if pull_label == "PULL ĐẸP":
     return "PULL ĐẸP"
 
 if pull_label == "PULL VỪA":
