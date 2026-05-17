@@ -732,7 +732,7 @@ def classify_group(row: dict) -> str:
         ):
             return "CP MẠNH"
 
-        return "MUA EARLY"
+    return "MUA EARLY"
 
 
 # =========================================================
