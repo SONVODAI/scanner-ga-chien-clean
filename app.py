@@ -2152,13 +2152,13 @@ st.dataframe(
     height=350
 )
 
-    csv = out.to_csv(index=False).encode("utf-8-sig")
+csv = out.to_csv(index=False).encode("utf-8-sig")
 
-    st.download_button(
-        "📥 Download Evolution Leaders CSV",
-        csv,
-        file_name="evolution_leaders.csv",
-        mime="text/csv"
+st.download_button(
+    "📥 Download Evolution Leaders CSV",
+    csv,
+    file_name="evolution_leaders.csv",
+    mime="text/csv"
     )
 # =====================================================
 # HIỂN THỊ TIẾN HÓA 5 NGÀY
