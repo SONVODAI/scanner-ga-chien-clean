@@ -2140,17 +2140,17 @@ else:
     "volume_status",
     "current_group",
 ]
-    out = evolution_leaders_df[
-        show_cols
-    ].copy()
+out = evolution_leaders_df[
+    show_cols
+].copy()
 
-    out.index = range(len(out))
+out.index = range(len(out))
 
-    st.dataframe(
-        out,
-        use_container_width=True,
-        height=350
-    )
+st.dataframe(
+    out,
+    use_container_width=True,
+    height=350
+)
 
     csv = out.to_csv(index=False).encode("utf-8-sig")
 
