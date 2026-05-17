@@ -2001,39 +2001,39 @@ def build_evolution_leaders(evo_df):
                 evolution_text = " → ".join(last_groups)
 
                 # =========================
-    # VOLUME STATUS
-    # =========================
-    
-            sub_scan = scan_df[
-            scan_df["symbol"] == symbol
-            ]
-            
-            vol_status = "⚪"
-
-        if not sub_scan.empty:
-    
-            scan_row = sub_scan.iloc[0]
+        # VOLUME STATUS
+        # =========================
         
-            vol_now = scan_row.get("volume", np.nan)
-            vol_ma20 = scan_row.get("vol_ma20", np.nan)
-
-if pd.notna(vol_now) and pd.notna(vol_ma20):
-
-            ratio = vol_now / vol_ma20
+                sub_scan = scan_df[
+                scan_df["symbol"] == symbol
+                ]
+                
+                vol_status = "⚪"
     
-            if ratio >= 1.5:
-                vol_status = "🔥 VOL BREAK"
+            if not sub_scan.empty:
+        
+                scan_row = sub_scan.iloc[0]
+            
+                vol_now = scan_row.get("volume", np.nan)
+                vol_ma20 = scan_row.get("vol_ma20", np.nan)
     
-            elif ratio >= 1.0:
-                vol_status = "🟢 VOL OK"
+    if pd.notna(vol_now) and pd.notna(vol_ma20):
     
-            elif ratio >= 0.7:
-                vol_status = "🟡 VOL TB"
-
-        else:
-            vol_status = "🔴 VOL YẾU"
-
-leaders.append({
+                ratio = vol_now / vol_ma20
+        
+                if ratio >= 1.5:
+                    vol_status = "🔥 VOL BREAK"
+        
+                elif ratio >= 1.0:
+                    vol_status = "🟢 VOL OK"
+        
+                elif ratio >= 0.7:
+                    vol_status = "🟡 VOL TB"
+    
+            else:
+                vol_status = "🔴 VOL YẾU"
+    
+    leaders.append({
 
     "symbol": symbol,
     "evolution": evolution_text,
