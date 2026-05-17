@@ -2132,30 +2132,30 @@ if evolution_leaders_df.empty:
     st.info("Chưa có CP tiến hóa mạnh liên tục")
 
 else:
-    show_cols = [
-        "symbol",
-        "evolution",
-        "days_up",
-        "speed",
-        "volume_status",
-        "current_group",
-]
-out = evolution_leaders_df[
-    show_cols
-].copy()
-
-out.index = range(len(out))
-
-st.dataframe(
-    out,
-    use_container_width=True,
-    height=350
-)
-
-csv = out.to_csv(index=False).encode("utf-8-sig")
-
-st.download_button(
-    "📥 Download Evolution Leaders CSV",
+        show_cols = [
+            "symbol",
+            "evolution",
+            "days_up",
+            "speed",
+            "volume_status",
+            "current_group",
+    ]
+    out = evolution_leaders_df[
+        show_cols
+    ].copy()
+    
+    out.index = range(len(out))
+    
+    st.dataframe(
+        out,
+        use_container_width=True,
+        height=350
+    )
+    
+    csv = out.to_csv(index=False).encode("utf-8-sig")
+    
+    st.download_button(
+        "📥 Download Evolution Leaders CSV",
     csv,
     file_name="evolution_leaders.csv",
     mime="text/csv"
