@@ -696,13 +696,20 @@ def classify_group(row: dict) -> str:
     ):
         return "GÀ TĂNG TỐC"
 
-    if not leader:
-        if total <= 1:
-            return "THEO DÕI"
-        if total == 2:
-            return "TÍCH LŨY"
-        return "MUA EARLY"
+    if pull_label == "PULL ĐẸP":
+    return "PULL ĐẸP"
 
+if pull_label == "PULL VỪA":
+    return "PULL VỪA"
+
+if not leader:
+    if total <= 1:
+        return "THEO DÕI"
+
+    if total == 2:
+        return "TÍCH LŨY"
+
+    return "MUA EARLY"
     if pull_label == "PULL ĐẸP" and pd.notna(price) and pd.notna(ma20_) and price >= ma20_:
         return "PULL ĐẸP"
 
