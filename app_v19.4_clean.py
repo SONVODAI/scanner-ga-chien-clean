@@ -695,40 +695,42 @@ def classify_group(row: dict) -> str:
         and o >= 1
     ):
         return "GÀ TĂNG TỐC"
-
+    
+    if pull_label == "PULL ĐẸP":
+        return "PULL ĐẸP"
+    
+    if pull_label == "PULL VỪA":
+        return "PULL VỪA"
+    
     if not leader:
         if total <= 1:
             return "THEO DÕI"
+    
         if total == 2:
             return "TÍCH LŨY"
+    
         return "MUA EARLY"
-
-    if pull_label == "PULL ĐẸP" and pd.notna(price) and pd.notna(ma20_) and price >= ma20_:
-        return "PULL ĐẸP"
-
-    if pull_label == "PULL VỪA" and pd.notna(price) and pd.notna(ma20_) and price >= ma20_:
-        return "PULL VỪA"
-
+   
     if (
-        pd.notna(breakout_ref)
-        and pd.notna(price)
-        and pd.notna(vol_)
-        and pd.notna(vol_ma20_)
-        and price >= breakout_ref * 1.01
-        and vol_ >= vol_ma20_ * 1.2
-        and r >= 1
-        and o >= 1
-    ):
-        return "MUA BREAK"
-
+            pd.notna(breakout_ref)
+            and pd.notna(price)
+            and pd.notna(vol_)
+            and pd.notna(vol_ma20_)
+            and price >= breakout_ref * 1.01
+            and vol_ >= vol_ma20_ * 1.2
+            and r >= 1
+            and o >= 1
+        ):
+            return "MUA BREAK"
+    
     if (
-        pd.notna(dist_from_ema9)
-        and dist_from_ema9 > 1.5
-        and e == 2
-        and r >= 1
-        and o >= 1
-    ):
-        return "CP MẠNH"
+            pd.notna(dist_from_ema9)
+            and dist_from_ema9 > 1.5
+            and e == 2
+            and r >= 1
+            and o >= 1
+        ):
+            return "CP MẠNH"
 
     return "MUA EARLY"
 
