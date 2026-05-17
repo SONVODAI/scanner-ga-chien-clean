@@ -368,7 +368,7 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
         ""
         )    
     
-        return x
+    return x
 # =========================================================
 # DRY-UP ENGINE
 # =========================================================
