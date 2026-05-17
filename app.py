@@ -711,26 +711,26 @@ def classify_group(row: dict) -> str:
     
         return "MUA EARLY"
    
-if (
-        pd.notna(breakout_ref)
-        and pd.notna(price)
-        and pd.notna(vol_)
-        and pd.notna(vol_ma20_)
-        and price >= breakout_ref * 1.01
-        and vol_ >= vol_ma20_ * 1.2
-        and r >= 1
-        and o >= 1
-    ):
-        return "MUA BREAK"
-
-if (
-        pd.notna(dist_from_ema9)
-        and dist_from_ema9 > 1.5
-        and e == 2
-        and r >= 1
-        and o >= 1
-    ):
-        return "CP MẠNH"
+    if (
+            pd.notna(breakout_ref)
+            and pd.notna(price)
+            and pd.notna(vol_)
+            and pd.notna(vol_ma20_)
+            and price >= breakout_ref * 1.01
+            and vol_ >= vol_ma20_ * 1.2
+            and r >= 1
+            and o >= 1
+        ):
+            return "MUA BREAK"
+    
+    if (
+            pd.notna(dist_from_ema9)
+            and dist_from_ema9 > 1.5
+            and e == 2
+            and r >= 1
+            and o >= 1
+        ):
+            return "CP MẠNH"
 
         return "MUA EARLY"
 
