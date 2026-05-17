@@ -2033,17 +2033,17 @@ def build_evolution_leaders(evo_df):
                     else:
                         vol_status = "🔴 VOL YẾU"
         
-    leaders.append({
-
-    "symbol": symbol,
-    "evolution": evolution_text,
-    "days_up": evolution_up,
-    "speed": speed,
-    "volume_status": vol_status,
-    "current_group": last_groups[-1],
-    "current_rank": last_ranks[-1],
-
-})
+                    leaders.append({
+                
+                    "symbol": symbol,
+                    "evolution": evolution_text,
+                    "days_up": evolution_up,
+                    "speed": speed,
+                    "volume_status": vol_status,
+                    "current_group": last_groups[-1],
+                    "current_rank": last_ranks[-1],
+            
+                    })
 
         # =========================
         # DataFrame
