@@ -326,49 +326,49 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
         (x["close"] / x["close"].shift(10)) - 1
     ) * 100
 
-# =====================================================
-# 🟢 GREEN 2 CONFIRM
-# =====================================================
-
-x["green_candle"] = x["close"] > x["open"]
-
-x["green_1"] = x["green_candle"].shift(1)
-x["green_2"] = x["green_candle"]
-
-# Volume tăng dần
-x["vol_up_confirm"] = (
-    x["volume"] > x["volume"].shift(1)
-)
-
-# RSI xác nhận
-x["rsi_confirm"] = (
-    (x["rsi14"] > 55)
-    & (x["rsi14"] > x["rsi14"].shift(1))
-)
-
-# OBV xác nhận
-x["obv_confirm"] = (
-    (x["obv"] > x["obv_ema9"])
-    & (x["obv"] > x["obv"].shift(1))
-)
-
-# GREEN 2 SIGNAL
-x["green_2_confirm"] = np.where(
-
-    (
-        x["green_1"]
-        & x["green_2"]
-        & x["vol_up_confirm"]
-        & x["rsi_confirm"]
-        & x["obv_confirm"]
-    ),
-
-    "🟢 GREEN 2",
-
-    ""
-    )    
-
-    return x
+    # =====================================================
+    # 🟢 GREEN 2 CONFIRM
+    # =====================================================
+    
+    x["green_candle"] = x["close"] > x["open"]
+    
+    x["green_1"] = x["green_candle"].shift(1)
+    x["green_2"] = x["green_candle"]
+    
+    # Volume tăng dần
+    x["vol_up_confirm"] = (
+        x["volume"] > x["volume"].shift(1)
+    )
+    
+    # RSI xác nhận
+    x["rsi_confirm"] = (
+        (x["rsi14"] > 55)
+        & (x["rsi14"] > x["rsi14"].shift(1))
+    )
+    
+    # OBV xác nhận
+    x["obv_confirm"] = (
+        (x["obv"] > x["obv_ema9"])
+        & (x["obv"] > x["obv"].shift(1))
+    )
+    
+    # GREEN 2 SIGNAL
+    x["green_2_confirm"] = np.where(
+    
+        (
+            x["green_1"]
+            & x["green_2"]
+            & x["vol_up_confirm"]
+            & x["rsi_confirm"]
+            & x["obv_confirm"]
+        ),
+    
+        "🟢 GREEN 2",
+    
+        ""
+        )    
+    
+        return x
 # =========================================================
 # DRY-UP ENGINE
 # =========================================================
