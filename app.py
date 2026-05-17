@@ -2019,16 +2019,16 @@ def build_evolution_leaders(evo_df):
 
     if pd.notna(vol_now) and pd.notna(vol_ma20):
 
-        ratio = vol_now / vol_ma20
-
-        if ratio >= 1.5:
-            vol_status = "🔥 VOL BREAK"
-
-        elif ratio >= 1.0:
-            vol_status = "🟢 VOL OK"
-
-        elif ratio >= 0.7:
-            vol_status = "🟡 VOL TB"
+            ratio = vol_now / vol_ma20
+    
+            if ratio >= 1.5:
+                vol_status = "🔥 VOL BREAK"
+    
+            elif ratio >= 1.0:
+                vol_status = "🟢 VOL OK"
+    
+            elif ratio >= 0.7:
+                vol_status = "🟡 VOL TB"
 
         else:
             vol_status = "🔴 VOL YẾU"
