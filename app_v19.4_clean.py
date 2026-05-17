@@ -325,6 +325,49 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["rs10"] = (
         (x["close"] / x["close"].shift(10)) - 1
     ) * 100
+
+    # =====================================================
+    # 🟢 GREEN 2 CONFIRM
+    # =====================================================
+    
+    x["green_candle"] = x["close"] > x["open"]
+    
+    x["green_1"] = x["green_candle"].shift(1)
+    x["green_2"] = x["green_candle"]
+    
+    # Volume tăng dần
+    x["vol_up_confirm"] = (
+        x["volume"] > x["volume"].shift(1)
+    )
+    
+    # RSI xác nhận
+    x["rsi_confirm"] = (
+        (x["rsi14"] > 55)
+        & (x["rsi14"] > x["rsi14"].shift(1))
+    )
+    
+    # OBV xác nhận
+    x["obv_confirm"] = (
+        (x["obv"] > x["obv_ema9"])
+        & (x["obv"] > x["obv"].shift(1))
+    )
+    
+    # GREEN 2 SIGNAL
+    x["green_2_confirm"] = np.where(
+    
+        (
+            x["green_1"]
+            & x["green_2"]
+            & x["vol_up_confirm"]
+            & x["rsi_confirm"]
+            & x["obv_confirm"]
+        ),
+    
+        "🟢 GREEN 2",
+    
+        ""
+        )    
+    
     return x
 # =========================================================
 # DRY-UP ENGINE
@@ -788,7 +831,7 @@ def analyze_symbol(symbol: str) -> dict | None:
 
         "rs5": safe_round(rs5_, 2),
         "rs10": safe_round(rs10_, 2),
-
+        "green_2_confirm": last["green_2_confirm"],
         "total_score": total_score,    
     }
    
@@ -1368,7 +1411,7 @@ buy_table = scan_df[scan_df["Đèn"].isin(["🟢", "🟡"])].copy()
 buy_cols_show = [
     "symbol", "group", "price", "total_score",
     "ema9_ma20_slope", "slope_state",
-    "rsi14", "obv_status", "dist_from_ema9_pct",
+    "rsi14", "obv_status", "green_2_confirm", "dist_from_ema9_pct",
     "Đèn", "Khuyến nghị", "Vùng mua", "NAV gợi ý", "Lý do"
 ]
 
