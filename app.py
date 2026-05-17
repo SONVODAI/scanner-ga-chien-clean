@@ -1847,7 +1847,7 @@ def classify_vnindex(prediction):
     else:
         return "THEO DÕI"    
 try:
-    vnindex = pd.read_csv("vnindex_.csv")
+    vnindex = pd.read_csv("vnindex_history.csv")
 
     vnindex["Date"] = pd.to_datetime(
         vnindex["Date"],
