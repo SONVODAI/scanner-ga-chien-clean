@@ -1920,8 +1920,157 @@ except Exception as e:
 # Theo dõi cổ phiếu chuyển nhóm theo ngày
 # =====================================================
 
-EVOLUTION_FILE = "group_evolution_history.csv"
+EVOLUTION_FILE = "group_evolution_.csv"
+# =====================================================
+# 🧬 EVOLUTION LEADERS ENGINE
+# Tách riêng các CP tiến hoá tốt liên tục
+# =====================================================
 
+GROUP_RANK = {
+    "THEO DÕI": 0,
+    "TÍCH LŨY": 1,
+    "MUA EARLY": 2,
+    "PULL VỪA": 3,
+    "PULL ĐẸP": 4,
+    "MUA BREAK": 5,
+    "CP MẠNH": 6,
+    "GÀ TĂNG TỐC": 7,
+}
+
+
+def build_evolution_leaders(evo_df):
+
+    if evo_df.empty:
+        return pd.DataFrame()
+
+    try:
+
+        # =========================
+        # Pivot data
+        # =========================
+        pivot = evo_df.pivot_table(
+            index="symbol",
+            columns="date",
+            values="group",
+            aggfunc="first"
+        )
+
+        pivot = pivot.sort_index(axis=1)
+
+        leaders = []
+
+        # =========================
+        # Loop từng CP
+        # =========================
+        for symbol in pivot.index:
+
+            row = pivot.loc[symbol].dropna()
+
+            if len(row) < 3:
+                continue
+
+            groups = row.values.tolist()
+
+            ranks = [
+                GROUP_RANK.get(g, 0)
+                for g in groups
+            ]
+
+            # =========================
+            # Chỉ lấy 3 phiên cuối
+            # =========================
+            last_groups = groups[-3:]
+            last_ranks = ranks[-3:]
+
+            evolution_up = 0
+
+            for i in range(1, len(last_ranks)):
+                if last_ranks[i] > last_ranks[i - 1]:
+                    evolution_up += 1
+
+            # =========================
+            # Chỉ lấy CP tăng >= 2 lần
+            # =========================
+            if evolution_up >= 2:
+
+                speed = (
+                    last_ranks[-1]
+                    - last_ranks[0]
+                )
+
+                evolution_text = " → ".join(last_groups)
+
+                # =========================
+       # =========================
+# VOLUME STATUS
+# =========================
+
+                sub_scan = scan_df[
+                    scan_df["symbol"] == symbol
+                ]
+
+                vol_status = "⚪ N/A"
+
+                if not sub_scan.empty:
+
+                    scan_row = sub_scan.iloc[0]
+
+                    vol_now = scan_row.get("volume", np.nan)
+                    vol_ma20 = scan_row.get("vol_ma20", np.nan)
+
+                    if (
+                        pd.notna(vol_now)
+                        and pd.notna(vol_ma20)
+                        and vol_ma20 > 0
+                    ):
+
+                        ratio = vol_now / vol_ma20
+
+                        if ratio >= 1.5:
+                            vol_status = "🔥 VOL BREAK"
+
+                        elif ratio >= 1.0:
+                            vol_status = "🟢 VOL OK"
+
+                        elif ratio >= 0.7:
+                            vol_status = "🟡 VOL TB"
+
+                        else:
+                            vol_status = "🔴 VOL YẾU"
+
+                leaders.append({
+
+                    "symbol": symbol,
+                    "evolution": evolution_text,
+                    "days_up": evolution_up,
+                    "speed": speed,
+                    "volume_status": vol_status,
+                    "current_group": last_groups[-1],
+                    "current_rank": last_ranks[-1],
+
+                })
+        # =========================
+        # DataFrame
+        # =========================
+        if not leaders:
+            return pd.DataFrame()
+
+        out = pd.DataFrame(leaders)
+
+        out = out.sort_values(
+            by=[
+                "speed",
+                "current_rank",
+                "days_up"
+            ],
+            ascending=False
+        ).reset_index(drop=True)
+
+        return out
+
+    except Exception as e:
+        st.error(f"Evolution Leaders Error: {e}")
+        return pd.DataFrame()
 GROUPS_TO_TRACK = [
     "GÀ TĂNG TỐC",
     "CP MẠNH",
@@ -1966,7 +2115,53 @@ if os.path.exists(EVOLUTION_FILE):
 
 else:
     full_df = evo_today_df.copy()
+   # SAVE FILE
+full_df.to_csv(EVOLUTION_FILE, index=False)
+
 # =====================================================
+# BUILD EVOLUTION LEADERS
+# =====================================================
+
+evolution_leaders_df = build_evolution_leaders(full_df) 
+
+# =====================================================
+# 🧬 EVOLUTION LEADERS DISPLAY
+# =====================================================
+
+st.markdown("---")
+st.markdown("## 🧬 EVOLUTION LEADERS")
+
+if evolution_leaders_df.empty:
+    st.info("Chưa có CP tiến hóa mạnh liên tục")
+
+if not evolution_leaders_df.empty:
+
+    show_cols = [
+        "symbol",
+        "evolution",
+        "days_up",
+        "speed",
+        "volume_status",
+        "current_group",
+    ]
+
+    out = evolution_leaders_df[show_cols].copy()
+    out.index = range(len(out))
+
+    st.dataframe(
+        out,
+        use_container_width=True,
+        height=350
+    )
+
+    csv = out.to_csv(index=False).encode("utf-8-sig")
+
+    st.download_button(
+        "📥 Download Evolution Leaders CSV",
+        csv,
+        file_name="evolution_leaders.csv",
+        mime="text/csv"
+    )# =====================================================
 # HIỂN THỊ TIẾN HÓA 5 NGÀY
 # =====================================================
 
