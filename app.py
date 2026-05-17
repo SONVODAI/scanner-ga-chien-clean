@@ -2009,7 +2009,8 @@ def build_evolution_leaders(evo_df):
                 ]
                 
                 vol_status = "⚪"
-    
+                vol_now = np.nan
+                vol_ma20 = np.nan
             if not sub_scan.empty:
         
                 scan_row = sub_scan.iloc[0]
