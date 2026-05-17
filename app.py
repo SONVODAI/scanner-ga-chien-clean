@@ -2030,7 +2030,7 @@ def build_evolution_leaders(evo_df):
                     elif ratio >= 0.7:
                         vol_status = "🟡 VOL TB"
         
-                else:
+                    else:
                     vol_status = "🔴 VOL YẾU"
         
     leaders.append({
