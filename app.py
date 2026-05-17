@@ -2131,8 +2131,6 @@ if evolution_leaders_df.empty:
 
     st.info("Chưa có CP tiến hoá mạnh liên tục")
 
-else:
-
    show_cols = [
     "symbol",
     "evolution",
