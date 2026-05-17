@@ -2031,7 +2031,7 @@ def build_evolution_leaders(evo_df):
                         vol_status = "🟡 VOL TB"
         
                     else:
-                    vol_status = "🔴 VOL YẾU"
+                        vol_status = "🔴 VOL YẾU"
         
     leaders.append({
 
