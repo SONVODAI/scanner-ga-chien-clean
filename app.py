@@ -710,12 +710,7 @@ if not leader:
         return "TÍCH LŨY"
 
     return "MUA EARLY"
-    if pull_label == "PULL ĐẸP" and pd.notna(price) and pd.notna(ma20_) and price >= ma20_:
-        return "PULL ĐẸP"
-
-    if pull_label == "PULL VỪA" and pd.notna(price) and pd.notna(ma20_) and price >= ma20_:
-        return "PULL VỪA"
-
+   
     if (
         pd.notna(breakout_ref)
         and pd.notna(price)
