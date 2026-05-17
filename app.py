@@ -694,7 +694,7 @@ if (
     and r >= 1
     and o >= 1
 ):
-        return "GÀ TĂNG TỐC"
+    return "GÀ TĂNG TỐC"
 
 if pull_label == "PULL ĐẸP":
     return "PULL ĐẸP"
