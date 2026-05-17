@@ -2017,7 +2017,7 @@ def build_evolution_leaders(evo_df):
             vol_now = scan_row.get("volume", np.nan)
             vol_ma20 = scan_row.get("vol_ma20", np.nan)
 
-    if pd.notna(vol_now) and pd.notna(vol_ma20):
+if pd.notna(vol_now) and pd.notna(vol_ma20):
 
             ratio = vol_now / vol_ma20
     
