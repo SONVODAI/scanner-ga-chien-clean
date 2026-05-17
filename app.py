@@ -2129,15 +2129,16 @@ st.markdown("## 🧬 EVOLUTION LEADERS")
 
 if evolution_leaders_df.empty:
 
-    st.info("Chưa có CP tiến hoá mạnh liên tục")
+    st.info("Chưa có CP tiến hóa mạnh liên tục")
 
-show_cols = [
-    "symbol",
-    "evolution",
-    "days_up",
-    "speed",
-    "volume_status",
-    "current_group",
+else:
+    show_cols = [
+        "symbol",
+        "evolution",
+        "days_up",
+        "speed",
+        "volume_status",
+        "current_group",
 ]
 out = evolution_leaders_df[
     show_cols
