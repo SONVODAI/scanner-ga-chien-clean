@@ -686,32 +686,32 @@ def classify_group(row: dict) -> str:
         and price >= ema9_ * 0.97
     )
 
-        if (
-            pd.notna(slope_)
-            and slope_ > 2
-            and total >= 6
-            and e >= 1
-            and r >= 1
-            and o >= 1
-        ):
-            return "GÀ TĂNG TỐC"
-    
-    if pull_label == "PULL ĐẸP":
-        return "PULL ĐẸP"
-    
-    if pull_label == "PULL VỪA":
-        return "PULL VỪA"
-    
-    if not leader:
-        if total <= 1:
-            return "THEO DÕI"
-    
-        if total == 2:
-            return "TÍCH LŨY"
-    
-        return "MUA EARLY"
-       
-    if (
+if (
+    pd.notna(slope_)
+    and slope_ > 2
+    and total >= 6
+    and e >= 1
+    and r >= 1
+    and o >= 1
+):
+        return "GÀ TĂNG TỐC"
+
+if pull_label == "PULL ĐẸP":
+    return "PULL ĐẸP"
+
+if pull_label == "PULL VỪA":
+    return "PULL VỪA"
+
+if not leader:
+    if total <= 1:
+        return "THEO DÕI"
+
+    if total == 2:
+        return "TÍCH LŨY"
+
+    return "MUA EARLY"
+   
+if (
         pd.notna(breakout_ref)
         and pd.notna(price)
         and pd.notna(vol_)
@@ -723,7 +723,7 @@ def classify_group(row: dict) -> str:
     ):
         return "MUA BREAK"
 
-    if (
+if (
         pd.notna(dist_from_ema9)
         and dist_from_ema9 > 1.5
         and e == 2
