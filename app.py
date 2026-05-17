@@ -2001,14 +2001,14 @@ def build_evolution_leaders(evo_df):
                 evolution_text = " → ".join(last_groups)
 
                 # =========================
-# VOLUME STATUS
-# =========================
-
-sub_scan = scan_df[
+    # VOLUME STATUS
+    # =========================
+    
+    sub_scan = scan_df[
     scan_df["symbol"] == symbol
-]
-
-vol_status = "⚪"
+    ]
+    
+    vol_status = "⚪"
 
 if not sub_scan.empty:
 
