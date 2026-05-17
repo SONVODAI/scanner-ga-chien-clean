@@ -2017,22 +2017,22 @@ def build_evolution_leaders(evo_df):
                 vol_now = scan_row.get("volume", np.nan)
                 vol_ma20 = scan_row.get("vol_ma20", np.nan)
     
-    if pd.notna(vol_now) and pd.notna(vol_ma20):
-    
-                ratio = vol_now / vol_ma20
+        if pd.notna(vol_now) and pd.notna(vol_ma20):
         
-                if ratio >= 1.5:
-                    vol_status = "🔥 VOL BREAK"
+                    ratio = vol_now / vol_ma20
+            
+                    if ratio >= 1.5:
+                        vol_status = "🔥 VOL BREAK"
+            
+                    elif ratio >= 1.0:
+                        vol_status = "🟢 VOL OK"
+            
+                    elif ratio >= 0.7:
+                        vol_status = "🟡 VOL TB"
         
-                elif ratio >= 1.0:
-                    vol_status = "🟢 VOL OK"
+                else:
+                    vol_status = "🔴 VOL YẾU"
         
-                elif ratio >= 0.7:
-                    vol_status = "🟡 VOL TB"
-    
-            else:
-                vol_status = "🔴 VOL YẾU"
-    
     leaders.append({
 
     "symbol": symbol,
