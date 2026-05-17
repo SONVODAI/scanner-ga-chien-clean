@@ -686,30 +686,30 @@ def classify_group(row: dict) -> str:
         and price >= ema9_ * 0.97
     )
 
-if (
-    pd.notna(slope_)
-    and slope_ > 2
-    and total >= 6
-    and e >= 1
-    and r >= 1
-    and o >= 1
-):
-    return "GÀ TĂNG TỐC"
-
-if pull_label == "PULL ĐẸP":
-    return "PULL ĐẸP"
-
-if pull_label == "PULL VỪA":
-    return "PULL VỪA"
-
-if not leader:
-    if total <= 1:
-        return "THEO DÕI"
-
-    if total == 2:
-        return "TÍCH LŨY"
-
-    return "MUA EARLY"
+    if (
+        pd.notna(slope_)
+        and slope_ > 2
+        and total >= 6
+        and e >= 1
+        and r >= 1
+        and o >= 1
+    ):
+        return "GÀ TĂNG TỐC"
+    
+    if pull_label == "PULL ĐẸP":
+        return "PULL ĐẸP"
+    
+    if pull_label == "PULL VỪA":
+        return "PULL VỪA"
+    
+    if not leader:
+        if total <= 1:
+            return "THEO DÕI"
+    
+        if total == 2:
+            return "TÍCH LŨY"
+    
+        return "MUA EARLY"
    
 if (
         pd.notna(breakout_ref)
