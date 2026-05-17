@@ -2015,10 +2015,7 @@ def build_evolution_leaders(evo_df):
         
                 scan_row = sub_scan.iloc[0]
             
-                vol_now = scan_row.get("volume", np.nan)
-                vol_ma20 = scan_row.get("vol_ma20", np.nan)
-    
-        # =========================
+               # =========================
 # VOLUME STATUS
 # =========================
 
@@ -2042,7 +2039,18 @@ if pd.notna(vol_now) and pd.notna(vol_ma20) and vol_ma20 > 0:
 
     else:
         vol_status = "🔴 VOL YẾU"
-                    leaders.append({
+
+leaders.append({
+
+    "symbol": symbol,
+    "evolution": evolution_text,
+    "days_up": evolution_up,
+    "speed": speed,
+    "volume_status": vol_status,
+    "current_group": last_groups[-1],
+    "current_rank": last_ranks[-1],
+
+})                    leaders.append({
                 
                     "symbol": symbol,
                     "evolution": evolution_text,
