@@ -1946,22 +1946,22 @@ try:
     
     vnindex_status = classify_vnindex(prediction)
         
-        status_icon = "→"
+    status_icon = "→"
         
     if vnindex_status == "GÀ TĂNG TỐC":
-        status_icon = "🔥 ↑"
+    status_icon = "🔥 ↑"
     
     elif vnindex_status == "CP MẠNH":
-        status_icon = "↑"
+    status_icon = "↑"
     
     elif vnindex_status == "MUA EARLY":
-        status_icon = "🟦"
+    status_icon = "🟦"
     
     elif vnindex_status == "TÍCH LŨY":
-        status_icon = "🟨"
+    status_icon = "🟨"
     
     else:
-        status_icon = "↓"
+    status_icon = "↓"
     
     st.info(f"VNINDEX {status_icon} | {vnindex_status}")
     
