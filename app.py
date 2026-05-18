@@ -1920,34 +1920,34 @@ try:
     # Market yếu / xoay trục nhanh -> phản ứng nhanh hơn
     # =========================================
     
-    if market_real >= 8:
-        analog_window = 40
-        analog_mode = "TREND MODE"
+        if market_real >= 8:
+            analog_window = 40
+            analog_mode = "TREND MODE"
+            
+        elif market_real >= 6:
+            analog_window = 30
+            analog_mode = "BALANCE MODE"
+            
+        else:
+            analog_window = 20
+            analog_mode = "FAST MODE"
         
-    elif market_real >= 6:
-        analog_window = 30
-        analog_mode = "BALANCE MODE"
+        similar_df = find_similar_periods(
+            vnindex,
+            window=analog_window,
+            top_k=5
+        )
+        prediction = generate_market_prediction(similar_df)
+    
+    st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
+        # =========================================
+        # VNINDEX EVOLUTION STATUS
+        # =========================================
+    
+        vnindex_status = classify_vnindex(prediction)
         
-    else:
-        analog_window = 20
-        analog_mode = "FAST MODE"
-    
-    similar_df = find_similar_periods(
-        vnindex,
-        window=analog_window,
-        top_k=5
-    )
-    prediction = generate_market_prediction(similar_df)
-
-st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
-    # =========================================
-    # VNINDEX EVOLUTION STATUS
-    # =========================================
-
-    vnindex_status = classify_vnindex(prediction)
-    
-    status_icon = "→"
-    
+        status_icon = "→"
+        
     if vnindex_status == "GÀ TĂNG TỐC":
         status_icon = "🔥 ↑"
     
