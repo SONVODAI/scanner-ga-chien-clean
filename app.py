@@ -1932,19 +1932,19 @@ try:
             analog_window = 20
             analog_mode = "FAST MODE"
         
-        similar_df = find_similar_periods(
+    similar_df = find_similar_periods(
             vnindex,
             window=analog_window,
             top_k=5
         )
-        prediction = generate_market_prediction(similar_df)
+    prediction = generate_market_prediction(similar_df)
     
     st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
         # =========================================
         # VNINDEX EVOLUTION STATUS
         # =========================================
     
-        vnindex_status = classify_vnindex(prediction)
+    vnindex_status = classify_vnindex(prediction)
         
         status_icon = "→"
         
