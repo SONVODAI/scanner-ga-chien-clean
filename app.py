@@ -1975,11 +1975,13 @@ except Exception as e:
 # Theo dõi cổ phiếu chuyển nhóm theo ngày
 # =====================================================
 
+# =====================================================
+# 🧬 STOCK GROUP EVOLUTION TRACKER - V2
+# Lưu lịch sử theo ngày, hiển thị 15 phiên gần nhất
+# =====================================================
+
 EVOLUTION_FILE = "group_evolution_.csv"
-# =====================================================
-# 🧬 EVOLUTION LEADERS ENGINE
-# Tách riêng các CP tiến hoá tốt liên tục
-# =====================================================
+MAX_EVOLUTION_DAYS = 15
 
 GROUP_RANK = {
     "THEO DÕI": 0,
@@ -1992,17 +1994,75 @@ GROUP_RANK = {
     "GÀ TĂNG TỐC": 7,
 }
 
+today_str = datetime.now().strftime("%Y-%m-%d")
 
+# =====================================================
+# BUILD TODAY SNAPSHOT
+# =====================================================
+evolution_rows = []
+
+vnindex_group = classify_vnindex(prediction)
+
+evolution_rows.append({
+    "date": today_str,
+    "symbol": "VNINDEX",
+    "group": vnindex_group
+})
+
+for _, r in scan_df.iterrows():
+    if pd.notna(r.get("group", np.nan)):
+        evolution_rows.append({
+            "date": today_str,
+            "symbol": r["symbol"],
+            "group": r["group"]
+        })
+
+evo_today_df = pd.DataFrame(evolution_rows)
+
+# Mỗi ngày mỗi mã chỉ giữ 1 trạng thái cuối cùng
+evo_today_df = evo_today_df.drop_duplicates(
+    subset=["date", "symbol"],
+    keep="last"
+)
+
+# =====================================================
+# LOAD + MERGE HISTORY
+# =====================================================
+if os.path.exists(EVOLUTION_FILE):
+    old_df = pd.read_csv(EVOLUTION_FILE)
+
+    full_df = pd.concat(
+        [old_df, evo_today_df],
+        ignore_index=True
+    )
+
+    full_df = full_df.drop_duplicates(
+        subset=["date", "symbol"],
+        keep="last"
+    )
+
+else:
+    full_df = evo_today_df.copy()
+
+# =====================================================
+# GIỮ 15 PHIÊN GẦN NHẤT
+# =====================================================
+all_days = sorted(full_df["date"].dropna().unique())
+latest_days = all_days[-MAX_EVOLUTION_DAYS:]
+
+full_df = full_df[full_df["date"].isin(latest_days)].copy()
+
+full_df.to_csv(EVOLUTION_FILE, index=False)
+
+# =====================================================
+# BUILD EVOLUTION LEADERS
+# =====================================================
 def build_evolution_leaders(evo_df):
 
     if evo_df.empty:
         return pd.DataFrame()
 
     try:
-
-        # =========================
-        # Pivot data
-        # =========================
         pivot = evo_df.pivot_table(
             index="symbol",
             columns="date",
@@ -2014,9 +2074,6 @@ def build_evolution_leaders(evo_df):
 
         leaders = []
 
-        # =========================
-        # Loop từng CP
-        # =========================
         for symbol in pivot.index:
 
             row = pivot.loc[symbol].dropna()
@@ -2025,15 +2082,8 @@ def build_evolution_leaders(evo_df):
                 continue
 
             groups = row.values.tolist()
+            ranks = [GROUP_RANK.get(g, 0) for g in groups]
 
-            ranks = [
-                GROUP_RANK.get(g, 0)
-                for g in groups
-            ]
-
-            # =========================
-            # Chỉ lấy 3 phiên cuối
-            # =========================
             last_groups = groups[-3:]
             last_ranks = ranks[-3:]
 
@@ -2043,58 +2093,34 @@ def build_evolution_leaders(evo_df):
                 if last_ranks[i] > last_ranks[i - 1]:
                     evolution_up += 1
 
-            # =========================
-            # Chỉ lấy CP tăng >= 2 lần
-            # =========================
             if evolution_up >= 2:
 
-                speed = (
-                    last_ranks[-1]
-                    - last_ranks[0]
-                )
-
+                speed = last_ranks[-1] - last_ranks[0]
                 evolution_text = " → ".join(last_groups)
 
-                # =========================
-       # =========================
-# VOLUME STATUS
-# =========================
-
-                sub_scan = scan_df[
-                    scan_df["symbol"] == symbol
-                ]
+                sub_scan = scan_df[scan_df["symbol"] == symbol]
 
                 vol_status = "⚪ N/A"
 
                 if not sub_scan.empty:
-
                     scan_row = sub_scan.iloc[0]
 
                     vol_now = scan_row.get("volume", np.nan)
                     vol_ma20 = scan_row.get("vol_ma20", np.nan)
 
-                    if (
-                        pd.notna(vol_now)
-                        and pd.notna(vol_ma20)
-                        and vol_ma20 > 0
-                    ):
-
+                    if pd.notna(vol_now) and pd.notna(vol_ma20) and vol_ma20 > 0:
                         ratio = vol_now / vol_ma20
 
                         if ratio >= 1.5:
                             vol_status = "🔥 VOL BREAK"
-
                         elif ratio >= 1.0:
                             vol_status = "🟢 VOL OK"
-
                         elif ratio >= 0.7:
                             vol_status = "🟡 VOL TB"
-
                         else:
                             vol_status = "🔴 VOL YẾU"
 
                 leaders.append({
-
                     "symbol": symbol,
                     "evolution": evolution_text,
                     "days_up": evolution_up,
@@ -2102,22 +2128,15 @@ def build_evolution_leaders(evo_df):
                     "volume_status": vol_status,
                     "current_group": last_groups[-1],
                     "current_rank": last_ranks[-1],
-
                 })
-        # =========================
-        # DataFrame
-        # =========================
+
         if not leaders:
             return pd.DataFrame()
 
         out = pd.DataFrame(leaders)
 
         out = out.sort_values(
-            by=[
-                "speed",
-                "current_rank",
-                "days_up"
-            ],
+            by=["speed", "current_rank", "days_up"],
             ascending=False
         ).reset_index(drop=True)
 
@@ -2126,71 +2145,19 @@ def build_evolution_leaders(evo_df):
     except Exception as e:
         st.error(f"Evolution Leaders Error: {e}")
         return pd.DataFrame()
-GROUPS_TO_TRACK = [
-    "GÀ TĂNG TỐC",
-    "CP MẠNH",
-    "MUA BREAK",
-    "PULL ĐẸP",
-    "PULL VỪA",
-    "MUA EARLY",
-    "TÍCH LŨY"
-]
 
-today_str = datetime.now().strftime("%Y-%m-%d")
-evolution_rows = []
-# THÊM VNINDEX
-vnindex_group = classify_vnindex(prediction)
 
-evolution_rows.append({
-    "date": today_str,
-    "symbol": "VNINDEX",
-    "group": vnindex_group
-})
-
-for _, r in scan_df.iterrows():
-
-    if pd.notna(r["group"]):
-
-        evolution_rows.append({
-            "date": today_str,
-            "symbol": r["symbol"],
-            "group": r["group"]
-        })
-evo_today_df = pd.DataFrame(evolution_rows)
-# LOAD FILE CŨ
-if os.path.exists(EVOLUTION_FILE):
-
-    old_df = pd.read_csv(EVOLUTION_FILE)
-
-    full_df = pd.concat([old_df, evo_today_df], ignore_index=True)
-
-    full_df = full_df.drop_duplicates(
-        subset=["date", "symbol", "group"]
-    )
-
-else:
-    full_df = evo_today_df.copy()
-   # SAVE FILE
-full_df.to_csv(EVOLUTION_FILE, index=False)
-
-# =====================================================
-# BUILD EVOLUTION LEADERS
-# =====================================================
-
-evolution_leaders_df = build_evolution_leaders(full_df) 
+evolution_leaders_df = build_evolution_leaders(full_df)
 
 # =====================================================
 # 🧬 EVOLUTION LEADERS DISPLAY
 # =====================================================
-
 st.markdown("---")
 st.markdown("## 🧬 EVOLUTION LEADERS")
 
 if evolution_leaders_df.empty:
     st.info("Chưa có CP tiến hóa mạnh liên tục")
-
-if not evolution_leaders_df.empty:
-
+else:
     show_cols = [
         "symbol",
         "evolution",
@@ -2216,18 +2183,15 @@ if not evolution_leaders_df.empty:
         csv,
         file_name="evolution_leaders.csv",
         mime="text/csv"
-    )# =====================================================
-# HIỂN THỊ TIẾN HÓA 5 NGÀY
+    )
+
 # =====================================================
-
+# 🧬 HIỂN THỊ TIẾN HÓA 15 PHIÊN
+# =====================================================
 st.markdown("---")
-st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU")
+st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
 
-latest_days = sorted(full_df["date"].unique())[-5:]
-
-recent_df = full_df[
-    full_df["date"].isin(latest_days)
-]
+recent_df = full_df[full_df["date"].isin(latest_days)].copy()
 
 pivot_df = recent_df.pivot_table(
     index="symbol",
@@ -2235,6 +2199,8 @@ pivot_df = recent_df.pivot_table(
     values="group",
     aggfunc="first"
 )
+
+pivot_df = pivot_df.reindex(columns=latest_days)
 
 def color_group(val):
     if pd.isna(val):
@@ -2247,25 +2213,16 @@ def color_group(val):
         "PULL ĐẸP": "#ffe066",
         "PULL VỪA": "#fff299",
         "MUA EARLY": "#99ccff",
-        "TÍCH LŨY": "#d9d9d9"
+        "TÍCH LŨY": "#d9d9d9",
+        "THEO DÕI": "#ffffff",
     }
 
     color = color_map.get(val, "#ffffff")
     return f"background-color: {color}; color: black"
-# =========================
+
+# =====================================================
 # TIẾN HÓA ↑ ↓ →
-# =========================
-
-status_rank = {
-    "THEO DÕI": 0,
-    "TÍCH LŨY": 1,
-    "MUA EARLY": 2,
-    "PULL VỪA": 3,
-    "PULL ĐẸP": 4,
-    "CP MẠNH": 5,
-    "GÀ TĂNG TỐC": 6
-}
-
+# =====================================================
 if len(latest_days) >= 2:
 
     today_col = latest_days[-1]
@@ -2278,14 +2235,12 @@ if len(latest_days) >= 2:
         today_val = pivot_df.loc[idx, today_col]
         prev_val = pivot_df.loc[idx, prev_col]
 
-        today_rank = status_rank.get(today_val, 0)
-        prev_rank = status_rank.get(prev_val, 0)
+        today_rank = GROUP_RANK.get(today_val, 0)
+        prev_rank = GROUP_RANK.get(prev_val, 0)
 
         if today_rank > prev_rank:
-
             if today_val == "GÀ TĂNG TỐC":
                 pivot_df.loc[idx, "TIẾN HÓA"] = "🔥 ↑"
-
             else:
                 pivot_df.loc[idx, "TIẾN HÓA"] = "↑"
 
@@ -2294,10 +2249,11 @@ if len(latest_days) >= 2:
 
         else:
             pivot_df.loc[idx, "TIẾN HÓA"] = "→"
+
 styled_df = pivot_df.style.map(color_group)
 
 st.dataframe(
     styled_df,
     use_container_width=True,
-    height=600
+    height=650
 )
