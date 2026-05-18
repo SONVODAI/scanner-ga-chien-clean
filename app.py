@@ -1346,7 +1346,7 @@ market_status, market_action = market_status_text(market_real)
 
 st.markdown("## 📊 MARKET OVERVIEW")
 
-m1, m2, m3, m4, m5 = st.columns([1,1,1,1,2])
+m1, m2, m3, m5 = st.columns([1,1,1,2])
 
 with m1:
     st.metric("Market REAL", f"{market_real}/13")
@@ -1356,9 +1356,6 @@ with m2:
 
 with m3:
     st.metric("Forecast 5-10D", f"{market_forecast}/10")
-
-with m4:
-    st.metric("ANALOG MODE", f"{analog_mode} ({analog_window})")
 
 with m5:
     st.subheader(market_status)
@@ -1940,6 +1937,9 @@ try:
         window=analog_window,
         top_k=5
     )
+    prediction = generate_market_prediction(similar_df)
+
+st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
     # =========================================
     # VNINDEX EVOLUTION STATUS
     # =========================================
