@@ -1346,7 +1346,7 @@ market_status, market_action = market_status_text(market_real)
 
 st.markdown("## 📊 MARKET OVERVIEW")
 
-m1, m2, m3, m4 = st.columns([1,1,1,2])
+m1, m2, m3, m5 = st.columns([1,1,1,2])
 
 with m1:
     st.metric("Market REAL", f"{market_real}/13")
@@ -1357,7 +1357,7 @@ with m2:
 with m3:
     st.metric("Forecast 5-10D", f"{market_forecast}/10")
 
-with m4:
+with m5:
     st.subheader(market_status)
     st.caption(market_forecast_text)
 
@@ -1914,30 +1914,40 @@ try:
 
     st.success("Đã tải dữ liệu VNINDEX thành công")
 
+        # =========================================
+    # ADAPTIVE ANALOG WINDOW
+    # Market khỏe -> nhìn dài hơn
+    # Market yếu / xoay trục nhanh -> phản ứng nhanh hơn
+    # =========================================
+    
+    if market_real >= 8:
+            analog_window = 40
+            analog_mode = "TREND MODE"
+            
+    elif market_real >= 6:
+            analog_window = 30
+            analog_mode = "BALANCE MODE"
+            
+    else:
+            analog_window = 20
+            analog_mode = "FAST MODE"
+        
     similar_df = find_similar_periods(
-        vnindex,
-        window=40,
-        top_k=5
-    )
-
+            vnindex,
+            window=analog_window,
+            top_k=5
+        )
     prediction = generate_market_prediction(similar_df)
-
-    st.success("Đã chạy similarity engine thành công")
-    # =========================================
-    col1, col2, col3 = st.columns(3)
     
-    col1.metric("REGIME", prediction["regime"])
-    col2.metric("NAV GỢI Ý", prediction["nav"])
-    col3.metric("CONFIDENCE", f'{prediction["confidence"]}%')
+    st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
+        # =========================================
+        # VNINDEX EVOLUTION STATUS
+        # =========================================
     
-    # =========================================
-    # VNINDEX EVOLUTION STATUS
-    # =========================================
-
     vnindex_status = classify_vnindex(prediction)
-    
+        
     status_icon = "→"
-    
+        
     if vnindex_status == "GÀ TĂNG TỐC":
         status_icon = "🔥 ↑"
     
