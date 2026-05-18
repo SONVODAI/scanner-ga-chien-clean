@@ -1917,29 +1917,29 @@ try:
 
     st.success("Đã tải dữ liệu VNINDEX thành công")
 
+        # =========================================
+    # ADAPTIVE ANALOG WINDOW
+    # Market khỏe -> nhìn dài hơn
+    # Market yếu / xoay trục nhanh -> phản ứng nhanh hơn
     # =========================================
-# ADAPTIVE ANALOG WINDOW
-# Market khỏe -> nhìn dài hơn
-# Market yếu / xoay trục nhanh -> phản ứng nhanh hơn
-# =========================================
-
-if market_real >= 8:
-    analog_window = 40
-    analog_mode = "TREND MODE"
     
-elif market_real >= 6:
-    analog_window = 30
-    analog_mode = "BALANCE MODE"
+    if market_real >= 8:
+        analog_window = 40
+        analog_mode = "TREND MODE"
+        
+    elif market_real >= 6:
+        analog_window = 30
+        analog_mode = "BALANCE MODE"
+        
+    else:
+        analog_window = 20
+        analog_mode = "FAST MODE"
     
-else:
-    analog_window = 20
-    analog_mode = "FAST MODE"
-
-similar_df = find_similar_periods(
-    vnindex,
-    window=analog_window,
-    top_k=5
-)
+    similar_df = find_similar_periods(
+        vnindex,
+        window=analog_window,
+        top_k=5
+    )
     # =========================================
     # VNINDEX EVOLUTION STATUS
     # =========================================
