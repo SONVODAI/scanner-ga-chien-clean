@@ -2082,19 +2082,32 @@ def build_evolution_leaders(evo_df):
                 continue
 
             groups = row.values.tolist()
-            ranks = [GROUP_RANK.get(g, 0) for g in groups]
 
-            last_groups = groups[-3:]
-            last_ranks = ranks[-3:]
+            ranks = [
+                GROUP_RANK.get(g, 0)
+                for g in groups
+            ]
+
+            # ====================================
+            # TIẾN HÓA 2 NGÀY LIÊN TỤC
+            # ====================================
 
             evolution_up = 0
 
-            for i in range(1, len(last_ranks)):
-                if last_ranks[i] > last_ranks[i - 1]:
+            for i in range(1, len(ranks)):
+
+                if ranks[i] > ranks[i - 1]:
                     evolution_up += 1
 
+                else:
+                    evolution_up = 0
+
+            # chỉ cần tăng liên tục >= 2 lần
             if evolution_up >= 2:
 
+                speed = ranks[-1] - ranks[0]
+
+                evolution_text = " → ".join(groups[-3:])
                 speed = last_ranks[-1] - last_ranks[0]
                 evolution_text = " → ".join(last_groups)
 
