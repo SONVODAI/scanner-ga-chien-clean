@@ -1946,7 +1946,7 @@ try:
     
     vnindex_status = classify_vnindex(prediction)
         
-        status_icon = "→"
+    status_icon = "→"
         
     if vnindex_status == "GÀ TĂNG TỐC":
         status_icon = "🔥 ↑"
