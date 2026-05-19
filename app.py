@@ -1994,7 +1994,14 @@ GROUP_RANK = {
     "GÀ TĂNG TỐC": 7,
 }
 
+
 today_str = datetime.now().strftime("%Y-%m-%d")
+
+current_time = datetime.now().strftime(
+    "%Y-%m-%d %H:%M"
+)
+
+
 
 # =====================================================
 # BUILD TODAY SNAPSHOT
@@ -2003,11 +2010,14 @@ evolution_rows = []
 
 vnindex_group = classify_vnindex(prediction)
 
+
 evolution_rows.append({
     "date": today_str,
+    "time": current_time,
     "symbol": "VNINDEX",
     "group": vnindex_group
 })
+
 
 for _, r in scan_df.iterrows():
     if pd.notna(r.get("group", np.nan)):
@@ -2021,7 +2031,10 @@ evo_today_df = pd.DataFrame(evolution_rows)
 
 # Mỗi ngày mỗi mã chỉ giữ 1 trạng thái cuối cùng
 evo_today_df = evo_today_df.drop_duplicates(
-    subset=["date", "symbol"],
+    
+subset=["time", "symbol"]
+
+
     keep="last"
 )
 
@@ -2057,6 +2070,15 @@ full_df = full_df.sort_values(
 ).reset_index(drop=True)
 
 full_df.to_csv(EVOLUTION_FILE, index=False)
+```python id="e3ax4d"
+# BACKUP FILE
+backup_name = f"backup_evolution_{today_str}.csv"
+
+full_df.to_csv(
+    backup_name,
+    index=False
+)
+```
 
 
 def build_evolution_leaders(evo_df):
