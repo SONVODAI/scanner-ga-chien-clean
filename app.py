@@ -2014,10 +2014,9 @@ vnindex_group = classify_vnindex(prediction)
 evolution_rows.append({
     "date": today_str,
     "time": current_time,
-    "symbol": "VNINDEX",
-    "group": vnindex_group
+    "symbol": r["symbol"],
+    "group": r["group"]
 })
-
 
 for _, r in scan_df.iterrows():
     if pd.notna(r.get("group", np.nan)):
@@ -2050,9 +2049,9 @@ if os.path.exists(EVOLUTION_FILE):
     )
 
     full_df = full_df.drop_duplicates(
-        subset=["date", "symbol"],
-        keep="last"
-    )
+    subset=["time", "symbol"],
+    keep="last"
+)
 
 else:
     full_df = evo_today_df.copy()
