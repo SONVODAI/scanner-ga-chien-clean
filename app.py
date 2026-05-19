@@ -2015,30 +2015,26 @@ vnindex_group = classify_vnindex(prediction)
 evolution_rows.append({
     "date": today_str,
     "time": current_time,
-    "symbol": r["symbol"],
-    "group": r["group"]
+    "symbol": "VNINDEX",
+    "group": vnindex_group
 })
-
-
 for _, r in scan_df.iterrows():
+
     if pd.notna(r.get("group", np.nan)):
+
         evolution_rows.append({
             "date": today_str,
+            "time": current_time,
             "symbol": r["symbol"],
             "group": r["group"]
         })
-
 evo_today_df = pd.DataFrame(evolution_rows)
 
 # Mỗi ngày mỗi mã chỉ giữ 1 trạng thái cuối cùng
 evo_today_df = evo_today_df.drop_duplicates(
-    
-subset=["time", "symbol"],
-
-
+    subset=["time", "symbol"],
     keep="last"
 )
-
 # =====================================================
 # LOAD + MERGE HISTORY
 # =====================================================
