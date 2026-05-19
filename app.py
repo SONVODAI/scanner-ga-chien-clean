@@ -1980,7 +1980,7 @@ except Exception as e:
 # Lưu lịch sử theo ngày, hiển thị 15 phiên gần nhất
 # =====================================================
 
-EVOLUTION_FILE = "group_evolution_.csv"
+EVOLUTION_FILE = "group_evolution_history.csv"
 MAX_EVOLUTION_DAYS = 15
 
 GROUP_RANK = {
@@ -2053,16 +2053,15 @@ latest_days = all_days[-MAX_EVOLUTION_DAYS:]
 full_df = full_df[full_df["date"].isin(latest_days)].copy()
 
 full_df.to_csv(EVOLUTION_FILE, index=False)
-
-# =====================================================
-# BUILD EVOLUTION LEADERS
-# =====================================================
+return pd.DataFrame()
+```python
 def build_evolution_leaders(evo_df):
 
     if evo_df.empty:
         return pd.DataFrame()
 
     try:
+
         pivot = evo_df.pivot_table(
             index="symbol",
             columns="date",
@@ -2089,54 +2088,81 @@ def build_evolution_leaders(evo_df):
             ]
 
             # ====================================
-            # TIẾN HÓA 2 NGÀY LIÊN TỤC
+            # TÍNH CHUỖI TĂNG DÀI NHẤT
             # ====================================
 
-            evolution_up = 0
+            current_up = 0
+            max_up = 0
 
             for i in range(1, len(ranks)):
 
                 if ranks[i] > ranks[i - 1]:
-                    evolution_up += 1
+
+                    current_up += 1
+
+                    if current_up > max_up:
+                        max_up = current_up
 
                 else:
-                    evolution_up = 0
+                    current_up = 0
 
-            # chỉ cần tăng liên tục >= 2 lần
-            if evolution_up >= 2:
+            # ====================================
+            # CHỈ LẤY CP CÓ TIẾN HÓA
+            # ====================================
 
-                speed = ranks[-1] - ranks[0]
+            if max_up >= 2:
 
-                evolution_text = " → ".join(groups[-3:])
+                last_groups = groups[-5:]
+                last_ranks = ranks[-5:]
+
                 speed = last_ranks[-1] - last_ranks[0]
+
                 evolution_text = " → ".join(last_groups)
 
-                sub_scan = scan_df[scan_df["symbol"] == symbol]
+                sub_scan = scan_df[
+                    scan_df["symbol"] == symbol
+                ]
 
                 vol_status = "⚪ N/A"
 
                 if not sub_scan.empty:
+
                     scan_row = sub_scan.iloc[0]
 
-                    vol_now = scan_row.get("volume", np.nan)
-                    vol_ma20 = scan_row.get("vol_ma20", np.nan)
+                    vol_now = scan_row.get(
+                        "volume",
+                        np.nan
+                    )
 
-                    if pd.notna(vol_now) and pd.notna(vol_ma20) and vol_ma20 > 0:
+                    vol_ma20 = scan_row.get(
+                        "vol_ma20",
+                        np.nan
+                    )
+
+                    if (
+                        pd.notna(vol_now)
+                        and pd.notna(vol_ma20)
+                        and vol_ma20 > 0
+                    ):
+
                         ratio = vol_now / vol_ma20
 
                         if ratio >= 1.5:
                             vol_status = "🔥 VOL BREAK"
+
                         elif ratio >= 1.0:
                             vol_status = "🟢 VOL OK"
+
                         elif ratio >= 0.7:
                             vol_status = "🟡 VOL TB"
+
                         else:
                             vol_status = "🔴 VOL YẾU"
 
                 leaders.append({
                     "symbol": symbol,
                     "evolution": evolution_text,
-                    "days_up": evolution_up,
+                    "days_up": max_up,
                     "speed": speed,
                     "volume_status": vol_status,
                     "current_group": last_groups[-1],
@@ -2149,15 +2175,24 @@ def build_evolution_leaders(evo_df):
         out = pd.DataFrame(leaders)
 
         out = out.sort_values(
-            by=["speed", "current_rank", "days_up"],
+            by=[
+                "speed",
+                "current_rank",
+                "days_up"
+            ],
             ascending=False
         ).reset_index(drop=True)
 
         return out
 
     except Exception as e:
-        st.error(f"Evolution Leaders Error: {e}")
+
+        st.error(
+            f"Evolution Leaders Error: {e}"
+        )
+
         return pd.DataFrame()
+```
 
 
 evolution_leaders_df = build_evolution_leaders(full_df)
