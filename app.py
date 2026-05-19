@@ -2052,6 +2052,10 @@ latest_days = all_days[-MAX_EVOLUTION_DAYS:]
 
 full_df = full_df[full_df["date"].isin(latest_days)].copy()
 
+full_df = full_df.sort_values(
+    by=["date", "symbol"]
+).reset_index(drop=True)
+
 full_df.to_csv(EVOLUTION_FILE, index=False)
 
 
