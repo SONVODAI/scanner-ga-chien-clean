@@ -2192,7 +2192,6 @@ def build_evolution_leaders(evo_df):
         )
 
         return pd.DataFrame()
-```
 
 
 evolution_leaders_df = build_evolution_leaders(full_df)
