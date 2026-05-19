@@ -2054,7 +2054,7 @@ full_df = full_df[full_df["date"].isin(latest_days)].copy()
 
 full_df.to_csv(EVOLUTION_FILE, index=False)
 return pd.DataFrame()
-```python
+
 def build_evolution_leaders(evo_df):
 
     if evo_df.empty:
