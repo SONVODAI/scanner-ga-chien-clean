@@ -2032,7 +2032,7 @@ evo_today_df = pd.DataFrame(evolution_rows)
 # Mỗi ngày mỗi mã chỉ giữ 1 trạng thái cuối cùng
 evo_today_df = evo_today_df.drop_duplicates(
     
-subset=["time", "symbol"]
+subset=["time", "symbol"],
 
 
     keep="last"
