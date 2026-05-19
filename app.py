@@ -2070,7 +2070,7 @@ full_df = full_df.sort_values(
 ).reset_index(drop=True)
 
 full_df.to_csv(EVOLUTION_FILE, index=False)
-```python id="e3ax4d"
+
 # BACKUP FILE
 backup_name = f"backup_evolution_{today_str}.csv"
 
@@ -2078,7 +2078,7 @@ full_df.to_csv(
     backup_name,
     index=False
 )
-```
+
 
 
 def build_evolution_leaders(evo_df):
