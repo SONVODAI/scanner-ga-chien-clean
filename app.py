@@ -2011,12 +2011,14 @@ evolution_rows = []
 vnindex_group = classify_vnindex(prediction)
 
 
+
 evolution_rows.append({
     "date": today_str,
     "time": current_time,
     "symbol": r["symbol"],
     "group": r["group"]
 })
+
 
 for _, r in scan_df.iterrows():
     if pd.notna(r.get("group", np.nan)):
