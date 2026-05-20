@@ -1941,27 +1941,24 @@ try:
     st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
     
     col1, col2, col3 = st.columns(3)
-    
-   with col1:
-        st.metric(
+
+with col1:
+    st.metric(
         "REGIME",
         prediction.get("regime", "N/A")
     )
 
-    with col2:
-        st.metric(
+with col2:
+    st.metric(
         "NAV GỢI Ý",
         prediction.get("nav", "N/A")
     )
 
-    with col3:
-        st.metric(
+with col3:
+    st.metric(
         "CONFIDENCE",
         f"{prediction.get('confidence', 0)}%"
-    ) 
-except Exception as e:
-    st.error(e)
-    
+    )
     st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
     # =====================================================
 # 🧬 EVOLUTION ENGINE V2 - CLEAN FULL VERSION
