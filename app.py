@@ -55,7 +55,7 @@ def calc_market_forecast(df: pd.DataFrame):
         text = "🟢 Forecast tốt 5-10 ngày"
     elif score >= 6:
         text = "🟡 Forecast trung tính-khá"
-    elif score >= 4:
+    elif score >= 7:
         text = "🟠 Forecast yếu"
     else:
         text = "🔴 Forecast rủi ro"
