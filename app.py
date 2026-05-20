@@ -2168,9 +2168,9 @@ elif max_down >= 2:
 
 else:
     evo_icon = "→"
-                sub_scan = scan_df[
-                    scan_df["symbol"] == symbol
-                ]
+    sub_scan = scan_df[
+        scan_df["symbol"] == symbol
+    ]
 
                 vol_status = "⚪ N/A"
 
