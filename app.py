@@ -2280,7 +2280,7 @@ if (
         })
 
 if not leaders:
-        return pd.DataFrame()
+    return pd.DataFrame()
 
     out = pd.DataFrame(leaders)
 
