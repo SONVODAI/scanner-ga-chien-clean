@@ -1892,27 +1892,27 @@ def classify_vnindex(prediction):
     else:
         return "THEO DÕI"    
 try:
-    vnindex = pd.read_csv("vnindex_history.csv")
-
-    vnindex["Date"] = pd.to_datetime(
-        vnindex["Date"],
-        dayfirst=True,
-        errors="coerce"
-    )
-
-    vnindex = vnindex.dropna(subset=["Date"])
-
-    vnindex = vnindex[[
-        "Date",
-        "Close",
-        "Volume"
-    ]]
-
-    if vnindex.empty or len(vnindex) < 100:
-        st.error("VNINDEX tải về bị rỗng hoặc quá ít dữ liệu. Chưa thể chạy Market Analog Engine.")
-        st.stop()
-
-    st.success("Đã tải dữ liệu VNINDEX thành công")
+        vnindex = pd.read_csv("vnindex_history.csv")
+    
+        vnindex["Date"] = pd.to_datetime(
+            vnindex["Date"],
+            dayfirst=True,
+            errors="coerce"
+        )
+    
+        vnindex = vnindex.dropna(subset=["Date"])
+    
+        vnindex = vnindex[[
+            "Date",
+            "Close",
+            "Volume"
+        ]]
+    
+        if vnindex.empty or len(vnindex) < 100:
+            st.error("VNINDEX tải về bị rỗng hoặc quá ít dữ liệu. Chưa thể chạy Market Analog Engine.")
+            st.stop()
+    
+        st.success("Đã tải dữ liệu VNINDEX thành công")
 
         # =========================================
     # ADAPTIVE ANALOG WINDOW
