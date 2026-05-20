@@ -1937,12 +1937,12 @@ try:
         analog_mode = "FAST MODE"
 
     similar_df = find_similar_periods(
-        st.write(similar_df)
+        
         vnindex,
         window=analog_window,
         top_k=5
     )
-
+    st.write(similar_df)
     prediction = generate_market_prediction(
         similar_df
     )
