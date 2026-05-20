@@ -2477,7 +2477,7 @@ def build_top_risk_detector(base_df):
     df = base_df.copy()
 
     symbol_col = _find_col(df, ["symbol", "ticker", "Mã", "ma"])
-    rsi_col    = _find_col(df, ["rsi", "RSI", "RSI14"])
+    rsi_col    = _find_col(df, ["rsi", "RSI", "RSI14", "rsi14"])
     dist_col   = _find_col(df, ["dist_from_ema9_pct", "DIST_EMA9", "dist"])
     vol_col    = _find_col(df, ["volume_ratio", "vol_ratio", "VOL_RATIO", "vol_chg"])
     pct_col    = _find_col(df, ["pct_change", "%change", "change_percent", "price_change_pct"])
