@@ -2510,7 +2510,7 @@ def build_top_risk_detector(base_df):
         # Sau khi giá đã tăng nhiều → dễ là cây FOMO cuối sóng
         # =====================================================
 
-                if (
+        if (
             not np.isnan(dist)
             and not np.isnan(vol)
             and not np.isnan(pct)
@@ -2533,6 +2533,12 @@ def build_top_risk_detector(base_df):
             # ==========================================
 
             elif dist >= 5 and vol >= 1.8 and pct >= 3:
+
+                score += 5
+
+                reasons.append(
+                    "⚠️ Nến tăng nóng + vol cao bất thường"
+                )
 
                 score += 5
 
