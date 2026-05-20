@@ -2110,30 +2110,52 @@ def build_evolution_leaders(evo_df):
                 for g in groups
             ]
 
-            # ====================================
-            # TÍNH CHUỖI TĂNG DÀI NHẤT
-            # ====================================
+           # ====================================
+# TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
+# ====================================
 
-            current_up = 0
-            max_up = 0
+current_up = 0
+max_up = 0
 
-            for i in range(1, len(ranks)):
+current_down = 0
+max_down = 0
 
-                if ranks[i] > ranks[i - 1]:
+for i in range(1, len(ranks)):
 
-                    current_up += 1
+    # =========================
+    # TIẾN HÓA
+    # =========================
+    if ranks[i] > ranks[i - 1]:
 
-                    if current_up > max_up:
-                        max_up = current_up
+        current_up += 1
+        current_down = 0
 
-                else:
-                    current_up = 0
+        if current_up > max_up:
+            max_up = current_up
 
+    # =========================
+    # THOÁI HÓA
+    # =========================
+    elif ranks[i] < ranks[i - 1]:
+
+        current_down += 1
+        current_up = 0
+
+        if current_down > max_down:
+            max_down = current_down
+
+    # =========================
+    # ĐỨNG YÊN
+    # =========================
+    else:
+
+        current_up = 0
+        current_down = 0            
             # ====================================
             # CHỈ LẤY CP CÓ TIẾN HÓA
             # ====================================
 
-            if max_up >= 2:
+            if max_up >= 2 or max_down >= 2:
 
                 last_groups = groups[-5:]
                 last_ranks = ranks[-5:]
@@ -2141,7 +2163,24 @@ def build_evolution_leaders(evo_df):
                 speed = last_ranks[-1] - last_ranks[0]
 
                 evolution_text = " → ".join(last_groups)
+# ====================================
+# ICON TIẾN HÓA
+# ====================================
 
+if max_up >= 3:
+    evo_icon = "🔥↑"
+
+elif max_up >= 2:
+    evo_icon = "🟢↑"
+
+elif max_down >= 3:
+    evo_icon = "🚨↓↓"
+
+elif max_down >= 2:
+    evo_icon = "⚠️↓"
+
+else:
+    evo_icon = "→"
                 sub_scan = scan_df[
                     scan_df["symbol"] == symbol
                 ]
@@ -2185,6 +2224,8 @@ def build_evolution_leaders(evo_df):
                 leaders.append({
                     "symbol": symbol,
                     "evolution": evolution_text,
+                    "evo_icon": evo_icon,
+                    "days_down": max_down,
                     "days_up": max_up,
                     "speed": speed,
                     "volume_status": vol_status,
@@ -2230,6 +2271,7 @@ if evolution_leaders_df.empty:
 else:
     show_cols = [
         "symbol",
+        "evo_icon",
         "evolution",
         "days_up",
         "speed",
