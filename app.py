@@ -1921,17 +1921,19 @@ try:
     # =========================================
     
     if market_real >= 8:
-            analog_window = 40
-            analog_mode = "TREND MODE"
-            
-    elif market_real >= 6:
-            analog_window = 30
-            analog_mode = "BALANCE MODE"
-            
-    else:
-            analog_window = 20
-            analog_mode = "FAST MODE"
-        
+
+    analog_window = 40
+    analog_mode = "TREND MODE"
+
+elif market_real >= 6:
+
+    analog_window = 30
+    analog_mode = "BALANCE MODE"
+
+else:
+
+    analog_window = 20
+    analog_mode = "FAST MODE"   
     similar_df = find_similar_periods(
             vnindex,
             window=analog_window,
