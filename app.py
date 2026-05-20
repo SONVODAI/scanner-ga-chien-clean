@@ -1920,7 +1920,7 @@ try:
     # Market yếu / xoay trục nhanh -> phản ứng nhanh hơn
     # =========================================
     
-    if market_real >= 8:
+if market_real >= 8:
 
     analog_window = 40
     analog_mode = "TREND MODE"
