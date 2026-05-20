@@ -2123,7 +2123,7 @@ def build_evolution_leaders(evo_df):
                     current_up += 1
                     current_down = 0
 
-                    if current_up > max_up:
+                if current_up > max_up:
                         max_up = current_up
 
                 elif ranks[i] < ranks[i - 1]:
@@ -2131,7 +2131,7 @@ def build_evolution_leaders(evo_df):
                     current_down += 1
                     current_up = 0
 
-                    if current_down > max_down:
+                if current_down > max_down:
                         max_down = current_down
 
                 else:
