@@ -1938,7 +1938,7 @@ try:
             top_k=5
         )
     prediction = generate_market_prediction(similar_df)
-    except Exception as e:
+except Exception as e:
     st.error(e)
     
     st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
