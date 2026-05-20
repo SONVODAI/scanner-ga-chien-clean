@@ -2186,7 +2186,40 @@ def build_evolution_leaders(full_df, scan_df):
         # =========================
 
         vol_status = "⚪ N/A"
+        # =========================
+        # EVOLUTION QUALITY SCORE
+        # =========================
 
+        evo_score = 0
+
+        # tốc độ tiến hóa
+        if speed >= 3:
+            evo_score += 2
+
+        elif speed > 0:
+            evo_score += 1
+
+        # tăng liên tục
+        if up_days >= 3:
+            evo_score += 2
+
+        elif up_days >= 2:
+            evo_score += 1
+
+        # không bị suy yếu
+        if down_days == 0:
+            evo_score += 2
+
+        # giữ nhóm mạnh
+        if current_rank >= 6:
+            evo_score += 2
+
+        elif current_rank >= 5:
+            evo_score += 1
+
+        # đi ngang khỏe
+        if flat_days >= 2 and current_rank >= 5:
+            evo_score += 1
         sub_scan = scan_df[
             scan_df["symbol"] == symbol
         ]
@@ -2217,13 +2250,39 @@ def build_evolution_leaders(full_df, scan_df):
 
                 else:
                     vol_status = "🔴 VOL YẾU"
+        # =========================
+        # EVOLUTION TYPE
+        # =========================
 
+        if evo_score >= 8:
+
+            evo_type = "🚀 SIÊU TIẾN HÓA"
+
+        elif evo_score >= 6:
+
+            evo_type = "🔥 TĂNG TỐC"
+
+        elif evo_score >= 4:
+
+            evo_type = "🧱 TÍCH LŨY ĐẸP"
+
+        elif evo_score >= 2:
+
+            evo_type = "🟡 THEO DÕI"
+
+        else:
+
+            evo_type = "⚠️ NHIỄU"
         leaders.append({
             "symbol": symbol,
             "evo_icon": evo_icon,
             "evo_trend": evo_trend,
             "evolution": evolution_text,
             "speed": speed,
+            
+            "evo_score": evo_score,
+            "evo_type": evo_type,
+            
             "up_days": up_days,
             "down_days": down_days,
             "flat_days": flat_days,
