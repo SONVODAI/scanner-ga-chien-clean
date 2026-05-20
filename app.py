@@ -1975,8 +1975,8 @@ try:
 
 except Exception as e:
 
-    st.error(e)
-   st.markdown("---")
+st.error(e)
+st.markdown("---")
 
 st.markdown("### 📚 CÁC GIAI ĐOẠN LỊCH SỬ TƯƠNG ĐỒNG")
 
