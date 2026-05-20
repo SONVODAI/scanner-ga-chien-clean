@@ -2111,16 +2111,17 @@ def build_evolution_leaders(evo_df):
             ]
 
     # ====================================
-    # TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
-    # ====================================
-    
-            current_up = 0
-            max_up = 0
-            
-            current_down = 0
-            max_down = 0
-        
-        for i in range(1, len(ranks)):
+   # ====================================
+# TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
+# ====================================
+
+current_up = 0
+max_up = 0
+
+current_down = 0
+max_down = 0
+
+for i in range(1, len(ranks)):
 
     # =========================
     # TIẾN HÓA
@@ -2150,10 +2151,10 @@ def build_evolution_leaders(evo_df):
     else:
 
         current_up = 0
-        current_down = 0            
-            # ====================================
-            # CHỈ LẤY CP CÓ TIẾN HÓA
-            # ====================================
+        current_down = 0         
+        # ====================================
+        # CHỈ LẤY CP CÓ TIẾN HÓA
+        # ====================================
 
             if max_up >= 2 or max_down >= 2:
 
