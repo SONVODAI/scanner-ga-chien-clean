@@ -2122,144 +2122,144 @@ def build_evolution_leaders(full_df, scan_df):
             continue
 
         groups = row.values.tolist()
-
+    
         ranks = [
             GROUP_RANK.get(g, 0)
             for g in groups
         ]
-
+    
         last_groups = groups[-5:]
         last_ranks = ranks[-5:]
-
+    
         speed = last_ranks[-1] - last_ranks[0]
-
+    
         up_days = 0
         down_days = 0
         flat_days = 0
-
+    
         for i in range(1, len(last_ranks)):
-
+    
             if last_ranks[i] > last_ranks[i - 1]:
                 up_days += 1
-
+    
             elif last_ranks[i] < last_ranks[i - 1]:
                 down_days += 1
-
+    
             else:
                 flat_days += 1
-
+    
         current_rank = last_ranks[-1]
         current_group = last_groups[-1]
-
+    
         # =========================
         # ICON / TREND
         # =========================
-
+    
         if speed >= 3 or up_days >= 3:
             evo_icon = "🔥↑↑"
             evo_trend = "TĂNG TỐC"
-
+    
         elif speed > 0:
             evo_icon = "🟢↑"
             evo_trend = "MẠNH LÊN"
-
+    
         elif speed < -2 or down_days >= 3:
             evo_icon = "🚨↓↓"
             evo_trend = "YẾU NHANH"
-
+    
         elif speed < 0:
             evo_icon = "⚠️↓"
             evo_trend = "YẾU ĐI"
-
+    
         elif current_rank >= 5:
             evo_icon = "🟢→"
             evo_trend = "ĐI NGANG KHỎE"
-
+    
         else:
             evo_icon = "→"
             evo_trend = "ĐI NGANG"
-
+    
         evolution_text = " ➜ ".join(last_groups)
-
+    
         # =========================
         # VOLUME STATUS
         # =========================
-
+    
         vol_status = "⚪ N/A"
         # =========================
         # EVOLUTION QUALITY SCORE
         # =========================
-
+    
         evo_score = 0
-
+    
         # tốc độ tiến hóa
         if speed >= 3:
             evo_score += 2
-
+    
         elif speed > 0:
             evo_score += 1
-
+    
         # tăng liên tục
         if up_days >= 3:
             evo_score += 2
-
+    
         elif up_days >= 2:
             evo_score += 1
-
+    
         # không bị suy yếu
         if down_days == 0:
             evo_score += 2
-
+    
         # giữ nhóm mạnh
         if current_rank >= 6:
             evo_score += 2
-
+    
         elif current_rank >= 5:
             evo_score += 1
-
+    
         # đi ngang khỏe
         if flat_days >= 2 and current_rank >= 5:
             evo_score += 1
         sub_scan = scan_df[
             scan_df["symbol"] == symbol
         ]
-
+    
         if not sub_scan.empty:
-
+    
             scan_row = sub_scan.iloc[0]
-
+    
             vol_now = scan_row.get("volume", np.nan)
             vol_ma20 = scan_row.get("vol_ma20", np.nan)
             vol_ratio = np.nan
-
-if (
+    
+    if (
     pd.notna(vol_now)
     and pd.notna(vol_ma20)
     and vol_ma20 > 0
-):
-
+    ):
+    
         # =========================
         # EVOLUTION TYPE
         # =========================
-
+    
         if evo_score >= 8:
-
+    
             evo_type = "🚀 SIÊU TIẾN HÓA"
-
+    
         elif evo_score >= 6:
-
+    
             evo_type = "🔥 TĂNG TỐC"
-
+    
         elif evo_score >= 4:
-
+    
             evo_type = "🧱 TÍCH LŨY ĐẸP"
-
+    
         elif evo_score >= 2:
-
+    
             evo_type = "🟡 THEO DÕI"
-
+    
         else:
-
+    
             evo_type = "⚠️ NHIỄU"
         leaders.append({
             "symbol": symbol,
@@ -2278,18 +2278,18 @@ if (
             "current_group": current_group,
             "current_rank": current_rank
         })
-
-if not leaders:
+    
+    if not leaders:
     return pd.DataFrame()
-
+    
     out = pd.DataFrame(leaders)
-
+    
     out = out.sort_values(
         by=["speed", "current_rank", "up_days"],
         ascending=False
     ).reset_index(drop=True)
-
-    return out
+    
+return out
 
 
 # =====================================================
