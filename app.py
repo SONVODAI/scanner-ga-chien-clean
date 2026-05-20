@@ -2118,7 +2118,7 @@ def build_evolution_leaders(full_df, scan_df):
 
         row = pivot.loc[symbol].dropna()
 
-        if len(row) < 1:
+        if len(row) < 2:
             continue
 
         groups = row.values.tolist()
