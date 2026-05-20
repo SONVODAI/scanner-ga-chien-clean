@@ -2078,34 +2078,10 @@ full_df.to_csv(
 
 
 
-# =====================================================
-# 🧬 EVOLUTION LEADERS MODULE - FULL CLEAN REWRITE
-# =====================================================
-
-GROUP_RANK = {
-
-    "THEO DÕI": 0,
-    "TÍCH LŨY": 1,
-    "MUA EARLY": 2,
-    "PULL VỪA": 3,
-    "PULL ĐẸP": 4,
-    "MUA BREAK": 5,
-    "CP MẠNH": 6,
-    "GÀ TĂNG TỐC": 7
-
-}
-
-
-# =====================================================
-# BUILD EVOLUTION LEADERS
-# =====================================================
-
-def build_evolution_leaders(evo_df, scan_df):
+def build_evolution_leaders(evo_df):
 
     if evo_df.empty:
         return pd.DataFrame()
-
-    leaders = []
 
     try:
 
@@ -2118,9 +2094,8 @@ def build_evolution_leaders(evo_df, scan_df):
 
         pivot = pivot.sort_index(axis=1)
 
-        # =========================================
-        # LOOP SYMBOL
-        # =========================================
+        leaders = []
+
         for symbol in pivot.index:
 
             row = pivot.loc[symbol].dropna()
@@ -2130,184 +2105,96 @@ def build_evolution_leaders(evo_df, scan_df):
 
             groups = row.values.tolist()
 
-            ranks = []
+            ranks = [
+                GROUP_RANK.get(g, 0)
+                for g in groups
+            ]
 
-            for g in groups:
+            # ====================================
+            # TÍNH CHUỖI TĂNG DÀI NHẤT
+            # ====================================
 
-                rank = GROUP_RANK.get(g, 0)
-
-                ranks.append(rank)
-
-            # =====================================
-            # INIT
-            # =====================================
             current_up = 0
             max_up = 0
 
-            current_down = 0
-            max_down = 0
-
-            # =====================================
-            # EVOLUTION LOOP
-            # =====================================
             for i in range(1, len(ranks)):
 
-                prev_rank = ranks[i - 1]
-                current_rank = ranks[i]
-
-                # =================================
-                # UP
-                # =================================
-                if current_rank > prev_rank:
+                if ranks[i] > ranks[i - 1]:
 
                     current_up += 1
-                    current_down = 0
 
                     if current_up > max_up:
                         max_up = current_up
 
-                # =================================
-                # DOWN
-                # =================================
-                elif current_rank < prev_rank:
-
-                    current_down += 1
-                    current_up = 0
-
-                    if current_down > max_down:
-                        max_down = current_down
-
-                # =================================
-                # SIDEWAY
-                # =================================
                 else:
-
                     current_up = 0
-                    current_down = 0
 
-            # =====================================
-            # FILTER
-            # =====================================
-            if max_up < 2 and max_down < 2:
-                continue
+            # ====================================
+            # CHỈ LẤY CP CÓ TIẾN HÓA
+            # ====================================
 
-            # =====================================
-            # LAST DATA
-            # =====================================
-            last_groups = groups[-5:]
-            last_ranks = ranks[-5:]
+            if max_up >= 2:
 
-            speed = last_ranks[-1] - last_ranks[0]
+                last_groups = groups[-5:]
+                last_ranks = ranks[-5:]
 
-            evolution_text = " ➜ ".join(last_groups)
+                speed = last_ranks[-1] - last_ranks[0]
 
-            # =====================================
-            # ICON
-            # =====================================
-            if max_up >= 3:
+                evolution_text = " → ".join(last_groups)
 
-                evo_icon = "🔥↑"
+                sub_scan = scan_df[
+                    scan_df["symbol"] == symbol
+                ]
 
-            elif max_up >= 2:
+                vol_status = "⚪ N/A"
 
-                evo_icon = "🟢↑"
+                if not sub_scan.empty:
 
-            elif max_down >= 3:
+                    scan_row = sub_scan.iloc[0]
 
-                evo_icon = "🚨↓↓"
+                    vol_now = scan_row.get(
+                        "volume",
+                        np.nan
+                    )
 
-            elif max_down >= 2:
+                    vol_ma20 = scan_row.get(
+                        "vol_ma20",
+                        np.nan
+                    )
 
-                evo_icon = "⚠️↓"
+                    if (
+                        pd.notna(vol_now)
+                        and pd.notna(vol_ma20)
+                        and vol_ma20 > 0
+                    ):
 
-            else:
+                        ratio = vol_now / vol_ma20
 
-                evo_icon = "➜"
+                        if ratio >= 1.5:
+                            vol_status = "🔥 VOL BREAK"
 
-            # =====================================
-            # DEFAULT VOL STATUS
-            # =====================================
-            vol_status = "⚪ N/A"
+                        elif ratio >= 1.0:
+                            vol_status = "🟢 VOL OK"
 
-            # =====================================
-            # SCAN DATA
-            # =====================================
-            sub_scan = scan_df[
-                scan_df["symbol"] == symbol
-            ]
+                        elif ratio >= 0.7:
+                            vol_status = "🟡 VOL TB"
 
-            if not sub_scan.empty:
+                        else:
+                            vol_status = "🔴 VOL YẾU"
 
-                scan_row = sub_scan.iloc[0]
+                leaders.append({
+                    "symbol": symbol,
+                    "evolution": evolution_text,
+                    "days_up": max_up,
+                    "speed": speed,
+                    "volume_status": vol_status,
+                    "current_group": last_groups[-1],
+                    "current_rank": last_ranks[-1],
+                })
 
-                vol_now = scan_row.get(
-                    "volume",
-                    np.nan
-                )
-
-                vol_ma20 = scan_row.get(
-                    "vol_ma20",
-                    np.nan
-                )
-
-                if (
-                    pd.notna(vol_now)
-                    and pd.notna(vol_ma20)
-                    and vol_ma20 > 0
-                ):
-
-                    ratio = vol_now / vol_ma20
-
-                    if ratio >= 1.5:
-
-                        vol_status = "🔥 VOL BREAK"
-
-                    elif ratio >= 1.0:
-
-                        vol_status = "🟢 VOL OK"
-
-                    elif ratio >= 0.7:
-
-                        vol_status = "🟡 VOL TB"
-
-                    else:
-
-                        vol_status = "🔴 VOL YẾU"
-
-            # =====================================
-            # SAVE
-            # =====================================
-            leaders.append({
-
-                "symbol": symbol,
-
-                "evo_icon": evo_icon,
-
-                "evolution": evolution_text,
-
-                "days_up": max_up,
-
-                "days_down": max_down,
-
-                "speed": speed,
-
-                "volume_status": vol_status,
-
-                "current_group": last_groups[-1],
-
-                "current_rank": last_ranks[-1]
-
-            })
-
-        # =========================================
-        # EMPTY
-        # =========================================
-        if len(leaders) == 0:
+        if not leaders:
             return pd.DataFrame()
 
-        # =========================================
-        # FINAL DATAFRAME
-        # =========================================
         out = pd.DataFrame(leaders)
 
         out = out.sort_values(
@@ -2317,79 +2204,46 @@ def build_evolution_leaders(evo_df, scan_df):
                 "days_up"
             ],
             ascending=False
-        )
-
-        out = out.reset_index(drop=True)
+        ).reset_index(drop=True)
 
         return out
 
     except Exception as e:
 
         st.error(
-            f"Evolution Error: {e}"
+            f"Evolution Leaders Error: {e}"
         )
 
         return pd.DataFrame()
 
 
-# =====================================================
-# BUILD DATA
-# =====================================================
-
-evolution_leaders_df = build_evolution_leaders(
-    full_df,
-    scan_df
-)
-
+evolution_leaders_df = build_evolution_leaders(full_df)
 
 # =====================================================
 # 🧬 EVOLUTION LEADERS DISPLAY
 # =====================================================
-
 st.markdown("---")
-
-st.markdown(
-    "## 🧬 EVOLUTION LEADERS"
-)
+st.markdown("## 🧬 EVOLUTION LEADERS")
 
 if evolution_leaders_df.empty:
-
-    st.info(
-        "Chưa có CP tiến hóa mạnh"
-    )
-
+    st.info("Chưa có CP tiến hóa mạnh liên tục")
 else:
-
     show_cols = [
-
         "symbol",
-
-        "evo_icon",
-
         "evolution",
-
         "days_up",
-
-        "days_down",
-
         "speed",
-
         "volume_status",
-
-        "current_group"
-
+        "current_group",
     ]
 
-    out = evolution_leaders_df[
-        show_cols
-    ].copy()
-
+    out = evolution_leaders_df[show_cols].copy()
     out.index = range(len(out))
 
     st.dataframe(
         out,
         use_container_width=True,
-        height=500
+        height=350
     )
 
     csv = out.to_csv(index=False).encode("utf-8-sig")
@@ -2401,20 +2255,13 @@ else:
         mime="text/csv"
     )
 
-
 # =====================================================
 # 🧬 HIỂN THỊ TIẾN HÓA 15 PHIÊN
 # =====================================================
-
 st.markdown("---")
+st.subheader("🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
 
-st.subheader(
-    "🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT"
-)
-
-recent_df = full_df[
-    full_df["date"].isin(latest_days)
-].copy()
+recent_df = full_df[full_df["date"].isin(latest_days)].copy()
 
 pivot_df = recent_df.pivot_table(
     index="symbol",
@@ -2423,118 +2270,57 @@ pivot_df = recent_df.pivot_table(
     aggfunc="first"
 )
 
-pivot_df = pivot_df.reindex(
-    columns=latest_days
-)
-
-
-# =====================================================
-# COLOR
-# =====================================================
+pivot_df = pivot_df.reindex(columns=latest_days)
 
 def color_group(val):
-
     if pd.isna(val):
         return ""
 
     color_map = {
-
         "GÀ TĂNG TỐC": "#00cc66",
-
         "CP MẠNH": "#66ff99",
-
         "MUA BREAK": "#99ffcc",
-
         "PULL ĐẸP": "#ffe066",
-
         "PULL VỪA": "#fff299",
-
         "MUA EARLY": "#99ccff",
-
         "TÍCH LŨY": "#d9d9d9",
-
-        "THEO DÕI": "#ffffff"
-
+        "THEO DÕI": "#ffffff",
     }
 
-    color = color_map.get(
-        val,
-        "#ffffff"
-    )
-
-    return (
-        f"background-color: {color}; color: black"
-    )
-
+    color = color_map.get(val, "#ffffff")
+    return f"background-color: {color}; color: black"
 
 # =====================================================
 # TIẾN HÓA ↑ ↓ →
 # =====================================================
-
 if len(latest_days) >= 2:
 
     today_col = latest_days[-1]
-
     prev_col = latest_days[-2]
 
     pivot_df["TIẾN HÓA"] = ""
 
     for idx in pivot_df.index:
 
-        today_val = pivot_df.loc[
-            idx,
-            today_col
-        ]
+        today_val = pivot_df.loc[idx, today_col]
+        prev_val = pivot_df.loc[idx, prev_col]
 
-        prev_val = pivot_df.loc[
-            idx,
-            prev_col
-        ]
-
-        today_rank = GROUP_RANK.get(
-            today_val,
-            0
-        )
-
-        prev_rank = GROUP_RANK.get(
-            prev_val,
-            0
-        )
+        today_rank = GROUP_RANK.get(today_val, 0)
+        prev_rank = GROUP_RANK.get(prev_val, 0)
 
         if today_rank > prev_rank:
-
             if today_val == "GÀ TĂNG TỐC":
-
-                pivot_df.loc[
-                    idx,
-                    "TIẾN HÓA"
-                ] = "🔥 ↑"
-
+                pivot_df.loc[idx, "TIẾN HÓA"] = "🔥 ↑"
             else:
-
-                pivot_df.loc[
-                    idx,
-                    "TIẾN HÓA"
-                ] = "↑"
+                pivot_df.loc[idx, "TIẾN HÓA"] = "↑"
 
         elif today_rank < prev_rank:
-
-            pivot_df.loc[
-                idx,
-                "TIẾN HÓA"
-            ] = "↓"
+            pivot_df.loc[idx, "TIẾN HÓA"] = "↓"
 
         else:
+            pivot_df.loc[idx, "TIẾN HÓA"] = "→"
 
-            pivot_df.loc[
-                idx,
-                "TIẾN HÓA"
-            ] = "→"
-
-
-styled_df = pivot_df.style.map(
-    color_group
-)
+styled_df = pivot_df.style.map(color_group)
 
 st.dataframe(
     styled_df,
