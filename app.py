@@ -1892,78 +1892,90 @@ def classify_vnindex(prediction):
     else:
         return "THEO DÕI"    
 try:
-        vnindex = pd.read_csv("vnindex_history.csv")
-    
-        vnindex["Date"] = pd.to_datetime(
-            vnindex["Date"],
-            dayfirst=True,
-            errors="coerce"
-        )
-    
-        vnindex = vnindex.dropna(subset=["Date"])
-    
-        vnindex = vnindex[[
-            "Date",
-            "Close",
-            "Volume"
-        ]]
-    
-        if vnindex.empty or len(vnindex) < 100:
-            st.error("VNINDEX tải về bị rỗng hoặc quá ít dữ liệu. Chưa thể chạy Market Analog Engine.")
-            st.stop()
-    
-        st.success("Đã tải dữ liệu VNINDEX thành công")
 
-        # =========================================
+    vnindex = pd.read_csv("vnindex_history.csv")
+
+    vnindex["Date"] = pd.to_datetime(
+        vnindex["Date"],
+        dayfirst=True,
+        errors="coerce"
+    )
+
+    vnindex = vnindex.dropna(subset=["Date"])
+
+    vnindex = vnindex[
+        ["Date", "Close", "Volume"]
+    ]
+
+    if vnindex.empty or len(vnindex) < 100:
+
+        st.error(
+            "VNINDEX tải về bị rỗng hoặc quá ít dữ liệu."
+        )
+
+        st.stop()
+
+    st.success("Đã tải dữ liệu VNINDEX thành công")
+
+    # =====================================
     # ADAPTIVE ANALOG WINDOW
-    # Market khỏe -> nhìn dài hơn
-    # Market yếu / xoay trục nhanh -> phản ứng nhanh hơn
-    # =========================================
-    
-if market_real >= 8:
+    # =====================================
 
-    analog_window = 40
-    analog_mode = "TREND MODE"
+    if market_real >= 8:
 
-elif market_real >= 6:
+        analog_window = 40
+        analog_mode = "TREND MODE"
 
-    analog_window = 30
-    analog_mode = "BALANCE MODE"
+    elif market_real >= 6:
 
-else:
+        analog_window = 30
+        analog_mode = "BALANCE MODE"
 
-    analog_window = 20
-    analog_mode = "FAST MODE"   
+    else:
+
+        analog_window = 20
+        analog_mode = "FAST MODE"
+
     similar_df = find_similar_periods(
-            vnindex,
-            window=analog_window,
-            top_k=5
-        )
-    prediction = generate_market_prediction(similar_df)
-    st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
-    
+        vnindex,
+        window=analog_window,
+        top_k=5
+    )
+
+    prediction = generate_market_prediction(
+        similar_df
+    )
+
+    st.info(
+        f"🧠 ANALOG MODE: {analog_mode} ({analog_window})"
+    )
+
     col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.metric(
-        "REGIME",
-        prediction.get("regime", "N/A")
-    )
+    with col1:
 
-with col2:
-    st.metric(
-        "NAV GỢI Ý",
-        prediction.get("nav", "N/A")
-    )
+        st.metric(
+            "REGIME",
+            prediction.get("regime", "N/A")
+        )
 
-with col3:
-    st.metric(
-        "CONFIDENCE",
-        f"{prediction.get('confidence', 0)}%"
-    )
-    except Exception as e:
-        st.error(e)
-        st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
+    with col2:
+
+        st.metric(
+            "NAV GỢI Ý",
+            prediction.get("nav", "N/A")
+        )
+
+    with col3:
+
+        st.metric(
+            "CONFIDENCE",
+            f"{prediction.get('confidence', 0)}%"
+        )
+
+except Exception as e:
+
+    st.error(e)
     # =====================================================
 # 🧬 EVOLUTION ENGINE V2 - CLEAN FULL VERSION
 # Lưu 15 ngày + đọc tăng/đi ngang/giảm sức mạnh CP
