@@ -2103,22 +2103,22 @@ def build_evolution_leaders(evo_df):
             if len(row) < 3:
                 continue
 
-groups = row.values.tolist()
-
-ranks = [
-    GROUP_RANK.get(g, 0)
-    for g in groups
-]
-
-# ====================================
-# TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
-# ====================================
-
-current_up = 0
-max_up = 0
-
-current_down = 0
-max_down = 0
+    groups = row.values.tolist()
+    
+    ranks = [
+        GROUP_RANK.get(g, 0)
+        for g in groups
+    ]
+    
+    # ====================================
+    # TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
+    # ====================================
+    
+    current_up = 0
+    max_up = 0
+    
+    current_down = 0
+    max_down = 0
 
 for i in range(1, len(ranks)):
 
