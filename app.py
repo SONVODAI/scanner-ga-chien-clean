@@ -2125,13 +2125,13 @@ def build_evolution_leaders(evo_df):
     # =========================
     # TIẾN HÓA
     # =========================
-    if ranks[i] > ranks[i - 1]:
-
-        current_up += 1
-        current_down = 0
-
-        if current_up > max_up:
-            max_up = current_up
+        if ranks[i] > ranks[i - 1]:
+    
+            current_up += 1
+            current_down = 0
+    
+            if current_up > max_up:
+                max_up = current_up
 
     # =========================
     # THOÁI HÓA
