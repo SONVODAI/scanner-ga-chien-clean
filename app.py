@@ -2587,10 +2587,10 @@ def build_top_risk_detector(base_df):
         # =====================================================
 
         if not np.isnan(vol):
-            if vol >= 2.5:
+            if vol >= 2.5 and dist >= 5:
                 score += 3
                 reasons.append("Volume đột biến rất cao")
-            elif vol >= 1.8:
+            elif vol >= 1.8 and dist >= 4:
                 score += 2
                 reasons.append("Volume cao bất thường")
             elif vol >= 1.3:
@@ -2637,7 +2637,7 @@ def build_top_risk_detector(base_df):
         # Kết luận
         # =====================================================
 
-        if score >= 4:
+        if score >= 7:
 
             if score >= 10:
                 level = "🔴 RỦI RO TẠO ĐỈNH CAO"
