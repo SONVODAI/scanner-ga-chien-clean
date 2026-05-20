@@ -2526,6 +2526,12 @@ def build_top_risk_detector(base_df):
                 reasons.append("🔥 Nến xanh mạnh + vol cực cao sau đoạn tăng dài")
 
             elif dist >= 5 and vol >= 1.8 and pct >= 3:
+
+    score += 5
+
+    reasons.append(
+        "⚠️ Nến tăng nóng + vol cao bất thường"
+    )
                 score += 3
                 reasons.append("Nến xanh mạnh + vol cao, bắt đầu có dấu hiệu FOMO")
 
