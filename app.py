@@ -6,7 +6,7 @@ def calc_market_forecast(df: pd.DataFrame):
     total = len(df)
 
     if total == 0:
-        return 0, "Không có dữ liệu"f
+        return 0, "Không có dữ liệu"
 
     # =========================
     # Đếm nhóm khỏe
