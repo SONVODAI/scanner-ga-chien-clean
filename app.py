@@ -1972,6 +1972,35 @@ try:
             "CONFIDENCE",
             f"{prediction.get('confidence', 0)}%"
         )
+
+except Exception as e:
+
+    st.error(e)
+   st.markdown("---")
+
+st.markdown("### 📚 CÁC GIAI ĐOẠN LỊCH SỬ TƯƠNG ĐỒNG")
+
+if not similar_df.empty:
+
+    display_cols = [
+        "start_date",
+        "end_date",
+        "similarity"
+    ]
+
+    available_cols = [
+        c for c in display_cols
+        if c in similar_df.columns
+    ]
+
+    st.dataframe(
+        similar_df[available_cols],
+        use_container_width=True
+    )
+
+else:
+
+    st.warning("Không tìm thấy mẫu lịch sử tương đồng") 
 st.markdown("---")
 
 st.markdown("### 📚 CÁC GIAI ĐOẠN LỊCH SỬ TƯƠNG ĐỒNG")
@@ -1997,9 +2026,6 @@ if not similar_df.empty:
 else:
 
     st.warning("Không tìm thấy mẫu lịch sử tương đồng")
-except Exception as e:
-
-    st.error(e)
     # =====================================================
 # 🧬 EVOLUTION ENGINE V2 - CLEAN FULL VERSION
 # Lưu 15 ngày + đọc tăng/đi ngang/giảm sức mạnh CP
