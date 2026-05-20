@@ -2120,7 +2120,7 @@ def build_evolution_leaders(evo_df):
             current_down = 0
             max_down = 0
         
-    for i in range(1, len(ranks)):
+        for i in range(1, len(ranks)):
 
     # =========================
     # TIẾN HÓA
