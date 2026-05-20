@@ -2280,7 +2280,7 @@ def build_evolution_leaders(full_df, scan_df):
         })
     
     if not leaders:
-    return pd.DataFrame()
+        return pd.DataFrame()
     
     out = pd.DataFrame(leaders)
     
@@ -2289,7 +2289,7 @@ def build_evolution_leaders(full_df, scan_df):
         ascending=False
     ).reset_index(drop=True)
     
-return out
+    return out
 
 
 # =====================================================
