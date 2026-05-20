@@ -2103,24 +2103,24 @@ def build_evolution_leaders(evo_df):
             if len(row) < 3:
                 continue
 
-                groups = row.values.tolist()
-    
-                ranks = [
-                    GROUP_RANK.get(g, 0)
-                    for g in groups
-                ]
-        
-        # ====================================
-        # TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
-        # ====================================
-        
-            current_up = 0
-            max_up = 0
-            
-            current_down = 0
-            max_down = 0
-        
-        for i in range(1, len(ranks)):
+      groups = row.values.tolist()
+
+ranks = [
+    GROUP_RANK.get(g, 0)
+    for g in groups
+]
+
+# ====================================
+# TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
+# ====================================
+
+current_up = 0
+max_up = 0
+
+current_down = 0
+max_down = 0
+
+for i in range(1, len(ranks)):
 
     # =========================
     # TIẾN HÓA
@@ -2150,7 +2150,97 @@ def build_evolution_leaders(evo_df):
     else:
 
         current_up = 0
-        current_down = 0         
+        current_down = 0
+
+# ====================================
+# CHỈ LẤY CP CÓ TIẾN HÓA / THOÁI HÓA
+# ====================================
+
+if max_up >= 2 or max_down >= 2:
+
+    last_groups = groups[-5:]
+    last_ranks = ranks[-5:]
+
+    speed = last_ranks[-1] - last_ranks[0]
+
+    evolution_text = " → ".join(last_groups)
+
+    # ====================================
+    # ICON TIẾN HÓA
+    # ====================================
+
+    if max_up >= 3:
+        evo_icon = "🔥↑"
+
+    elif max_up >= 2:
+        evo_icon = "🟢↑"
+
+    elif max_down >= 3:
+        evo_icon = "🚨↓↓"
+
+    elif max_down >= 2:
+        evo_icon = "⚠️↓"
+
+    else:
+        evo_icon = "→"
+
+    sub_scan = scan_df[
+        scan_df["symbol"] == symbol
+    ]
+
+    vol_status = "⚪ N/A"
+
+    if not sub_scan.empty:
+
+        scan_row = sub_scan.iloc[0]
+
+        vol_now = scan_row.get(
+            "volume",
+            np.nan
+        )
+
+        vol_ma20 = scan_row.get(
+            "vol_ma20",
+            np.nan
+        )
+
+        if (
+            pd.notna(vol_now)
+            and pd.notna(vol_ma20)
+            and vol_ma20 > 0
+        ):
+
+            ratio = vol_now / vol_ma20
+
+            if ratio >= 1.5:
+                vol_status = "🔥 VOL BREAK"
+
+            elif ratio >= 1.0:
+                vol_status = "🟢 VOL OK"
+
+            elif ratio >= 0.7:
+                vol_status = "🟡 VOL TB"
+
+            else:
+                vol_status = "🔴 VOL YẾU"
+
+    leaders.append({
+        "symbol": symbol,
+
+        "evo_icon": evo_icon,
+
+        "evolution": evolution_text,
+
+        "days_up": max_up,
+        "days_down": max_down,
+
+        "speed": speed,
+
+        "volume_status": vol_status,
+
+        "current_group": last_groups[-1],
+        "current_rank": last_ranks[-1],
+    })                 
         # ====================================
         # CHỈ LẤY CP CÓ TIẾN HÓA
         # ====================================
