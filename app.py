@@ -2279,7 +2279,7 @@ if (
             "current_rank": current_rank
         })
 
-    if not leaders:
+if not leaders:
         return pd.DataFrame()
 
     out = pd.DataFrame(leaders)
