@@ -2237,8 +2237,8 @@ if (
     and pd.notna(vol_ma20)
     and vol_ma20 > 0
 ):
-    vol_ratio = vol_now / vol_ma20
-            if (
+
+    ratio = vol_now / vol_ma20            if (
                 pd.notna(vol_now)
                 and pd.notna(vol_ma20)
                 and vol_ma20 > 0
