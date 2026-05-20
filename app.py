@@ -2451,3 +2451,232 @@ st.dataframe(
     use_container_width=True,
     height=650
 )    
+# =====================================================
+# 🔺 TOP RISK DETECTOR V1.1
+# Cổ phiếu có dấu hiệu nóng / tạo đỉnh ngắn hạn
+# Dán cuối app.py - không đụng logic cũ
+# =====================================================
+
+import pandas as pd
+import numpy as np
+import streamlit as st
+
+
+def _find_col(df, names):
+    for c in names:
+        if c in df.columns:
+            return c
+    return None
+
+
+def build_top_risk_detector(base_df):
+
+    if base_df is None or base_df.empty:
+        return pd.DataFrame()
+
+    df = base_df.copy()
+
+    symbol_col = _find_col(df, ["symbol", "ticker", "Mã", "ma"])
+    rsi_col    = _find_col(df, ["rsi", "RSI", "RSI14"])
+    dist_col   = _find_col(df, ["dist_from_ema9_pct", "DIST_EMA9", "dist"])
+    vol_col    = _find_col(df, ["volume_ratio", "vol_ratio", "VOL_RATIO", "vol_chg"])
+    pct_col    = _find_col(df, ["pct_change", "%change", "change_percent", "price_change_pct"])
+    obv_col    = _find_col(df, ["OBV_POWER", "obv_power"])
+    macd_col   = _find_col(df, ["macd_hist", "MACD_HIST", "histogram", "Histogram"])
+    group_col  = _find_col(df, ["group", "ENTRY_TYPE", "entry_type", "Nhóm"])
+
+    if symbol_col is None:
+        return pd.DataFrame()
+
+    rows = []
+
+    for _, row in df.iterrows():
+
+        symbol = row.get(symbol_col, "")
+        score = 0
+        reasons = []
+
+        rsi = pd.to_numeric(row.get(rsi_col, np.nan), errors="coerce") if rsi_col else np.nan
+        dist = pd.to_numeric(row.get(dist_col, np.nan), errors="coerce") if dist_col else np.nan
+        vol = pd.to_numeric(row.get(vol_col, np.nan), errors="coerce") if vol_col else np.nan
+        pct = pd.to_numeric(row.get(pct_col, np.nan), errors="coerce") if pct_col else np.nan
+        macd = pd.to_numeric(row.get(macd_col, np.nan), errors="coerce") if macd_col else np.nan
+
+        obv_text = str(row.get(obv_col, "")).upper() if obv_col else ""
+        group_text = str(row.get(group_col, "")).upper() if group_col else ""
+
+        # =====================================================
+        # 1. CASE QUAN TRỌNG: NẾN XANH MẠNH + VOL CỰC CAO
+        # Sau khi giá đã tăng nhiều → dễ là cây FOMO cuối sóng
+        # =====================================================
+
+        if (
+            not np.isnan(dist)
+            and not np.isnan(vol)
+            and not np.isnan(pct)
+        ):
+            if dist >= 7 and vol >= 2 and pct >= 4:
+                score += 5
+                reasons.append("🔥 Nến xanh mạnh + vol cực cao sau đoạn tăng dài")
+
+            elif dist >= 5 and vol >= 1.8 and pct >= 3:
+                score += 3
+                reasons.append("Nến xanh mạnh + vol cao, bắt đầu có dấu hiệu FOMO")
+
+        # =====================================================
+        # 2. RSI quá nóng
+        # =====================================================
+
+        if not np.isnan(rsi):
+            if rsi >= 80:
+                score += 3
+                reasons.append("RSI quá nóng ≥80")
+            elif rsi >= 75:
+                score += 2
+                reasons.append("RSI nóng ≥75")
+            elif rsi >= 70:
+                score += 1
+                reasons.append("RSI vào vùng cao ≥70")
+
+        # =====================================================
+        # 3. Giá xa EMA9
+        # =====================================================
+
+        if not np.isnan(dist):
+            if dist >= 10:
+                score += 3
+                reasons.append("Giá xa EMA9 >10%")
+            elif dist >= 7:
+                score += 2
+                reasons.append("Giá xa EMA9 7–10%")
+            elif dist >= 5:
+                score += 1
+                reasons.append("Giá bắt đầu nóng >5%")
+
+        # =====================================================
+        # 4. Volume tăng bất thường
+        # =====================================================
+
+        if not np.isnan(vol):
+            if vol >= 2.5:
+                score += 3
+                reasons.append("Volume đột biến rất cao")
+            elif vol >= 1.8:
+                score += 2
+                reasons.append("Volume cao bất thường")
+            elif vol >= 1.3:
+                score += 1
+                reasons.append("Volume tăng mạnh")
+
+        # =====================================================
+        # 5. OBV không còn mạnh
+        # =====================================================
+
+        if obv_text:
+            if "YẾU" in obv_text or "WEAK" in obv_text:
+                score += 3
+                reasons.append("OBV yếu")
+            elif "VỪA" in obv_text or "TRUNG" in obv_text:
+                score += 1
+                reasons.append("OBV không còn thật mạnh")
+
+        # =====================================================
+        # 6. MACD Histogram suy yếu
+        # =====================================================
+
+        if not np.isnan(macd):
+            if macd < 0:
+                score += 2
+                reasons.append("MACD Histogram âm")
+            elif macd == 0:
+                score += 1
+                reasons.append("MACD chững lại")
+
+        # =====================================================
+        # 7. Cổ phiếu đang thuộc nhóm quá mạnh/quá nóng
+        # =====================================================
+
+        if group_text:
+            if "GÀ TĂNG TỐC" in group_text:
+                score += 2
+                reasons.append("Đang ở nhóm Gà tăng tốc")
+            elif "CP MẠNH" in group_text:
+                score += 1
+                reasons.append("Đang ở nhóm CP mạnh")
+
+        # =====================================================
+        # Kết luận
+        # =====================================================
+
+        if score >= 4:
+
+            if score >= 10:
+                level = "🔴 RỦI RO TẠO ĐỈNH CAO"
+                action = "Không mua đuổi / canh hạ tỷ trọng / siết stop"
+            elif score >= 7:
+                level = "🟠 CẢNH BÁO NÓNG"
+                action = "Chỉ giữ nếu trend còn tốt, không mua mới"
+            else:
+                level = "🟡 THEO DÕI PHÂN PHỐI"
+                action = "Theo dõi thêm 1–3 phiên"
+
+            rows.append({
+                "symbol": symbol,
+                "top_risk_score": score,
+                "risk_level": level,
+                "reason": " | ".join(reasons),
+                "action": action
+            })
+
+    out = pd.DataFrame(rows)
+
+    if out.empty:
+        return out
+
+    return out.sort_values(
+        by="top_risk_score",
+        ascending=False
+    ).reset_index(drop=True)
+
+
+# =====================================================
+# DISPLAY
+# =====================================================
+
+st.markdown("---")
+st.markdown("## 🔺 CỔ PHIẾU CÓ DẤU HIỆU TẠO ĐỈNH / FOMO CUỐI SÓNG")
+
+try:
+
+    _source_df = None
+
+    for _name in [
+        "final_df",
+        "result_df",
+        "scan_df",
+        "ranking_df",
+        "watchlist_df",
+        "df"
+    ]:
+        if _name in globals():
+            _tmp = globals()[_name]
+            if isinstance(_tmp, pd.DataFrame) and not _tmp.empty:
+                _source_df = _tmp
+                break
+
+    if _source_df is None:
+        st.info("Chưa tìm thấy bảng dữ liệu để quét dấu hiệu tạo đỉnh.")
+    else:
+        top_risk_df = build_top_risk_detector(_source_df)
+
+        if top_risk_df.empty:
+            st.success("✅ Chưa phát hiện cổ phiếu có dấu hiệu tạo đỉnh rõ.")
+        else:
+            st.dataframe(
+                top_risk_df,
+                use_container_width=True,
+                hide_index=True
+            )
+
+except Exception as e:
+    st.warning(f"TOP RISK detector chưa chạy được: {e}")
