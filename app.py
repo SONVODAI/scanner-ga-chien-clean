@@ -2114,12 +2114,12 @@ def build_evolution_leaders(evo_df):
     # TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
     # ====================================
     
-        current_up = 0
-        max_up = 0
+            current_up = 0
+            max_up = 0
+            
+            current_down = 0
+            max_down = 0
         
-        current_down = 0
-        max_down = 0
-    
     for i in range(1, len(ranks)):
 
     # =========================
