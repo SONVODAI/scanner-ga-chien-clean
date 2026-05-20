@@ -1979,19 +1979,6 @@ except Exception as e:
     st.error(e)
 st.markdown("---")
 
-st.markdown("### 📚 CÁC GIAI ĐOẠN LỊCH SỬ TƯƠNG ĐỒNG")
-
-if not similar_df.empty:
-
-    st.dataframe(
-        similar_df,
-        use_container_width=True
-    )
-else:
-
-    st.warning("Không tìm thấy mẫu lịch sử tương đồng") 
-st.markdown("---")
-
 
     # =====================================================
 # 🧬 EVOLUTION ENGINE V2 - CLEAN FULL VERSION
