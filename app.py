@@ -2540,11 +2540,7 @@ def build_top_risk_detector(base_df):
                     "⚠️ Nến tăng nóng + vol cao bất thường"
                 )
 
-                score += 5
-
-                          reasons.append(
-                    "⚠️ Nến tăng nóng + vol cao bất thường"
-                )      
+                      
         # =====================================================
         # 2. RSI quá nóng
         # =====================================================
