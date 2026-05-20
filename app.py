@@ -2333,6 +2333,10 @@ else:
         "symbol",
         "evo_icon",
         "evo_trend",
+
+        "evo_score",
+        "evo_type",
+        
         "evolution",
         "speed",
         "up_days",
