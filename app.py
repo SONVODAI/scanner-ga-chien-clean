@@ -2542,15 +2542,9 @@ def build_top_risk_detector(base_df):
 
                 score += 5
 
-                reasons.append(
+                          reasons.append(
                     "⚠️ Nến tăng nóng + vol cao bất thường"
-                )
-    reasons.append(
-        "⚠️ Nến tăng nóng + vol cao bất thường"
-    )
-        score += 3
-        reasons.append("Nến xanh mạnh + vol cao, bắt đầu có dấu hiệu FOMO")
-
+                )      
         # =====================================================
         # 2. RSI quá nóng
         # =====================================================
