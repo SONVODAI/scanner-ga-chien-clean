@@ -2510,25 +2510,35 @@ def build_top_risk_detector(base_df):
         # Sau khi giá đã tăng nhiều → dễ là cây FOMO cuối sóng
         # =====================================================
 
-        if (
+                if (
             not np.isnan(dist)
             and not np.isnan(vol)
             and not np.isnan(pct)
         ):
+
+            # ==========================================
+            # 🔥 NẾN FOMO CUỐI SÓNG
+            # ==========================================
+
             if dist >= 7 and vol >= 2 and pct >= 4:
 
-    score += 8
+                score += 8
 
-    reasons.append(
-        "🔥 Nến FOMO cuối sóng - tăng mạnh + vol cực lớn"
-    )
-                score += 5
-                reasons.append("🔥 Nến xanh mạnh + vol cực cao sau đoạn tăng dài")
+                reasons.append(
+                    "🔥 Nến FOMO cuối sóng - tăng mạnh + vol cực lớn"
+                )
+
+            # ==========================================
+            # ⚠️ NẾN TĂNG NÓNG
+            # ==========================================
 
             elif dist >= 5 and vol >= 1.8 and pct >= 3:
 
-    score += 5
+                score += 5
 
+                reasons.append(
+                    "⚠️ Nến tăng nóng + vol cao bất thường"
+                )
     reasons.append(
         "⚠️ Nến tăng nóng + vol cao bất thường"
     )
