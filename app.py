@@ -2653,7 +2653,7 @@ def build_top_risk_detector(base_df):
                 "symbol": symbol,
                 "pct": round(pct, 2) if not np.isnan(pct) else None,
                 "dist": round(dist, 2) if not np.isnan(dist) else None,
-                "vol": round(vol, 2) if not np.isnan(vol) else None,
+                "vol": f"{round(vol, 1)}x" if not np.isnan(vol) else None,
                 "rsi": round(rsi, 2) if not np.isnan(rsi) else None,
                 "top_risk_score": score,
                 "risk_level": level,
