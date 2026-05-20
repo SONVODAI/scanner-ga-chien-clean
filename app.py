@@ -6,7 +6,7 @@ def calc_market_forecast(df: pd.DataFrame):
     total = len(df)
 
     if total == 0:
-        return 0, "Không có dữ liệu"
+        return 0, "Không có dữ liệu"f
 
     # =========================
     # Đếm nhóm khỏe
@@ -2479,11 +2479,17 @@ def build_top_risk_detector(base_df):
     symbol_col = _find_col(df, ["symbol", "ticker", "Mã", "ma"])
     rsi_col    = _find_col(df, ["rsi", "RSI", "RSI14", "rsi14"])
     dist_col   = _find_col(df, ["dist_from_ema9_pct", "DIST_EMA9", "dist"])
-    vol_col    = _find_col(df, [
+    vol_col = _find_col(df, [
     "volume_ratio",
     "vol_ratio",
     "VOL_RATIO",
-    "vol_chg"
+    "vol_chg",
+    "vol",
+    "volume",
+    "volume_ratio_20",
+    "vol_strength",
+    "vol20_ratio",
+    "volume_strength"
 ])
     pct_col    = _find_col(df, ["pct_change", "%change", "change_percent", "price_change_pct"])
     obv_col    = _find_col(df, ["OBV_POWER", "obv_power"])
