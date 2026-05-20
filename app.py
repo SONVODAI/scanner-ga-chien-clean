@@ -1972,7 +1972,31 @@ try:
             "CONFIDENCE",
             f"{prediction.get('confidence', 0)}%"
         )
+st.markdown("---")
 
+st.markdown("### 📚 CÁC GIAI ĐOẠN LỊCH SỬ TƯƠNG ĐỒNG")
+
+if not similar_df.empty:
+
+    display_cols = [
+        "start_date",
+        "end_date",
+        "similarity"
+    ]
+
+    available_cols = [
+        c for c in display_cols
+        if c in similar_df.columns
+    ]
+
+    st.dataframe(
+        similar_df[available_cols],
+        use_container_width=True
+    )
+
+else:
+
+    st.warning("Không tìm thấy mẫu lịch sử tương đồng")
 except Exception as e:
 
     st.error(e)
