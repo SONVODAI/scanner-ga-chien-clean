@@ -2237,7 +2237,7 @@ def build_evolution_leaders(full_df, scan_df):
     and pd.notna(vol_ma20)
     and vol_ma20 > 0
     ):
-    
+    vol_ratio = vol_now / vol_ma20
         # =========================
         # EVOLUTION TYPE
         # =========================
