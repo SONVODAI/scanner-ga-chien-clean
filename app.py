@@ -1948,13 +1948,13 @@ try:
         prediction.get("regime", "N/A")
     )
 
-with col2:
+    with col2:
     st.metric(
         "NAV GỢI Ý",
         prediction.get("nav", "N/A")
     )
 
-with col3:
+    with col3:
     st.metric(
         "CONFIDENCE",
         f"{prediction.get('confidence', 0)}%"
