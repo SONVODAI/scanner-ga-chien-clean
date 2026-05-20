@@ -2103,12 +2103,12 @@ def build_evolution_leaders(evo_df):
             if len(row) < 3:
                 continue
 
-    groups = row.values.tolist()
-    
-    ranks = [
-        GROUP_RANK.get(g, 0)
-        for g in groups
-    ]
+        groups = row.values.tolist()
+        
+        ranks = [
+            GROUP_RANK.get(g, 0)
+            for g in groups
+        ]
     
     # ====================================
     # TÍNH CHUỖI TIẾN HÓA / THOÁI HÓA
