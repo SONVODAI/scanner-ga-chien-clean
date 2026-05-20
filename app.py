@@ -2230,7 +2230,14 @@ def build_evolution_leaders(full_df, scan_df):
 
             vol_now = scan_row.get("volume", np.nan)
             vol_ma20 = scan_row.get("vol_ma20", np.nan)
+            vol_ratio = np.nan
 
+if (
+    pd.notna(vol_now)
+    and pd.notna(vol_ma20)
+    and vol_ma20 > 0
+):
+    vol_ratio = vol_now / vol_ma20
             if (
                 pd.notna(vol_now)
                 and pd.notna(vol_ma20)
@@ -2653,7 +2660,7 @@ def build_top_risk_detector(base_df):
                 "symbol": symbol,
                 "pct": round(pct, 2) if not np.isnan(pct) else None,
                 "dist": round(dist, 2) if not np.isnan(dist) else None,
-                "vol": f"{round(vol, 1)}x" if not np.isnan(vol) else None,
+                "vol": f"{round(vol_ratio, 1)}x" if not np.isnan(vol) else None,
                 "rsi": round(rsi, 2) if not np.isnan(rsi) else None,
                 "top_risk_score": score,
                 "risk_level": level,
