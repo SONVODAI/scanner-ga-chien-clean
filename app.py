@@ -1937,6 +1937,7 @@ try:
         analog_mode = "FAST MODE"
 
     similar_df = find_similar_periods(
+        st.write(similar_df)
         vnindex,
         window=analog_window,
         top_k=5
@@ -1982,22 +1983,10 @@ st.markdown("### 📚 CÁC GIAI ĐOẠN LỊCH SỬ TƯƠNG ĐỒNG")
 
 if not similar_df.empty:
 
-    display_cols = [
-        "start_date",
-        "end_date",
-        "similarity"
-    ]
-
-    available_cols = [
-        c for c in display_cols
-        if c in similar_df.columns
-    ]
-
     st.dataframe(
-        similar_df[available_cols],
+        similar_df,
         use_container_width=True
     )
-
 else:
 
     st.warning("Không tìm thấy mẫu lịch sử tương đồng") 
