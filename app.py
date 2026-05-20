@@ -2516,6 +2516,12 @@ def build_top_risk_detector(base_df):
             and not np.isnan(pct)
         ):
             if dist >= 7 and vol >= 2 and pct >= 4:
+
+    score += 8
+
+    reasons.append(
+        "🔥 Nến FOMO cuối sóng - tăng mạnh + vol cực lớn"
+    )
                 score += 5
                 reasons.append("🔥 Nến xanh mạnh + vol cực cao sau đoạn tăng dài")
 
