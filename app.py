@@ -2120,18 +2120,18 @@ def build_evolution_leaders(evo_df):
             current_down = 0
             max_down = 0
         
-        for i in range(1, len(ranks)):
+    for i in range(1, len(ranks)):
 
     # =========================
     # TIẾN HÓA
     # =========================
-        if ranks[i] > ranks[i - 1]:
-    
-            current_up += 1
-            current_down = 0
-    
-            if current_up > max_up:
-                max_up = current_up
+    if ranks[i] > ranks[i - 1]:
+
+        current_up += 1
+        current_down = 0
+
+        if current_up > max_up:
+            max_up = current_up
 
     # =========================
     # THOÁI HÓA
