@@ -1959,9 +1959,9 @@ with col3:
         "CONFIDENCE",
         f"{prediction.get('confidence', 0)}%"
     )
-except Exception as e:
-    st.error(e)
-    st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
+    except Exception as e:
+        st.error(e)
+        st.info(f"🧠 ANALOG MODE: {analog_mode} ({analog_window})")
     # =====================================================
 # 🧬 EVOLUTION ENGINE V2 - CLEAN FULL VERSION
 # Lưu 15 ngày + đọc tăng/đi ngang/giảm sức mạnh CP
