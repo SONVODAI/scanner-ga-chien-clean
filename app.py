@@ -2280,17 +2280,17 @@ for symbol in pivot.index:
         else:
 
             evo_type = "⚠️ NHIỄU"
-          leaders.append({
-            "symbol": symbol,
-            "evolution": evolution_text,
-            "speed": speed,
-            "up_days": up_days,
-            "down_days": down_days,
-            "flat_days": flat_days,
-            "volume_status": vol_status,
-            "current_group": current_group,
-            "current_rank": current_rank
-        })
+              leaders.append({
+                "symbol": symbol,
+                "evolution": evolution_text,
+                "speed": speed,
+                "up_days": up_days,
+                "down_days": down_days,
+                "flat_days": flat_days,
+                "volume_status": vol_status,
+                "current_group": current_group,
+                "current_rank": current_rank
+            })
 
     if not leaders:
         return pd.DataFrame()
