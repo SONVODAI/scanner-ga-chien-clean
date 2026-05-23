@@ -2006,8 +2006,12 @@ GROUP_RANK = {
 
 def save_evolution_history(scan_df):
 
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+    today_str = pd.Timestamp.now(
+    tz="Asia/Ho_Chi_Minh"
+).strftime("%Y-%m-%d")
+    current_time = pd.Timestamp.now(
+    tz="Asia/Ho_Chi_Minh"
+).strftime("%Y-%m-%d %H:%M")
 
     rows = []
 
@@ -2064,14 +2068,23 @@ def save_evolution_history(scan_df):
         subset=["date", "symbol"],
         keep="last"
     )
+full_df["date"] = pd.to_datetime(
+    full_df["date"],
+    errors="coerce"
+)
 
-    all_days = sorted(
-        full_df["date"].dropna().unique()
-    )
+all_days = sorted(
+    full_df["date"].dropna().unique()
+)
 
-    latest_days = all_days[-MAX_EVOLUTION_DAYS:]
+latest_days = all_days[-MAX_EVOLUTION_DAYS:]
 
-    full_df = full_df[
+full_df = full_df[
+    full_df["date"].isin(latest_days)
+].copy()
+
+full_df["date"] = full_df["date"].dt.strftime("%Y-%m-%d")
+        full_df = full_df[
         full_df["date"].isin(latest_days)
     ].copy()
 
