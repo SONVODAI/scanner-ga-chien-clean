@@ -2282,7 +2282,7 @@ st.markdown("---")
     
 st.markdown("---")
 st.markdown("## 🚀 CỔ PHIẾU TIẾN HÓA CHỌN LỌC")
-
+leaders_df = build_evolution_leaders(full_df)
 if leaders_df.empty:
 
     st.info("Chưa có cổ phiếu tiến hóa mạnh")
