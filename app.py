@@ -2078,16 +2078,17 @@ def save_evolution_history(scan_df):
     )
     latest_days = all_days[-MAX_EVOLUTION_DAYS:]
     
-    full_df = full_df[
+        full_df = full_df[
         full_df["date"].isin(latest_days)
     ].copy()
-    
+
     full_df["date"] = full_df["date"].dt.strftime("%Y-%m-%d")
-    
+
     full_df = full_df.sort_values(
         by=["date", "symbol"]
     ).reset_index(drop=True)
-        full_df.to_csv(
+
+    full_df.to_csv(
         EVOLUTION_FILE,
         index=False
     )
@@ -2099,6 +2100,7 @@ def save_evolution_history(scan_df):
         index=False
     )
 
+    return full_df, latest_days
     return full_df, latest_days
  =====================================================
 # BUILD EVOLUTION LEADERS
