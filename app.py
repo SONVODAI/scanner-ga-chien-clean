@@ -2280,8 +2280,8 @@ except Exception as e:
         st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
 except Exception as e:
         st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
-    st.markdown("---")
-    st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
+st.markdown("---")
+st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
     
     pivot = full_df.pivot_table(
     index="symbol",
