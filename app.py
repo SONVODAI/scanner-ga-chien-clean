@@ -2280,7 +2280,7 @@ for symbol in pivot.index:
         else:
 
             evo_type = "⚠️ NHIỄU"
-        leaders.append({
+          leaders.append({
             "symbol": symbol,
             "evolution": evolution_text,
             "speed": speed,
@@ -2302,7 +2302,7 @@ for symbol in pivot.index:
         ascending=False
     ).reset_index(drop=True)
 
-    return out        
+    return out             
 # =====================================================
 # RUN EVOLUTION ENGINE
 # =====================================================
