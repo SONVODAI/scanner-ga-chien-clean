@@ -171,9 +171,6 @@ except Exception as e:
 
     except Exception as e:
         print("GitHub push error:", e)
-
-        return full_df, latest_days
-
 def build_evolution_leaders(full_df):
 
     if full_df.empty:
@@ -222,6 +219,7 @@ def build_evolution_leaders(full_df):
         leaders_df = pd.DataFrame(leaders)
 
         if not leaders_df.empty:
+
             leaders_df = leaders_df.sort_values(
                 by="evolution_score",
                 ascending=False
@@ -229,7 +227,10 @@ def build_evolution_leaders(full_df):
 
         return leaders_df
 
-    except Exception:
-        return pd.DataFrame()
+    except Exception as e:
 
-    
+        print("Evolution leaders error:", e)
+
+        return pd.DataFrame()
+        return full_df, latest_days
+
