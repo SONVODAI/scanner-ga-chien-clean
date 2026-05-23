@@ -2076,7 +2076,6 @@ full_df["date"] = pd.to_datetime(
 all_days = sorted(
     full_df["date"].dropna().unique()
 )
-
 latest_days = all_days[-MAX_EVOLUTION_DAYS:]
 
 full_df = full_df[
@@ -2084,16 +2083,15 @@ full_df = full_df[
 ].copy()
 
 full_df["date"] = full_df["date"].dt.strftime("%Y-%m-%d")
-   
-    full_df = full_df.sort_values(
-        by=["date", "symbol"]
-    ).reset_index(drop=True)
 
-    full_df.to_csv(
-        EVOLUTION_FILE,
-        index=False
-    )
+full_df = full_df.sort_values(
+    by=["date", "symbol"]
+).reset_index(drop=True)
 
+full_df.to_csv(
+    EVOLUTION_FILE,
+    index=False
+)
     backup_name = f"backup_evolution_{today_str}.csv"
 
     full_df.to_csv(
