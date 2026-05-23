@@ -2088,20 +2088,19 @@ def save_evolution_history(scan_df):
         by=["date", "symbol"]
     ).reset_index(drop=True)
     
-    full_df.to_csv(
+        full_df.to_csv(
         EVOLUTION_FILE,
         index=False
     )
+
     backup_name = f"backup_evolution_{today_str}.csv"
-    
+
     full_df.to_csv(
         backup_name,
         index=False
     )
-    
-        return full_df, latest_days
-    
-    
+
+    return full_df, latest_days  
 # =====================================================
 # BUILD EVOLUTION LEADERS
 # =====================================================
