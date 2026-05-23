@@ -2,19 +2,23 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 def save_evolution_history(scan_df):
-
+GROUP_RANK = {
+    "THEO DÕI": 0,
+    "TÍCH LŨY": 1,
+    "MUA EARLY": 2,
+    "PULL VỪA": 3,
+    "PULL ĐẸP": 4,
+    "MUA BREAK": 5,
+    "CP MẠNH": 6,
+    "GÀ TĂNG TỐC": 7,
+}
     today_str = datetime.now().strftime("%Y-%m-%d")
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     rows = []
-
-    # VNINDEXf
-    try:
-        vnindex_group = classify_vnindex(prediction)
-    except Exception:
-        vnindex_group = "THEO DÕI"
-
-    rows.append({
+# VNINDEX
+vnindex_group = "THEO DÕI"
+        rows.append({
         "date": today_str,
         "time": current_time,
         "symbol": "VNINDEX",
