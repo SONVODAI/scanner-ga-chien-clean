@@ -1649,37 +1649,66 @@ else:
 # DETAIL TABLE
 # =========================================================
 if show_detail:
+
     st.markdown("---")
     st.subheader("BẢNG TỔNG CHI TIẾT")
 
-        detail_cols = [
+    def classify_obv(row):
+
+        if row["obv"] < row["obv_ema9"]:
+            return "🔴 OBV YẾU"
+
+        elif (
+            (row["obv"] - row["obv_ema9"])
+            / abs(row["obv_ema9"])
+            * 100
+        ) > 2:
+            return "🟢 OBV MẠNH"
+
+        else:
+            return "🟡 OBV TRUNG TÍNH"
+
+
+    scan_df["OBV_POWER"] = scan_df.apply(
+        classify_obv,
+        axis=1
+    )
+
+    detail_cols = [
         "symbol", "group", "price",
         "ema9", "ma20",
-        "ema9_ma20_slope", "ema9_ma20_slope_change", "slope_state",
+        "ema9_ma20_slope",
+        "ema9_ma20_slope_change",
+        "slope_state",
         "rsi14", "rsi_slope",
-        "obv", "obv_ema9", "obv_status", "OBV_POWER",
+        "obv", "obv_ema9",
+        "obv_status",
+        "OBV_POWER",
         "E", "R", "O", "S", "RS",
         "rs5", "rs10",
         "total_score",
         "dry_score", "dry_label",
-        "dist_from_ema9_pct", "pull_label", "breakout_ref",
-        "status", "warning"
+        "dist_from_ema9_pct",
+        "pull_label",
+        "breakout_ref",
+        "status",
+        "warning"
     ]
-def classify_obv(row):
-    if row["obv"] < row["obv_ema9"]:
-        return "🔴 OBV YẾU"
-    elif (row["obv"] - row["obv_ema9"]) / abs(row["obv_ema9"]) * 100 > 2:
-        return "🟢 OBV MẠNH"
-    else:
-        return "🟡 OBV TRUNG TÍNH"
-    scan_df["OBV_POWER"] = scan_df.apply(classify_obv, axis=1)
-    detail_cols = [c for c in detail_cols if c in scan_df.columns]
+
+    detail_cols = [
+        c for c in detail_cols
+        if c in scan_df.columns
+    ]
 
     detail_df = scan_df[detail_cols].copy()
+
     detail_df.index = range(len(detail_df))
 
-st.dataframe(detail_df, use_container_width=True, height=720)
-# ============================================
+    st.dataframe(
+        detail_df,
+        use_container_width=True,
+        height=720
+    )
 # ============================================
 # GÀ 1KG – AUTO SELECT + XẾP HẠNG + NAV
 # ============================================
