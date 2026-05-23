@@ -6,7 +6,7 @@ from datetime import datetime
 GROUP_RANK = {
     "THEO DÕI": 0,
     "TÍCH LŨY": 1,
-    "MUA EARLY": 2,f
+    "MUA EARLY": 2,
     "PULL VỪA": 3,
     "PULL ĐẸP": 4,
     "MUA BREAK": 5,
