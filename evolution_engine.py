@@ -77,6 +77,51 @@ def save_evolution_history(scan_df):
     ]
 
     full_df.to_csv(FILE_NAME, index=False)
+    try:
+    github_token = st.secrets["GITHUB_TOKEN"]
+
+    repo_owner = "SONVODAI"
+    repo_name = "scanner-ga-chien-clean"
+    file_path = "group_evolution_history.csv"
+
+    with open(FILE_NAME, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    encoded_content = base64.b64encode(
+        content.encode("utf-8")
+    ).decode("utf-8")
+
+    # lấy SHA file cũ
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    sha = None
+
+    if response.status_code == 200:
+        sha = response.json()["sha"]
+
+    data = {
+        "message": "update evolution history",
+        "content": encoded_content,
+        "branch": "main"
+    }
+
+    if sha:
+        data["sha"] = sha
+
+    requests.put(
+        url,
+        headers=headers,
+        json=data
+    )
+
+except Exception as e:
+    st.warning(f"Lỗi push GitHub: {e}")
     return full_df, latest_days
 
 def build_evolution_leaders(full_df):
