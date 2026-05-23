@@ -2301,7 +2301,6 @@ out = out.sort_values(
     by=["speed", "current_rank", "up_days"],
     ascending=False
 ).reset_index(drop=True)
-
     return out   
 # =====================================================
 # RUN EVOLUTION ENGINE
