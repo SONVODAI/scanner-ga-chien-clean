@@ -2276,7 +2276,7 @@ try:
     use_container_width=True,
     height=500
     )    
-    except Exception as e:
+except Exception as e:
         st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
     except Exception as e:
         st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
