@@ -2084,10 +2084,7 @@ full_df = full_df[
 ].copy()
 
 full_df["date"] = full_df["date"].dt.strftime("%Y-%m-%d")
-    full_df = full_df[
-    full_df["date"].isin(latest_days)
-    ].copy()
-
+   
     full_df = full_df.sort_values(
         by=["date", "symbol"]
     ).reset_index(drop=True)
