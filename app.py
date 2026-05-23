@@ -1652,7 +1652,7 @@ if show_detail:
     st.markdown("---")
     st.subheader("BẢNG TỔNG CHI TIẾT")
 
-    detail_cols = [
+        detail_cols = [
         "symbol", "group", "price",
         "ema9", "ma20",
         "ema9_ma20_slope", "ema9_ma20_slope_change", "slope_state",
@@ -1672,11 +1672,11 @@ def classify_obv(row):
         return "🟢 OBV MẠNH"
     else:
         return "🟡 OBV TRUNG TÍNH"
-scan_df["OBV_POWER"] = scan_df.apply(classify_obv, axis=1)
-detail_cols = [c for c in detail_cols if c in scan_df.columns]
+    scan_df["OBV_POWER"] = scan_df.apply(classify_obv, axis=1)
+    detail_cols = [c for c in detail_cols if c in scan_df.columns]
 
-detail_df = scan_df[detail_cols].copy()
-detail_df.index = range(len(detail_df))
+    detail_df = scan_df[detail_cols].copy()
+    detail_df.index = range(len(detail_df))
 
 st.dataframe(detail_df, use_container_width=True, height=720)
 # ============================================
