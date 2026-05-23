@@ -2270,8 +2270,17 @@ for symbol in pivot.index:
             evo_type = "🔥 TĂNG TỐC"
 
         elif evo_score >= 4:
+        if evo_score >= 6:
 
-            evo_type = "🧱 TÍCH LŨY ĐẸP"
+            evo_type = "🚀 SIÊU TIẾN HÓA"
+
+        elif evo_score >= 4:
+
+            evo_type = "🔥 TIẾN HÓA MẠNH"
+
+        elif evo_score >= 3:
+
+            evo_type = "📈 TÍCH LŨY ĐẸP"
 
         elif evo_score >= 2:
 
@@ -2280,17 +2289,18 @@ for symbol in pivot.index:
         else:
 
             evo_type = "⚠️ NHIỄU"
-              leaders.append({
-                "symbol": symbol,
-                "evolution": evolution_text,
-                "speed": speed,
-                "up_days": up_days,
-                "down_days": down_days,
-                "flat_days": flat_days,
-                "volume_status": vol_status,
-                "current_group": current_group,
-                "current_rank": current_rank
-            })
+
+        leaders.append({
+            "symbol": symbol,
+            "evolution": evolution_text,
+            "speed": speed,
+            "up_days": up_days,
+            "down_days": down_days,
+            "flat_days": flat_days,
+            "volume_status": vol_status,
+            "current_group": current_group,
+            "current_rank": current_rank
+        })
 
     if not leaders:
         return pd.DataFrame()
