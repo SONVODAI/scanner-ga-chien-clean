@@ -2266,5 +2266,7 @@ try:
 
 except Exception as e:
     st.warning(f"TOP RISK detector chưa chạy được: {e}")
+from evolution_engine import *
+    
 
 
