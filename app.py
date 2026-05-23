@@ -2290,7 +2290,8 @@ for symbol in pivot.index:
             "volume_status": vol_status,
             "current_group": current_group,
             "current_rank": current_rank
-     })
+        })
+
     if not leaders:
         return pd.DataFrame()
 
@@ -2301,7 +2302,7 @@ for symbol in pivot.index:
         ascending=False
     ).reset_index(drop=True)
 
-    return out
+    return out        
 # =====================================================
 # RUN EVOLUTION ENGINE
 # =====================================================
