@@ -2110,7 +2110,7 @@ def build_evolution_leaders(full_df, scan_df):
 
     if full_df.empty:
         return pd.DataFrame()
-
+full_df["date"] = full_df["date"].astype(str)
     pivot = full_df.pivot_table(
         index="symbol",
         columns="date",
