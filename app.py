@@ -2087,7 +2087,6 @@ def save_evolution_history(scan_df):
     full_df = full_df.sort_values(
         by=["date", "symbol"]
     ).reset_index(drop=True)
-    
         full_df.to_csv(
         EVOLUTION_FILE,
         index=False
@@ -2100,8 +2099,8 @@ def save_evolution_history(scan_df):
         index=False
     )
 
-    return full_df, latest_days  
-# =====================================================
+    return full_df, latest_days
+ =====================================================
 # BUILD EVOLUTION LEADERS
 # =====================================================
 
