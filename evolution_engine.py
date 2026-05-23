@@ -78,4 +78,63 @@ def save_evolution_history(scan_df):
 
     full_df.to_csv(FILE_NAME, index=False)
 
+    def build_evolution_leaders(full_df):
+
+    if full_df.empty:
+        return pd.DataFrame()
+
+    pivot = full_df.pivot_table(
+        index="symbol",
+        columns="date",
+        values="rank",
+        aggfunc="first"
+    )
+
+    pivot = pivot.sort_index(axis=1)
+
+    leaders = []
+
+    for symbol in pivot.index:
+
+        row = pivot.loc[symbol].dropna()
+
+        if len(row) < 3:
+            continue
+
+        ranks = row.values.tolist()
+
+        recent = ranks[-5:]
+
+        speed = recent[-1] - recent[0]
+
+        up_days = 0
+
+        for i in range(1, len(recent)):
+
+            if recent[i] > recent[i - 1]:
+                up_days += 1
+
+        current_rank = recent[-1]
+
+        if speed >= 2 or up_days >= 2:
+
+            leaders.append({
+                "symbol": symbol,
+                "speed": speed,
+                "up_days": up_days,
+                "current_rank": current_rank
+            })
+
+    if not leaders:
+        return pd.DataFrame()
+
+    out = pd.DataFrame(leaders)
+
+    out = out.sort_values(
+        by=["speed", "current_rank"],
+        ascending=False
+    )
+
+    return out
+
     return full_df, latest_days
