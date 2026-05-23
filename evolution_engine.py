@@ -78,7 +78,7 @@ def save_evolution_history(scan_df):
 
     full_df.to_csv(FILE_NAME, index=False)
     try:
-    github_token = st.secrets["GITHUB_TOKEN"]
+        github_token = st.secrets["GITHUB_TOKEN"]
 
     repo_owner = "SONVODAI"
     repo_name = "scanner-ga-chien-clean"
