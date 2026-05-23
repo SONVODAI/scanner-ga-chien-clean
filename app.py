@@ -2262,18 +2262,7 @@ try:
     st.markdown("---")
     st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
 
-    try:
-    from evolution_engine import save_evolution_history
-
-    result = save_evolution_history(scan_df)
-
-    if result is not None:
-
-        full_df, latest_days = result
-
-        st.markdown("---")
-        st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
-
+    
         pivot = full_df.pivot_table(
             index="symbol",
             columns="date",
