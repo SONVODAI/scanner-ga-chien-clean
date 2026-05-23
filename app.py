@@ -2260,8 +2260,7 @@ for symbol in pivot.index:
         # =========================
         # EVOLUTION TYPE
         # =========================
-
-                if evo_score >= 6:
+        if evo_score >= 6:
 
             evo_type = "🚀 SIÊU TIẾN HÓA"
 
@@ -2280,7 +2279,7 @@ for symbol in pivot.index:
         else:
 
             evo_type = "⚠️ NHIỄU"
-        leaders.append({
+                        leaders.append({
             "symbol": symbol,
             "evolution": evolution_text,
             "speed": speed,
