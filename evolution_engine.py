@@ -79,4 +79,62 @@ def save_evolution_history(scan_df):
     full_df.to_csv(FILE_NAME, index=False)
     return full_df, latest_days
 
+def build_evolution_leaders(full_df):
+
+    if full_df.empty:
+        return pd.DataFrame()
+
+    try:
+
+        pivot = full_df.pivot_table(
+            index="symbol",
+            columns="date",
+            values="group",
+            aggfunc="first"
+        )
+
+        pivot = pivot.sort_index(axis=1)
+
+        leaders = []
+
+        for symbol in pivot.index:
+
+            row = pivot.loc[symbol].dropna()
+
+            if len(row) < 3:
+                continue
+
+            groups = row.values.tolist()
+
+            score = 0
+
+            for i in range(1, len(groups)):
+
+                prev_rank = GROUP_RANK.get(groups[i - 1], 0)
+                curr_rank = GROUP_RANK.get(groups[i], 0)
+
+                if curr_rank > prev_rank:
+                    score += 1
+
+            if score >= 2:
+
+                leaders.append({
+                    "symbol": symbol,
+                    "evolution_score": score,
+                    "current_group": groups[-1]
+                })
+
+        leaders_df = pd.DataFrame(leaders)
+
+        if not leaders_df.empty:
+            leaders_df = leaders_df.sort_values(
+                by="evolution_score",
+                ascending=False
+            )
+
+        return leaders_df
+
+    except Exception:
+        return pd.DataFrame()
+
     
