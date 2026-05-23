@@ -73,6 +73,9 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+import requests
+import base64
+import streamlit as st
 import streamlit as st
 import yfinance as yf
 from market_analog_engine import find_similar_periods, generate_market_prediction
