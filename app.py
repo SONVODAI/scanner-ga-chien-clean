@@ -2121,7 +2121,7 @@ pivot = pivot.sort_index(axis=1)
 leaders = []
 
 
-    for symbol in pivot.index:
+for symbol in pivot.index:
 
         row = pivot.loc[symbol].dropna()
 
