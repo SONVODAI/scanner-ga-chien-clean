@@ -2092,14 +2092,14 @@ full_df.to_csv(
     EVOLUTION_FILE,
     index=False
 )
-    backup_name = f"backup_evolution_{today_str}.csv"
+backup_name = f"backup_evolution_{today_str}.csv"
 
-    full_df.to_csv(
-        backup_name,
-        index=False
-    )
+full_df.to_csv(
+    backup_name,
+    index=False
+)
 
-    return full_df, latest_days
+return full_df, latest_days
 
 
 # =====================================================
