@@ -2297,8 +2297,8 @@ height=500
 )
 leaders_df = build_evolution_leaders(full_df)
     
-    st.markdown("---")
-    st.markdown("## 🚀 CỔ PHIẾU TIẾN HÓA CHỌN LỌC")
+st.markdown("---")
+st.markdown("## 🚀 CỔ PHIẾU TIẾN HÓA CHỌN LỌC")
 
 if leaders_df.empty:
 
