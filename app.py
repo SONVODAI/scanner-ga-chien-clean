@@ -2301,7 +2301,6 @@ for symbol in pivot.index:
     ).reset_index(drop=True)
 
     return out
-        
 # =====================================================
 # RUN EVOLUTION ENGINE
 # =====================================================
