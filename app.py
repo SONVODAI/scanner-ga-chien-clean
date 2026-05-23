@@ -2099,7 +2099,7 @@ full_df.to_csv(
     index=False
 )
 
-return full_df, latest_days
+    return full_df, latest_days
 
 
 # =====================================================
