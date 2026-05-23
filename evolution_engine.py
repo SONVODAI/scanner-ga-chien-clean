@@ -77,5 +77,6 @@ def save_evolution_history(scan_df):
     ]
 
     full_df.to_csv(FILE_NAME, index=False)
+    return full_df, latest_days
 
     
