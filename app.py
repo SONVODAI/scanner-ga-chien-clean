@@ -6,7 +6,7 @@ def calc_market_forecast(df: pd.DataFrame):
     total = len(df)
 
     if total == 0:
-        return 0, "Không có dữ liệu"
+        return 0, "Không có dữ liệu"f
 
     # =========================
     # Đếm nhóm khỏe
@@ -2262,21 +2262,35 @@ try:
     st.markdown("---")
     st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
 
-    pivot = full_df.pivot_table(
-        index="symbol",
-        columns="date",
-        values="group",
-        aggfunc="first"
-    )
+    try:
+    from evolution_engine import save_evolution_history
 
-    pivot = pivot.sort_index(axis=1)
+    result = save_evolution_history(scan_df)
 
-    st.dataframe(
-        pivot,
-        use_container_width=True,
-        height=500
-    )
+    if result is not None:
 
+        full_df, latest_days = result
+
+        st.markdown("---")
+        st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
+
+        pivot = full_df.pivot_table(
+            index="symbol",
+            columns="date",
+            values="group",
+            aggfunc="first"
+        )
+
+        pivot = pivot.sort_index(axis=1)
+
+        st.dataframe(
+            pivot,
+            use_container_width=True,
+            height=500
+        )
+
+except Exception as e:
+    st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
 except Exception as e:
     st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
 st.markdown("---")
