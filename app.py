@@ -2101,11 +2101,9 @@ def save_evolution_history(scan_df):
     )
 
     return full_df, latest_days
-    return full_df, latest_days
 #=====================================================
 # BUILD EVOLUTION LEADERS
 # =====================================================
-
 def build_evolution_leaders(full_df, scan_df):
 
     if full_df.empty:
@@ -2121,6 +2119,7 @@ pivot = full_df.pivot_table(
 pivot = pivot.sort_index(axis=1)
 
 leaders = []
+
 
     for symbol in pivot.index:
 
