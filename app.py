@@ -2273,5 +2273,36 @@ evolution_leaders_df = build_evolution_leaders(
     full_df,
     scan_df
 )    
+st.markdown("---")
+st.markdown("## 🧬 EVOLUTION LEADERS")
 
+if evolution_leaders_df.empty:
+
+    st.info("Chưa có cổ phiếu tiến hóa rõ")
+
+else:
+
+    show_cols = [
+        "symbol",
+        "evo_icon",
+        "evo_trend",
+        "evo_score",
+        "evo_type",
+        "evolution",
+        "speed",
+        "up_days",
+        "down_days",
+        "volume_status",
+        "current_group"
+    ]
+
+    out = evolution_leaders_df[show_cols].copy()
+
+    out.index = range(len(out))
+
+    st.dataframe(
+        out,
+        use_container_width=True,
+        height=420
+    )
 
