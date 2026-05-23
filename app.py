@@ -2257,8 +2257,4 @@ except Exception as e:
 from evolution_engine import *
 full_df, latest_days = save_evolution_history(scan_df)
 
-        out,
-        use_container_width=True,
-        height=420
-    )
-
+       
