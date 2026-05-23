@@ -2118,9 +2118,9 @@ pivot = full_df.pivot_table(
         aggfunc="first"
     )
 
-    pivot = pivot.sort_index(axis=1)
+pivot = pivot.sort_index(axis=1)
 
-    leaders = []
+leaders = []
 
     for symbol in pivot.index:
 
