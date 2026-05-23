@@ -119,9 +119,8 @@ def save_evolution_history(scan_df):
         headers=headers,
         json=data
     )
-
 except Exception as e:
-    st.warning(f"Lỗi push GitHub: {e}")
+    st.error(f"GitHub push error: {e}")
     full_df.to_csv(FILE_NAME, index=False)
 
     try:
