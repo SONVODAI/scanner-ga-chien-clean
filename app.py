@@ -2282,14 +2282,8 @@ for symbol in pivot.index:
             evo_type = "⚠️ NHIỄU"
         leaders.append({
             "symbol": symbol,
-            "evo_icon": evo_icon,
-            "evo_trend": evo_trend,
             "evolution": evolution_text,
             "speed": speed,
-            
-            "evo_score": evo_score,
-            "evo_type": evo_type,
-            
             "up_days": up_days,
             "down_days": down_days,
             "flat_days": flat_days,
@@ -2297,18 +2291,19 @@ for symbol in pivot.index:
             "current_group": current_group,
             "current_rank": current_rank
         })
+
     if not leaders:
         return pd.DataFrame()
-    
+
     out = pd.DataFrame(leaders)
-    
+
     out = out.sort_values(
         by=["speed", "current_rank", "up_days"],
         ascending=False
     ).reset_index(drop=True)
-    
+
     return out
-    # =====================================================
+            # =====================================================
 # RUN EVOLUTION ENGINE
 # =====================================================
 
