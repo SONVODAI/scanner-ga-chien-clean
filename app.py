@@ -2292,18 +2292,18 @@ for symbol in pivot.index:
             "current_rank": current_rank
         })
 
-    if not leaders:
-        return pd.DataFrame()
+if not leaders:
+    return pd.DataFrame()
 
-    out = pd.DataFrame(leaders)
+out = pd.DataFrame(leaders)
 
-    out = out.sort_values(
-        by=["speed", "current_rank", "up_days"],
-        ascending=False
-    ).reset_index(drop=True)
+out = out.sort_values(
+    by=["speed", "current_rank", "up_days"],
+    ascending=False
+).reset_index(drop=True)
 
-    return out
-            # =====================================================
+return out   
+# =====================================================
 # RUN EVOLUTION ENGINE
 # =====================================================
 
