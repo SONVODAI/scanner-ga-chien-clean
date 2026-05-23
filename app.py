@@ -2078,7 +2078,7 @@ def save_evolution_history(scan_df):
     )
     latest_days = all_days[-MAX_EVOLUTION_DAYS:]
     
-        full_df = full_df[
+    full_df = full_df[
         full_df["date"].isin(latest_days)
     ].copy()
 
