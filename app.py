@@ -2278,7 +2278,7 @@ try:
     )    
 except Exception as e:
         st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
-    except Exception as e:
+except Exception as e:
         st.warning(f"Evolution engine tạm lỗi, app vẫn chạy bình thường: {e}")
     st.markdown("---")
     st.markdown("## 🧬 TIẾN HÓA NHÓM CỔ PHIẾU - 15 PHIÊN GẦN NHẤT")
