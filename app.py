@@ -2255,7 +2255,7 @@ try:
 except Exception as e:
     st.warning(f"TOP RISK detector chưa chạy được: {e}")
 try:
-    from evolution_engine import save_evolution_history
+    from evolution_engine import save_evolution_history, build_evolution_leaders
 
     full_df, latest_days = save_evolution_history(scan_df)
     
