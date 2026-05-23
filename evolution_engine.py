@@ -305,14 +305,6 @@ def build_evolution_leaders(full_df, scan_df):
 # RUN EVOLUTION ENGINE
 # =====================================================
 
-full_df, latest_days = save_evolution_history(scan_df)
-
-evolution_leaders_df = build_evolution_leaders(
-    full_df,
-    scan_df
-)
-
-
 # =====================================================
 # DISPLAY EVOLUTION LEADERS
 # =====================================================
