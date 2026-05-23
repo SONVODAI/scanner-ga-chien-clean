@@ -6,7 +6,7 @@ from datetime import datetime
 GROUP_RANK = {
     "THEO DÕI": 0,
     "TÍCH LŨY": 1,
-    "MUA EARLY": 2,
+    "MUA EARLY": 2,f
     "PULL VỪA": 3,
     "PULL ĐẸP": 4,
     "MUA BREAK": 5,
@@ -171,7 +171,8 @@ except Exception as e:
 
     except Exception as e:
         print("GitHub push error:", e)
-    return full_df, latest_days
+
+        return full_df, latest_days
 
 def build_evolution_leaders(full_df):
 
