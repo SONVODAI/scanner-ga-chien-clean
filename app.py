@@ -2291,8 +2291,8 @@ for symbol in pivot.index:
             "current_group": current_group,
             "current_rank": current_rank
      })
-        if not leaders:
-        return pd.DataFrame()
+    if not leaders:
+            return pd.DataFrame()
 
     out = pd.DataFrame(leaders)
 
