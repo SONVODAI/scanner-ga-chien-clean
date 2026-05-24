@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import yfinance as yf
-from vnstock import Vnstock
+from vnstock import stock_historical_data
 try:
     from market_analog_engine import find_similar_periods, generate_market_prediction
 except Exception:
@@ -599,11 +599,15 @@ def get_stock_data(symbol, days=250):
 
     try:
 
-        df = yf.download(
-            symbol + ".VN",
-            period="1y",
-            interval="1d",
-            progress=False
+        df = stock_historical_data(
+            symbol=symbol,
+            start_date="2024-01-01",
+            end_date="2026-12-31",
+            resolution="1D",
+            type="stock",
+            beautify=True,
+            decor=False,
+            source="DNSE"
         )
 
         if df is None or len(df) == 0:
