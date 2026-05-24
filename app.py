@@ -595,31 +595,52 @@ def classify_group(row: dict) -> str:
 # GET STOCK DATA
 # =========================================================
 
+# =========================================================
+# GET STOCK DATA
+# =========================================================
+
 def get_stock_data(symbol, days=250):
 
     try:
+
         stock = Vnstock().stock(
             symbol=symbol,
             source="VCI"
         )
 
         df = stock.quote.history(
-            start='2024-01-01',
-            end='2026-12-31',
-            interval='1D'
+            start="2024-01-01",
+            end="2026-12-31",
+            interval="1D"
         )
 
-        if df is None or df.empty:
+        if df is None:
+            return pd.DataFrame()
+
+        if len(df) == 0:
             return pd.DataFrame()
 
         df.columns = [c.lower() for c in df.columns]
 
+        required_cols = [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume"
+        ]
+
+        for col in required_cols:
+            if col not in df.columns:
+                return pd.DataFrame()
+
         return df.tail(days)
 
     except Exception as e:
-        print(f"Lỗi lấy data {symbol}: {e}")
-        return pd.DataFrame()
 
+        print(f"Lỗi data {symbol}: {e}")
+
+        return pd.DataFrame()
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
