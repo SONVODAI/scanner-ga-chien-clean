@@ -11,7 +11,6 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 import streamlit as st
-import yfinance as yf
 from vnstock import stock_historical_data
 try:
     from market_analog_engine import find_similar_periods, generate_market_prediction
