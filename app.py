@@ -882,11 +882,7 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
         "R",
         "ema9_ma20_slope",
     ]
-        # =========================
-    # DRY-UP ENGINE
-    # =========================
-    dry_score, dry_label = calculate_dryup_score(df)
-    existing_sort_cols = [c for c in sort_cols if c in df.columns]
+           existing_sort_cols = [c for c in sort_cols if c in df.columns]
 
     if existing_sort_cols:
         ascending_map = {
