@@ -1,7 +1,6 @@
 streamlit
 pandas
 numpy
-yfinance==0.2.54
-vnstock
+vnstock==0.2.9.2
 scipy
 scikit-learn
