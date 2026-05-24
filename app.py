@@ -1563,7 +1563,7 @@ else:
     out.index = range(len(out))
 # ===== OBV POWER (SAFE - DÙNG CHO EARLY TABLE) =====
 
-if "OBV" in early_df.columns and "EMA9_OBV" in early_df.columns:
+if "obv" in early_df.columns and "obv_ema9" in early_df.columns:
 
     out["OBV"] = early_df["OBV"]
     out["EMA9_OBV"] = early_df["EMA9_OBV"]
