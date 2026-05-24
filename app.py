@@ -883,7 +883,7 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
         "R",
         "ema9_ma20_slope",
     ]
-           existing_sort_cols = [c for c in sort_cols if c in df.columns]
+    existing_sort_cols = [c for c in sort_cols if c in df.columns]
 
     if existing_sort_cols:
         ascending_map = {
