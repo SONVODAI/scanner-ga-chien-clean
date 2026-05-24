@@ -784,85 +784,111 @@ def analyze_symbol(symbol: str) -> dict | None:
     RS = calc_rs_score(rs5_, rs10_)
 
     total_score = E + R + O + S + RS
-   # =====================================================
+# =====================================================
 # DRYUP SCORE
 # =====================================================
-dry_score, dry_label = calculate_dryup_score(df) 
+
+dry_score, dry_label = calculate_dryup_score(df)
+
 pull_label = classify_pull_label(
-        dist_from_ema9=dist_from_ema9,
-        rsi_=rsi_,
-        rsi_slope_=rsi_slope_,
-        obv_=obv_,
-        obv_ema9_=obv_ema9_,
-    )
+    dist_from_ema9=dist_from_ema9,
+    rsi_=rsi_,
+    rsi_slope_=rsi_slope_,
+    obv_=obv_,
+    obv_ema9_=obv_ema9_,
+)
 
-obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
+obv_status = (
+    "🟢"
+    if pd.notna(obv_)
+    and pd.notna(obv_ema9_)
+    and obv_ >= obv_ema9_
+    else "🔴"
+)
 
-    row = {
-    
-            "symbol": symbol,
-    
-            "price": safe_round(price, 0),
-            "ema9": safe_round(ema9_, 2),
-            "ma20": safe_round(ma20_, 2),
-    
-            "ema9_ma20_slope": safe_round(slope_, 2),
-            "ema9_ma20_slope_change": safe_round(slope_change_, 2),
-            "slope_state": slope_state_,
-    
-            "rsi14": safe_round(rsi_, 2),
-            "rsi_slope": safe_round(rsi_slope_, 2),
-    
-            "obv": safe_round(obv_, 0),
-            "obv_ema9": safe_round(obv_ema9_, 0),
-            "obv_status": obv_status,
-    
-            "volume": safe_round(vol_, 0),
-            "vol_ma20": safe_round(vol_ma20_, 0),
-    
-            "breakout_ref": safe_round(breakout_ref_, 2),
-    
-            "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
-    
-            "pull_label": pull_label,
-    
-            "E": E,
-            "R": R,
-            "O": O,
-            "S": S,
-            "RS": RS,
-    
-            "rs5": safe_round(rs5_, 2),
-            "rs10": safe_round(rs10_, 2),
-    
-            "green_2_confirm": last["green_2_confirm"],
-    
-            "total_score": total_score,
-    
-            "dry_score": dry_score,
-            "dry_label": dry_label,
-        }
-    
-    row["group"] = classify_group(row)
-    
-    row["warning"] = build_warning(
-            price,
-            ema9_,
-            rsi_,
-            rsi_slope_,
-            obv_,
-            obv_ema9_,
-            pull_label,
-            slope_
-        )
-    
-    row["status"] = build_status(
-            total_score,
-            row["warning"],
-            row["group"]
-        )
-    
-        return row    
+# =====================================================
+# BUILD ROW
+# =====================================================
+
+row = {
+
+    "symbol": symbol,
+
+    "price": safe_round(price, 0),
+    "ema9": safe_round(ema9_, 2),
+    "ma20": safe_round(ma20_, 2),
+
+    "ema9_ma20_slope": safe_round(slope_, 2),
+    "ema9_ma20_slope_change": safe_round(slope_change_, 2),
+    "slope_state": slope_state_,
+
+    "rsi14": safe_round(rsi_, 2),
+    "rsi_slope": safe_round(rsi_slope_, 2),
+
+    "obv": safe_round(obv_, 0),
+    "obv_ema9": safe_round(obv_ema9_, 0),
+    "obv_status": obv_status,
+
+    "volume": safe_round(vol_, 0),
+    "vol_ma20": safe_round(vol_ma20_, 0),
+
+    "breakout_ref": safe_round(breakout_ref_, 2),
+
+    "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
+
+    "pull_label": pull_label,
+
+    "E": E,
+    "R": R,
+    "O": O,
+    "S": S,
+    "RS": RS,
+
+    "rs5": safe_round(rs5_, 2),
+    "rs10": safe_round(rs10_, 2),
+
+    "green_2_confirm": last["green_2_confirm"],
+
+    "total_score": total_score,
+
+    "dry_score": dry_score,
+    "dry_label": dry_label,
+}
+
+# =====================================================
+# GROUP
+# =====================================================
+
+row["group"] = classify_group(row)
+
+# =====================================================
+# WARNING
+# =====================================================
+
+row["warning"] = build_warning(
+    price,
+    ema9_,
+    rsi_,
+    rsi_slope_,
+    obv_,
+    obv_ema9_,
+    pull_label,
+    slope_
+)
+
+# =====================================================
+# STATUS
+# =====================================================
+
+row["status"] = build_status(
+    total_score,
+    row["warning"],
+    row["group"]
+)
+return row
+# =====================================================
+# RETURN
+# =====================================================
 # =========================================================
 # SCAN
 # =========================================================
