@@ -1807,7 +1807,7 @@ else:
     st.dataframe(ga_1kg_df[cols_show], use_container_width=True)
 
   # ===== HÀNH ĐỘNG =====
-def action_goi_y(row, i):
+
     if i == 0:
         return "🔥 MUA MẠNH"
     elif i <= 2:
