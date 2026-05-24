@@ -1941,9 +1941,11 @@ try:
     pivot = pivot.sort_index(axis=1)
 
     st.dataframe(
-        pivot,
-        use_container_width=True,
-        height=500
+    pivot,
+    use_container_width=True,
+    height=500,
+    hide_index=True
+
     )
 
     st.markdown("---")
