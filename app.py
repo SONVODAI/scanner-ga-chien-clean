@@ -798,7 +798,7 @@ pull_label = classify_pull_label(
 
 obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
 
-    row = {
+row = {
 
         "symbol": symbol,
 
@@ -843,9 +843,9 @@ obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_em
         "dry_label": dry_label,
     }
 
-    row["group"] = classify_group(row)
+row["group"] = classify_group(row)
 
-    row["warning"] = build_warning(
+row["warning"] = build_warning(
         price,
         ema9_,
         rsi_,
@@ -856,13 +856,13 @@ obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_em
         slope_
     )
 
-    row["status"] = build_status(
+row["status"] = build_status(
         total_score,
         row["warning"],
         row["group"]
     )
 
-    return row    
+return row    
 # =========================================================
 # SCAN
 # =========================================================
