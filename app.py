@@ -1571,13 +1571,19 @@ if "obv" in early_df.columns and "obv_ema9" in early_df.columns:
     out["obv_diff_pct"] = (out["OBV"] - out["EMA9_OBV"]) / out["EMA9_OBV"].abs() * 100
     out["ema9_obv_slope"] = out["EMA9_OBV"].diff()
     def classify_obv(row):
-        if row["OBV"] < row["EMA9_OBV"]:
-            return "🔴 OBV YẾU"
-        elif row["obv_diff_pct"] > 2:
-            return "🟢 OBV MẠNH"
-        else:
-            return "🟡 OBV TRUNG TÍNH"
 
+    if row["obv"] < row["obv_ema9"]:
+        return "🔴 OBV YẾU"
+
+    elif (
+        (row["obv"] - row["obv_ema9"])
+        / abs(row["obv_ema9"])
+        * 100
+    ) > 2:
+        return "🟢 OBV MẠNH"
+
+    else:
+        return "🟡 OBV TRUNG TÍNH"
     out["OBV_POWER"] = out.apply(classify_obv, axis=1)
     early_cols = [c for c in early_cols if c in out.columns]
     out = out[early_cols]
