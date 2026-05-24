@@ -1729,7 +1729,12 @@ pf_df = build_portfolio_table(scan_df, portfolio_text, market_real)
 if pf_df.empty:
     st.info("Chưa nhập danh mục.")
 else:
-    st.dataframe(pf_df, use_container_width=True, height=360)
+    st.dataframe(
+    pf_df,
+    use_container_width=True,
+    height=360,
+    hide_index=True
+    )
 
     p1, p2, p3 = st.columns(3)
 
