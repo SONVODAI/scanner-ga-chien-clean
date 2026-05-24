@@ -797,7 +797,11 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
 
     for symbol in symbols:
         try:
+            print(f"Đang quét: {symbol}")
+
             item = analyze_symbol(symbol)
+
+            print(f"Xong: {symbol}")
             if item is not None:
                 rows.append(item)
         except Exception as e:
