@@ -1827,7 +1827,12 @@ else:
     ]
 
     cols_show = [c for c in cols_show if c in ga_1kg_df.columns]
-    st.dataframe(ga_1kg_df[cols_show], use_container_width=True, height=400)
+    st.dataframe(
+    ga_1kg_df[cols_show],
+    use_container_width=True,
+    height=400,
+    hide_index=True
+)
 
 
 # =========================================================
