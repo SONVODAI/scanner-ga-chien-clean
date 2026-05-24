@@ -1565,8 +1565,8 @@ else:
 
 if "obv" in early_df.columns and "obv_ema9" in early_df.columns:
 
-    out["OBV"] = early_df["OBV"]
-    out["EMA9_OBV"] = early_df["EMA9_OBV"]
+    out["obv"] = early_df["obv"]
+    out["obv_ema9"] = early_df["obv_ema9"]
 
     out["obv_diff_pct"] = (out["OBV"] - out["EMA9_OBV"]) / out["EMA9_OBV"].abs() * 100
     out["ema9_obv_slope"] = out["EMA9_OBV"].diff()
