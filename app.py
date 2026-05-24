@@ -784,6 +784,10 @@ def analyze_symbol(symbol: str) -> dict | None:
     RS = calc_rs_score(rs5_, rs10_)
 
     total_score = E + R + O + S + RS
+   # =====================================================
+# DRYUP SCORE
+# =====================================================
+dry_score, dry_label = calculate_dryup_score(df) 
     pull_label = classify_pull_label(
         dist_from_ema9=dist_from_ema9,
         rsi_=rsi_,
