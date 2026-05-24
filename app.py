@@ -796,7 +796,7 @@ pull_label = classify_pull_label(
         obv_ema9_=obv_ema9_,
     )
 
-    obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
+obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
 
     row = {
         "symbol": symbol,
