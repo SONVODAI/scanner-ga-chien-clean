@@ -831,9 +831,10 @@ row = {
         "rs10": safe_round(rs10_, 2),
         "green_2_confirm": last["green_2_confirm"],
         "total_score": total_score,    
-    }
+  
    "dry_score": dry_score,
     "dry_label": dry_label,
+    }
     row["group"] = classify_group(row)
     row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label, slope_)
     row["status"] = build_status(total_score, row["warning"], row["group"])
