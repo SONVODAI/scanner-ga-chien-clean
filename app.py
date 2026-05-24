@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import yfinance as yf
-
+from vnstock import Vnstock
 try:
     from market_analog_engine import find_similar_periods, generate_market_prediction
 except Exception:
@@ -591,13 +591,40 @@ def classify_group(row: dict) -> str:
         return "CP MẠNH"
 
     return "MUA EARLY"
+# =========================================================
+# GET STOCK DATA
+# =========================================================
 
+def get_stock_data(symbol, days=250):
+
+    try:
+        stock = Vnstock().stock(
+            symbol=symbol,
+            source="VCI"
+        )
+
+        df = stock.quote.history(
+            start='2024-01-01',
+            end='2026-12-31',
+            interval='1D'
+        )
+
+        if df is None or df.empty:
+            return pd.DataFrame()
+
+        df.columns = [c.lower() for c in df.columns]
+
+        return df.tail(days)
+
+    except Exception as e:
+        print(f"Lỗi lấy data {symbol}: {e}")
+        return pd.DataFrame()
 
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
 def analyze_symbol(symbol: str) -> dict | None:
-    raw = download_symbol_data(symbol)
+    raw = get_stock_data(symbol)
 
     if raw.empty or len(raw) < 40:
         return None
