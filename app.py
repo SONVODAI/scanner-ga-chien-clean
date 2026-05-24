@@ -51,17 +51,18 @@ def calc_market_forecast(df: pd.DataFrame):
     # =========================
     # TEXT
     # =========================
-    if score >= 8:
-        text = "🟢 Forecast tốt 5-10 ngày"
-    elif score >= 6:
-        text = "🟡 Forecast trung tính-khá"
-    elif score >= 7:
-        text = "🟠 Forecast yếu"
-    else:
-        text = "🔴 Forecast rủi ro"
+if score >= 8:
+    text = "🟢 Forecast tốt 5-10 ngày"
 
-    return score, text
-# =========================================================
+elif score >= 6:
+    text = "🟡 Forecast trung tính-khá"
+
+elif score >= 4:
+    text = "🟠 Forecast yếu"
+
+else:
+    text = "🔴 Forecast rủi ro"
+    # =========================================================
 # SCANNER GÀ CHIẾN V18.4 + SLOPE CLEAN REWRITE
 # Full app.py - viết lại sạch từ đầu
 # Có: Market REAL/LIVE, EMA9/MA20 slope, RSI, OBV, nhóm CP,
