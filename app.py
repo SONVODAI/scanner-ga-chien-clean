@@ -38,7 +38,37 @@ st.caption("Bản clean: giữ lõi V18.4 + sửa sạch indent, dryup, OBV_POWE
 # =========================================================
 WATCHLIST = sorted(list(set([
     "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
-   
+    "HAH", "VSC", "GMD", "VOS", "VTO", "ACV", "HVN", "VJC",
+
+    "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB", "VGT",
+
+    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", "AAA",
+    "PAC", "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
+    "TV2", "DGC", "POW",
+
+    "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
+    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "TLH", "TVN",
+
+    "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
+    "MCH", "PAN", "VNM", "MML", "TLG",
+
+    "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
+    "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
+    "VND", "SSI", "HCM", "VIX", "BSI", "FTS", "TVS", "SHS",
+    "AGR", "VCI", "TCX", "VCK", "VPX", "ORS", "BVS", "VDS", "MBS",
+
+    "VGC", "SZC", "IDC", "KBC", "LHG", "IJC", "DTD", "BCM",
+
+    "GVR", "SIP", "DPR", "PHR", "DRI",
+
+    "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
+
+    "IMP", "BVH", "SBT", "LSS", "PNJ", "DHT", "TNH", "YEG",
+
+    "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
+    "EVF", "SAB", "VPL", "PDR", "DPG", "NHA", "HDC", "NTL",
+    "HHS", "NLG", "KDH", "HUT",
+
 ])))
 
 DEFAULT_SUFFIX = ".VN"
