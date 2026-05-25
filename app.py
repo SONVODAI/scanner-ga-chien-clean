@@ -147,7 +147,7 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 
     for c in df.columns:
         cl = str(c).lower()
-                return "🟢 Tăng tốc"
+        
         # =========================================================
 # DATA DOWNLOAD
 # =========================================================
