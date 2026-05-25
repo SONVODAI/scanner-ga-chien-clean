@@ -1461,6 +1461,7 @@ if auto_refresh:
 
 if scan_btn:
     st.cache_data.clear()
+    st.rerun()
 
 
 # =========================================================
