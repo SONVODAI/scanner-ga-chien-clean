@@ -603,11 +603,11 @@ def get_stock_data(symbol, days=250):
             symbol=symbol,
             start_date="2024-01-01",
             end_date="2026-12-31",
-            resolution="D",
+            resolution="1D",
             type="stock",
             beautify=True,
             decor=False,
-            source="TCBS"
+            source="DNSE"
         )
 
         if df is None or len(df) == 0:
