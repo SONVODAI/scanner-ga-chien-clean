@@ -507,14 +507,17 @@ def classify_group(row: dict) -> str:
 
     return "MUA EARLY"
 # =========================================================
+# =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
 def analyze_symbol(symbol: str) -> dict | None:
     raw = download_symbol_data(symbol)
+
     if raw.empty or len(raw) < 40:
         return None
 
     df = build_indicators(raw)
+
     if df.empty or len(df) < 25:
         return None
 
@@ -524,15 +527,16 @@ def analyze_symbol(symbol: str) -> dict | None:
     price = to_float(last["close"])
     volume = to_float(last["volume"])
 
-# REALTIME OVERLAY
-rt = get_realtime_overlay(symbol)
+    # REALTIME OVERLAY
+    rt = get_realtime_overlay(symbol)
 
-if rt:
-    price = rt.get("rt_price", price)
+    if rt:
+        price = rt.get("rt_price", price)
 
-    rt_vol = rt.get("rt_volume")
-    if rt_vol is not None and rt_vol > volume:
-        volume = rt_vol
+        rt_vol = rt.get("rt_volume")
+        if rt_vol is not None and rt_vol > volume:
+            volume = rt_vol
+
     ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
     ema9_prev = to_float(prev["ema9"])
@@ -550,10 +554,17 @@ if rt:
     obv_ema9_ = to_float(last["obv_ema9"])
     obv_prev = to_float(prev["obv"])
 
-    vol_ = to_float(last["volume"])
+    vol_ = volume
     vol_ma20_ = to_float(last["vol_ma20"])
-    vol_ratio_ = to_float(last["vol_ratio"])
-    pct_change_ = to_float(last["pct_change"])
+
+    vol_ratio_ = np.nan
+    if pd.notna(vol_) and pd.notna(vol_ma20_) and vol_ma20_ != 0:
+        vol_ratio_ = vol_ / vol_ma20_
+
+    pct_change_ = np.nan
+    prev_close = to_float(prev["close"])
+    if pd.notna(price) and pd.notna(prev_close) and prev_close != 0:
+        pct_change_ = (price / prev_close - 1) * 100
 
     breakout_ref = to_float(df["high"].iloc[-21:-1].max())
 
@@ -566,11 +577,24 @@ if rt:
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
     S = calc_slope_score(slope_, slope_change_)
     RS = calc_rs_score(rs5_, rs10_)
+
     total_score = E + R + O + S + RS
+
     dry_score, dry_label = calculate_dryup_score(df)
 
-    pull_label = classify_pull_label(dist_from_ema9, rsi_, rsi_slope_, obv_, obv_ema9_)
-    obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
+    pull_label = classify_pull_label(
+        dist_from_ema9,
+        rsi_,
+        rsi_slope_,
+        obv_,
+        obv_ema9_
+    )
+
+    obv_status = "🟢" if (
+        pd.notna(obv_)
+        and pd.notna(obv_ema9_)
+        and obv_ >= obv_ema9_
+    ) else "🔴"
 
     row = {
         "symbol": symbol,
@@ -608,10 +632,23 @@ if rt:
 
     row["OBV_POWER"] = classify_obv_power(row)
     row["group"] = classify_group(row)
-    row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label, slope_)
-    row["status"] = build_status(total_score, row["warning"], row["group"])
-    return row
+    row["warning"] = build_warning(
+        price,
+        ema9_,
+        rsi_,
+        rsi_slope_,
+        obv_,
+        obv_ema9_,
+        pull_label,
+        slope_
+    )
+    row["status"] = build_status(
+        total_score,
+        row["warning"],
+        row["group"]
+    )
 
+    return row
 # =========================================================
 # SCAN ENGINE
 # =========================================================
