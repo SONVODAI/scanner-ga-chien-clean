@@ -626,7 +626,7 @@ def get_stock_data(symbol, days=250):
 # ANALYZE ONE SYMBOL
 # =========================================================
 def analyze_symbol(symbol: str) -> dict | None:
-    raw = get_stock_data(symbol)
+    raw = download_symbol_data(symbol)
     print(symbol, raw.tail(1))
     if raw.empty or len(raw) < 40:
         return None
@@ -638,8 +638,6 @@ def analyze_symbol(symbol: str) -> dict | None:
 
     last = df.iloc[-1]
     prev = df.iloc[-2]
-    if symbol == "GVR":
-        st.write(df.tail(3))
     price = to_float(last["close"])
     ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
