@@ -173,7 +173,7 @@ try:
 except Exception:
     return pd.DataFrame() 
     if df is None or df.empty:
-    return pd.DataFrame()
+        return pd.DataFrame()
 
 df = df.reset_index()
 
