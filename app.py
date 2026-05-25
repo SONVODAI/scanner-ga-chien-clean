@@ -17,6 +17,10 @@ from vnstock import stock_historical_data
 
 try:
     from market_analog_engine import find_similar_periods, generate_market_prediction
+    from evolution_engine import (
+    save_evolution_history,
+    build_evolution_leaders,
+)
 except Exception:
     find_similar_periods = None
     generate_market_prediction = None
@@ -1101,6 +1105,62 @@ def save_evolution_history(scan_df: pd.DataFrame):
 
 
 def build_evolution_leaders(full_df: pd.DataFrame):
+    if full_df is None or full_df.empty:
+        return pd.DataFrame()
+
+    try:
+        pivot = full_df.pivot_table(
+            index="symbol",
+            columns="date",
+            values="group",
+            aggfunc="first"
+        ).sort_index(axis=1)
+
+        leaders = []
+
+        for symbol in pivot.index:
+            row = pivot.loc[symbol].dropna()
+
+            if len(row) < 2:
+                continue
+
+            groups = row.values.tolist()
+            ranks = [GROUP_RANK.get(g, 0) for g in groups]
+
+            current_group = groups[-1]
+            current_rank = ranks[-1]
+            prev_rank = ranks[-2]
+
+            delta = current_rank - prev_rank
+
+            up_days = 0
+            for i in range(1, len(ranks)):
+                if ranks[i] > ranks[i - 1]:
+                    up_days += 1
+
+            # Hiện nếu: đang nhóm mạnh, hoặc vừa nâng hạng
+            if current_rank >= 5 or delta > 0:
+                leaders.append({
+                    "symbol": symbol,
+                    "current_group": current_group,
+                    "rank_change": delta,
+                    "up_days": up_days,
+                    "days_seen": len(row),
+                    "evolution": " ➜ ".join(groups[-5:]),
+                })
+
+        out = pd.DataFrame(leaders)
+
+        if not out.empty:
+            out = out.sort_values(
+                by=["rank_change", "up_days", "days_seen"],
+                ascending=False
+            ).reset_index(drop=True)
+
+        return out
+
+    except Exception:
+        return pd.DataFrame()
     if full_df is None or full_df.empty:
         return pd.DataFrame()
     try:
