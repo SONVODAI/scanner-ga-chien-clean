@@ -637,15 +637,17 @@ def build_indicators(df):
     df["slope_state"] = df[
         "ema9_ma20_slope"
     ].apply(slope_state)
-# RS
-df["rs5"] = (
-    df["close"] / df["close"].shift(5) - 1
-) * 100
+    # RS
+    df["rs5"] = (
+        (df["close"] / df["close"].shift(5)) - 1
+    ) * 100
 
-df["rs10"] = (
-    df["close"] / df["close"].shift(10) - 1
-) * 100
-    return df       
+    df["rs10"] = (
+        (df["close"] / df["close"].shift(10)) - 1
+    ) * 100
+
+    return df
+
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
