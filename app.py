@@ -1469,7 +1469,7 @@ if scan_btn:
 # =========================================================
 with st.spinner("Đang quét dữ liệu..."):
     scan_df = run_scan(WATCHLIST)
-
+st.write("Last scan:", datetime.now())
 if scan_df.empty:
     st.error("Không lấy được dữ liệu. Anh kiểm tra lại mạng hoặc nguồn Yahoo Finance.")
     st.stop()
