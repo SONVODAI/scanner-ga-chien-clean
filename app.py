@@ -157,23 +157,21 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # =========================================================
 # DATA DOWNLOAD
 # =========================================================
+
 @st.cache_data(ttl=60, show_spinner=False)
 def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
     ticker = f"{symbol}{DEFAULT_SUFFIX}"
 
-    try:
-        df = yf.download(
-            ticker,
-            period=period,
-            interval=interval,
-            auto_adjust=False,
-            progress=False,
-            threads=False,
-            group_by="column",
-        )
-    except Exception:
-        return pd.DataFrame()
-
+try:
+    df = yf.download(
+        ticker,
+        period="6mo",
+        interval="1d",
+        progress=False,
+        auto_adjust=True,
+    )
+except Exception:
+    return pd.DataFrame() 
     if df is None or df.empty:
         return pd.DataFrame()
 
@@ -202,7 +200,7 @@ def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d")
     return out
 
 
-# =========================================================
+
 # INDICATORS
 # =========================================================
 def slope_state_text(slope: float) -> str:
