@@ -16,6 +16,11 @@ import streamlit as st
 from vnstock import stock_historical_data
 
 try:
+    from vnstock import stock_intraday_data
+except Exception:
+    stock_intraday_data = None
+
+try:
     from market_analog_engine import find_similar_periods, generate_market_prediction
     from evolution_engine import (
     save_evolution_history,
