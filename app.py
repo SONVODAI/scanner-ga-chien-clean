@@ -1539,7 +1539,49 @@ try:
         st.dataframe(leaders_df, use_container_width=True, height=360)
 except Exception as e:
     st.warning(f"Evolution chưa chạy được: {e}")
+# =========================================================
+# EVOLUTION FULL HISTORY TABLE
+# =========================================================
+st.markdown("---")
+st.markdown("## 🧬 BẢNG TIẾN HÓA TOÀN BỘ CỔ PHIẾU")
 
+try:
+    evo_full = pd.read_csv(EVOLUTION_FILE)
+
+    evo_pivot = evo_full.pivot_table(
+        index="symbol",
+        columns="date",
+        values="group",
+        aggfunc="first"
+    )
+
+    evo_pivot = evo_pivot.sort_index(axis=1)
+
+    latest_cols = list(evo_pivot.columns)[-15:]
+    evo_pivot = evo_pivot[latest_cols]
+
+    group_color = {
+        "GÀ TĂNG TỐC": "background-color: #b7f7c2",
+        "CP MẠNH": "background-color: #d5f5d5",
+        "MUA BREAK": "background-color: #d9ecff",
+        "PULL ĐẸP": "background-color: #fff2b2",
+        "PULL VỪA": "background-color: #fff7d6",
+        "MUA EARLY": "background-color: #e8ddff",
+        "TÍCH LŨY": "background-color: #eeeeee",
+        "THEO DÕI": "background-color: #ffd6d6",
+    }
+
+    def color_group(val):
+        return group_color.get(val, "")
+
+    st.dataframe(
+        evo_pivot.style.applymap(color_group),
+        use_container_width=True,
+        height=600
+    )
+
+except Exception as e:
+    st.warning(f"Lỗi bảng evolution tổng: {e}")
 # =========================================================
 # MARKET ANALOG
 # =========================================================
