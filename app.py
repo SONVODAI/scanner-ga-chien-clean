@@ -159,7 +159,8 @@ def download_symbol_data(
 ) -> pd.DataFrame:
 
     ticker = f"{symbol}{DEFAULT_SUFFIX}"
-
+    if symbol == "ACB":
+        st.write(ticker)
     try:
 
         df = yf.download(
