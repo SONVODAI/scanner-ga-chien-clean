@@ -173,34 +173,35 @@ try:
 except Exception:
     return pd.DataFrame() 
     if df is None or df.empty:
+    return pd.DataFrame()
+
+df = df.reset_index()
+
+df.columns = [c.lower() for c in df.columns]
+
+needed = [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+]
+
+for col in needed:
+    if col not in df.columns:
         return pd.DataFrame()
 
-    df = flatten_columns(df).reset_index()
+out = df[needed].copy()
 
-    date_col = find_col(df, ["Date", "Datetime"])
-    open_col = find_col(df, ["Open"])
-    high_col = find_col(df, ["High"])
-    low_col = find_col(df, ["Low"])
-    close_col = find_col(df, ["Close"])
-    vol_col = find_col(df, ["Volume"])
+for col in ["open", "high", "low", "close", "volume"]:
+    out[col] = pd.to_numeric(out[col], errors="coerce")
 
-    needed = [date_col, open_col, high_col, low_col, close_col, vol_col]
-    if any(col is None for col in needed):
-        return pd.DataFrame()
+out = out.dropna(subset=["close"])
 
-    out = df[[date_col, open_col, high_col, low_col, close_col, vol_col]].copy()
-    out.columns = ["date", "open", "high", "low", "close", "volume"]
+out = out.sort_values("date").reset_index(drop=True)
 
-    for col in ["open", "high", "low", "close", "volume"]:
-        out[col] = pd.to_numeric(out[col], errors="coerce")
-
-    out = out.dropna(subset=["close"])
-    out = out.sort_values("date").reset_index(drop=True)
-
-    return out
-
-
-
+return out
 # INDICATORS
 # =========================================================
 def slope_state_text(slope: float) -> str:
