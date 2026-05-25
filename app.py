@@ -147,69 +147,68 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 
     for c in df.columns:
         cl = str(c).lower()
-        for cand in candidates:
-            if cand.lower() in cl:
-                return c
-
-    return None
-
-
-# =========================================================
+                return "🟢 Tăng tốc"
+        # =========================================================
 # DATA DOWNLOAD
 # =========================================================
-
 @st.cache_data(ttl=60, show_spinner=False)
-def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
+def download_symbol_data(
+    symbol: str,
+    period: str = "6mo",
+    interval: str = "1d"
+) -> pd.DataFrame:
+
     ticker = f"{symbol}{DEFAULT_SUFFIX}"
 
-try:
-    df = yf.download(
-        ticker,
-        period="6mo",
-        interval="1d",
-        progress=False,
-        auto_adjust=True,
-    )
-except Exception:
-    return pd.DataFrame() 
+    try:
+
+        df = yf.download(
+            ticker,
+            period=period,
+            interval=interval,
+            progress=False,
+            auto_adjust=True,
+        )
+
+    except Exception:
+
+        return pd.DataFrame()
+
     if df is None or df.empty:
         return pd.DataFrame()
 
-df = df.reset_index()
+    df = df.reset_index()
 
-df.columns = [c.lower() for c in df.columns]
+    df.columns = [c.lower() for c in df.columns]
 
-needed = [
-    "date",
-    "open",
-    "high",
-    "low",
-    "close",
-    "volume"
-]
+    needed = [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+    ]
 
-for col in needed:
-    if col not in df.columns:
-        return pd.DataFrame()
+    for col in needed:
+        if col not in df.columns:
+            return pd.DataFrame()
 
-out = df[needed].copy()
+    out = df[needed].copy()
 
-for col in ["open", "high", "low", "close", "volume"]:
-    out[col] = pd.to_numeric(out[col], errors="coerce")
+    for col in ["open", "high", "low", "close", "volume"]:
+        out[col] = pd.to_numeric(
+            out[col],
+            errors="coerce"
+        )
 
-out = out.dropna(subset=["close"])
+    out = out.dropna(subset=["close"])
 
-out = out.sort_values("date").reset_index(drop=True)
+    out = out.sort_values("date").reset_index(drop=True)
 
-return out
-# INDICATORS
-# =========================================================
-def slope_state_text(slope: float) -> str:
-    if pd.isna(slope):
-        return ""
-    if slope > 2:
-        return "🟢 Tăng tốc"
+    return out
     if slope > 0:
+        
         return "🟡 Ổn định"
     return "🔴 Yếu"
 
