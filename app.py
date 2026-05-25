@@ -1189,7 +1189,7 @@ def save_evolution_history(scan_df: pd.DataFrame):
         repo_owner = "SONVODAI"
         repo_name = "scanner-ga-chien-clean"
         file_path = EVOLUTION_FILE
-        st.write(full_df.tail(20))
+        
         csv_content = full_df.to_csv(index=False)
         url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
         headers = {"Authorization": f"token {github_token}", "Accept": "application/vnd.github+json"}
