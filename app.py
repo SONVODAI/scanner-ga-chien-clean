@@ -566,6 +566,79 @@ def get_stock_data(symbol, days=250):
         print(symbol, e)
 
         return pd.DataFrame()
+ # =========================================================
+# BUILD INDICATORS
+# =========================================================
+def build_indicators(df):
+
+    df = df.copy()
+
+    # EMA
+    df["ema9"] = df["close"].ewm(span=9).mean()
+    df["ma20"] = df["close"].rolling(20).mean()
+
+    # EMA SLOPE
+    df["ema9_ma20_slope"] = (
+        (df["ema9"] - df["ma20"])
+        / df["ma20"]
+        * 100
+    )
+
+    df["ema9_ma20_slope_change"] = (
+        df["ema9_ma20_slope"].diff()
+    )
+
+    # RSI
+    delta = df["close"].diff()
+
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+
+    avg_gain = gain.rolling(14).mean()
+    avg_loss = loss.rolling(14).mean()
+
+    rs = avg_gain / avg_loss.replace(0, np.nan)
+
+    df["rsi14"] = 100 - (100 / (1 + rs))
+
+    df["rsi_slope"] = df["rsi14"].diff()
+
+    # OBV
+    obv = [0]
+
+    for i in range(1, len(df)):
+
+        if df["close"].iloc[i] > df["close"].iloc[i - 1]:
+            obv.append(
+                obv[-1] + df["volume"].iloc[i]
+            )
+
+        elif df["close"].iloc[i] < df["close"].iloc[i - 1]:
+            obv.append(
+                obv[-1] - df["volume"].iloc[i]
+            )
+
+        else:
+            obv.append(obv[-1])
+
+    df["obv"] = obv
+
+    # SLOPE STATE
+    def slope_state(x):
+
+        if x >= 2:
+            return "🟢 Tăng tốc"
+
+        elif x >= 0:
+            return "🟡 Đi ngang"
+
+        return "🔴 Giảm"
+
+    df["slope_state"] = df[
+        "ema9_ma20_slope"
+    ].apply(slope_state)
+
+    return df       
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
