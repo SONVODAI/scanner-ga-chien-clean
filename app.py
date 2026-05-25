@@ -148,7 +148,7 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
     for c in df.columns:
         cl = str(c).lower()
         
-        # =========================================================
+# =========================================================
 # DATA DOWNLOAD
 # =========================================================
 @st.cache_data(ttl=60, show_spinner=False)
@@ -158,33 +158,34 @@ def download_symbol_data(
     interval: str = "1d"
 ) -> pd.DataFrame:
 
-    ticker = f"{symbol}{DEFAULT_SUFFIX}"
-    if symbol == "ACB":
-        st.write(ticker)
     try:
 
-        df = yf.download(
-            ticker,
-            period=period,
-            interval=interval,
-            progress=False,
-            auto_adjust=False,
+        df = stock_historical_data(
+            symbol=symbol,
+            start_date="2025-01-01",
+            end_date=datetime.now().strftime("%Y-%m-%d"),
+            resolution="1D",
+            type="stock",
+            beautify=True,
         )
 
-    except Exception:
+    except Exception as e:
+
+        print(symbol, e)
 
         return pd.DataFrame()
 
     if df is None or df.empty:
         return pd.DataFrame()
 
-    df = df.reset_index()
+    df.columns = [str(c).lower() for c in df.columns]
 
-    df.columns = [
-    c[0].lower() if isinstance(c, tuple)
-    else str(c).lower()
-    for c in df.columns
-    ]
+    rename_map = {
+        "time": "date",
+        "tradingdate": "date",
+    }
+
+    df = df.rename(columns=rename_map)
 
     needed = [
         "date",
@@ -212,66 +213,6 @@ def download_symbol_data(
     out = out.sort_values("date").reset_index(drop=True)
 
     return out
-    if slope > 0:
-        
-        return "🟡 Ổn định"
-    return "🔴 Yếu"
-
-
-def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    x = df.copy()
-
-    x["ema9"] = ema(x["close"], 9)
-    x["ma20"] = sma(x["close"], 20)
-
-    x["ema9_ma20_slope"] = np.where(
-        x["ma20"] != 0,
-        (x["ema9"] - x["ma20"]) / x["ma20"] * 100,
-        np.nan
-    )
-    x["ema9_ma20_slope_change"] = x["ema9_ma20_slope"] - x["ema9_ma20_slope"].shift(3)
-    x["slope_state"] = x["ema9_ma20_slope"].apply(slope_state_text)
-
-    x["rsi14"] = calc_rsi(x["close"], 14)
-    x["rsi_slope"] = x["rsi14"] - x["rsi14"].shift(3)
-
-    x["obv"] = calc_obv(x["close"], x["volume"])
-    x["obv_ema9"] = ema(x["obv"], 9)
-
-    x["vol_ma20"] = sma(x["volume"], 20)
-    x["vol_ratio"] = np.where(
-        x["vol_ma20"] != 0,
-        x["volume"] / x["vol_ma20"],
-        np.nan
-    )
-
-    x["rs5"] = ((x["close"] / x["close"].shift(5)) - 1) * 100
-    x["rs10"] = ((x["close"] / x["close"].shift(10)) - 1) * 100
-
-    x["pct_change"] = x["close"].pct_change() * 100
-    x["green_candle"] = x["close"] > x["open"]
-    x["green_1"] = x["green_candle"].shift(1)
-    x["green_2"] = x["green_candle"]
-
-    x["vol_up_confirm"] = x["volume"] > x["volume"].shift(1)
-    x["rsi_confirm"] = (x["rsi14"] > 55) & (x["rsi14"] > x["rsi14"].shift(1))
-    x["obv_confirm"] = (x["obv"] > x["obv_ema9"]) & (x["obv"] > x["obv"].shift(1))
-
-    x["green_2_confirm"] = np.where(
-        (
-            x["green_1"]
-            & x["green_2"]
-            & x["vol_up_confirm"]
-            & x["rsi_confirm"]
-            & x["obv_confirm"]
-        ),
-        "🟢 GREEN 2",
-        ""
-    )
-
-    return x
-
-
 # =========================================================
 # DRY-UP ENGINE
 # =========================================================
