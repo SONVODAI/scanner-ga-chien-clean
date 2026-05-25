@@ -7,7 +7,8 @@
 
 import time
 from datetime import datetime
-
+import yfinance as yf
+import requests
 import numpy as np
 import pandas as pd
 import streamlit as st
