@@ -630,8 +630,8 @@ def get_stock_data(symbol, days=250):
 def analyze_symbol(symbol: str) -> dict | None:
     raw = download_symbol_data(symbol)
     if symbol == "ACB":
-    st.write(raw.tail())
-    print(symbol, raw.tail(1))
+        st.write(raw.tail())
+        print(symbol, raw.tail(1))
     if raw.empty or len(raw) < 40:
         return None
 
