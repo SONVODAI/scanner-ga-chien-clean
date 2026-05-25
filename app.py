@@ -1575,7 +1575,7 @@ try:
         return group_color.get(val, "")
 
     st.dataframe(
-        evo_pivot.style.applymap(color_group),
+        evo_pivot.style.map(color_group),
         use_container_width=True,
         height=600
     )
