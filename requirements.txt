@@ -6,3 +6,5 @@ scipy
 scikit-learn
 beautifulsoup4
 ipython
+yfinance
+requests
