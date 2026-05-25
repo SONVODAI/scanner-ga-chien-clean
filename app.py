@@ -607,7 +607,7 @@ def get_stock_data(symbol, days=250):
             type="stock",
             beautify=True,
             decor=False,
-            source="VCI"
+            source="TCBS"
         )
 
         if df is None or len(df) == 0:
