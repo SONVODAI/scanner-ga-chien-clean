@@ -1189,6 +1189,7 @@ def save_evolution_history(scan_df: pd.DataFrame):
         repo_owner = "SONVODAI"
         repo_name = "scanner-ga-chien-clean"
         file_path = EVOLUTION_FILE
+        
         csv_content = full_df.to_csv(index=False)
         url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
         headers = {"Authorization": f"token {github_token}", "Accept": "application/vnd.github+json"}
@@ -1198,6 +1199,7 @@ def save_evolution_history(scan_df: pd.DataFrame):
         if sha:
             data["sha"] = sha
         put_response = requests.put(url, headers=headers, json=data)
+        
         if put_response.status_code not in [200, 201]:
             st.warning(f"GitHub push lỗi: {put_response.status_code}")
     except Exception as e:
@@ -1207,20 +1209,25 @@ def save_evolution_history(scan_df: pd.DataFrame):
 
 
 def build_evolution_leaders(full_df: pd.DataFrame):
+
     if full_df is None or full_df.empty:
         return pd.DataFrame()
 
     try:
-        pivot = full_df.pivot_table(
-            index="symbol",
-            columns="date",
-            values="group",
-            aggfunc="first"
-        ).sort_index(axis=1)
+        pivot = (
+            full_df.pivot_table(
+                index="symbol",
+                columns="date",
+                values="group",
+                aggfunc="first"
+            )
+            .sort_index(axis=1)
+        )
 
         leaders = []
 
         for symbol in pivot.index:
+
             row = pivot.loc[symbol].dropna()
 
             if len(row) < 2:
@@ -1233,29 +1240,42 @@ def build_evolution_leaders(full_df: pd.DataFrame):
             current_rank = ranks[-1]
             prev_rank = ranks[-2]
 
-            delta = current_rank - prev_rank
+            rank_change = current_rank - prev_rank
 
             up_days = 0
+
             for i in range(1, len(ranks)):
                 if ranks[i] > ranks[i - 1]:
                     up_days += 1
 
-            # Hiện nếu: đang nhóm mạnh, hoặc vừa nâng hạng
-            if current_rank >= 5 or delta > 0:
+            # =========================
+            # CHỈ GIỮ CP TIẾN HÓA THẬT
+            # =========================
+
+            if (
+                rank_change > 0
+                and current_group != "THEO DÕI"
+            ):
+
                 leaders.append({
                     "symbol": symbol,
                     "current_group": current_group,
-                    "rank_change": delta,
+                    "rank_change": rank_change,
                     "up_days": up_days,
                     "days_seen": len(row),
-                    "evolution": " ➜ ".join(groups[-5:]),
+                    "evolution": " ➜ ".join(groups[-5:])
                 })
 
         out = pd.DataFrame(leaders)
 
         if not out.empty:
+
             out = out.sort_values(
-                by=["rank_change", "up_days", "days_seen"],
+                by=[
+                    "rank_change",
+                    "up_days",
+                    "days_seen"
+                ],
                 ascending=False
             ).reset_index(drop=True)
 
@@ -1263,32 +1283,6 @@ def build_evolution_leaders(full_df: pd.DataFrame):
 
     except Exception:
         return pd.DataFrame()
-    if full_df is None or full_df.empty:
-        return pd.DataFrame()
-    try:
-        pivot = full_df.pivot_table(index="symbol", columns="date", values="group", aggfunc="first").sort_index(axis=1)
-        leaders = []
-        for symbol in pivot.index:
-            row = pivot.loc[symbol].dropna()
-            if len(row) < 3:
-                continue
-            groups = row.values.tolist()
-            ranks = [GROUP_RANK.get(g, 0) for g in groups]
-            score = 0
-            up_days = 0
-            for i in range(1, len(ranks)):
-                if ranks[i] > ranks[i - 1]:
-                    score += 1
-                    up_days += 1
-            if score >= 2:
-                leaders.append({"symbol": symbol, "evolution_score": score, "up_days": up_days, "current_group": groups[-1], "evolution": " ➜ ".join(groups[-5:])})
-        out = pd.DataFrame(leaders)
-        if not out.empty:
-            out = out.sort_values(["evolution_score", "up_days"], ascending=False).reset_index(drop=True)
-        return out
-    except Exception:
-        return pd.DataFrame()
-
 # =========================================================
 # MARKET ANALOG
 # =========================================================
