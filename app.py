@@ -157,7 +157,7 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # =========================================================
 # DATA DOWNLOAD
 # =========================================================
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=60, show_spinner=False)
 def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
     ticker = f"{symbol}{DEFAULT_SUFFIX}"
 
