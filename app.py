@@ -179,7 +179,11 @@ def download_symbol_data(
 
     df = df.reset_index()
 
-    df.columns = [c.lower() for c in df.columns]
+    df.columns = [
+    c[0].lower() if isinstance(c, tuple)
+    else str(c).lower()
+    for c in df.columns
+    ]
 
     needed = [
         "date",
