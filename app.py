@@ -638,7 +638,8 @@ def analyze_symbol(symbol: str) -> dict | None:
 
     last = df.iloc[-1]
     prev = df.iloc[-2]
-
+    if symbol == "GVR":
+    st.write(df.tail(3))
     price = to_float(last["close"])
     ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
