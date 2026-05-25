@@ -1198,6 +1198,8 @@ def save_evolution_history(scan_df: pd.DataFrame):
         if sha:
             data["sha"] = sha
         put_response = requests.put(url, headers=headers, json=data)
+        st.write("GITHUB STATUS:", put_response.status_code)
+        st.write(put_response.text)
         if put_response.status_code not in [200, 201]:
             st.warning(f"GitHub push lỗi: {put_response.status_code}")
     except Exception as e:
