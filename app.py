@@ -168,7 +168,7 @@ def download_symbol_data(
             period=period,
             interval=interval,
             progress=False,
-            auto_adjust=True,
+            auto_adjust=False,
         )
 
     except Exception:
