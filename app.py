@@ -249,7 +249,7 @@ for c in df.columns:
 df = df.rename(columns=rename_map)
             
 
-    needed = [
+needed = [
         "date",
         "open",
         "high",
