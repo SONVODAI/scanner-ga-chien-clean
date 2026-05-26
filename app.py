@@ -1645,7 +1645,7 @@ def build_evolution_table():
     # =========================================
 
     buy_table = evo_table[
-        (evo_table["evolution"] >= 2)
+        (evo_table["evolution"] >= 1)
         &
         (
             evo_table["TODAY"].isin([
