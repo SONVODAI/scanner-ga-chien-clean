@@ -530,7 +530,7 @@ def analyze_symbol(symbol):
     price = to_float(last["close"])
     volume = to_float(last["volume"])
 
-        rt = get_realtime_overlay(symbol)
+    rt = get_realtime_overlay(symbol)
 
     if rt:
 
