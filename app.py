@@ -648,7 +648,7 @@ row["warning"] = build_warning(
     slope_
     )
 
-    row["status"] = build_status(
+row["status"] = build_status(
         total_score,
         row["warning"],
         row["group"]
