@@ -249,14 +249,7 @@ for c in df.columns:
 df = df.rename(columns=rename_map)
             
 
-needed = [
-        "date",
-        "open",
-        "high",
-        "low",
-        "close",
-        "volume"
-    ]
+        needed = ["date", "open", "high", "low", "close", "volume"]
 
         for c in needed:
             if c not in df.columns:
@@ -271,7 +264,6 @@ needed = [
         df = df.dropna(subset=["close"])
 
         return df.reset_index(drop=True)
-
     except Exception as e:
         st.write(f"🔥 {symbol}:", e)
         return pd.DataFrame()
