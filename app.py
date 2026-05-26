@@ -260,10 +260,9 @@ for c in df.columns:
         df = df.dropna(subset=["close"])
 
         return df.reset_index(drop=True)
-    except Exception as e:
-        st.write(f"🔥 {symbol}:", e)
-        return pd.DataFrame()
+            return df.reset_index(drop=True)
 
+    except Exception as e:
 
 
 # =========================================================
