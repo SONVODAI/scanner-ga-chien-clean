@@ -561,18 +561,18 @@ def analyze_symbol(symbol):
     last = df.iloc[-1]
     prev = df.iloc[-2]
 
-        price = to_float(last["close"])
+    price = to_float(last["close"])
     volume = to_float(last["volume"])
 
     rt = get_realtime_overlay(symbol)
 
     if rt:
 
-        rt_price = rt.get("rt_price")
+    rt_price = rt.get("rt_price")
 
-        if rt_price is not None and rt_price > 0:
+    if rt_price is not None and rt_price > 0:
 
-            last["close"] = rt_price
+        last["close"] = rt_price
 
             if "price" in last.index:
                 last["price"] = rt_price
