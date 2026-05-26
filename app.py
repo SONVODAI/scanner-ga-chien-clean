@@ -137,7 +137,7 @@ def calc_obv(close, volume):
 # =========================================================
 # DATA
 # =========================================================
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=5, show_spinner=False)
 def download_symbol_data(symbol, days=260):
     if stock_historical_data is None:
         return pd.DataFrame()
@@ -190,13 +190,13 @@ def get_realtime_overlay(symbol):
         return {}
 
     try:
-        rt = stock_intraday_data(symbol=symbol, page_size=100, page_num=0)
+        rt = stock_intraday_data(symbol=symbol, page_size=500, page_num=0)
         if rt is None or rt.empty:
             return {}
 
         rt = rt.copy()
         rt.columns = [str(c).lower().strip() for c in rt.columns]
-
+        rt = rt.sort_index()
         price_col = None
         vol_col = None
         for c in rt.columns:
@@ -1120,7 +1120,7 @@ def save_evolution_history(scan_df):
         if sha:
             data["sha"] = sha
         put_response = requests.put(url, headers=headers, json=data, timeout=15)
-        if put_response.status_code not in [200, 201]:
+        if put_response.status_code not in [200, 201, 409]:
             st.warning(f"GitHub push lỗi: {put_response.status_code}")
     except Exception as e:
         st.warning(f"GitHub push error: {e}")
@@ -1417,6 +1417,6 @@ try:
         }
         return color_map.get(value, "")
 
-    st.dataframe(evo_pivot.style.applymap(color_group), use_container_width=True, height=720)
+    st.dataframe(evo_pivot.style.map(color_group), use_container_width=True, height=720)
 except Exception as e:
     st.info(f"Chưa có dữ liệu tiến hóa: {e}")
