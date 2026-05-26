@@ -525,18 +525,21 @@ def analyze_symbol(symbol: str) -> dict | None:
     prev = df.iloc[-2]
 
     price = to_float(last["close"])
-    volume = to_float(last["volume"])
+volume = to_float(last["volume"])
 
-    # REALTIME OVERLAY
-    rt = get_realtime_overlay(symbol)
+# REALTIME OVERLAY
+rt = get_realtime_overlay(symbol)
 
-    if rt:
-        price = rt.get("rt_price", price)
+if rt:
 
-        rt_vol = rt.get("rt_volume")
-        if rt_vol is not None and rt_vol > volume:
-            volume = rt_vol
+    rt_price = rt.get("rt_price")
+    rt_vol = rt.get("rt_volume")
 
+    if rt_price is not None:
+        price = rt_price
+
+    if rt_vol is not None and rt_vol > volume:
+        volume = rt_vol
 
         ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
