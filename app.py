@@ -4,26 +4,19 @@
 # Giữ lõi: Market REAL/LIVE, Pull/Break, Dryup, Gà 1KG,
 # Portfolio, Top Risk, Evolution 15 phiên, GitHub push CSV.
 # =========================================================
-
-import time
-import base64
-from datetime import datetime
-
-import numpy as np
-import pandas as pd
-import requests
-import streamlit as st
-
+# =========================================================
+# VNSTOCK IMPORT
+# =========================================================
 try:
     from vnstock import stock_historical_data
-except Exception:
-    stock_historical_data = None
-
-try:
     from vnstock import stock_intraday_data
-except Exception:
-    stock_intraday_data = None
 
+except Exception as e:
+
+    print("VNSTOCK IMPORT ERROR:", e)
+
+    stock_historical_data = None
+    stock_intraday_data = None
 # =========================================================
 # CONFIG
 # =========================================================
