@@ -221,7 +221,7 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # =========================================================
 # DATA DOWNLOAD
 # =========================================================
-@st.cache_data(ttl=300, show_spinner=False)
+
 def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
     ticker = f"{symbol}.VN"
 
@@ -846,7 +846,7 @@ def analyze_symbol(symbol: str) -> dict | None:
 # =========================================================
 # SCAN
 # =========================================================
-@st.cache_data(ttl=300, show_spinner=False)
+
 def run_scan(symbols: list[str]) -> pd.DataFrame:
     rows = []
 
@@ -1327,6 +1327,10 @@ if scan_btn:
 # =========================================================
 # RUN SCAN
 # =========================================================
+test_df = download_symbol_data("VCB")
+
+st.write("TEST VCB")
+st.write(test_df.tail())
 with st.spinner("Đang quét dữ liệu..."):
     scan_df = run_scan(WATCHLIST)
 
