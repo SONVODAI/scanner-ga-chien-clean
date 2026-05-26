@@ -247,12 +247,7 @@ for c in df.columns:
         rename_map[c] = "volume"
 
 df = df.rename(columns=rename_map)
-            "Open": "open",
-            "High": "high",
-            "Low": "low",
-            "Close": "close",
-            "Volume": "volume",
-        })
+            
 
         needed = [
             "date",
