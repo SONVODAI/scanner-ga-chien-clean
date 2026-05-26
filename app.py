@@ -537,7 +537,8 @@ def analyze_symbol(symbol: str) -> dict | None:
         if rt_vol is not None and rt_vol > volume:
             volume = rt_vol
 
-    ema9_ = to_float(last["ema9"])
+
+        ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
     ema9_prev = to_float(prev["ema9"])
 
