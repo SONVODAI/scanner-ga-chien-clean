@@ -535,7 +535,7 @@ def analyze_symbol(symbol):
         rt_price = rt.get("rt_price")
         if rt_price is not None and rt_price > 0:
 
-    last["Close"] = rt_price
+        last["Close"] = rt_price
 
     if "price" in last.index:
         last["price"] = rt_price
