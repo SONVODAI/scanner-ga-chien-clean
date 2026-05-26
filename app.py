@@ -260,7 +260,7 @@ for c in df.columns:
         df = df.dropna(subset=["close"])
 
         return df.reset_index(drop=True)
-            return df.reset_index(drop=True)
+            
 
     except Exception as e:
 
