@@ -568,9 +568,9 @@ def analyze_symbol(symbol):
 
     if rt:
 
-    rt_price = rt.get("rt_price")
+        rt_price = rt.get("rt_price")
 
-    if rt_price is not None and rt_price > 0:
+        if rt_price is not None and rt_price > 0:
 
         last["close"] = rt_price
 
