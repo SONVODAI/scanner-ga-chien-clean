@@ -1514,5 +1514,193 @@ st.markdown("---")
 st.caption(
     "Realtime VNStock | V18.4 lightweight rebuild"
 )
+# =========================================================
+# EVOLUTION 5 DAYS
+# =========================================================
 
+GROUP_RANK = {
+    "THEO DÕI": 0,
+    "TÍCH LŨY": 1,
+    "MUA EARLY": 2,
+    "PULL VỪA": 3,
+    "PULL ĐẸP": 4,
+    "MUA BREAK": 5,
+    "CP MẠNH": 6,
+    "GÀ TĂNG TỐC": 7
+}
+
+# =========================================================
+# SAVE EVOLUTION
+# =========================================================
+def save_evolution(scan_df):
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    rows = []
+
+    for _, r in scan_df.iterrows():
+
+        rows.append({
+            "date": today,
+            "symbol": r["symbol"],
+            "group": r["group"]
+        })
+
+    new_df = pd.DataFrame(rows)
+
+    FILE_NAME = "group_evolution_history.csv"
+
+    try:
+
+        old_df = pd.read_csv(FILE_NAME)
+
+        evo_df = pd.concat(
+            [old_df, new_df],
+            ignore_index=True
+        )
+
+    except:
+        evo_df = new_df
+
+    evo_df = evo_df.drop_duplicates(
+        subset=["date", "symbol"],
+        keep="last"
+    )
+
+    evo_df.to_csv(FILE_NAME, index=False)
+
+    return evo_df
+
+
+# =========================================================
+# BUILD EVOLUTION TABLE
+# =========================================================
+def build_evolution_table():
+
+    FILE_NAME = "group_evolution_history.csv"
+
+    try:
+        evo_df = pd.read_csv(FILE_NAME)
+
+    except:
+        return pd.DataFrame(), pd.DataFrame()
+
+    if evo_df.empty:
+        return pd.DataFrame(), pd.DataFrame()
+
+    pivot = evo_df.pivot_table(
+        index="symbol",
+        columns="date",
+        values="group",
+        aggfunc="first"
+    )
+
+    pivot = pivot.sort_index(axis=1)
+
+    if len(pivot.columns) < 5:
+        return pd.DataFrame(), pd.DataFrame()
+
+    last_cols = pivot.columns[-5:]
+
+    evo_list = []
+
+    for symbol in pivot.index:
+
+        row = pivot.loc[symbol]
+
+        groups = row[last_cols].tolist()
+
+        if any(pd.isna(groups)):
+            continue
+
+        ranks = [
+            GROUP_RANK.get(g, 0)
+            for g in groups
+        ]
+
+        evolution_score = ranks[-1] - ranks[0]
+
+        evo_list.append({
+            "symbol": symbol,
+            "D-4": groups[0],
+            "D-3": groups[1],
+            "D-2": groups[2],
+            "D-1": groups[3],
+            "TODAY": groups[4],
+            "evolution": evolution_score
+        })
+
+    evo_table = pd.DataFrame(evo_list)
+
+    if evo_table.empty:
+        return pd.DataFrame(), pd.DataFrame()
+
+    evo_table = evo_table.sort_values(
+        "evolution",
+        ascending=False
+    )
+
+    # =========================================
+    # BẢNG CHỌN LỌC (BẢNG MUA)
+    # =========================================
+
+    buy_table = evo_table[
+        (evo_table["evolution"] >= 2)
+        &
+        (
+            evo_table["TODAY"].isin([
+                "MUA EARLY",
+                "PULL ĐẸP",
+                "CP MẠNH"
+            ])
+        )
+    ].copy()
+
+    return evo_table, buy_table
+
+
+# =========================================================
+# SAVE EVOLUTION DATA
+# =========================================================
+save_evolution(scan_df)
+
+evo_table, buy_table = build_evolution_table()
+
+
+# =========================================================
+# SHOW EVOLUTION
+# =========================================================
+st.markdown("---")
+
+st.subheader("🚀 BẢNG TIẾN HÓA 5 NGÀY")
+
+if not evo_table.empty:
+
+    st.dataframe(
+        evo_table,
+        use_container_width=True,
+        height=400
+    )
+
+else:
+    st.info("Chưa đủ dữ liệu 5 ngày")
+
+
+# =========================================================
+# BUY TABLE
+# =========================================================
+st.markdown("---")
+
+st.subheader("🔥 BẢNG TIẾN HÓA CHỌN LỌC")
+
+if not buy_table.empty:
+
+    st.dataframe(
+        buy_table,
+        use_container_width=True,
+        height=400
+    )
+
+else:
+    st.info("Chưa có cổ phiếu đạt điều kiện")
 # =========================================================
