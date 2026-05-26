@@ -754,6 +754,7 @@ def classify_group(row: dict) -> str:
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
+@st.cache_data(ttl=300)
 def analyze_symbol(symbol: str) -> dict | None:
     raw = download_symbol_data(symbol)
 
