@@ -646,16 +646,16 @@ row["warning"] = build_warning(
     obv_ema9_,
     pull_label,
     slope_
-)
+    )
 
-row["status"] = build_status(
-    total_score,
-    row["warning"],
-    row["group"]
-)
-
-return row
-    # =========================================================
+    row["status"] = build_status(
+        total_score,
+        row["warning"],
+        row["group"]
+    )
+    
+    return row
+# =========================================================
 # SCAN ENGINE
 # =========================================================
 @st.cache_data(ttl=60, show_spinner=False)
