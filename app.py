@@ -216,8 +216,6 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
                 return c
 
     return None
-
-
 # =========================================================
 # DATA DOWNLOAD
 # =========================================================
@@ -265,6 +263,8 @@ for c in df.columns:
     except Exception as e:
         st.write(f"🔥 {symbol}:", e)
         return pd.DataFrame()
+
+
 
 # =========================================================
 # INDICATORS
