@@ -430,16 +430,19 @@ def analyze_symbol(symbol: str) -> dict | None:
 @st.cache_data(ttl=300, show_spinner=False)
 def run_scan(symbols: list[str]) -> pd.DataFrame:
     rows = []
+for symbol in symbols:
+    try:
+        item = analyze_symbol(symbol)
 
-    for symbol in symbols:
-        try:
-            item = analyze_symbol(symbol)
-            if item is not None:
-                rows.append(item)
-        except Exception as e:
-            # Không để 1 mã lỗi làm hỏng toàn app
-            pass
+        if item is not None:
+            rows.append(item)
 
+        else:
+            st.write(f"❌ {symbol} = None")
+
+    except Exception as e:
+        st.write(f"🔥 {symbol} ERROR:", e)
+    
     if not rows:
         return pd.DataFrame()
 
