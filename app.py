@@ -223,48 +223,56 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # =========================================================
 @st.cache_data(ttl=300, show_spinner=False)
 def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
-    ticker = f"{symbol}{DEFAULT_SUFFIX}"
+    ticker = f"{symbol}.VN"
 
     try:
         df = yf.download(
             ticker,
             period=period,
             interval=interval,
-            auto_adjust=False,
+            auto_adjust=True,
             progress=False,
             threads=False,
-            group_by="column",
         )
-    except Exception:
+
+        if df is None or df.empty:
+            return pd.DataFrame()
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = [c[0] for c in df.columns]
+
+        df = df.reset_index()
+
+        rename_map = {
+            "Date": "date",
+            "Datetime": "date",
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Close": "close",
+            "Adj Close": "close",
+            "Volume": "volume",
+        }
+
+        df = df.rename(columns=rename_map)
+
+        needed = ["date", "open", "high", "low", "close", "volume"]
+        if any(c not in df.columns for c in needed):
+            return pd.DataFrame()
+
+        out = df[needed].copy()
+
+        for c in ["open", "high", "low", "close", "volume"]:
+            out[c] = pd.to_numeric(out[c], errors="coerce")
+
+        out = out.dropna(subset=["close"])
+        out = out.sort_values("date").reset_index(drop=True)
+
+        return out
+
+    except Exception as e:
+        st.write(f"🔥 Lỗi tải {symbol}: {e}")
         return pd.DataFrame()
-
-    if df is None or df.empty:
-        return pd.DataFrame()
-
-    df = flatten_columns(df).reset_index()
-
-    date_col = find_col(df, ["Date", "Datetime"])
-    open_col = find_col(df, ["Open"])
-    high_col = find_col(df, ["High"])
-    low_col = find_col(df, ["Low"])
-    close_col = find_col(df, ["Close"])
-    vol_col = find_col(df, ["Volume"])
-
-    needed = [date_col, open_col, high_col, low_col, close_col, vol_col]
-    if any(col is None for col in needed):
-        return pd.DataFrame()
-
-    out = df[[date_col, open_col, high_col, low_col, close_col, vol_col]].copy()
-    out.columns = ["date", "open", "high", "low", "close", "volume"]
-
-    for col in ["open", "high", "low", "close", "volume"]:
-        out[col] = pd.to_numeric(out[col], errors="coerce")
-
-    out = out.dropna(subset=["close"])
-    out = out.sort_values("date").reset_index(drop=True)
-
-    return out
-
 
 # =========================================================
 # INDICATORS
