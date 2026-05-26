@@ -1344,10 +1344,6 @@ if scan_btn:
 # =========================================================
 # RUN SCAN
 # =========================================================
-test_df = download_symbol_data("VCB")
-
-st.write("TEST VCB")
-st.write(test_df.tail())
 with st.spinner("Đang quét dữ liệu..."):
     scan_df = run_scan(WATCHLIST)
 
