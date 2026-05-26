@@ -10,6 +10,8 @@ import numpy as np
 
 from datetime import datetime
 import time
+import base64
+import requests
 # =========================================================
 # VNSTOCK IMPORT
 # =========================================================
