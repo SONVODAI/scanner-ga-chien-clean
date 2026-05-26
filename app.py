@@ -137,19 +137,20 @@ def flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
     else:
         df.columns = [str(c) for c in df.columns]
     return df
-
-
 def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
-    lower_map = {str(c).lower(): c for c in df.columns}
-
-    for cand in candidates:
-        if cand.lower() in lower_map:
-            return lower_map[cand.lower()]
-
     for c in df.columns:
         cl = str(c).lower()
+
         for cand in candidates:
-            if cand.lower() in cl:
+            cand_l = cand.lower()
+
+            if cl == cand_l:
+                return c
+
+            if cl.startswith(cand_l + "_"):
+                return c
+
+            if cl.endswith("_" + cand_l):
                 return c
 
     return None
