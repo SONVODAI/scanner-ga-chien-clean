@@ -221,25 +221,32 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # =========================================================
 # DATA DOWNLOAD
 # =========================================================
-def download_symbol_data(symbol: str) -> pd.DataFrame:
+# ===== ĐỔI TÊN CỘT LINH HOẠT =====
+rename_map = {}
 
-    try:
-        from vnstock import stock_historical_data
+for c in df.columns:
 
-        df = stock_historical_data(
-            symbol=symbol,
-            start_date="2025-01-01",
-            end_date=datetime.now().strftime("%Y-%m-%d"),
-            resolution="1D",
-            type="stock",
-            beautify=True,
-        )
+    cl = str(c).lower()
 
-        if df is None or len(df) == 0:
-            return pd.DataFrame()
+    if "date" in cl or "time" in cl:
+        rename_map[c] = "date"
 
-        df = df.rename(columns={
-            "TradingDate": "date",
+    elif cl == "open":
+        rename_map[c] = "open"
+
+    elif cl == "high":
+        rename_map[c] = "high"
+
+    elif cl == "low":
+        rename_map[c] = "low"
+
+    elif cl == "close":
+        rename_map[c] = "close"
+
+    elif cl == "volume":
+        rename_map[c] = "volume"
+
+df = df.rename(columns=rename_map)
             "Open": "open",
             "High": "high",
             "Low": "low",
