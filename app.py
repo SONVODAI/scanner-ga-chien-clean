@@ -245,25 +245,23 @@ for c in df.columns:
 
     elif cl == "volume":
         rename_map[c] = "volume"
+        df = df.rename(columns=rename_map)
 
-df = df.rename(columns=rename_map)
-            
+        needed = ["date", "open", "high", "low", "close", "volume"]
 
-    needed = ["date", "open", "high", "low", "close", "volume"]
+        for c in needed:
+            if c not in df.columns:
+                st.write(f"Thiếu cột: {c}")
+                return pd.DataFrame()
 
-    for c in needed:
-        if c not in df.columns:
-            st.write(f"Thiếu cột: {c}")
-            return pd.DataFrame()
+        df = df[needed].copy()
 
-    df = df[needed].copy()
+        for c in ["open", "high", "low", "close", "volume"]:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    for c in ["open", "high", "low", "close", "volume"]:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
+        df = df.dropna(subset=["close"])
 
-    df = df.dropna(subset=["close"])
-
-    return df.reset_index(drop=True)
+        return df.reset_index(drop=True)
     except Exception as e:
         st.write(f"🔥 {symbol}:", e)
         return pd.DataFrame()
