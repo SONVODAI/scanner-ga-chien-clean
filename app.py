@@ -184,47 +184,85 @@ def download_symbol_data(symbol, days=260):
     return out
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=5, show_spinner=False)
 def get_realtime_overlay(symbol):
+
     if stock_intraday_data is None:
         return {}
 
     try:
-        rt = stock_intraday_data(symbol=symbol, page_size=500, page_num=0)
-        if rt is None or rt.empty:
+        rt = stock_intraday_data(
+            symbol=symbol,
+            page_size=500,
+            page_num=0
+        )
+
+        if rt is None:
             return {}
 
-        rt = rt.copy()
-        rt.columns = [str(c).lower().strip() for c in rt.columns]
+        if len(rt) == 0:
+            return {}
+
+        rt.columns = [
+            str(c).lower().strip()
+            for c in rt.columns
+        ]
+
         rt = rt.sort_index()
+
         price_col = None
         vol_col = None
+
         for c in rt.columns:
-            if c in ["price", "matchprice", "close"]:
+
+            if c in [
+                "price",
+                "matchprice",
+                "close"
+            ]:
                 price_col = c
-            if c in ["volume", "matchvolume"]:
+
+            if c in [
+                "volume",
+                "matchvolume"
+            ]:
                 vol_col = c
 
         if price_col is None:
             return {}
 
-        prices = pd.to_numeric(rt[price_col], errors="coerce").dropna()
-        if prices.empty:
+        last_price = pd.to_numeric(
+            rt[price_col],
+            errors="coerce"
+        ).dropna()
+
+        if len(last_price) == 0:
             return {}
 
-        result = {"rt_price": float(prices.iloc[-1])}
+        result = {
+            "rt_price": float(last_price.iloc[-1])
+        }
 
         if vol_col is not None:
+
             result["rt_volume"] = float(
-                pd.to_numeric(rt[vol_col], errors="coerce").fillna(0).sum()
+                pd.to_numeric(
+                    rt[vol_col],
+                    errors="coerce"
+                ).fillna(0).sum()
             )
 
         return result
 
     except Exception as e:
-        print("REALTIME ERROR", symbol, e)
-        return {}
 
+        print(
+            "REALTIME ERROR",
+            symbol,
+            e
+        )
+
+        return {}
 # =========================================================
 # INDICATORS
 # =========================================================
