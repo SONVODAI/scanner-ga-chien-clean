@@ -516,10 +516,45 @@ def classify_group(row):
 # ANALYZE / SCAN
 # =========================================================
 def analyze_symbol(symbol):
+
     raw = download_symbol_data(symbol)
+
     if raw.empty or len(raw) < 40:
         return None
-df = build_indicators(raw)
+
+    # =====================================
+    # APPLY REALTIME TO RAW
+    # =====================================
+
+    rt = get_realtime_overlay(symbol)
+
+    if rt:
+
+        rt_price = rt.get("rt_price")
+        rt_vol = rt.get("rt_volume")
+
+        if rt_price is not None and rt_price > 0:
+
+            if "close" in raw.columns:
+                raw.loc[raw.index[-1], "close"] = rt_price
+
+            if "Close" in raw.columns:
+                raw.loc[raw.index[-1], "Close"] = rt_price
+
+        if rt_vol is not None and rt_vol > 0:
+
+            if "volume" in raw.columns:
+                raw.loc[raw.index[-1], "volume"] = rt_vol
+
+            if "Volume" in raw.columns:
+                raw.loc[raw.index[-1], "Volume"] = rt_vol
+
+    # =====================================
+    # BUILD INDICATORS
+    # =====================================
+
+    df = build_indicators(raw)
+
     if df.empty or len(df) < 25:
         return None
 
@@ -528,11 +563,6 @@ df = build_indicators(raw)
 
     price = to_float(last["close"])
     volume = to_float(last["volume"])
-
-    rt = get_realtime_overlay(symbol)
-
-    if rt:
-
         rt_price = rt.get("rt_price")
 
         if rt_price is not None and rt_price > 0:
