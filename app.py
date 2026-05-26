@@ -530,21 +530,26 @@ def analyze_symbol(symbol):
     price = to_float(last["close"])
     volume = to_float(last["volume"])
 
-    rt = get_realtime_overlay(symbol)
+        rt = get_realtime_overlay(symbol)
+
     if rt:
+
         rt_price = rt.get("rt_price")
+
         if rt_price is not None and rt_price > 0:
 
-        last["Close"] = rt_price
+            last["Close"] = rt_price
 
-    if "price" in last.index:
-        last["price"] = rt_price
+            if "price" in last.index:
+                last["price"] = rt_price
+
         rt_vol = rt.get("rt_volume")
+
         if rt_price is not None:
             price = rt_price
+
         if rt_vol is not None and rt_vol > volume:
             volume = rt_vol
-
     ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
     ema9_prev = to_float(prev["ema9"])
