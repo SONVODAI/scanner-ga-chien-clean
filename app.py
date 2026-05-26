@@ -221,57 +221,57 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 # =========================================================
 # DATA DOWNLOAD
 # =========================================================
-
-def download_symbol_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
-    ticker = f"{symbol}.VN"
+def download_symbol_data(symbol: str) -> pd.DataFrame:
 
     try:
-        df = yf.download(
-            ticker,
-            period=period,
-            interval=interval,
-            auto_adjust=True,
-            progress=False,
-            threads=False,
+        from vnstock import stock_historical_data
+
+        df = stock_historical_data(
+            symbol=symbol,
+            start_date="2025-01-01",
+            end_date=datetime.now().strftime("%Y-%m-%d"),
+            resolution="1D",
+            type="stock",
+            beautify=True,
         )
 
-        if df is None or df.empty:
+        if df is None or len(df) == 0:
             return pd.DataFrame()
 
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = [c[0] for c in df.columns]
-
-        df = df.reset_index()
-
-        rename_map = {
-            "Date": "date",
-            "Datetime": "date",
+        df = df.rename(columns={
+            "TradingDate": "date",
             "Open": "open",
             "High": "high",
             "Low": "low",
             "Close": "close",
-            "Adj Close": "close",
             "Volume": "volume",
-        }
+        })
 
-        df = df.rename(columns=rename_map)
+        needed = [
+            "date",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume"
+        ]
 
-        needed = ["date", "open", "high", "low", "close", "volume"]
-        if any(c not in df.columns for c in needed):
-            return pd.DataFrame()
+        for c in needed:
+            if c not in df.columns:
+                st.write(f"Thiếu cột: {c}")
+                return pd.DataFrame()
 
-        out = df[needed].copy()
+        df = df[needed].copy()
 
         for c in ["open", "high", "low", "close", "volume"]:
-            out[c] = pd.to_numeric(out[c], errors="coerce")
+            df[c] = pd.to_numeric(df[c], errors="coerce")
 
-        out = out.dropna(subset=["close"])
-        out = out.sort_values("date").reset_index(drop=True)
+        df = df.dropna(subset=["close"])
 
-        return out
+        return df.reset_index(drop=True)
 
     except Exception as e:
-        st.write(f"🔥 Lỗi tải {symbol}: {e}")
+        st.write(f"🔥 {symbol}:", e)
         return pd.DataFrame()
 
 # =========================================================
