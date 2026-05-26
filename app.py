@@ -571,29 +571,7 @@ def analyze_symbol(symbol):
     # APPLY REALTIME TO RAW
     # =====================================
 
-    rt = get_realtime_overlay(symbol)
-
-    if rt:
-
-        rt_price = rt.get("rt_price")
-        rt_vol = rt.get("rt_volume")
-
-        if rt_price is not None and rt_price > 0:
-
-            if "close" in raw.columns:
-                raw.loc[raw.index[-1], "close"] = rt_price
-
-            if "Close" in raw.columns:
-                raw.loc[raw.index[-1], "Close"] = rt_price
-
-        if rt_vol is not None and rt_vol > 0:
-
-            if "volume" in raw.columns:
-                raw.loc[raw.index[-1], "volume"] = rt_vol
-
-            if "Volume" in raw.columns:
-                raw.loc[raw.index[-1], "Volume"] = rt_vol
-
+    
     # =====================================
     # BUILD INDICATORS
     # =====================================
@@ -697,8 +675,7 @@ def analyze_symbol(symbol):
 
     return row
 
-
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=300, show_spinner=False)
 def run_scan(symbols):
     rows = []
     errors = []
