@@ -533,6 +533,13 @@ def analyze_symbol(symbol):
     rt = get_realtime_overlay(symbol)
     if rt:
         rt_price = rt.get("rt_price")
+        if rt_price is not None and rt_price > 0:
+
+    last["close"] = rt_price
+    last["Close"] = rt_price
+
+    if "price" in last.index:
+        last["price"] = rt_price
         rt_vol = rt.get("rt_volume")
         if rt_price is not None:
             price = rt_price
