@@ -633,27 +633,29 @@ if rt:
         "dry_score": dry_score,
         "dry_label": dry_label,
     }
+row["OBV_POWER"] = classify_obv_power(row)
 
-    row["OBV_POWER"] = classify_obv_power(row)
-    row["group"] = classify_group(row)
-    row["warning"] = build_warning(
-        price,
-        ema9_,
-        rsi_,
-        rsi_slope_,
-        obv_,
-        obv_ema9_,
-        pull_label,
-        slope_
-    )
-    row["status"] = build_status(
-        total_score,
-        row["warning"],
-        row["group"]
-    )
+row["group"] = classify_group(row)
 
-        return row
-# =========================================================
+row["warning"] = build_warning(
+    price,
+    ema9_,
+    rsi_,
+    rsi_slope_,
+    obv_,
+    obv_ema9_,
+    pull_label,
+    slope_
+)
+
+row["status"] = build_status(
+    total_score,
+    row["warning"],
+    row["group"]
+)
+
+return row
+    # =========================================================
 # SCAN ENGINE
 # =========================================================
 @st.cache_data(ttl=60, show_spinner=False)
