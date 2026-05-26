@@ -16,15 +16,18 @@ import requests
 # VNSTOCK IMPORT
 # =========================================================
 try:
-    from vnstock import stock_historical_data
-    from vnstock import stock_intraday_data
+    from vnstock import Vnstock
+
+    stock = Vnstock().stock(
+        symbol='VCB',
+        source='VCI'
+    )
 
 except Exception as e:
 
     print("VNSTOCK IMPORT ERROR:", e)
 
-    stock_historical_data = None
-    stock_intraday_data = None
+    stock = None
 # =========================================================
 # CONFIG
 # =========================================================
@@ -138,21 +141,25 @@ def calc_obv(close, volume):
 # =========================================================
 # DATA
 # =========================================================
-@st.cache_data(ttl=5, show_spinner=False)
+@st.cache_data(ttl=300, show_spinner=False)
 def download_symbol_data(symbol, days=260):
-    if stock_historical_data is None:
+
+    if stock is None:
         return pd.DataFrame()
 
     try:
-        df = stock_historical_data(
+
+        df = Vnstock().stock(
             symbol=symbol,
-            start_date="2024-01-01",
-            end_date=datetime.now().strftime("%Y-%m-%d"),
-            resolution="1D",
-            type="stock",
-            beautify=True,
+            source='VCI'
+        ).quote.history(
+            start='2024-01-01',
+            end=datetime.now().strftime("%Y-%m-%d"),
+            interval='1D'
         )
+
     except Exception as e:
+
         print("DATA ERROR", symbol, e)
         return pd.DataFrame()
 
@@ -160,30 +167,67 @@ def download_symbol_data(symbol, days=260):
         return pd.DataFrame()
 
     df = df.copy()
-    df.columns = [str(c).lower().strip() for c in df.columns]
-    df = df.rename(columns={
-        "time": "date",
-        "tradingdate": "date",
-        "datetime": "date",
-        "ticker": "symbol",
-    })
 
-    needed = ["date", "open", "high", "low", "close", "volume"]
+    df.columns = [
+        str(c).lower().strip()
+        for c in df.columns
+    ]
+
+    rename_map = {
+        "time": "date",
+        "datetime": "date",
+        "tradingdate": "date",
+    }
+
+    df = df.rename(columns=rename_map)
+
+    needed = [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+    ]
+
     for col in needed:
+
         if col not in df.columns:
-            print("MISSING COL", symbol, col, list(df.columns))
+
+            print("MISSING COL", symbol, col)
             return pd.DataFrame()
 
     out = df[needed].copy()
-    out["date"] = pd.to_datetime(out["date"], errors="coerce")
-    for col in ["open", "high", "low", "close", "volume"]:
-        out[col] = pd.to_numeric(out[col], errors="coerce")
 
-    out = out.dropna(subset=["date", "close"])
-    out = out.sort_values("date").drop_duplicates("date", keep="last")
-    out = out.tail(days).reset_index(drop=True)
+    out["date"] = pd.to_datetime(
+        out["date"],
+        errors="coerce"
+    )
+
+    for col in [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+    ]:
+
+        out[col] = pd.to_numeric(
+            out[col],
+            errors="coerce"
+        )
+
+    out = out.dropna(
+        subset=["date", "close"]
+    )
+
+    out = out.sort_values("date")
+
+    out = out.tail(days)
+
+    out = out.reset_index(drop=True)
+
     return out
-
 
 @st.cache_data(ttl=5, show_spinner=False)
 def get_realtime_overlay(symbol):
