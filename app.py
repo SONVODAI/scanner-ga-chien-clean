@@ -216,36 +216,63 @@ def find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
                 return c
 
     return None
-# =========================================================
+   # =========================================================
 # DATA DOWNLOAD
 # =========================================================
-# ===== ĐỔI TÊN CỘT LINH HOẠT =====
-rename_map = {}
+def download_symbol_data(symbol: str) -> pd.DataFrame:
 
-for c in df.columns:
+    try:
+        from vnstock import stock_historical_data
 
-    cl = str(c).lower()
+        df = stock_historical_data(
+            symbol=symbol,
+            start_date="2025-01-01",
+            end_date=datetime.now().strftime("%Y-%m-%d"),
+            resolution="1D",
+            type="stock",
+            beautify=True,
+        )
 
-    if "date" in cl or "time" in cl:
-        rename_map[c] = "date"
+        if df is None or len(df) == 0:
+            return pd.DataFrame()
 
-    elif cl == "open":
-        rename_map[c] = "open"
+        # =========================
+        # RENAME COLUMNS
+        # =========================
+        rename_map = {}
 
-    elif cl == "high":
-        rename_map[c] = "high"
+        for c in df.columns:
 
-    elif cl == "low":
-        rename_map[c] = "low"
+            cl = str(c).lower()
 
-    elif cl == "close":
-        rename_map[c] = "close"
+            if "date" in cl or "time" in cl:
+                rename_map[c] = "date"
 
-    elif cl == "volume":
-        rename_map[c] = "volume"
+            elif cl == "open":
+                rename_map[c] = "open"
+
+            elif cl == "high":
+                rename_map[c] = "high"
+
+            elif cl == "low":
+                rename_map[c] = "low"
+
+            elif cl == "close":
+                rename_map[c] = "close"
+
+            elif cl == "volume":
+                rename_map[c] = "volume"
+
         df = df.rename(columns=rename_map)
 
-        needed = ["date", "open", "high", "low", "close", "volume"]
+        needed = [
+            "date",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume"
+        ]
 
         for c in needed:
             if c not in df.columns:
@@ -260,11 +287,10 @@ for c in df.columns:
         df = df.dropna(subset=["close"])
 
         return df.reset_index(drop=True)
-            
 
     except Exception as e:
-
-
+        st.write(f"🔥 {symbol}: {e}")
+        return pd.DataFrame() 
 # =========================================================
 # INDICATORS
 # =========================================================
