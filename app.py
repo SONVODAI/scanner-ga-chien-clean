@@ -21,6 +21,11 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+try:
+    import yfinance as yf
+except Exception:
+    yf = None
+
 # =========================================================
 # PAGE CONFIG
 # =========================================================
@@ -61,6 +66,9 @@ WATCHLIST = sorted(list(set([
 ])))
 
 EVOLUTION_FILE = "group_evolution_history.csv"
+PRICE_CACHE_TTL = 20 * 60  # 20 phút: realtime đủ dùng, tránh app lỗi/nặng
+DATA_CACHE_TTL = 20 * 60   # Daily data cũng refresh theo nhịp 20 phút
+YAHOO_SUFFIX = ".VN"
 
 GROUP_RANK = {
     "THEO DÕI": 0,
@@ -150,7 +158,7 @@ def slope_state_text(slope: float) -> str:
 # Có cache ngắn ở từng lần tải dữ liệu để tránh spam nguồn dữ liệu.
 # Muốn realtime hơn: giảm ttl xuống 30-60 giây.
 # =========================================================
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=DATA_CACHE_TTL, show_spinner=False)
 def download_symbol_data(symbol: str) -> pd.DataFrame:
     try:
         from vnstock import stock_historical_data
@@ -201,6 +209,55 @@ def download_symbol_data(symbol: str) -> pd.DataFrame:
 
     except Exception:
         return pd.DataFrame()
+
+# =========================================================
+# HYBRID REALTIME PRICE
+# Lấy giá hiện tại riêng để app có nhịp sống trong phiên.
+# Nếu yfinance không trả dữ liệu, tự fallback về giá D1 của vnstock.
+# =========================================================
+@st.cache_data(ttl=PRICE_CACHE_TTL, show_spinner=False)
+def fetch_live_price(symbol: str):
+    if yf is None:
+        return np.nan, np.nan, "NO_YF"
+
+    try:
+        ticker = f"{symbol}{YAHOO_SUFFIX}"
+        data = yf.download(
+            ticker,
+            period="1d",
+            interval="15m",
+            progress=False,
+            auto_adjust=False,
+            threads=False,
+        )
+
+        if data is None or data.empty:
+            data = yf.download(
+                ticker,
+                period="5d",
+                interval="1d",
+                progress=False,
+                auto_adjust=False,
+                threads=False,
+            )
+
+        if data is None or data.empty:
+            return np.nan, np.nan, "NO_DATA"
+
+        close_col = "Close"
+        volume_col = "Volume"
+
+        live_price = to_float(data[close_col].dropna().iloc[-1]) if close_col in data.columns else np.nan
+        live_volume = to_float(data[volume_col].dropna().iloc[-1]) if volume_col in data.columns else np.nan
+
+        if pd.isna(live_price) or live_price <= 0:
+            return np.nan, np.nan, "BAD_PRICE"
+
+        return live_price, live_volume, "YF_15M"
+
+    except Exception:
+        return np.nan, np.nan, "ERROR"
+
 
 # =========================================================
 # INDICATORS
@@ -424,7 +481,9 @@ def analyze_symbol(symbol: str) -> dict | None:
     last = df.iloc[-1]
     prev = df.iloc[-2]
 
-    price = to_float(last["close"])
+    daily_price = to_float(last["close"])
+    live_price, live_volume, live_source = fetch_live_price(symbol)
+    price = live_price if pd.notna(live_price) and live_price > 0 else daily_price
     ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
     ema9_prev = to_float(prev["ema9"])
@@ -439,7 +498,8 @@ def analyze_symbol(symbol: str) -> dict | None:
     obv_ema9_ = to_float(last["obv_ema9"])
     obv_prev = to_float(prev["obv"])
 
-    vol_ = to_float(last["volume"])
+    daily_volume = to_float(last["volume"])
+    vol_ = live_volume if pd.notna(live_volume) and live_volume > 0 else daily_volume
     vol_ma20_ = to_float(last["vol_ma20"])
 
     rs5_ = to_float(last["rs5"])
@@ -473,6 +533,8 @@ def analyze_symbol(symbol: str) -> dict | None:
         "symbol": symbol,
         "date": last.get("date", None),
         "price": safe_round(price, 0),
+        "daily_price": safe_round(daily_price, 0),
+        "live_source": live_source,
         "ema9": safe_round(ema9_, 2),
         "ma20": safe_round(ma20_, 2),
         "ema9_ma20_slope": safe_round(slope_, 2),
@@ -904,7 +966,7 @@ with left2:
     auto_refresh = st.checkbox("Auto refresh", value=True)
 
 with left3:
-    refresh_seconds = st.selectbox("Nhịp", [60, 120, 180, 300], index=1)
+    refresh_seconds = st.selectbox("Nhịp", [300, 600, 900, 1200], index=3)
 
 with left4:
     show_detail = st.checkbox("Hiện bảng chi tiết", value=False)
@@ -914,6 +976,7 @@ with left5:
         f"""
         <div style="font-size:14px">
         Watchlist: <b>{len(WATCHLIST)}</b> mã &nbsp; | &nbsp;
+        Hybrid price: <b>20 phút/lần</b> &nbsp; | &nbsp;
         Update: <b>{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</b>
         </div>
         """,
@@ -1008,6 +1071,8 @@ SHOW_COLS = [
     "symbol",
     "group",
     "price",
+    "daily_price",
+    "live_source",
     "total_score",
     "E",
     "R",
@@ -1046,6 +1111,8 @@ if show_detail:
         "symbol",
         "group",
         "price",
+        "daily_price",
+        "live_source",
         "ema9",
         "ma20",
         "ema9_ma20_slope",
@@ -1106,4 +1173,4 @@ with e2:
 # FOOTER
 # =========================================================
 st.markdown("---")
-st.caption("V18.4-Lite Realtime | Ưu tiên giá nhảy trước - thông minh sau | Không cache analyze_symbol 5 phút")
+st.caption("V18.4-Lite Hybrid Realtime | Giá live 15m qua yfinance, refresh 20 phút/lần | Indicator nền D1 giữ ổn định")
