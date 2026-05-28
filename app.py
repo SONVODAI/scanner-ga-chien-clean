@@ -416,7 +416,7 @@ def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame
     live["volume"] = final_volume
 
     return df.reset_index(drop=True), live
-```
+
 
 # =========================================================
 # INDICATORS
