@@ -306,71 +306,118 @@ def fetch_live_price(symbol: str) -> dict:
         return {"price": np.nan, "volume": np.nan, "source": "ERROR", "ts": ""}
 
 
+```python
 # =========================================================
-# REALTIME INJECTION
+# REALTIME INJECTION - FIX FINAL
 # =========================================================
 def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame, dict]:
-    """
-    Đây là chỗ sửa bệnh chính.
-    Bản cũ: indicator tính xong từ D1, sau đó mới gắn price live.
-    Bản này: gắn live price vào cây nến cuối trước, sau đó mới tính indicator.
-    Nhờ vậy price / EMA / RSI / OBV / group / market / detail / evo cùng một nhịp.
-    """
+
     live = fetch_live_price(symbol)
+
     df = raw.copy().sort_values("date").reset_index(drop=True)
 
     if df.empty:
         return df, live
 
-    daily_last_close = to_float(df.iloc[-1]["close"])
-    live_price = live.get("price", np.nan)
-    live_volume = live.get("volume", np.nan)
-
-    if pd.isna(live_price) or live_price <= 0:
-        df["is_live_adjusted"] = False
-        return df, live
+    df["is_live_adjusted"] = False
 
     last_idx = df.index[-1]
 
-    # Nếu dữ liệu D1 chưa có ngày hôm nay, tạo cây nến tạm cho hôm nay.
-    # Cây nến này dùng close hiện tại để tính indicator realtime-lite.
-    last_date = pd.to_datetime(df.loc[last_idx, "date"], errors="coerce")
-    current_date = pd.to_datetime(today_str())
+    last_close = to_float(df.loc[last_idx, "close"])
+    last_open = to_float(df.loc[last_idx, "open"])
+    last_high = to_float(df.loc[last_idx, "high"])
+    last_low = to_float(df.loc[last_idx, "low"])
+    last_volume = to_float(df.loc[last_idx, "volume"])
 
-    if pd.notna(last_date) and last_date.date() < current_date.date():
-        prev_close = daily_last_close
-        new_row = {
-            "date": current_date,
-            "open": prev_close,
-            "high": max(prev_close, live_price),
-            "low": min(prev_close, live_price),
-            "close": live_price,
-            "volume": live_volume if pd.notna(live_volume) and live_volume > 0 else df.loc[last_idx, "volume"],
-            "is_live_adjusted": True,
-        }
-        df["is_live_adjusted"] = False
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+    live_price = to_float(live.get("price", np.nan))
+    live_volume = to_float(live.get("volume", np.nan))
+
+    now_vn = pd.Timestamp.now(tz="Asia/Ho_Chi_Minh")
+
+    market_closed = (
+        (now_vn.hour > 15)
+        or (now_vn.hour == 15 and now_vn.minute >= 0)
+    )
+
+    live["daily_last_close_before_live"] = last_close
+
+    # =====================================================
+    # CASE 1: KHÔNG CÓ LIVE
+    # =====================================================
+    if pd.isna(live_price) or live_price <= 0:
+
+        live["source"] = "NO_DATA"
+
+        # Sau 15h => dùng luôn close D1 cuối
+        if market_closed:
+
+            df.loc[last_idx, "close"] = last_close
+            df.loc[last_idx, "high"] = max(last_high, last_close)
+            df.loc[last_idx, "low"] = min(last_low, last_close)
+
+            df.loc[last_idx, "is_live_adjusted"] = True
+
+            live["price"] = last_close
+            live["volume"] = last_volume
+            live["source"] = "D1_CLOSE"
+
+        return df.reset_index(drop=True), live
+
+    # =====================================================
+    # CASE 2: CÓ LIVE
+    # =====================================================
+
+    # Sau 15h:
+    # Nếu live khác close D1 quá nhỏ => ưu tiên D1
+    if market_closed:
+
+        if abs(live_price - last_close) <= max(50, last_close * 0.003):
+
+            final_price = last_close
+            final_volume = max(last_volume, live_volume)
+
+            live["source"] = "D1_FINAL"
+
+        else:
+
+            final_price = live_price
+            final_volume = max(last_volume, live_volume)
+
+            live["source"] = "YF_15M"
+
     else:
-        # Nếu đã có cây nến hôm nay, thay close/high/low/volume hiện tại bằng live.
-        old_open = to_float(df.loc[last_idx, "open"])
-        old_high = to_float(df.loc[last_idx, "high"])
-        old_low = to_float(df.loc[last_idx, "low"])
 
-        df["is_live_adjusted"] = False
-        df.loc[last_idx, "close"] = live_price
-        df.loc[last_idx, "high"] = np.nanmax([old_high, old_open, live_price])
-        df.loc[last_idx, "low"] = np.nanmin([old_low, old_open, live_price])
+        final_price = live_price
+        final_volume = max(last_volume, live_volume)
 
-        if pd.notna(live_volume) and live_volume > 0:
-            # Không để volume live thấp hơn volume D1 nếu vnstock đã có số lớn hơn.
-            old_vol = to_float(df.loc[last_idx, "volume"])
-            df.loc[last_idx, "volume"] = max(old_vol, live_volume) if pd.notna(old_vol) else live_volume
+    # =====================================================
+    # UPDATE CANDLE CUỐI
+    # =====================================================
 
-        df.loc[last_idx, "is_live_adjusted"] = True
+    df.loc[last_idx, "close"] = final_price
 
-    live["daily_last_close_before_live"] = daily_last_close
+    df.loc[last_idx, "high"] = np.nanmax([
+        last_high,
+        last_open,
+        final_price,
+    ])
+
+    df.loc[last_idx, "low"] = np.nanmin([
+        last_low,
+        last_open,
+        final_price,
+    ])
+
+    if pd.notna(final_volume) and final_volume > 0:
+        df.loc[last_idx, "volume"] = final_volume
+
+    df.loc[last_idx, "is_live_adjusted"] = True
+
+    live["price"] = final_price
+    live["volume"] = final_volume
+
     return df.reset_index(drop=True), live
-
+```
 
 # =========================================================
 # INDICATORS
