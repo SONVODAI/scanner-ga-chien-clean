@@ -306,7 +306,6 @@ def fetch_live_price(symbol: str) -> dict:
         return {"price": np.nan, "volume": np.nan, "source": "ERROR", "ts": ""}
 
 
-```python
 # =========================================================
 # REALTIME INJECTION - FIX FINAL
 # =========================================================
