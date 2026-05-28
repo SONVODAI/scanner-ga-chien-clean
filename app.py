@@ -11,6 +11,7 @@
 import os
 import time
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
@@ -65,6 +66,7 @@ WATCHLIST = sorted(list(set([
 # =========================================================
 EVOLUTION_FILE = "group_evolution_history.csv"
 YAHOO_SUFFIX = ".VN"
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 
 # Daily data cache giữ nhẹ để không spam vnstock.
 # Live price cache ngắn để bảng không lệch quá lâu.
@@ -154,8 +156,17 @@ def slope_state_text(slope: float) -> str:
     return "🔴 Yếu"
 
 
+def vn_now() -> datetime:
+    """Luôn lấy giờ Việt Nam, tránh lệch UTC trên server Streamlit Cloud."""
+    return datetime.now(VN_TZ)
+
+
 def today_str() -> str:
-    return datetime.now().strftime("%Y-%m-%d")
+    return vn_now().strftime("%Y-%m-%d")
+
+
+def vn_time_str(fmt: str = "%d/%m/%Y %H:%M:%S") -> str:
+    return vn_now().strftime(fmt)
 
 # =========================================================
 # DATA DOWNLOAD
@@ -169,7 +180,7 @@ def download_symbol_data(symbol: str) -> pd.DataFrame:
         df = stock_historical_data(
             symbol=symbol,
             start_date="2025-01-01",
-            end_date=datetime.now().strftime("%Y-%m-%d"),
+            end_date=today_str(),
             resolution="1D",
             type="stock",
             beautify=True,
@@ -938,8 +949,8 @@ def save_evolution(scan_df: pd.DataFrame) -> pd.DataFrame:
     Vẫn lưu 1 bản cuối cho mỗi ngày/mã để không phình file.
     Nhưng vì scan_df giờ đã realtime unified, cuối ngày/evo sẽ đúng hơn.
     """
-    today = datetime.now().strftime("%Y-%m-%d")
-    now_time = datetime.now().strftime("%H:%M:%S")
+    today = today_str()
+    now_time = vn_time_str("%H:%M:%S")
 
     rows = []
     for _, r in scan_df.iterrows():
@@ -1114,7 +1125,7 @@ with left5:
         Watchlist: <b>{len(WATCHLIST)}</b> mã &nbsp; | &nbsp;
         Live cache: <b>{LIVE_CACHE_TTL}s</b> &nbsp; | &nbsp;
         Daily cache: <b>{DAILY_CACHE_TTL // 60} phút</b> &nbsp; | &nbsp;
-        Update: <b>{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</b>
+        Update VN: <b>{vn_time_str()}</b>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1318,4 +1329,4 @@ with e2:
 # FOOTER
 # =========================================================
 st.markdown("---")
-st.caption("V19 Realtime Unified | Live price 15m qua yfinance | Live bơm vào candle cuối trước khi tính indicator | Tất cả bảng dùng chung scan_df")
+st.caption("V19.1 Realtime Unified | Giờ VN chuẩn Asia/Ho_Chi_Minh | Live price 15m qua yfinance | Live bơm vào candle cuối trước khi tính indicator | Tất cả bảng dùng chung scan_df")
