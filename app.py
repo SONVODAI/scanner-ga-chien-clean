@@ -10,6 +10,8 @@
 
 import os
 import time
+import base64
+import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -40,22 +42,22 @@ st.caption("Một pipeline duy nhất: live price → candle cuối → indicato
 WATCHLIST = sorted(list(set([
     "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
     "HAH", "VSC", "GMD", "VOS", "VTO", "ACV", "HVN", "VJC",
-    "MSH", "TNG", "VHC", "ANV", "FMC", "PTB",
-    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP",
+    "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB", "VGT",
+    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", "AAA",
     "PAC", "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
-    "DGC", "POW",
-    "FCN", "CII", "KSB", "DHA", "HPG", "HSG",
-    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "TVN",
+    "TV2", "DGC", "POW",
+    "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
+    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "TLH", "TVN",
     "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
-    "MCH", "PAN", "VNM", "MML",
+    "MCH", "PAN", "VNM", "MML", "TLG",
     "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
     "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
     "VND", "SSI", "HCM", "VIX", "BSI", "FTS", "TVS", "SHS",
     "AGR", "VCI", "TCX", "VCK", "VPX", "ORS", "BVS", "VDS", "MBS",
     "VGC", "SZC", "IDC", "KBC", "LHG", "IJC", "DTD", "BCM",
     "GVR", "SIP", "DPR", "PHR", "DRI",
-    "FPT", "VGI", "CTR", "VTP", "CMG", "FOX",
-    "BVH", "SBT", "PNJ", "YEG",
+    "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
+    "IMP", "BVH", "SBT", "LSS", "PNJ", "DHT", "TNH", "YEG",
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
     "EVF", "SAB", "VPL", "PDR", "DPG", "NHA", "HDC", "NTL", "HHS",
     "NLG", "KDH", "HUT",
@@ -67,6 +69,12 @@ WATCHLIST = sorted(list(set([
 EVOLUTION_FILE = "group_evolution_history.csv"
 YAHOO_SUFFIX = ".VN"
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+
+# Nếu có GITHUB_TOKEN trong Streamlit secrets thì evolution sẽ được lưu bền trên GitHub.
+# Nếu không có token, app vẫn chạy bằng file local như bản cũ.
+GITHUB_REPO_OWNER = "SONVODAI"
+GITHUB_REPO_NAME = "scanner-ga-chien-clean"
+GITHUB_EVO_PATH = EVOLUTION_FILE
 
 # Daily data cache giữ nhẹ để không spam vnstock.
 # Live price cache ngắn để bảng không lệch quá lâu.
@@ -942,12 +950,86 @@ def build_buy_table(scan_df: pd.DataFrame, market_real: float) -> pd.DataFrame:
 
 
 # =========================================================
-# EVOLUTION ENGINE - HIỂN THỊ REALTIME, LƯU THEO PHIÊN
+# EVOLUTION ENGINE - HIỂN THỊ REALTIME, LƯU BỀN THEO PHIÊN
 # =========================================================
-def save_evolution(scan_df: pd.DataFrame) -> pd.DataFrame:
+def get_github_token():
+    try:
+        return st.secrets.get("GITHUB_TOKEN", None)
+    except Exception:
+        return None
+
+
+def read_evolution_history() -> pd.DataFrame:
     """
-    Vẫn lưu 1 bản cuối cho mỗi ngày/mã để không phình file.
-    Nhưng vì scan_df giờ đã realtime unified, cuối ngày/evo sẽ đúng hơn.
+    Đọc lịch sử evolution.
+    Ưu tiên GitHub nếu có token để tránh mất ngày khi Streamlit redeploy/restart.
+    Nếu GitHub lỗi thì fallback về file local.
+    """
+    token = get_github_token()
+
+    if token:
+        try:
+            url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_EVO_PATH}"
+            headers = {"Authorization": f"token {token}"}
+            r = requests.get(url, headers=headers, timeout=10)
+            if r.status_code == 200:
+                content = r.json().get("content", "")
+                decoded = base64.b64decode(content).decode("utf-8")
+                from io import StringIO
+                return pd.read_csv(StringIO(decoded))
+        except Exception:
+            pass
+
+    try:
+        return pd.read_csv(EVOLUTION_FILE)
+    except Exception:
+        return pd.DataFrame()
+
+
+def write_evolution_history(evo_df: pd.DataFrame) -> str:
+    """
+    Ghi evolution ra local và nếu có GITHUB_TOKEN thì commit lên GitHub.
+    Đây là điểm sửa bệnh mất ngày 27/5: dữ liệu phải có nơi lưu bền, không chỉ local trên Streamlit.
+    """
+    try:
+        evo_df.to_csv(EVOLUTION_FILE, index=False)
+    except Exception:
+        pass
+
+    token = get_github_token()
+    if not token:
+        return "LOCAL_ONLY"
+
+    try:
+        csv_content = evo_df.to_csv(index=False)
+        encoded_content = base64.b64encode(csv_content.encode("utf-8")).decode("utf-8")
+        url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_EVO_PATH}"
+        headers = {"Authorization": f"token {token}"}
+
+        sha = None
+        get_r = requests.get(url, headers=headers, timeout=10)
+        if get_r.status_code == 200:
+            sha = get_r.json().get("sha")
+
+        payload = {
+            "message": f"Update evolution history {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+            "content": encoded_content,
+        }
+        if sha:
+            payload["sha"] = sha
+
+        put_r = requests.put(url, headers=headers, json=payload, timeout=15)
+        if put_r.status_code in [200, 201]:
+            return "GITHUB_OK"
+        return f"GITHUB_FAIL_{put_r.status_code}"
+    except Exception:
+        return "GITHUB_ERROR"
+
+
+def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
+    """
+    Lưu 1 bản cuối cho mỗi ngày/mã.
+    Dữ liệu được đọc/ghi qua read_evolution_history + write_evolution_history để không mất phiên khi app restart.
     """
     today = today_str()
     now_time = vn_time_str("%H:%M:%S")
@@ -966,12 +1048,12 @@ def save_evolution(scan_df: pd.DataFrame) -> pd.DataFrame:
         })
 
     new_df = pd.DataFrame(rows)
+    old_df = read_evolution_history()
 
-    try:
-        old_df = pd.read_csv(EVOLUTION_FILE)
-        evo_df = pd.concat([old_df, new_df], ignore_index=True)
-    except Exception:
+    if old_df.empty:
         evo_df = new_df
+    else:
+        evo_df = pd.concat([old_df, new_df], ignore_index=True)
 
     evo_df = evo_df.drop_duplicates(subset=["date", "symbol"], keep="last")
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
@@ -983,8 +1065,8 @@ def save_evolution(scan_df: pd.DataFrame) -> pd.DataFrame:
     evo_df = evo_df.drop(columns=["date_str"])
     evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
 
-    evo_df.to_csv(EVOLUTION_FILE, index=False)
-    return evo_df
+    save_status = write_evolution_history(evo_df)
+    return evo_df, save_status
 
 
 def build_evolution_tables(scan_df: pd.DataFrame):
@@ -994,10 +1076,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     - Nhưng cột TODAY luôn ép từ scan_df hiện tại.
     Vì vậy trong phiên nếu group đổi, bảng evo nhìn thấy ngay ở cột TODAY.
     """
-    try:
-        evo_df = pd.read_csv(EVOLUTION_FILE)
-    except Exception:
-        evo_df = pd.DataFrame()
+    evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
     current = current.rename(columns={
@@ -1306,8 +1385,16 @@ if show_detail:
 st.markdown("---")
 st.markdown("## 🚀 TIẾN HÓA CỔ PHIẾU")
 
-save_evolution(scan_df)
+evo_saved_df, evo_save_status = save_evolution(scan_df)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
+
+saved_dates = []
+try:
+    saved_dates = sorted(pd.to_datetime(evo_saved_df["date"], errors="coerce").dropna().dt.strftime("%Y-%m-%d").unique())
+except Exception:
+    saved_dates = []
+
+st.caption(f"Evolution save: {evo_save_status} | Dates: {', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}")
 
 e1, e2 = st.columns(2)
 
