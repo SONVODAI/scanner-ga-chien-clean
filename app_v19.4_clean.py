@@ -1,21 +1,19 @@
 # =========================================================
-# SCANNER GÀ CHIẾN V18.4-LITE REALTIME
-# Viết lại sạch để ưu tiên REALTIME trước - thông minh sau
-# Giữ lõi:
-#   1) Dữ liệu cập nhật nhẹ hơn
-#   2) Bảng chi tiết
-#   3) Bảng theo nhóm
-#   4) Bảng tiến hóa 5 ngày
-#   5) Bảng tiến hóa chọn lọc để mua
-# Bỏ/tạm bỏ:
-#   - market analog nặng
-#   - dry-up engine gọi sai chỗ
-#   - cache 5 phút ở analyze_symbol
+# SCANNER GÀ CHIẾN V19 - REALTIME UNIFIED PIPELINE
+# Viết lại sạch 100% từ bản V18.4-Lite
+# Mục tiêu:
+#   1) Một nguồn dữ liệu sống duy nhất: scan_df
+#   2) Live price được bơm vào cây nến cuối TRƯỚC khi tính indicator
+#   3) Market / bảng nhóm / bảng chi tiết / bảng hành động / evolution dùng chung scan_df
+#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch pha
 # =========================================================
 
 import os
 import time
-from datetime import datetime
+import base64
+import requests
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
@@ -30,13 +28,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V18.4-Lite Realtime",
+    page_title="Scanner Gà Chiến V19 Realtime Unified",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V18.4-Lite Realtime")
-st.caption("Bản viết lại sạch: ưu tiên giá nhảy trong phiên, bảng nhẹ, tiến hóa rõ ràng")
+st.title("🐔 Scanner Gà Chiến V19 - Realtime Unified")
+st.caption("Một pipeline duy nhất: live price → candle cuối → indicator → group → market → detail → evolution")
 
 # =========================================================
 # WATCHLIST
@@ -65,10 +63,23 @@ WATCHLIST = sorted(list(set([
     "NLG", "KDH", "HUT",
 ])))
 
+# =========================================================
+# CONFIG
+# =========================================================
 EVOLUTION_FILE = "group_evolution_history.csv"
-PRICE_CACHE_TTL = 20 * 60  # 20 phút: realtime đủ dùng, tránh app lỗi/nặng
-DATA_CACHE_TTL = 20 * 60   # Daily data cũng refresh theo nhịp 20 phút
 YAHOO_SUFFIX = ".VN"
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+
+# Nếu có GITHUB_TOKEN trong Streamlit secrets thì evolution sẽ được lưu bền trên GitHub.
+# Nếu không có token, app vẫn chạy bằng file local như bản cũ.
+GITHUB_REPO_OWNER = "SONVODAI"
+GITHUB_REPO_NAME = "scanner-ga-chien-clean"
+GITHUB_EVO_PATH = EVOLUTION_FILE
+
+# Daily data cache giữ nhẹ để không spam vnstock.
+# Live price cache ngắn để bảng không lệch quá lâu.
+DAILY_CACHE_TTL = 20 * 60
+LIVE_CACHE_TTL = 90
 
 GROUP_RANK = {
     "THEO DÕI": 0,
@@ -152,21 +163,32 @@ def slope_state_text(slope: float) -> str:
         return "🟡 Ổn định"
     return "🔴 Yếu"
 
+
+def vn_now() -> datetime:
+    """Luôn lấy giờ Việt Nam, tránh lệch UTC trên server Streamlit Cloud."""
+    return datetime.now(VN_TZ)
+
+
+def today_str() -> str:
+    return vn_now().strftime("%Y-%m-%d")
+
+
+def vn_time_str(fmt: str = "%d/%m/%Y %H:%M:%S") -> str:
+    return vn_now().strftime(fmt)
+
 # =========================================================
 # DATA DOWNLOAD
-# Không cache ở analyze_symbol nữa.
-# Có cache ngắn ở từng lần tải dữ liệu để tránh spam nguồn dữ liệu.
-# Muốn realtime hơn: giảm ttl xuống 30-60 giây.
 # =========================================================
-@st.cache_data(ttl=DATA_CACHE_TTL, show_spinner=False)
+@st.cache_data(ttl=DAILY_CACHE_TTL, show_spinner=False)
 def download_symbol_data(symbol: str) -> pd.DataFrame:
+    """Tải dữ liệu D1. Chỉ cache ở tầng dữ liệu nền, không cache analyze_symbol."""
     try:
         from vnstock import stock_historical_data
 
         df = stock_historical_data(
             symbol=symbol,
             start_date="2025-01-01",
-            end_date=datetime.now().strftime("%Y-%m-%d"),
+            end_date=today_str(),
             resolution="1D",
             type="stock",
             beautify=True,
@@ -193,35 +215,35 @@ def download_symbol_data(symbol: str) -> pd.DataFrame:
 
         df = df.rename(columns=rename_map)
         needed = ["date", "open", "high", "low", "close", "volume"]
-
         for c in needed:
             if c not in df.columns:
                 return pd.DataFrame()
 
         df = df[needed].copy()
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
-
         for c in ["open", "high", "low", "close", "volume"]:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
-        df = df.dropna(subset=["close"])
+        df = df.dropna(subset=["date", "close"]).sort_values("date")
         return df.reset_index(drop=True)
 
     except Exception:
         return pd.DataFrame()
 
-# =========================================================
-# HYBRID REALTIME PRICE
-# Lấy giá hiện tại riêng để app có nhịp sống trong phiên.
-# Nếu yfinance không trả dữ liệu, tự fallback về giá D1 của vnstock.
-# =========================================================
-@st.cache_data(ttl=PRICE_CACHE_TTL, show_spinner=False)
-def fetch_live_price(symbol: str):
+
+@st.cache_data(ttl=LIVE_CACHE_TTL, show_spinner=False)
+def fetch_live_price(symbol: str) -> dict:
+    """
+    Lấy giá live 15m từ yfinance.
+    Trả về dict để sau này dễ mở rộng.
+    Quan trọng: volume ở đây là tổng volume intraday YF nếu có, không lấy riêng cây 15m cuối.
+    """
     if yf is None:
-        return np.nan, np.nan, "NO_YF"
+        return {"price": np.nan, "volume": np.nan, "source": "NO_YF", "ts": ""}
+
+    ticker = f"{symbol}{YAHOO_SUFFIX}"
 
     try:
-        ticker = f"{symbol}{YAHOO_SUFFIX}"
         data = yf.download(
             ticker,
             period="1d",
@@ -230,6 +252,8 @@ def fetch_live_price(symbol: str):
             auto_adjust=False,
             threads=False,
         )
+
+        source = "YF_15M"
 
         if data is None or data.empty:
             data = yf.download(
@@ -240,23 +264,158 @@ def fetch_live_price(symbol: str):
                 auto_adjust=False,
                 threads=False,
             )
+            source = "YF_1D_FALLBACK"
 
         if data is None or data.empty:
-            return np.nan, np.nan, "NO_DATA"
+            return {"price": np.nan, "volume": np.nan, "source": "NO_DATA", "ts": ""}
 
-        close_col = "Close"
-        volume_col = "Volume"
+        # Xử lý cả trường hợp columns MultiIndex.
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = [c[0] for c in data.columns]
 
-        live_price = to_float(data[close_col].dropna().iloc[-1]) if close_col in data.columns else np.nan
-        live_volume = to_float(data[volume_col].dropna().iloc[-1]) if volume_col in data.columns else np.nan
+        if "Close" not in data.columns:
+            return {"price": np.nan, "volume": np.nan, "source": "NO_CLOSE", "ts": ""}
+
+        close_series = pd.to_numeric(data["Close"], errors="coerce").dropna()
+        if close_series.empty:
+            return {"price": np.nan, "volume": np.nan, "source": "BAD_CLOSE", "ts": ""}
+
+        live_price = to_float(close_series.iloc[-1])
+        live_volume = np.nan
+        if "Volume" in data.columns:
+            vol_series = pd.to_numeric(data["Volume"], errors="coerce").dropna()
+            if not vol_series.empty:
+                live_volume = to_float(vol_series.sum())
 
         if pd.isna(live_price) or live_price <= 0:
-            return np.nan, np.nan, "BAD_PRICE"
+            return {"price": np.nan, "volume": np.nan, "source": "BAD_PRICE", "ts": ""}
 
-        return live_price, live_volume, "YF_15M"
+        try:
+            ts = str(data.index[-1])
+        except Exception:
+            ts = ""
+
+        return {
+            "price": live_price,
+            "volume": live_volume,
+            "source": source,
+            "ts": ts,
+        }
 
     except Exception:
-        return np.nan, np.nan, "ERROR"
+        return {"price": np.nan, "volume": np.nan, "source": "ERROR", "ts": ""}
+
+
+# =========================================================
+# REALTIME INJECTION - FIX FINAL
+# =========================================================
+def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame, dict]:
+
+    live = fetch_live_price(symbol)
+
+    df = raw.copy().sort_values("date").reset_index(drop=True)
+
+    if df.empty:
+        return df, live
+
+    df["is_live_adjusted"] = False
+
+    last_idx = df.index[-1]
+
+    last_close = to_float(df.loc[last_idx, "close"])
+    last_open = to_float(df.loc[last_idx, "open"])
+    last_high = to_float(df.loc[last_idx, "high"])
+    last_low = to_float(df.loc[last_idx, "low"])
+    last_volume = to_float(df.loc[last_idx, "volume"])
+
+    live_price = to_float(live.get("price", np.nan))
+    live_volume = to_float(live.get("volume", np.nan))
+
+    now_vn = pd.Timestamp.now(tz="Asia/Ho_Chi_Minh")
+
+    market_closed = (
+        (now_vn.hour > 15)
+        or (now_vn.hour == 15 and now_vn.minute >= 0)
+    )
+
+    live["daily_last_close_before_live"] = last_close
+
+    # =====================================================
+    # CASE 1: KHÔNG CÓ LIVE
+    # =====================================================
+    if pd.isna(live_price) or live_price <= 0:
+
+        live["source"] = "NO_DATA"
+
+        # Sau 15h => dùng luôn close D1 cuối
+        if market_closed:
+
+            df.loc[last_idx, "close"] = last_close
+            df.loc[last_idx, "high"] = max(last_high, last_close)
+            df.loc[last_idx, "low"] = min(last_low, last_close)
+
+            df.loc[last_idx, "is_live_adjusted"] = True
+
+            live["price"] = last_close
+            live["volume"] = last_volume
+            live["source"] = "D1_CLOSE"
+
+        return df.reset_index(drop=True), live
+
+    # =====================================================
+    # CASE 2: CÓ LIVE
+    # =====================================================
+
+    # Sau 15h:
+    # Nếu live khác close D1 quá nhỏ => ưu tiên D1
+    if market_closed:
+
+        if abs(live_price - last_close) <= max(50, last_close * 0.003):
+
+            final_price = last_close
+            final_volume = max(last_volume, live_volume)
+
+            live["source"] = "D1_FINAL"
+
+        else:
+
+            final_price = live_price
+            final_volume = max(last_volume, live_volume)
+
+            live["source"] = "YF_15M"
+
+    else:
+
+        final_price = live_price
+        final_volume = max(last_volume, live_volume)
+
+    # =====================================================
+    # UPDATE CANDLE CUỐI
+    # =====================================================
+
+    df.loc[last_idx, "close"] = final_price
+
+    df.loc[last_idx, "high"] = np.nanmax([
+        last_high,
+        last_open,
+        final_price,
+    ])
+
+    df.loc[last_idx, "low"] = np.nanmin([
+        last_low,
+        last_open,
+        final_price,
+    ])
+
+    if pd.notna(final_volume) and final_volume > 0:
+        df.loc[last_idx, "volume"] = final_volume
+
+    df.loc[last_idx, "is_live_adjusted"] = True
+
+    live["price"] = final_price
+    live["volume"] = final_volume
+
+    return df.reset_index(drop=True), live
 
 
 # =========================================================
@@ -303,6 +462,7 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return x
+
 
 # =========================================================
 # SCORE ENGINE
@@ -351,8 +511,9 @@ def calc_rs_score(rs5_, rs10_):
             return 1
     return 0
 
+
 # =========================================================
-# LABELS
+# LABELS / GROUPS
 # =========================================================
 def classify_pull_label(dist_from_ema9, rsi_, rsi_slope_, obv_, obv_ema9_):
     if not pd.notna(dist_from_ema9):
@@ -415,7 +576,6 @@ def classify_group(row: dict) -> str:
     e = row["E"]
     r = row["R"]
     o = row["O"]
-    slope_score = row["S"]
     dist_from_ema9 = row["dist_from_ema9_pct"]
     breakout_ref = row["breakout_ref"]
     pull_label = row["pull_label"]
@@ -463,27 +623,30 @@ def classify_group(row: dict) -> str:
 
     return "MUA EARLY"
 
+
 # =========================================================
 # ANALYZE ONE SYMBOL
-# Không cache ở đây để mỗi lần run_scan đều tính mới từ dữ liệu mới nhất.
 # =========================================================
 def analyze_symbol(symbol: str) -> dict | None:
     raw = download_symbol_data(symbol)
-
     if raw.empty or len(raw) < 40:
         return None
 
-    df = build_indicators(raw)
+    # Sửa bệnh chính: bơm live vào D1 trước khi tính indicator.
+    live_df, live_info = inject_live_into_daily(raw, symbol)
+    if live_df.empty or len(live_df) < 40:
+        return None
 
+    df = build_indicators(live_df)
     if df.empty or len(df) < 25:
         return None
 
     last = df.iloc[-1]
     prev = df.iloc[-2]
 
-    daily_price = to_float(last["close"])
-    live_price, live_volume, live_source = fetch_live_price(symbol)
-    price = live_price if pd.notna(live_price) and live_price > 0 else daily_price
+    price = to_float(last["close"])
+    daily_price_before_live = live_info.get("daily_last_close_before_live", np.nan)
+
     ema9_ = to_float(last["ema9"])
     ma20_ = to_float(last["ma20"])
     ema9_prev = to_float(prev["ema9"])
@@ -498,8 +661,7 @@ def analyze_symbol(symbol: str) -> dict | None:
     obv_ema9_ = to_float(last["obv_ema9"])
     obv_prev = to_float(prev["obv"])
 
-    daily_volume = to_float(last["volume"])
-    vol_ = live_volume if pd.notna(live_volume) and live_volume > 0 else daily_volume
+    vol_ = to_float(last["volume"])
     vol_ma20_ = to_float(last["vol_ma20"])
 
     rs5_ = to_float(last["rs5"])
@@ -516,7 +678,6 @@ def analyze_symbol(symbol: str) -> dict | None:
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
     S = calc_slope_score(slope_, slope_change_)
     RS = calc_rs_score(rs5_, rs10_)
-
     total_score = E + R + O + S + RS
 
     pull_label = classify_pull_label(
@@ -533,8 +694,10 @@ def analyze_symbol(symbol: str) -> dict | None:
         "symbol": symbol,
         "date": last.get("date", None),
         "price": safe_round(price, 0),
-        "daily_price": safe_round(daily_price, 0),
-        "live_source": live_source,
+        "daily_price_before_live": safe_round(daily_price_before_live, 0),
+        "live_source": live_info.get("source", ""),
+        "live_ts": live_info.get("ts", ""),
+        "is_live_adjusted": bool(last.get("is_live_adjusted", False)),
         "ema9": safe_round(ema9_, 2),
         "ma20": safe_round(ma20_, 2),
         "ema9_ma20_slope": safe_round(slope_, 2),
@@ -566,6 +729,7 @@ def analyze_symbol(symbol: str) -> dict | None:
     row["status"] = build_status(total_score, row["warning"], row["group"])
 
     return row
+
 
 # =========================================================
 # SCAN
@@ -616,8 +780,9 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
 
     return df
 
+
 # =========================================================
-# MARKET SCORE
+# MARKET SCORE - DÙNG CHUNG scan_df
 # =========================================================
 def calc_market_real(df: pd.DataFrame) -> float:
     total = len(df)
@@ -652,25 +817,26 @@ def calc_market_live(df: pd.DataFrame) -> float:
     if total == 0:
         return 0.0
 
+    live_ok_ratio = len(df[df["is_live_adjusted"] == True]) / total if "is_live_adjusted" in df.columns else 0
+    green_price_ratio = len(df[df["price"] >= df["daily_price_before_live"]]) / total if "daily_price_before_live" in df.columns else 0
+
     e_ratio = len(df[df["E"] >= 1]) / total
-    r_ratio = len(df[df["R"] >= 1]) / total
     o_ratio = len(df[df["O"] >= 1]) / total
     s_ratio = len(df[df["S"] >= 1]) / total
 
-    strong = len(df[df["group"] == "CP MẠNH"])
     accel = len(df[df["group"] == "GÀ TĂNG TỐC"])
     breakout = len(df[df["group"] == "MUA BREAK"])
     pull_good = len(df[df["group"] == "PULL ĐẸP"])
 
     score = (
         e_ratio * 2.5
-        + r_ratio * 2.5
         + o_ratio * 2.0
         + s_ratio * 2.0
-        + min(strong / 10, 1) * 1.0
+        + green_price_ratio * 2.0
+        + live_ok_ratio * 1.0
         + min(accel / 6, 1) * 1.5
         + min(breakout / 8, 1) * 1.0
-        + min(pull_good / 6, 1) * 0.5
+        + min(pull_good / 6, 1) * 1.0
     )
 
     return round(min(score, 13), 1)
@@ -718,6 +884,7 @@ def market_status_text(score: float) -> tuple[str, str]:
     if score >= 6:
         return "🟡 TRUNG TÍNH", "⚠️ Chỉ nên test nhỏ"
     return "🔴 THỊ TRƯỜNG YẾU", "⛔ Không nên vào tiền"
+
 
 # =========================================================
 # BUY RECOMMENDATION
@@ -800,6 +967,7 @@ def build_buy_table(scan_df: pd.DataFrame, market_real: float) -> pd.DataFrame:
             "RSI": row["rsi14"],
             "OBV": row["obv_status"],
             "Dist EMA9%": row["dist_from_ema9_pct"],
+            "Live": "✅" if row.get("is_live_adjusted", False) else "",
             "Lý do": reason,
             "Cảnh báo": row["warning"],
         })
@@ -826,12 +994,91 @@ def build_buy_table(scan_df: pd.DataFrame, market_real: float) -> pd.DataFrame:
 
     return out
 
+
 # =========================================================
-# EVOLUTION ENGINE
+# EVOLUTION ENGINE - HIỂN THỊ REALTIME, LƯU BỀN THEO PHIÊN
 # =========================================================
-def save_evolution(scan_df: pd.DataFrame) -> pd.DataFrame:
-    today = datetime.now().strftime("%Y-%m-%d")
-    now_time = datetime.now().strftime("%H:%M:%S")
+def get_github_token():
+    try:
+        return st.secrets.get("GITHUB_TOKEN", None)
+    except Exception:
+        return None
+
+
+def read_evolution_history() -> pd.DataFrame:
+    """
+    Đọc lịch sử evolution.
+    Ưu tiên GitHub nếu có token để tránh mất ngày khi Streamlit redeploy/restart.
+    Nếu GitHub lỗi thì fallback về file local.
+    """
+    token = get_github_token()
+
+    if token:
+        try:
+            url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_EVO_PATH}"
+            headers = {"Authorization": f"token {token}"}
+            r = requests.get(url, headers=headers, timeout=10)
+            if r.status_code == 200:
+                content = r.json().get("content", "")
+                decoded = base64.b64decode(content).decode("utf-8")
+                from io import StringIO
+                return pd.read_csv(StringIO(decoded))
+        except Exception:
+            pass
+
+    try:
+        return pd.read_csv(EVOLUTION_FILE)
+    except Exception:
+        return pd.DataFrame()
+
+
+def write_evolution_history(evo_df: pd.DataFrame) -> str:
+    """
+    Ghi evolution ra local và nếu có GITHUB_TOKEN thì commit lên GitHub.
+    Đây là điểm sửa bệnh mất ngày 27/5: dữ liệu phải có nơi lưu bền, không chỉ local trên Streamlit.
+    """
+    try:
+        evo_df.to_csv(EVOLUTION_FILE, index=False)
+    except Exception:
+        pass
+
+    token = get_github_token()
+    if not token:
+        return "LOCAL_ONLY"
+
+    try:
+        csv_content = evo_df.to_csv(index=False)
+        encoded_content = base64.b64encode(csv_content.encode("utf-8")).decode("utf-8")
+        url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_EVO_PATH}"
+        headers = {"Authorization": f"token {token}"}
+
+        sha = None
+        get_r = requests.get(url, headers=headers, timeout=10)
+        if get_r.status_code == 200:
+            sha = get_r.json().get("sha")
+
+        payload = {
+            "message": f"Update evolution history {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+            "content": encoded_content,
+        }
+        if sha:
+            payload["sha"] = sha
+
+        put_r = requests.put(url, headers=headers, json=payload, timeout=15)
+        if put_r.status_code in [200, 201]:
+            return "GITHUB_OK"
+        return f"GITHUB_FAIL_{put_r.status_code}"
+    except Exception:
+        return "GITHUB_ERROR"
+
+
+def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
+    """
+    Lưu 1 bản cuối cho mỗi ngày/mã.
+    Dữ liệu được đọc/ghi qua read_evolution_history + write_evolution_history để không mất phiên khi app restart.
+    """
+    today = today_str()
+    now_time = vn_time_str("%H:%M:%S")
 
     rows = []
     for _, r in scan_df.iterrows():
@@ -843,106 +1090,130 @@ def save_evolution(scan_df: pd.DataFrame) -> pd.DataFrame:
             "rank": GROUP_RANK.get(r["group"], 0),
             "score": r.get("total_score", np.nan),
             "price": r.get("price", np.nan),
+            "is_live_adjusted": r.get("is_live_adjusted", False),
         })
 
     new_df = pd.DataFrame(rows)
+    old_df = read_evolution_history()
 
-    try:
-        old_df = pd.read_csv(EVOLUTION_FILE)
-        evo_df = pd.concat([old_df, new_df], ignore_index=True)
-    except Exception:
+    if old_df.empty:
         evo_df = new_df
+    else:
+        evo_df = pd.concat([old_df, new_df], ignore_index=True)
 
     evo_df = evo_df.drop_duplicates(subset=["date", "symbol"], keep="last")
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date"])
 
-    # Giữ tối đa 15 phiên gần nhất để nhẹ app
     last_dates = sorted(evo_df["date"].dt.strftime("%Y-%m-%d").unique())[-15:]
     evo_df["date_str"] = evo_df["date"].dt.strftime("%Y-%m-%d")
     evo_df = evo_df[evo_df["date_str"].isin(last_dates)].copy()
     evo_df = evo_df.drop(columns=["date_str"])
     evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
 
-    evo_df.to_csv(EVOLUTION_FILE, index=False)
-    return evo_df
+    save_status = write_evolution_history(evo_df)
+    return evo_df, save_status
 
 
-def build_evolution_tables():
-    try:
-        evo_df = pd.read_csv(EVOLUTION_FILE)
-    except Exception:
-        return pd.DataFrame(), pd.DataFrame()
+def build_evolution_tables(scan_df: pd.DataFrame):
+    """
+    Điểm mới:
+    - Lịch sử vẫn lấy từ CSV.
+    - Nhưng cột TODAY luôn ép từ scan_df hiện tại.
+    Vì vậy trong phiên nếu group đổi, bảng evo nhìn thấy ngay ở cột TODAY.
+    """
+    evo_df = read_evolution_history()
 
-    if evo_df.empty:
-        return pd.DataFrame(), pd.DataFrame()
+    current = scan_df[["symbol", "group", "total_score", "price"]].copy()
+    current = current.rename(columns={
+        "group": "TODAY",
+        "total_score": "today_score",
+        "price": "today_price",
+    })
+    current["today_rank"] = current["TODAY"].map(GROUP_RANK).fillna(0)
 
-    needed = {"date", "symbol", "group"}
-    if not needed.issubset(set(evo_df.columns)):
-        return pd.DataFrame(), pd.DataFrame()
+    if evo_df.empty or not {"date", "symbol", "group"}.issubset(set(evo_df.columns)):
+        base = current.copy()
+        base["evolution"] = 0
+        base["recent_change"] = 0
+        base["arrow"] = "➡️"
+        return base, pd.DataFrame()
 
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date"])
     evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
 
     dates = sorted(evo_df["date"].unique())[-5:]
-
-    if len(dates) < 2:
-        return pd.DataFrame(), pd.DataFrame()
+    if len(dates) < 1:
+        base = current.copy()
+        base["evolution"] = 0
+        base["recent_change"] = 0
+        base["arrow"] = "➡️"
+        return base, pd.DataFrame()
 
     pivot = evo_df.pivot_table(
         index="symbol",
         columns="date",
         values="group",
         aggfunc="first",
-    )
+    ).reindex(columns=dates)
 
-    pivot = pivot.reindex(columns=dates)
-
-    evo_rows = []
+    hist_rows = []
     for symbol in pivot.index:
-        groups = pivot.loc[symbol].tolist()
-        valid_groups = [g for g in groups if pd.notna(g)]
-
-        if len(valid_groups) < 2:
-            continue
-
-        first_group = valid_groups[0]
-        last_group = valid_groups[-1]
-        first_rank = GROUP_RANK.get(first_group, 0)
-        last_rank = GROUP_RANK.get(last_group, 0)
-        evolution_score = last_rank - first_rank
-
-        recent_improve = 0
-        ranks = [GROUP_RANK.get(g, 0) for g in valid_groups]
-        if len(ranks) >= 2:
-            recent_improve = ranks[-1] - ranks[-2]
-
         row = {"symbol": symbol}
-        for i, d in enumerate(dates):
+        for d in dates:
             row[d] = pivot.loc[symbol, d] if d in pivot.columns else np.nan
+        hist_rows.append(row)
 
-        row["TODAY"] = last_group
-        row["evolution"] = evolution_score
-        row["recent_change"] = recent_improve
-        row["arrow"] = "⬆️" if recent_improve > 0 else ("➡️" if recent_improve == 0 else "⬇️")
-        evo_rows.append(row)
+    hist = pd.DataFrame(hist_rows)
+    if hist.empty:
+        base = current.copy()
+    else:
+        base = hist.merge(current, on="symbol", how="outer")
 
-    evo_table = pd.DataFrame(evo_rows)
-    if evo_table.empty:
-        return pd.DataFrame(), pd.DataFrame()
+    # Tính evolution từ nhóm lịch sử đầu tiên còn dữ liệu đến TODAY realtime.
+    evo_scores = []
+    recent_changes = []
+    arrows = []
 
-    evo_table = evo_table.sort_values(
-        by=["evolution", "recent_change"],
-        ascending=[False, False],
-    ).reset_index(drop=True)
+    for _, r in base.iterrows():
+        hist_groups = []
+        for d in dates:
+            g = r.get(d, np.nan)
+            if pd.notna(g):
+                hist_groups.append(g)
 
-    buy_table = evo_table[
+        today_group = r.get("TODAY", np.nan)
+        today_rank = GROUP_RANK.get(today_group, 0) if pd.notna(today_group) else 0
+
+        if hist_groups:
+            first_rank = GROUP_RANK.get(hist_groups[0], 0)
+            last_hist_rank = GROUP_RANK.get(hist_groups[-1], 0)
+            evolution = today_rank - first_rank
+            recent_change = today_rank - last_hist_rank
+        else:
+            evolution = 0
+            recent_change = 0
+
+        evo_scores.append(evolution)
+        recent_changes.append(recent_change)
+        arrows.append("⬆️" if recent_change > 0 else ("➡️" if recent_change == 0 else "⬇️"))
+
+    base["evolution"] = evo_scores
+    base["recent_change"] = recent_changes
+    base["arrow"] = arrows
+
+    sort_cols = ["evolution", "recent_change", "today_score"]
+    sort_cols = [c for c in sort_cols if c in base.columns]
+    if sort_cols:
+        base = base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols)).reset_index(drop=True)
+
+    buy_table = base[
         (
-            (evo_table["evolution"] >= 1)
-            | (evo_table["recent_change"] >= 1)
+            (base["evolution"] >= 1)
+            | (base["recent_change"] >= 1)
         )
-        & evo_table["TODAY"].isin([
+        & base["TODAY"].isin([
             "MUA EARLY",
             "PULL VỪA",
             "PULL ĐẸP",
@@ -952,7 +1223,8 @@ def build_evolution_tables():
         ])
     ].copy()
 
-    return evo_table, buy_table
+    return base, buy_table
+
 
 # =========================================================
 # UI CONTROLS
@@ -966,7 +1238,7 @@ with left2:
     auto_refresh = st.checkbox("Auto refresh", value=True)
 
 with left3:
-    refresh_seconds = st.selectbox("Nhịp", [300, 600, 900, 1200], index=3)
+    refresh_seconds = st.selectbox("Nhịp", [60, 90, 120, 300, 600], index=2)
 
 with left4:
     show_detail = st.checkbox("Hiện bảng chi tiết", value=False)
@@ -976,8 +1248,9 @@ with left5:
         f"""
         <div style="font-size:14px">
         Watchlist: <b>{len(WATCHLIST)}</b> mã &nbsp; | &nbsp;
-        Hybrid price: <b>20 phút/lần</b> &nbsp; | &nbsp;
-        Update: <b>{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</b>
+        Live cache: <b>{LIVE_CACHE_TTL}s</b> &nbsp; | &nbsp;
+        Daily cache: <b>{DAILY_CACHE_TTL // 60} phút</b> &nbsp; | &nbsp;
+        Update VN: <b>{vn_time_str()}</b>
         </div>
         """,
         unsafe_allow_html=True,
@@ -999,7 +1272,7 @@ if auto_refresh:
 # =========================================================
 # RUN SCAN
 # =========================================================
-with st.spinner("Đang quét dữ liệu realtime-lite..."):
+with st.spinner("Đang quét realtime unified..."):
     scan_df = run_scan(WATCHLIST)
 
 if scan_df.empty:
@@ -1014,9 +1287,11 @@ market_live = calc_market_live(scan_df)
 market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
 
+live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in scan_df.columns else 0
+
 st.markdown("## 📊 MARKET OVERVIEW")
 
-m1, m2, m3, m4, m5 = st.columns(5)
+m1, m2, m3, m4, m5, m6 = st.columns(6)
 with m1:
     st.metric("REAL", f"{market_real}/13")
 with m2:
@@ -1026,6 +1301,8 @@ with m3:
 with m4:
     st.metric("SCAN OK", len(scan_df))
 with m5:
+    st.metric("LIVE OK", live_count)
+with m6:
     st.metric("WATCHLIST", len(WATCHLIST))
 
 if market_real < 6:
@@ -1036,6 +1313,7 @@ else:
     st.success(market_action)
 
 st.caption(market_forecast_text)
+st.caption("V19: live price đã được bơm vào candle cuối trước khi tính indicator, nên market/bảng nhóm/detail/evo dùng cùng một scan_df.")
 
 # =========================================================
 # GROUP SUMMARY
@@ -1071,8 +1349,9 @@ SHOW_COLS = [
     "symbol",
     "group",
     "price",
-    "daily_price",
+    "daily_price_before_live",
     "live_source",
+    "is_live_adjusted",
     "total_score",
     "E",
     "R",
@@ -1111,8 +1390,10 @@ if show_detail:
         "symbol",
         "group",
         "price",
-        "daily_price",
+        "daily_price_before_live",
         "live_source",
+        "live_ts",
+        "is_live_adjusted",
         "ema9",
         "ma20",
         "ema9_ma20_slope",
@@ -1150,8 +1431,16 @@ if show_detail:
 st.markdown("---")
 st.markdown("## 🚀 TIẾN HÓA CỔ PHIẾU")
 
-save_evolution(scan_df)
-evo_table, evo_buy_table = build_evolution_tables()
+evo_saved_df, evo_save_status = save_evolution(scan_df)
+evo_table, evo_buy_table = build_evolution_tables(scan_df)
+
+saved_dates = []
+try:
+    saved_dates = sorted(pd.to_datetime(evo_saved_df["date"], errors="coerce").dropna().dt.strftime("%Y-%m-%d").unique())
+except Exception:
+    saved_dates = []
+
+st.caption(f"Evolution save: {evo_save_status} | Dates: {', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}")
 
 e1, e2 = st.columns(2)
 
@@ -1173,4 +1462,4 @@ with e2:
 # FOOTER
 # =========================================================
 st.markdown("---")
-st.caption("V18.4-Lite Hybrid Realtime | Giá live 15m qua yfinance, refresh 20 phút/lần | Indicator nền D1 giữ ổn định")
+st.caption("V19.1 Realtime Unified | Giờ VN chuẩn Asia/Ho_Chi_Minh | Live price 15m qua yfinance | Live bơm vào candle cuối trước khi tính indicator | Tất cả bảng dùng chung scan_df")
