@@ -1,5 +1,5 @@
 # =========================================================
-# SCANNER GÀ CHIẾN V19 - REALTIME UNIFIED PIPELINE
+# SCANNER GÀ CHIẾN V19.2 - SAFE MODE REALTIME UNIFIED
 # Viết lại sạch 100% từ bản V18.4-Lite
 # Mục tiêu:
 #   1) Một nguồn dữ liệu sống duy nhất: scan_df
@@ -28,13 +28,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V19 Realtime Unified",
+    page_title="Scanner Gà Chiến V19.2 Safe Mode",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V19 - Realtime Unified")
-st.caption("Một pipeline duy nhất: live price → candle cuối → indicator → group → market → detail → evolution")
+st.title("🐔 Scanner Gà Chiến V19.2 - Safe Mode Realtime Unified")
+st.caption("Một pipeline duy nhất + SAFE MODE: live lỗi thì dùng D1, một mã lỗi không làm sập app")
 
 # =========================================================
 # WATCHLIST
@@ -107,19 +107,78 @@ GROUP_ORDER = [
 # HELPERS
 # =========================================================
 def to_float(value, default=np.nan):
+    """Ép mọi kiểu dữ liệu về float an toàn.
+
+    Mục tiêu: chặn các giá trị bẩn từ API như None, "", "--", Series,
+    DataFrame, ndarray, inf... để không làm sập app khi gán vào candle cuối.
+    """
     try:
+        if value is None:
+            return default
+
+        if isinstance(value, pd.DataFrame):
+            if value.empty:
+                return default
+            value = value.iloc[-1, -1]
+
         if isinstance(value, pd.Series):
             if len(value) == 0:
                 return default
             value = value.iloc[-1]
+
         if isinstance(value, np.ndarray):
-            if len(value) == 0:
+            if value.size == 0:
                 return default
-            value = value[-1]
-        return float(value)
+            value = value.flatten()[-1]
+
+        if isinstance(value, str):
+            value = value.strip()
+            if value in ["", "--", "nan", "NaN", "None", "N/A", "null"]:
+                return default
+            value = value.replace(",", "")
+
+        out = float(value)
+        if pd.isna(out) or np.isinf(out):
+            return default
+        return out
+
     except Exception:
         return default
 
+
+def is_valid_price(value) -> bool:
+    v = to_float(value)
+    return pd.notna(v) and v > 0
+
+
+def safe_max_number(*values):
+    nums = [to_float(v) for v in values]
+    nums = [v for v in nums if pd.notna(v)]
+    return max(nums) if nums else np.nan
+
+
+def safe_min_number(*values):
+    nums = [to_float(v) for v in values]
+    nums = [v for v in nums if pd.notna(v)]
+    return min(nums) if nums else np.nan
+
+
+def log_runtime_error(symbol: str, stage: str, error):
+    """Ghi lỗi mềm ra CSV để app không chết vì một mã hoặc một API lỗi."""
+    try:
+        row = pd.DataFrame([{
+            "time": vn_time_str("%Y-%m-%d %H:%M:%S"),
+            "symbol": symbol,
+            "stage": stage,
+            "error": str(error),
+        }])
+        file_name = "runtime_error_log.csv"
+        if os.path.exists(file_name):
+            old = pd.read_csv(file_name)
+            row = pd.concat([old, row], ignore_index=True).tail(300)
+        row.to_csv(file_name, index=False)
+    except Exception:
+        pass
 
 def safe_round(value, digits=2):
     try:
@@ -310,113 +369,130 @@ def fetch_live_price(symbol: str) -> dict:
 # REALTIME INJECTION - FIX FINAL
 # =========================================================
 def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame, dict]:
+    """Bơm live price vào candle cuối theo chế độ an toàn.
 
-    live = fetch_live_price(symbol)
+    Nguyên tắc V19.2 SAFE:
+    - Live lỗi / dữ liệu bẩn / giá rỗng => dùng D1, không crash.
+    - Chỉ gán vào df sau khi final_price đã được kiểm tra là số hợp lệ.
+    - Bất kỳ lỗi nào trong injection đều fallback về daily dataframe.
+    """
+    live = {
+        "price": np.nan,
+        "volume": np.nan,
+        "source": "INIT",
+        "ts": "",
+        "daily_last_close_before_live": np.nan,
+    }
 
-    df = raw.copy().sort_values("date").reset_index(drop=True)
+    try:
+        live = fetch_live_price(symbol)
+        if not isinstance(live, dict):
+            live = {"price": np.nan, "volume": np.nan, "source": "BAD_LIVE_DICT", "ts": ""}
 
-    if df.empty:
-        return df, live
+        df = raw.copy().sort_values("date").reset_index(drop=True)
+        if df.empty:
+            live["source"] = "EMPTY_DAILY"
+            return df, live
 
-    df["is_live_adjusted"] = False
+        for c in ["open", "high", "low", "close", "volume"]:
+            if c in df.columns:
+                df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    last_idx = df.index[-1]
+        df["is_live_adjusted"] = False
+        last_idx = df.index[-1]
 
-    last_close = to_float(df.loc[last_idx, "close"])
-    last_open = to_float(df.loc[last_idx, "open"])
-    last_high = to_float(df.loc[last_idx, "high"])
-    last_low = to_float(df.loc[last_idx, "low"])
-    last_volume = to_float(df.loc[last_idx, "volume"])
+        last_close = to_float(df.loc[last_idx, "close"])
+        last_open = to_float(df.loc[last_idx, "open"])
+        last_high = to_float(df.loc[last_idx, "high"])
+        last_low = to_float(df.loc[last_idx, "low"])
+        last_volume = to_float(df.loc[last_idx, "volume"])
 
-    live_price = to_float(live.get("price", np.nan))
-    live_volume = to_float(live.get("volume", np.nan))
+        live_price = to_float(live.get("price", np.nan))
+        live_volume = to_float(live.get("volume", np.nan))
+        live["daily_last_close_before_live"] = last_close
 
-    now_vn = pd.Timestamp.now(tz="Asia/Ho_Chi_Minh")
+        now_vn = pd.Timestamp.now(tz="Asia/Ho_Chi_Minh")
+        market_closed = (now_vn.hour > 15) or (now_vn.hour == 15 and now_vn.minute >= 0)
 
-    market_closed = (
-        (now_vn.hour > 15)
-        or (now_vn.hour == 15 and now_vn.minute >= 0)
-    )
-
-    live["daily_last_close_before_live"] = last_close
-
-    # =====================================================
-    # CASE 1: KHÔNG CÓ LIVE
-    # =====================================================
-    if pd.isna(live_price) or live_price <= 0:
-
-        live["source"] = "NO_DATA"
-
-        # Sau 15h => dùng luôn close D1 cuối
-        if market_closed:
-
-            df.loc[last_idx, "close"] = last_close
-            df.loc[last_idx, "high"] = max(last_high, last_close)
-            df.loc[last_idx, "low"] = min(last_low, last_close)
-
-            df.loc[last_idx, "is_live_adjusted"] = True
-
+        # CASE 1: không có live hợp lệ -> giữ nguyên candle D1, không đánh dấu live.
+        if not is_valid_price(live_price):
             live["price"] = last_close
             live["volume"] = last_volume
-            live["source"] = "D1_CLOSE"
+            live["source"] = "NO_DATA"
+            return df.reset_index(drop=True), live
+
+        # CASE 2: có live hợp lệ.
+        if market_closed and is_valid_price(last_close):
+            # Sau giờ đóng cửa: nếu live gần sát D1 thì ưu tiên D1 để tránh lệch dữ liệu.
+            if abs(live_price - last_close) <= max(50, last_close * 0.003):
+                final_price = last_close
+                final_volume = safe_max_number(last_volume, live_volume)
+                live["source"] = "D1_FINAL"
+            else:
+                final_price = live_price
+                final_volume = safe_max_number(last_volume, live_volume)
+                live["source"] = live.get("source", "YF_15M") or "YF_15M"
+        else:
+            final_price = live_price
+            final_volume = safe_max_number(last_volume, live_volume)
+
+        final_price = to_float(final_price)
+
+        # Chốt chặn cuối: tuyệt đối không gán giá bẩn vào cột close.
+        if not is_valid_price(final_price):
+            live["price"] = last_close
+            live["volume"] = last_volume
+            live["source"] = "BAD_FINAL_PRICE"
+            return df.reset_index(drop=True), live
+
+        final_high = safe_max_number(last_high, last_open, final_price)
+        final_low = safe_min_number(last_low, last_open, final_price)
+
+        if not is_valid_price(final_high):
+            final_high = final_price
+        if not is_valid_price(final_low):
+            final_low = final_price
+
+        df.loc[last_idx, "close"] = float(final_price)
+        df.loc[last_idx, "high"] = float(final_high)
+        df.loc[last_idx, "low"] = float(final_low)
+
+        if pd.notna(final_volume) and final_volume > 0:
+            df.loc[last_idx, "volume"] = float(final_volume)
+
+        df.loc[last_idx, "is_live_adjusted"] = True
+
+        live["price"] = final_price
+        live["volume"] = final_volume
 
         return df.reset_index(drop=True), live
 
-    # =====================================================
-    # CASE 2: CÓ LIVE
-    # =====================================================
+    except Exception as e:
+        log_runtime_error(symbol, "inject_live_into_daily", e)
+        try:
+            df = raw.copy().sort_values("date").reset_index(drop=True)
+            if not df.empty:
+                df["is_live_adjusted"] = False
+                last = df.iloc[-1]
+                live = {
+                    "price": to_float(last.get("close", np.nan)),
+                    "volume": to_float(last.get("volume", np.nan)),
+                    "source": "SAFE_MODE_D1",
+                    "ts": "",
+                    "daily_last_close_before_live": to_float(last.get("close", np.nan)),
+                }
+                return df, live
+        except Exception as e2:
+            log_runtime_error(symbol, "inject_fallback", e2)
 
-    # Sau 15h:
-    # Nếu live khác close D1 quá nhỏ => ưu tiên D1
-    if market_closed:
-
-        if abs(live_price - last_close) <= max(50, last_close * 0.003):
-
-            final_price = last_close
-            final_volume = max(last_volume, live_volume)
-
-            live["source"] = "D1_FINAL"
-
-        else:
-
-            final_price = live_price
-            final_volume = max(last_volume, live_volume)
-
-            live["source"] = "YF_15M"
-
-    else:
-
-        final_price = live_price
-        final_volume = max(last_volume, live_volume)
-
-    # =====================================================
-    # UPDATE CANDLE CUỐI
-    # =====================================================
-
-    df.loc[last_idx, "close"] = final_price
-
-    df.loc[last_idx, "high"] = np.nanmax([
-        last_high,
-        last_open,
-        final_price,
-    ])
-
-    df.loc[last_idx, "low"] = np.nanmin([
-        last_low,
-        last_open,
-        final_price,
-    ])
-
-    if pd.notna(final_volume) and final_volume > 0:
-        df.loc[last_idx, "volume"] = final_volume
-
-    df.loc[last_idx, "is_live_adjusted"] = True
-
-    live["price"] = final_price
-    live["volume"] = final_volume
-
-    return df.reset_index(drop=True), live
-
+        live = {
+            "price": np.nan,
+            "volume": np.nan,
+            "source": "SAFE_MODE_EMPTY",
+            "ts": "",
+            "daily_last_close_before_live": np.nan,
+        }
+        return pd.DataFrame(), live
 
 # =========================================================
 # INDICATORS
@@ -735,15 +811,28 @@ def analyze_symbol(symbol: str) -> dict | None:
 # SCAN
 # =========================================================
 def run_scan(symbols: list[str]) -> pd.DataFrame:
+    """Quét watchlist theo chế độ chịu lỗi.
+
+    Một mã lỗi không được phép làm sập toàn bộ scanner.
+    Lỗi được ghi vào runtime_error_log.csv, các mã còn lại vẫn chạy bình thường.
+    """
     rows = []
     progress = st.progress(0)
     total = len(symbols)
 
     for i, symbol in enumerate(symbols):
-        item = analyze_symbol(symbol)
-        if item is not None:
-            rows.append(item)
-        progress.progress((i + 1) / total)
+        try:
+            item = analyze_symbol(symbol)
+            if item is not None:
+                rows.append(item)
+        except Exception as e:
+            log_runtime_error(symbol, "analyze_symbol", e)
+            continue
+        finally:
+            try:
+                progress.progress((i + 1) / total)
+            except Exception:
+                pass
 
     progress.empty()
 
@@ -779,7 +868,6 @@ def run_scan(symbols: list[str]) -> pd.DataFrame:
         df = df.sort_values(by=existing_sort_cols, ascending=ascending).reset_index(drop=True)
 
     return df
-
 
 # =========================================================
 # MARKET SCORE - DÙNG CHUNG scan_df
@@ -1288,6 +1376,7 @@ market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
 
 live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in scan_df.columns else 0
+safe_mode_count = int((scan_df["live_source"].astype(str).str.contains("SAFE_MODE|NO_DATA|BAD", na=False)).sum()) if "live_source" in scan_df.columns else 0
 
 st.markdown("## 📊 MARKET OVERVIEW")
 
@@ -1304,6 +1393,9 @@ with m5:
     st.metric("LIVE OK", live_count)
 with m6:
     st.metric("WATCHLIST", len(WATCHLIST))
+
+if safe_mode_count > 0:
+    st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
 
 if market_real < 6:
     st.error(market_action)
@@ -1462,4 +1554,4 @@ with e2:
 # FOOTER
 # =========================================================
 st.markdown("---")
-st.caption("V19.1 Realtime Unified | Giờ VN chuẩn Asia/Ho_Chi_Minh | Live price 15m qua yfinance | Live bơm vào candle cuối trước khi tính indicator | Tất cả bảng dùng chung scan_df")
+st.caption("V19.2 SAFE MODE | Giờ VN chuẩn Asia/Ho_Chi_Minh | Live price 15m qua yfinance | Live lỗi tự fallback D1 | Một mã lỗi không làm sập app | Tất cả bảng dùng chung scan_df")
