@@ -1371,6 +1371,7 @@ def build_group_statistics():
             Samples=("return_pct", "count"),
             WinRate=("win", "mean"),
             AvgReturn=("return_pct", "mean"),
+            MedianReturn=("return_pct", "median"),
             MaxReturn=("return_pct", "max"),
             MinReturn=("return_pct", "min"),
         )
