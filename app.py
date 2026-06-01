@@ -1312,7 +1312,82 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     ].copy()
 
     return base, buy_table
+# =========================================================
+# GROUP PERFORMANCE STATISTICS
+# =========================================================
+def build_group_statistics():
+    evo_df = read_evolution_history()
 
+    if evo_df.empty:
+        return pd.DataFrame()
+
+    required = {"date", "symbol", "group", "price"}
+    if not required.issubset(set(evo_df.columns)):
+        return pd.DataFrame()
+
+    evo_df = evo_df.copy()
+    evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
+    evo_df = evo_df.dropna(subset=["date", "price"])
+
+    results = []
+
+    for symbol, sub in evo_df.groupby("symbol"):
+        sub = sub.sort_values("date").reset_index(drop=True)
+
+        if len(sub) < 4:
+            continue
+
+        for i in range(len(sub) - 3):
+            start_row = sub.iloc[i]
+            future_row = sub.iloc[i + 3]
+
+            start_group = start_row["group"]
+
+            try:
+                start_price = float(start_row["price"])
+                future_price = float(future_row["price"])
+            except:
+                continue
+
+            if start_price <= 0:
+                continue
+
+            ret = (future_price / start_price - 1) * 100
+
+            results.append({
+                "group": start_group,
+                "return_pct": ret,
+                "win": 1 if ret > 0 else 0,
+            })
+
+    if not results:
+        return pd.DataFrame()
+
+    stat_df = pd.DataFrame(results)
+
+    summary = (
+        stat_df.groupby("group")
+        .agg(
+            Samples=("return_pct", "count"),
+            WinRate=("win", "mean"),
+            AvgReturn=("return_pct", "mean"),
+            MaxReturn=("return_pct", "max"),
+            MinReturn=("return_pct", "min"),
+        )
+        .reset_index()
+    )
+
+    summary["WinRate"] = (summary["WinRate"] * 100).round(1)
+    summary["AvgReturn"] = summary["AvgReturn"].round(2)
+    summary["MaxReturn"] = summary["MaxReturn"].round(2)
+    summary["MinReturn"] = summary["MinReturn"].round(2)
+
+    summary = summary.sort_values(
+        ["AvgReturn", "WinRate"],
+        ascending=False
+    )
+
+    return summary
 
 # =========================================================
 # UI CONTROLS
