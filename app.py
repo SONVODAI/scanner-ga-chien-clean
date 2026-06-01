@@ -1301,10 +1301,10 @@ for evo in evo_scores:
         status_icons.append("⚪")
 
 base["status"] = status_icons
-    sort_cols = ["evolution", "recent_change", "today_score"]
-    sort_cols = [c for c in sort_cols if c in base.columns]
-    if sort_cols:
-        base = base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols)).reset_index(drop=True)
+sort_cols = ["evolution", "recent_change", "today_score"]
+sort_cols = [c for c in sort_cols if c in base.columns]
+if sort_cols:
+    base = base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols)).reset_index(drop=True)
 
     buy_table = base[
         (
