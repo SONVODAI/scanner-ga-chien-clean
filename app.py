@@ -1624,7 +1624,26 @@ with e2:
         st.dataframe(evo_buy_table, use_container_width=True, height=420)
     else:
         st.info("Chưa có cổ phiếu tiến hóa đạt điều kiện mua/theo dõi.")
+# =========================================================
+# GROUP STATISTICS
+# =========================================================
+st.markdown("---")
+st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
 
+group_stats = build_group_statistics()
+
+if not group_stats.empty:
+    st.dataframe(
+        group_stats,
+        use_container_width=True,
+        height=350
+    )
+
+    st.caption(
+        "WinRate và AvgReturn được tính sau 3 phiên kể từ ngày cổ phiếu xuất hiện trong nhóm."
+    )
+else:
+    st.info("Chưa đủ dữ liệu để thống kê.")
 # =========================================================
 # FOOTER
 # =========================================================
