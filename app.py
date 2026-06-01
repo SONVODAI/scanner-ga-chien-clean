@@ -1338,7 +1338,7 @@ for evo in evo_scores:
             "MUA BREAK",
             "CP MẠNH",
             "GÀ TĂNG TỐC",
-        ])
+        
     ].copy()
 
         return base, buy_table
