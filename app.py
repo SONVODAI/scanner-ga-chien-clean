@@ -1334,12 +1334,12 @@ def build_group_statistics():
     for symbol, sub in evo_df.groupby("symbol"):
         sub = sub.sort_values("date").reset_index(drop=True)
 
-        if len(sub) < 4:
+        if len(sub) < 6:
             continue
 
-        for i in range(len(sub) - 3):
+        for i in range(len(sub) - 5):
             start_row = sub.iloc[i]
-            future_row = sub.iloc[i + 3]
+            future_row = sub.iloc[i + 5]
 
             start_group = start_row["group"]
 
