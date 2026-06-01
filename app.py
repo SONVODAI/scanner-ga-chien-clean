@@ -1201,15 +1201,13 @@ def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
 
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
-
-
 def build_evolution_tables(scan_df: pd.DataFrame):
-    """
+    
     Điểm mới:
     - Lịch sử vẫn lấy từ CSV.
     - Nhưng cột TODAY luôn ép từ scan_df hiện tại.
     Vì vậy trong phiên nếu group đổi, bảng evo nhìn thấy ngay ở cột TODAY.
-    """
+    
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
@@ -1344,6 +1342,8 @@ for evo in evo_scores:
     ].copy()
 
         return base, buy_table
+
+
 
 # =========================================================
 # GROUP PERFORMANCE STATISTICS
