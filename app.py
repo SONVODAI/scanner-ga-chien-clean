@@ -1380,6 +1380,7 @@ def build_group_statistics():
 
     summary["WinRate"] = (summary["WinRate"] * 100).round(1)
     summary["AvgReturn"] = summary["AvgReturn"].round(2)
+    summary["MedianReturn"] = summary["MedianReturn"].round(2)
     summary["MaxReturn"] = summary["MaxReturn"].round(2)
     summary["MinReturn"] = summary["MinReturn"].round(2)
 
