@@ -1340,7 +1340,7 @@ for evo in evo_scores:
     ])
 ].copy()
     
-        return base, buy_table
+    return base, buy_table
 
 
 
