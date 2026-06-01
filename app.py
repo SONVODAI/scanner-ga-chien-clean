@@ -1319,9 +1319,9 @@ if sort_cols:
             "CP MẠNH",
             "GÀ TĂNG TỐC",
         ])
-    ].copy()
+        ].copy()
 
-    return base, buy_table
+        return base, buy_table
 # =========================================================
 # GROUP PERFORMANCE STATISTICS
 # =========================================================
