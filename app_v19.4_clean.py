@@ -1201,15 +1201,8 @@ def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
 
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
-
-
 def build_evolution_tables(scan_df: pd.DataFrame):
-    """
-    Điểm mới:
-    - Lịch sử vẫn lấy từ CSV.
-    - Nhưng cột TODAY luôn ép từ scan_df hiện tại.
-    Vì vậy trong phiên nếu group đổi, bảng evo nhìn thấy ngay ở cột TODAY.
-    """
+
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
@@ -1225,6 +1218,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base["evolution"] = 0
         base["recent_change"] = 0
         base["arrow"] = "➡️"
+        base["status"] = "⚪"
         return base, pd.DataFrame()
 
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
@@ -1232,12 +1226,6 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
 
     dates = sorted(evo_df["date"].unique())[-5:]
-    if len(dates) < 1:
-        base = current.copy()
-        base["evolution"] = 0
-        base["recent_change"] = 0
-        base["arrow"] = "➡️"
-        return base, pd.DataFrame()
 
     pivot = evo_df.pivot_table(
         index="symbol",
@@ -1247,54 +1235,77 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     ).reindex(columns=dates)
 
     hist_rows = []
+
     for symbol in pivot.index:
         row = {"symbol": symbol}
         for d in dates:
-            row[d] = pivot.loc[symbol, d] if d in pivot.columns else np.nan
+            row[d] = pivot.loc[symbol, d]
         hist_rows.append(row)
 
     hist = pd.DataFrame(hist_rows)
+
     if hist.empty:
         base = current.copy()
     else:
         base = hist.merge(current, on="symbol", how="outer")
 
-    # Tính evolution từ nhóm lịch sử đầu tiên còn dữ liệu đến TODAY realtime.
     evo_scores = []
     recent_changes = []
     arrows = []
+    status_icons = []
 
     for _, r in base.iterrows():
+
         hist_groups = []
+
         for d in dates:
             g = r.get(d, np.nan)
             if pd.notna(g):
                 hist_groups.append(g)
 
         today_group = r.get("TODAY", np.nan)
-        today_rank = GROUP_RANK.get(today_group, 0) if pd.notna(today_group) else 0
+        today_rank = GROUP_RANK.get(today_group, 0)
 
         if hist_groups:
             first_rank = GROUP_RANK.get(hist_groups[0], 0)
-            last_hist_rank = GROUP_RANK.get(hist_groups[-1], 0)
+            last_rank = GROUP_RANK.get(hist_groups[-1], 0)
+
             evolution = today_rank - first_rank
-            recent_change = today_rank - last_hist_rank
+            recent_change = today_rank - last_rank
         else:
             evolution = 0
             recent_change = 0
 
         evo_scores.append(evolution)
         recent_changes.append(recent_change)
-        arrows.append("⬆️" if recent_change > 0 else ("➡️" if recent_change == 0 else "⬇️"))
+
+        if recent_change > 0:
+            arrows.append("⬆️")
+        elif recent_change < 0:
+            arrows.append("⬇️")
+        else:
+            arrows.append("➡️")
+
+        if evolution > 0:
+            status_icons.append("🟢")
+        elif evolution < 0:
+            status_icons.append("🔴")
+        else:
+            status_icons.append("⚪")
 
     base["evolution"] = evo_scores
     base["recent_change"] = recent_changes
     base["arrow"] = arrows
+    base["status"] = status_icons
 
     sort_cols = ["evolution", "recent_change", "today_score"]
     sort_cols = [c for c in sort_cols if c in base.columns]
+
     if sort_cols:
-        base = base.sort_values(by=sort_cols, ascending=[False] * len(sort_cols)).reset_index(drop=True)
+        base = base.sort_values(
+            by=sort_cols,
+            ascending=[False] * len(sort_cols)
+        ).reset_index(drop=True)
 
     buy_table = base[
         (
@@ -1312,7 +1323,84 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     ].copy()
 
     return base, buy_table
+# =========================================================
+# GROUP PERFORMANCE STATISTICS
+# =========================================================
+def build_group_statistics():
+    evo_df = read_evolution_history()
 
+    if evo_df.empty:
+        return pd.DataFrame()
+
+    required = {"date", "symbol", "group", "price"}
+    if not required.issubset(set(evo_df.columns)):
+        return pd.DataFrame()
+
+    evo_df = evo_df.copy()
+    evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
+    evo_df = evo_df.dropna(subset=["date", "price"])
+
+    results = []
+
+    for symbol, sub in evo_df.groupby("symbol"):
+        sub = sub.sort_values("date").reset_index(drop=True)
+
+        if len(sub) < 6:
+            continue
+
+        for i in range(len(sub) - 5):
+            start_row = sub.iloc[i]
+            future_row = sub.iloc[i + 5]
+
+            start_group = start_row["group"]
+
+            try:
+                start_price = float(start_row["price"])
+                future_price = float(future_row["price"])
+            except:
+                continue
+
+            if start_price <= 0:
+                continue
+
+            ret = (future_price / start_price - 1) * 100
+
+            results.append({
+                "group": start_group,
+                "return_pct": ret,
+                "win": 1 if ret > 0 else 0,
+            })
+
+    if not results:
+        return pd.DataFrame()
+
+    stat_df = pd.DataFrame(results)
+
+    summary = (
+        stat_df.groupby("group")
+        .agg(
+            Samples=("return_pct", "count"),
+            WinRate=("win", "mean"),
+            AvgReturn=("return_pct", "mean"),
+            MedianReturn=("return_pct", "median"),
+            MaxReturn=("return_pct", "max"),
+            MinReturn=("return_pct", "min"),
+        )
+        .reset_index()
+    )
+
+    summary["WinRate"] = (summary["WinRate"] * 100).round(1)
+    summary["AvgReturn"] = summary["AvgReturn"].round(2)
+    summary["MedianReturn"] = summary["MedianReturn"].round(2)
+    summary["MaxReturn"] = summary["MaxReturn"].round(2)
+    summary["MinReturn"] = summary["MinReturn"].round(2)
+
+    summary = summary.sort_values(
+        ["AvgReturn", "WinRate"],
+        ascending=False
+    )
+
+    return summary
 
 # =========================================================
 # UI CONTROLS
@@ -1549,7 +1637,26 @@ with e2:
         st.dataframe(evo_buy_table, use_container_width=True, height=420)
     else:
         st.info("Chưa có cổ phiếu tiến hóa đạt điều kiện mua/theo dõi.")
+# =========================================================
+# GROUP STATISTICS
+# =========================================================
+st.markdown("---")
+st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
 
+group_stats = build_group_statistics()
+
+if not group_stats.empty:
+    st.dataframe(
+        group_stats,
+        use_container_width=True,
+        height=350
+    )
+
+    st.caption(
+        "WinRate và AvgReturn được tính sau 3 phiên kể từ ngày cổ phiếu xuất hiện trong nhóm."
+    )
+else:
+    st.info("Chưa đủ dữ liệu để thống kê.")
 # =========================================================
 # FOOTER
 # =========================================================
