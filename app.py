@@ -1290,7 +1290,17 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     base["evolution"] = evo_scores
     base["recent_change"] = recent_changes
     base["arrow"] = arrows
+status_icons = []
 
+for evo in evo_scores:
+    if evo > 0:
+        status_icons.append("🟢")
+    elif evo < 0:
+        status_icons.append("🔴")
+    else:
+        status_icons.append("⚪")
+
+base["status"] = status_icons
     sort_cols = ["evolution", "recent_change", "today_score"]
     sort_cols = [c for c in sort_cols if c in base.columns]
     if sort_cols:
