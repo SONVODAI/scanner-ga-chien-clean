@@ -1325,22 +1325,21 @@ for evo in evo_scores:
             )
             .reset_index(drop=True)
         )
-
     buy_table = base[
-        (
-            (base["evolution"] >= 1)
-            | (base["recent_change"] >= 1)
-        )
-        & base["TODAY"].isin([
-            "MUA EARLY",
-            "PULL VỪA",
-            "PULL ĐẸP",
-            "MUA BREAK",
-            "CP MẠNH",
-            "GÀ TĂNG TỐC",
-        
-    ].copy()
-
+    (
+        (base["evolution"] >= 1)
+        | (base["recent_change"] >= 1)
+    )
+    & base["TODAY"].isin([
+        "MUA EARLY",
+        "PULL VỪA",
+        "PULL ĐẸP",
+        "MUA BREAK",
+        "CP MẠNH",
+        "GÀ TĂNG TỐC",
+    ])
+].copy()
+    
         return base, buy_table
 
 
