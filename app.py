@@ -1299,7 +1299,7 @@ for evo in evo_scores:
         status_icons.append("🔴")
     else:
         status_icons.append("⚪")
-```python
+    python
     base["evolution"] = evo_scores
     base["recent_change"] = recent_changes
     base["arrow"] = arrows
