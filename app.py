@@ -1202,12 +1202,7 @@ def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
 def build_evolution_tables(scan_df: pd.DataFrame):
-    """
-    Điểm mới:
-    - Lịch sử vẫn lấy từ CSV.
-    - Nhưng cột TODAY luôn ép từ scan_df hiện tại.
-    Vì vậy trong phiên nếu group đổi, bảng evo nhìn thấy ngay ở cột TODAY.
-    """
+
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
@@ -1223,6 +1218,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base["evolution"] = 0
         base["recent_change"] = 0
         base["arrow"] = "➡️"
+        base["status"] = "⚪"
         return base, pd.DataFrame()
 
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
@@ -1230,12 +1226,6 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
 
     dates = sorted(evo_df["date"].unique())[-5:]
-    if len(dates) < 1:
-        base = current.copy()
-        base["evolution"] = 0
-        base["recent_change"] = 0
-        base["arrow"] = "➡️"
-        return base, pd.DataFrame()
 
     pivot = evo_df.pivot_table(
         index="symbol",
@@ -1245,101 +1235,93 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     ).reindex(columns=dates)
 
     hist_rows = []
+
     for symbol in pivot.index:
         row = {"symbol": symbol}
         for d in dates:
-            row[d] = pivot.loc[symbol, d] if d in pivot.columns else np.nan
+            row[d] = pivot.loc[symbol, d]
         hist_rows.append(row)
 
     hist = pd.DataFrame(hist_rows)
+
     if hist.empty:
         base = current.copy()
     else:
         base = hist.merge(current, on="symbol", how="outer")
 
-    # Tính evolution từ nhóm lịch sử đầu tiên còn dữ liệu đến TODAY realtime.
     evo_scores = []
     recent_changes = []
     arrows = []
+    status_icons = []
 
     for _, r in base.iterrows():
+
         hist_groups = []
+
         for d in dates:
             g = r.get(d, np.nan)
             if pd.notna(g):
                 hist_groups.append(g)
 
         today_group = r.get("TODAY", np.nan)
-        today_rank = GROUP_RANK.get(today_group, 0) if pd.notna(today_group) else 0
+        today_rank = GROUP_RANK.get(today_group, 0)
 
         if hist_groups:
             first_rank = GROUP_RANK.get(hist_groups[0], 0)
-            last_hist_rank = GROUP_RANK.get(hist_groups[-1], 0)
+            last_rank = GROUP_RANK.get(hist_groups[-1], 0)
+
             evolution = today_rank - first_rank
-            recent_change = today_rank - last_hist_rank
+            recent_change = today_rank - last_rank
         else:
             evolution = 0
             recent_change = 0
 
         evo_scores.append(evolution)
         recent_changes.append(recent_change)
-        arrows.append("⬆️" if recent_change > 0 else ("➡️" if recent_change == 0 else "⬇️"))
 
-    base["evolution"] = evo_scores
-    base["recent_change"] = recent_changes
-    base["arrow"] = arrows
-status_icons = []
+        if recent_change > 0:
+            arrows.append("⬆️")
+        elif recent_change < 0:
+            arrows.append("⬇️")
+        else:
+            arrows.append("➡️")
 
-for evo in evo_scores:
-    if evo > 0:
-        status_icons.append("🟢")
-    elif evo < 0:
-        status_icons.append("🔴")
-    else:
-        status_icons.append("⚪")
-    python
-    base["evolution"] = evo_scores
-    base["recent_change"] = recent_changes
-    base["arrow"] = arrows
-
-    status_icons = []
-
-    for evo in evo_scores:
-        if evo > 0:
+        if evolution > 0:
             status_icons.append("🟢")
-        elif evo < 0:
+        elif evolution < 0:
             status_icons.append("🔴")
         else:
             status_icons.append("⚪")
 
+    base["evolution"] = evo_scores
+    base["recent_change"] = recent_changes
+    base["arrow"] = arrows
     base["status"] = status_icons
 
     sort_cols = ["evolution", "recent_change", "today_score"]
     sort_cols = [c for c in sort_cols if c in base.columns]
 
     if sort_cols:
-        base = (
-            base.sort_values(
-                by=sort_cols,
-                ascending=[False] * len(sort_cols)
-            )
-            .reset_index(drop=True)
-        )
+        base = base.sort_values(
+            by=sort_cols,
+            ascending=[False] * len(sort_cols)
+        ).reset_index(drop=True)
+
     buy_table = base[
-    (
-        (base["evolution"] >= 1)
-        | (base["recent_change"] >= 1)
-    )
-    & base["TODAY"].isin([
-        "MUA EARLY",
-        "PULL VỪA",
-        "PULL ĐẸP",
-        "MUA BREAK",
-        "CP MẠNH",
-        "GÀ TĂNG TỐC",
-    ])
-].copy()
-    
+        (
+            (base["evolution"] >= 1)
+            | (base["recent_change"] >= 1)
+        )
+        & base["TODAY"].isin([
+            "MUA EARLY",
+            "PULL VỪA",
+            "PULL ĐẸP",
+            "MUA BREAK",
+            "CP MẠNH",
+            "GÀ TĂNG TỐC",
+        ])
+    ].copy()
+
     return base, buy_table
 # =========================================================
 # GROUP PERFORMANCE STATISTICS
