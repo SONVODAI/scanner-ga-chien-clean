@@ -1526,15 +1526,6 @@ if auto_refresh:
         st.session_state["last_auto_refresh"] = now_ts
         st.cache_data.clear()
         st.rerun()
-st.subheader("🏆 XẾP HẠNG NHÓM")
-
-summary_df = build_group_summary(stats_df)
-
-st.dataframe(
-    summary_df,
-    use_container_width=True,
-    hide_index=True
-)
 # =========================================================
 # RUN SCAN
 # =========================================================
