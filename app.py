@@ -1642,7 +1642,15 @@ with e2:
 # =========================================================
 st.markdown("---")
 st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
+evo_df = read_evolution_history()
 
+st.write("DEBUG - số dòng mỗi mã")
+st.dataframe(
+    evo_df.groupby("symbol")
+    .size()
+    .sort_values()
+    .reset_index(name="rows")
+)
 group_stats = build_group_statistics()
 
 if not group_stats.empty:
