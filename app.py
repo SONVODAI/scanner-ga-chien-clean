@@ -1725,7 +1725,15 @@ st.markdown("---")
 st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
 
 group_stats = build_group_statistics()
+summary_df = build_group_summary(group_stats)
 
+if not summary_df.empty:
+    st.subheader("🏆 XẾP HẠNG NHÓM TỔNG HỢP")
+    st.dataframe(
+        summary_df,
+        use_container_width=True,
+        hide_index=True
+    )
 if not group_stats.empty:
     st.dataframe(
         group_stats,
