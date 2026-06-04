@@ -1338,38 +1338,62 @@ def build_group_statistics():
 
     evo_df = evo_df.copy()
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
-    evo_df = evo_df.dropna(subset=["date", "price"])
+    evo_df["price"] = pd.to_numeric(evo_df["price"], errors="coerce")
+    evo_df["group"] = evo_df["group"].astype(str).str.strip()
+
+    evo_df = evo_df.dropna(subset=["date", "symbol", "group", "price"])
+    evo_df = evo_df[evo_df["symbol"] != "VNINDEX"].copy()
+    evo_df = evo_df.sort_values(["symbol", "date"])
+
+    horizons = {
+        "T+1": 1,
+        "T+3": 3,
+        "T+5": 5,
+    }
 
     results = []
 
+    total_signals = (
+        evo_df.groupby("group")
+        .size()
+        .reset_index(name="TotalSignals")
+    )
+
     for symbol, sub in evo_df.groupby("symbol"):
-        sub = sub.sort_values("date").reset_index(drop=True)
+        sub = (
+            sub.sort_values("date")
+            .drop_duplicates(subset=["date"], keep="last")
+            .reset_index(drop=True)
+        )
 
-        if len(sub) < 6:
-            continue
-
-        for i in range(len(sub) - 5):
+        for i in range(len(sub)):
             start_row = sub.iloc[i]
-            future_row = sub.iloc[i + 5]
-
             start_group = start_row["group"]
+            start_price = start_row["price"]
 
-            try:
-                start_price = float(start_row["price"])
-                future_price = float(future_row["price"])
-            except:
+            if pd.isna(start_price) or start_price <= 0:
                 continue
 
-            if start_price <= 0:
-                continue
+            for horizon_name, step in horizons.items():
+                future_i = i + step
 
-            ret = (future_price / start_price - 1) * 100
+                if future_i >= len(sub):
+                    continue
 
-            results.append({
-                "group": start_group,
-                "return_pct": ret,
-                "win": 1 if ret > 0 else 0,
-            })
+                future_row = sub.iloc[future_i]
+                future_price = future_row["price"]
+
+                if pd.isna(future_price) or future_price <= 0:
+                    continue
+
+                ret = (future_price / start_price - 1) * 100
+
+                results.append({
+                    "Horizon": horizon_name,
+                    "group": start_group,
+                    "return_pct": ret,
+                    "win": 1 if ret > 0 else 0,
+                })
 
     if not results:
         return pd.DataFrame()
@@ -1377,7 +1401,7 @@ def build_group_statistics():
     stat_df = pd.DataFrame(results)
 
     summary = (
-        stat_df.groupby("group")
+        stat_df.groupby(["Horizon", "group"])
         .agg(
             Samples=("return_pct", "count"),
             WinRate=("win", "mean"),
@@ -1389,19 +1413,77 @@ def build_group_statistics():
         .reset_index()
     )
 
+    summary = summary.merge(total_signals, on="group", how="left")
+    summary["Pending"] = summary["TotalSignals"] - summary["Samples"]
+
     summary["WinRate"] = (summary["WinRate"] * 100).round(1)
     summary["AvgReturn"] = summary["AvgReturn"].round(2)
     summary["MedianReturn"] = summary["MedianReturn"].round(2)
     summary["MaxReturn"] = summary["MaxReturn"].round(2)
     summary["MinReturn"] = summary["MinReturn"].round(2)
 
+    horizon_order = {"T+1": 1, "T+3": 2, "T+5": 3}
+    summary["horizon_rank"] = summary["Horizon"].map(horizon_order).fillna(9)
+
     summary = summary.sort_values(
-        ["AvgReturn", "WinRate"],
-        ascending=False
-    )
+        ["horizon_rank", "AvgReturn", "WinRate"],
+        ascending=[True, False, False]
+    ).drop(columns=["horizon_rank"])
 
     return summary
 
+# =========================================================
+# BẢNG TỔNG HỢP NHANH
+# =========================================================
+
+def build_group_summary(stats_df):
+    if stats_df.empty:
+        return pd.DataFrame()
+
+    rows = []
+
+    for group in stats_df["group"].unique():
+
+        sub = stats_df[stats_df["group"] == group]
+
+        t1 = sub[sub["Horizon"] == "T+1"]
+        t3 = sub[sub["Horizon"] == "T+3"]
+        t5 = sub[sub["Horizon"] == "T+5"]
+
+        def get_val(df, col):
+            if df.empty:
+                return 0
+            return float(df.iloc[0][col])
+
+        win_score = (
+            get_val(t1, "WinRate") * 0.5 +
+            get_val(t3, "WinRate") * 0.3 +
+            get_val(t5, "WinRate") * 0.2
+        )
+
+        return_score = (
+            get_val(t1, "AvgReturn") * 0.5 +
+            get_val(t3, "AvgReturn") * 0.3 +
+            get_val(t5, "AvgReturn") * 0.2
+        )
+
+        rows.append({
+            "group": group,
+            "Score": round(win_score, 1),
+            "AvgReturn": round(return_score, 2),
+            "T+1 Win": get_val(t1, "WinRate"),
+            "T+3 Win": get_val(t3, "WinRate"),
+            "T+5 Win": get_val(t5, "WinRate"),
+        })
+
+    summary = pd.DataFrame(rows)
+
+    summary = summary.sort_values(
+        ["Score", "AvgReturn"],
+        ascending=False
+    ).reset_index(drop=True)
+
+    return summary
 # =========================================================
 # UI CONTROLS
 # =========================================================
@@ -1444,7 +1526,6 @@ if auto_refresh:
         st.session_state["last_auto_refresh"] = now_ts
         st.cache_data.clear()
         st.rerun()
-
 # =========================================================
 # RUN SCAN
 # =========================================================
@@ -1644,7 +1725,15 @@ st.markdown("---")
 st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
 
 group_stats = build_group_statistics()
+summary_df = build_group_summary(group_stats)
 
+if not summary_df.empty:
+    st.subheader("🏆 XẾP HẠNG NHÓM TỔNG HỢP")
+    st.dataframe(
+        summary_df,
+        use_container_width=True,
+        hide_index=True
+    )
 if not group_stats.empty:
     st.dataframe(
         group_stats,
