@@ -1339,21 +1339,18 @@ def build_group_statistics():
     evo_df = evo_df.copy()
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date", "price"])
-    st.write(
-    evo_df[evo_df["group"] == "CP MẠNH"]
-    [["date","symbol","group","price"]]
-)
+
     results = []
 
     for symbol, sub in evo_df.groupby("symbol"):
         sub = sub.sort_values("date").reset_index(drop=True)
 
-        if len(sub) < 4:
+        if len(sub) < 6:
             continue
 
-        for i in range(len(sub) - 3):
+        for i in range(len(sub) - 5):
             start_row = sub.iloc[i]
-            future_row = sub.iloc[i + 3]
+            future_row = sub.iloc[i + 5]
 
             start_group = start_row["group"]
 
@@ -1645,15 +1642,7 @@ with e2:
 # =========================================================
 st.markdown("---")
 st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
-evo_df = read_evolution_history()
 
-st.write("DEBUG - số dòng mỗi mã")
-st.dataframe(
-    evo_df.groupby("symbol")
-    .size()
-    .sort_values()
-    .reset_index(name="rows")
-)
 group_stats = build_group_statistics()
 
 if not group_stats.empty:
