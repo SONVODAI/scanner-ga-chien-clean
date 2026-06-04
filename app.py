@@ -1431,6 +1431,59 @@ def build_group_statistics():
     ).drop(columns=["horizon_rank"])
 
     return summary
+
+# =========================================================
+# BẢNG TỔNG HỢP NHANH
+# =========================================================
+
+def build_group_summary(stats_df):
+    if stats_df.empty:
+        return pd.DataFrame()
+
+    rows = []
+
+    for group in stats_df["group"].unique():
+
+        sub = stats_df[stats_df["group"] == group]
+
+        t1 = sub[sub["Horizon"] == "T+1"]
+        t3 = sub[sub["Horizon"] == "T+3"]
+        t5 = sub[sub["Horizon"] == "T+5"]
+
+        def get_val(df, col):
+            if df.empty:
+                return 0
+            return float(df.iloc[0][col])
+
+        win_score = (
+            get_val(t1, "WinRate") * 0.5 +
+            get_val(t3, "WinRate") * 0.3 +
+            get_val(t5, "WinRate") * 0.2
+        )
+
+        return_score = (
+            get_val(t1, "AvgReturn") * 0.5 +
+            get_val(t3, "AvgReturn") * 0.3 +
+            get_val(t5, "AvgReturn") * 0.2
+        )
+
+        rows.append({
+            "group": group,
+            "Score": round(win_score, 1),
+            "AvgReturn": round(return_score, 2),
+            "T+1 Win": get_val(t1, "WinRate"),
+            "T+3 Win": get_val(t3, "WinRate"),
+            "T+5 Win": get_val(t5, "WinRate"),
+        })
+
+    summary = pd.DataFrame(rows)
+
+    summary = summary.sort_values(
+        ["Score", "AvgReturn"],
+        ascending=False
+    ).reset_index(drop=True)
+
+    return summary
 # =========================================================
 # UI CONTROLS
 # =========================================================
