@@ -1339,7 +1339,10 @@ def build_group_statistics():
     evo_df = evo_df.copy()
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date", "price"])
-
+    st.write(
+    evo_df[evo_df["group"] == "CP MẠNH"]
+    [["date","symbol","group","price"]]
+)
     results = []
 
     for symbol, sub in evo_df.groupby("symbol"):
