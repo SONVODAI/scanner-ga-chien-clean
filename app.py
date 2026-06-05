@@ -1817,11 +1817,23 @@ try:
 
         dna_leaders = dna_leaders[cols]
 
-        dna_leaders = dna_leaders.sort_values(
-            ["Persistence", "evolution"],
-            ascending=[False, False]
-        ).head(10)
-
+        dna_leaders = evo_table[
+        [
+        "symbol",
+        "Persistence",
+        "DNA",
+        "TODAY",
+        "rsi14",
+        "ema9_ma20_slope",
+        "evolution",
+        "recent_change"
+        ]
+        ].head(10)
+        dna_leaders = dna_leaders.rename(columns={
+        "TODAY": "GROUP",
+        "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE"
+        })
         st.markdown("## 🏆 DNA LEADERS HÔM NAY")
 
         st.dataframe(
