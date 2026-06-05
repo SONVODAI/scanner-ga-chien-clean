@@ -1224,7 +1224,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     Lưu 1 bản cuối cho mỗi ngày/mã.
     Dữ liệu được đọc/ghi qua read_evolution_history + write_evolution_history để không mất phiên khi app restart.
     """
-        if not allow_save:
+    if not allow_save:
         old_df = read_evolution_history()
         return old_df, f"SKIP_NO_TRADING_SESSION | {reason}"
     today = today_str()
