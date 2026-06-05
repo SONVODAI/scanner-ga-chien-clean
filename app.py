@@ -1218,12 +1218,15 @@ def is_vnindex_trading_today() -> tuple[bool, str]:
 
     except Exception as e:
         return False, f"Không kiểm tra được VNINDEX: {e}"
+def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str = "") -> tuple[pd.DataFrame, str]:
 
-def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
     """
     Lưu 1 bản cuối cho mỗi ngày/mã.
     Dữ liệu được đọc/ghi qua read_evolution_history + write_evolution_history để không mất phiên khi app restart.
     """
+        if not allow_save:
+        old_df = read_evolution_history()
+        return old_df, f"SKIP_NO_TRADING_SESSION | {reason}"
     today = today_str()
     now_time = vn_time_str("%H:%M:%S")
 
@@ -1751,7 +1754,14 @@ if show_detail:
 st.markdown("---")
 st.markdown("## 🚀 TIẾN HÓA CỔ PHIẾU")
 
-evo_saved_df, evo_save_status = save_evolution(scan_df)
+
+trading_today, trading_reason = is_vnindex_trading_today()
+
+evo_saved_df, evo_save_status = save_evolution(
+    scan_df,
+    allow_save=trading_today,
+    reason=trading_reason,
+)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
 
 saved_dates = []
@@ -1760,8 +1770,11 @@ try:
 except Exception:
     saved_dates = []
 
-st.caption(f"Evolution save: {evo_save_status} | Dates: {', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}")
 
+st.caption(
+    f"Evolution save: {evo_save_status} | {trading_reason} | Dates: "
+    f"{', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}"
+)
 e1, e2 = st.columns(2)
 
 with e1:
