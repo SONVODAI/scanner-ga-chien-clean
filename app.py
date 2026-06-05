@@ -1336,7 +1336,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
 
             evolution = today_rank - first_rank
             recent_change = today_rank - last_rank
-                ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+            ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
 
     if today_group and pd.notna(today_group):
         ranks.append(today_rank)
