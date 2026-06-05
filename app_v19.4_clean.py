@@ -1158,13 +1158,75 @@ def write_evolution_history(evo_df: pd.DataFrame) -> str:
         return f"GITHUB_FAIL_{put_r.status_code}"
     except Exception:
         return "GITHUB_ERROR"
+@st.cache_data(ttl=5 * 60, show_spinner=False)
+def is_vnindex_trading_today() -> tuple[bool, str]:
+    """
+    Chỉ trả True khi VNINDEX có dữ liệu ngày hôm nay.
+    Nếu thứ 7, CN hoặc ngày lễ: dữ liệu VNINDEX mới nhất sẽ là phiên trước đó => False.
+    """
+    today = today_str()
 
+    try:
+        from vnstock import stock_historical_data
 
-def save_evolution(scan_df: pd.DataFrame) -> tuple[pd.DataFrame, str]:
+        attempts = [
+            {"symbol": "VNINDEX", "type": "index"},
+            {"symbol": "VNINDEX", "type": "stock"},
+        ]
+
+        last_seen_date = ""
+
+        for cfg in attempts:
+            try:
+                df = stock_historical_data(
+                    symbol=cfg["symbol"],
+                    start_date=(vn_now() - timedelta(days=10)).strftime("%Y-%m-%d"),
+                    end_date=today,
+                    resolution="1D",
+                    type=cfg["type"],
+                    beautify=True,
+                )
+
+                if df is None or df.empty:
+                    continue
+
+                date_col = None
+                for c in df.columns:
+                    if "date" in str(c).lower() or "time" in str(c).lower():
+                        date_col = c
+                        break
+
+                if date_col is None:
+                    continue
+
+                df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
+                df = df.dropna(subset=[date_col]).sort_values(date_col)
+
+                if df.empty:
+                    continue
+
+                last_date = df[date_col].iloc[-1].strftime("%Y-%m-%d")
+                last_seen_date = last_date
+
+                if last_date == today:
+                    return True, f"VNINDEX có giao dịch hôm nay: {today}"
+
+            except Exception:
+                continue
+
+        return False, f"Không lưu Evolution: VNINDEX mới nhất là {last_seen_date}, không phải {today}"
+
+    except Exception as e:
+        return False, f"Không kiểm tra được VNINDEX: {e}"
+def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str = "") -> tuple[pd.DataFrame, str]:
+
     """
     Lưu 1 bản cuối cho mỗi ngày/mã.
     Dữ liệu được đọc/ghi qua read_evolution_history + write_evolution_history để không mất phiên khi app restart.
     """
+    if not allow_save:
+        old_df = read_evolution_history()
+        return old_df, f"SKIP_NO_TRADING_SESSION | {reason}"
     today = today_str()
     now_time = vn_time_str("%H:%M:%S")
 
@@ -1692,7 +1754,14 @@ if show_detail:
 st.markdown("---")
 st.markdown("## 🚀 TIẾN HÓA CỔ PHIẾU")
 
-evo_saved_df, evo_save_status = save_evolution(scan_df)
+
+trading_today, trading_reason = is_vnindex_trading_today()
+
+evo_saved_df, evo_save_status = save_evolution(
+    scan_df,
+    allow_save=trading_today,
+    reason=trading_reason,
+)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
 
 saved_dates = []
@@ -1701,8 +1770,11 @@ try:
 except Exception:
     saved_dates = []
 
-st.caption(f"Evolution save: {evo_save_status} | Dates: {', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}")
 
+st.caption(
+    f"Evolution save: {evo_save_status} | {trading_reason} | Dates: "
+    f"{', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}"
+)
 e1, e2 = st.columns(2)
 
 with e1:
