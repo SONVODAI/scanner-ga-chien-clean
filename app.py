@@ -1362,7 +1362,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         recent_changes.append(recent_change)
         persistences.append(persistence)
         dna_flags.append(dna)
-               recent_changes.append(recent_change)
+        recent_changes.append(recent_change)
         persistences.append(persistence)
         dna_flags.append(dna)
         if recent_change > 0:
