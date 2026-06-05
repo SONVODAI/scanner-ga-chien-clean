@@ -1795,8 +1795,9 @@ evo_saved_df, evo_save_status = save_evolution(
     reason=trading_reason,
 )
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
+
 # =========================================================
-# 🏆 DNA LEADERS HÔM NAY
+# 🏆 DNA LEADERS V2 - BẢNG MUA LÕI
 # =========================================================
 
 try:
@@ -1805,30 +1806,65 @@ try:
 
         dna_leaders = evo_table.copy()
 
+        # Ghép thêm dữ liệu realtime từ scan hiện tại
+        extra_cols = [
+            "symbol",
+            "rsi14",
+            "ema9_ma20_slope",
+            "total_score",
+            "group"
+        ]
+
+        scan_extra = scan_df[
+            [c for c in extra_cols if c in scan_df.columns]
+        ].copy()
+
+        dna_leaders = dna_leaders.merge(
+            scan_extra,
+            on="symbol",
+            how="left"
+        )
+
         cols = [
             "symbol",
             "Persistence",
             "DNA",
+            "group",
+            "rsi14",
+            "ema9_ma20_slope",
+            "total_score",
             "evolution",
-            "recent_change",
+            "recent_change"
         ]
 
         cols = [c for c in cols if c in dna_leaders.columns]
 
         dna_leaders = dna_leaders[cols]
 
-        dna_leaders = dna_leaders.sort_values(
-            ["Persistence", "evolution"],
-            ascending=[False, False]
-        ).head(10)
+        dna_leaders = dna_leaders.rename(columns={
+            "symbol": "MÃ",
+            "Persistence": "DNA",
+            "DNA": "LOẠI",
+            "group": "NHÓM",
+            "rsi14": "RSI",
+            "ema9_ma20_slope": "SLOPE",
+            "total_score": "SCORE",
+            "evolution": "TIẾN HÓA",
+            "recent_change": "GẦN NHẤT"
+        })
 
-        st.markdown("## 🏆 DNA LEADERS HÔM NAY")
+        dna_leaders = dna_leaders.sort_values(
+            ["DNA", "TIẾN HÓA", "SCORE"],
+            ascending=[False, False, False]
+        ).head(15)
+
+        st.markdown("## 🏆 DNA LEADERS V2 - BẢNG MUA")
 
         st.dataframe(
             dna_leaders,
             use_container_width=True,
             hide_index=True,
-            height=420
+            height=500
         )
 
 except Exception as e:
