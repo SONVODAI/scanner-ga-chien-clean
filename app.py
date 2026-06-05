@@ -1823,8 +1823,6 @@ try:
         "Persistence",
         "DNA",
         "TODAY",
-        "rsi14",
-        "ema9_ma20_slope",
         "evolution",
         "recent_change"
         ]
