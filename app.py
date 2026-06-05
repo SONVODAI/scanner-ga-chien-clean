@@ -1819,38 +1819,21 @@ try:
 # ==========================================================
 # DNA LEADERS V2
 # ==========================================================
-
 dna_leaders = evo_table.copy()
 
-# Lấy RSI + SLOPE + SCORE từ scan hiện tại
-extra_cols = [
+available_cols = [c for c in [
     "symbol",
+    "Persistence",
+    "DNA",
+    "TODAY",
     "rsi14",
     "ema9_ma20_slope",
-    "total_score"
-]
+    "total_score",
+    "evolution",
+    "recent_change"
+] if c in dna_leaders.columns]
 
-available_cols = [c for c in extra_cols if c in scan_df.columns]
-
-dna_leaders = dna_leaders.merge(
-    scan_df[available_cols],
-    on="symbol",
-    how="left"
-)
-
-dna_leaders = dna_leaders[
-    [
-        "symbol",
-        "Persistence",
-        "DNA",
-        "TODAY",
-        "rsi14",
-        "ema9_ma20_slope",
-        "total_score",
-        "evolution",
-        "recent_change"
-    ]
-]
+dna_leaders = dna_leaders[available_cols]
 
 dna_leaders = dna_leaders.rename(columns={
     "symbol": "MÃ",
@@ -1861,19 +1844,15 @@ dna_leaders = dna_leaders.rename(columns={
 })
 
 dna_leaders = dna_leaders.head(10)
-        dna_leaders = dna_leaders.rename(columns={
-        "TODAY": "GROUP",
-        "rsi14": "RSI",
-        "ema9_ma20_slope": "SLOPE"
-        })
-        st.markdown("## 🏆 DNA LEADERS HÔM NAY")
 
-        st.dataframe(
-            dna_leaders,
-            use_container_width=True,
-            hide_index=True,
-            height=420
-        )
+st.markdown("## 🏆 DNA LEADERS HÔM NAY")
+
+st.dataframe(
+    dna_leaders,
+    use_container_width=True,
+    hide_index=True,
+    height=420
+)
 
 except Exception as e:
     st.warning(f"DNA LEADERS ERROR: {e}")
