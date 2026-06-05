@@ -1331,12 +1331,14 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         today_rank = GROUP_RANK.get(today_group, 0)
 
         if hist_groups:
-            first_rank = GROUP_RANK.get(hist_groups[0], 0)
-            last_rank = GROUP_RANK.get(hist_groups[-1], 0)
 
-            evolution = today_rank - first_rank
-            recent_change = today_rank - last_rank
-            ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+    first_rank = GROUP_RANK.get(hist_groups[0], 0)
+    last_rank = GROUP_RANK.get(hist_groups[-1], 0)
+
+    evolution = today_rank - first_rank
+    recent_change = today_rank - last_rank
+
+    ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
 
     if today_group and pd.notna(today_group):
         ranks.append(today_rank)
@@ -1349,12 +1351,18 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         dna = "🟡 BỀN"
     else:
         dna = "⚪ MỚI"
-    else:
-        evolution = 0
-        recent_change = 0
-        persistence = 0
-        dna = "⚪ MỚI"
-        evo_scores.append(evolution)
+
+else:
+
+    evolution = 0
+    recent_change = 0
+    persistence = 0
+    dna = "⚪ MỚI"
+
+evo_scores.append(evolution)
+recent_changes.append(recent_change)
+persistences.append(persistence)
+dna_flags.append(dna)
         recent_changes.append(recent_change)
         persistences.append(persistence)
         dna_flags.append(dna)
