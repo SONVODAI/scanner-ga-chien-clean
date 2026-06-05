@@ -1310,12 +1310,14 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base = current.copy()
     else:
         base = hist.merge(current, on="symbol", how="outer")
-
     evo_scores = []
     recent_changes = []
     arrows = []
     status_icons = []
 
+    persistences = []
+    dna_flags = []
+    
     for _, r in base.iterrows():
 
         hist_groups = []
@@ -1327,20 +1329,40 @@ def build_evolution_tables(scan_df: pd.DataFrame):
 
         today_group = r.get("TODAY", np.nan)
         today_rank = GROUP_RANK.get(today_group, 0)
-
         if hist_groups:
+
             first_rank = GROUP_RANK.get(hist_groups[0], 0)
             last_rank = GROUP_RANK.get(hist_groups[-1], 0)
 
             evolution = today_rank - first_rank
             recent_change = today_rank - last_rank
+
+            ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+
+            if today_group and pd.notna(today_group):
+                ranks.append(today_rank)
+
+            persistence = round(sum(ranks) / len(ranks), 1)
+
+            if persistence >= 5.0:
+                dna = "🟢 DNA MẠNH"
+            elif persistence >= 3.5:
+                dna = "🟡 BỀN"
+            else:
+                dna = "⚪ MỚI"
+
         else:
+
             evolution = 0
             recent_change = 0
+            persistence = 0
+            dna = "⚪ MỚI"
 
         evo_scores.append(evolution)
         recent_changes.append(recent_change)
-
+        persistences.append(persistence)
+        dna_flags.append(dna)
+        
         if recent_change > 0:
             arrows.append("⬆️")
         elif recent_change < 0:
@@ -1355,12 +1377,22 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         else:
             status_icons.append("⚪")
 
+    
     base["evolution"] = evo_scores
     base["recent_change"] = recent_changes
+
+    base["Persistence"] = persistences
+    base["DNA"] = dna_flags
+
     base["arrow"] = arrows
     base["status"] = status_icons
-
-    sort_cols = ["evolution", "recent_change", "today_score"]
+    
+    sort_cols = [
+    "Persistence",
+    "evolution",
+    "recent_change",
+    "today_score",
+]
     sort_cols = [c for c in sort_cols if c in base.columns]
 
     if sort_cols:
