@@ -1795,7 +1795,44 @@ evo_saved_df, evo_save_status = save_evolution(
     reason=trading_reason,
 )
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
+# =========================================================
+# 🏆 DNA LEADERS HÔM NAY
+# =========================================================
 
+try:
+
+    if not evo_table.empty and "Persistence" in evo_table.columns:
+
+        dna_leaders = evo_table.copy()
+
+        cols = [
+            "symbol",
+            "Persistence",
+            "DNA",
+            "evolution",
+            "recent_change",
+        ]
+
+        cols = [c for c in cols if c in dna_leaders.columns]
+
+        dna_leaders = dna_leaders[cols]
+
+        dna_leaders = dna_leaders.sort_values(
+            ["Persistence", "evolution"],
+            ascending=[False, False]
+        ).head(10)
+
+        st.markdown("## 🏆 DNA LEADERS HÔM NAY")
+
+        st.dataframe(
+            dna_leaders,
+            use_container_width=True,
+            hide_index=True,
+            height=420
+        )
+
+except Exception as e:
+    st.warning(f"DNA LEADERS ERROR: {e}")
 saved_dates = []
 try:
     saved_dates = sorted(pd.to_datetime(evo_saved_df["date"], errors="coerce").dropna().dt.strftime("%Y-%m-%d").unique())
