@@ -1255,7 +1255,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date"])
 
-    last_dates = sorted(evo_df["date"].dt.strftime("%Y-%m-%d").unique())[-15:]
+    last_dates = sorted(evo_df["date"].dt.strftime("%Y-%m-%d").unique())[-120:]
     evo_df["date_str"] = evo_df["date"].dt.strftime("%Y-%m-%d")
     evo_df = evo_df[evo_df["date_str"].isin(last_dates)].copy()
     evo_df = evo_df.drop(columns=["date_str"])
