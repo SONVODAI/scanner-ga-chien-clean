@@ -1931,7 +1931,7 @@ if not summary_df.empty:
         market_regime = "🌿 TÍCH LŨY CẢI THIỆN"
 
     elif (
-        market_real < 6
+        market_real < 4
         and total_strong > 0
     ):
         market_regime = "🟡 HỒI KỸ THUẬT"
@@ -1945,6 +1945,16 @@ if not summary_df.empty:
         f"TOP GROUP = {top_group}",
         f"GÀ TĂNG TỐC + CP MẠNH = {total_strong}"
     ]
+    # =========================================================
+# HIỂN THỊ MARKET REGIME
+# =========================================================
+
+st.subheader("🧭 MARKET REGIME")
+
+st.success(market_regime)
+
+for r in market_reason:
+    st.caption(r)
 if not summary_df.empty:
     st.subheader("🏆 XẾP HẠNG NHÓM TỔNG HỢP")
     st.dataframe(
