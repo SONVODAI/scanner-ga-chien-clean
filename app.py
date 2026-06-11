@@ -1903,7 +1903,48 @@ st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
 
 group_stats = build_group_statistics()
 summary_df = build_group_summary(group_stats)
+# =========================================================
+# MARKET REGIME
+# =========================================================
 
+market_regime = "🧊 MÙA ĐÔNG"
+market_reason = []
+
+if not summary_df.empty:
+
+    top_group = summary_df.iloc[0]["group"]
+    top_score = summary_df.iloc[0]["Score"]
+
+    gt_count = len(scan_df[scan_df["group"] == "GÀ TĂNG TỐC"])
+    strong_count = len(scan_df[scan_df["group"] == "CP MẠNH"])
+
+    total_strong = gt_count + strong_count
+
+    if market_real >= 6:
+        market_regime = "🌱 MÙA XUÂN"
+
+    elif (
+        market_real >= 4
+        and top_score >= 40
+        and total_strong >= 5
+    ):
+        market_regime = "🌿 TÍCH LŨY CẢI THIỆN"
+
+    elif (
+        market_real < 6
+        and total_strong > 0
+    ):
+        market_regime = "🟡 HỒI KỸ THUẬT"
+
+    else:
+        market_regime = "🧊 MÙA ĐÔNG"
+
+    market_reason = [
+        f"REAL = {market_real:.1f}/13",
+        f"FORECAST = {market_forecast:.1f}/10",
+        f"TOP GROUP = {top_group}",
+        f"GÀ TĂNG TỐC + CP MẠNH = {total_strong}"
+    ]
 if not summary_df.empty:
     st.subheader("🏆 XẾP HẠNG NHÓM TỔNG HỢP")
     st.dataframe(
