@@ -1255,7 +1255,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date"])
 
-    last_dates = sorted(evo_df["date"].dt.strftime("%Y-%m-%d").unique())[-15:]
+    last_dates = sorted(evo_df["date"].dt.strftime("%Y-%m-%d").unique())[-120:]
     evo_df["date_str"] = evo_df["date"].dt.strftime("%Y-%m-%d")
     evo_df = evo_df[evo_df["date_str"].isin(last_dates)].copy()
     evo_df = evo_df.drop(columns=["date_str"])
@@ -1903,7 +1903,58 @@ st.markdown("## 📊 THỐNG KÊ HIỆU SUẤT NHÓM")
 
 group_stats = build_group_statistics()
 summary_df = build_group_summary(group_stats)
+# =========================================================
+# MARKET REGIME
+# =========================================================
 
+market_regime = "🧊 MÙA ĐÔNG"
+market_reason = []
+
+if not summary_df.empty:
+
+    top_group = summary_df.iloc[0]["group"]
+    top_score = summary_df.iloc[0]["Score"]
+
+    gt_count = len(scan_df[scan_df["group"] == "GÀ TĂNG TỐC"])
+    strong_count = len(scan_df[scan_df["group"] == "CP MẠNH"])
+
+    total_strong = gt_count + strong_count
+
+    if market_real >= 6:
+        market_regime = "🌱 MÙA XUÂN"
+
+    elif (
+        market_real >= 4
+        and top_score >= 40
+        and total_strong >= 5
+    ):
+        market_regime = "🌿 TÍCH LŨY CẢI THIỆN"
+
+    elif (
+        market_real < 4
+        and total_strong > 0
+    ):
+        market_regime = "🟡 HỒI KỸ THUẬT"
+
+    else:
+        market_regime = "🧊 MÙA ĐÔNG"
+
+    market_reason = [
+        f"REAL = {market_real:.1f}/13",
+        f"FORECAST = {market_forecast:.1f}/10",
+        f"TOP GROUP = {top_group}",
+        f"GÀ TĂNG TỐC + CP MẠNH = {total_strong}"
+    ]
+    # =========================================================
+# HIỂN THỊ MARKET REGIME
+# =========================================================
+
+st.subheader("🧭 MARKET REGIME")
+
+st.success(market_regime)
+
+for r in market_reason:
+    st.caption(r)
 if not summary_df.empty:
     st.subheader("🏆 XẾP HẠNG NHÓM TỔNG HỢP")
     st.dataframe(
