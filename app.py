@@ -788,7 +788,15 @@ def analyze_symbol(symbol: str) -> dict | None:
     O = calc_obv_score(obv_, obv_ema9_, obv_prev)
     S = calc_slope_score(slope_, slope_change_)
     RS = calc_rs_score(rs5_, rs10_)
-    total_score = E + R + O + S + RS
+
+    V = calc_volume_score(
+    close_=last["close"],
+    open_=last["open"],
+    volume_=vol_,
+    vol_ma20_=vol_ma20_,
+)
+
+total_score = E + R + O + S + RS + V
 
     pull_label = classify_pull_label(
         dist_from_ema9=dist_from_ema9,
