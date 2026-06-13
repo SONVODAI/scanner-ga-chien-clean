@@ -815,58 +815,58 @@ def analyze_symbol(symbol: str) -> dict | None:
     vol_ma20_=vol_ma20_,
 )
 
-total_score = E + R + O + S + RS + V
-
-pull_label = classify_pull_label(
-        dist_from_ema9=dist_from_ema9,
-        rsi_=rsi_,
-        rsi_slope_=rsi_slope_,
-        obv_=obv_,
-        obv_ema9_=obv_ema9_,
-    )
-
-obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
-
-row = {
-        "symbol": symbol,
-        "date": last.get("date", None),
-        "price": safe_round(price, 0),
-        "daily_price_before_live": safe_round(daily_price_before_live, 0),
-        "live_source": live_info.get("source", ""),
-        "live_ts": live_info.get("ts", ""),
-        "is_live_adjusted": bool(last.get("is_live_adjusted", False)),
-        "ema9": safe_round(ema9_, 2),
-        "ma20": safe_round(ma20_, 2),
-        "ema9_ma20_slope": safe_round(slope_, 2),
-        "ema9_ma20_slope_change": safe_round(slope_change_, 2),
-        "slope_state": slope_state_text(slope_),
-        "rsi14": safe_round(rsi_, 2),
-        "rsi_slope": safe_round(rsi_slope_, 2),
-        "obv": safe_round(obv_, 0),
-        "obv_ema9": safe_round(obv_ema9_, 0),
-        "obv_status": obv_status,
-        "volume": safe_round(vol_, 0),
-        "vol_ma20": safe_round(vol_ma20_, 0),
-        "breakout_ref": safe_round(breakout_ref, 2),
-        "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
-        "pull_label": pull_label,
-        "E": E,
-        "R": R,
-        "O": O,
-        "S": S,
-        "RS": RS,
-        "V": V,
-        "rs5": safe_round(rs5_, 2),
-        "rs10": safe_round(rs10_, 2),
-        "green_2_confirm": str(last.get("green_2_confirm", "")),
-        "total_score": total_score,
-    }
-
-row["group"] = classify_group(row)
-row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label, slope_)
-row["status"] = build_status(total_score, row["warning"], row["group"])
-
-return row
+    total_score = E + R + O + S + RS + V
+    
+    pull_label = classify_pull_label(
+            dist_from_ema9=dist_from_ema9,
+            rsi_=rsi_,
+            rsi_slope_=rsi_slope_,
+            obv_=obv_,
+            obv_ema9_=obv_ema9_,
+        )
+    
+    obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
+    
+    row = {
+            "symbol": symbol,
+            "date": last.get("date", None),
+            "price": safe_round(price, 0),
+            "daily_price_before_live": safe_round(daily_price_before_live, 0),
+            "live_source": live_info.get("source", ""),
+            "live_ts": live_info.get("ts", ""),
+            "is_live_adjusted": bool(last.get("is_live_adjusted", False)),
+            "ema9": safe_round(ema9_, 2),
+            "ma20": safe_round(ma20_, 2),
+            "ema9_ma20_slope": safe_round(slope_, 2),
+            "ema9_ma20_slope_change": safe_round(slope_change_, 2),
+            "slope_state": slope_state_text(slope_),
+            "rsi14": safe_round(rsi_, 2),
+            "rsi_slope": safe_round(rsi_slope_, 2),
+            "obv": safe_round(obv_, 0),
+            "obv_ema9": safe_round(obv_ema9_, 0),
+            "obv_status": obv_status,
+            "volume": safe_round(vol_, 0),
+            "vol_ma20": safe_round(vol_ma20_, 0),
+            "breakout_ref": safe_round(breakout_ref, 2),
+            "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
+            "pull_label": pull_label,
+            "E": E,
+            "R": R,
+            "O": O,
+            "S": S,
+            "RS": RS,
+            "V": V,
+            "rs5": safe_round(rs5_, 2),
+            "rs10": safe_round(rs10_, 2),
+            "green_2_confirm": str(last.get("green_2_confirm", "")),
+            "total_score": total_score,
+        }
+    
+    row["group"] = classify_group(row)
+    row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label, slope_)
+    row["status"] = build_status(total_score, row["warning"], row["group"])
+    
+    return row
 
 
 # =========================================================
