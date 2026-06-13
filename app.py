@@ -827,7 +827,7 @@ pull_label = classify_pull_label(
 
 obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
 
-    row = {
+row = {
         "symbol": symbol,
         "date": last.get("date", None),
         "price": safe_round(price, 0),
