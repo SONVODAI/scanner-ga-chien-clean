@@ -817,7 +817,7 @@ def analyze_symbol(symbol: str) -> dict | None:
 
 total_score = E + R + O + S + RS + V
 
-    pull_label = classify_pull_label(
+pull_label = classify_pull_label(
         dist_from_ema9=dist_from_ema9,
         rsi_=rsi_,
         rsi_slope_=rsi_slope_,
