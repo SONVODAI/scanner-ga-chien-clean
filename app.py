@@ -586,7 +586,41 @@ def calc_rs_score(rs5_, rs10_):
         if rs5_ >= 1 or rs10_ >= 2:
             return 1
     return 0
+def calc_volume_score(close_, open_, volume_, vol_ma20_):
+    """
+    Đánh giá chất lượng volume.
+    Không đo volume lớn hay nhỏ đơn thuần.
+    Đo volume có đi cùng giá đúng hướng hay không.
+    """
 
+    if (
+        pd.isna(close_)
+        or pd.isna(open_)
+        or pd.isna(volume_)
+        or pd.isna(vol_ma20_)
+        or vol_ma20_ <= 0
+    ):
+        return 0
+
+    vol_ratio = volume_ / vol_ma20_
+
+    # Giá tăng + vol lớn
+    if close_ > open_ and vol_ratio >= 1.2:
+        return 2
+
+    # Giá tăng + vol trung bình
+    if close_ > open_ and vol_ratio >= 0.8:
+        return 1
+
+    # Giá giảm mạnh nhưng vol lớn
+    if close_ < open_ and vol_ratio >= 1.2:
+        return -2
+
+    # Giá giảm nhẹ nhưng vol thấp
+    if close_ < open_ and vol_ratio < 0.8:
+        return 1
+
+    return 0
 
 # =========================================================
 # LABELS / GROUPS
