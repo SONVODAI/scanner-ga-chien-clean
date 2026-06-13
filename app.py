@@ -683,6 +683,7 @@ def classify_group(row: dict) -> str:
     vol_ = row["volume"]
     vol_ma20_ = row["vol_ma20"]
     total = row["total_score"]
+    V = row["V"]
     e = row["E"]
     r = row["R"]
     o = row["O"]
@@ -700,7 +701,16 @@ def classify_group(row: dict) -> str:
         and price >= ema9_ * 0.97
     )
 
-    if pd.notna(slope_) and slope_ > 2 and total >= 6 and e >= 1 and r >= 1 and o >= 1:
+    
+    if (
+        pd.notna(slope_)
+        and slope_ > 2
+        and total >= 7
+        and e >= 1
+        and r >= 1
+        and o >= 1
+        and V >= 1
+    ):
         return "GÀ TĂNG TỐC"
 
     if pull_label == "PULL ĐẸP":
@@ -721,7 +731,16 @@ def classify_group(row: dict) -> str:
     ):
         return "MUA BREAK"
 
-    if leader and pd.notna(dist_from_ema9) and dist_from_ema9 > 1.5 and e == 2 and r >= 1 and o >= 1:
+   
+    if (
+        leader
+        and pd.notna(dist_from_ema9)
+        and dist_from_ema9 > 1.5
+        and e == 2
+        and r >= 1
+        and o >= 1
+        and V >= 1
+    ):
         return "CP MẠNH"
 
     if not leader:
