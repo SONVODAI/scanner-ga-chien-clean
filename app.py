@@ -1329,15 +1329,20 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
 
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
-    def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
-        evo_df = read_evolution_history()
-    
-        if scan_df.empty:
-            return pd.DataFrame()
-    
-        current = scan_df.copy()
-    
-        current["vol_ratio"] = np.where(
+    # =========================================================
+# STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
+# =========================================================
+def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
+    if scan_df.empty:
+        return pd.DataFrame()
+
+    current = scan_df.copy()
+
+    for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
+        if col not in current.columns:
+            current[col] = np.nan
+
+    current["vol_ratio"] = np.where(
         current["vol_ma20"] > 0,
         current["volume"] / current["vol_ma20"],
         np.nan
@@ -1353,19 +1358,17 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
         default=0
     )
 
-    current["obv_now_score"] = np.where(
-        current["obv_status"] == "🟢",
-        2,
-        0
-    )
-
     current["dna_accel"] = 0.0
     current["obv_accel_score"] = 0.0
 
-    if not evo_df.empty and {"date", "symbol", "score"}.issubset(evo_df.columns):
+    evo_df = read_evolution_history()
+
+    if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.columns):
         hist = evo_df.copy()
         hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
-        hist = hist.dropna(subset=["date"])
+        hist["score"] = pd.to_numeric(hist["score"], errors="coerce")
+        hist["obv"] = pd.to_numeric(hist["obv"], errors="coerce")
+        hist = hist.dropna(subset=["date", "symbol"])
         hist = hist.sort_values(["symbol", "date"])
 
         old_rows = []
@@ -1409,20 +1412,25 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
         + current["V"].fillna(0)
     )
 
+    valid_groups = [
+        "MUA EARLY",
+        "PULL VỪA",
+        "PULL ĐẸP",
+        "MUA BREAK",
+        "CP MẠNH",
+        "GÀ TĂNG TỐC",
+    ]
+
     out = current[
         (current["storm_score"] > 0)
-        & (current["group"].isin([
-            "MUA EARLY",
-            "PULL VỪA",
-            "PULL ĐẸP",
-            "MUA BREAK",
-            "CP MẠNH",
-            "GÀ TĂNG TỐC",
-        ]))
+        & (current["group"].isin(valid_groups))
     ].copy()
 
+    if out.empty:
+        return pd.DataFrame()
+
     out = out.sort_values(
-        ["storm_score", "volume_surge_score", "dna_accel", "O", "V"],
+        ["storm_score", "volume_surge_score", "dna_accel", "obv_accel_score", "O", "V"],
         ascending=False
     )
 
@@ -1439,6 +1447,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
         "rsi14": "RSI",
         "ema9_ma20_slope": "SLOPE",
         "obv_status": "OBV",
+        "warning": "CẢNH BÁO",
     })
 
     cols = [
@@ -1454,7 +1463,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
         "RSI",
         "SLOPE",
         "OBV",
-        "warning",
+        "CẢNH BÁO",
     ]
 
     cols = [c for c in cols if c in out.columns]
@@ -1871,8 +1880,6 @@ st.caption("V19: live price đã được bơm vào candle cuối trước khi t
 # =========================================================
 st.markdown("---")
 st.markdown("## 🚀 STORM LEADERS - TIỀN LỚN ĐANG TĂNG TỐC")
-st.write("CHECK STORM FUNCTION")
-st.write("build_storm_leaders" in globals())
 storm_df = build_storm_leaders(scan_df)
 
 if not storm_df.empty:
