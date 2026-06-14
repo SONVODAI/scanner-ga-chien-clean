@@ -1329,6 +1329,137 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
 
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
+    def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
+    evo_df = read_evolution_history()
+
+    if scan_df.empty:
+        return pd.DataFrame()
+
+    current = scan_df.copy()
+
+    current["vol_ratio"] = np.where(
+        current["vol_ma20"] > 0,
+        current["volume"] / current["vol_ma20"],
+        np.nan
+    )
+
+    current["volume_surge_score"] = np.select(
+        [
+            current["vol_ratio"] >= 2.0,
+            current["vol_ratio"] >= 1.5,
+            current["vol_ratio"] >= 1.2,
+        ],
+        [3, 2, 1],
+        default=0
+    )
+
+    current["obv_now_score"] = np.where(
+        current["obv_status"] == "🟢",
+        2,
+        0
+    )
+
+    current["dna_accel"] = 0.0
+    current["obv_accel_score"] = 0.0
+
+    if not evo_df.empty and {"date", "symbol", "score"}.issubset(evo_df.columns):
+        hist = evo_df.copy()
+        hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
+        hist = hist.dropna(subset=["date"])
+        hist = hist.sort_values(["symbol", "date"])
+
+        old_rows = []
+
+        for symbol, sub in hist.groupby("symbol"):
+            sub = sub.drop_duplicates("date", keep="last").sort_values("date")
+
+            if len(sub) >= 5:
+                old = sub.iloc[-5]
+            elif len(sub) >= 2:
+                old = sub.iloc[0]
+            else:
+                continue
+
+            old_rows.append({
+                "symbol": symbol,
+                "old_score": old.get("score", np.nan),
+                "old_obv": old.get("obv", np.nan),
+            })
+
+        old_df = pd.DataFrame(old_rows)
+
+        if not old_df.empty:
+            current = current.merge(old_df, on="symbol", how="left")
+
+            current["dna_accel"] = current["total_score"] - current["old_score"]
+
+            current["obv_accel_score"] = np.where(
+                (pd.notna(current["obv"])) &
+                (pd.notna(current["old_obv"])) &
+                (current["obv"] > current["old_obv"]),
+                2,
+                0
+            )
+
+    current["storm_score"] = (
+        current["dna_accel"].fillna(0) * 1.5
+        + current["obv_accel_score"].fillna(0) * 2.0
+        + current["volume_surge_score"].fillna(0) * 2.0
+        + current["O"].fillna(0)
+        + current["V"].fillna(0)
+    )
+
+    out = current[
+        (current["storm_score"] > 0)
+        & (current["group"].isin([
+            "MUA EARLY",
+            "PULL VỪA",
+            "PULL ĐẸP",
+            "MUA BREAK",
+            "CP MẠNH",
+            "GÀ TĂNG TỐC",
+        ]))
+    ].copy()
+
+    out = out.sort_values(
+        ["storm_score", "volume_surge_score", "dna_accel", "O", "V"],
+        ascending=False
+    )
+
+    out = out.rename(columns={
+        "symbol": "MÃ",
+        "group": "NHÓM",
+        "price": "GIÁ",
+        "storm_score": "STORM",
+        "dna_accel": "DNA ACCEL",
+        "obv_accel_score": "OBV ACCEL",
+        "volume_surge_score": "VOL SURGE",
+        "vol_ratio": "VOL/MA20",
+        "total_score": "SCORE",
+        "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE",
+        "obv_status": "OBV",
+    })
+
+    cols = [
+        "MÃ",
+        "NHÓM",
+        "GIÁ",
+        "STORM",
+        "DNA ACCEL",
+        "OBV ACCEL",
+        "VOL SURGE",
+        "VOL/MA20",
+        "SCORE",
+        "RSI",
+        "SLOPE",
+        "OBV",
+        "warning",
+    ]
+
+    cols = [c for c in cols if c in out.columns]
+
+    return out[cols].head(20)
 def build_evolution_tables(scan_df: pd.DataFrame):
 
     evo_df = read_evolution_history()
@@ -1735,7 +1866,23 @@ else:
 
 st.caption(market_forecast_text)
 st.caption("V19: live price đã được bơm vào candle cuối trước khi tính indicator, nên market/bảng nhóm/detail/evo dùng cùng một scan_df.")
+# =========================================================
+# STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
+# =========================================================
+st.markdown("---")
+st.markdown("## 🚀 STORM LEADERS - TIỀN LỚN ĐANG TĂNG TỐC")
 
+storm_df = build_storm_leaders(scan_df)
+
+if not storm_df.empty:
+    st.dataframe(
+        storm_df,
+        use_container_width=True,
+        hide_index=True,
+        height=420,
+    )
+else:
+    st.info("Chưa có mã đạt tiêu chí Storm Leaders.")
 # =========================================================
 # GROUP SUMMARY
 # =========================================================
