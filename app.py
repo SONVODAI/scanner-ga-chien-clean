@@ -1330,14 +1330,14 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
     def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
-    evo_df = read_evolution_history()
-
-    if scan_df.empty:
-        return pd.DataFrame()
-
-    current = scan_df.copy()
-
-    current["vol_ratio"] = np.where(
+        evo_df = read_evolution_history()
+    
+        if scan_df.empty:
+            return pd.DataFrame()
+    
+        current = scan_df.copy()
+    
+        current["vol_ratio"] = np.where(
         current["vol_ma20"] > 0,
         current["volume"] / current["vol_ma20"],
         np.nan
