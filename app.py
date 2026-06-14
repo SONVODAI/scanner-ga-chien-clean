@@ -1302,7 +1302,11 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
             "rank": GROUP_RANK.get(r["group"], 0),
             "score": r.get("total_score", np.nan),
             "price": r.get("price", np.nan),
+            "obv": r.get("obv", np.nan),
+            "volume": r.get("volume", np.nan),
+            "vol_ma20": r.get("vol_ma20", np.nan),
             "is_live_adjusted": r.get("is_live_adjusted", False),
+            
         })
 
     new_df = pd.DataFrame(rows)
