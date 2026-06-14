@@ -1338,6 +1338,16 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
 
     current = scan_df.copy()
 
+    # GREEN2 từ tín hiệu thật của hệ thống
+    if "green_2_confirm" in current.columns:
+        current["GREEN2"] = np.where(
+            current["green_2_confirm"].astype(str).str.contains("GREEN 2", na=False),
+            "✅",
+            ""
+        )
+    else:
+        current["GREEN2"] = ""
+
     for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
         if col not in current.columns:
             current[col] = np.nan
@@ -1393,7 +1403,6 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
 
         if not old_df.empty:
             current = current.merge(old_df, on="symbol", how="left")
-
             current["dna_accel"] = current["total_score"] - current["old_score"]
 
             current["obv_accel_score"] = np.where(
@@ -1455,6 +1464,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         "NHÓM",
         "GIÁ",
         "STORM",
+        "GREEN2",
         "DNA ACCEL",
         "OBV ACCEL",
         "VOL SURGE",
@@ -1469,8 +1479,6 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     cols = [c for c in cols if c in out.columns]
 
     return out[cols].head(20)
-def build_evolution_tables(scan_df: pd.DataFrame):
-
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
