@@ -1368,9 +1368,9 @@ current["volume_surge_score"] = np.select(
 current["dna_accel"] = 0.0
 current["obv_accel_score"] = 0.0
 
-    evo_df = read_evolution_history()
+evo_df = read_evolution_history()
 
-    if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.columns):
+if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.columns):
         hist = evo_df.copy()
         hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
         hist["score"] = pd.to_numeric(hist["score"], errors="coerce")
