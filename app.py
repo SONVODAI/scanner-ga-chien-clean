@@ -1333,42 +1333,59 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
 # STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
 # =========================================================
 def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
-    if scan_df.empty:
-        return pd.DataFrame()
+if scan_df.empty:
+return pd.DataFrame()
 
-    current = scan_df.copy()
-    # GREEN2 từ tín hiệu thật của hệ thống
+```
+current = scan_df.copy()
+
+# GREEN2 từ tín hiệu thật của hệ thống
 if "green_2_confirm" in current.columns:
     current["GREEN2"] = np.where(
-        current["green_2_confirm"].astype(str).str.contains("GREEN 2", na=False),
+        current["green_2_confirm"].astype(str).str.contains(
+            "GREEN 2",
+            na=False
+        ),
         "✅",
         ""
     )
 else:
     current["GREEN2"] = ""
-for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
-        if col not in current.columns:
-            current[col] = np.nan
+
+for col in [
+    "volume",
+    "vol_ma20",
+    "obv",
+    "total_score",
+    "O",
+    "V",
+    "rsi14",
+    "ema9_ma20_slope",
+]:
+    if col not in current.columns:
+        current[col] = np.nan
 
 current["vol_ratio"] = np.where(
-        current["vol_ma20"] > 0,
-        current["volume"] / current["vol_ma20"],
-        np.nan
-    )
+    current["vol_ma20"] > 0,
+    current["volume"] / current["vol_ma20"],
+    np.nan
+)
+
 current["volume_surge_score"] = np.select(
-        [
-            current["vol_ratio"] >= 2.0,
-            current["vol_ratio"] >= 1.5,
-            current["vol_ratio"] >= 1.2,
-        ],
-        [3, 2, 1],
-        default=0
-    )
+    [
+        current["vol_ratio"] >= 2.0,
+        current["vol_ratio"] >= 1.5,
+        current["vol_ratio"] >= 1.2,
+    ],
+    [3, 2, 1],
+    default=0
+)
 
 current["dna_accel"] = 0.0
 current["obv_accel_score"] = 0.0
 
 evo_df = read_evolution_history()
+```
 
 if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.columns):
         hist = evo_df.copy()
