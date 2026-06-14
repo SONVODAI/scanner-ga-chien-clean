@@ -1350,12 +1350,12 @@ for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9
         if col not in current.columns:
             current[col] = np.nan
 
-    current["vol_ratio"] = np.where(
+current["vol_ratio"] = np.where(
         current["vol_ma20"] > 0,
         current["volume"] / current["vol_ma20"],
         np.nan
     )
-    current["volume_surge_score"] = np.select(
+current["volume_surge_score"] = np.select(
         [
             current["vol_ratio"] >= 2.0,
             current["vol_ratio"] >= 1.5,
