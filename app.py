@@ -1350,13 +1350,13 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     # Hiển thị Green2
     if "green2" in current.columns:
 
-    current["green2"] = np.where(
-        current["green2"] == True,
-        "✅",
-        ""
+        current["green2"] = np.where(
+            current["green2"] == True,
+            "✅",
+            ""
     )
-else:
-    current["green2"] = ""
+    else:
+        current["green2"] = ""
     current["volume_surge_score"] = np.select(
         [
             current["vol_ratio"] >= 2.0,
