@@ -1337,8 +1337,16 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     current = scan_df.copy()
-    st.write(scan_df.columns.tolist())
-    for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
+    # GREEN2 từ tín hiệu thật của hệ thống
+if "green_2_confirm" in current.columns:
+    current["GREEN2"] = np.where(
+        current["green_2_confirm"].astype(str).str.contains("GREEN 2", na=False),
+        "✅",
+        ""
+    )
+else:
+    current["GREEN2"] = ""
+for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
         if col not in current.columns:
             current[col] = np.nan
 
@@ -1347,17 +1355,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         current["volume"] / current["vol_ma20"],
         np.nan
     )
-    # Hiển thị Green2
-    if "green2" in current.columns:
-
-        current["green2"] = np.where(
-            current["green2"] == True,
-            "✅",
-            ""
-    )
-    else:
-        current["green2"] = ""
-    current["volume_surge_score"] = np.select(
+        current["volume_surge_score"] = np.select(
         [
             current["vol_ratio"] >= 2.0,
             current["vol_ratio"] >= 1.5,
@@ -1448,7 +1446,6 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         "group": "NHÓM",
         "price": "GIÁ",
         "storm_score": "STORM",
-        "green2": "GREEN2",
         "dna_accel": "DNA ACCEL",
         "obv_accel_score": "OBV ACCEL",
         "volume_surge_score": "VOL SURGE",
