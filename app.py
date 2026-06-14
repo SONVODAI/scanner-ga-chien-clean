@@ -1871,7 +1871,8 @@ st.caption("V19: live price đã được bơm vào candle cuối trước khi t
 # =========================================================
 st.markdown("---")
 st.markdown("## 🚀 STORM LEADERS - TIỀN LỚN ĐANG TĂNG TỐC")
-
+st.write("CHECK STORM FUNCTION")
+st.write("build_storm_leaders" in globals())
 storm_df = build_storm_leaders(scan_df)
 
 if not storm_df.empty:
