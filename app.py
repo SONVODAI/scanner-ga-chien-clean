@@ -1366,7 +1366,7 @@ current["volume_surge_score"] = np.select(
     )
 
 current["dna_accel"] = 0.0
-    current["obv_accel_score"] = 0.0
+current["obv_accel_score"] = 0.0
 
     evo_df = read_evolution_history()
 
