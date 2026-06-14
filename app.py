@@ -1336,7 +1336,6 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
 if scan_df.empty:
 return pd.DataFrame()
 
-```
 current = scan_df.copy()
 
 # GREEN2 từ tín hiệu thật của hệ thống
