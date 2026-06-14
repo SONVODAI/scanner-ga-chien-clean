@@ -1347,7 +1347,12 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         current["volume"] / current["vol_ma20"],
         np.nan
     )
-
+    # Hiển thị Green2
+    current["green2"] = np.where(
+        current["green2"] == True,
+        "✅",
+        ""
+)
     current["volume_surge_score"] = np.select(
         [
             current["vol_ratio"] >= 2.0,
@@ -1439,6 +1444,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         "group": "NHÓM",
         "price": "GIÁ",
         "storm_score": "STORM",
+        "green2": "GREEN2",
         "dna_accel": "DNA ACCEL",
         "obv_accel_score": "OBV ACCEL",
         "volume_surge_score": "VOL SURGE",
@@ -1455,6 +1461,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         "NHÓM",
         "GIÁ",
         "STORM",
+        "GREEN2",
         "DNA ACCEL",
         "OBV ACCEL",
         "VOL SURGE",
