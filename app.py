@@ -1478,9 +1478,11 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
 
     cols = [c for c in cols if c in out.columns]
 
-    return out[cols].head(20)
+        return out[cols].head(20)
+
+
 def build_evolution_tables(scan_df: pd.DataFrame):
-        evo_df = read_evolution_history()
+    evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
     current = current.rename(columns={
