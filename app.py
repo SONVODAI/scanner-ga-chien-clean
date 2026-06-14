@@ -1411,7 +1411,7 @@ if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.colum
                 0
             )
 
-    current["storm_score"] = (
+current["storm_score"] = (
         current["dna_accel"].fillna(0) * 1.5
         + current["obv_accel_score"].fillna(0) * 2.0
         + current["volume_surge_score"].fillna(0) * 2.0
