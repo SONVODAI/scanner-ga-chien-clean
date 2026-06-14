@@ -1337,7 +1337,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     current = scan_df.copy()
-
+    st.write(scan_df.columns.tolist())
     for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
         if col not in current.columns:
             current[col] = np.nan
