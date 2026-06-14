@@ -1419,7 +1419,7 @@ current["storm_score"] = (
         + current["V"].fillna(0)
     )
 
-    valid_groups = [
+valid_groups = [
         "MUA EARLY",
         "PULL VỪA",
         "PULL ĐẸP",
