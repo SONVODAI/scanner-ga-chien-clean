@@ -1333,167 +1333,152 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
 # STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
 # =========================================================
 def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
-if scan_df.empty:
-return pd.DataFrame()
+    if scan_df.empty:
+        return pd.DataFrame()
 
-current = scan_df.copy()
+    current = scan_df.copy()
 
-# GREEN2 từ tín hiệu thật của hệ thống
-if "green_2_confirm" in current.columns:
-    current["GREEN2"] = np.where(
-        current["green_2_confirm"].astype(str).str.contains(
-            "GREEN 2",
-            na=False
-        ),
-        "✅",
-        ""
-    )
-else:
-    current["GREEN2"] = ""
-
-for col in [
-    "volume",
-    "vol_ma20",
-    "obv",
-    "total_score",
-    "O",
-    "V",
-    "rsi14",
-    "ema9_ma20_slope",
-]:
-    if col not in current.columns:
-        current[col] = np.nan
-
-current["vol_ratio"] = np.where(
-    current["vol_ma20"] > 0,
-    current["volume"] / current["vol_ma20"],
-    np.nan
-)
-
-current["volume_surge_score"] = np.select(
-    [
-        current["vol_ratio"] >= 2.0,
-        current["vol_ratio"] >= 1.5,
-        current["vol_ratio"] >= 1.2,
-    ],
-    [3, 2, 1],
-    default=0
-)
-
-current["dna_accel"] = 0.0
-current["obv_accel_score"] = 0.0
-
-evo_df = read_evolution_history()
-
-if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.columns):
-    hist = evo_df.copy()
-    hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
-    hist["score"] = pd.to_numeric(hist["score"], errors="coerce")
-    hist["obv"] = pd.to_numeric(hist["obv"], errors="coerce")
-    hist = hist.dropna(subset=["date", "symbol"])
-    hist = hist.sort_values(["symbol", "date"])
-
-    old_rows = []
-
-    for symbol, sub in hist.groupby("symbol"):
-        sub = sub.drop_duplicates("date", keep="last").sort_values("date")
-
-        if len(sub) >= 5:
-            old = sub.iloc[-5]
-        elif len(sub) >= 2:
-            old = sub.iloc[0]
-        else:
-            continue
-
-        old_rows.append({
-            "symbol": symbol,
-            "old_score": old.get("score", np.nan),
-            "old_obv": old.get("obv", np.nan),
-        })
-
-    old_df = pd.DataFrame(old_rows)
-
-    if not old_df.empty:
-        current = current.merge(old_df, on="symbol", how="left")
-
-        current["dna_accel"] = current["total_score"] - current["old_score"]
-
-        current["obv_accel_score"] = np.where(
-            (pd.notna(current["obv"])) &
-            (pd.notna(current["old_obv"])) &
-            (current["obv"] > current["old_obv"]),
-            2,
-            0
+    # GREEN2 từ tín hiệu thật của hệ thống
+    if "green_2_confirm" in current.columns:
+        current["GREEN2"] = np.where(
+            current["green_2_confirm"].astype(str).str.contains("GREEN 2", na=False),
+            "✅",
+            ""
         )
+    else:
+        current["GREEN2"] = ""
 
-current["storm_score"] = (
-    current["dna_accel"].fillna(0) * 1.5
-    + current["obv_accel_score"].fillna(0) * 2.0
-    + current["volume_surge_score"].fillna(0) * 2.0
-    + current["O"].fillna(0)
-    + current["V"].fillna(0)
-)
+    for col in ["volume", "vol_ma20", "obv", "total_score", "O", "V", "rsi14", "ema9_ma20_slope"]:
+        if col not in current.columns:
+            current[col] = np.nan
 
-valid_groups = [
-    "MUA EARLY",
-    "PULL VỪA",
-    "PULL ĐẸP",
-    "MUA BREAK",
-    "CP MẠNH",
-    "GÀ TĂNG TỐC",
-]
+    current["vol_ratio"] = np.where(
+        current["vol_ma20"] > 0,
+        current["volume"] / current["vol_ma20"],
+        np.nan
+    )
 
-out = current[
-    (current["storm_score"] > 0)
-    & (current["group"].isin(valid_groups))
-].copy()
+    current["volume_surge_score"] = np.select(
+        [
+            current["vol_ratio"] >= 2.0,
+            current["vol_ratio"] >= 1.5,
+            current["vol_ratio"] >= 1.2,
+        ],
+        [3, 2, 1],
+        default=0
+    )
 
-if out.empty:
-    return pd.DataFrame()
+    current["dna_accel"] = 0.0
+    current["obv_accel_score"] = 0.0
 
-out = out.sort_values(
-    ["storm_score", "volume_surge_score", "dna_accel", "obv_accel_score", "O", "V"],
-    ascending=False
-)
+    evo_df = read_evolution_history()
 
-out = out.rename(columns={
-    "symbol": "MÃ",
-    "group": "NHÓM",
-    "price": "GIÁ",
-    "storm_score": "STORM",
-    "dna_accel": "DNA ACCEL",
-    "obv_accel_score": "OBV ACCEL",
-    "volume_surge_score": "VOL SURGE",
-    "vol_ratio": "VOL/MA20",
-    "total_score": "SCORE",
-    "rsi14": "RSI",
-    "ema9_ma20_slope": "SLOPE",
-    "obv_status": "OBV",
-    "warning": "CẢNH BÁO",
-})
+    if not evo_df.empty and {"date", "symbol", "score", "obv"}.issubset(evo_df.columns):
+        hist = evo_df.copy()
+        hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
+        hist["score"] = pd.to_numeric(hist["score"], errors="coerce")
+        hist["obv"] = pd.to_numeric(hist["obv"], errors="coerce")
+        hist = hist.dropna(subset=["date", "symbol"])
+        hist = hist.sort_values(["symbol", "date"])
 
-cols = [
-    "MÃ",
-    "NHÓM",
-    "GIÁ",
-    "STORM",
-    "GREEN2",
-    "DNA ACCEL",
-    "OBV ACCEL",
-    "VOL SURGE",
-    "VOL/MA20",
-    "SCORE",
-    "RSI",
-    "SLOPE",
-    "OBV",
-    "CẢNH BÁO",
-]
+        old_rows = []
 
-cols = [c for c in cols if c in out.columns]
+        for symbol, sub in hist.groupby("symbol"):
+            sub = sub.drop_duplicates("date", keep="last").sort_values("date")
 
-return out[cols].head(20)
-```
+            if len(sub) >= 5:
+                old = sub.iloc[-5]
+            elif len(sub) >= 2:
+                old = sub.iloc[0]
+            else:
+                continue
 
+            old_rows.append({
+                "symbol": symbol,
+                "old_score": old.get("score", np.nan),
+                "old_obv": old.get("obv", np.nan),
+            })
+
+        old_df = pd.DataFrame(old_rows)
+
+        if not old_df.empty:
+            current = current.merge(old_df, on="symbol", how="left")
+            current["dna_accel"] = current["total_score"] - current["old_score"]
+
+            current["obv_accel_score"] = np.where(
+                (pd.notna(current["obv"])) &
+                (pd.notna(current["old_obv"])) &
+                (current["obv"] > current["old_obv"]),
+                2,
+                0
+            )
+
+    current["storm_score"] = (
+        current["dna_accel"].fillna(0) * 1.5
+        + current["obv_accel_score"].fillna(0) * 2.0
+        + current["volume_surge_score"].fillna(0) * 2.0
+        + current["O"].fillna(0)
+        + current["V"].fillna(0)
+    )
+
+    valid_groups = [
+        "MUA EARLY",
+        "PULL VỪA",
+        "PULL ĐẸP",
+        "MUA BREAK",
+        "CP MẠNH",
+        "GÀ TĂNG TỐC",
+    ]
+
+    out = current[
+        (current["storm_score"] > 0)
+        & (current["group"].isin(valid_groups))
+    ].copy()
+
+    if out.empty:
+        return pd.DataFrame()
+
+    out = out.sort_values(
+        ["storm_score", "volume_surge_score", "dna_accel", "obv_accel_score", "O", "V"],
+        ascending=False
+    )
+
+    out = out.rename(columns={
+        "symbol": "MÃ",
+        "group": "NHÓM",
+        "price": "GIÁ",
+        "storm_score": "STORM",
+        "dna_accel": "DNA ACCEL",
+        "obv_accel_score": "OBV ACCEL",
+        "volume_surge_score": "VOL SURGE",
+        "vol_ratio": "VOL/MA20",
+        "total_score": "SCORE",
+        "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE",
+        "obv_status": "OBV",
+        "warning": "CẢNH BÁO",
+    })
+
+    cols = [
+        "MÃ",
+        "NHÓM",
+        "GIÁ",
+        "STORM",
+        "GREEN2",
+        "DNA ACCEL",
+        "OBV ACCEL",
+        "VOL SURGE",
+        "VOL/MA20",
+        "SCORE",
+        "RSI",
+        "SLOPE",
+        "OBV",
+        "CẢNH BÁO",
+    ]
+
+    cols = [c for c in cols if c in out.columns]
+
+    return out[cols].head(20)
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
