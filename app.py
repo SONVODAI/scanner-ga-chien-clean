@@ -1477,7 +1477,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     ]
 
     cols = [c for c in cols if c in out.columns]
-    st.write(out.columns.tolist())
+   
     return out[cols].head(20)
 
 
