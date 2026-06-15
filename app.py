@@ -5,7 +5,7 @@
 #   1) Một nguồn dữ liệu sống duy nhất: scan_df
 #   2) Live price được bơm vào cây nến cuối TRƯỚC khi tính indicator
 #   3) Market / bảng nhóm / bảng chi tiết / bảng hành động / evolution dùng chung scan_df
-#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch pha
+#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch phaF
 # =========================================================
 
 import os
@@ -1994,13 +1994,12 @@ def build_tinh_hoa_leaders(
     ).reset_index(drop=True)
 
     base.insert(0, "Rank", range(1, len(base) + 1))
-
     out = base.rename(columns={
-        "symbol": "MÃ",
-        "group": "NHÓM",
-        "price": "GIÁ",
-        "Persistence": "DNA",
-        "rsi14": "RSI",
+    "symbol": "MÃ",
+    "group": "NHÓM",
+    "price": "GIÁ",
+    "Persistence": "DNA_SCORE",
+            "rsi14": "RSI",
         "ema9_ma20_slope": "SLOPE",
         "total_score": "SCORE",
         "evolution": "TIẾN HÓA",
@@ -2011,7 +2010,7 @@ def build_tinh_hoa_leaders(
     })
 
     cols = [
-        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ",
+        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ", "DNA_SCORE",
         "DNA", "RSI", "SLOPE", "Storm", "Green2", "TIẾN HÓA", "GẦN NHẤT",
         "SCORE", "OBV", "DIST EMA9%", "Hành động", "CẢNH BÁO"
     ]
