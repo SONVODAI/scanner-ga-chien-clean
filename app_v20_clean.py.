@@ -5,7 +5,7 @@
 #   1) Một nguồn dữ liệu sống duy nhất: scan_df
 #   2) Live price được bơm vào cây nến cuối TRƯỚC khi tính indicator
 #   3) Market / bảng nhóm / bảng chi tiết / bảng hành động / evolution dùng chung scan_df
-#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch pha
+#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch phaF
 # =========================================================
 
 import os
@@ -1477,7 +1477,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     ]
 
     cols = [c for c in cols if c in out.columns]
-
+   
     return out[cols].head(20)
 
 
@@ -1795,6 +1795,229 @@ def build_group_summary(stats_df):
     ).reset_index(drop=True)
 
     return summary
+
+# =========================================================
+# 👑 TINH HOA LEADERS - TINH HOA CỦA TINH HOA
+# =========================================================
+def score_rsi_tinh_hoa(rsi):
+    """RSI đẹp nhất là vùng 60-70. Quá thấp là yếu, quá cao là nóng."""
+    rsi = to_float(rsi)
+    if pd.isna(rsi):
+        return 0
+    if 60 <= rsi <= 70:
+        return 15
+    if 55 <= rsi < 60 or 70 < rsi <= 75:
+        return 11
+    if 50 <= rsi < 55 or 75 < rsi <= 80:
+        return 6
+    if rsi > 80:
+        return 3
+    return 0
+
+
+def score_slope_tinh_hoa(slope):
+    """Slope đẹp nhất là dương vừa phải: có lực nhưng chưa quá nóng."""
+    slope = to_float(slope)
+    if pd.isna(slope):
+        return 0
+    if 1.0 <= slope <= 3.0:
+        return 15
+    if 0.3 <= slope < 1.0:
+        return 10
+    if 3.0 < slope <= 5.0:
+        return 10
+    if 0 < slope < 0.3:
+        return 5
+    if slope > 5.0:
+        return 6
+    return 0
+
+
+def build_tinh_hoa_leaders(
+    scan_df: pd.DataFrame,
+    evo_table: pd.DataFrame,
+    storm_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    Bảng Tinh Hoa = giao thoa mềm giữa DNA + Evolution + Storm + chất lượng hiện tại.
+
+    Tư duy:
+    - DNA/Persistence: cổ phiếu mạnh bền, không phải mạnh một phiên.
+    - GroupStrength: hôm nay đang thuộc nhóm tốt hay không.
+    - RSI: ưu tiên vùng 60-70, tránh quá yếu hoặc quá nóng.
+    - Slope: ưu tiên tăng đều, chưa quá dốc.
+    - Storm: có tiền mới vào hiện tại.
+    - Evolution: có tiến hóa hoặc giữ hạng tốt.
+    """
+    if scan_df.empty:
+        return pd.DataFrame()
+
+    valid_groups = [
+        "MUA EARLY",
+        "PULL VỪA",
+        "PULL ĐẸP",
+        "MUA BREAK",
+        "CP MẠNH",
+        "GÀ TĂNG TỐC",
+    ]
+
+    base_cols = [
+        "symbol", "group", "price", "total_score", "rsi14", "ema9_ma20_slope",
+        "obv_status", "dist_from_ema9_pct", "green_2_confirm", "warning"
+    ]
+    base_cols = [c for c in base_cols if c in scan_df.columns]
+    base = scan_df[base_cols].copy()
+
+    if "group" not in base.columns or "symbol" not in base.columns:
+        return pd.DataFrame()
+
+    base = base[base["group"].isin(valid_groups)].copy()
+    if base.empty:
+        return pd.DataFrame()
+
+    # Ghép DNA/Evolution từ evo_table
+    if evo_table is not None and not evo_table.empty and "symbol" in evo_table.columns:
+        evo_cols = [
+            "symbol", "Persistence", "DNA", "evolution", "recent_change", "TODAY", "today_score"
+        ]
+        evo_cols = [c for c in evo_cols if c in evo_table.columns]
+        evo_small = evo_table[evo_cols].copy()
+        base = base.merge(evo_small, on="symbol", how="left")
+    else:
+        base["Persistence"] = 0
+        base["DNA"] = "⚪ MỚI"
+        base["evolution"] = 0
+        base["recent_change"] = 0
+
+    for c in ["Persistence", "evolution", "recent_change", "total_score", "rsi14", "ema9_ma20_slope", "dist_from_ema9_pct"]:
+        if c not in base.columns:
+            base[c] = np.nan
+        base[c] = pd.to_numeric(base[c], errors="coerce")
+
+    # Storm set: dùng bảng đã rename cột MÃ từ build_storm_leaders
+    storm_symbols = set()
+    if storm_df is not None and not storm_df.empty:
+        if "MÃ" in storm_df.columns:
+            storm_symbols = set(storm_df["MÃ"].astype(str))
+        elif "symbol" in storm_df.columns:
+            storm_symbols = set(storm_df["symbol"].astype(str))
+
+    base["Storm"] = np.where(base["symbol"].astype(str).isin(storm_symbols), "✅", "")
+    base["Green2"] = np.where(
+        base.get("green_2_confirm", "").astype(str).str.contains("GREEN 2", na=False),
+        "✅",
+        ""
+    )
+
+    group_strength_map = {
+        "GÀ TĂNG TỐC": 25,
+        "CP MẠNH": 22,
+        "MUA BREAK": 20,
+        "PULL ĐẸP": 21,
+        "PULL VỪA": 17,
+        "MUA EARLY": 13,
+    }
+
+    base["DNA_SCORE"] = (base["Persistence"].fillna(0).clip(lower=0, upper=7) / 7 * 30).round(2)
+    base["GROUP_SCORE"] = base["group"].map(group_strength_map).fillna(0)
+    base["RSI_SCORE"] = base["rsi14"].apply(score_rsi_tinh_hoa)
+    base["SLOPE_SCORE"] = base["ema9_ma20_slope"].apply(score_slope_tinh_hoa)
+    base["STORM_SCORE"] = np.where(base["Storm"] == "✅", 10, 0)
+    base["EVO_SCORE"] = np.select(
+        [
+            base["evolution"] >= 3,
+            base["evolution"] >= 1,
+            base["recent_change"] >= 1,
+        ],
+        [5, 4, 3],
+        default=0,
+    )
+
+    base["TinhHoa"] = (
+        base["DNA_SCORE"]
+        + base["GROUP_SCORE"]
+        + base["RSI_SCORE"]
+        + base["SLOPE_SCORE"]
+        + base["STORM_SCORE"]
+        + base["EVO_SCORE"]
+    ).round(1)
+
+    # Số bảng đồng thuận: DNA đủ bền + Evolution có tiến hóa + Storm có tiền hiện tại
+    base["Số bảng"] = (
+        (base["Persistence"].fillna(0) >= 3.5).astype(int)
+        + ((base["evolution"].fillna(0) >= 1) | (base["recent_change"].fillna(0) >= 1)).astype(int)
+        + (base["Storm"] == "✅").astype(int)
+    )
+
+    base["Tier"] = np.select(
+        [
+            base["TinhHoa"] >= 90,
+            base["TinhHoa"] >= 80,
+            base["TinhHoa"] >= 70,
+        ],
+        ["🏆 S", "🥇 A", "🥈 B"],
+        default="⚪ C",
+    )
+
+    def action_row(r):
+        if market_real < 6:
+            return "🟡 THEO DÕI - MARKET CHƯA ỦNG HỘ"
+        if market_forecast < 3:
+            return "🟡 CANH NHỎ - FORECAST CÒN YẾU"
+        if str(r.get("warning", "")).find("OBV gãy") >= 0:
+            return "🔴 LOẠI TẠM - OBV GÃY"
+        dist = to_float(r.get("dist_from_ema9_pct", np.nan))
+        group = str(r.get("group", ""))
+        tier = str(r.get("Tier", ""))
+        if group in ["GÀ TĂNG TỐC", "CP MẠNH", "MUA BREAK"] and pd.notna(dist) and dist > 4:
+            return "🟡 CHỜ PULL VỀ EMA9"
+        if tier == "🏆 S":
+            return "🟢 ƯU TIÊN MUA KHI CÓ ĐIỂM ĐẸP"
+        if tier == "🥇 A":
+            return "🟡 CANH MUA ĐỎ / TEST NHỎ"
+        if tier == "🥈 B":
+            return "⚪ THEO DÕI THÊM"
+        return "⚪ CHƯA PHẢI TINH HOA"
+
+    base["Hành động"] = base.apply(action_row, axis=1)
+
+    # Lọc tinh hoa: ưu tiên điểm cao, hoặc có ít nhất 2 bảng đồng thuận.
+    base = base[(base["TinhHoa"] >= 65) | (base["Số bảng"] >= 2)].copy()
+    if base.empty:
+        return pd.DataFrame()
+
+    base = base.sort_values(
+        ["TinhHoa", "Số bảng", "Persistence", "STORM_SCORE", "GROUP_SCORE", "SLOPE_SCORE"],
+        ascending=[False, False, False, False, False, False]
+    ).reset_index(drop=True)
+
+    base.insert(0, "Rank", range(1, len(base) + 1))
+    out = base.rename(columns={
+    "symbol": "MÃ",
+    "group": "NHÓM",
+    "price": "GIÁ",
+    "Persistence": "DNA_GOC",
+            "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE",
+        "total_score": "SCORE",
+        "evolution": "TIẾN HÓA",
+        "recent_change": "GẦN NHẤT",
+        "obv_status": "OBV",
+        "dist_from_ema9_pct": "DIST EMA9%",
+        "warning": "CẢNH BÁO",
+    })
+
+    cols = [
+        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ", "DNA_GOC", "DNA_SCORE",    
+        "DNA", "RSI", "SLOPE", "Storm", "Green2", "TIẾN HÓA", "GẦN NHẤT",
+        "SCORE", "OBV", "DIST EMA9%", "Hành động", "CẢNH BÁO"
+    ]
+    cols = [c for c in cols if c in out.columns]
+
+    return out[cols].head(20)
+
 # =========================================================
 # UI CONTROLS
 # =========================================================
@@ -2102,6 +2325,61 @@ try:
 
 except Exception as e:
     st.warning(f"DNA LEADERS ERROR: {e}")
+
+# =========================================================
+# 👑 TINH HOA LEADERS - BẢNG LỌC CUỐI CÙNG
+# =========================================================
+st.markdown("---")
+st.markdown("## 👑 TINH HOA LEADERS - TINH HOA CỦA TINH HOA")
+
+try:
+    tinh_hoa_df = build_tinh_hoa_leaders(
+        scan_df=scan_df,
+        evo_table=evo_table,
+        storm_df=storm_df,
+        market_real=market_real,
+        market_forecast=market_forecast,
+    )
+
+    if not tinh_hoa_df.empty:
+        s_count = int((tinh_hoa_df["Tier"] == "🏆 S").sum()) if "Tier" in tinh_hoa_df.columns else 0
+        a_count = int((tinh_hoa_df["Tier"] == "🥇 A").sum()) if "Tier" in tinh_hoa_df.columns else 0
+        b_count = int((tinh_hoa_df["Tier"] == "🥈 B").sum()) if "Tier" in tinh_hoa_df.columns else 0
+
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            st.metric("Tinh hoa S", s_count)
+        with c2:
+            st.metric("Tinh hoa A", a_count)
+        with c3:
+            st.metric("Tinh hoa B", b_count)
+        with c4:
+            st.metric("Tổng theo dõi", len(tinh_hoa_df))
+
+        if market_real < 6:
+            st.warning("Market REAL < 6: bảng Tinh Hoa chỉ dùng để theo dõi, chưa dùng để đánh lớn.")
+        elif market_forecast < 3:
+            st.warning("Forecast còn yếu: chỉ ưu tiên mua đỏ/test nhỏ, chưa mua đuổi.")
+        else:
+            st.success("Market bắt đầu ủng hộ: ưu tiên các mã Tier S/A khi có điểm mua đẹp.")
+
+        st.dataframe(
+            tinh_hoa_df,
+            use_container_width=True,
+            hide_index=True,
+            height=520,
+        )
+
+        st.caption(
+            "TinhHoa = DNA bền + nhóm hiện tại + RSI đẹp + slope đẹp + Storm + Evolution. "
+            "Tier S/A/B là để chọn rổ theo dõi, không thay thế điểm mua và kỷ luật market first."
+        )
+    else:
+        st.info("Chưa có mã đạt chuẩn Tinh Hoa. Đây là tín hiệu nên kiên nhẫn, không ép giao dịch.")
+
+except Exception as e:
+    st.warning(f"TINH HOA LEADERS ERROR: {e}")
+
 saved_dates = []
 try:
     saved_dates = sorted(pd.to_datetime(evo_saved_df["date"], errors="coerce").dropna().dt.strftime("%Y-%m-%d").unique())
