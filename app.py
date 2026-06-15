@@ -1998,7 +1998,7 @@ def build_tinh_hoa_leaders(
     "symbol": "MÃ",
     "group": "NHÓM",
     "price": "GIÁ",
-    "Persistence": "DNA_SCORE",
+    "Persistence": "DNA_GOC",
             "rsi14": "RSI",
         "ema9_ma20_slope": "SLOPE",
         "total_score": "SCORE",
@@ -2010,7 +2010,7 @@ def build_tinh_hoa_leaders(
     })
 
     cols = [
-        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ", "DNA_SCORE",
+        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ", "DNA_GOC", "DNA_SCORE",    
         "DNA", "RSI", "SLOPE", "Storm", "Green2", "TIẾN HÓA", "GẦN NHẤT",
         "SCORE", "OBV", "DIST EMA9%", "Hành động", "CẢNH BÁO"
     ]
