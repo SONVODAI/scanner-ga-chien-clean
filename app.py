@@ -1297,8 +1297,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     # Loại VNINDEX khỏi Evolution
     scan_df = scan_df[scan_df["symbol"] != "VNINDEX"]
 
-    rows = []
-    for _, r in scan_df.iterrows():
+   
     rows = []
     for _, r in scan_df.iterrows():
         rows.append({
