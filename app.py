@@ -1,5 +1,5 @@
 # =========================================================
-# SCANNER GÀ CHIẾN V19.2 - SAFE MODE REALTIME UNIFIED
+# SCANNER GÀ CHIẾN V20 FINAL - OPTION2 CORE + OPTION1 PULLBACK BUY LIST
 # Viết lại sạch 100% từ bản V18.4-Lite
 # Mục tiêu:
 #   1) Một nguồn dữ liệu sống duy nhất: scan_df
@@ -28,13 +28,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V19.2 Safe Mode",
+    page_title="Scanner Gà Chiến V20 Final",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V19.2 - Safe Mode Realtime Unified")
-st.caption("Một pipeline duy nhất + SAFE MODE: live lỗi thì dùng D1, một mã lỗi không làm sập app")
+st.title("🐔 Scanner Gà Chiến V20 Final - Pullback First")
+st.caption("Market First → Storm → Pullback Buy → DNA/Evolution. Giữ pipeline scan_df, chỉ tái cấu trúc UI và thêm bảng mua Pull.")
 
 # =========================================================
 # WATCHLIST
@@ -2021,6 +2021,7 @@ def build_tinh_hoa_leaders(
 
     return out[cols].head(20)
 
+
 # =========================================================
 # 🎯 PULLBACK BUY LIST V20 - BẢNG MUA CHÍNH
 # =========================================================
@@ -2320,12 +2321,9 @@ def build_pullback_buy_list(
 
 
 # =========================================================
-# UI CONTROLS V20
+# UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
-st.title("🐔 Scanner Gà Chiến V20 - Pullback First")
-st.caption("Market First → Storm → Pullback Buy → DNA → Evolution → Chi tiết ẩn | Tất cả dùng chung scan_df")
-
-left1, left2, left3, left4, left5 = st.columns([1.1, 1.2, 1.1, 1.4, 2.2])
+left1, left2, left3, left4, left5, left6 = st.columns([1.05, 1.15, 1.0, 1.25, 1.2, 2.4])
 
 with left1:
     scan_btn = st.button("🚀 SCAN", use_container_width=True)
@@ -2337,9 +2335,12 @@ with left3:
     refresh_seconds = st.selectbox("Nhịp", [60, 90, 120, 300, 600], index=2)
 
 with left4:
-    show_detail = st.checkbox("Hiện bảng chi tiết", value=False)
+    show_detail = st.checkbox("Chi tiết", value=False)
 
 with left5:
+    show_legacy = st.checkbox("Bảng phụ", value=False)
+
+with left6:
     st.markdown(
         f"""
         <div style="font-size:14px">
@@ -2368,7 +2369,7 @@ if auto_refresh:
 # =========================================================
 # RUN SCAN
 # =========================================================
-with st.spinner("Đang quét realtime unified V20..."):
+with st.spinner("Đang quét realtime unified..."):
     scan_df = run_scan(WATCHLIST)
 
 if scan_df.empty:
@@ -2376,7 +2377,7 @@ if scan_df.empty:
     st.stop()
 
 # =========================================================
-# MARKET OVERVIEW - GIỮ NGUYÊN BỘ NÃO
+# MARKET FIRST
 # =========================================================
 market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
@@ -2386,8 +2387,7 @@ market_status, market_action = market_status_text(market_real)
 live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in scan_df.columns else 0
 safe_mode_count = int((scan_df["live_source"].astype(str).str.contains("SAFE_MODE|NO_DATA|BAD", na=False)).sum()) if "live_source" in scan_df.columns else 0
 
-st.markdown("## 📊 MARKET - CÓ ĐƯỢC PHÉP KIẾM TIỀN KHÔNG?")
-
+st.markdown("## 🌍 MARKET FIRST")
 m1, m2, m3, m4, m5, m6 = st.columns(6)
 with m1:
     st.metric("REAL", f"{market_real}/13")
@@ -2402,9 +2402,6 @@ with m5:
 with m6:
     st.metric("WATCHLIST", len(WATCHLIST))
 
-if safe_mode_count > 0:
-    st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
-
 if market_real < 6:
     st.error(market_action)
 elif market_real < 8:
@@ -2413,22 +2410,30 @@ else:
     st.success(market_action)
 
 st.caption(market_forecast_text)
-st.caption("V20: Bảng Pullback Buy là bảng hành động chính; Storm/DNA/Evolution là bảng kiểm chứng sức mạnh.")
+if safe_mode_count > 0:
+    st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
+st.caption("V20: tất cả bảng vẫn dùng chung scan_df. Bảng Pullback Buy chỉ ghép lại Storm + DNA/Evolution + vùng test, không tạo thêm vòng scan nặng.")
 
 # =========================================================
-# SAVE EVOLUTION SỚM ĐỂ CÁC BẢNG DNA/STORM/PULL DÙNG CHUNG
+# PREPARE CORE TABLES
 # =========================================================
+storm_df = build_storm_leaders(scan_df)
 trading_today, trading_reason = is_vnindex_trading_today()
 evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
+pullback_df = build_pullback_buy_list(
+    scan_df=scan_df,
+    storm_df=storm_df,
+    evo_table=evo_table,
+    market_real=market_real,
+    top_n=30,
+)
 
 # =========================================================
-# STORM LEADERS - DÒNG TIỀN ĐANG VÀO ĐÂU
+# STORM LEADERS
 # =========================================================
 st.markdown("---")
-st.markdown("## ⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU?")
-storm_df = build_storm_leaders(scan_df)
-
+st.markdown("## ⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU")
 if not storm_df.empty:
     st.dataframe(storm_df, use_container_width=True, hide_index=True, height=380)
 else:
@@ -2441,13 +2446,12 @@ st.markdown("---")
 st.markdown("## 🎯 PULLBACK BUY LIST - BẢNG MUA CHÍNH")
 st.caption("Ưu tiên cổ phiếu có Storm/DNA/Evolution tốt, đang test khoảng 3-5% từ đỉnh gần nhất, vẫn giữ quanh EMA9 và OBV chưa gãy.")
 
-pullback_df = build_pullback_buy_list(
-    scan_df=scan_df,
-    storm_df=storm_df,
-    evo_table=evo_table,
-    market_real=market_real,
-    top_n=30,
-)
+if market_real < 6:
+    st.warning("Market REAL < 6: bảng Pullback chỉ để lập danh sách theo dõi, chưa dùng để đánh lớn.")
+elif market_real < 8:
+    st.warning("Market trung tính: ưu tiên test nhỏ, mua đỏ, đặt stop ngắn quanh EMA9.")
+else:
+    st.success("Market ủng hộ: ưu tiên mã PullScore cao, có Storm + DNA + Evolution đồng thuận.")
 
 if not pullback_df.empty:
     p1, p2, p3, p4 = st.columns(4)
@@ -2461,51 +2465,15 @@ if not pullback_df.empty:
         st.metric("Tổng danh sách", len(pullback_df))
 
     st.dataframe(pullback_df, use_container_width=True, hide_index=True, height=560)
+    st.caption("PullScore ưu tiên: pull 3-5% từ đỉnh gần nhất + test EMA9 + DNA bền + Storm có tiền + Evolution không xấu + OBV/RSI/Slope/Vol ổn.")
 else:
     st.info("Chưa có mã đạt chuẩn Pullback Buy. Đây là tín hiệu nên kiên nhẫn, không ép mua.")
 
 # =========================================================
-# DNA LEADERS - SỨC MẠNH BỀN
+# DNA / EVOLUTION - SUPPORTING TABLES
 # =========================================================
 st.markdown("---")
-st.markdown("## 🧬 DNA LEADERS - AI KHỎE BỀN NHẤT?")
-
-try:
-    if not evo_table.empty and "Persistence" in evo_table.columns:
-        dna_leaders = evo_table.copy()
-        extra_cols = ["symbol", "rsi14", "ema9_ma20_slope", "total_score", "group", "price", "obv_status", "dist_from_ema9_pct"]
-        scan_extra = scan_df[[c for c in extra_cols if c in scan_df.columns]].copy()
-        dna_leaders = dna_leaders.merge(scan_extra, on="symbol", how="left")
-
-        cols = ["symbol", "Persistence", "DNA", "group", "price", "rsi14", "ema9_ma20_slope", "total_score", "evolution", "recent_change", "obv_status", "dist_from_ema9_pct"]
-        cols = [c for c in cols if c in dna_leaders.columns]
-        dna_leaders = dna_leaders[cols]
-        dna_leaders = dna_leaders.rename(columns={
-            "symbol": "MÃ",
-            "Persistence": "DNA SCORE",
-            "DNA": "LOẠI",
-            "group": "NHÓM",
-            "price": "GIÁ",
-            "rsi14": "RSI",
-            "ema9_ma20_slope": "SLOPE",
-            "total_score": "SCORE",
-            "evolution": "TIẾN HÓA",
-            "recent_change": "GẦN NHẤT",
-            "obv_status": "OBV",
-            "dist_from_ema9_pct": "CÁCH EMA9%",
-        })
-        dna_leaders = dna_leaders.sort_values(["DNA SCORE", "TIẾN HÓA", "SCORE"], ascending=[False, False, False]).head(20)
-        st.dataframe(dna_leaders, use_container_width=True, hide_index=True, height=440)
-    else:
-        st.info("Chưa đủ dữ liệu DNA. Cần ít nhất vài phiên Evolution để DNA có ý nghĩa.")
-except Exception as e:
-    st.warning(f"DNA LEADERS ERROR: {e}")
-
-# =========================================================
-# EVOLUTION - AI ĐANG TIẾN HÓA?
-# =========================================================
-st.markdown("---")
-st.markdown("## 🚀 EVOLUTION - AI ĐANG MẠNH LÊN?")
+st.markdown("## 🧬 DNA / EVOLUTION - SỨC MẠNH BỀN VÀ TIẾN HÓA")
 
 saved_dates = []
 try:
@@ -2518,140 +2486,111 @@ st.caption(
     f"{', '.join(saved_dates[-7:]) if saved_dates else 'chưa có'}"
 )
 
-e1, e2 = st.columns(2)
-with e1:
-    st.subheader("Bảng tiến hóa")
-    if not evo_table.empty:
-        st.dataframe(evo_table, use_container_width=True, height=420)
-    else:
-        st.info("Chưa đủ dữ liệu tiến hóa.")
+d1, d2 = st.columns(2)
+with d1:
+    st.subheader("🏆 DNA Leaders")
+    try:
+        if not evo_table.empty and "Persistence" in evo_table.columns:
+            dna_leaders = evo_table[evo_table["Persistence"] >= 3.5].copy()
+            extra_cols = ["symbol", "rsi14", "ema9_ma20_slope", "total_score", "group", "dist_from_ema9_pct"]
+            scan_extra = scan_df[[c for c in extra_cols if c in scan_df.columns]].copy()
+            dna_leaders = dna_leaders.merge(scan_extra, on="symbol", how="left")
+            cols = ["symbol", "Persistence", "DNA", "group", "rsi14", "ema9_ma20_slope", "dist_from_ema9_pct", "total_score", "evolution", "recent_change"]
+            cols = [c for c in cols if c in dna_leaders.columns]
+            dna_leaders = dna_leaders[cols].rename(columns={
+                "symbol": "MÃ", "Persistence": "DNA", "DNA": "LOẠI", "group": "NHÓM",
+                "rsi14": "RSI", "ema9_ma20_slope": "SLOPE", "dist_from_ema9_pct": "DIST EMA9%",
+                "total_score": "SCORE", "evolution": "TIẾN HÓA", "recent_change": "GẦN NHẤT"
+            })
+            dna_leaders = dna_leaders.sort_values(["DNA", "TIẾN HÓA", "SCORE"], ascending=[False, False, False]).head(20)
+            st.dataframe(dna_leaders, use_container_width=True, hide_index=True, height=420)
+        else:
+            st.info("Chưa đủ dữ liệu DNA.")
+    except Exception as e:
+        st.warning(f"DNA LEADERS ERROR: {e}")
 
-with e2:
-    st.subheader("Tiến hóa chọn lọc")
+with d2:
+    st.subheader("🚀 Evolution chọn lọc")
     if not evo_buy_table.empty:
         st.dataframe(evo_buy_table, use_container_width=True, height=420)
     else:
         st.info("Chưa có cổ phiếu tiến hóa đạt điều kiện mua/theo dõi.")
 
 # =========================================================
-# GROUP SNAPSHOT - ẨN GỌN, KHÔNG CÒN LÀ BẢNG CHÍNH
-# =========================================================
-with st.expander("📦 Xem nhanh số lượng theo nhóm", expanded=False):
-    group_counts = (
-        scan_df.groupby("group")
-        .size()
-        .reindex(GROUP_ORDER)
-        .dropna()
-        .astype(int)
-        .reset_index(name="Số mã")
-        .rename(columns={"group": "Nhóm"})
-    )
-    st.dataframe(group_counts, use_container_width=True, hide_index=True)
-
-with st.expander("🐔 Bảng theo nhóm", expanded=False):
-    SHOW_COLS = [
-        "symbol", "group", "price", "daily_price_before_live", "live_source", "is_live_adjusted",
-        "total_score", "E", "R", "O", "S", "RS", "V", "ema9_ma20_slope", "rsi14",
-        "obv_status", "dist_from_ema9_pct", "green_2_confirm", "status", "warning",
-    ]
-    tabs = st.tabs(GROUP_ORDER)
-    for tab, g in zip(tabs, GROUP_ORDER):
-        with tab:
-            sub = scan_df[scan_df["group"] == g].copy()
-            if sub.empty:
-                st.info("Không có mã")
-                continue
-            cols_show = [c for c in SHOW_COLS if c in sub.columns]
-            out = sub[cols_show].copy()
-            out.index = range(len(out))
-            st.dataframe(out, use_container_width=True, height=min(600, 80 + len(out) * 35))
-
-# =========================================================
-# DETAIL TABLE - MẶC ĐỊNH ẨN
-# =========================================================
-if show_detail:
-    st.markdown("---")
-    st.markdown("## 📋 BẢNG CHI TIẾT")
-    detail_cols = [
-        "symbol", "group", "price", "daily_price_before_live", "live_source", "live_ts", "is_live_adjusted",
-        "ema9", "ma20", "ema9_ma20_slope", "ema9_ma20_slope_change", "slope_state",
-        "rsi14", "rsi_slope", "obv_status", "volume", "vol_ma20", "E", "R", "O", "S", "RS", "V",
-        "total_score", "rs5", "rs10", "breakout_ref", "dist_from_ema9_pct", "pull_label", "green_2_confirm", "status", "warning",
-    ]
-    detail_cols = [c for c in detail_cols if c in scan_df.columns]
-    detail_df = scan_df[detail_cols].copy()
-    detail_df.index = range(len(detail_df))
-    st.dataframe(detail_df, use_container_width=True, height=700)
-
-# =========================================================
-# THỐNG KÊ HIỆU SUẤT NHÓM - CHUYỂN VÀO EXPANDER
-# =========================================================
-with st.expander("📊 Thống kê hiệu suất nhóm", expanded=False):
-    group_stats = build_group_statistics()
-    summary_df = build_group_summary(group_stats)
-
-    market_regime = "🧊 MÙA ĐÔNG"
-    market_reason = []
-
-    if not summary_df.empty:
-        top_group = summary_df.iloc[0]["group"]
-        top_score = summary_df.iloc[0]["Score"]
-        gt_count = len(scan_df[scan_df["group"] == "GÀ TĂNG TỐC"])
-        strong_count = len(scan_df[scan_df["group"] == "CP MẠNH"])
-        total_strong = gt_count + strong_count
-
-        if market_real >= 6:
-            market_regime = "🌱 MÙA XUÂN"
-        elif market_real >= 4 and top_score >= 40 and total_strong >= 5:
-            market_regime = "🌿 TÍCH LŨY CẢI THIỆN"
-        elif market_real < 4 and total_strong > 0:
-            market_regime = "🟡 HỒI KỸ THUẬT"
-        else:
-            market_regime = "🧊 MÙA ĐÔNG"
-
-        market_reason = [
-            f"REAL = {market_real:.1f}/13",
-            f"FORECAST = {market_forecast:.1f}/10",
-            f"TOP GROUP = {top_group}",
-            f"GÀ TĂNG TỐC + CP MẠNH = {total_strong}",
-        ]
-
-    st.subheader("🧭 MARKET REGIME")
-    st.success(market_regime)
-    for r in market_reason:
-        st.caption(r)
-
-    if not summary_df.empty:
-        st.subheader("🏆 Xếp hạng nhóm tổng hợp")
-        st.dataframe(summary_df, use_container_width=True, hide_index=True)
-
-    if not group_stats.empty:
-        st.dataframe(group_stats, use_container_width=True, height=350)
-        st.caption("WinRate và AvgReturn được tính theo T+1/T+3/T+5 từ lịch sử Evolution.")
-    else:
-        st.info("Chưa đủ dữ liệu để thống kê.")
-
-# =========================================================
-# TINH HOA LEADERS - GIỮ LẠI NHƯ BẢNG THAM KHẢO, MẶC ĐỊNH ẨN
-# =========================================================
-with st.expander("👑 Tinh Hoa Leaders tham khảo", expanded=False):
-    try:
-        tinh_hoa_df = build_tinh_hoa_leaders(
-            scan_df=scan_df,
-            evo_table=evo_table,
-            storm_df=storm_df,
-            market_real=market_real,
-            market_forecast=market_forecast,
-        )
-        if not tinh_hoa_df.empty:
-            st.dataframe(tinh_hoa_df, use_container_width=True, hide_index=True, height=520)
-        else:
-            st.info("Chưa có mã đạt chuẩn Tinh Hoa.")
-    except Exception as e:
-        st.warning(f"TINH HOA LEADERS ERROR: {e}")
-
-# =========================================================
-# FOOTER
+# QUICK GROUP SNAPSHOT
 # =========================================================
 st.markdown("---")
-st.caption("V20 PULLBACK FIRST | Market/Storm/Pullback/DNA/Evolution dùng chung scan_df | Chi tiết và thống kê chuyển vào expander để app gọn hơn")
+st.markdown("## 📦 NHÓM CỔ PHIẾU - SNAPSHOT")
+cols = st.columns(len(GROUP_ORDER))
+for c, g in zip(cols, GROUP_ORDER):
+    with c:
+        st.metric(g, int((scan_df["group"] == g).sum()))
+
+# =========================================================
+# OPTIONAL / LEGACY TABLES
+# =========================================================
+if show_legacy:
+    with st.expander("⚡ Bảng hành động nhanh cũ", expanded=False):
+        old_buy_df = build_buy_table(scan_df, market_real)
+        show_buy = old_buy_df[old_buy_df["Hành động"] != "KHÔNG MUA"].copy() if not old_buy_df.empty else pd.DataFrame()
+        if not show_buy.empty:
+            st.dataframe(show_buy.head(30), use_container_width=True, hide_index=True, height=500)
+        else:
+            st.info("Chưa có mã đạt điều kiện mua theo bảng cũ.")
+
+    with st.expander("👑 Tinh Hoa Leaders cũ", expanded=False):
+        try:
+            tinh_hoa_df = build_tinh_hoa_leaders(
+                scan_df=scan_df,
+                evo_table=evo_table,
+                storm_df=storm_df,
+                market_real=market_real,
+                market_forecast=market_forecast,
+            )
+            if not tinh_hoa_df.empty:
+                st.dataframe(tinh_hoa_df, use_container_width=True, hide_index=True, height=520)
+            else:
+                st.info("Chưa có mã đạt chuẩn Tinh Hoa.")
+        except Exception as e:
+            st.warning(f"TINH HOA LEADERS ERROR: {e}")
+
+    with st.expander("📊 Thống kê hiệu suất nhóm", expanded=False):
+        group_stats = build_group_statistics()
+        summary_df = build_group_summary(group_stats)
+        if not summary_df.empty:
+            st.subheader("🏆 Xếp hạng nhóm tổng hợp")
+            st.dataframe(summary_df, use_container_width=True, hide_index=True, height=260)
+            st.subheader("Chi tiết T+1 / T+3 / T+5")
+            st.dataframe(group_stats, use_container_width=True, hide_index=True, height=420)
+        else:
+            st.info("Chưa đủ dữ liệu để thống kê.")
+
+    with st.expander("🐔 Bảng theo nhóm", expanded=False):
+        tabs = st.tabs(GROUP_ORDER)
+        for tab, group_name in zip(tabs, GROUP_ORDER):
+            with tab:
+                sub = scan_df[scan_df["group"] == group_name].copy()
+                if sub.empty:
+                    st.info("Không có mã")
+                else:
+                    show_cols = [
+                        "symbol", "status", "price", "total_score", "E", "R", "O", "S", "RS", "V",
+                        "rsi14", "ema9_ma20_slope", "obv_status", "dist_from_ema9_pct", "green_2_confirm", "warning"
+                    ]
+                    show_cols = [c for c in show_cols if c in sub.columns]
+                    st.dataframe(sub[show_cols], use_container_width=True, hide_index=True, height=min(600, 80 + len(sub) * 35))
+
+if show_detail:
+    with st.expander("📋 Bảng chi tiết đầy đủ", expanded=True):
+        detail_cols = [
+            "symbol", "date", "group", "status", "price", "daily_price_before_live", "live_source",
+            "is_live_adjusted", "ema9", "ma20", "ema9_ma20_slope", "ema9_ma20_slope_change",
+            "rsi14", "rsi_slope", "obv_status", "volume", "vol_ma20", "breakout_ref",
+            "dist_from_ema9_pct", "pull_label", "E", "R", "O", "S", "RS", "V", "rs5", "rs10",
+            "green_2_confirm", "total_score", "warning"
+        ]
+        detail_cols = [c for c in detail_cols if c in scan_df.columns]
+        st.dataframe(scan_df[detail_cols], use_container_width=True, hide_index=True, height=700)
+
+st.markdown("---")
+st.caption("V20 PULLBACK FIRST | Market → Storm → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
