@@ -45,11 +45,11 @@ WATCHLIST = sorted(list(set([
     "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "FMC", "VCS", "PTB", "VGT",
     "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", "AAA",
     "PAC", "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
-    "TV2", "DGC", "POW",
-    "C4G", "FCN", "CII", "KSB", "DHA", "CTI", "HBC", "HPG", "HSG",
-    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "TLH", "TVN",
-    "MWG", "FRT", "DGW", "PET", "HAX", "MSN", "DBC", "HAG", "BAF",
-    "MCH", "PAN", "VNM", "MML", "TLG",
+    "DGC", "POW",
+    "C4G", "FCN", "CII", "KSB", "HPG", "HSG",
+    "NKG", "VGS", "CTD", "HHV", "VCG", "PLC", "TVN",
+    "MWG", "FRT", "DGW", "PET", "MSN", "DBC", "HAG", "BAF",
+    "MCH", "PAN", "VNM", "MML",
     "VCB", "BID", "CTG", "TCB", "VPB", "MBB", "ACB", "SHB", "SSB",
     "STB", "HDB", "TPB", "VIB", "LPB", "OCB", "MSB", "NAB", "EIB",
     "VND", "SSI", "HCM", "VIX", "BSI", "FTS", "TVS", "SHS",
@@ -57,7 +57,7 @@ WATCHLIST = sorted(list(set([
     "VGC", "SZC", "IDC", "KBC", "LHG", "IJC", "DTD", "BCM",
     "GVR", "SIP", "DPR", "PHR", "DRI",
     "FPT", "VGI", "CTR", "VTP", "CMG", "ELC", "FOX",
-    "IMP", "BVH", "SBT", "LSS", "PNJ", "DHT", "TNH", "YEG",
+    "BVH", "SBT", "PNJ", "YEG",
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
     "EVF", "SAB", "VPL", "PDR", "DPG", "NHA", "HDC", "NTL", "HHS",
     "NLG", "KDH", "HUT",
@@ -1291,7 +1291,10 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
         return old_df, f"SKIP_NO_TRADING_SESSION | {reason}"
     today = today_str()
     now_time = vn_time_str("%H:%M:%S")
+    today = today_str()
+    now_time = vn_time_str("%H:%M:%S")
 
+   
     rows = []
     for _, r in scan_df.iterrows():
         rows.append({
