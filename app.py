@@ -1705,11 +1705,8 @@ if sort_cols:
 else:
     base = base.reset_index(drop=True)
 
-    buy_table = base[
-        (
-            (base["evolution"] >= 1)
-            | (base["recent_change"] >= 1)
-        )
+        buy_mask = (
+        ((base["evolution"] >= 1) | (base["recent_change"] >= 1))
         & base["TODAY"].isin([
             "MUA EARLY",
             "PULL VỪA",
@@ -1718,7 +1715,10 @@ else:
             "CP MẠNH",
             "GÀ TĂNG TỐC",
         ])
-    ].copy()
+    )
+
+    buy_table = base[buy_mask].copy()
+
     return base, buy_table
 # =========================================================
 # GROUP PERFORMANCE STATISTICS
