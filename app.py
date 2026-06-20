@@ -2677,7 +2677,7 @@ base = base[
 if base.empty:
         return pd.DataFrame()
 
-    action_rank = {
+action_rank = {
         "🟢 MUA EARLY CẠN CUNG": 0,
         "🟡 TEST EARLY": 1,
         "👀 CHỜ GREEN2": 2,
