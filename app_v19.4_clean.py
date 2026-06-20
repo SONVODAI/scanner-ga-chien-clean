@@ -28,13 +28,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V20 Pullback First",
+    page_title="Scanner Gà Chiến V20 Early Buy Lab",
     page_icon="🐔",
     layout="wide",
 )
 
 st.title("🐔 Scanner Gà Chiến V20 - Pullback First")
-st.caption("Market First → Storm → Pullback Buy → DNA/Evolution. Giữ pipeline scan_df, chỉ tái cấu trúc UI và thêm bảng mua Pull.")
+st.caption("Market First → Storm → Early Buy Lab → Pullback Buy → DNA/Evolution. Giữ pipeline scan_df và thêm bảng săn GREEN2 gần đáy.")
 
 # =========================================================
 # WATCHLIST
@@ -517,12 +517,45 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["obv"] = calc_obv(x["close"], x["volume"])
     x["obv_ema9"] = ema(x["obv"], 9)
 
+    # Volume nền và volume trước phiên hiện tại.
+    # Dry-up phải đo TRƯỚC khi GREEN2 xuất hiện, vì phiên GREEN2 thường volume đã tăng lại.
+    x["vol_ma5"] = sma(x["volume"], 5)
+    x["vol_ma10"] = sma(x["volume"], 10)
     x["vol_ma20"] = sma(x["volume"], 20)
+
+    x["pre_vol_ma5"] = sma(x["volume"].shift(1), 5)
+    x["pre_vol_ma10"] = sma(x["volume"].shift(1), 10)
+    x["pre_vol_ma20"] = sma(x["volume"].shift(1), 20)
+
+    x["dryup_ratio_5"] = np.where(
+        x["pre_vol_ma20"] > 0,
+        x["pre_vol_ma5"] / x["pre_vol_ma20"],
+        np.nan,
+    )
+    x["dryup_ratio_10"] = np.where(
+        x["pre_vol_ma20"] > 0,
+        x["pre_vol_ma10"] / x["pre_vol_ma20"],
+        np.nan,
+    )
+    x["dryup_ok"] = (x["dryup_ratio_5"] <= 0.75) | (x["dryup_ratio_10"] <= 0.85)
+
+    # Gần đáy: đo khoảng cách so với đáy 20 phiên và 60 phiên.
+    low20 = x["close"].rolling(20).min()
+    low60 = x["close"].rolling(60).min()
+    x["near_bottom_20_pct"] = np.where(low20 > 0, (x["close"] / low20 - 1) * 100, np.nan)
+    x["near_bottom_60_pct"] = np.where(low60 > 0, (x["close"] / low60 - 1) * 100, np.nan)
+
+    # Khoảng cách tới đỉnh gần nhất để tránh mua mã đã chạy lưng chừng.
+    high20_prev = x["high"].shift(1).rolling(20).max()
+    x["dist_high20_pct"] = np.where(high20_prev > 0, (x["close"] / high20_prev - 1) * 100, np.nan)
 
     x["rs5"] = ((x["close"] / x["close"].shift(5)) - 1) * 100
     x["rs10"] = ((x["close"] / x["close"].shift(10)) - 1) * 100
 
     x["green_candle"] = x["close"] > x["open"]
+    x["body_pct"] = np.where(x["open"] > 0, (x["close"] / x["open"] - 1) * 100, np.nan)
+
+    # GREEN2 bản cũ vẫn giữ để các bảng Storm/Pullback không bị lệch logic.
     x["green_2_confirm"] = np.where(
         (
             x["green_candle"].shift(1)
@@ -534,6 +567,35 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
             & (x["obv"] > x["obv"].shift(1))
         ),
         "🟢 GREEN 2",
+        "",
+    )
+
+    # GREEN2 EARLY: nhẹ hơn bản cũ, dùng riêng cho vùng đáy.
+    # Mục tiêu là bắt 2 nến xanh nhỏ đầu tiên khi RSI còn 45-58.
+    x["early_green2"] = np.where(
+        (
+            x["green_candle"].shift(1)
+            & x["green_candle"]
+            & (x["close"] > x["close"].shift(1))
+            & (x["rsi14"] >= 45)
+            & (x["rsi14"] <= 58)
+            & (x["rsi14"] > x["rsi14"].shift(1))
+            & (x["obv"] > x["obv"].shift(1))
+            & (x["body_pct"].fillna(0).abs() <= 5.5)
+        ),
+        "✅ EARLY GREEN2",
+        "",
+    )
+
+    x["early_dry_green2"] = np.where(
+        (
+            x["dryup_ok"]
+            & x["early_green2"].astype(str).str.contains("EARLY GREEN2", na=False)
+            & (x["near_bottom_20_pct"] <= 12)
+            & (x["near_bottom_60_pct"] <= 22)
+            & (x["ema9_ma20_slope"] <= 2.5)
+        ),
+        "🌱 EARLY DRY GREEN2",
         "",
     )
 
@@ -859,6 +921,14 @@ def analyze_symbol(symbol: str) -> dict | None:
             "rs5": safe_round(rs5_, 2),
             "rs10": safe_round(rs10_, 2),
             "green_2_confirm": str(last.get("green_2_confirm", "")),
+            "early_green2": str(last.get("early_green2", "")),
+            "early_dry_green2": str(last.get("early_dry_green2", "")),
+            "dryup_ratio_5": safe_round(last.get("dryup_ratio_5", np.nan), 2),
+            "dryup_ratio_10": safe_round(last.get("dryup_ratio_10", np.nan), 2),
+            "near_bottom_20_pct": safe_round(last.get("near_bottom_20_pct", np.nan), 2),
+            "near_bottom_60_pct": safe_round(last.get("near_bottom_60_pct", np.nan), 2),
+            "dist_high20_pct": safe_round(last.get("dist_high20_pct", np.nan), 2),
+            "body_pct": safe_round(last.get("body_pct", np.nan), 2),
             "total_score": total_score,
         }
     
@@ -2285,6 +2355,269 @@ def build_pullback_buy_list(
     cols = [c for c in cols if c in out.columns]
     return out[cols].head(30)
 
+
+# =========================================================
+# 🌱 EARLY BUY LAB - CẠN CUNG + GREEN2 GẦN ĐÁY
+# =========================================================
+def build_early_buy_lab(
+    scan_df: pd.DataFrame,
+    evo_table: pd.DataFrame,
+    storm_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    EARLY BUY LAB tìm cổ phiếu vừa bật khỏi vùng đáy bằng 2 nến xanh nhỏ.
+
+    Khác Pullback Buy List:
+    - Pullback mua mã đã mạnh và đang nghỉ.
+    - Early Buy Lab săn mã vừa có dấu hiệu dòng tiền quay lại sau giai đoạn cạn cung.
+
+    Điều kiện lõi:
+    - RSI còn thấp 45-58.
+    - Có EARLY GREEN2.
+    - Volume trước đó cạn so với MA20.
+    - Giá còn gần đáy 20/60 phiên.
+    - Slope chưa quá nóng.
+    """
+    if scan_df is None or scan_df.empty:
+        return pd.DataFrame()
+
+    needed = [
+        "symbol", "group", "price", "ema9", "ma20", "rsi14", "rsi_slope",
+        "ema9_ma20_slope", "obv_status", "volume", "vol_ma20", "total_score",
+        "green_2_confirm", "early_green2", "early_dry_green2", "dryup_ratio_5",
+        "dryup_ratio_10", "near_bottom_20_pct", "near_bottom_60_pct",
+        "dist_high20_pct", "dist_from_ema9_pct", "body_pct", "warning",
+        "is_live_adjusted",
+    ]
+    base = scan_df[[c for c in needed if c in scan_df.columns]].copy()
+    if base.empty or "symbol" not in base.columns:
+        return pd.DataFrame()
+
+    for c in [
+        "price", "ema9", "ma20", "rsi14", "rsi_slope", "ema9_ma20_slope",
+        "volume", "vol_ma20", "total_score", "dryup_ratio_5", "dryup_ratio_10",
+        "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct",
+        "dist_from_ema9_pct", "body_pct",
+    ]:
+        if c not in base.columns:
+            base[c] = np.nan
+        base[c] = pd.to_numeric(base[c], errors="coerce")
+
+    if "early_green2" not in base.columns:
+        base["early_green2"] = ""
+    if "early_dry_green2" not in base.columns:
+        base["early_dry_green2"] = ""
+
+    base["EarlyGreen2"] = np.where(
+        base["early_green2"].astype(str).str.contains("EARLY GREEN2", na=False),
+        "✅",
+        "",
+    )
+    base["DryUp"] = np.where(
+        (base["dryup_ratio_5"] <= 0.75) | (base["dryup_ratio_10"] <= 0.85),
+        "✅",
+        "",
+    )
+    base["NearBottom"] = np.where(
+        (base["near_bottom_20_pct"] <= 12) & (base["near_bottom_60_pct"] <= 22),
+        "✅",
+        "",
+    )
+
+    # Ghép DNA/Evolution.
+    if evo_table is not None and not evo_table.empty and "symbol" in evo_table.columns:
+        evo_cols = ["symbol", "Persistence", "DNA", "evolution", "recent_change"]
+        evo_cols = [c for c in evo_cols if c in evo_table.columns]
+        base = base.merge(evo_table[evo_cols].copy(), on="symbol", how="left")
+    else:
+        base["Persistence"] = 0
+        base["DNA"] = "⚪ MỚI"
+        base["evolution"] = 0
+        base["recent_change"] = 0
+
+    for c in ["Persistence", "evolution", "recent_change"]:
+        if c not in base.columns:
+            base[c] = 0
+        base[c] = pd.to_numeric(base[c], errors="coerce").fillna(0)
+
+    # Ghép Storm.
+    storm_small = pd.DataFrame()
+    if storm_df is not None and not storm_df.empty:
+        if "MÃ" in storm_df.columns:
+            storm_small = storm_df.copy().rename(columns={"MÃ": "symbol", "STORM": "storm_raw"})
+        elif "symbol" in storm_df.columns:
+            storm_small = storm_df.copy().rename(columns={"STORM": "storm_raw"})
+
+    if not storm_small.empty and "symbol" in storm_small.columns:
+        keep = [c for c in ["symbol", "storm_raw"] if c in storm_small.columns]
+        base = base.merge(storm_small[keep], on="symbol", how="left")
+    else:
+        base["storm_raw"] = 0
+
+    base["storm_raw"] = pd.to_numeric(base["storm_raw"], errors="coerce").fillna(0)
+    base["Storm"] = np.where(base["storm_raw"] > 0, "✅", "")
+
+    # Bộ lọc lõi: chỉ giữ đúng dạng anh đang muốn săn.
+    base = base[
+        (base["EarlyGreen2"] == "✅")
+        & (base["DryUp"] == "✅")
+        & (base["NearBottom"] == "✅")
+        & (base["rsi14"].between(45, 58, inclusive="both"))
+        & (base["ema9_ma20_slope"] <= 2.5)
+        & (base["body_pct"].abs() <= 5.5)
+    ].copy()
+
+    if base.empty:
+        return pd.DataFrame()
+
+    base["RSI_SCORE"] = np.select(
+        [
+            base["rsi14"].between(47, 54, inclusive="both"),
+            base["rsi14"].between(45, 58, inclusive="both"),
+        ],
+        [22, 15],
+        default=0,
+    )
+    base["DRY_SCORE"] = np.select(
+        [
+            base["dryup_ratio_5"] <= 0.60,
+            base["dryup_ratio_5"] <= 0.75,
+            base["dryup_ratio_10"] <= 0.85,
+        ],
+        [22, 17, 12],
+        default=0,
+    )
+    base["BOTTOM_SCORE"] = np.select(
+        [
+            (base["near_bottom_20_pct"] <= 6) & (base["near_bottom_60_pct"] <= 14),
+            (base["near_bottom_20_pct"] <= 10) & (base["near_bottom_60_pct"] <= 20),
+            (base["near_bottom_20_pct"] <= 12) & (base["near_bottom_60_pct"] <= 22),
+        ],
+        [20, 16, 12],
+        default=0,
+    )
+    base["OBV_SCORE"] = np.where(base.get("obv_status", "") == "🟢", 12, 5)
+    base["SLOPE_SCORE"] = np.select(
+        [
+            base["ema9_ma20_slope"].between(-1.5, 1.2, inclusive="both"),
+            base["ema9_ma20_slope"].between(-2.5, 2.5, inclusive="both"),
+        ],
+        [12, 8],
+        default=0,
+    )
+    base["DNA_SCORE"] = (base["Persistence"].clip(lower=0, upper=7) / 7 * 10).round(2)
+    base["STORM_SCORE"] = np.where(base["storm_raw"] > 0, np.minimum(base["storm_raw"] * 1.5, 8), 0)
+    base["EVO_SCORE"] = np.select(
+        [
+            base["evolution"] >= 2,
+            base["evolution"] >= 1,
+            base["recent_change"] >= 1,
+        ],
+        [6, 5, 4],
+        default=0,
+    )
+
+    base["EarlyScore"] = (
+        base["RSI_SCORE"]
+        + base["DRY_SCORE"]
+        + base["BOTTOM_SCORE"]
+        + base["OBV_SCORE"]
+        + base["SLOPE_SCORE"]
+        + base["DNA_SCORE"]
+        + base["STORM_SCORE"]
+        + base["EVO_SCORE"]
+    ).clip(upper=100).round(1)
+
+    def early_action(r):
+        warning = str(r.get("warning", ""))
+        if market_real < 6:
+            return "🟡 THEO DÕI - MARKET < 6"
+        if market_forecast < 3:
+            return "🟡 TEST RẤT NHỎ - FORECAST YẾU"
+        if "OBV gãy" in warning:
+            return "⚪ CHỜ OBV XÁC NHẬN"
+        score = to_float(r.get("EarlyScore", 0), 0)
+        if score >= 78:
+            return "🟢 TEST EARLY ĐẸP"
+        if score >= 65:
+            return "🟡 CANH ĐỎ / TEST NHỎ"
+        return "⚪ THEO DÕI THÊM"
+
+    def early_nav(r):
+        if market_real < 6:
+            return "0%"
+        score = to_float(r.get("EarlyScore", 0), 0)
+        if score >= 78:
+            return "5-10% NAV"
+        if score >= 65:
+            return "3-5% NAV"
+        return "0%"
+
+    def early_buy_zone(r):
+        price_ = to_float(r.get("price", np.nan))
+        ema9_ = to_float(r.get("ema9", np.nan))
+        if pd.notna(ema9_) and ema9_ > 0:
+            return f"{round(min(price_, ema9_ * 1.005), 0)} - {round(ema9_ * 1.02, 0)}"
+        if pd.notna(price_) and price_ > 0:
+            return f"{round(price_ * 0.99, 0)} - {round(price_ * 1.01, 0)}"
+        return "-"
+
+    def early_stop_zone(r):
+        price_ = to_float(r.get("price", np.nan))
+        ema9_ = to_float(r.get("ema9", np.nan))
+        if pd.notna(ema9_) and ema9_ > 0:
+            return f"{round(ema9_ * 0.965, 0)} - {round(ema9_ * 0.98, 0)}"
+        if pd.notna(price_) and price_ > 0:
+            return f"{round(price_ * 0.965, 0)}"
+        return "-"
+
+    base["Hành động"] = base.apply(early_action, axis=1)
+    base["NAV"] = base.apply(early_nav, axis=1)
+    base["Vùng mua"] = base.apply(early_buy_zone, axis=1)
+    base["Stop tham chiếu"] = base.apply(early_stop_zone, axis=1)
+
+    base = base.sort_values(
+        ["EarlyScore", "BOTTOM_SCORE", "DRY_SCORE", "RSI_SCORE", "OBV_SCORE"],
+        ascending=[False, False, False, False, False],
+    ).reset_index(drop=True)
+
+    base.insert(0, "Rank", range(1, len(base) + 1))
+    out = base.rename(columns={
+        "symbol": "MÃ",
+        "group": "NHÓM",
+        "price": "GIÁ",
+        "rsi14": "RSI",
+        "rsi_slope": "RSI SLOPE",
+        "ema9_ma20_slope": "SLOPE",
+        "dryup_ratio_5": "DRY5",
+        "dryup_ratio_10": "DRY10",
+        "near_bottom_20_pct": "GẦN ĐÁY 20D%",
+        "near_bottom_60_pct": "GẦN ĐÁY 60D%",
+        "dist_high20_pct": "CÁCH ĐỈNH 20D%",
+        "dist_from_ema9_pct": "DIST EMA9%",
+        "body_pct": "BODY%",
+        "obv_status": "OBV",
+        "Persistence": "DNA_GỐC",
+        "DNA": "DNA_LOẠI",
+        "evolution": "TIẾN HÓA",
+        "recent_change": "GẦN NHẤT",
+        "storm_raw": "STORM",
+        "total_score": "SCORE",
+        "warning": "CẢNH BÁO",
+    })
+
+    cols = [
+        "Rank", "MÃ", "EarlyScore", "Hành động", "NAV", "NHÓM", "GIÁ",
+        "Vùng mua", "Stop tham chiếu", "RSI", "RSI SLOPE", "SLOPE",
+        "DRY5", "DRY10", "GẦN ĐÁY 20D%", "GẦN ĐÁY 60D%",
+        "CÁCH ĐỈNH 20D%", "DIST EMA9%", "BODY%", "OBV", "Storm",
+        "DNA_GỐC", "DNA_LOẠI", "TIẾN HÓA", "GẦN NHẤT", "SCORE", "CẢNH BÁO",
+    ]
+    cols = [c for c in cols if c in out.columns]
+    return out[cols].head(30)
+
 # =========================================================
 # UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
@@ -2393,6 +2726,13 @@ pullback_df = build_pullback_buy_list(
     market_real=market_real,
     market_forecast=market_forecast,
 )
+early_buy_lab_df = build_early_buy_lab(
+    scan_df=scan_df,
+    evo_table=evo_table,
+    storm_df=storm_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
 
 # =========================================================
 # STORM LEADERS
@@ -2403,6 +2743,27 @@ if not storm_df.empty:
     st.dataframe(storm_df, use_container_width=True, hide_index=True, height=380)
 else:
     st.info("Chưa có mã đạt tiêu chí Storm Leaders.")
+
+# =========================================================
+# EARLY BUY LAB - MAIN EARLY TABLE
+# =========================================================
+st.markdown("---")
+st.markdown("## 🌱 EARLY BUY LAB - CẠN CUNG + 2 NẾN XANH GẦN ĐÁY")
+
+if market_real < 6:
+    st.warning("Market REAL < 6: Early Buy Lab chỉ dùng để lập watchlist, chưa đánh lớn.")
+elif market_real < 8:
+    st.warning("Market trung tính: chỉ test nhỏ các mã EarlyScore cao, ưu tiên mua đỏ và stop ngắn.")
+else:
+    st.success("Market ủng hộ: có thể test sớm mã EarlyScore cao, nhưng vẫn giữ tỷ trọng nhỏ hơn Pullback.")
+
+if not early_buy_lab_df.empty:
+    st.dataframe(early_buy_lab_df, use_container_width=True, hide_index=True, height=460)
+    st.caption(
+        "EarlyScore ưu tiên: RSI 45-58 + cạn cung trước phiên hiện tại + EARLY GREEN2 + gần đáy 20/60 phiên + OBV/Slope không xấu."
+    )
+else:
+    st.info("Chưa có mã đạt chuẩn Early Buy Lab. Đây là bảng săn sớm nên không cần ngày nào cũng có mã.")
 
 # =========================================================
 # PULLBACK BUY LIST - MAIN ACTION TABLE
@@ -2543,10 +2904,11 @@ if show_detail:
             "is_live_adjusted", "ema9", "ma20", "ema9_ma20_slope", "ema9_ma20_slope_change",
             "rsi14", "rsi_slope", "obv_status", "volume", "vol_ma20", "breakout_ref",
             "dist_from_ema9_pct", "pull_label", "E", "R", "O", "S", "RS", "V", "rs5", "rs10",
-            "green_2_confirm", "total_score", "warning"
+            "green_2_confirm", "early_green2", "early_dry_green2", "dryup_ratio_5", "dryup_ratio_10",
+            "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct", "body_pct", "total_score", "warning"
         ]
         detail_cols = [c for c in detail_cols if c in scan_df.columns]
         st.dataframe(scan_df[detail_cols], use_container_width=True, hide_index=True, height=700)
 
 st.markdown("---")
-st.caption("V20 PULLBACK FIRST | Market → Storm → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
+st.caption("V20 EARLY BUY LAB | Market → Storm → Early Buy Lab → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
