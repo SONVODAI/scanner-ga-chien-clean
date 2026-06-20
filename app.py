@@ -1720,7 +1720,7 @@ else:
         ])
     ].copy()
 
-    return base, buy_table
+return base, buy_table
 # =========================================================
 # GROUP PERFORMANCE STATISTICS
 # =========================================================
