@@ -1677,10 +1677,33 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     sort_cols = [c for c in sort_cols if c in base.columns]
 
     if sort_cols:
-        base = base.sort_values(
-            by=sort_cols,
-            ascending=[False] * len(sort_cols)
-        ).reset_index(drop=True)
+        sort_cols = [
+    "action_rank",
+    "SUPPLY SCORE",
+    "GREEN2 SCORE",
+    "DRY5 SCORE",
+    "STORM BONUS",
+    "DNA BONUS",
+]
+sort_cols = [c for c in sort_cols if c in base.columns]
+
+ascending_map = {
+    "action_rank": True,
+    "SUPPLY SCORE": False,
+    "GREEN2 SCORE": False,
+    "DRY5 SCORE": False,
+    "STORM BONUS": False,
+    "DNA BONUS": False,
+}
+ascending_list = [ascending_map[c] for c in sort_cols]
+
+if sort_cols:
+    base = base.sort_values(
+        sort_cols,
+        ascending=ascending_list,
+    ).reset_index(drop=True)
+else:
+    base = base.reset_index(drop=True)
 
     buy_table = base[
         (
