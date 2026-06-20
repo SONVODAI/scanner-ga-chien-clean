@@ -1719,7 +1719,6 @@ else:
             "GÀ TĂNG TỐC",
         ])
     ].copy()
-
     return base, buy_table
 # =========================================================
 # GROUP PERFORMANCE STATISTICS
