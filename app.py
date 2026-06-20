@@ -2647,36 +2647,24 @@ def build_early_supply_buy_list(
 
     base["Vùng mua"] = base.apply(buy_zone, axis=1)
     base["Stop tham chiếu"] = base.apply(stop_zone, axis=1)
-    # =====================================================
+
+# =====================================================
 # LỌC CỨNG - EARLY GẦN ĐÁY THẬT SỰ
 # =====================================================
 base = base[
-    (
-        # Bắt buộc có cả CẠN CUNG và GREEN2
-        (base["GREEN2"] == "✅")
-        & (base["CẠN CUNG"] == "✅")
+    (base["GREEN2"] == "✅")
+    & (base["CẠN CUNG"] == "✅")
+    & (base["rsi14"] >= 45)
+    & (base["rsi14"] <= 55)
+    & (base["near_low10_pct"] <= 5)
+    & (base["ema9_ma20_slope"] >= -0.5)
+    & (base["ema9_ma20_slope"] <= 1.5)
+    & (base["obv_status"] == "🟢")
+    & (base["dist_from_ema9_pct"] >= 0)
+].copy()
 
-        # RSI vùng đẹp nhất: vừa thức dậy, chưa chạy xa
-        & (base["rsi14"] >= 45)
-        & (base["rsi14"] <= 55)
-
-        # Vẫn nằm sát đáy 10 phiên
-        & (base["near_low10_pct"] <= 5)
-
-        # Slope mới ngóc đầu, chưa nóng
-        & (base["ema9_ma20_slope"] >= -0.5)
-        & (base["ema9_ma20_slope"] <= 1.5)
-
-        # OBV xác nhận tiền vào
-        & (base["obv_status"] == "🟢")
-
-        # Giá đã lấy lại EMA9
-        & (base["dist_from_ema9_pct"] >= 0)
-    )
-    ].copy()
-    if base.empty:
-        return pd.DataFrame()
-
+if base.empty:
+    return pd.DataFrame()
     action_rank = {
         "🟢 MUA EARLY CẠN CUNG": 0,
         "🟡 TEST EARLY": 1,
