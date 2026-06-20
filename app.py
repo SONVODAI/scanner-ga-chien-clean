@@ -2673,11 +2673,11 @@ base = base[
         # Giá đã lấy lại EMA9
         & (base["dist_from_ema9_pct"] >= 0)
     )
-    ].copy()
-if base.empty:
+        ].copy()
+    if base.empty:
         return pd.DataFrame()
 
-action_rank = {
+    action_rank = {
         "🟢 MUA EARLY CẠN CUNG": 0,
         "🟡 TEST EARLY": 1,
         "👀 CHỜ GREEN2": 2,
