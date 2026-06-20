@@ -1702,7 +1702,7 @@ if sort_cols:
         sort_cols,
         ascending=ascending_list,
     ).reset_index(drop=True)
-else:
+    else:
     base = base.reset_index(drop=True)
 
     buy_mask = (
