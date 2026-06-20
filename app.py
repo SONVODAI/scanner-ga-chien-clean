@@ -2614,11 +2614,11 @@ def build_early_supply_buy_list(
             if score >= 65 and green2 == "✅" and dry == "✅":
                 return "🟡 THEO DÕI - MARKET YẾU"
             return "⚪ CHỜ"
-
-        if score >= 70 and green2 == "✅" and dry == "✅" and obv == "🟢":
+        if score >= 65 and green2 == "✅" and dry == "✅" and obv == "🟢":
+        
             return "🟢 MUA EARLY CẠN CUNG"
-
-        if score >= 60 and green2 == "✅" and dry == "✅":
+        if score >= 55 and green2 == "✅" and dry == "✅":
+        
             return "🟡 TEST EARLY"
         if score >= 65 and dry == "✅" and green2 != "✅":
             return "👀 CHỜ GREEN2"
@@ -2647,21 +2647,33 @@ def build_early_supply_buy_list(
 
     base["Vùng mua"] = base.apply(buy_zone, axis=1)
     base["Stop tham chiếu"] = base.apply(stop_zone, axis=1)
-    # Lọc cứng: chỉ lấy mẫu EARLY GẦN ĐÁY thật sự
-    # RSI còn thấp, giá chưa xa đáy 10 phiên, slope chưa nóng.
-    base = base[
+    # =====================================================
+# LỌC CỨNG - EARLY GẦN ĐÁY THẬT SỰ
+# =====================================================
+base = base[
     (
-        (base["rsi14"] >= 40)
+        # Bắt buộc có cả CẠN CUNG và GREEN2
+        (base["GREEN2"] == "✅")
+        & (base["CẠN CUNG"] == "✅")
+
+        # RSI vùng đẹp nhất: vừa thức dậy, chưa chạy xa
+        & (base["rsi14"] >= 45)
         & (base["rsi14"] <= 55)
-        & (base["near_low10_pct"] <= 6)
+
+        # Vẫn nằm sát đáy 10 phiên
+        & (base["near_low10_pct"] <= 5)
+
+        # Slope mới ngóc đầu, chưa nóng
+        & (base["ema9_ma20_slope"] >= -0.5)
         & (base["ema9_ma20_slope"] <= 1.5)
-        & (
-            (base["GREEN2"] == "✅")
-            | (base["CẠN CUNG"] == "✅")
-        )
+
+        # OBV xác nhận tiền vào
+        & (base["obv_status"] == "🟢")
+
+        # Giá đã lấy lại EMA9
+        & (base["dist_from_ema9_pct"] >= 0)
     )
 ].copy()
-
     if base.empty:
         return pd.DataFrame()
 
