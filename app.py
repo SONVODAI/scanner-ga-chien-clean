@@ -1705,7 +1705,7 @@ if sort_cols:
 else:
     base = base.reset_index(drop=True)
 
-        buy_mask = (
+    buy_mask = (
         ((base["evolution"] >= 1) | (base["recent_change"] >= 1))
         & base["TODAY"].isin([
             "MUA EARLY",
