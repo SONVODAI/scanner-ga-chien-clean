@@ -2531,27 +2531,28 @@ def build_early_supply_buy_list(
 
     base["OBV SCORE"] = np.where(base.get("obv_status", "") == "🟢", 12, 0)
 
-    # RSI đẹp cho Early là 50-65, chưa quá nóng.
+    # RSI đẹp cho Early cạn cung là 45-55:
+    # cổ phiếu vừa thức dậy gần đáy, chưa chạy xa.
     base["RSI SCORE"] = np.select(
-        [
-            (base["rsi14"] >= 52) & (base["rsi14"] <= 65),
-            (base["rsi14"] >= 48) & (base["rsi14"] < 52),
-            (base["rsi14"] > 65) & (base["rsi14"] <= 72),
-        ],
-        [10, 6, 5],
-        default=0,
-    )
+    [
+        (base["rsi14"] >= 45) & (base["rsi14"] <= 55),
+        (base["rsi14"] >= 40) & (base["rsi14"] < 45),
+        (base["rsi14"] > 55) & (base["rsi14"] <= 60),
+    ],
+    [15, 10, 5],
+    default=0,
+)
 
-    # Slope dương nhẹ là đẹp nhất cho vùng mới chuyển hóa.
+    # Slope đẹp cho Early là vừa ngóc đầu:
+    # EMA9 chưa xa MA20, cổ phiếu còn gần đáy.
     base["SLOPE SCORE"] = np.select(
-        [
-            (base["ema9_ma20_slope"] >= 0.2) & (base["ema9_ma20_slope"] <= 2.5),
-            (base["ema9_ma20_slope"] > 2.5) & (base["ema9_ma20_slope"] <= 4.5),
-            (base["ema9_ma20_slope"] > -0.5) & (base["ema9_ma20_slope"] < 0.2),
-        ],
-        [8, 5, 3],
-        default=0,
-    )
+    [
+        (base["ema9_ma20_slope"] >= -0.5) & (base["ema9_ma20_slope"] <= 1.5),
+        (base["ema9_ma20_slope"] > 1.5) & (base["ema9_ma20_slope"] <= 3.0),
+    ],
+    [12, 6],
+    default=0,
+)
 
     base["STORM BONUS"] = np.select(
         [
@@ -2614,12 +2615,11 @@ def build_early_supply_buy_list(
                 return "🟡 THEO DÕI - MARKET YẾU"
             return "⚪ CHỜ"
 
-        if score >= 75 and green2 == "✅" and dry == "✅" and obv == "🟢":
+        if score >= 70 and green2 == "✅" and dry == "✅" and obv == "🟢":
             return "🟢 MUA EARLY CẠN CUNG"
 
-        if score >= 65 and green2 == "✅" and dry == "✅":
+        if score >= 60 and green2 == "✅" and dry == "✅":
             return "🟡 TEST EARLY"
-
         if score >= 65 and dry == "✅" and green2 != "✅":
             return "👀 CHỜ GREEN2"
 
