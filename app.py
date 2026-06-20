@@ -1704,21 +1704,21 @@ if sort_cols:
 else:
     base = base.reset_index(drop=True)
 
-buy_mask = (
-    ((base["evolution"] >= 1) | (base["recent_change"] >= 1))
-    & base["TODAY"].isin([
-        "MUA EARLY",
-        "PULL VỪA",
-        "PULL ĐẸP",
-        "MUA BREAK",
-        "CP MẠNH",
-        "GÀ TĂNG TỐC",
-    ])
-)
-
-buy_table = base[buy_mask].copy()
-
-return base, buy_table
+    buy_mask = (
+        ((base["evolution"] >= 1) | (base["recent_change"] >= 1))
+        & base["TODAY"].isin([
+            "MUA EARLY",
+            "PULL VỪA",
+            "PULL ĐẸP",
+            "MUA BREAK",
+            "CP MẠNH",
+            "GÀ TĂNG TỐC",
+        ])
+    )
+    
+    buy_table = base[buy_mask].copy()
+    
+    return base, buy_table
     # =========================================================
 # GROUP PERFORMANCE STATISTICS
 # =========================================================
