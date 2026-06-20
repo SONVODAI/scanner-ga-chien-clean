@@ -559,6 +559,7 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     # GREEN2 nới lỏng: trong 5 phiên gần nhất có ít nhất 2 nến xanh.
     # Phù hợp quan sát của anh: 2 nến xanh dưới đáy có thể liền nhau hoặc không.
+    x["green_candle"] = x["close"] > x["open"]
     x["green_count_5"] = x["green_candle"].rolling(5).sum()
     x["green_count_10"] = x["green_candle"].rolling(10).sum()
 
@@ -575,7 +576,7 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
     x["rs5"] = ((x["close"] / x["close"].shift(5)) - 1) * 100
     x["rs10"] = ((x["close"] / x["close"].shift(10)) - 1) * 100
 
-    x["green_candle"] = x["close"] > x["open"]
+    
     x["green_2_confirm"] = np.where(
         (
             x["green_candle"].shift(1)
