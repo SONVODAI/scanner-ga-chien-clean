@@ -519,6 +519,59 @@ def build_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     x["vol_ma20"] = sma(x["volume"], 20)
 
+    # =====================================================
+    # SUPPLY DRY-UP / CẠN CUNG LAB
+    # =====================================================
+    # Đo cạn cung TRƯỚC phiên hiện tại.
+    # Lý do: khi GREEN2 xuất hiện thì volume có thể đã nổ,
+    # nếu đo luôn phiên hiện tại sẽ làm mất dấu vết cạn cung.
+    x["vol_ma5"] = sma(x["volume"], 5)
+    x["vol_ma10"] = sma(x["volume"], 10)
+
+    x["pre_vol_ma5"] = sma(x["volume"].shift(1), 5)
+    x["pre_vol_ma10"] = sma(x["volume"].shift(1), 10)
+    x["pre_vol_ma20"] = sma(x["volume"].shift(1), 20)
+
+    x["dryup_ratio_5"] = np.where(
+        x["pre_vol_ma20"] > 0,
+        x["pre_vol_ma5"] / x["pre_vol_ma20"],
+        np.nan,
+    )
+    x["dryup_ratio_10"] = np.where(
+        x["pre_vol_ma20"] > 0,
+        x["pre_vol_ma10"] / x["pre_vol_ma20"],
+        np.nan,
+    )
+
+    # Đo biên nền 10 phiên: nền càng chặt, cung càng dễ cạn.
+    x["low10"] = x["low"].rolling(10).min()
+    x["high10"] = x["high"].rolling(10).max()
+    x["base_range_10_pct"] = np.where(
+        x["low10"] > 0,
+        (x["high10"] / x["low10"] - 1) * 100,
+        np.nan,
+    )
+    x["near_low10_pct"] = np.where(
+        x["low10"] > 0,
+        (x["close"] / x["low10"] - 1) * 100,
+        np.nan,
+    )
+
+    # GREEN2 nới lỏng: trong 5 phiên gần nhất có ít nhất 2 nến xanh.
+    # Phù hợp quan sát của anh: 2 nến xanh dưới đáy có thể liền nhau hoặc không.
+    x["green_count_5"] = x["green_candle"].rolling(5).sum()
+    x["green_count_10"] = x["green_candle"].rolling(10).sum()
+
+    x["green2_supply"] = np.where(
+        (
+            (x["green_count_5"] >= 2)
+            & (x["near_low10_pct"] <= 12)
+            & (x["dryup_ratio_5"] <= 0.95)
+        ),
+        "🟢 GREEN2 CẠN CUNG",
+        "",
+    )
+
     x["rs5"] = ((x["close"] / x["close"].shift(5)) - 1) * 100
     x["rs10"] = ((x["close"] / x["close"].shift(10)) - 1) * 100
 
@@ -847,6 +900,13 @@ def analyze_symbol(symbol: str) -> dict | None:
             "obv_status": obv_status,
             "volume": safe_round(vol_, 0),
             "vol_ma20": safe_round(vol_ma20_, 0),
+            "dryup_ratio_5": safe_round(last.get("dryup_ratio_5", np.nan), 2),
+            "dryup_ratio_10": safe_round(last.get("dryup_ratio_10", np.nan), 2),
+            "base_range_10_pct": safe_round(last.get("base_range_10_pct", np.nan), 2),
+            "near_low10_pct": safe_round(last.get("near_low10_pct", np.nan), 2),
+            "green_count_5": safe_round(last.get("green_count_5", np.nan), 0),
+            "green_count_10": safe_round(last.get("green_count_10", np.nan), 0),
+            "green2_supply": str(last.get("green2_supply", "")),
             "breakout_ref": safe_round(breakout_ref, 2),
             "dist_from_ema9_pct": safe_round(dist_from_ema9, 2),
             "pull_label": pull_label,
@@ -2320,6 +2380,335 @@ def build_pullback_buy_list(
     return out[final_cols].head(top_n)
 
 
+
+
+# =========================================================
+# 🌱 EARLY CẠN CUNG + GREEN2 BUY LIST
+# =========================================================
+def score_dryup_ratio(ratio):
+    """Volume Dry-Up: càng thấp càng tốt, đo trước phiên hiện tại."""
+    ratio = to_float(ratio)
+    if pd.isna(ratio):
+        return 0
+    if ratio <= 0.45:
+        return 30
+    if ratio <= 0.60:
+        return 25
+    if ratio <= 0.75:
+        return 18
+    if ratio <= 0.90:
+        return 10
+    return 0
+
+
+def score_base_tightness(base_range, near_low):
+    """Nền chặt + giá chưa xa đáy 10 phiên."""
+    base_range = to_float(base_range)
+    near_low = to_float(near_low)
+
+    score = 0
+
+    if pd.notna(base_range):
+        if base_range <= 7:
+            score += 18
+        elif base_range <= 10:
+            score += 14
+        elif base_range <= 15:
+            score += 8
+
+    if pd.notna(near_low):
+        # Ở rất gần đáy mà không thủng: RR đẹp nhất.
+        if 1 <= near_low <= 8:
+            score += 14
+        elif 0 <= near_low < 1 or 8 < near_low <= 12:
+            score += 9
+        elif 12 < near_low <= 18:
+            score += 4
+
+    return score
+
+
+def score_green2_supply(green_2_confirm, green2_supply, green_count_5):
+    """Ưu tiên GREEN2 thật, sau đó tới GREEN2 nới lỏng trong vùng cạn cung."""
+    g1 = str(green_2_confirm)
+    g2 = str(green2_supply)
+    gc5 = to_float(green_count_5)
+
+    if "GREEN 2" in g1:
+        return 25
+    if "GREEN2 CẠN CUNG" in g2:
+        return 20
+    if pd.notna(gc5) and gc5 >= 2:
+        return 12
+    return 0
+
+
+def build_early_supply_buy_list(
+    scan_df: pd.DataFrame,
+    storm_df: pd.DataFrame,
+    evo_table: pd.DataFrame,
+    market_real: float,
+    top_n: int = 25,
+) -> pd.DataFrame:
+    """
+    Bảng EARLY CẠN CUNG + GREEN2.
+
+    Triết lý:
+    - Không mua breakout đuổi giá.
+    - Tìm cổ phiếu đang ở TÍCH LŨY / MUA EARLY / PULL VỪA / PULL ĐẸP.
+    - Ưu tiên nền 5-10 phiên cạn cung, có 2 nến xanh dưới đáy, OBV không gãy.
+    - Leader/Storm chỉ dùng để xác nhận dòng tiền đang quay lại.
+    """
+    if scan_df.empty:
+        return pd.DataFrame()
+
+    base_cols = [
+        "symbol", "group", "price", "ema9", "total_score",
+        "rsi14", "ema9_ma20_slope", "obv_status", "dist_from_ema9_pct",
+        "volume", "vol_ma20", "dryup_ratio_5", "dryup_ratio_10",
+        "base_range_10_pct", "near_low10_pct", "green_count_5", "green_count_10",
+        "green_2_confirm", "green2_supply", "warning", "is_live_adjusted",
+        "E", "R", "O", "S", "RS", "V",
+    ]
+    base_cols = [c for c in base_cols if c in scan_df.columns]
+    base = scan_df[base_cols].copy()
+
+    valid_groups = ["TÍCH LŨY", "MUA EARLY", "PULL VỪA", "PULL ĐẸP"]
+    base = base[base["group"].isin(valid_groups)].copy()
+    if base.empty:
+        return pd.DataFrame()
+
+    num_cols = [
+        "price", "ema9", "total_score", "rsi14", "ema9_ma20_slope",
+        "dist_from_ema9_pct", "volume", "vol_ma20", "dryup_ratio_5",
+        "dryup_ratio_10", "base_range_10_pct", "near_low10_pct",
+        "green_count_5", "green_count_10",
+    ]
+    for c in num_cols:
+        if c not in base.columns:
+            base[c] = np.nan
+        base[c] = pd.to_numeric(base[c], errors="coerce")
+
+    # Ghép Storm để biết dòng tiền có quay lại không.
+    if storm_df is not None and not storm_df.empty and "MÃ" in storm_df.columns:
+        storm_small = storm_df[[c for c in ["MÃ", "STORM", "VOL/MA20"] if c in storm_df.columns]].copy()
+        storm_small = storm_small.rename(columns={"MÃ": "symbol", "STORM": "storm_score", "VOL/MA20": "storm_vol_ratio"})
+        base = base.merge(storm_small, on="symbol", how="left")
+    else:
+        base["storm_score"] = 0
+        base["storm_vol_ratio"] = np.nan
+
+    base["storm_score"] = pd.to_numeric(base.get("storm_score", 0), errors="coerce").fillna(0)
+
+    # Ghép DNA / Evolution để tránh chọn mã quá rác.
+    if evo_table is not None and not evo_table.empty and "symbol" in evo_table.columns:
+        evo_cols = [c for c in ["symbol", "Persistence", "DNA", "evolution", "recent_change"] if c in evo_table.columns]
+        base = base.merge(evo_table[evo_cols].copy(), on="symbol", how="left")
+    else:
+        base["Persistence"] = 0
+        base["DNA"] = "⚪ MỚI"
+        base["evolution"] = 0
+        base["recent_change"] = 0
+
+    for c in ["Persistence", "evolution", "recent_change"]:
+        base[c] = pd.to_numeric(base.get(c, 0), errors="coerce").fillna(0)
+
+    base["DRY5 SCORE"] = base["dryup_ratio_5"].apply(score_dryup_ratio)
+    base["DRY10 SCORE"] = base["dryup_ratio_10"].apply(score_dryup_ratio)
+    base["BASE SCORE"] = base.apply(
+        lambda r: score_base_tightness(r.get("base_range_10_pct", np.nan), r.get("near_low10_pct", np.nan)),
+        axis=1,
+    )
+    base["GREEN2 SCORE"] = base.apply(
+        lambda r: score_green2_supply(
+            r.get("green_2_confirm", ""),
+            r.get("green2_supply", ""),
+            r.get("green_count_5", np.nan),
+        ),
+        axis=1,
+    )
+
+    base["OBV SCORE"] = np.where(base.get("obv_status", "") == "🟢", 12, 0)
+
+    # RSI đẹp cho Early là 50-65, chưa quá nóng.
+    base["RSI SCORE"] = np.select(
+        [
+            (base["rsi14"] >= 52) & (base["rsi14"] <= 65),
+            (base["rsi14"] >= 48) & (base["rsi14"] < 52),
+            (base["rsi14"] > 65) & (base["rsi14"] <= 72),
+        ],
+        [10, 6, 5],
+        default=0,
+    )
+
+    # Slope dương nhẹ là đẹp nhất cho vùng mới chuyển hóa.
+    base["SLOPE SCORE"] = np.select(
+        [
+            (base["ema9_ma20_slope"] >= 0.2) & (base["ema9_ma20_slope"] <= 2.5),
+            (base["ema9_ma20_slope"] > 2.5) & (base["ema9_ma20_slope"] <= 4.5),
+            (base["ema9_ma20_slope"] > -0.5) & (base["ema9_ma20_slope"] < 0.2),
+        ],
+        [8, 5, 3],
+        default=0,
+    )
+
+    base["STORM BONUS"] = np.select(
+        [
+            base["storm_score"] >= 8,
+            base["storm_score"] >= 4,
+            base["storm_score"] > 0,
+        ],
+        [10, 7, 4],
+        default=0,
+    )
+
+    base["DNA BONUS"] = np.select(
+        [
+            base["Persistence"] >= 5,
+            base["Persistence"] >= 3.5,
+            base["evolution"] >= 1,
+        ],
+        [8, 5, 3],
+        default=0,
+    )
+
+    base["SUPPLY SCORE"] = (
+        base["DRY5 SCORE"] * 0.45
+        + base["DRY10 SCORE"] * 0.20
+        + base["BASE SCORE"]
+        + base["GREEN2 SCORE"]
+        + base["OBV SCORE"]
+        + base["RSI SCORE"]
+        + base["SLOPE SCORE"]
+        + base["STORM BONUS"]
+        + base["DNA BONUS"]
+    ).round(1)
+
+    # Cờ hiển thị.
+    base["GREEN2"] = np.where(
+        base.get("green_2_confirm", "").astype(str).str.contains("GREEN 2", na=False)
+        | base.get("green2_supply", "").astype(str).str.contains("GREEN2", na=False),
+        "✅",
+        "",
+    )
+    base["CẠN CUNG"] = np.where(
+        (base["dryup_ratio_5"] <= 0.75) | (base["dryup_ratio_10"] <= 0.80),
+        "✅",
+        "",
+    )
+    base["LIVE"] = np.where(base.get("is_live_adjusted", False) == True, "✅", "")
+
+    def early_action(r):
+        warning = str(r.get("warning", ""))
+        score = to_float(r.get("SUPPLY SCORE", 0))
+        green2 = str(r.get("GREEN2", ""))
+        dry = str(r.get("CẠN CUNG", ""))
+        obv = str(r.get("obv_status", ""))
+
+        if "Giá dưới EMA9" in warning and r.get("dist_from_ema9_pct", 0) < -3:
+            return "🔴 LOẠI TẠM"
+
+        if market_real < 6:
+            if score >= 65 and green2 == "✅" and dry == "✅":
+                return "🟡 THEO DÕI - MARKET YẾU"
+            return "⚪ CHỜ"
+
+        if score >= 75 and green2 == "✅" and dry == "✅" and obv == "🟢":
+            return "🟢 MUA EARLY CẠN CUNG"
+
+        if score >= 65 and green2 == "✅" and dry == "✅":
+            return "🟡 TEST EARLY"
+
+        if score >= 65 and dry == "✅" and green2 != "✅":
+            return "👀 CHỜ GREEN2"
+
+        return "⚪ CHỜ"
+
+    base["Hành động"] = base.apply(early_action, axis=1)
+
+    def buy_zone(r):
+        price = to_float(r.get("price", np.nan))
+        ema9_ = to_float(r.get("ema9", np.nan))
+        if pd.notna(ema9_) and ema9_ > 0:
+            return f"{round(ema9_ * 0.99, 0)} - {round(ema9_ * 1.01, 0)}"
+        if pd.notna(price):
+            return f"{round(price * 0.99, 0)} - {round(price * 1.01, 0)}"
+        return "-"
+
+    def stop_zone(r):
+        ema9_ = to_float(r.get("ema9", np.nan))
+        price = to_float(r.get("price", np.nan))
+        if pd.notna(ema9_) and ema9_ > 0:
+            return round(ema9_ * 0.97, 0)
+        if pd.notna(price):
+            return round(price * 0.96, 0)
+        return np.nan
+
+    base["Vùng mua"] = base.apply(buy_zone, axis=1)
+    base["Stop tham chiếu"] = base.apply(stop_zone, axis=1)
+
+    # Lọc bảng: chỉ giữ mã có cạn cung rõ hoặc có GREEN2.
+    base = base[
+        (base["SUPPLY SCORE"] >= 55)
+        | (base["GREEN2"] == "✅")
+        | (base["CẠN CUNG"] == "✅")
+    ].copy()
+
+    if base.empty:
+        return pd.DataFrame()
+
+    action_rank = {
+        "🟢 MUA EARLY CẠN CUNG": 0,
+        "🟡 TEST EARLY": 1,
+        "👀 CHỜ GREEN2": 2,
+        "🟡 THEO DÕI - MARKET YẾU": 3,
+        "⚪ CHỜ": 6,
+        "🔴 LOẠI TẠM": 9,
+    }
+    base["action_rank"] = base["Hành động"].map(action_rank).fillna(8)
+
+    base = base.sort_values(
+        ["action_rank", "SUPPLY SCORE", "GREEN2 SCORE", "DRY5 SCORE", "STORM BONUS", "DNA BONUS"],
+        ascending=[True, False, False, False, False, False],
+    ).reset_index(drop=True)
+
+    base.insert(0, "Rank", range(1, len(base) + 1))
+
+    out = base.rename(columns={
+        "symbol": "MÃ",
+        "group": "NHÓM",
+        "price": "GIÁ",
+        "dryup_ratio_5": "DRY5",
+        "dryup_ratio_10": "DRY10",
+        "base_range_10_pct": "NỀN 10P%",
+        "near_low10_pct": "CÁCH ĐÁY10%",
+        "green_count_5": "GREEN 5P",
+        "green_count_10": "GREEN 10P",
+        "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE",
+        "obv_status": "OBV",
+        "storm_score": "STORM",
+        "Persistence": "DNA SCORE",
+        "DNA": "DNA LOẠI",
+        "evolution": "TIẾN HÓA",
+        "recent_change": "GẦN NHẤT",
+        "warning": "CẢNH BÁO",
+    })
+
+    cols = [
+        "Rank", "MÃ", "Hành động", "SUPPLY SCORE", "NHÓM", "GIÁ", "Vùng mua", "Stop tham chiếu",
+        "CẠN CUNG", "GREEN2", "DRY5", "DRY10", "NỀN 10P%", "CÁCH ĐÁY10%",
+        "GREEN 5P", "GREEN 10P", "STORM", "DNA SCORE", "DNA LOẠI", "TIẾN HÓA", "GẦN NHẤT",
+        "RSI", "SLOPE", "OBV", "LIVE", "CẢNH BÁO",
+    ]
+    final_cols = []
+    for c in cols:
+        if c in out.columns and c not in final_cols:
+            final_cols.append(c)
+
+    return out[final_cols].head(top_n)
+
+
 # =========================================================
 # UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
@@ -2429,6 +2818,14 @@ pullback_df = build_pullback_buy_list(
     top_n=30,
 )
 
+early_supply_df = build_early_supply_buy_list(
+    scan_df=scan_df,
+    storm_df=storm_df,
+    evo_table=evo_table,
+    market_real=market_real,
+    top_n=30,
+)
+
 # =========================================================
 # STORM LEADERS
 # =========================================================
@@ -2438,6 +2835,38 @@ if not storm_df.empty:
     st.dataframe(storm_df, use_container_width=True, hide_index=True, height=380)
 else:
     st.info("Chưa có mã đạt tiêu chí Storm Leaders.")
+
+
+# =========================================================
+# EARLY CẠN CUNG + GREEN2 - BẢNG MUA SỚM
+# =========================================================
+st.markdown("---")
+st.markdown("## 🌱 EARLY CẠN CUNG + GREEN2 - BẢNG MUA SỚM")
+st.caption("Tìm cổ phiếu Tích lũy / Early / Pull vừa / Pull đẹp có nền 5-10 phiên cạn cung, xuất hiện 2 nến xanh dưới đáy, OBV không gãy.")
+
+if market_real < 6:
+    st.warning("Market REAL < 6: bảng này chỉ để theo dõi sớm, chưa dùng để đánh lớn.")
+elif market_real < 8:
+    st.warning("Market trung tính: chỉ test nhỏ những mã có SUPPLY SCORE cao + GREEN2 + OBV xanh.")
+else:
+    st.success("Market ủng hộ: ưu tiên Early cạn cung có GREEN2, cùng ngành với Storm Leader.")
+
+if not early_supply_df.empty:
+    e1, e2, e3, e4 = st.columns(4)
+    with e1:
+        st.metric("Mua early", int((early_supply_df["Hành động"] == "🟢 MUA EARLY CẠN CUNG").sum()))
+    with e2:
+        st.metric("Test early", int((early_supply_df["Hành động"] == "🟡 TEST EARLY").sum()))
+    with e3:
+        st.metric("Chờ Green2", int((early_supply_df["Hành động"] == "👀 CHỜ GREEN2").sum()))
+    with e4:
+        st.metric("Tổng danh sách", len(early_supply_df))
+
+    st.dataframe(early_supply_df, use_container_width=True, hide_index=True, height=560)
+    st.caption("SUPPLY SCORE ưu tiên: DRY5/DRY10 thấp + nền 10 phiên chặt + gần đáy 10 phiên + GREEN2 + OBV xanh + Storm/DNA xác nhận.")
+else:
+    st.info("Chưa có mã đạt chuẩn Early cạn cung + Green2. Đây là tín hiệu nên kiên nhẫn, chưa ép mua.")
+
 
 # =========================================================
 # PULLBACK BUY LIST - BẢNG MUA CHÍNH
