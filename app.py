@@ -2674,7 +2674,7 @@ base = base[
         & (base["dist_from_ema9_pct"] >= 0)
     )
     ].copy()
-    if base.empty:
+if base.empty:
         return pd.DataFrame()
 
     action_rank = {
