@@ -2673,7 +2673,7 @@ base = base[
         # Giá đã lấy lại EMA9
         & (base["dist_from_ema9_pct"] >= 0)
     )
-].copy()
+    ].copy()
     if base.empty:
         return pd.DataFrame()
 
