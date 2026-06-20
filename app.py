@@ -2665,15 +2665,14 @@ def build_early_supply_buy_list(
     
     if base.empty:
         return pd.DataFrame()
-        action_rank = {
-        "🟢 MUA EARLY CẠN CUNG": 0,
-        "🟡 TEST EARLY": 1,
-        "👀 CHỜ GREEN2": 2,
-        "🟡 THEO DÕI - MARKET YẾU": 3,
-        "⚪ CHỜ": 6,
-        "🔴 LOẠI TẠM": 9,
-    }
-    base["action_rank"] = base["Hành động"].map(action_rank).fillna(8)
+        base["action_rank"] = base["Hành động"].map({
+    "🟢 MUA EARLY CẠN CUNG": 0,
+    "🟡 TEST EARLY": 1,
+    "👀 CHỜ GREEN2": 2,
+    "🟡 THEO DÕI - MARKET YẾU": 3,
+    "⚪ CHỜ": 6,
+    "🔴 LOẠI TẠM": 9,
+}).fillna(8)
 
     base = base.sort_values(
         ["action_rank", "SUPPLY SCORE", "GREEN2 SCORE", "DRY5 SCORE", "STORM BONUS", "DNA BONUS"],
