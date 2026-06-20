@@ -2647,13 +2647,20 @@ def build_early_supply_buy_list(
 
     base["Vùng mua"] = base.apply(buy_zone, axis=1)
     base["Stop tham chiếu"] = base.apply(stop_zone, axis=1)
-
-    # Lọc bảng: chỉ giữ mã có cạn cung rõ hoặc có GREEN2.
+    # Lọc cứng: chỉ lấy mẫu EARLY GẦN ĐÁY thật sự
+    # RSI còn thấp, giá chưa xa đáy 10 phiên, slope chưa nóng.
     base = base[
-        (base["SUPPLY SCORE"] >= 55)
-        | (base["GREEN2"] == "✅")
-        | (base["CẠN CUNG"] == "✅")
-    ].copy()
+    (
+        (base["rsi14"] >= 40)
+        & (base["rsi14"] <= 55)
+        & (base["near_low10_pct"] <= 6)
+        & (base["ema9_ma20_slope"] <= 1.5)
+        & (
+            (base["GREEN2"] == "✅")
+            | (base["CẠN CUNG"] == "✅")
+        )
+    )
+].copy()
 
     if base.empty:
         return pd.DataFrame()
