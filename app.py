@@ -2648,24 +2648,24 @@ def build_early_supply_buy_list(
     base["Vùng mua"] = base.apply(buy_zone, axis=1)
     base["Stop tham chiếu"] = base.apply(stop_zone, axis=1)
 
-# =====================================================
-# LỌC CỨNG - EARLY GẦN ĐÁY THẬT SỰ
-# =====================================================
-base = base[
-    (base["GREEN2"] == "✅")
-    & (base["CẠN CUNG"] == "✅")
-    & (base["rsi14"] >= 45)
-    & (base["rsi14"] <= 55)
-    & (base["near_low10_pct"] <= 5)
-    & (base["ema9_ma20_slope"] >= -0.5)
-    & (base["ema9_ma20_slope"] <= 1.5)
-    & (base["obv_status"] == "🟢")
-    & (base["dist_from_ema9_pct"] >= 0)
-].copy()
-
-if base.empty:
-    return pd.DataFrame()
-    action_rank = {
+    # =====================================================
+    # LỌC CỨNG - EARLY GẦN ĐÁY THẬT SỰ
+    # =====================================================
+    base = base[
+        (base["GREEN2"] == "✅")
+        & (base["CẠN CUNG"] == "✅")
+        & (base["rsi14"] >= 45)
+        & (base["rsi14"] <= 55)
+        & (base["near_low10_pct"] <= 5)
+        & (base["ema9_ma20_slope"] >= -0.5)
+        & (base["ema9_ma20_slope"] <= 1.5)
+        & (base["obv_status"] == "🟢")
+        & (base["dist_from_ema9_pct"] >= 0)
+    ].copy()
+    
+    if base.empty:
+        return pd.DataFrame()
+        action_rank = {
         "🟢 MUA EARLY CẠN CUNG": 0,
         "🟡 TEST EARLY": 1,
         "👀 CHỜ GREEN2": 2,
