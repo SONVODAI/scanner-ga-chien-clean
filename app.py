@@ -1674,10 +1674,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     "recent_change",
     "today_score",
 ]
-    sort_cols = [c for c in sort_cols if c in base.columns]
-
-    if sort_cols:
-        sort_cols = [
+    sort_cols = [
     "action_rank",
     "SUPPLY SCORE",
     "GREEN2 SCORE",
@@ -1685,6 +1682,7 @@ def build_evolution_tables(scan_df: pd.DataFrame):
     "STORM BONUS",
     "DNA BONUS",
 ]
+
 sort_cols = [c for c in sort_cols if c in base.columns]
 
 ascending_map = {
@@ -1695,6 +1693,7 @@ ascending_map = {
     "STORM BONUS": False,
     "DNA BONUS": False,
 }
+
 ascending_list = [ascending_map[c] for c in sort_cols]
 
 if sort_cols:
@@ -1702,25 +1701,25 @@ if sort_cols:
         sort_cols,
         ascending=ascending_list,
     ).reset_index(drop=True)
-    else:
+else:
     base = base.reset_index(drop=True)
 
-    buy_mask = (
-        ((base["evolution"] >= 1) | (base["recent_change"] >= 1))
-        & base["TODAY"].isin([
-            "MUA EARLY",
-            "PULL VỪA",
-            "PULL ĐẸP",
-            "MUA BREAK",
-            "CP MẠNH",
-            "GÀ TĂNG TỐC",
-        ])
-    )
+buy_mask = (
+    ((base["evolution"] >= 1) | (base["recent_change"] >= 1))
+    & base["TODAY"].isin([
+        "MUA EARLY",
+        "PULL VỪA",
+        "PULL ĐẸP",
+        "MUA BREAK",
+        "CP MẠNH",
+        "GÀ TĂNG TỐC",
+    ])
+)
 
-    buy_table = base[buy_mask].copy()
+buy_table = base[buy_mask].copy()
 
-    return base, buy_table
-# =========================================================
+return base, buy_table
+    # =========================================================
 # GROUP PERFORMANCE STATISTICS
 # =========================================================
 def build_group_statistics():
