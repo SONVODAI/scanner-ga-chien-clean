@@ -2315,7 +2315,7 @@ def build_pullback_buy_list(
     base["group"].isin(["PULL ĐẸP", "PULL VỪA"])
     & (base["PullScore"] >= 45)
     ].copy()
-        if base.empty:
+    if base.empty:
         return pd.DataFrame()
 
     base = base.sort_values(
