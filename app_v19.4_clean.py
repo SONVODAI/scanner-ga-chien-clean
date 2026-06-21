@@ -1495,13 +1495,10 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     )
 
     valid_groups = [
-        "MUA EARLY",
-        "PULL VỪA",
-        "PULL ĐẸP",
-        "MUA BREAK",
-        "CP MẠNH",
-        "GÀ TĂNG TỐC",
+    "PULL ĐẸP",
+    "PULL VỪA",
     ]
+    
 
     out = current[
         (current["storm_score"] > 0)
@@ -2315,9 +2312,8 @@ def build_pullback_buy_list(
 
     # Loại bớt mã pull quá xấu để bảng thực chiến gọn.
     base = base[
-        (base["PullScore"] >= 45)
-        | (base["group"].isin(["PULL ĐẸP", "PULL VỪA"]))
-        | (base["Green2"] == "✅")
+    base["group"].isin(["PULL ĐẸP", "PULL VỪA"])
+    & (base["PullScore"] >= 45)
     ].copy()
     if base.empty:
         return pd.DataFrame()
