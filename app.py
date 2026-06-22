@@ -1608,22 +1608,48 @@ def calculate_evolution_quality(hist_groups, today_rank):
         else:
             smoothness -= diff
 
-    # THƯỞNG EARLY
-
-    if 2 in ranks:
-        evo_quality += 10
+    
 
     # THƯỞNG EARLY -> PULL
 
     for i in range(len(ranks) - 1):
-        if ranks[i] == 2 and ranks[i + 1] in [3, 4]:
-            evo_quality += 8
 
+        if ranks[i] == 2 and ranks[i + 1] in [3, 4]:
+            evo_quality += 15
+    
+        elif ranks[i] in [3, 4] and ranks[i + 1] == 6:
+            evo_quality += 20
+    
+        elif ranks[i] == 6 and ranks[i + 1] == 5:
+            evo_quality += 10
+        growth_steps = 0
+
+    for i in range(len(ranks) - 1):
+
+        if ranks[i + 1] > ranks[i]:
+            growth_steps += 1
+
+    evo_quality += growth_steps * 3
+    flat_steps = 0
+
+for i in range(len(ranks) - 1):
+
+    if ranks[i + 1] == ranks[i]:
+        flat_steps += 1
+
+evo_quality -= flat_steps * 2
     # PHẠT TĂNG TỐC
 
     if today_rank == 7:
         evo_quality -= 5
+    if today_rank == 6:      # CP MẠNH
+    evo_quality += 10
 
+elif today_rank == 4:    # PULL ĐẸP
+    evo_quality += 8
+
+elif today_rank == 3:    # PULL VỪA
+    evo_quality += 5
     return evo_quality, smoothness
 
 def build_evolution_tables(scan_df: pd.DataFrame):
