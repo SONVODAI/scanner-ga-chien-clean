@@ -1643,6 +1643,10 @@ def calculate_evolution_quality(hist_groups, today_rank):
         evo_quality -= 5
 
     return evo_quality, smoothness
+# =========================================================
+# EVOLUTION TABLES
+# =========================================================
+def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
