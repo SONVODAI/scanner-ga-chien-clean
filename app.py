@@ -1650,7 +1650,7 @@ elif today_rank == 4:    # PULL ĐẸP
 
 elif today_rank == 3:    # PULL VỪA
     evo_quality += 5
-    return evo_quality, smoothness
+return evo_quality, smoothness
 
 def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
