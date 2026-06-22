@@ -1549,6 +1549,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     cols = [c for c in cols if c in out.columns]
    
     return out[cols].head(20)
+
 # =========================================================
 # EVOLUTION QUALITY ENGINE
 # =========================================================
@@ -1571,35 +1572,33 @@ def calculate_evolution_quality(hist_groups, today_rank):
         old = ranks[i]
         new = ranks[i + 1]
 
-        # Cầu thang bộ
-
+        # EARLY -> PULL
         if old == 2 and new in [3, 4]:
-            evo_quality += 15
+            evo_quality += 18
 
+        # PULL -> MẠNH
         elif old in [3, 4] and new == 6:
-            evo_quality += 20
+            evo_quality += 25
 
+        # MẠNH -> BREAK
         elif old == 6 and new == 5:
             evo_quality += 10
 
-        # Gãy cấu trúc
-
-        if old >= 5 and new <= 1:
-            evo_quality -= 10
-
-        elif old >= 4 and new == 0:
+        # PHẠT NHẢY CÓC
+        if new - old >= 3:
             evo_quality -= 8
 
-        # Độ mượt
+        # PHẠT GÃY CẤU TRÚC
+        if old - new >= 2:
+            evo_quality -= 10
 
+        # ĐỘ MƯỢT
         diff = abs(new - old)
 
         if diff <= 1:
             smoothness += 2
-
         elif diff == 2:
             smoothness += 1
-
         else:
             smoothness -= diff
 
@@ -1610,7 +1609,6 @@ def calculate_evolution_quality(hist_groups, today_rank):
     growth_steps = 0
 
     for i in range(len(ranks) - 1):
-
         if ranks[i + 1] > ranks[i]:
             growth_steps += 1
 
@@ -1623,7 +1621,6 @@ def calculate_evolution_quality(hist_groups, today_rank):
     flat_steps = 0
 
     for i in range(len(ranks) - 1):
-
         if ranks[i + 1] == ranks[i]:
             flat_steps += 1
 
@@ -1633,20 +1630,19 @@ def calculate_evolution_quality(hist_groups, today_rank):
     # THƯỞNG ĐÍCH ĐẾN
     # =====================================================
 
-    if today_rank == 7:
-        evo_quality -= 5
-
-    elif today_rank == 6:      # CP MẠNH
+    if today_rank == 6:      # CP MẠNH
         evo_quality += 10
 
-    elif today_rank == 4:      # PULL ĐẸP
+    elif today_rank == 4:    # PULL ĐẸP
         evo_quality += 8
 
-    elif today_rank == 3:      # PULL VỪA
+    elif today_rank == 3:    # PULL VỪA
         evo_quality += 5
 
+    elif today_rank == 7:    # TĂNG TỐC
+        evo_quality -= 5
+
     return evo_quality, smoothness
-def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
 
     current = scan_df[["symbol", "group", "total_score", "price"]].copy()
