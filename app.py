@@ -1549,7 +1549,82 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     cols = [c for c in cols if c in out.columns]
    
     return out[cols].head(20)
+# =========================================================
+# EVOLUTION QUALITY ENGINE
+# =========================================================
+def calculate_evolution_quality(hist_groups, today_rank):
 
+    ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+
+    evo_quality = 0
+    smoothness = 0
+
+    if len(ranks) < 2:
+        return 0, 0
+
+    for i in range(len(ranks) - 1):
+
+        old = ranks[i]
+        new = ranks[i + 1]
+
+        # THƯỞNG CẦU THANG BỘ
+
+        if old == 1 and new == 2:
+            evo_quality += 3
+
+        elif old == 2 and new == 3:
+            evo_quality += 8
+
+        elif old == 3 and new == 4:
+            evo_quality += 6
+
+        elif old == 4 and new == 6:
+            evo_quality += 10
+
+        elif old == 6 and new == 5:
+            evo_quality += 2
+
+        elif old == 5 and new == 7:
+            evo_quality += 1
+
+        # PHẠT GÃY CẤU TRÚC
+
+        if old >= 5 and new <= 1:
+            evo_quality -= 10
+
+        elif old >= 4 and new == 0:
+            evo_quality -= 8
+
+        # ĐỘ MƯỢT
+
+        diff = abs(new - old)
+
+        if diff <= 1:
+            smoothness += 2
+
+        elif diff == 2:
+            smoothness += 1
+
+        else:
+            smoothness -= diff
+
+    # THƯỞNG EARLY
+
+    if 2 in ranks:
+        evo_quality += 10
+
+    # THƯỞNG EARLY -> PULL
+
+    for i in range(len(ranks) - 1):
+        if ranks[i] == 2 and ranks[i + 1] in [3, 4]:
+            evo_quality += 8
+
+    # PHẠT TĂNG TỐC
+
+    if today_rank == 7:
+        evo_quality -= 5
+
+    return evo_quality, smoothness
 
 def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
