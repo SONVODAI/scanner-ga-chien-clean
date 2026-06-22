@@ -1597,117 +1597,117 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base = current.copy()
     else:
         base = hist.merge(current, on="symbol", how="outer")
-     evo_scores = []
-recent_changes = []
-
-persistences = []
-dna_flags = []
-
-evo_quality_scores = []
-smooth_scores = []
-evo_final_scores = []
-
-arrows = []
-status_icons = []
-
-for _, r in base.iterrows():
-
-    hist_groups = []
-
-    for d in dates:
-        g = r.get(d, np.nan)
-
-        if pd.notna(g):
-            hist_groups.append(g)
-
-    today_group = r.get("TODAY", np.nan)
-    today_rank = GROUP_RANK.get(today_group, 0)
-
-    if hist_groups:
-
-        first_rank = GROUP_RANK.get(hist_groups[0], 0)
-        last_rank = GROUP_RANK.get(hist_groups[-1], 0)
-
-        evolution = today_rank - first_rank
-        recent_change = today_rank - last_rank
-
-        ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
-
-        if pd.notna(today_group):
-            ranks.append(today_rank)
-
-        persistence = round(sum(ranks) / len(ranks), 1)
-
-        evo_quality, smoothness = calculate_evolution_quality(
-            hist_groups,
-            today_rank
-        )
-
-        evo_final = round(
-            evo_quality * 0.50
-            + smoothness * 0.25
-            + persistence * 0.15
-            + evolution * 0.10,
-            1
-        )
-
-        if persistence >= 5.0:
-            dna = "🟢 DNA MẠNH"
-
-        elif persistence >= 3.5:
-            dna = "🟡 BỀN"
-
+    evo_scores = []
+    recent_changes = []
+    
+    persistences = []
+    dna_flags = []
+    
+    evo_quality_scores = []
+    smooth_scores = []
+    evo_final_scores = []
+    
+    arrows = []
+    status_icons = []
+    
+    for _, r in base.iterrows():
+    
+        hist_groups = []
+    
+        for d in dates:
+            g = r.get(d, np.nan)
+    
+            if pd.notna(g):
+                hist_groups.append(g)
+    
+        today_group = r.get("TODAY", np.nan)
+        today_rank = GROUP_RANK.get(today_group, 0)
+    
+        if hist_groups:
+    
+            first_rank = GROUP_RANK.get(hist_groups[0], 0)
+            last_rank = GROUP_RANK.get(hist_groups[-1], 0)
+    
+            evolution = today_rank - first_rank
+            recent_change = today_rank - last_rank
+    
+            ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+    
+            if pd.notna(today_group):
+                ranks.append(today_rank)
+    
+            persistence = round(sum(ranks) / len(ranks), 1)
+    
+            evo_quality, smoothness = calculate_evolution_quality(
+                hist_groups,
+                today_rank
+            )
+    
+            evo_final = round(
+                evo_quality * 0.50
+                + smoothness * 0.25
+                + persistence * 0.15
+                + evolution * 0.10,
+                1
+            )
+    
+            if persistence >= 5.0:
+                dna = "🟢 DNA MẠNH"
+    
+            elif persistence >= 3.5:
+                dna = "🟡 BỀN"
+    
+            else:
+                dna = "⚪ MỚI"
+    
         else:
+    
+            evolution = 0
+            recent_change = 0
+            persistence = 0
+    
+            evo_quality = 0
+            smoothness = 0
+            evo_final = 0
+    
             dna = "⚪ MỚI"
-
-    else:
-
-        evolution = 0
-        recent_change = 0
-        persistence = 0
-
-        evo_quality = 0
-        smoothness = 0
-        evo_final = 0
-
-        dna = "⚪ MỚI"
-
-    evo_scores.append(evolution)
-    recent_changes.append(recent_change)
-
-    persistences.append(persistence)
-    dna_flags.append(dna)
-
-    evo_quality_scores.append(evo_quality)
-    smooth_scores.append(smoothness)
-    evo_final_scores.append(evo_final)
-
-    if recent_change > 0:
-        arrows.append("⬆️")
-    elif recent_change < 0:
-        arrows.append("⬇️")
-    else:
-        arrows.append("➡️")
-
-    if evolution > 0:
-        status_icons.append("🟢")
-    elif evolution < 0:
-        status_icons.append("🔴")
-    else:
-        status_icons.append("⚪")
-
-base["evolution"] = evo_scores
-base["recent_change"] = recent_changes
-
-base["Persistence"] = persistences
-base["DNA"] = dna_flags
-
-base["EvoQuality"] = evo_quality_scores
-base["Smooth"] = smooth_scores
-base["EvoFinal"] = evo_final_scores
-
-base["arrow"] = arrows
-base["status"] = status_icons   
+    
+        evo_scores.append(evolution)
+        recent_changes.append(recent_change)
+    
+        persistences.append(persistence)
+        dna_flags.append(dna)
+    
+        evo_quality_scores.append(evo_quality)
+        smooth_scores.append(smoothness)
+        evo_final_scores.append(evo_final)
+    
+        if recent_change > 0:
+            arrows.append("⬆️")
+        elif recent_change < 0:
+            arrows.append("⬇️")
+        else:
+            arrows.append("➡️")
+    
+        if evolution > 0:
+            status_icons.append("🟢")
+        elif evolution < 0:
+            status_icons.append("🔴")
+        else:
+            status_icons.append("⚪")
+    
+    base["evolution"] = evo_scores
+    base["recent_change"] = recent_changes
+    
+    base["Persistence"] = persistences
+    base["DNA"] = dna_flags
+    
+    base["EvoQuality"] = evo_quality_scores
+    base["Smooth"] = smooth_scores
+    base["EvoFinal"] = evo_final_scores
+    
+    base["arrow"] = arrows
+    base["status"] = status_icons   
     sort_cols = [
     "EvoFinal",
     "Persistence",
