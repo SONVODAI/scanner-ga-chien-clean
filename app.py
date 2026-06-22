@@ -1562,32 +1562,27 @@ def calculate_evolution_quality(hist_groups, today_rank):
     if len(ranks) < 2:
         return 0, 0
 
+    # =====================================================
+    # CHẤM ĐIỂM CHUYỂN PHA
+    # =====================================================
+
     for i in range(len(ranks) - 1):
 
         old = ranks[i]
         new = ranks[i + 1]
 
-        # THƯỞNG CẦU THANG BỘ
+        # Cầu thang bộ
 
-        if old == 1 and new == 2:
-            evo_quality += 3
+        if old == 2 and new in [3, 4]:
+            evo_quality += 15
 
-        elif old == 2 and new == 3:
-            evo_quality += 8
-
-        elif old == 3 and new == 4:
-            evo_quality += 6
-
-        elif old == 4 and new == 6:
-            evo_quality += 10
+        elif old in [3, 4] and new == 6:
+            evo_quality += 20
 
         elif old == 6 and new == 5:
-            evo_quality += 2
+            evo_quality += 10
 
-        elif old == 5 and new == 7:
-            evo_quality += 1
-
-        # PHẠT GÃY CẤU TRÚC
+        # Gãy cấu trúc
 
         if old >= 5 and new <= 1:
             evo_quality -= 10
@@ -1595,7 +1590,7 @@ def calculate_evolution_quality(hist_groups, today_rank):
         elif old >= 4 and new == 0:
             evo_quality -= 8
 
-        # ĐỘ MƯỢT
+        # Độ mượt
 
         diff = abs(new - old)
 
@@ -1608,21 +1603,11 @@ def calculate_evolution_quality(hist_groups, today_rank):
         else:
             smoothness -= diff
 
-    
+    # =====================================================
+    # THƯỞNG TIẾN BỘ
+    # =====================================================
 
-    # THƯỞNG EARLY -> PULL
-
-    for i in range(len(ranks) - 1):
-
-        if ranks[i] == 2 and ranks[i + 1] in [3, 4]:
-            evo_quality += 15
-    
-        elif ranks[i] in [3, 4] and ranks[i + 1] == 6:
-            evo_quality += 20
-    
-        elif ranks[i] == 6 and ranks[i + 1] == 5:
-            evo_quality += 10
-        growth_steps = 0
+    growth_steps = 0
 
     for i in range(len(ranks) - 1):
 
@@ -1630,28 +1615,37 @@ def calculate_evolution_quality(hist_groups, today_rank):
             growth_steps += 1
 
     evo_quality += growth_steps * 3
+
+    # =====================================================
+    # PHẠT ĐỨNG YÊN
+    # =====================================================
+
     flat_steps = 0
 
-for i in range(len(ranks) - 1):
+    for i in range(len(ranks) - 1):
 
-    if ranks[i + 1] == ranks[i]:
-        flat_steps += 1
+        if ranks[i + 1] == ranks[i]:
+            flat_steps += 1
 
-evo_quality -= flat_steps * 2
-# PHẠT TĂNG TỐC
+    evo_quality -= flat_steps * 2
 
-if today_rank == 7:
+    # =====================================================
+    # THƯỞNG ĐÍCH ĐẾN
+    # =====================================================
+
+    if today_rank == 7:
         evo_quality -= 5
-if today_rank == 6:      # CP MẠNH
-    evo_quality += 10
 
-elif today_rank == 4:    # PULL ĐẸP
-    evo_quality += 8
+    elif today_rank == 6:      # CP MẠNH
+        evo_quality += 10
 
-elif today_rank == 3:    # PULL VỪA
-    evo_quality += 5
-return evo_quality, smoothness
+    elif today_rank == 4:      # PULL ĐẸP
+        evo_quality += 8
 
+    elif today_rank == 3:      # PULL VỪA
+        evo_quality += 5
+
+    return evo_quality, smoothness
 def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
 
