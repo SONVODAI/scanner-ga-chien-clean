@@ -1640,17 +1640,17 @@ for i in range(len(ranks) - 1):
 evo_quality -= flat_steps * 2
     # PHẠT TĂNG TỐC
 
-if today_rank == 7:
-        evo_quality -= 5
-if today_rank == 6:      # CP MẠNH
-    evo_quality += 10
-
-elif today_rank == 4:    # PULL ĐẸP
-    evo_quality += 8
-
-elif today_rank == 3:    # PULL VỪA
-    evo_quality += 5
-return evo_quality, smoothness
+    if today_rank == 7:
+            evo_quality -= 5
+    if today_rank == 6:      # CP MẠNH
+        evo_quality += 10
+    
+    elif today_rank == 4:    # PULL ĐẸP
+        evo_quality += 8
+    
+    elif today_rank == 3:    # PULL VỪA
+        evo_quality += 5
+    return evo_quality, smoothness
 
 def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
