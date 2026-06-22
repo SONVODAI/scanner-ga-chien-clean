@@ -1597,89 +1597,124 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base = current.copy()
     else:
         base = hist.merge(current, on="symbol", how="outer")
-    evo_scores = []
-    recent_changes = []
-    arrows = []
-    status_icons = []
+     evo_scores = []
+recent_changes = []
 
-    persistences = []
-    dna_flags = []
-    
-    for _, r in base.iterrows():
+persistences = []
+dna_flags = []
 
-        hist_groups = []
+evo_quality_scores = []
+smooth_scores = []
+evo_final_scores = []
 
-        for d in dates:
-            g = r.get(d, np.nan)
-            if pd.notna(g):
-                hist_groups.append(g)
+arrows = []
+status_icons = []
 
-        today_group = r.get("TODAY", np.nan)
-        today_rank = GROUP_RANK.get(today_group, 0)
-        if hist_groups:
+for _, r in base.iterrows():
 
-            first_rank = GROUP_RANK.get(hist_groups[0], 0)
-            last_rank = GROUP_RANK.get(hist_groups[-1], 0)
+    hist_groups = []
 
-            evolution = today_rank - first_rank
-            recent_change = today_rank - last_rank
+    for d in dates:
+        g = r.get(d, np.nan)
 
-            ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+        if pd.notna(g):
+            hist_groups.append(g)
 
-            if today_group and pd.notna(today_group):
-                ranks.append(today_rank)
+    today_group = r.get("TODAY", np.nan)
+    today_rank = GROUP_RANK.get(today_group, 0)
 
-            persistence = round(sum(ranks) / len(ranks), 1)
+    if hist_groups:
 
-            if persistence >= 5.0:
-                dna = "🟢 DNA MẠNH"
-            elif persistence >= 3.5:
-                dna = "🟡 BỀN"
-            else:
-                dna = "⚪ MỚI"
+        first_rank = GROUP_RANK.get(hist_groups[0], 0)
+        last_rank = GROUP_RANK.get(hist_groups[-1], 0)
+
+        evolution = today_rank - first_rank
+        recent_change = today_rank - last_rank
+
+        ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+
+        if pd.notna(today_group):
+            ranks.append(today_rank)
+
+        persistence = round(sum(ranks) / len(ranks), 1)
+
+        evo_quality, smoothness = calculate_evolution_quality(
+            hist_groups,
+            today_rank
+        )
+
+        evo_final = round(
+            evo_quality * 0.50
+            + smoothness * 0.25
+            + persistence * 0.15
+            + evolution * 0.10,
+            1
+        )
+
+        if persistence >= 5.0:
+            dna = "🟢 DNA MẠNH"
+
+        elif persistence >= 3.5:
+            dna = "🟡 BỀN"
 
         else:
-
-            evolution = 0
-            recent_change = 0
-            persistence = 0
             dna = "⚪ MỚI"
 
-        evo_scores.append(evolution)
-        recent_changes.append(recent_change)
-        persistences.append(persistence)
-        dna_flags.append(dna)
-        
-        if recent_change > 0:
-            arrows.append("⬆️")
-        elif recent_change < 0:
-            arrows.append("⬇️")
-        else:
-            arrows.append("➡️")
+    else:
 
-        if evolution > 0:
-            status_icons.append("🟢")
-        elif evolution < 0:
-            status_icons.append("🔴")
-        else:
-            status_icons.append("⚪")
+        evolution = 0
+        recent_change = 0
+        persistence = 0
 
-    
-    base["evolution"] = evo_scores
-    base["recent_change"] = recent_changes
+        evo_quality = 0
+        smoothness = 0
+        evo_final = 0
 
-    base["Persistence"] = persistences
-    base["DNA"] = dna_flags
+        dna = "⚪ MỚI"
 
-    base["arrow"] = arrows
-    base["status"] = status_icons
-    
+    evo_scores.append(evolution)
+    recent_changes.append(recent_change)
+
+    persistences.append(persistence)
+    dna_flags.append(dna)
+
+    evo_quality_scores.append(evo_quality)
+    smooth_scores.append(smoothness)
+    evo_final_scores.append(evo_final)
+
+    if recent_change > 0:
+        arrows.append("⬆️")
+    elif recent_change < 0:
+        arrows.append("⬇️")
+    else:
+        arrows.append("➡️")
+
+    if evolution > 0:
+        status_icons.append("🟢")
+    elif evolution < 0:
+        status_icons.append("🔴")
+    else:
+        status_icons.append("⚪")
+
+base["evolution"] = evo_scores
+base["recent_change"] = recent_changes
+
+base["Persistence"] = persistences
+base["DNA"] = dna_flags
+
+base["EvoQuality"] = evo_quality_scores
+base["Smooth"] = smooth_scores
+base["EvoFinal"] = evo_final_scores
+
+base["arrow"] = arrows
+base["status"] = status_icons   
     sort_cols = [
+    "EvoFinal",
     "Persistence",
     "evolution",
     "recent_change",
-    "today_score",
 ]
+
     sort_cols = [c for c in sort_cols if c in base.columns]
 
     if sort_cols:
