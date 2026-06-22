@@ -1550,7 +1550,102 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
    
     return out[cols].head(20)
 
+# =========================================================
+# EVOLUTION QUALITY ENGINE
+# =========================================================
+def calculate_evolution_quality(hist_groups, today_rank):
 
+    ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
+
+    evo_quality = 0
+    smoothness = 0
+
+    if len(ranks) < 2:
+        return 0, 0
+
+    # =====================================================
+    # CHẤM ĐIỂM CHUYỂN PHA
+    # =====================================================
+
+    for i in range(len(ranks) - 1):
+
+        old = ranks[i]
+        new = ranks[i + 1]
+
+        # EARLY -> PULL
+        if old == 2 and new in [3, 4]:
+            evo_quality += 18
+
+        # PULL -> MẠNH
+        elif old in [3, 4] and new == 6:
+            evo_quality += 25
+
+        # MẠNH -> BREAK
+        elif old == 6 and new == 5:
+            evo_quality += 10
+
+        # PHẠT NHẢY CÓC
+        if new - old >= 3:
+            evo_quality -= 8
+
+        # PHẠT GÃY CẤU TRÚC
+        if old - new >= 2:
+            evo_quality -= 10
+
+        # ĐỘ MƯỢT
+        diff = abs(new - old)
+
+        if diff <= 1:
+            smoothness += 2
+        elif diff == 2:
+            smoothness += 1
+        else:
+            smoothness -= diff
+
+    # =====================================================
+    # THƯỞNG TIẾN BỘ
+    # =====================================================
+
+    growth_steps = 0
+
+    for i in range(len(ranks) - 1):
+        if ranks[i + 1] > ranks[i]:
+            growth_steps += 1
+
+    evo_quality += growth_steps * 3
+
+    # =====================================================
+    # PHẠT ĐỨNG YÊN
+    # =====================================================
+
+    flat_steps = 0
+
+    for i in range(len(ranks) - 1):
+        if ranks[i + 1] == ranks[i]:
+            flat_steps += 1
+
+    evo_quality -= flat_steps * 2
+
+    # =====================================================
+    # THƯỞNG ĐÍCH ĐẾN
+    # =====================================================
+
+    if today_rank == 6:      # CP MẠNH
+        evo_quality += 10
+
+    elif today_rank == 4:    # PULL ĐẸP
+        evo_quality += 8
+
+    elif today_rank == 3:    # PULL VỪA
+        evo_quality += 5
+
+    elif today_rank == 7:    # TĂNG TỐC
+        evo_quality -= 5
+
+    return evo_quality, smoothness
+# =========================================================
+# EVOLUTION TABLES
+# =========================================================
 def build_evolution_tables(scan_df: pd.DataFrame):
     evo_df = read_evolution_history()
 
@@ -1599,87 +1694,122 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base = hist.merge(current, on="symbol", how="outer")
     evo_scores = []
     recent_changes = []
-    arrows = []
-    status_icons = []
-
+    
     persistences = []
     dna_flags = []
     
+    evo_quality_scores = []
+    smooth_scores = []
+    evo_final_scores = []
+    
+    arrows = []
+    status_icons = []
+    
     for _, r in base.iterrows():
-
+    
         hist_groups = []
-
+    
         for d in dates:
             g = r.get(d, np.nan)
+    
             if pd.notna(g):
                 hist_groups.append(g)
-
+    
         today_group = r.get("TODAY", np.nan)
         today_rank = GROUP_RANK.get(today_group, 0)
+    
         if hist_groups:
-
+    
             first_rank = GROUP_RANK.get(hist_groups[0], 0)
             last_rank = GROUP_RANK.get(hist_groups[-1], 0)
-
+    
             evolution = today_rank - first_rank
             recent_change = today_rank - last_rank
-
+    
             ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
-
-            if today_group and pd.notna(today_group):
+    
+            if pd.notna(today_group):
                 ranks.append(today_rank)
-
+    
             persistence = round(sum(ranks) / len(ranks), 1)
-
+    
+            evo_quality, smoothness = calculate_evolution_quality(
+                hist_groups,
+                today_rank
+            )
+    
+            evo_final = round(
+                evo_quality * 0.50
+                + smoothness * 0.25
+                + persistence * 0.15
+                + evolution * 0.10,
+                1
+            )
+    
             if persistence >= 5.0:
                 dna = "🟢 DNA MẠNH"
+    
             elif persistence >= 3.5:
                 dna = "🟡 BỀN"
+    
             else:
                 dna = "⚪ MỚI"
-
+    
         else:
-
+    
             evolution = 0
             recent_change = 0
             persistence = 0
+    
+            evo_quality = 0
+            smoothness = 0
+            evo_final = 0
+    
             dna = "⚪ MỚI"
-
+    
         evo_scores.append(evolution)
         recent_changes.append(recent_change)
+    
         persistences.append(persistence)
         dna_flags.append(dna)
-        
+    
+        evo_quality_scores.append(evo_quality)
+        smooth_scores.append(smoothness)
+        evo_final_scores.append(evo_final)
+    
         if recent_change > 0:
             arrows.append("⬆️")
         elif recent_change < 0:
             arrows.append("⬇️")
         else:
             arrows.append("➡️")
-
+    
         if evolution > 0:
             status_icons.append("🟢")
         elif evolution < 0:
             status_icons.append("🔴")
         else:
             status_icons.append("⚪")
-
     
     base["evolution"] = evo_scores
     base["recent_change"] = recent_changes
-
+    
     base["Persistence"] = persistences
     base["DNA"] = dna_flags
-
-    base["arrow"] = arrows
-    base["status"] = status_icons
     
+    base["EvoQuality"] = evo_quality_scores
+    base["Smooth"] = smooth_scores
+    base["EvoFinal"] = evo_final_scores
+    
+    base["arrow"] = arrows
+    base["status"] = status_icons   
     sort_cols = [
+    "EvoFinal",
     "Persistence",
     "evolution",
     "recent_change",
-    "today_score",
 ]
+
     sort_cols = [c for c in sort_cols if c in base.columns]
 
     if sort_cols:
