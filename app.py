@@ -3386,11 +3386,34 @@ if show_green_red:
         st.success("Market ủng hộ: ưu tiên mã vừa TrendScore cao vừa BuyScore cao.")
 
     if not green_red_df.empty:
+
+    compact_cols = [
+        "ĐÈN",
+        "MÃ",
+        "TÍN HIỆU",
+        "BUY_SCORE",
+        "NHÓM",
+        "GIÁ",
+        "VÙNG MUA",
+        "NAV",
+    ]
+
+    st.dataframe(
+        style_green_red_board(
+            green_red_df[compact_cols]
+        ),
+        use_container_width=True,
+        hide_index=True,
+        height=560,
+    )
+
+    with st.expander("🔎 Mở đầy đủ cột Xanh/Đỏ"):
         st.dataframe(
             style_green_red_board(green_red_df),
             use_container_width=True,
             hide_index=True,
-            height=560,
+            height=700,
+        )
         )
         st.caption(
             "TrendScore đo sức khỏe cổ phiếu. BuyScore đo chất lượng điểm mua. "
