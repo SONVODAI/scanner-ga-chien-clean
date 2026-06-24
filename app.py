@@ -3186,6 +3186,65 @@ def style_green_red_board(df: pd.DataFrame):
 
 
 # =========================================================
+# COMPACT TABLE VIEW - ẨN CỘT PHỤ CHO MOBILE
+# =========================================================
+def split_existing_cols(df: pd.DataFrame, main_cols: list[str]):
+    """Tách cột chính / cột phụ nhưng không làm mất dữ liệu gốc.
+
+    - main_cols: các cột cần nhìn nhanh trên điện thoại.
+    - extra_cols: toàn bộ cột còn lại, mở trong expander khi cần soi kỹ.
+    """
+    if df is None or df.empty:
+        return [], []
+
+    main = [c for c in main_cols if c in df.columns]
+    extra = [c for c in df.columns if c not in main]
+    return main, extra
+
+
+def show_compact_table(
+    df: pd.DataFrame,
+    main_cols: list[str],
+    height: int = 420,
+    detail_title: str = "🔎 Mở cột phụ / xem đầy đủ",
+    hide_index: bool = True,
+):
+    """Hiển thị bảng tinh gọn trước, cột phụ để trong nút mở rộng.
+
+    Cách này hợp với điện thoại: bảng chính chỉ còn các cột quyết định mua/bán.
+    Dữ liệu phụ vẫn tồn tại và xem được trên máy tính bằng expander.
+    """
+    if df is None or df.empty:
+        return
+
+    main, extra = split_existing_cols(df, main_cols)
+
+    if main:
+        st.dataframe(
+            df[main],
+            use_container_width=True,
+            hide_index=hide_index,
+            height=height,
+        )
+    else:
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=hide_index,
+            height=height,
+        )
+
+    if extra:
+        with st.expander(detail_title, expanded=False):
+            st.dataframe(
+                df[main + extra] if main else df,
+                use_container_width=True,
+                hide_index=hide_index,
+                height=min(700, height + 160),
+            )
+
+
+# =========================================================
 # UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
 left1, left2, left3, left4, left5, left6, left7 = st.columns([1.05, 1.15, 1.0, 1.25, 1.2, 1.2, 2.4])
@@ -3280,7 +3339,7 @@ else:
 st.caption(market_forecast_text)
 if safe_mode_count > 0:
     st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
-st.caption("V20: tất cả bảng vẫn dùng chung scan_df. Bảng Pullback Buy chỉ ghép lại Storm + DNA/Evolution + vùng test, không tạo thêm vòng scan nặng.")
+st.caption("V20: tất cả bảng vẫn dùng chung scan_df. Bảng chính đã tinh gọn cột cho điện thoại; cột phụ vẫn nằm trong nút 🔎 mở rộng để soi kỹ trên máy tính.")
 
 # =========================================================
 # PREPARE CORE TABLES
@@ -3346,7 +3405,12 @@ if show_green_red:
 st.markdown("---")
 st.markdown("## ⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU")
 if not storm_df.empty:
-    st.dataframe(storm_df, use_container_width=True, hide_index=True, height=380)
+    show_compact_table(
+        storm_df,
+        main_cols=["MÃ", "NHÓM", "GIÁ", "STORM", "GREEN2", "VOL/MA20", "RSI", "SLOPE", "OBV", "CẢNH BÁO"],
+        height=360,
+        detail_title="🔎 Mở đầy đủ cột Storm",
+    )
 else:
     st.info("Chưa có mã đạt tiêu chí Storm Leaders.")
 
@@ -3364,7 +3428,12 @@ else:
     st.success("Market ủng hộ: có thể test sớm mã EarlyScore cao, nhưng vẫn giữ tỷ trọng nhỏ hơn Pullback.")
 
 if not early_buy_lab_df.empty:
-    st.dataframe(early_buy_lab_df, use_container_width=True, hide_index=True, height=460)
+    show_compact_table(
+        early_buy_lab_df,
+        main_cols=["ĐÈN", "MÃ", "TÍN HIỆU", "NHÓM", "GIÁ", "VÙNG MUA", "NAV", "EarlyScore", "RSI", "SLOPE", "OBV", "LÝ DO", "CẢNH BÁO"],
+        height=430,
+        detail_title="🔎 Mở đầy đủ cột Early Lab",
+    )
     st.caption(
         "EarlyScore ưu tiên: RSI 45-58 + cạn cung trước phiên hiện tại + EARLY GREEN2 + gần đáy 20/60 phiên + OBV/Slope không xấu."
     )
@@ -3385,7 +3454,12 @@ else:
     st.success("Market ủng hộ: ưu tiên mã PullScore cao, có Storm + DNA + Evolution đồng thuận.")
 
 if not pullback_df.empty:
-    st.dataframe(pullback_df, use_container_width=True, hide_index=True, height=520)
+    show_compact_table(
+        pullback_df,
+        main_cols=["ĐÈN", "MÃ", "TÍN HIỆU", "NHÓM", "GIÁ", "VÙNG MUA", "NAV", "PullScore", "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO", "CẢNH BÁO"],
+        height=470,
+        detail_title="🔎 Mở đầy đủ cột Pullback",
+    )
     st.caption(
         "PullScore ưu tiên: pull 2-5% từ đỉnh gần nhất + test EMA9 + DNA bền + Storm có tiền + Evolution không xấu + OBV/RSI/Slope/Vol ổn."
     )
@@ -3426,7 +3500,12 @@ with d1:
                 "total_score": "SCORE", "evolution": "TIẾN HÓA", "recent_change": "GẦN NHẤT"
             })
             dna_leaders = dna_leaders.sort_values(["DNA", "TIẾN HÓA", "SCORE"], ascending=[False, False, False]).head(20)
-            st.dataframe(dna_leaders, use_container_width=True, hide_index=True, height=420)
+            show_compact_table(
+                dna_leaders,
+                main_cols=["MÃ", "DNA", "LOẠI", "NHÓM", "RSI", "SLOPE", "DIST EMA9%", "SCORE"],
+                height=380,
+                detail_title="🔎 Mở đầy đủ cột DNA",
+            )
         else:
             st.info("Chưa đủ dữ liệu DNA.")
     except Exception as e:
@@ -3435,7 +3514,13 @@ with d1:
 with d2:
     st.subheader("🚀 Evolution chọn lọc")
     if not evo_buy_table.empty:
-        st.dataframe(evo_buy_table, use_container_width=True, height=420)
+        show_compact_table(
+            evo_buy_table,
+            main_cols=["symbol", "TODAY", "today_score", "today_price", "Persistence", "DNA", "EvoFinal", "evolution", "recent_change", "arrow"],
+            height=380,
+            detail_title="🔎 Mở đầy đủ cột Evolution",
+            hide_index=True,
+        )
     else:
         st.info("Chưa có cổ phiếu tiến hóa đạt điều kiện mua/theo dõi.")
 
@@ -3457,7 +3542,12 @@ if show_legacy:
         old_buy_df = build_buy_table(scan_df, market_real)
         show_buy = old_buy_df[old_buy_df["Hành động"] != "KHÔNG MUA"].copy() if not old_buy_df.empty else pd.DataFrame()
         if not show_buy.empty:
-            st.dataframe(show_buy.head(30), use_container_width=True, hide_index=True, height=500)
+            show_compact_table(
+                show_buy.head(30),
+                main_cols=["Đèn", "Mã", "Hành động", "Nhóm", "Giá", "Vùng mua", "NAV", "Điểm", "RSI", "OBV", "Lý do"],
+                height=460,
+                detail_title="🔎 Mở đầy đủ cột Hành động nhanh cũ",
+            )
         else:
             st.info("Chưa có mã đạt điều kiện mua theo bảng cũ.")
 
@@ -3471,7 +3561,12 @@ if show_legacy:
                 market_forecast=market_forecast,
             )
             if not tinh_hoa_df.empty:
-                st.dataframe(tinh_hoa_df, use_container_width=True, hide_index=True, height=520)
+                show_compact_table(
+                    tinh_hoa_df,
+                    main_cols=["MÃ", "NHÓM", "GIÁ", "TINH HOA", "RSI", "SLOPE", "OBV", "CẢNH BÁO"],
+                    height=480,
+                    detail_title="🔎 Mở đầy đủ cột Tinh Hoa",
+                )
             else:
                 st.info("Chưa có mã đạt chuẩn Tinh Hoa.")
         except Exception as e:
@@ -3514,7 +3609,12 @@ if show_detail:
             "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct", "body_pct", "total_score", "warning"
         ]
         detail_cols = [c for c in detail_cols if c in scan_df.columns]
-        st.dataframe(scan_df[detail_cols], use_container_width=True, hide_index=True, height=700)
+        show_compact_table(
+            scan_df[detail_cols],
+            main_cols=["symbol", "group", "status", "price", "total_score", "rsi14", "ema9_ma20_slope", "obv_status", "dist_from_ema9_pct", "warning"],
+            height=620,
+            detail_title="🔎 Mở toàn bộ cột chi tiết",
+        )
 
 st.markdown("---")
 st.caption("V20 EARLY BUY LAB | Market → Xanh/Đỏ Lab → Storm → Early Buy Lab → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
