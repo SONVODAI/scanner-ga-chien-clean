@@ -2744,10 +2744,510 @@ def build_early_buy_lab(
     cols = [c for c in cols if c in out.columns]
     return out[cols].head(30)
 
+
+# =========================================================
+# 🟢🔴 XANH MUA - ĐỎ BÁN LAB
+# =========================================================
+def build_green_red_board(
+    scan_df: pd.DataFrame,
+    evo_table: pd.DataFrame,
+    storm_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    Bảng Xanh Mua - Đỏ Bán LAB.
+
+    Mục tiêu:
+    - TREND_SCORE: cổ phiếu có khỏe, có tiền, có DNA/Evolution hay không.
+    - BUY_SCORE: điểm mua hiện tại có đẹp, có gần EMA9, RSI vừa phải, chưa nóng hay không.
+    - TÍN HIỆU: ghép Market + Trend + Buy để ra đèn giao thông.
+
+    Bảng này chỉ đọc scan_df/evo_table/storm_df, không làm thay đổi các bảng cũ.
+    """
+    if scan_df is None or scan_df.empty:
+        return pd.DataFrame()
+
+    base = scan_df.copy()
+
+    # -----------------------------------------------------
+    # GHÉP EVOLUTION / DNA
+    # -----------------------------------------------------
+    if evo_table is not None and not evo_table.empty and "symbol" in evo_table.columns:
+        evo_cols = [
+            "symbol",
+            "Persistence",
+            "DNA",
+            "evolution",
+            "recent_change",
+            "EvoFinal",
+            "EvoQuality",
+            "Smooth",
+        ]
+        evo_cols = [c for c in evo_cols if c in evo_table.columns]
+        base = base.merge(evo_table[evo_cols], on="symbol", how="left")
+
+    # -----------------------------------------------------
+    # GHÉP STORM
+    # -----------------------------------------------------
+    base["Storm"] = 0.0
+
+    if storm_df is not None and not storm_df.empty and "MÃ" in storm_df.columns:
+        s = storm_df.copy()
+        s = s.rename(columns={
+            "MÃ": "symbol",
+            "STORM": "Storm_from_storm",
+        })
+
+        keep_cols = [c for c in ["symbol", "Storm_from_storm"] if c in s.columns]
+        if keep_cols:
+            base = base.merge(s[keep_cols], on="symbol", how="left")
+            if "Storm_from_storm" in base.columns:
+                base["Storm"] = base["Storm_from_storm"].fillna(0)
+
+    # -----------------------------------------------------
+    # CHUẨN HÓA CỘT
+    # -----------------------------------------------------
+    numeric_cols = [
+        "total_score",
+        "rsi14",
+        "rsi_slope",
+        "ema9_ma20_slope",
+        "ema9_ma20_slope_change",
+        "dist_from_ema9_pct",
+        "volume",
+        "vol_ma20",
+        "Persistence",
+        "evolution",
+        "recent_change",
+        "EvoFinal",
+        "EvoQuality",
+        "Smooth",
+        "Storm",
+        "near_bottom_20_pct",
+        "near_bottom_60_pct",
+        "dryup_ratio_5",
+        "dryup_ratio_10",
+        "dist_high20_pct",
+        "body_pct",
+        "E",
+        "R",
+        "O",
+        "S",
+        "RS",
+        "V",
+    ]
+
+    for c in numeric_cols:
+        if c not in base.columns:
+            base[c] = np.nan
+        base[c] = pd.to_numeric(base[c], errors="coerce")
+
+    for c in [
+        "symbol",
+        "group",
+        "obv_status",
+        "warning",
+        "early_dry_green2",
+        "early_green2",
+        "green_2_confirm",
+        "pull_label",
+    ]:
+        if c not in base.columns:
+            base[c] = ""
+
+    base["vol_ratio"] = np.where(
+        base["vol_ma20"] > 0,
+        base["volume"] / base["vol_ma20"],
+        np.nan,
+    )
+
+    # =====================================================
+    # TREND SCORE: CỔ PHIẾU CÓ KHỎE KHÔNG?
+    # =====================================================
+    score_core = base["total_score"].fillna(0).clip(-3, 10) * 5
+
+    score_persistence = base["Persistence"].fillna(0).clip(0, 7) * 4
+
+    score_evolution = (
+        base["evolution"].fillna(0).clip(0, 3) * 5
+        + base["recent_change"].fillna(0).clip(0, 2) * 4
+        + base["EvoFinal"].fillna(0).clip(0, 30) * 0.35
+    )
+
+    score_money = (
+        np.where(base["obv_status"] == "🟢", 12, 0)
+        + np.where(base["O"].fillna(0) >= 1, 6, 0)
+        + np.where(base["Storm"].fillna(0) > 0, 12, 0)
+    )
+
+    score_slope = np.select(
+        [
+            base["ema9_ma20_slope"].between(0.3, 4.5),
+            base["ema9_ma20_slope"].between(0.0, 0.3),
+            base["ema9_ma20_slope"].between(4.5, 7.0),
+        ],
+        [12, 6, 5],
+        default=0,
+    )
+
+    score_group_trend = base["group"].map({
+        "PULL ĐẸP": 14,
+        "PULL VỪA": 12,
+        "CP MẠNH": 12,
+        "MUA BREAK": 10,
+        "MUA EARLY": 9,
+        "GÀ TĂNG TỐC": 8,
+        "TÍCH LŨY": 4,
+        "THEO DÕI": 0,
+    }).fillna(0)
+
+    trend_penalty = (
+        np.where(base["obv_status"] != "🟢", 12, 0)
+        + np.where(base["ema9_ma20_slope"] < 0, 12, 0)
+        + np.where(base["total_score"] <= 1, 10, 0)
+    )
+
+    base["TREND_SCORE"] = (
+        score_core
+        + score_persistence
+        + score_evolution
+        + score_money
+        + score_slope
+        + score_group_trend
+        - trend_penalty
+    ).clip(0, 100).round(1)
+
+    # =====================================================
+    # BUY SCORE: ĐIỂM MUA CÓ ĐẸP KHÔNG?
+    # =====================================================
+    group_buy_score = base["group"].map({
+        "PULL ĐẸP": 30,
+        "PULL VỪA": 24,
+        "MUA EARLY": 20,
+        "TÍCH LŨY": 10,
+        "CP MẠNH": 8,
+        "MUA BREAK": 5,
+        "GÀ TĂNG TỐC": 0,
+        "THEO DÕI": 0,
+    }).fillna(0)
+
+    rsi_buy_score = np.select(
+        [
+            base["rsi14"].between(45, 58),
+            base["rsi14"].between(58, 68),
+            base["rsi14"].between(68, 72),
+            base["rsi14"].between(40, 45),
+        ],
+        [18, 16, 8, 6],
+        default=0,
+    )
+
+    ema_buy_score = np.select(
+        [
+            base["dist_from_ema9_pct"].between(-1.5, 1.5),
+            base["dist_from_ema9_pct"].between(-3.0, 2.5),
+            base["dist_from_ema9_pct"].between(-5.0, 4.0),
+        ],
+        [20, 14, 6],
+        default=0,
+    )
+
+    volume_buy_score = np.select(
+        [
+            base["vol_ratio"].between(0.45, 1.15),
+            base["vol_ratio"].between(0.30, 1.50),
+            base["vol_ratio"].between(1.50, 2.00),
+        ],
+        [10, 6, 3],
+        default=0,
+    )
+
+    dryup_score = np.where(
+        (base["dryup_ratio_5"] <= 0.75) | (base["dryup_ratio_10"] <= 0.85),
+        8,
+        0,
+    )
+
+    early_bonus = np.where(
+        base["early_dry_green2"].astype(str).str.contains("EARLY DRY", na=False),
+        14,
+        np.where(
+            base["early_green2"].astype(str).str.contains("EARLY GREEN2", na=False),
+            8,
+            0,
+        ),
+    )
+
+    pull_bonus = np.where(
+        base["pull_label"].astype(str).eq("PULL ĐẸP"),
+        8,
+        np.where(base["pull_label"].astype(str).eq("PULL VỪA"), 5, 0),
+    )
+
+    money_buy_score = (
+        np.where(base["obv_status"] == "🟢", 10, 0)
+        + np.where(base["ema9_ma20_slope"] > 0, 8, 0)
+    )
+
+    hot_penalty = (
+        np.where(base["rsi14"] > 75, 15, 0)
+        + np.where(base["rsi14"] > 80, 8, 0)
+        + np.where(base["dist_from_ema9_pct"] > 5, 15, 0)
+        + np.where(base["dist_from_ema9_pct"] > 8, 8, 0)
+        + np.where(base["group"] == "GÀ TĂNG TỐC", 18, 0)
+        + np.where(base["obv_status"] != "🟢", 18, 0)
+        + np.where(base["ema9_ma20_slope"] < 0, 12, 0)
+    )
+
+    base["BUY_SCORE"] = (
+        group_buy_score
+        + rsi_buy_score
+        + ema_buy_score
+        + volume_buy_score
+        + dryup_score
+        + early_bonus
+        + pull_bonus
+        + money_buy_score
+        - hot_penalty
+    ).clip(0, 100).round(1)
+
+    # =====================================================
+    # ĐÈN GIAO THÔNG
+    # =====================================================
+    def make_signal(row):
+        trend = to_float(row.get("TREND_SCORE", 0), 0)
+        buy = to_float(row.get("BUY_SCORE", 0), 0)
+        group = str(row.get("group", ""))
+        warning = str(row.get("warning", ""))
+
+        bad_warning = ("OBV gãy" in warning) or ("Giá dưới EMA9" in warning) or ("Slope âm" in warning)
+
+        if market_real < 6:
+            if trend >= 75 and buy >= 75 and not bad_warning:
+                return "🟡 THEO DÕI - MARKET YẾU"
+            return "🔴 KHÔNG MUA"
+
+        if bad_warning and buy < 75:
+            return "🔴 ĐỎ TRÁNH"
+
+        if trend >= 78 and buy >= 78:
+            return "🟢 XANH MUA"
+
+        if trend >= 70 and buy >= 65:
+            return "🟢 XANH NHẸ"
+
+        if trend >= 75 and buy < 60:
+            if group in ["CP MẠNH", "MUA BREAK", "GÀ TĂNG TỐC"]:
+                return "🟡 CP KHỎE - CHỜ PULL"
+            return "🟡 CHỜ ĐIỂM MUA"
+
+        if trend >= 60 and buy >= 55:
+            return "🟡 CANH MUA NHỎ"
+
+        if trend < 45 or buy < 35:
+            return "🔴 ĐỎ TRÁNH"
+
+        return "⚪ THEO DÕI"
+
+    base["TÍN HIỆU"] = base.apply(make_signal, axis=1)
+    base["ĐÈN"] = base["TÍN HIỆU"].astype(str).str[:1]
+
+    base["LÝ DO"] = np.select(
+        [
+            base["TÍN HIỆU"].astype(str).str.startswith("🟢"),
+            base["TÍN HIỆU"].astype(str).str.contains("CHỜ PULL", na=False),
+            base["BUY_SCORE"] >= 75,
+            base["TREND_SCORE"] >= 75,
+            base["TÍN HIỆU"].astype(str).str.startswith("🔴"),
+        ],
+        [
+            "Trend khỏe + điểm mua đẹp",
+            "Cổ phiếu khỏe nhưng điểm mua chưa đẹp",
+            "Điểm mua đẹp",
+            "Cổ phiếu khỏe, cần thêm điểm mua",
+            "Chưa đủ điều kiện hoặc cảnh báo xấu",
+        ],
+        default="Theo dõi thêm",
+    )
+
+    # Gợi ý vùng mua theo triết lý pull/early.
+    base["VÙNG MUA"] = np.where(
+        base["group"].isin(["PULL ĐẸP", "PULL VỪA"]),
+        base["ema9"].apply(lambda x: f"{round(x * 0.99, 0)} - {round(x * 1.01, 0)}" if pd.notna(x) else "-"),
+        base["price"].apply(lambda x: f"{round(x * 0.99, 0)} - {round(x * 1.01, 0)}" if pd.notna(x) else "-"),
+    )
+
+    base["NAV"] = np.select(
+        [
+            base["TÍN HIỆU"].astype(str).str.startswith("🟢") & (market_real >= 8),
+            base["TÍN HIỆU"].astype(str).str.startswith("🟢") & (market_real >= 6),
+            base["TÍN HIỆU"].astype(str).str.startswith("🟡") & (market_real >= 6),
+        ],
+        [
+            "10-15% NAV",
+            "5-10% NAV",
+            "0-5% NAV",
+        ],
+        default="0%",
+    )
+
+    out = base.rename(columns={
+        "symbol": "MÃ",
+        "group": "NHÓM",
+        "price": "GIÁ",
+        "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE",
+        "dist_from_ema9_pct": "DIST EMA9%",
+        "vol_ratio": "VOL/MA20",
+        "obv_status": "OBV",
+        "warning": "CẢNH BÁO",
+    })
+
+    cols = [
+        "ĐÈN",
+        "MÃ",
+        "TÍN HIỆU",
+        "TREND_SCORE",
+        "BUY_SCORE",
+        "NHÓM",
+        "GIÁ",
+        "VÙNG MUA",
+        "NAV",
+        "RSI",
+        "SLOPE",
+        "DIST EMA9%",
+        "VOL/MA20",
+        "OBV",
+        "Persistence",
+        "evolution",
+        "recent_change",
+        "Storm",
+        "early_dry_green2",
+        "LÝ DO",
+        "CẢNH BÁO",
+    ]
+    cols = [c for c in cols if c in out.columns]
+
+    rank_signal = out["TÍN HIỆU"].map({
+        "🟢 XANH MUA": 0,
+        "🟢 XANH NHẸ": 1,
+        "🟡 CANH MUA NHỎ": 2,
+        "🟡 THEO DÕI - MARKET YẾU": 3,
+        "🟡 CP KHỎE - CHỜ PULL": 4,
+        "🟡 CHỜ ĐIỂM MUA": 5,
+        "⚪ THEO DÕI": 6,
+        "🔴 ĐỎ TRÁNH": 8,
+        "🔴 KHÔNG MUA": 9,
+    }).fillna(7)
+
+    out = out.assign(_rank_signal=rank_signal)
+    out = out.sort_values(
+        ["_rank_signal", "BUY_SCORE", "TREND_SCORE"],
+        ascending=[True, False, False],
+    ).drop(columns=["_rank_signal"]).reset_index(drop=True)
+
+    return out[cols].head(60)
+
+
+def style_green_red_board(df: pd.DataFrame):
+    """Tô màu cả dòng theo tín hiệu."""
+    def row_style(row):
+        sig = str(row.get("TÍN HIỆU", ""))
+
+        if sig.startswith("🟢"):
+            return ["background-color: #d9f7d9; color: #064e06; font-weight: 600"] * len(row)
+
+        if sig.startswith("🟡"):
+            return ["background-color: #fff3cd; color: #5f4300"] * len(row)
+
+        if sig.startswith("🔴"):
+            return ["background-color: #f8d7da; color: #6b0000"] * len(row)
+
+        return ["background-color: #f5f5f5; color: #333333"] * len(row)
+
+    return (
+        df.style
+        .apply(row_style, axis=1)
+        .format({
+            "TREND_SCORE": "{:.1f}",
+            "BUY_SCORE": "{:.1f}",
+            "GIÁ": "{:.0f}",
+            "RSI": "{:.1f}",
+            "SLOPE": "{:.2f}",
+            "DIST EMA9%": "{:.2f}",
+            "VOL/MA20": "{:.2f}",
+            "Persistence": "{:.1f}",
+            "evolution": "{:.0f}",
+            "recent_change": "{:.0f}",
+            "Storm": "{:.1f}",
+        }, na_rep="")
+    )
+
+
+# =========================================================
+# COMPACT TABLE VIEW - ẨN CỘT PHỤ CHO MOBILE
+# =========================================================
+def split_existing_cols(df: pd.DataFrame, main_cols: list[str]):
+    """Tách cột chính / cột phụ nhưng không làm mất dữ liệu gốc.
+
+    - main_cols: các cột cần nhìn nhanh trên điện thoại.
+    - extra_cols: toàn bộ cột còn lại, mở trong expander khi cần soi kỹ.
+    """
+    if df is None or df.empty:
+        return [], []
+
+    main = [c for c in main_cols if c in df.columns]
+    extra = [c for c in df.columns if c not in main]
+    return main, extra
+
+
+def show_compact_table(
+    df: pd.DataFrame,
+    main_cols: list[str],
+    height: int = 420,
+    detail_title: str = "🔎 Mở cột phụ / xem đầy đủ",
+    hide_index: bool = True,
+):
+    """Hiển thị bảng tinh gọn trước, cột phụ để trong nút mở rộng.
+
+    Cách này hợp với điện thoại: bảng chính chỉ còn các cột quyết định mua/bán.
+    Dữ liệu phụ vẫn tồn tại và xem được trên máy tính bằng expander.
+    """
+    if df is None or df.empty:
+        return
+
+    main, extra = split_existing_cols(df, main_cols)
+
+    if main:
+        st.dataframe(
+            df[main],
+            use_container_width=True,
+            hide_index=hide_index,
+            height=height,
+        )
+    else:
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=hide_index,
+            height=height,
+        )
+
+    if extra:
+        with st.expander(detail_title, expanded=False):
+            st.dataframe(
+                df[main + extra] if main else df,
+                use_container_width=True,
+                hide_index=hide_index,
+                height=min(700, height + 160),
+            )
+
+
 # =========================================================
 # UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
-left1, left2, left3, left4, left5, left6 = st.columns([1.05, 1.15, 1.0, 1.25, 1.2, 2.4])
+left1, left2, left3, left4, left5, left6, left7 = st.columns([1.05, 1.15, 1.0, 1.25, 1.2, 1.2, 2.4])
 
 with left1:
     scan_btn = st.button("🚀 SCAN", use_container_width=True)
@@ -2765,6 +3265,9 @@ with left5:
     show_legacy = st.checkbox("Bảng phụ", value=False)
 
 with left6:
+    show_green_red = st.checkbox("Xanh/Đỏ", value=True)
+
+with left7:
     st.markdown(
         f"""
         <div style="font-size:14px">
@@ -2836,7 +3339,7 @@ else:
 st.caption(market_forecast_text)
 if safe_mode_count > 0:
     st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
-st.caption("V20: tất cả bảng vẫn dùng chung scan_df. Bảng Pullback Buy chỉ ghép lại Storm + DNA/Evolution + vùng test, không tạo thêm vòng scan nặng.")
+st.caption("V20: tất cả bảng vẫn dùng chung scan_df. Bảng chính đã tinh gọn cột cho điện thoại; cột phụ vẫn nằm trong nút 🔎 mở rộng để soi kỹ trên máy tính.")
 
 # =========================================================
 # PREPARE CORE TABLES
@@ -2860,13 +3363,77 @@ early_buy_lab_df = build_early_buy_lab(
     market_forecast=market_forecast,
 )
 
+green_red_df = build_green_red_board(
+    scan_df=scan_df,
+    evo_table=evo_table,
+    storm_df=storm_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+
+# =========================================================
+# XANH MUA - ĐỎ BÁN LAB
+# =========================================================
+if show_green_red:
+    st.markdown("---")
+    st.markdown("## 🟢🔴 XANH MUA - ĐỎ BÁN LAB")
+
+    if market_real < 6:
+        st.warning("Market REAL < 6: bảng chỉ dùng để theo dõi sớm, chưa nên mua thật.")
+    elif market_real < 8:
+        st.warning("Market trung tính: chỉ ưu tiên mã xanh có BuyScore cao, mua nhỏ và có stop gần.")
+    else:
+        st.success("Market ủng hộ: ưu tiên mã vừa TrendScore cao vừa BuyScore cao.")
+
+    if not green_red_df.empty:
+
+        compact_cols = [
+            "ĐÈN",
+            "MÃ",
+            "TÍN HIỆU",
+            "BUY_SCORE",
+            "NHÓM",
+            "GIÁ",
+            "VÙNG MUA",
+            "NAV",
+        ]
+    
+        st.dataframe(
+            style_green_red_board(
+                green_red_df[compact_cols]
+            ),
+            use_container_width=True,
+            hide_index=True,
+            height=560,
+        )
+    
+        with st.expander("🔎 Mở đầy đủ cột Xanh/Đỏ"):
+            st.dataframe(
+                style_green_red_board(green_red_df),
+                use_container_width=True,
+                hide_index=True,
+                height=700,
+            )
+            
+            st.caption(
+                "TrendScore đo sức khỏe cổ phiếu. BuyScore đo chất lượng điểm mua. "
+                "Đèn xanh tốt nhất là mã vừa khỏe vừa có điểm mua gần EMA9, RSI hợp lý, OBV còn giữ."
+            )
+    else:
+        st.info("Chưa có dữ liệu cho bảng Xanh mua - Đỏ bán.")
+
 # =========================================================
 # STORM LEADERS
 # =========================================================
 st.markdown("---")
 st.markdown("## ⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU")
 if not storm_df.empty:
-    st.dataframe(storm_df, use_container_width=True, hide_index=True, height=380)
+    show_compact_table(
+        storm_df,
+        main_cols=["MÃ", "NHÓM", "GIÁ", "STORM", "GREEN2", "VOL/MA20", "RSI", "SLOPE", "OBV", "CẢNH BÁO"],
+        height=360,
+        detail_title="🔎 Mở đầy đủ cột Storm",
+    )
 else:
     st.info("Chưa có mã đạt tiêu chí Storm Leaders.")
 
@@ -2884,7 +3451,12 @@ else:
     st.success("Market ủng hộ: có thể test sớm mã EarlyScore cao, nhưng vẫn giữ tỷ trọng nhỏ hơn Pullback.")
 
 if not early_buy_lab_df.empty:
-    st.dataframe(early_buy_lab_df, use_container_width=True, hide_index=True, height=460)
+    show_compact_table(
+        early_buy_lab_df,
+        main_cols=["ĐÈN", "MÃ", "TÍN HIỆU", "NHÓM", "GIÁ", "VÙNG MUA", "NAV", "EarlyScore", "RSI", "SLOPE", "OBV", "LÝ DO", "CẢNH BÁO"],
+        height=430,
+        detail_title="🔎 Mở đầy đủ cột Early Lab",
+    )
     st.caption(
         "EarlyScore ưu tiên: RSI 45-58 + cạn cung trước phiên hiện tại + EARLY GREEN2 + gần đáy 20/60 phiên + OBV/Slope không xấu."
     )
@@ -2905,7 +3477,12 @@ else:
     st.success("Market ủng hộ: ưu tiên mã PullScore cao, có Storm + DNA + Evolution đồng thuận.")
 
 if not pullback_df.empty:
-    st.dataframe(pullback_df, use_container_width=True, hide_index=True, height=520)
+    show_compact_table(
+        pullback_df,
+        main_cols=["ĐÈN", "MÃ", "TÍN HIỆU", "NHÓM", "GIÁ", "VÙNG MUA", "NAV", "PullScore", "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO", "CẢNH BÁO"],
+        height=470,
+        detail_title="🔎 Mở đầy đủ cột Pullback",
+    )
     st.caption(
         "PullScore ưu tiên: pull 2-5% từ đỉnh gần nhất + test EMA9 + DNA bền + Storm có tiền + Evolution không xấu + OBV/RSI/Slope/Vol ổn."
     )
@@ -2946,7 +3523,12 @@ with d1:
                 "total_score": "SCORE", "evolution": "TIẾN HÓA", "recent_change": "GẦN NHẤT"
             })
             dna_leaders = dna_leaders.sort_values(["DNA", "TIẾN HÓA", "SCORE"], ascending=[False, False, False]).head(20)
-            st.dataframe(dna_leaders, use_container_width=True, hide_index=True, height=420)
+            show_compact_table(
+                dna_leaders,
+                main_cols=["MÃ", "DNA", "LOẠI", "NHÓM", "RSI", "SLOPE", "DIST EMA9%", "SCORE"],
+                height=380,
+                detail_title="🔎 Mở đầy đủ cột DNA",
+            )
         else:
             st.info("Chưa đủ dữ liệu DNA.")
     except Exception as e:
@@ -2955,7 +3537,13 @@ with d1:
 with d2:
     st.subheader("🚀 Evolution chọn lọc")
     if not evo_buy_table.empty:
-        st.dataframe(evo_buy_table, use_container_width=True, height=420)
+        show_compact_table(
+            evo_buy_table,
+            main_cols=["symbol", "TODAY", "today_score", "today_price", "Persistence", "DNA", "EvoFinal", "evolution", "recent_change", "arrow"],
+            height=380,
+            detail_title="🔎 Mở đầy đủ cột Evolution",
+            hide_index=True,
+        )
     else:
         st.info("Chưa có cổ phiếu tiến hóa đạt điều kiện mua/theo dõi.")
 
@@ -2977,7 +3565,12 @@ if show_legacy:
         old_buy_df = build_buy_table(scan_df, market_real)
         show_buy = old_buy_df[old_buy_df["Hành động"] != "KHÔNG MUA"].copy() if not old_buy_df.empty else pd.DataFrame()
         if not show_buy.empty:
-            st.dataframe(show_buy.head(30), use_container_width=True, hide_index=True, height=500)
+            show_compact_table(
+                show_buy.head(30),
+                main_cols=["Đèn", "Mã", "Hành động", "Nhóm", "Giá", "Vùng mua", "NAV", "Điểm", "RSI", "OBV", "Lý do"],
+                height=460,
+                detail_title="🔎 Mở đầy đủ cột Hành động nhanh cũ",
+            )
         else:
             st.info("Chưa có mã đạt điều kiện mua theo bảng cũ.")
 
@@ -2991,7 +3584,12 @@ if show_legacy:
                 market_forecast=market_forecast,
             )
             if not tinh_hoa_df.empty:
-                st.dataframe(tinh_hoa_df, use_container_width=True, hide_index=True, height=520)
+                show_compact_table(
+                    tinh_hoa_df,
+                    main_cols=["MÃ", "NHÓM", "GIÁ", "TINH HOA", "RSI", "SLOPE", "OBV", "CẢNH BÁO"],
+                    height=480,
+                    detail_title="🔎 Mở đầy đủ cột Tinh Hoa",
+                )
             else:
                 st.info("Chưa có mã đạt chuẩn Tinh Hoa.")
         except Exception as e:
@@ -3034,7 +3632,12 @@ if show_detail:
             "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct", "body_pct", "total_score", "warning"
         ]
         detail_cols = [c for c in detail_cols if c in scan_df.columns]
-        st.dataframe(scan_df[detail_cols], use_container_width=True, hide_index=True, height=700)
+        show_compact_table(
+            scan_df[detail_cols],
+            main_cols=["symbol", "group", "status", "price", "total_score", "rsi14", "ema9_ma20_slope", "obv_status", "dist_from_ema9_pct", "warning"],
+            height=620,
+            detail_title="🔎 Mở toàn bộ cột chi tiết",
+        )
 
 st.markdown("---")
-st.caption("V20 EARLY BUY LAB | Market → Storm → Early Buy Lab → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
+st.caption("V20 EARLY BUY LAB | Market → Xanh/Đỏ Lab → Storm → Early Buy Lab → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
