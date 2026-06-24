@@ -3414,7 +3414,7 @@ if show_green_red:
             hide_index=True,
             height=700,
         )
-        )
+        
         st.caption(
             "TrendScore đo sức khỏe cổ phiếu. BuyScore đo chất lượng điểm mua. "
             "Đèn xanh tốt nhất là mã vừa khỏe vừa có điểm mua gần EMA9, RSI hợp lý, OBV còn giữ."
