@@ -11,6 +11,7 @@
 import os
 import time
 import base64
+import json
 import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -28,13 +29,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V21 Buy Elite V2",
+    page_title="Scanner Gà Chiến V21 Buy Elite V3",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V21 - BUY ELITE V2")
-st.caption("Market First → BUY ELITE V2 → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution. Decision Engine có WinProb, đồng thuận và trọng số theo mùa.")
+st.title("🐔 Scanner Gà Chiến V21 - BUY ELITE V3")
+st.caption("Market First → BUY ELITE V3 → Learning Engine → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution. Decision Engine có WinProb, đồng thuận và tự học chậm từ lịch sử T+1/T+3/T+5.")
 
 # =========================================================
 # WATCHLIST
@@ -75,6 +76,9 @@ VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 GITHUB_REPO_OWNER = "SONVODAI"
 GITHUB_REPO_NAME = "scanner-ga-chien-clean"
 GITHUB_EVO_PATH = EVOLUTION_FILE
+
+BUY_ELITE_HISTORY_FILE = "buy_elite_learning_history.csv"
+BUY_ELITE_PROFILE_FILE = "buy_elite_learning_profile.json"
 
 # Daily data cache giữ nhẹ để không spam vnstock.
 # Live price cache ngắn để bảng không lệch quá lâu.
@@ -3188,7 +3192,474 @@ def style_green_red_board(df: pd.DataFrame):
 
 # =========================================================
 
-# BUY ELITE V2 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
+# =========================================================
+# BUY ELITE V3 / LEARNING ENGINE - TỰ HỌC CHẬM TỪ LỊCH SỬ
+# =========================================================
+def _github_read_text(path: str) -> str | None:
+    """Đọc text từ GitHub nếu có token; lỗi thì trả None để fallback local."""
+    token = get_github_token()
+    if not token:
+        return None
+    try:
+        url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{path}"
+        headers = {"Authorization": f"token {token}"}
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            content = r.json().get("content", "")
+            return base64.b64decode(content).decode("utf-8")
+    except Exception:
+        pass
+    return None
+
+
+def _github_write_text(path: str, text: str, message: str) -> str:
+    """Ghi text lên GitHub nếu có token; đồng thời luôn ghi local."""
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+    except Exception:
+        pass
+
+    token = get_github_token()
+    if not token:
+        return "LOCAL_ONLY"
+
+    try:
+        url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{path}"
+        headers = {"Authorization": f"token {token}"}
+        encoded_content = base64.b64encode(text.encode("utf-8")).decode("utf-8")
+
+        sha = None
+        get_r = requests.get(url, headers=headers, timeout=10)
+        if get_r.status_code == 200:
+            sha = get_r.json().get("sha")
+
+        payload = {"message": message, "content": encoded_content}
+        if sha:
+            payload["sha"] = sha
+
+        put_r = requests.put(url, headers=headers, json=payload, timeout=15)
+        if put_r.status_code in [200, 201]:
+            return "GITHUB_OK"
+        return f"GITHUB_FAIL_{put_r.status_code}"
+    except Exception:
+        return "GITHUB_ERROR"
+
+
+def default_buy_elite_learning_profile() -> dict:
+    return {
+        "version": "BUY_ELITE_LEARNING_V3",
+        "mode": "WARMUP",
+        "created_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "updated_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "completed_t5": 0,
+        "baseline_winrate": None,
+        "min_completed_to_learn": 80,
+        "min_feature_samples": 20,
+        "note": "WARMUP: chưa đủ dữ liệu, multiplier giữ gần 1.0 để không làm méo hệ thống.",
+        "multipliers": {
+            "market": 1.0,
+            "action": 1.0,
+            "storm": 1.0,
+            "evo": 1.0,
+            "zone": 1.0,
+            "obv": 1.0,
+            "rsi_penalty": 1.0,
+            "dist_penalty": 1.0,
+        },
+        "regime_multipliers": {
+            "WINTER": {},
+            "NEUTRAL": {},
+            "SPRING": {},
+        },
+        "insights": [],
+    }
+
+
+def read_buy_elite_learning_profile() -> dict:
+    text = _github_read_text(BUY_ELITE_PROFILE_FILE)
+    if text is None:
+        try:
+            with open(BUY_ELITE_PROFILE_FILE, "r", encoding="utf-8") as f:
+                text = f.read()
+        except Exception:
+            return default_buy_elite_learning_profile()
+    try:
+        obj = json.loads(text)
+        if not isinstance(obj, dict):
+            return default_buy_elite_learning_profile()
+        base = default_buy_elite_learning_profile()
+        base.update(obj)
+        base.setdefault("multipliers", {}).update(obj.get("multipliers", {}))
+        base.setdefault("regime_multipliers", {}).update(obj.get("regime_multipliers", {}))
+        return base
+    except Exception:
+        return default_buy_elite_learning_profile()
+
+
+def write_buy_elite_learning_profile(profile: dict) -> str:
+    try:
+        text = json.dumps(profile, ensure_ascii=False, indent=2)
+    except Exception:
+        text = json.dumps(default_buy_elite_learning_profile(), ensure_ascii=False, indent=2)
+    return _github_write_text(
+        BUY_ELITE_PROFILE_FILE,
+        text,
+        f"Update BUY ELITE learning profile {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+    )
+
+
+def read_buy_elite_history() -> pd.DataFrame:
+    text = _github_read_text(BUY_ELITE_HISTORY_FILE)
+    if text is not None:
+        try:
+            from io import StringIO
+            return pd.read_csv(StringIO(text))
+        except Exception:
+            pass
+    try:
+        return pd.read_csv(BUY_ELITE_HISTORY_FILE)
+    except Exception:
+        return pd.DataFrame()
+
+
+def write_buy_elite_history(history_df: pd.DataFrame) -> str:
+    if history_df is None:
+        history_df = pd.DataFrame()
+    try:
+        text = history_df.to_csv(index=False)
+    except Exception:
+        text = ""
+    return _github_write_text(
+        BUY_ELITE_HISTORY_FILE,
+        text,
+        f"Update BUY ELITE learning history {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+    )
+
+
+def _regime_key(regime_name: str) -> str:
+    text = str(regime_name)
+    if "XUÂN" in text:
+        return "SPRING"
+    if "TRUNG" in text:
+        return "NEUTRAL"
+    return "WINTER"
+
+
+def get_learning_multipliers(profile: dict | None, regime_name: str = "") -> dict:
+    """Lấy multiplier đã học. Nếu chưa đủ dữ liệu, mặc định = 1.0."""
+    base = default_buy_elite_learning_profile()["multipliers"].copy()
+    if not isinstance(profile, dict):
+        return base
+
+    for k, v in profile.get("multipliers", {}).items():
+        base[k] = to_float(v, base.get(k, 1.0))
+
+    regime_key = _regime_key(regime_name)
+    regime_mult = profile.get("regime_multipliers", {}).get(regime_key, {})
+    if isinstance(regime_mult, dict):
+        for k, v in regime_mult.items():
+            base[k] = base.get(k, 1.0) * to_float(v, 1.0)
+
+    # Chốt chặn: không cho AI non trẻ làm lệch hệ thống quá mạnh.
+    for k in list(base.keys()):
+        base[k] = float(np.clip(to_float(base[k], 1.0), 0.70, 1.35))
+    return base
+
+
+def update_buy_elite_outcomes(history_df: pd.DataFrame, scan_df: pd.DataFrame) -> pd.DataFrame:
+    """Cập nhật T+1/T+3/T+5 cho các tín hiệu cũ bằng giá hiện tại trong scan_df."""
+    if history_df is None or history_df.empty or scan_df is None or scan_df.empty:
+        return history_df if history_df is not None else pd.DataFrame()
+
+    hist = history_df.copy()
+    if "date" not in hist.columns or "symbol" not in hist.columns or "entry_price" not in hist.columns:
+        return hist
+
+    hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
+    hist = hist.dropna(subset=["date", "symbol"])
+    if hist.empty:
+        return hist
+
+    today = pd.to_datetime(today_str())
+    current_prices = scan_df.set_index("symbol")["price"].to_dict() if {"symbol", "price"}.issubset(scan_df.columns) else {}
+
+    # Dùng số phiên app có dữ liệu trong history làm proxy cho trading days.
+    date_strs = sorted(set(hist["date"].dt.strftime("%Y-%m-%d").tolist() + [today_str()]))
+    date_pos = {d: i for i, d in enumerate(date_strs)}
+
+    for col in ["t1_return", "t3_return", "t5_return", "t1_win", "t3_win", "t5_win", "last_outcome_update"]:
+        if col not in hist.columns:
+            hist[col] = np.nan
+
+    for idx, r in hist.iterrows():
+        symbol = str(r.get("symbol", ""))
+        entry = to_float(r.get("entry_price", np.nan))
+        if symbol not in current_prices or not is_valid_price(entry):
+            continue
+        current_price = to_float(current_prices.get(symbol, np.nan))
+        if not is_valid_price(current_price):
+            continue
+
+        signal_date = r["date"].strftime("%Y-%m-%d")
+        gap = date_pos.get(today_str(), 0) - date_pos.get(signal_date, 0)
+        if gap <= 0:
+            continue
+
+        ret = round((current_price / entry - 1) * 100, 2)
+        for h in [1, 3, 5]:
+            ret_col = f"t{h}_return"
+            win_col = f"t{h}_win"
+            if gap >= h and pd.isna(r.get(ret_col, np.nan)):
+                hist.at[idx, ret_col] = ret
+                hist.at[idx, win_col] = 1 if ret > 0 else 0
+                hist.at[idx, "last_outcome_update"] = vn_time_str("%Y-%m-%d %H:%M:%S")
+
+    hist["date"] = hist["date"].dt.strftime("%Y-%m-%d")
+    return hist
+
+
+def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.DataFrame, market_real: float, market_forecast: float, allow_save: bool = True) -> pd.DataFrame:
+    """Ghi tín hiệu BUY ELITE trong ngày để vài phiên sau có dữ liệu học."""
+    if not allow_save or buy_elite_df is None or buy_elite_df.empty:
+        return history_df if history_df is not None else pd.DataFrame()
+
+    today = today_str()
+    now_time = vn_time_str("%H:%M:%S")
+    rows = []
+
+    for _, r in buy_elite_df.head(30).iterrows():
+        rows.append({
+            "date": today,
+            "time": now_time,
+            "symbol": r.get("MÃ", ""),
+            "entry_price": r.get("GIÁ", np.nan),
+            "market_real": market_real,
+            "market_forecast": market_forecast,
+            "regime": r.get("REGIME", ""),
+            "learning_mode": r.get("LearningMode", ""),
+            "conclusion": r.get("KẾT LUẬN", ""),
+            "winprob": r.get("WinProb", np.nan),
+            "elite_score": r.get("EliteScore", np.nan),
+            "consensus": r.get("ĐỒNG THUẬN", ""),
+            "nav": r.get("NAV ELITE", ""),
+            "group": r.get("NHÓM", ""),
+            "storm": r.get("Storm", np.nan),
+            "persistence": r.get("Persistence", np.nan),
+            "dna": r.get("DNA", ""),
+            "evolution": r.get("evolution", np.nan),
+            "recent_change": r.get("recent_change", np.nan),
+            "rsi": r.get("RSI", np.nan),
+            "slope": r.get("SLOPE", np.nan),
+            "dist_ema9": r.get("DIST EMA9%", np.nan),
+            "obv": r.get("OBV", ""),
+            "market_score": r.get("MarketScore", np.nan),
+            "action_score": r.get("ActionScore", np.nan),
+            "storm_score": r.get("StormScore", np.nan),
+            "evo_score": r.get("EvoScore", np.nan),
+            "zone_score": r.get("ZoneScore", np.nan),
+            "penalty": r.get("Penalty", np.nan),
+            "t1_return": np.nan,
+            "t3_return": np.nan,
+            "t5_return": np.nan,
+            "t1_win": np.nan,
+            "t3_win": np.nan,
+            "t5_win": np.nan,
+            "last_outcome_update": "",
+        })
+
+    new_df = pd.DataFrame(rows)
+    if new_df.empty:
+        return history_df if history_df is not None else pd.DataFrame()
+
+    if history_df is None or history_df.empty:
+        hist = new_df
+    else:
+        hist = pd.concat([history_df, new_df], ignore_index=True)
+
+    hist = hist.drop_duplicates(subset=["date", "symbol"], keep="last")
+    return hist
+
+
+def _feature_multiplier(completed: pd.DataFrame, mask: pd.Series, baseline: float, min_n: int, kind: str = "good") -> tuple[float, str | None]:
+    sub = completed[mask.fillna(False)].copy()
+    n = len(sub)
+    if n < min_n or baseline is None or pd.isna(baseline):
+        return 1.0, None
+
+    wr = to_float(sub["t5_win"].mean(), np.nan)
+    if pd.isna(wr):
+        return 1.0, None
+
+    if kind == "good":
+        adj = np.clip((wr - baseline) * 0.45, -0.12, 0.12)
+        mult = 1.0 + adj
+    else:
+        # Với rủi ro: winrate càng thấp hơn baseline thì phạt càng mạnh.
+        adj = np.clip((baseline - wr) * 0.65, -0.18, 0.25)
+        mult = 1.0 + adj
+
+    insight = f"{kind}: n={n}, winrate={round(wr*100,1)}%, baseline={round(baseline*100,1)}%, mult={round(mult,3)}"
+    return round(float(np.clip(mult, 0.80, 1.25)), 3), insight
+
+
+def build_buy_elite_learning_profile(history_df: pd.DataFrame, old_profile: dict | None = None) -> dict:
+    """Sinh learning profile từ lịch sử đã hoàn tất T+5. Học chậm, thay đổi nhỏ."""
+    old_profile = old_profile if isinstance(old_profile, dict) else default_buy_elite_learning_profile()
+    profile = default_buy_elite_learning_profile()
+    profile["created_at"] = old_profile.get("created_at", profile["created_at"])
+    profile["updated_at"] = vn_time_str("%Y-%m-%d %H:%M:%S")
+
+    if history_df is None or history_df.empty or "t5_win" not in history_df.columns:
+        profile["note"] = "Chưa có lịch sử BUY ELITE. V3 đang WARMUP, chưa tự chỉnh trọng số."
+        return profile
+
+    hist = history_df.copy()
+    hist["t5_win"] = pd.to_numeric(hist["t5_win"], errors="coerce")
+    hist["t5_return"] = pd.to_numeric(hist.get("t5_return", np.nan), errors="coerce")
+    completed = hist.dropna(subset=["t5_win", "t5_return"]).copy()
+    completed_count = len(completed)
+    profile["completed_t5"] = int(completed_count)
+
+    min_completed = int(profile.get("min_completed_to_learn", 80))
+    min_feature_samples = int(profile.get("min_feature_samples", 20))
+
+    if completed_count == 0:
+        profile["note"] = "Đã ghi tín hiệu nhưng chưa có mã nào đủ T+5 để học."
+        return profile
+
+    baseline = to_float(completed["t5_win"].mean(), np.nan)
+    avg_ret = to_float(completed["t5_return"].mean(), np.nan)
+    profile["baseline_winrate"] = round(float(baseline), 4) if pd.notna(baseline) else None
+    profile["avg_t5_return"] = round(float(avg_ret), 3) if pd.notna(avg_ret) else None
+
+    if completed_count < min_completed:
+        profile["mode"] = "WARMUP"
+        profile["note"] = f"Đã có {completed_count}/{min_completed} mẫu T+5. Chưa tự chỉnh trọng số, chỉ ghi nhớ và thống kê."
+        profile["insights"] = [
+            f"Completed T+5: {completed_count}/{min_completed}",
+            f"Baseline WinRate: {round(baseline*100,1)}%" if pd.notna(baseline) else "Baseline WinRate: chưa đủ",
+            f"Average T+5: {round(avg_ret,2)}%" if pd.notna(avg_ret) else "Average T+5: chưa đủ",
+        ]
+        return profile
+
+    profile["mode"] = "ACTIVE_LEARNING"
+    profile["note"] = "Đủ dữ liệu tối thiểu. Learning Engine đã bắt đầu tự chỉnh trọng số rất chậm."
+
+    completed["storm_num"] = pd.to_numeric(completed.get("storm", np.nan), errors="coerce")
+    completed["persistence_num"] = pd.to_numeric(completed.get("persistence", np.nan), errors="coerce")
+    completed["evolution_num"] = pd.to_numeric(completed.get("evolution", np.nan), errors="coerce")
+    completed["recent_change_num"] = pd.to_numeric(completed.get("recent_change", np.nan), errors="coerce")
+    completed["rsi_num"] = pd.to_numeric(completed.get("rsi", np.nan), errors="coerce")
+    completed["dist_num"] = pd.to_numeric(completed.get("dist_ema9", np.nan), errors="coerce")
+    completed["market_real_num"] = pd.to_numeric(completed.get("market_real", np.nan), errors="coerce")
+    completed["action_score_num"] = pd.to_numeric(completed.get("action_score", np.nan), errors="coerce")
+    completed["zone_score_num"] = pd.to_numeric(completed.get("zone_score", np.nan), errors="coerce")
+
+    obv_series = completed["obv"].astype(str) if "obv" in completed.columns else pd.Series("", index=completed.index)
+    features = {
+        "market": (completed["market_real_num"] >= 6, "good"),
+        "action": (completed["action_score_num"] > 0, "good"),
+        "storm": (completed["storm_num"].notna(), "good"),
+        "evo": ((completed["persistence_num"] >= 3.5) | (completed["evolution_num"] > 0) | (completed["recent_change_num"] > 0), "good"),
+        "zone": (completed["zone_score_num"] > 0, "good"),
+        "obv": (obv_series.str.contains("🟢", na=False), "good"),
+        "rsi_penalty": (completed["rsi_num"] > 72, "risk"),
+        "dist_penalty": (completed["dist_num"] > 3.5, "risk"),
+    }
+
+    insights = [
+        f"Completed T+5: {completed_count}",
+        f"Baseline WinRate: {round(baseline*100,1)}%",
+        f"Average T+5: {round(avg_ret,2)}%" if pd.notna(avg_ret) else "Average T+5: chưa đủ",
+    ]
+
+    new_mult = {}
+    for name, (mask, kind) in features.items():
+        mult, insight = _feature_multiplier(completed, mask, baseline, min_feature_samples, kind=kind)
+        # Học chậm: trộn 80% trọng số cũ + 20% kết quả mới.
+        old_mult = to_float(old_profile.get("multipliers", {}).get(name, 1.0), 1.0)
+        blended = round(float(np.clip(old_mult * 0.80 + mult * 0.20, 0.85, 1.15)), 3)
+        new_mult[name] = blended
+        if insight:
+            insights.append(f"{name}: {insight}, blended={blended}")
+
+    profile["multipliers"].update(new_mult)
+
+    # Học theo mùa thị trường nếu từng mùa đủ mẫu.
+    regime_mults = {"WINTER": {}, "NEUTRAL": {}, "SPRING": {}}
+    for regime_key in regime_mults.keys():
+        if "regime" not in completed.columns:
+            continue
+        if regime_key == "WINTER":
+            sub = completed[completed["regime"].astype(str).str.contains("ĐÔNG|WINTER", regex=True, na=False)]
+        elif regime_key == "NEUTRAL":
+            sub = completed[completed["regime"].astype(str).str.contains("TRUNG|NEUTRAL", regex=True, na=False)]
+        else:
+            sub = completed[completed["regime"].astype(str).str.contains("XUÂN|SPRING", regex=True, na=False)]
+        if len(sub) < max(40, min_feature_samples):
+            continue
+        sub_baseline = to_float(sub["t5_win"].mean(), np.nan)
+        # Nếu một mùa thắng thấp hơn baseline chung, hạ nhẹ action/storm; nếu tốt hơn thì tăng nhẹ.
+        if pd.notna(sub_baseline) and pd.notna(baseline):
+            seasonal = round(float(np.clip(1.0 + (sub_baseline - baseline) * 0.25, 0.90, 1.10)), 3)
+            regime_mults[regime_key] = {"action": seasonal, "storm": seasonal, "zone": round(float(np.clip(2 - seasonal, 0.90, 1.10)), 3)}
+            insights.append(f"Regime {regime_key}: n={len(sub)}, winrate={round(sub_baseline*100,1)}%, seasonal={seasonal}")
+
+    profile["regime_multipliers"] = regime_mults
+    profile["insights"] = insights[-20:]
+    return profile
+
+
+def run_buy_elite_learning_cycle(
+    buy_elite_df: pd.DataFrame,
+    scan_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+    trading_today: bool,
+) -> tuple[pd.DataFrame, dict, str, str]:
+    """Một vòng học: đọc history → cập nhật outcome → học profile → ghi tín hiệu hôm nay."""
+    history = read_buy_elite_history()
+    old_profile = read_buy_elite_learning_profile()
+
+    history = update_buy_elite_outcomes(history, scan_df)
+    profile = build_buy_elite_learning_profile(history, old_profile=old_profile)
+    profile_status = write_buy_elite_learning_profile(profile)
+
+    history = append_today_buy_elite_signals(history, buy_elite_df, market_real, market_forecast, allow_save=trading_today)
+    # Giữ 260 phiên gần nhất để file nhẹ.
+    if history is not None and not history.empty and "date" in history.columns:
+        tmp = history.copy()
+        tmp["date_dt"] = pd.to_datetime(tmp["date"], errors="coerce")
+        keep_dates = sorted(tmp["date_dt"].dropna().dt.strftime("%Y-%m-%d").unique())[-260:]
+        tmp["date_str"] = tmp["date_dt"].dt.strftime("%Y-%m-%d")
+        history = tmp[tmp["date_str"].isin(keep_dates)].drop(columns=["date_dt", "date_str"], errors="ignore")
+    hist_status = write_buy_elite_history(history)
+    return history, profile, hist_status, profile_status
+
+
+def build_learning_summary(profile: dict, history_df: pd.DataFrame) -> dict:
+    completed = int(profile.get("completed_t5", 0) or 0)
+    min_required = int(profile.get("min_completed_to_learn", 80) or 80)
+    mode = profile.get("mode", "WARMUP")
+    baseline = profile.get("baseline_winrate", None)
+    avg_ret = profile.get("avg_t5_return", None)
+    if baseline is None:
+        wr_text = "-"
+    else:
+        wr_text = f"{round(float(baseline)*100,1)}%"
+    avg_text = "-" if avg_ret is None else f"{round(float(avg_ret),2)}%"
+    total_signals = 0 if history_df is None or history_df.empty else len(history_df)
+    return {
+        "mode": mode,
+        "completed": f"{completed}/{min_required}",
+        "winrate": wr_text,
+        "avg_t5": avg_text,
+        "total_signals": total_signals,
+        "note": profile.get("note", ""),
+    }
+
+# BUY ELITE V3 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
 # =========================================================
 def elite_market_score(market_real: float, market_forecast: float) -> tuple[float, str]:
     """Market là cổng chặn đầu tiên, không phải chỉ là điểm cộng."""
@@ -3304,9 +3775,10 @@ def build_buy_elite_decision_engine(
     early_buy_lab_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
+    learning_profile: dict | None = None,
 ) -> pd.DataFrame:
     """
-    BUY ELITE V2 = Decision Engine có xác suất ước lượng, đồng thuận và trọng số theo mùa.
+    BUY ELITE V3 = Decision Engine có xác suất ước lượng, đồng thuận, trọng số theo mùa và Learning Engine.
 
     V2 khác V1 ở 5 điểm:
     1) Có WinProb: xác suất thắng ước lượng từ điểm đồng thuận, chưa phải xác suất thống kê thật.
@@ -3413,8 +3885,16 @@ def build_buy_elite_decision_engine(
     # 5) TÍNH ĐIỂM THEO CÁC CHUYÊN GIA + TRỌNG SỐ THEO MÙA
     # -----------------------------------------------------
     regime_name, weights, regime_note = elite_regime(market_real, market_forecast)
+
+    # V3: áp dụng trọng số tự học rất chậm từ lịch sử BUY ELITE.
+    # Nếu dữ liệu chưa đủ, learning_profile trả về multiplier = 1.0 nên V2 vẫn chạy y nguyên.
+    learn_mult = get_learning_multipliers(learning_profile, regime_name)
+    for _k in ["market", "action", "storm", "evo", "zone", "obv"]:
+        weights[_k] = weights.get(_k, 1.0) * learn_mult.get(_k, 1.0)
+
     market_score, market_note = elite_market_score(market_real, market_forecast)
     base["REGIME"] = regime_name
+    base["LearningMode"] = str((learning_profile or {}).get("mode", "WARMUP"))
     base["MarketScore"] = market_score * weights["market"]
 
     sig = base["GR_SIGNAL"].astype(str)
@@ -3492,8 +3972,10 @@ def build_buy_elite_decision_engine(
     base["Penalty"] += np.where(warn.str.contains("OBV gãy", na=False), 35, 0)
     base["Penalty"] += np.where(warn.str.contains("Giá dưới EMA9", na=False), 30, 0)
     base["Penalty"] += np.where(warn.str.contains("RSI yếu", na=False), 12, 0)
-    base["Penalty"] += np.where(dist > 4.5, 12, 0)
-    base["Penalty"] += np.where(rsi > 75, 8, 0)
+    dist_penalty_mult = learn_mult.get("dist_penalty", 1.0)
+    rsi_penalty_mult = learn_mult.get("rsi_penalty", 1.0)
+    base["Penalty"] += np.where(dist > 4.5, 12 * dist_penalty_mult, 0)
+    base["Penalty"] += np.where(rsi > 75, 8 * rsi_penalty_mult, 0)
     base["Penalty"] += np.where(group.eq("GÀ TĂNG TỐC"), 10, 0)
     base["Penalty"] += np.where(group.eq("CP MẠNH") & (dist > 3), 10, 0)
 
@@ -3642,7 +4124,7 @@ def build_buy_elite_decision_engine(
 
     cols = [
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN", "EliteScore",
-        "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE", "REGIME",
+        "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE", "REGIME", "LearningMode",
         "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "Penalty",
         "GR_SIGNAL", "GR_BUY_SCORE", "Storm", "Persistence", "DNA", "evolution", "recent_change",
         "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE", "RỦI RO", "CẢNH BÁO",
@@ -3901,7 +4383,7 @@ else:
 st.caption(market_forecast_text)
 if safe_mode_count > 0:
     st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
-st.caption("V20: tất cả bảng vẫn dùng chung scan_df. Bảng chính đã tinh gọn cột cho điện thoại; cột phụ vẫn nằm trong nút 🔎 mở rộng để soi kỹ trên máy tính.")
+st.caption("V21/V3: tất cả bảng vẫn dùng chung scan_df. BUY ELITE có thêm Learning Engine để ghi nhớ và tự điều chỉnh chậm theo lịch sử thực chiến.")
 
 # =========================================================
 # PREPARE CORE TABLES
@@ -3933,6 +4415,8 @@ green_red_df = build_green_red_board(
     market_forecast=market_forecast,
 )
 
+learning_profile = read_buy_elite_learning_profile()
+
 buy_elite_df = build_buy_elite_decision_engine(
     scan_df=scan_df,
     green_red_df=green_red_df,
@@ -3942,13 +4426,24 @@ buy_elite_df = build_buy_elite_decision_engine(
     early_buy_lab_df=early_buy_lab_df,
     market_real=market_real,
     market_forecast=market_forecast,
+    learning_profile=learning_profile,
 )
 
+buy_elite_history_df, learning_profile_after, learning_hist_status, learning_profile_status = run_buy_elite_learning_cycle(
+    buy_elite_df=buy_elite_df,
+    scan_df=scan_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+    trading_today=trading_today,
+)
+learning_summary = build_learning_summary(learning_profile_after, buy_elite_history_df)
+
+
 # =========================================================
-# BUY ELITE V2 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
+# BUY ELITE V3 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
 # =========================================================
 st.markdown("---")
-st.markdown("## 👑 BUY ELITE V2 - DECISION ENGINE")
+st.markdown("## 👑 BUY ELITE V3 - DECISION ENGINE + LEARNING ENGINE")
 
 elite_summary = build_buy_elite_today_summary(buy_elite_df, market_real, market_forecast)
 
@@ -3969,6 +4464,39 @@ elif market_real < 8:
 else:
     st.success(elite_summary["detail"])
 
+st.markdown("### 🧠 LEARNING ENGINE V3")
+l1, l2, l3, l4, l5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.2])
+with l1:
+    st.metric("MODE", learning_summary["mode"])
+with l2:
+    st.metric("T+5 MẪU", learning_summary["completed"])
+with l3:
+    st.metric("WINRATE T+5", learning_summary["winrate"])
+with l4:
+    st.metric("AVG T+5", learning_summary["avg_t5"])
+with l5:
+    st.metric("TÍN HIỆU ĐÃ GHI", learning_summary["total_signals"])
+
+if learning_summary["mode"] == "ACTIVE_LEARNING":
+    st.success("Learning Engine đã đủ mẫu tối thiểu và đang tự chỉnh trọng số rất chậm.")
+else:
+    st.info(learning_summary["note"])
+
+with st.expander("🧠 Nhật ký học của BUY ELITE V3"):
+    st.caption(f"History save: {learning_hist_status} | Profile save: {learning_profile_status}")
+    profile_show = learning_profile_after if isinstance(learning_profile_after, dict) else {}
+    mult = profile_show.get("multipliers", {})
+    mult_df = pd.DataFrame([{"Yếu tố": k, "Multiplier": v} for k, v in mult.items()])
+    if not mult_df.empty:
+        st.dataframe(mult_df, use_container_width=True, hide_index=True)
+    insights = profile_show.get("insights", [])
+    if insights:
+        st.markdown("**Những điều bot đang học được:**")
+        for item in insights[-12:]:
+            st.write("• " + str(item))
+    else:
+        st.write("Bot đang bắt đầu ghi nhớ dữ liệu. Chưa có insight đủ mạnh.")
+
 if not buy_elite_df.empty:
     elite_compact_cols = [
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN",
@@ -3984,7 +4512,7 @@ if not buy_elite_df.empty:
         height=540,
     )
 
-    with st.expander("🔎 Mở đầy đủ cột BUY ELITE V2"):
+    with st.expander("🔎 Mở đầy đủ cột BUY ELITE V3"):
         st.dataframe(
             style_buy_elite_board(buy_elite_df),
             use_container_width=True,
@@ -3992,11 +4520,11 @@ if not buy_elite_df.empty:
             height=760,
         )
         st.caption(
-            "BUY ELITE V2 = Market regime + WinProb ước lượng + đồng thuận 6 chuyên gia: Market, Xanh/Đỏ, Storm, Evolution/DNA, vùng mua, OBV. "
-            "WinProb hiện là xác suất mô phỏng theo quy tắc, chưa phải xác suất học máy thật; V3 sẽ học từ kết quả T+1/T+3/T+5."
+            "BUY ELITE V3 = V2 + Learning Engine: tự ghi lịch sử tín hiệu, tự cập nhật T+1/T+3/T+5, tự điều chỉnh trọng số rất chậm khi dữ liệu đủ mạnh. "
+            "Khi dữ liệu chưa đủ, hệ thống chạy WARMUP và không tự thay đổi quá mạnh."
         )
 else:
-    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE V2. Đây là tín hiệu tốt để không ép lệnh.")
+    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE V3. Đây là tín hiệu tốt để không ép lệnh.")
 
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
