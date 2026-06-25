@@ -1,0 +1,50 @@
+{
+  "version": "MR_BOT_PRO_V4.0",
+  "name": "Mr.BOT PRO",
+  "slogan": "Observe • Learn • Think • Evolve",
+  "created_at": "2026-06-25 17:28:56",
+  "updated_at": "2026-06-25 17:28:56",
+  "age_days": 0,
+  "bot_version_number": 4.0,
+  "status": "WARMUP",
+  "personality": "HỌC VIỆC THẬN TRỌNG",
+  "confidence": 0.0,
+  "experience": {
+    "observations": 3857,
+    "signals": 21,
+    "completed_t5": 0,
+    "hypotheses": 0,
+    "beliefs": 0,
+    "reflections": 0,
+    "discarded_beliefs": 0
+  },
+  "constitution": [
+    "Không cố đoán tương lai.",
+    "Market First: Market cấm thì không giải ngân thật.",
+    "Không chắc thì đứng ngoài.",
+    "Luôn ghi nhớ kết quả thực chiến.",
+    "Sẵn sàng thừa nhận sai khi dữ liệu chứng minh điều ngược lại.",
+    "Học chậm, đổi chậm, tránh ảo tưởng AI."
+  ],
+  "current_message": "Market REAL 5.0 < 6. Tôi chỉ lập watchlist (ACB, TNG, SAB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
+  "proposals": [
+    "Chưa đề xuất đổi trọng số: cần đủ tối thiểu 80 mẫu T+5."
+  ],
+  "self_questions": [
+    "Hôm nay tôi sai ở đâu nếu BUY ELITE không hiệu quả?",
+    "Điều kiện nào khiến tín hiệu thắng chỉ là may mắn?",
+    "Yếu tố nào còn giá trị khi Market đổi mùa?",
+    "Niềm tin nào cần bị kiểm tra lại?"
+  ],
+  "evolution_log": [
+    {
+      "time": "2026-06-25 17:28:56",
+      "status": "WARMUP",
+      "personality": "HỌC VIỆC THẬN TRỌNG",
+      "confidence": 0.0,
+      "completed_t5": 0,
+      "market_real": 5.0,
+      "message": "Market REAL 5.0 < 6. Tôi chỉ lập watchlist (ACB, TNG, SAB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    }
+  ]
+}
