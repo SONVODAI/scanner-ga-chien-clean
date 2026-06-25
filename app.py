@@ -29,13 +29,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V21 Buy Elite V3.1",
+    page_title="Mr.BOT PRO V4.0",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V21 - BUY ELITE V3.1")
-st.caption("Market First → BUY ELITE V3 → Learning Engine → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution. Decision Engine có WinProb, đồng thuận, Learning Engine và Thinking Engine biết quan sát - phân tích - phản biện từ lịch sử T+1/T+3/T+5.")
+st.title("🤖 Mr.BOT PRO V4.0 - Scanner Gà Chiến")
+st.caption("Observe • Learn • Think • Evolve. Market First → Mr.BOT PRO → Decision Engine → Learning Engine → Thinking Engine → Bot Evolution. Không dự đoán tương lai; chỉ học từ quá khứ để hỗ trợ quyết định hiện tại.")
 
 # =========================================================
 # WATCHLIST
@@ -81,6 +81,8 @@ BUY_ELITE_HISTORY_FILE = "buy_elite_learning_history.csv"
 BUY_ELITE_PROFILE_FILE = "buy_elite_learning_profile.json"
 BUY_ELITE_THINKING_FILE = "buy_elite_thinking_profile.json"
 BUY_ELITE_THINKING_JOURNAL_FILE = "buy_elite_thinking_journal.csv"
+MR_BOT_PRO_PROFILE_FILE = "mr_bot_pro_profile.json"
+MR_BOT_PRO_JOURNAL_FILE = "mr_bot_pro_journal.csv"
 
 # Daily data cache giữ nhẹ để không spam vnstock.
 # Live price cache ngắn để bảng không lệch quá lâu.
@@ -4037,6 +4039,285 @@ def build_thinking_summary(profile: dict) -> dict:
     }
 
 
+# =========================================================
+# Mr.BOT PRO V4.0 / BOT EVOLUTION - NHÂN CÁCH, TRÍ NHỚ, BẢN NĂNG
+# =========================================================
+def default_mr_bot_pro_profile() -> dict:
+    return {
+        "version": "MR_BOT_PRO_V4.0",
+        "name": "Mr.BOT PRO",
+        "slogan": "Observe • Learn • Think • Evolve",
+        "created_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "updated_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "age_days": 0,
+        "bot_version_number": 4.0,
+        "status": "WARMUP",
+        "personality": "PHÒNG THỦ",
+        "confidence": 0,
+        "experience": {
+            "observations": 0,
+            "signals": 0,
+            "completed_t5": 0,
+            "hypotheses": 0,
+            "beliefs": 0,
+            "reflections": 0,
+            "discarded_beliefs": 0,
+        },
+        "constitution": [
+            "Không cố đoán tương lai.",
+            "Market First: Market cấm thì không giải ngân thật.",
+            "Không chắc thì đứng ngoài.",
+            "Luôn ghi nhớ kết quả thực chiến.",
+            "Sẵn sàng thừa nhận sai khi dữ liệu chứng minh điều ngược lại.",
+            "Học chậm, đổi chậm, tránh ảo tưởng AI.",
+        ],
+        "current_message": "Tôi mới sinh ra. Tôi sẽ quan sát trước, học sau, rồi mới tư duy.",
+        "proposals": [],
+        "self_questions": [],
+        "evolution_log": [],
+    }
+
+
+def read_mr_bot_pro_profile() -> dict:
+    text = _github_read_text(MR_BOT_PRO_PROFILE_FILE)
+    if text is None:
+        try:
+            with open(MR_BOT_PRO_PROFILE_FILE, "r", encoding="utf-8") as f:
+                text = f.read()
+        except Exception:
+            return default_mr_bot_pro_profile()
+    try:
+        obj = json.loads(text)
+        if not isinstance(obj, dict):
+            return default_mr_bot_pro_profile()
+        base = default_mr_bot_pro_profile()
+        base.update(obj)
+        return base
+    except Exception:
+        return default_mr_bot_pro_profile()
+
+
+def write_mr_bot_pro_profile(profile: dict) -> str:
+    try:
+        text = json.dumps(profile, ensure_ascii=False, indent=2)
+    except Exception:
+        text = json.dumps(default_mr_bot_pro_profile(), ensure_ascii=False, indent=2)
+    return _github_write_text(
+        MR_BOT_PRO_PROFILE_FILE,
+        text,
+        f"Update Mr.BOT PRO profile {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+    )
+
+
+def _safe_date_age_days(created_at: str) -> int:
+    try:
+        dt = pd.to_datetime(created_at, errors="coerce")
+        if pd.isna(dt):
+            return 0
+        return max((pd.to_datetime(today_str()) - pd.to_datetime(dt.strftime("%Y-%m-%d"))).days, 0)
+    except Exception:
+        return 0
+
+
+def _mr_bot_personality(market_real: float, market_forecast: float, completed_t5: int) -> str:
+    if completed_t5 < 80:
+        return "HỌC VIỆC THẬN TRỌNG"
+    if market_real < 6:
+        return "PHÒNG THỦ"
+    if market_real < 8:
+        return "CÂN BẰNG"
+    if market_forecast >= 6:
+        return "TẤN CÔNG CÓ KỶ LUẬT"
+    return "CÂN BẰNG"
+
+
+def _mr_bot_status(completed_t5: int, confidence: float) -> str:
+    if completed_t5 < 80:
+        return "WARMUP"
+    if completed_t5 < 300:
+        return "LEARNING"
+    if confidence < 70:
+        return "THINKING"
+    if completed_t5 < 1000:
+        return "EVOLVING"
+    return "MATURE"
+
+
+def _mr_bot_confidence(winrate_t5, avg_t5, completed_t5: int, reflections: int) -> float:
+    if completed_t5 <= 0:
+        return 0.0
+    wr = to_float(winrate_t5, np.nan)
+    avg = to_float(avg_t5, 0)
+    if pd.isna(wr):
+        wr = 50.0
+    # Confidence không phải xác suất thắng; là độ trưởng thành của hệ thống.
+    sample_score = min(completed_t5 / 300, 1) * 45
+    win_score = np.clip((wr - 45) * 1.2, 0, 35)
+    avg_score = np.clip(avg * 2.0, 0, 10)
+    reflection_score = min(reflections, 10)
+    return round(float(np.clip(sample_score + win_score + avg_score + reflection_score, 0, 100)), 1)
+
+
+def build_mr_bot_pro_profile(
+    old_profile: dict,
+    learning_profile: dict,
+    thinking_profile: dict,
+    history_df: pd.DataFrame,
+    buy_elite_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> dict:
+    profile = old_profile if isinstance(old_profile, dict) else default_mr_bot_pro_profile()
+    created_at = profile.get("created_at") or vn_time_str("%Y-%m-%d %H:%M:%S")
+
+    completed_t5 = int(to_float(learning_profile.get("completed_t5", 0) if isinstance(learning_profile, dict) else 0, 0))
+    signals = len(history_df) if isinstance(history_df, pd.DataFrame) else 0
+    hypotheses = len(thinking_profile.get("hypotheses", [])) if isinstance(thinking_profile, dict) else 0
+    beliefs = len(thinking_profile.get("beliefs", [])) if isinstance(thinking_profile, dict) else 0
+    reflections = len(thinking_profile.get("reflections", [])) if isinstance(thinking_profile, dict) else 0
+
+    completed = pd.DataFrame()
+    if isinstance(history_df, pd.DataFrame) and not history_df.empty and "t5_return" in history_df.columns:
+        completed = history_df[pd.notna(pd.to_numeric(history_df["t5_return"], errors="coerce"))].copy()
+
+    winrate_t5 = np.nan
+    avg_t5 = np.nan
+    if not completed.empty:
+        completed["t5_return"] = pd.to_numeric(completed["t5_return"], errors="coerce")
+        winrate_t5 = round((completed["t5_return"] > 0).mean() * 100, 1)
+        avg_t5 = round(completed["t5_return"].mean(), 2)
+
+    confidence = _mr_bot_confidence(winrate_t5, avg_t5, completed_t5, reflections)
+    personality = _mr_bot_personality(market_real, market_forecast, completed_t5)
+    status = _mr_bot_status(completed_t5, confidence)
+    age_days = _safe_date_age_days(created_at)
+    bot_version_number = round(4.0 + min(completed_t5 / 1000, 0.99) + min(reflections / 1000, 0.10), 3)
+
+    top_watch = "-"
+    if isinstance(buy_elite_df, pd.DataFrame) and not buy_elite_df.empty and "MÃ" in buy_elite_df.columns:
+        top_watch = ", ".join(buy_elite_df.head(3)["MÃ"].astype(str).tolist())
+
+    if market_real < 6:
+        current_message = f"Market REAL {market_real} < 6. Tôi chỉ lập watchlist ({top_watch}), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    elif completed_t5 < 80:
+        current_message = f"Tôi đang WARMUP: đã ghi {signals} tín hiệu, nhưng mới có {completed_t5}/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
+    elif status in ["LEARNING", "THINKING"]:
+        current_message = f"Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
+    else:
+        current_message = f"Tôi đang tiến hóa thận trọng. Mỗi thay đổi phải được dữ liệu T+5 xác nhận, không thay đổi vì cảm xúc một vài phiên."
+
+    proposals = []
+    if completed_t5 < 80:
+        proposals.append("Chưa đề xuất đổi trọng số: cần đủ tối thiểu 80 mẫu T+5.")
+    else:
+        if market_real < 6:
+            proposals.append("Duy trì quyền phủ quyết của Market khi Market REAL < 6.")
+        if beliefs:
+            proposals.append("Theo dõi các niềm tin đã hình thành, chỉ nâng cấp khi được lặp lại qua nhiều mẫu.")
+        if reflections:
+            proposals.append("Ưu tiên các giả thuyết đã qua phản biện; giảm vai trò giả thuyết bị dữ liệu bác bỏ.")
+
+    self_questions = [
+        "Hôm nay tôi sai ở đâu nếu BUY ELITE không hiệu quả?",
+        "Điều kiện nào khiến tín hiệu thắng chỉ là may mắn?",
+        "Yếu tố nào còn giá trị khi Market đổi mùa?",
+        "Niềm tin nào cần bị kiểm tra lại?",
+    ]
+
+    new_log = {
+        "time": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "status": status,
+        "personality": personality,
+        "confidence": confidence,
+        "completed_t5": completed_t5,
+        "market_real": market_real,
+        "message": current_message,
+    }
+
+    old_log = profile.get("evolution_log", []) if isinstance(profile.get("evolution_log", []), list) else []
+    old_log.append(new_log)
+    old_log = old_log[-80:]
+
+    profile.update({
+        "version": "MR_BOT_PRO_V4.0",
+        "name": "Mr.BOT PRO",
+        "slogan": "Observe • Learn • Think • Evolve",
+        "created_at": created_at,
+        "updated_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "age_days": age_days,
+        "bot_version_number": bot_version_number,
+        "status": status,
+        "personality": personality,
+        "confidence": confidence,
+        "current_message": current_message,
+        "experience": {
+            "observations": signals + len(read_evolution_history()) if isinstance(read_evolution_history(), pd.DataFrame) else signals,
+            "signals": signals,
+            "completed_t5": completed_t5,
+            "hypotheses": hypotheses,
+            "beliefs": beliefs,
+            "reflections": reflections,
+            "discarded_beliefs": max(reflections - beliefs, 0),
+        },
+        "proposals": proposals,
+        "self_questions": self_questions,
+        "evolution_log": old_log,
+    })
+
+    profile.setdefault("constitution", default_mr_bot_pro_profile()["constitution"])
+    return profile
+
+
+def write_mr_bot_pro_journal(profile: dict) -> str:
+    try:
+        row = pd.DataFrame([{
+            "time": vn_time_str("%Y-%m-%d %H:%M:%S"),
+            "date": today_str(),
+            "name": profile.get("name", "Mr.BOT PRO"),
+            "version": profile.get("bot_version_number", 4.0),
+            "status": profile.get("status", "WARMUP"),
+            "personality": profile.get("personality", ""),
+            "confidence": profile.get("confidence", 0),
+            "age_days": profile.get("age_days", 0),
+            "message": profile.get("current_message", ""),
+        }])
+        old = pd.DataFrame()
+        text = _github_read_text(MR_BOT_PRO_JOURNAL_FILE)
+        if text is not None:
+            from io import StringIO
+            old = pd.read_csv(StringIO(text))
+        elif os.path.exists(MR_BOT_PRO_JOURNAL_FILE):
+            old = pd.read_csv(MR_BOT_PRO_JOURNAL_FILE)
+        out = pd.concat([old, row], ignore_index=True).drop_duplicates(subset=["date"], keep="last").tail(500)
+        return _github_write_text(
+            MR_BOT_PRO_JOURNAL_FILE,
+            out.to_csv(index=False),
+            f"Update Mr.BOT PRO journal {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+        )
+    except Exception:
+        return "MR_BOT_JOURNAL_ERROR"
+
+
+def build_mr_bot_pro_summary(profile: dict) -> dict:
+    exp = profile.get("experience", {}) if isinstance(profile, dict) else {}
+    return {
+        "name": profile.get("name", "Mr.BOT PRO"),
+        "version": profile.get("bot_version_number", 4.0),
+        "status": profile.get("status", "WARMUP"),
+        "personality": profile.get("personality", ""),
+        "confidence": profile.get("confidence", 0),
+        "age": profile.get("age_days", 0),
+        "signals": exp.get("signals", 0),
+        "completed_t5": exp.get("completed_t5", 0),
+        "beliefs": exp.get("beliefs", 0),
+        "hypotheses": exp.get("hypotheses", 0),
+        "reflections": exp.get("reflections", 0),
+        "message": profile.get("current_message", ""),
+        "proposals": profile.get("proposals", []),
+        "self_questions": profile.get("self_questions", []),
+    }
+
+
 # BUY ELITE V3 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
 # =========================================================
 def elite_market_score(market_real: float, market_forecast: float) -> tuple[float, str]:
@@ -4761,7 +5042,7 @@ else:
 st.caption(market_forecast_text)
 if safe_mode_count > 0:
     st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
-st.caption("V21/V3.1: tất cả bảng vẫn dùng chung scan_df. BUY ELITE có Learning Engine để ghi nhớ và Thinking Engine để quan sát, phân tích, phản biện theo lịch sử thực chiến.")
+st.caption("Mr.BOT PRO V4.0: tất cả bảng vẫn dùng chung scan_df. BUY ELITE ra quyết định; Learning ghi nhớ; Thinking phản biện; Bot Evolution lưu nhân cách và tiến hóa chậm từ thực chiến.")
 
 # =========================================================
 # PREPARE CORE TABLES
@@ -4829,12 +5110,64 @@ thinking_profile_status = write_buy_elite_thinking_profile(thinking_profile_afte
 thinking_journal_status = append_thinking_journal(thinking_profile_after)
 thinking_summary = build_thinking_summary(thinking_profile_after)
 
+mr_bot_profile_old = read_mr_bot_pro_profile()
+mr_bot_profile_after = build_mr_bot_pro_profile(
+    old_profile=mr_bot_profile_old,
+    learning_profile=learning_profile_after,
+    thinking_profile=thinking_profile_after,
+    history_df=buy_elite_history_df,
+    buy_elite_df=buy_elite_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+mr_bot_profile_status = write_mr_bot_pro_profile(mr_bot_profile_after)
+mr_bot_journal_status = write_mr_bot_pro_journal(mr_bot_profile_after)
+mr_bot_summary = build_mr_bot_pro_summary(mr_bot_profile_after)
+
 
 # =========================================================
-# BUY ELITE V3.1 / DECISION + LEARNING + THINKING
+# Mr.BOT PRO V4.0 / DECISION + LEARNING + THINKING + EVOLUTION
 # =========================================================
 st.markdown("---")
-st.markdown("## 👑 BUY ELITE V3.1 - DECISION ENGINE + LEARNING ENGINE + THINKING ENGINE")
+st.markdown("# 🤖 Mr.BOT PRO V4.0")
+st.caption("Observe • Learn • Think • Evolve | Tôi không dự đoán tương lai. Tôi học từ quá khứ để hỗ trợ quyết định hiện tại.")
+
+b1, b2, b3, b4, b5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.4])
+with b1:
+    st.metric("STATUS", mr_bot_summary["status"])
+with b2:
+    st.metric("AGE", f"{mr_bot_summary['age']} ngày")
+with b3:
+    st.metric("VERSION", mr_bot_summary["version"])
+with b4:
+    st.metric("CONFIDENCE", f"{mr_bot_summary['confidence']}%")
+with b5:
+    st.metric("NHÂN CÁCH", mr_bot_summary["personality"])
+
+st.info(mr_bot_summary["message"])
+
+with st.expander("🤖 Hồ sơ Mr.BOT PRO / Nhân cách / Đề xuất / Câu hỏi tự kiểm tra"):
+    st.caption(f"Profile save: {mr_bot_profile_status} | Journal save: {mr_bot_journal_status}")
+    st.markdown("**Hiến pháp của Mr.BOT PRO:**")
+    for item in mr_bot_profile_after.get("constitution", []):
+        st.write("• " + str(item))
+
+    if mr_bot_summary.get("proposals"):
+        st.markdown("**Đề xuất hiện tại:**")
+        for item in mr_bot_summary["proposals"]:
+            st.write("• " + str(item))
+
+    if mr_bot_summary.get("self_questions"):
+        st.markdown("**Câu hỏi tự phản biện:**")
+        for item in mr_bot_summary["self_questions"]:
+            st.write("• " + str(item))
+
+    log_show = mr_bot_profile_after.get("evolution_log", [])
+    if log_show:
+        st.markdown("**Nhật ký tiến hóa gần nhất:**")
+        st.dataframe(pd.DataFrame(log_show[-12:]), use_container_width=True, hide_index=True)
+
+st.markdown("## 👑 BUY ELITE - DECISION ENGINE")
 
 elite_summary = build_buy_elite_today_summary(buy_elite_df, market_real, market_forecast)
 
@@ -4855,7 +5188,7 @@ elif market_real < 8:
 else:
     st.success(elite_summary["detail"])
 
-st.markdown("### 🧠 LEARNING ENGINE V3")
+st.markdown("### 🧠 LEARNING ENGINE - Trí nhớ thực chiến")
 l1, l2, l3, l4, l5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.2])
 with l1:
     st.metric("MODE", learning_summary["mode"])
@@ -4873,7 +5206,7 @@ if learning_summary["mode"] == "ACTIVE_LEARNING":
 else:
     st.info(learning_summary["note"])
 
-with st.expander("🧠 Nhật ký học của BUY ELITE V3"):
+with st.expander("🧠 Nhật ký học của Mr.BOT PRO"):
     st.caption(f"History save: {learning_hist_status} | Profile save: {learning_profile_status}")
     profile_show = learning_profile_after if isinstance(learning_profile_after, dict) else {}
     mult = profile_show.get("multipliers", {})
@@ -4889,7 +5222,7 @@ with st.expander("🧠 Nhật ký học của BUY ELITE V3"):
         st.write("Bot đang bắt đầu ghi nhớ dữ liệu. Chưa có insight đủ mạnh.")
 
 
-st.markdown("### 🧠 THINKING ENGINE V3.1")
+st.markdown("### 🧠 THINKING ENGINE - Tư duy & phản biện")
 t1, t2, t3, t4, t5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.4])
 with t1:
     st.metric("MODE", thinking_summary["mode"])
@@ -4907,7 +5240,7 @@ if thinking_summary["mode"] in ["THINKING", "HYPOTHESIS"]:
 else:
     st.info(thinking_summary["current_thought"])
 
-with st.expander("🧠 Nhật ký tư duy / Quan sát / Giả thuyết / Phản biện V3.1"):
+with st.expander("🧠 Nhật ký tư duy / Quan sát / Giả thuyết / Phản biện của Mr.BOT PRO"):
     st.caption(f"Thinking profile: {thinking_profile_status} | Thinking journal: {thinking_journal_status}")
     st.markdown("**Quan sát phiên hiện tại:**")
     obs_show = thinking_profile_after.get("observation", {}) if isinstance(thinking_profile_after, dict) else {}
@@ -4937,7 +5270,7 @@ with st.expander("🧠 Nhật ký tư duy / Quan sát / Giả thuyết / Phản 
         for item in reflections[:8]:
             st.write("• " + str(item))
 
-    st.caption("Nguyên tắc V3.1: Bot không cố chứng minh mình đúng. Bot chỉ liên tục giảm số lần mình sai bằng dữ liệu thực chiến.")
+    st.caption("Nguyên tắc Mr.BOT PRO: không cố chứng minh mình đúng; chỉ liên tục giảm số lần sai bằng dữ liệu thực chiến.")
 
 
 if not buy_elite_df.empty:
@@ -4955,7 +5288,7 @@ if not buy_elite_df.empty:
         height=540,
     )
 
-    with st.expander("🔎 Mở đầy đủ cột BUY ELITE V3"):
+    with st.expander("🔎 Mở đầy đủ cột BUY ELITE"):
         st.dataframe(
             style_buy_elite_board(buy_elite_df),
             use_container_width=True,
@@ -4963,11 +5296,11 @@ if not buy_elite_df.empty:
             height=760,
         )
         st.caption(
-            "BUY ELITE V3.1 = V3 + Thinking Engine: ngoài tự học T+1/T+3/T+5, Bot còn biết quan sát, đặt giả thuyết, hình thành niềm tin và tự phản biện theo bối cảnh thị trường. "
+            "Mr.BOT PRO V4.0 = Decision + Learning + Thinking + Evolution: ngoài tự học T+1/T+3/T+5, Bot còn có nhân cách, trí nhớ, câu hỏi phản biện và nhật ký tiến hóa. "
             "Khi dữ liệu chưa đủ, hệ thống chạy WARMUP và không tự thay đổi quá mạnh."
         )
 else:
-    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE V3.1. Đây là tín hiệu tốt để không ép lệnh.")
+    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
 
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
@@ -5238,4 +5571,4 @@ if show_detail:
         )
 
 st.markdown("---")
-st.caption("V21 BUY ELITE V3.1 | Market → Decision Engine → Learning Engine → Thinking Engine → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution | Bot quan sát, học, phân tích và phản biện từ dữ liệu thực chiến.")
+st.caption("Mr.BOT PRO V4.0 | Market → Decision → Learning → Thinking → Evolution | Observe • Learn • Think • Evolve | Khi không chắc, đứng ngoài.")
