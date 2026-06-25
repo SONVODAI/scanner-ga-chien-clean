@@ -1,0 +1,26 @@
+{
+  "version": "BUY_ELITE_THINKING_V3_1",
+  "mode": "WARMUP",
+  "created_at": "2026-06-25 17:13:04",
+  "updated_at": "2026-06-25 17:13:04",
+  "completed_t5": 0,
+  "baseline_winrate": null,
+  "observation": {
+    "date": "2026-06-25",
+    "time": "17:13:04",
+    "market_real": 5.0,
+    "market_forecast": 1.2,
+    "regime": "🔴 MÙA ĐÔNG",
+    "regime_note": "Market yếu: chỉ lập watchlist, chưa giải ngân thật.",
+    "signals_today": 21,
+    "top_watch": "ACB, TNG, SAB",
+    "avg_winprob": 51.5,
+    "avg_elite_score": 38.6,
+    "high_consensus_count": 3
+  },
+  "hypotheses": [],
+  "beliefs": [],
+  "reflections": [],
+  "current_thought": "Hiện tại Bot mới có mắt quan sát, chưa có trải nghiệm đủ dài để hình thành tư duy.",
+  "note": "Đã có tín hiệu ghi nhận nhưng chưa có mẫu đủ T+5. Thinking Engine đang WARMUP."
+}
