@@ -29,13 +29,13 @@ except Exception:
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Scanner Gà Chiến V21 Buy Elite V3",
+    page_title="Scanner Gà Chiến V21 Buy Elite V3.1",
     page_icon="🐔",
     layout="wide",
 )
 
-st.title("🐔 Scanner Gà Chiến V21 - BUY ELITE V3")
-st.caption("Market First → BUY ELITE V3 → Learning Engine → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution. Decision Engine có WinProb, đồng thuận và tự học chậm từ lịch sử T+1/T+3/T+5.")
+st.title("🐔 Scanner Gà Chiến V21 - BUY ELITE V3.1")
+st.caption("Market First → BUY ELITE V3 → Learning Engine → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution. Decision Engine có WinProb, đồng thuận, Learning Engine và Thinking Engine biết quan sát - phân tích - phản biện từ lịch sử T+1/T+3/T+5.")
 
 # =========================================================
 # WATCHLIST
@@ -79,6 +79,8 @@ GITHUB_EVO_PATH = EVOLUTION_FILE
 
 BUY_ELITE_HISTORY_FILE = "buy_elite_learning_history.csv"
 BUY_ELITE_PROFILE_FILE = "buy_elite_learning_profile.json"
+BUY_ELITE_THINKING_FILE = "buy_elite_thinking_profile.json"
+BUY_ELITE_THINKING_JOURNAL_FILE = "buy_elite_thinking_journal.csv"
 
 # Daily data cache giữ nhẹ để không spam vnstock.
 # Live price cache ngắn để bảng không lệch quá lâu.
@@ -3659,6 +3661,382 @@ def build_learning_summary(profile: dict, history_df: pd.DataFrame) -> dict:
         "note": profile.get("note", ""),
     }
 
+
+# =========================================================
+# BUY ELITE V3.1 / THINKING ENGINE - QUAN SÁT, PHÂN TÍCH, PHẢN BIỆN
+# =========================================================
+def default_buy_elite_thinking_profile() -> dict:
+    return {
+        "version": "BUY_ELITE_THINKING_V3_1",
+        "mode": "WARMUP",
+        "created_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "updated_at": vn_time_str("%Y-%m-%d %H:%M:%S"),
+        "completed_t5": 0,
+        "baseline_winrate": None,
+        "observation": {},
+        "hypotheses": [],
+        "beliefs": [],
+        "reflections": [],
+        "current_thought": "Chưa đủ dữ liệu để hình thành tư duy. Bot chỉ quan sát và ghi nhớ.",
+        "note": "Thinking Engine đang WARMUP: ưu tiên quan sát, chưa kết luận mạnh.",
+    }
+
+
+def read_buy_elite_thinking_profile() -> dict:
+    raw = _github_read_text(BUY_ELITE_THINKING_FILE)
+    if raw is None:
+        try:
+            with open(BUY_ELITE_THINKING_FILE, "r", encoding="utf-8") as f:
+                raw = f.read()
+        except Exception:
+            return default_buy_elite_thinking_profile()
+    try:
+        data = json.loads(raw)
+        return data if isinstance(data, dict) else default_buy_elite_thinking_profile()
+    except Exception:
+        return default_buy_elite_thinking_profile()
+
+
+def write_buy_elite_thinking_profile(profile: dict) -> str:
+    try:
+        text = json.dumps(profile, ensure_ascii=False, indent=2)
+    except Exception:
+        text = json.dumps(default_buy_elite_thinking_profile(), ensure_ascii=False, indent=2)
+    return _github_write_text(
+        BUY_ELITE_THINKING_FILE,
+        text,
+        f"Update BUY ELITE Thinking Profile {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+    )
+
+
+def _thinking_strength(n: int, delta: float) -> tuple[str, str]:
+    """Phân cấp độ tin cậy của một phát hiện.
+
+    Không để Bot ảo tưởng: ít mẫu thì chỉ là quan sát/giả thuyết.
+    """
+    ad = abs(to_float(delta, 0))
+    if n >= 1000 and ad >= 0.08:
+        return "NIỀM TIN MẠNH", "🔵"
+    if n >= 500 and ad >= 0.07:
+        return "XU HƯỚNG ĐÁNG TIN", "🟢"
+    if n >= 200 and ad >= 0.06:
+        return "GIẢ THUYẾT MẠNH", "🟡"
+    if n >= 80 and ad >= 0.05:
+        return "GIẢ THUYẾT", "🟠"
+    return "QUAN SÁT", "⚪"
+
+
+def _condition_stats(df: pd.DataFrame, mask, label: str, baseline: float) -> dict | None:
+    try:
+        sub = df[mask].copy()
+    except Exception:
+        return None
+
+    n = len(sub)
+    if n == 0 or "t5_win" not in sub.columns:
+        return None
+
+    wr = to_float(sub["t5_win"].mean(), np.nan)
+    avg = to_float(sub["t5_return"].mean(), np.nan) if "t5_return" in sub.columns else np.nan
+    if pd.isna(wr) or pd.isna(baseline):
+        return None
+
+    delta = wr - baseline
+    strength, icon = _thinking_strength(n, delta)
+    return {
+        "label": label,
+        "n": int(n),
+        "winrate": round(float(wr) * 100, 1),
+        "avg_t5": round(float(avg), 2) if pd.notna(avg) else None,
+        "delta_vs_base": round(float(delta) * 100, 1),
+        "strength": strength,
+        "icon": icon,
+    }
+
+
+def _build_thinking_observation(buy_elite_df: pd.DataFrame, market_real: float, market_forecast: float) -> dict:
+    regime_name, _, regime_note = elite_regime(market_real, market_forecast)
+    obs = {
+        "date": today_str(),
+        "time": vn_time_str("%H:%M:%S"),
+        "market_real": to_float(market_real, 0),
+        "market_forecast": to_float(market_forecast, 0),
+        "regime": regime_name,
+        "regime_note": regime_note,
+        "signals_today": 0,
+        "top_watch": "-",
+        "avg_winprob": None,
+        "avg_elite_score": None,
+        "high_consensus_count": 0,
+    }
+
+    if buy_elite_df is None or buy_elite_df.empty:
+        return obs
+
+    df = buy_elite_df.copy()
+    obs["signals_today"] = int(len(df))
+    if "MÃ" in df.columns:
+        obs["top_watch"] = ", ".join(df["MÃ"].astype(str).head(3).tolist())
+
+    if "WinProb" in df.columns:
+        wp = pd.to_numeric(df["WinProb"].astype(str).str.replace("%", "", regex=False), errors="coerce")
+        obs["avg_winprob"] = round(float(wp.mean()), 1) if wp.notna().any() else None
+
+    if "EliteScore" in df.columns:
+        es = pd.to_numeric(df["EliteScore"], errors="coerce")
+        obs["avg_elite_score"] = round(float(es.mean()), 1) if es.notna().any() else None
+
+    if "ĐỒNG THUẬN" in df.columns:
+        try:
+            nums = df["ĐỒNG THUẬN"].astype(str).str.extract(r"(\d+)")[0].astype(float)
+            obs["high_consensus_count"] = int((nums >= 5).sum())
+        except Exception:
+            obs["high_consensus_count"] = 0
+
+    return obs
+
+
+def build_buy_elite_thinking_profile(
+    history_df: pd.DataFrame,
+    learning_profile: dict,
+    buy_elite_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+    old_profile: dict | None = None,
+) -> dict:
+    """Thinking Engine V3.1: từ dữ liệu lịch sử tạo ra quan sát, giả thuyết, niềm tin và phản biện.
+
+    Đây không phải LLM. Đây là một bộ tư duy thống kê có kỷ luật:
+    - ít mẫu: chỉ quan sát
+    - đủ mẫu: đặt giả thuyết
+    - nhiều mẫu: hình thành niềm tin
+    - luôn phản biện: kiểm tra điều kiện nào chỉ đúng trong một bối cảnh cụ thể
+    """
+    old_profile = old_profile if isinstance(old_profile, dict) else default_buy_elite_thinking_profile()
+    profile = default_buy_elite_thinking_profile()
+    profile["created_at"] = old_profile.get("created_at", profile["created_at"])
+    profile["updated_at"] = vn_time_str("%Y-%m-%d %H:%M:%S")
+    profile["observation"] = _build_thinking_observation(buy_elite_df, market_real, market_forecast)
+
+    if history_df is None or history_df.empty:
+        profile["note"] = "Chưa có lịch sử BUY ELITE. Thinking Engine chỉ quan sát phiên hiện tại."
+        profile["current_thought"] = "Bot đang học cách nhìn thị trường. Chưa đủ ký ức để phân tích nguyên nhân."
+        return profile
+
+    hist = history_df.copy()
+    for c in ["t5_win", "t5_return", "market_real", "storm", "persistence", "rsi", "dist_ema9", "evolution", "recent_change", "elite_score", "consensus_count", "action_score", "zone_score"]:
+        if c in hist.columns:
+            hist[c] = pd.to_numeric(hist[c], errors="coerce")
+
+    completed = hist.dropna(subset=["t5_win", "t5_return"]).copy()
+    completed_count = len(completed)
+    profile["completed_t5"] = int(completed_count)
+
+    if completed_count == 0:
+        profile["note"] = "Đã có tín hiệu ghi nhận nhưng chưa có mẫu đủ T+5. Thinking Engine đang WARMUP."
+        profile["current_thought"] = "Hiện tại Bot mới có mắt quan sát, chưa có trải nghiệm đủ dài để hình thành tư duy."
+        return profile
+
+    baseline = to_float(completed["t5_win"].mean(), np.nan)
+    avg_ret = to_float(completed["t5_return"].mean(), np.nan)
+    profile["baseline_winrate"] = round(float(baseline), 4) if pd.notna(baseline) else None
+    profile["avg_t5_return"] = round(float(avg_ret), 3) if pd.notna(avg_ret) else None
+
+    if completed_count < 80:
+        profile["mode"] = "WARMUP"
+        profile["note"] = f"Đã có {completed_count}/80 mẫu T+5. Bot chỉ quan sát, chưa kết luận."
+        profile["current_thought"] = f"Ta mới có {completed_count} trải nghiệm T+5. Chưa đủ để phản biện hệ thống, nhưng đã bắt đầu ghi nhớ."
+        return profile
+
+    if completed_count < 200:
+        profile["mode"] = "OBSERVING"
+    elif completed_count < 500:
+        profile["mode"] = "HYPOTHESIS"
+    else:
+        profile["mode"] = "THINKING"
+
+    # Chuẩn hóa các trường chữ
+    if "group" in completed.columns:
+        group_s = completed["group"].astype(str)
+    else:
+        group_s = pd.Series("", index=completed.index)
+    if "regime" in completed.columns:
+        regime_s = completed["regime"].astype(str)
+    else:
+        regime_s = pd.Series("", index=completed.index)
+    if "obv" in completed.columns:
+        obv_s = completed["obv"].astype(str)
+    else:
+        obv_s = pd.Series("", index=completed.index)
+
+    tests = []
+
+    # Các giả thuyết tổng quát
+    if "market_real" in completed.columns:
+        tests.append(_condition_stats(completed, completed["market_real"] >= 6, "Market REAL >= 6", baseline))
+        tests.append(_condition_stats(completed, completed["market_real"] < 6, "Market REAL < 6", baseline))
+        tests.append(_condition_stats(completed, completed["market_real"] >= 8, "Market REAL >= 8", baseline))
+
+    if "storm" in completed.columns:
+        tests.append(_condition_stats(completed, completed["storm"].notna(), "Có Storm xác nhận", baseline))
+        tests.append(_condition_stats(completed, completed["storm"].fillna(0) >= 15, "Storm >= 15", baseline))
+
+    if "persistence" in completed.columns:
+        tests.append(_condition_stats(completed, completed["persistence"] >= 3.5, "Persistence >= 3.5", baseline))
+        tests.append(_condition_stats(completed, completed["persistence"] >= 5.0, "Persistence >= 5.0", baseline))
+
+    if "consensus_count" in completed.columns:
+        tests.append(_condition_stats(completed, completed["consensus_count"] >= 5, "Đồng thuận >= 5/6", baseline))
+        tests.append(_condition_stats(completed, completed["consensus_count"] <= 2, "Đồng thuận <= 2/6", baseline))
+
+    if "zone_score" in completed.columns:
+        tests.append(_condition_stats(completed, completed["zone_score"] > 0, "Có vùng mua tốt", baseline))
+
+    if "action_score" in completed.columns:
+        tests.append(_condition_stats(completed, completed["action_score"] > 0, "Xanh/Đỏ xác nhận hành động", baseline))
+
+    if "rsi" in completed.columns:
+        tests.append(_condition_stats(completed, completed["rsi"].between(55, 65), "RSI 55-65", baseline))
+        tests.append(_condition_stats(completed, completed["rsi"] > 72, "RSI > 72", baseline))
+
+    if "dist_ema9" in completed.columns:
+        tests.append(_condition_stats(completed, completed["dist_ema9"].abs() <= 2, "Gần EMA9 ±2%", baseline))
+        tests.append(_condition_stats(completed, completed["dist_ema9"] > 4, "Xa EMA9 >4%", baseline))
+
+    tests.append(_condition_stats(completed, group_s.isin(["PULL ĐẸP", "PULL VỪA"]), "Nhóm Pull", baseline))
+    tests.append(_condition_stats(completed, group_s.eq("MUA EARLY"), "Nhóm Early", baseline))
+    tests.append(_condition_stats(completed, group_s.eq("MUA BREAK"), "Nhóm Break", baseline))
+    tests.append(_condition_stats(completed, obv_s.str.contains("🟢", na=False), "OBV xanh", baseline))
+
+    # Tư duy theo bối cảnh thị trường: cùng điều kiện nhưng regime khác nhau
+    if "storm" in completed.columns:
+        tests.append(_condition_stats(completed, completed["storm"].notna() & regime_s.str.contains("MÙA ĐÔNG", na=False), "Storm trong Mùa Đông", baseline))
+        tests.append(_condition_stats(completed, completed["storm"].notna() & regime_s.str.contains("MÙA XUÂN", na=False), "Storm trong Mùa Xuân", baseline))
+    tests.append(_condition_stats(completed, group_s.isin(["PULL ĐẸP", "PULL VỪA"]) & regime_s.str.contains("MÙA ĐÔNG", na=False), "Pull trong Mùa Đông", baseline))
+    tests.append(_condition_stats(completed, group_s.eq("MUA BREAK") & regime_s.str.contains("MÙA XUÂN", na=False), "Break trong Mùa Xuân", baseline))
+
+    tests = [t for t in tests if t is not None]
+
+    # Sắp xếp theo độ lệch so với baseline và số mẫu
+    tests_sorted = sorted(
+        tests,
+        key=lambda x: (abs(to_float(x.get("delta_vs_base", 0), 0)), x.get("n", 0)),
+        reverse=True,
+    )
+
+    hypotheses = []
+    beliefs = []
+    observations = []
+
+    for t in tests_sorted:
+        line = (
+            f"{t['icon']} {t['label']}: n={t['n']}, "
+            f"WinRate={t['winrate']}%, AvgT+5={t.get('avg_t5', '-')}, "
+            f"lệch baseline {t['delta_vs_base']}% → {t['strength']}"
+        )
+        if t["strength"] in ["NIỀM TIN MẠNH", "XU HƯỚNG ĐÁNG TIN"]:
+            beliefs.append(line)
+        elif t["strength"] in ["GIẢ THUYẾT MẠNH", "GIẢ THUYẾT"]:
+            hypotheses.append(line)
+        else:
+            observations.append(line)
+
+    # Phản biện: tìm trường hợp một niềm tin chỉ đúng theo bối cảnh
+    reflections = []
+    def add_reflection(condition_a: str, label_a: str, condition_b: str, label_b: str):
+        found_a = next((x for x in tests if x["label"] == condition_a), None)
+        found_b = next((x for x in tests if x["label"] == condition_b), None)
+        if found_a and found_b and found_a["n"] >= 20 and found_b["n"] >= 20:
+            diff = to_float(found_a["winrate"], 0) - to_float(found_b["winrate"], 0)
+            if abs(diff) >= 12:
+                better = label_a if diff > 0 else label_b
+                worse = label_b if diff > 0 else label_a
+                reflections.append(
+                    f"🪞 Phản biện: cùng một yếu tố nhưng {better} tốt hơn {worse} khoảng {round(abs(diff),1)} điểm %. Không nên kết luận một chiều."
+                )
+
+    add_reflection("Storm trong Mùa Xuân", "Storm trong Mùa Xuân", "Storm trong Mùa Đông", "Storm trong Mùa Đông")
+    add_reflection("Break trong Mùa Xuân", "Break trong Mùa Xuân", "Nhóm Break", "Break tổng thể")
+    add_reflection("Pull trong Mùa Đông", "Pull trong Mùa Đông", "Nhóm Pull", "Pull tổng thể")
+
+    # Nếu chưa có phản biện đủ mạnh, vẫn ghi nhắc nhở phương pháp
+    if not reflections:
+        reflections.append("🪞 Chưa có đủ mẫu để phản biện một niềm tin cụ thể. Bot giữ thái độ: mọi kết luận chỉ đúng cho đến khi dữ liệu mới chứng minh điều ngược lại.")
+
+    profile["hypotheses"] = hypotheses[:12]
+    profile["beliefs"] = beliefs[:12]
+    profile["observations"] = observations[:12]
+    profile["reflections"] = reflections[:8]
+
+    if beliefs:
+        profile["current_thought"] = beliefs[0]
+    elif hypotheses:
+        profile["current_thought"] = hypotheses[0]
+    elif observations:
+        profile["current_thought"] = observations[0]
+    else:
+        profile["current_thought"] = "Có dữ liệu T+5 nhưng chưa có mẫu hình nào đủ nổi bật so với baseline."
+
+    profile["note"] = (
+        f"Thinking Engine V3.1 đang ở chế độ {profile['mode']}. "
+        f"Baseline WinRate T+5 = {round(baseline*100,1)}%, Avg T+5 = {round(avg_ret,2)}%. "
+        "Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện."
+    )
+    return profile
+
+
+def append_thinking_journal(thinking_profile: dict) -> str:
+    """Ghi một dòng nhật ký tư duy mỗi ngày. Không ghi trùng ngày."""
+    try:
+        row = {
+            "date": today_str(),
+            "time": vn_time_str("%H:%M:%S"),
+            "mode": thinking_profile.get("mode", ""),
+            "completed_t5": thinking_profile.get("completed_t5", 0),
+            "baseline_winrate": thinking_profile.get("baseline_winrate", None),
+            "current_thought": thinking_profile.get("current_thought", ""),
+            "note": thinking_profile.get("note", ""),
+        }
+        new = pd.DataFrame([row])
+        old = pd.DataFrame()
+        raw = _github_read_text(BUY_ELITE_THINKING_JOURNAL_FILE)
+        if raw is not None:
+            from io import StringIO
+            old = pd.read_csv(StringIO(raw))
+        elif os.path.exists(BUY_ELITE_THINKING_JOURNAL_FILE):
+            old = pd.read_csv(BUY_ELITE_THINKING_JOURNAL_FILE)
+
+        if old.empty:
+            out = new
+        else:
+            out = pd.concat([old, new], ignore_index=True)
+            out = out.drop_duplicates(subset=["date"], keep="last").tail(500)
+
+        csv_text = out.to_csv(index=False)
+        return _github_write_text(
+            BUY_ELITE_THINKING_JOURNAL_FILE,
+            csv_text,
+            f"Update BUY ELITE Thinking Journal {vn_time_str('%Y-%m-%d %H:%M:%S')}",
+        )
+    except Exception:
+        return "THINKING_JOURNAL_ERROR"
+
+
+def build_thinking_summary(profile: dict) -> dict:
+    obs = profile.get("observation", {}) if isinstance(profile, dict) else {}
+    return {
+        "mode": profile.get("mode", "WARMUP") if isinstance(profile, dict) else "WARMUP",
+        "completed": profile.get("completed_t5", 0) if isinstance(profile, dict) else 0,
+        "beliefs": len(profile.get("beliefs", [])) if isinstance(profile, dict) else 0,
+        "hypotheses": len(profile.get("hypotheses", [])) if isinstance(profile, dict) else 0,
+        "reflections": len(profile.get("reflections", [])) if isinstance(profile, dict) else 0,
+        "current_thought": profile.get("current_thought", "") if isinstance(profile, dict) else "",
+        "top_watch": obs.get("top_watch", "-"),
+        "signals_today": obs.get("signals_today", 0),
+        "note": profile.get("note", "") if isinstance(profile, dict) else "",
+    }
+
+
 # BUY ELITE V3 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
 # =========================================================
 def elite_market_score(market_real: float, market_forecast: float) -> tuple[float, str]:
@@ -4383,7 +4761,7 @@ else:
 st.caption(market_forecast_text)
 if safe_mode_count > 0:
     st.caption(f"🟡 SAFE DATA: {safe_mode_count} mã đang dùng D1/NO_DATA thay cho live để tránh app bị crash.")
-st.caption("V21/V3: tất cả bảng vẫn dùng chung scan_df. BUY ELITE có thêm Learning Engine để ghi nhớ và tự điều chỉnh chậm theo lịch sử thực chiến.")
+st.caption("V21/V3.1: tất cả bảng vẫn dùng chung scan_df. BUY ELITE có Learning Engine để ghi nhớ và Thinking Engine để quan sát, phân tích, phản biện theo lịch sử thực chiến.")
 
 # =========================================================
 # PREPARE CORE TABLES
@@ -4438,12 +4816,25 @@ buy_elite_history_df, learning_profile_after, learning_hist_status, learning_pro
 )
 learning_summary = build_learning_summary(learning_profile_after, buy_elite_history_df)
 
+thinking_profile_old = read_buy_elite_thinking_profile()
+thinking_profile_after = build_buy_elite_thinking_profile(
+    history_df=buy_elite_history_df,
+    learning_profile=learning_profile_after,
+    buy_elite_df=buy_elite_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+    old_profile=thinking_profile_old,
+)
+thinking_profile_status = write_buy_elite_thinking_profile(thinking_profile_after)
+thinking_journal_status = append_thinking_journal(thinking_profile_after)
+thinking_summary = build_thinking_summary(thinking_profile_after)
+
 
 # =========================================================
-# BUY ELITE V3 / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
+# BUY ELITE V3.1 / DECISION + LEARNING + THINKING
 # =========================================================
 st.markdown("---")
-st.markdown("## 👑 BUY ELITE V3 - DECISION ENGINE + LEARNING ENGINE")
+st.markdown("## 👑 BUY ELITE V3.1 - DECISION ENGINE + LEARNING ENGINE + THINKING ENGINE")
 
 elite_summary = build_buy_elite_today_summary(buy_elite_df, market_real, market_forecast)
 
@@ -4497,6 +4888,58 @@ with st.expander("🧠 Nhật ký học của BUY ELITE V3"):
     else:
         st.write("Bot đang bắt đầu ghi nhớ dữ liệu. Chưa có insight đủ mạnh.")
 
+
+st.markdown("### 🧠 THINKING ENGINE V3.1")
+t1, t2, t3, t4, t5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.4])
+with t1:
+    st.metric("MODE", thinking_summary["mode"])
+with t2:
+    st.metric("T+5 MẪU", thinking_summary["completed"])
+with t3:
+    st.metric("NIỀM TIN", thinking_summary["beliefs"])
+with t4:
+    st.metric("GIẢ THUYẾT", thinking_summary["hypotheses"])
+with t5:
+    st.metric("PHẢN BIỆN", thinking_summary["reflections"])
+
+if thinking_summary["mode"] in ["THINKING", "HYPOTHESIS"]:
+    st.success(thinking_summary["current_thought"])
+else:
+    st.info(thinking_summary["current_thought"])
+
+with st.expander("🧠 Nhật ký tư duy / Quan sát / Giả thuyết / Phản biện V3.1"):
+    st.caption(f"Thinking profile: {thinking_profile_status} | Thinking journal: {thinking_journal_status}")
+    st.markdown("**Quan sát phiên hiện tại:**")
+    obs_show = thinking_profile_after.get("observation", {}) if isinstance(thinking_profile_after, dict) else {}
+    obs_df = pd.DataFrame([obs_show]) if obs_show else pd.DataFrame()
+    if not obs_df.empty:
+        st.dataframe(obs_df, use_container_width=True, hide_index=True)
+
+    beliefs = thinking_profile_after.get("beliefs", []) if isinstance(thinking_profile_after, dict) else []
+    hypotheses = thinking_profile_after.get("hypotheses", []) if isinstance(thinking_profile_after, dict) else []
+    reflections = thinking_profile_after.get("reflections", []) if isinstance(thinking_profile_after, dict) else []
+    observations = thinking_profile_after.get("observations", []) if isinstance(thinking_profile_after, dict) else []
+
+    if beliefs:
+        st.markdown("**Niềm tin đang hình thành:**")
+        for item in beliefs[:10]:
+            st.write("• " + str(item))
+    if hypotheses:
+        st.markdown("**Giả thuyết đáng theo dõi:**")
+        for item in hypotheses[:10]:
+            st.write("• " + str(item))
+    if observations:
+        st.markdown("**Quan sát thống kê:**")
+        for item in observations[:8]:
+            st.write("• " + str(item))
+    if reflections:
+        st.markdown("**Bot tự phản biện:**")
+        for item in reflections[:8]:
+            st.write("• " + str(item))
+
+    st.caption("Nguyên tắc V3.1: Bot không cố chứng minh mình đúng. Bot chỉ liên tục giảm số lần mình sai bằng dữ liệu thực chiến.")
+
+
 if not buy_elite_df.empty:
     elite_compact_cols = [
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN",
@@ -4520,11 +4963,11 @@ if not buy_elite_df.empty:
             height=760,
         )
         st.caption(
-            "BUY ELITE V3 = V2 + Learning Engine: tự ghi lịch sử tín hiệu, tự cập nhật T+1/T+3/T+5, tự điều chỉnh trọng số rất chậm khi dữ liệu đủ mạnh. "
+            "BUY ELITE V3.1 = V3 + Thinking Engine: ngoài tự học T+1/T+3/T+5, Bot còn biết quan sát, đặt giả thuyết, hình thành niềm tin và tự phản biện theo bối cảnh thị trường. "
             "Khi dữ liệu chưa đủ, hệ thống chạy WARMUP và không tự thay đổi quá mạnh."
         )
 else:
-    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE V3. Đây là tín hiệu tốt để không ép lệnh.")
+    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE V3.1. Đây là tín hiệu tốt để không ép lệnh.")
 
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
@@ -4795,4 +5238,4 @@ if show_detail:
         )
 
 st.markdown("---")
-st.caption("V20 EARLY BUY LAB | Market → Xanh/Đỏ Lab → Storm → Early Buy Lab → Pullback Buy → DNA/Evolution | Bảng phụ/chi tiết mặc định ẩn để app nhẹ và thực chiến hơn.")
+st.caption("V21 BUY ELITE V3.1 | Market → Decision Engine → Learning Engine → Thinking Engine → Xanh/Đỏ → Storm → Early/Pull → DNA/Evolution | Bot quan sát, học, phân tích và phản biện từ dữ liệu thực chiến.")
