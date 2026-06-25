@@ -3185,6 +3185,391 @@ def style_green_red_board(df: pd.DataFrame):
     )
 
 
+
+# =========================================================
+# BUY ELITE / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
+# =========================================================
+def elite_market_score(market_real: float, market_forecast: float) -> tuple[float, str]:
+    """Market là cổng chặn đầu tiên, không phải chỉ là điểm cộng."""
+    try:
+        mr = float(market_real)
+    except Exception:
+        mr = 0.0
+
+    try:
+        mf = float(market_forecast)
+    except Exception:
+        mf = 0.0
+
+    if mr >= 8 and mf >= 6:
+        return 20, "Market ủng hộ mạnh"
+    if mr >= 8:
+        return 17, "Market REAL khỏe"
+    if mr >= 6 and mf >= 4:
+        return 12, "Market đủ test nhỏ"
+    if mr >= 6:
+        return 9, "Market trung tính, chỉ mua nhỏ"
+    return 0, "Market yếu - chỉ theo dõi"
+
+
+def build_buy_elite_decision_engine(
+    scan_df: pd.DataFrame,
+    green_red_df: pd.DataFrame,
+    storm_df: pd.DataFrame,
+    evo_table: pd.DataFrame,
+    pullback_df: pd.DataFrame,
+    early_buy_lab_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    BUY ELITE = giao điểm thông minh của các bảng.
+
+    Triết lý:
+    - Không thay thế Storm / Evolution / Pullback / Early / Xanh-Đỏ.
+    - Mỗi bảng là một chuyên gia bỏ phiếu.
+    - Rule Engine đứng trên Score Engine: Market yếu, OBV gãy, giá thủng EMA9 thì không mua thật.
+    - Chỉ ưu tiên nhóm có thể hành động: PULL ĐẸP, PULL VỪA, MUA EARLY.
+    """
+    if scan_df is None or scan_df.empty:
+        return pd.DataFrame()
+
+    needed = [
+        "symbol", "group", "price", "ema9", "total_score", "rsi14", "rsi_slope",
+        "ema9_ma20_slope", "dist_from_ema9_pct", "obv_status", "warning",
+        "green_2_confirm", "early_dry_green2", "volume", "vol_ma20", "is_live_adjusted",
+    ]
+    base = scan_df[[c for c in needed if c in scan_df.columns]].copy()
+    if base.empty or "symbol" not in base.columns:
+        return pd.DataFrame()
+
+    # -----------------------------------------------------
+    # 1) GHÉP XANH MUA - ĐỎ BÁN: bảng hành động trung tâm
+    # -----------------------------------------------------
+    if green_red_df is not None and not green_red_df.empty and "MÃ" in green_red_df.columns:
+        gr_cols = [
+            "MÃ", "TÍN HIỆU", "TREND_SCORE", "BUY_SCORE", "VÙNG MUA", "NAV", "LÝ DO"
+        ]
+        gr_cols = [c for c in gr_cols if c in green_red_df.columns]
+        gr = green_red_df[gr_cols].copy().rename(columns={
+            "MÃ": "symbol",
+            "TÍN HIỆU": "GR_SIGNAL",
+            "TREND_SCORE": "GR_TREND_SCORE",
+            "BUY_SCORE": "GR_BUY_SCORE",
+            "VÙNG MUA": "GR_VÙNG MUA",
+            "NAV": "GR_NAV",
+            "LÝ DO": "GR_LÝ DO",
+        })
+        base = base.merge(gr, on="symbol", how="left")
+    else:
+        base["GR_SIGNAL"] = ""
+        base["GR_TREND_SCORE"] = np.nan
+        base["GR_BUY_SCORE"] = np.nan
+        base["GR_VÙNG MUA"] = ""
+        base["GR_NAV"] = ""
+        base["GR_LÝ DO"] = ""
+
+    # -----------------------------------------------------
+    # 2) GHÉP STORM: tiền vào / động lượng
+    # -----------------------------------------------------
+    if storm_df is not None and not storm_df.empty and "MÃ" in storm_df.columns:
+        st_cols = ["MÃ", "STORM", "GREEN2", "VOL/MA20", "DNA ACCEL", "OBV ACCEL", "VOL SURGE"]
+        st_cols = [c for c in st_cols if c in storm_df.columns]
+        st_part = storm_df[st_cols].copy().rename(columns={
+            "MÃ": "symbol",
+            "STORM": "Storm",
+            "GREEN2": "Storm_GREEN2",
+            "VOL/MA20": "Storm_VOL/MA20",
+            "DNA ACCEL": "Storm_DNA_ACCEL",
+            "OBV ACCEL": "Storm_OBV_ACCEL",
+            "VOL SURGE": "Storm_VOL_SURGE",
+        })
+        base = base.merge(st_part, on="symbol", how="left")
+    else:
+        base["Storm"] = np.nan
+        base["Storm_GREEN2"] = ""
+        base["Storm_VOL/MA20"] = np.nan
+        base["Storm_DNA_ACCEL"] = np.nan
+        base["Storm_OBV_ACCEL"] = np.nan
+        base["Storm_VOL_SURGE"] = np.nan
+
+    # -----------------------------------------------------
+    # 3) GHÉP EVOLUTION / DNA: tiến hóa và độ bền
+    # -----------------------------------------------------
+    if evo_table is not None and not evo_table.empty and "symbol" in evo_table.columns:
+        evo_cols = [
+            "symbol", "Persistence", "DNA", "evolution", "recent_change", "EvoQuality", "Smooth", "EvoFinal"
+        ]
+        evo_cols = [c for c in evo_cols if c in evo_table.columns]
+        base = base.merge(evo_table[evo_cols].copy(), on="symbol", how="left")
+    else:
+        base["Persistence"] = 0
+        base["DNA"] = "⚪ MỚI"
+        base["evolution"] = 0
+        base["recent_change"] = 0
+        base["EvoQuality"] = 0
+        base["Smooth"] = 0
+        base["EvoFinal"] = 0
+
+    # -----------------------------------------------------
+    # 4) GHÉP PULLBACK / EARLY: đúng vùng mua hay chưa
+    # -----------------------------------------------------
+    pull_symbols = set()
+    if pullback_df is not None and not pullback_df.empty and "MÃ" in pullback_df.columns:
+        pull_symbols = set(pullback_df["MÃ"].astype(str))
+
+    early_symbols = set()
+    if early_buy_lab_df is not None and not early_buy_lab_df.empty and "MÃ" in early_buy_lab_df.columns:
+        early_symbols = set(early_buy_lab_df["MÃ"].astype(str))
+
+    base["InPullback"] = base["symbol"].astype(str).isin(pull_symbols)
+    base["InEarlyLab"] = base["symbol"].astype(str).isin(early_symbols)
+
+    # -----------------------------------------------------
+    # 5) TÍNH ĐIỂM THEO CÁC CHUYÊN GIA
+    # -----------------------------------------------------
+    market_score, market_note = elite_market_score(market_real, market_forecast)
+    base["MarketScore"] = market_score
+
+    sig = base["GR_SIGNAL"].astype(str)
+    base["ActionScore"] = np.select(
+        [
+            sig.str.startswith("🟢 XANH MUA"),
+            sig.str.startswith("🟢"),
+            sig.str.startswith("🟡 CANH"),
+            sig.str.startswith("🟡"),
+        ],
+        [25, 20, 12, 8],
+        default=0,
+    )
+
+    base["GR_BUY_SCORE_NUM"] = pd.to_numeric(base.get("GR_BUY_SCORE", np.nan), errors="coerce")
+    base["BuyScoreBonus"] = (base["GR_BUY_SCORE_NUM"].clip(lower=0, upper=100) / 100 * 10).fillna(0)
+
+    base["Storm_NUM"] = pd.to_numeric(base.get("Storm", np.nan), errors="coerce")
+    base["StormScore"] = np.where(
+        base["Storm_NUM"].notna(),
+        10 + base["Storm_NUM"].clip(lower=0, upper=10),
+        0,
+    )
+
+    base["Persistence_NUM"] = pd.to_numeric(base.get("Persistence", 0), errors="coerce").fillna(0)
+    base["evolution_NUM"] = pd.to_numeric(base.get("evolution", 0), errors="coerce").fillna(0)
+    base["recent_change_NUM"] = pd.to_numeric(base.get("recent_change", 0), errors="coerce").fillna(0)
+    base["EvoFinal_NUM"] = pd.to_numeric(base.get("EvoFinal", 0), errors="coerce").fillna(0)
+
+    base["EvoScore"] = (
+        base["Persistence_NUM"].clip(0, 7) * 1.5
+        + base["evolution_NUM"].clip(lower=0, upper=5) * 2.0
+        + base["recent_change_NUM"].clip(lower=0, upper=3) * 2.5
+        + base["EvoFinal_NUM"].clip(lower=0, upper=20) * 0.25
+    ).clip(0, 20)
+
+    group = base["group"].astype(str)
+    base["ZoneScore"] = np.select(
+        [
+            group.eq("PULL ĐẸP"),
+            group.eq("PULL VỪA"),
+            group.eq("MUA EARLY") & base["InEarlyLab"],
+            group.eq("MUA EARLY"),
+            base["InPullback"],
+        ],
+        [18, 15, 14, 9, 12],
+        default=0,
+    )
+
+    base["ObvScore"] = np.where(base.get("obv_status", "") == "🟢", 5, 0)
+
+    # -----------------------------------------------------
+    # 6) RULE ENGINE: phạt và loại những điểm xấu cứng
+    # -----------------------------------------------------
+    warn = base.get("warning", "").astype(str)
+    dist = pd.to_numeric(base.get("dist_from_ema9_pct", np.nan), errors="coerce")
+    rsi = pd.to_numeric(base.get("rsi14", np.nan), errors="coerce")
+
+    base["Penalty"] = 0
+    base["Penalty"] += np.where(warn.str.contains("OBV gãy", na=False), 35, 0)
+    base["Penalty"] += np.where(warn.str.contains("Giá dưới EMA9", na=False), 30, 0)
+    base["Penalty"] += np.where(warn.str.contains("RSI yếu", na=False), 12, 0)
+    base["Penalty"] += np.where(dist > 4.5, 12, 0)
+    base["Penalty"] += np.where(rsi > 75, 8, 0)
+    base["Penalty"] += np.where(group.eq("GÀ TĂNG TỐC"), 10, 0)
+    base["Penalty"] += np.where(group.eq("CP MẠNH") & (dist > 3), 10, 0)
+
+    base["EliteScore"] = (
+        base["MarketScore"]
+        + base["ActionScore"]
+        + base["BuyScoreBonus"]
+        + base["StormScore"]
+        + base["EvoScore"]
+        + base["ZoneScore"]
+        + base["ObvScore"]
+        - base["Penalty"]
+    ).clip(0, 100).round(1)
+
+    # -----------------------------------------------------
+    # 7) ĐÈN / HÀNH ĐỘNG / NAV
+    # -----------------------------------------------------
+    hard_bad = (
+        warn.str.contains("OBV gãy", na=False)
+        | warn.str.contains("Giá dưới EMA9", na=False)
+    )
+
+    base["ĐÈN"] = np.select(
+        [
+            (market_real < 6),
+            hard_bad,
+            base["EliteScore"] >= 80,
+            base["EliteScore"] >= 65,
+            base["EliteScore"] >= 50,
+        ],
+        ["🟡", "🔴", "🟢", "🟢", "🟡"],
+        default="⚪",
+    )
+
+    base["KẾT LUẬN"] = np.select(
+        [
+            market_real < 6,
+            hard_bad,
+            base["EliteScore"] >= 80,
+            base["EliteScore"] >= 65,
+            base["EliteScore"] >= 50,
+        ],
+        [
+            "THEO DÕI - MARKET YẾU",
+            "LOẠI - TRỤC XẤU",
+            "BUY ELITE",
+            "MUA NHỎ / ƯU TIÊN",
+            "WATCHLIST",
+        ],
+        default="CHƯA ĐỦ ĐỒNG THUẬN",
+    )
+
+    base["NAV ELITE"] = np.select(
+        [
+            (base["KẾT LUẬN"].eq("BUY ELITE")) & (market_real >= 8),
+            (base["KẾT LUẬN"].eq("BUY ELITE")) & (market_real >= 6),
+            (base["KẾT LUẬN"].eq("MUA NHỎ / ƯU TIÊN")) & (market_real >= 6),
+            (base["KẾT LUẬN"].eq("WATCHLIST")) & (market_real >= 6),
+        ],
+        ["10-15% NAV", "5-10% NAV", "3-7% NAV", "0-3% NAV"],
+        default="0%",
+    )
+
+    # Vùng mua ưu tiên lấy từ Xanh/Đỏ; nếu không có thì tự tính quanh EMA9/giá.
+    base["VÙNG MUA ELITE"] = base.get("GR_VÙNG MUA", "").astype(str)
+    empty_zone = base["VÙNG MUA ELITE"].isin(["", "-", "nan", "None"])
+    ema9_num = pd.to_numeric(base.get("ema9", np.nan), errors="coerce")
+    price_num = pd.to_numeric(base.get("price", np.nan), errors="coerce")
+    auto_zone = np.where(
+        ema9_num.notna(),
+        (ema9_num * 0.99).round(0).astype("Int64").astype(str) + " - " + (ema9_num * 1.01).round(0).astype("Int64").astype(str),
+        price_num.round(0).astype("Int64").astype(str),
+    )
+    base.loc[empty_zone, "VÙNG MUA ELITE"] = auto_zone[empty_zone]
+
+    # -----------------------------------------------------
+    # 8) LÝ DO: phải giải thích được vì sao được chọn
+    # -----------------------------------------------------
+    reasons = []
+    for _, r in base.iterrows():
+        rs = []
+        rs.append(market_note)
+        if str(r.get("GR_SIGNAL", "")).startswith("🟢"):
+            rs.append("Xanh/Đỏ cho mua")
+        elif str(r.get("GR_SIGNAL", "")).startswith("🟡"):
+            rs.append("Xanh/Đỏ cho theo dõi/canh mua")
+        if pd.notna(r.get("Storm", np.nan)):
+            rs.append("có Storm")
+        if r.get("Persistence_NUM", 0) >= 5:
+            rs.append("DNA mạnh")
+        elif r.get("Persistence_NUM", 0) >= 3.5:
+            rs.append("DNA bền")
+        if r.get("recent_change_NUM", 0) > 0 or r.get("evolution_NUM", 0) > 0:
+            rs.append("Evolution tăng")
+        if bool(r.get("InPullback", False)):
+            rs.append("đúng Pullback")
+        if bool(r.get("InEarlyLab", False)):
+            rs.append("Early Lab")
+        if str(r.get("obv_status", "")) == "🟢":
+            rs.append("OBV giữ")
+        if r.get("Penalty", 0) > 0:
+            rs.append(f"phạt rủi ro {int(r.get('Penalty', 0))}")
+        reasons.append(" | ".join(dict.fromkeys(rs)))
+
+    base["LÝ DO ELITE"] = reasons
+
+    out = base.rename(columns={
+        "symbol": "MÃ",
+        "group": "NHÓM",
+        "price": "GIÁ",
+        "rsi14": "RSI",
+        "ema9_ma20_slope": "SLOPE",
+        "dist_from_ema9_pct": "DIST EMA9%",
+        "obv_status": "OBV",
+        "warning": "CẢNH BÁO",
+    })
+
+    cols = [
+        "ĐÈN", "MÃ", "KẾT LUẬN", "EliteScore", "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE",
+        "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "Penalty",
+        "GR_SIGNAL", "GR_BUY_SCORE", "Storm", "Persistence", "DNA", "evolution", "recent_change",
+        "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE", "CẢNH BÁO",
+    ]
+    cols = [c for c in cols if c in out.columns]
+
+    out = out.sort_values(
+        ["EliteScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore"],
+        ascending=[False, False, False, False, False],
+    ).reset_index(drop=True)
+
+    # Giữ bảng đủ gọn: chỉ mã có đồng thuận tương đối hoặc đang nằm trong Xanh/Đỏ / Storm / Pull / Early.
+    out = out[
+        (out["EliteScore"] >= 45)
+        | out.get("GR_SIGNAL", "").astype(str).str.startswith(("🟢", "🟡"), na=False)
+        | out.get("Storm", pd.Series(index=out.index, dtype=float)).notna()
+    ].copy()
+
+    return out[cols].head(30)
+
+
+def style_buy_elite_board(df: pd.DataFrame):
+    """Tô màu bảng BUY ELITE theo kết luận."""
+    def row_style(row):
+        sig = str(row.get("KẾT LUẬN", ""))
+        light = str(row.get("ĐÈN", ""))
+
+        if sig == "BUY ELITE" or light.startswith("🟢"):
+            return ["background-color: #d9f7d9; color: #064e06; font-weight: 700"] * len(row)
+        if sig.startswith("MUA NHỎ") or sig.startswith("WATCHLIST") or light.startswith("🟡"):
+            return ["background-color: #fff3cd; color: #5f4300"] * len(row)
+        if sig.startswith("LOẠI") or light.startswith("🔴"):
+            return ["background-color: #f8d7da; color: #6b0000"] * len(row)
+        return ["background-color: #f5f5f5; color: #333333"] * len(row)
+
+    return (
+        df.style
+        .apply(row_style, axis=1)
+        .format({
+            "EliteScore": "{:.1f}",
+            "GIÁ": "{:.0f}",
+            "MarketScore": "{:.1f}",
+            "ActionScore": "{:.1f}",
+            "StormScore": "{:.1f}",
+            "EvoScore": "{:.1f}",
+            "ZoneScore": "{:.1f}",
+            "Penalty": "{:.0f}",
+            "GR_BUY_SCORE": "{:.1f}",
+            "Storm": "{:.1f}",
+            "Persistence": "{:.1f}",
+            "evolution": "{:.0f}",
+            "recent_change": "{:.0f}",
+            "RSI": "{:.1f}",
+            "SLOPE": "{:.2f}",
+            "DIST EMA9%": "{:.2f}",
+        }, na_rep="")
+    )
+
 # =========================================================
 # COMPACT TABLE VIEW - ẨN CỘT PHỤ CHO MOBILE
 # =========================================================
@@ -3370,6 +3755,58 @@ green_red_df = build_green_red_board(
     market_real=market_real,
     market_forecast=market_forecast,
 )
+
+buy_elite_df = build_buy_elite_decision_engine(
+    scan_df=scan_df,
+    green_red_df=green_red_df,
+    storm_df=storm_df,
+    evo_table=evo_table,
+    pullback_df=pullback_df,
+    early_buy_lab_df=early_buy_lab_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+
+# =========================================================
+# BUY ELITE / DECISION ENGINE - BẢNG RA QUYẾT ĐỊNH MUA
+# =========================================================
+st.markdown("---")
+st.markdown("## 👑 BUY ELITE - DECISION ENGINE")
+
+if market_real < 6:
+    st.warning("Market REAL < 6: BUY ELITE chỉ dùng để lập watchlist, chưa giải ngân thật.")
+elif market_real < 8:
+    st.warning("Market trung tính: chỉ mua nhỏ mã EliteScore cao, ưu tiên mua đỏ và stop gần EMA9.")
+else:
+    st.success("Market ủng hộ: ưu tiên mã EliteScore cao, có Xanh/Đỏ + Storm + Evolution + đúng vùng mua.")
+
+if not buy_elite_df.empty:
+    elite_compact_cols = [
+        "ĐÈN", "MÃ", "KẾT LUẬN", "EliteScore", "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE",
+        "Storm", "Persistence", "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE"
+    ]
+    elite_compact_cols = [c for c in elite_compact_cols if c in buy_elite_df.columns]
+
+    st.dataframe(
+        style_buy_elite_board(buy_elite_df[elite_compact_cols]),
+        use_container_width=True,
+        hide_index=True,
+        height=520,
+    )
+
+    with st.expander("🔎 Mở đầy đủ cột BUY ELITE"):
+        st.dataframe(
+            style_buy_elite_board(buy_elite_df),
+            use_container_width=True,
+            hide_index=True,
+            height=720,
+        )
+        st.caption(
+            "BUY ELITE là bảng giao điểm: Market + Xanh/Đỏ + Storm + Evolution/DNA + Pull/Early + OBV + vùng mua. "
+            "Rule Engine luôn chặn trước các mã Market yếu, OBV gãy hoặc giá thủng EMA9."
+        )
+else:
+    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Đây là tín hiệu tốt để không ép lệnh.")
 
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
