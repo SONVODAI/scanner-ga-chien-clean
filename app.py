@@ -5233,7 +5233,22 @@ market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
 market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
+# =========================================================
+# MR.BOT BRAIN CONTROLLER
+# =========================================================
+try:
+    from brain_controller import run_brain_controller
 
+    brain_result = run_brain_controller(
+        scan_df=scan_df,
+        market_real=market_real,
+        market_live=market_live,
+        market_forecast=market_forecast,
+    )
+
+except Exception as e:
+    st.warning(f"Brain Controller: {e}")
+    brain_result = None
 live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in scan_df.columns else 0
 safe_mode_count = int((scan_df["live_source"].astype(str).str.contains("SAFE_MODE|NO_DATA|BAD", na=False)).sum()) if "live_source" in scan_df.columns else 0
 
