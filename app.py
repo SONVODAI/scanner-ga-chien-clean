@@ -28,7 +28,7 @@ except Exception:
 # V21 BRAIN / EXPERIENCE / DECISION MODULES
 # =========================================================
 try:
-    from brainmanager import get_brain
+    from brain_manager import get_brain
     from learning_engine import save_experience_learning, build_learning_view
     from decision_engine import make_market_decision, build_decision_view, build_decision_history_view
 except Exception as e:
