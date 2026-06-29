@@ -182,8 +182,9 @@ def log_runtime_error(symbol: str, stage: str, error):
         }])
         file_name = "runtime_error_log.csv"
         if os.path.exists(file_name):
-            old = pd.read_csv(file_name)
+            old = guard_dataframe_dtypes(pd.read_csv(file_name), text_cols=["time", "symbol", "stage", "error"], numeric_cols=[])
             row = pd.concat([old, row], ignore_index=True).tail(300)
+        row = guard_dataframe_dtypes(row, text_cols=["time", "symbol", "stage", "error"], numeric_cols=[])
         row.to_csv(file_name, index=False)
     except Exception:
         pass
@@ -242,6 +243,92 @@ def today_str() -> str:
 
 def vn_time_str(fmt: str = "%d/%m/%Y %H:%M:%S") -> str:
     return vn_now().strftime(fmt)
+
+
+# =========================================================
+# DATA GUARD LAYER - CHỐNG LỖI DTYPE PANDAS MỚI
+# =========================================================
+TEXT_GUARD_COLS = {
+    "date", "time", "created_at", "updated_at", "last_outcome_update",
+    "symbol", "group", "regime", "learning_mode", "conclusion", "nav",
+    "dna", "obv", "status", "personality", "message", "mode", "note",
+    "current_thought", "source", "stage", "error", "name", "version",
+}
+
+NUMERIC_GUARD_COLS = {
+    "rank", "score", "price", "entry_price", "market_real", "market_forecast",
+    "winprob", "elite_score", "storm", "persistence", "evolution",
+    "recent_change", "rsi", "slope", "dist_ema9", "market_score",
+    "action_score", "storm_score", "evo_score", "zone_score", "penalty",
+    "t1_return", "t3_return", "t5_return", "t1_win", "t3_win", "t5_win",
+    "obv_value", "volume", "vol_ma20", "completed_t5", "baseline_winrate",
+    "confidence", "age_days", "signals_today", "avg_winprob", "avg_elite_score",
+    "high_consensus_count",
+}
+
+
+def ensure_object_columns(df: pd.DataFrame, columns) -> pd.DataFrame:
+    """Ép các cột chữ/ngày giờ sang object để Pandas không báo lỗi khi gán string."""
+    if df is None:
+        return pd.DataFrame()
+    out = df.copy()
+    for col in columns:
+        if col not in out.columns:
+            out[col] = ""
+        out[col] = out[col].astype("object")
+        out[col] = out[col].where(pd.notna(out[col]), "")
+    return out
+
+
+def ensure_numeric_columns(df: pd.DataFrame, columns) -> pd.DataFrame:
+    """Ép các cột số về numeric an toàn, lỗi thì thành NaN."""
+    if df is None:
+        return pd.DataFrame()
+    out = df.copy()
+    for col in columns:
+        if col not in out.columns:
+            out[col] = np.nan
+        out[col] = pd.to_numeric(out[col], errors="coerce")
+    return out
+
+
+def guard_dataframe_dtypes(
+    df: pd.DataFrame,
+    text_cols=None,
+    numeric_cols=None,
+) -> pd.DataFrame:
+    """Chuẩn hóa dtype trước khi setitem/concat/to_csv.
+
+    Lỗi anh gặp xuất phát từ việc một cột đang là float64 nhưng bị gán chuỗi
+    dạng '2026-06-29 07:16:49'. Hàm này tách rõ cột chữ và cột số để tránh
+    Pandas 2.x/3.x chặn kiểu dữ liệu.
+    """
+    if df is None:
+        return pd.DataFrame()
+    out = df.copy()
+
+    text_cols = list(TEXT_GUARD_COLS if text_cols is None else text_cols)
+    numeric_cols = list(NUMERIC_GUARD_COLS if numeric_cols is None else numeric_cols)
+
+    existing_text = [c for c in text_cols if c in out.columns]
+    existing_numeric = [c for c in numeric_cols if c in out.columns and c not in existing_text]
+
+    if existing_text:
+        out = ensure_object_columns(out, existing_text)
+    if existing_numeric:
+        out = ensure_numeric_columns(out, existing_numeric)
+
+    return out
+
+
+def safe_read_csv_text(text: str | None) -> pd.DataFrame:
+    if not text:
+        return pd.DataFrame()
+    try:
+        from io import StringIO
+        return pd.read_csv(StringIO(text))
+    except Exception:
+        return pd.DataFrame()
 
 # =========================================================
 # DATA DOWNLOAD
@@ -1250,17 +1337,18 @@ def read_evolution_history() -> pd.DataFrame:
                 content = r.json().get("content", "")
                 decoded = base64.b64decode(content).decode("utf-8")
                 from io import StringIO
-                return pd.read_csv(StringIO(decoded))
+                return guard_dataframe_dtypes(pd.read_csv(StringIO(decoded)))
         except Exception:
             pass
 
     try:
-        return pd.read_csv(EVOLUTION_FILE)
+        return guard_dataframe_dtypes(pd.read_csv(EVOLUTION_FILE))
     except Exception:
         return pd.DataFrame()
 
 
 def write_evolution_history(evo_df: pd.DataFrame) -> str:
+    evo_df = guard_dataframe_dtypes(evo_df)
     """
     Ghi evolution ra local và nếu có GITHUB_TOKEN thì commit lên GitHub.
     Đây là điểm sửa bệnh mất ngày 27/5: dữ liệu phải có nơi lưu bền, không chỉ local trên Streamlit.
@@ -1369,10 +1457,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
         return old_df, f"SKIP_NO_TRADING_SESSION | {reason}"
     today = today_str()
     now_time = vn_time_str("%H:%M:%S")
-    today = today_str()
-    now_time = vn_time_str("%H:%M:%S")
 
-   
     rows = []
     for _, r in scan_df.iterrows():
         rows.append({
@@ -1390,8 +1475,8 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
             
         })
 
-    new_df = pd.DataFrame(rows)
-    old_df = read_evolution_history()
+    new_df = guard_dataframe_dtypes(pd.DataFrame(rows))
+    old_df = guard_dataframe_dtypes(read_evolution_history())
 
     if old_df.empty:
         evo_df = new_df
@@ -1407,6 +1492,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     evo_df = evo_df[evo_df["date_str"].isin(last_dates)].copy()
     evo_df = evo_df.drop(columns=["date_str"])
     evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
+    evo_df = guard_dataframe_dtypes(evo_df)
 
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
@@ -3322,7 +3408,7 @@ def read_buy_elite_history() -> pd.DataFrame:
         except Exception:
             pass
     try:
-        return pd.read_csv(BUY_ELITE_HISTORY_FILE)
+        return guard_dataframe_dtypes(pd.read_csv(BUY_ELITE_HISTORY_FILE))
     except Exception:
         return pd.DataFrame()
 
@@ -3330,6 +3416,7 @@ def read_buy_elite_history() -> pd.DataFrame:
 def write_buy_elite_history(history_df: pd.DataFrame) -> str:
     if history_df is None:
         history_df = pd.DataFrame()
+    history_df = guard_dataframe_dtypes(history_df)
     try:
         text = history_df.to_csv(index=False)
     except Exception:
@@ -3392,9 +3479,18 @@ def update_buy_elite_outcomes(history_df: pd.DataFrame, scan_df: pd.DataFrame) -
     date_strs = sorted(set(hist["date"].dt.strftime("%Y-%m-%d").tolist() + [today_str()]))
     date_pos = {d: i for i, d in enumerate(date_strs)}
 
-    for col in ["t1_return", "t3_return", "t5_return", "t1_win", "t3_win", "t5_win", "last_outcome_update"]:
+    # Pandas mới không cho gán chuỗi thời gian vào cột float64.
+    # Vì vậy tách rõ cột số và cột chữ trước khi cập nhật outcome.
+    outcome_num_cols = ["t1_return", "t3_return", "t5_return", "t1_win", "t3_win", "t5_win"]
+    for col in outcome_num_cols:
         if col not in hist.columns:
             hist[col] = np.nan
+        hist[col] = pd.to_numeric(hist[col], errors="coerce")
+
+    if "last_outcome_update" not in hist.columns:
+        hist["last_outcome_update"] = ""
+    hist["last_outcome_update"] = hist["last_outcome_update"].astype("object")
+    hist["last_outcome_update"] = hist["last_outcome_update"].where(pd.notna(hist["last_outcome_update"]), "")
 
     for idx, r in hist.iterrows():
         symbol = str(r.get("symbol", ""))
@@ -3420,7 +3516,7 @@ def update_buy_elite_outcomes(history_df: pd.DataFrame, scan_df: pd.DataFrame) -
                 hist.at[idx, "last_outcome_update"] = vn_time_str("%Y-%m-%d %H:%M:%S")
 
     hist["date"] = hist["date"].dt.strftime("%Y-%m-%d")
-    return hist
+    return guard_dataframe_dtypes(hist)
 
 
 def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.DataFrame, market_real: float, market_forecast: float, allow_save: bool = True) -> pd.DataFrame:
@@ -3472,15 +3568,17 @@ def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.Da
             "last_outcome_update": "",
         })
 
-    new_df = pd.DataFrame(rows)
+    new_df = guard_dataframe_dtypes(pd.DataFrame(rows))
     if new_df.empty:
         return history_df if history_df is not None else pd.DataFrame()
 
-    if history_df is None or history_df.empty:
+    history_df = guard_dataframe_dtypes(history_df) if history_df is not None else pd.DataFrame()
+    if history_df.empty:
         hist = new_df
     else:
         hist = pd.concat([history_df, new_df], ignore_index=True)
 
+    hist = guard_dataframe_dtypes(hist)
     hist = hist.drop_duplicates(subset=["date", "symbol"], keep="last")
     return hist
 
@@ -3999,14 +4097,14 @@ def append_thinking_journal(thinking_profile: dict) -> str:
             "current_thought": thinking_profile.get("current_thought", ""),
             "note": thinking_profile.get("note", ""),
         }
-        new = pd.DataFrame([row])
+        new = guard_dataframe_dtypes(pd.DataFrame([row]), text_cols=["date", "time", "mode", "current_thought", "note"], numeric_cols=["completed_t5", "baseline_winrate"])
         old = pd.DataFrame()
         raw = _github_read_text(BUY_ELITE_THINKING_JOURNAL_FILE)
         if raw is not None:
             from io import StringIO
-            old = pd.read_csv(StringIO(raw))
+            old = guard_dataframe_dtypes(pd.read_csv(StringIO(raw)))
         elif os.path.exists(BUY_ELITE_THINKING_JOURNAL_FILE):
-            old = pd.read_csv(BUY_ELITE_THINKING_JOURNAL_FILE)
+            old = guard_dataframe_dtypes(pd.read_csv(BUY_ELITE_THINKING_JOURNAL_FILE))
 
         if old.empty:
             out = new
@@ -4014,6 +4112,7 @@ def append_thinking_journal(thinking_profile: dict) -> str:
             out = pd.concat([old, new], ignore_index=True)
             out = out.drop_duplicates(subset=["date"], keep="last").tail(500)
 
+        out = guard_dataframe_dtypes(out)
         csv_text = out.to_csv(index=False)
         return _github_write_text(
             BUY_ELITE_THINKING_JOURNAL_FILE,
@@ -4285,10 +4384,11 @@ def write_mr_bot_pro_journal(profile: dict) -> str:
         text = _github_read_text(MR_BOT_PRO_JOURNAL_FILE)
         if text is not None:
             from io import StringIO
-            old = pd.read_csv(StringIO(text))
+            old = guard_dataframe_dtypes(pd.read_csv(StringIO(text)))
         elif os.path.exists(MR_BOT_PRO_JOURNAL_FILE):
-            old = pd.read_csv(MR_BOT_PRO_JOURNAL_FILE)
-        out = pd.concat([old, row], ignore_index=True).drop_duplicates(subset=["date"], keep="last").tail(500)
+            old = guard_dataframe_dtypes(pd.read_csv(MR_BOT_PRO_JOURNAL_FILE))
+        row = guard_dataframe_dtypes(row)
+        out = guard_dataframe_dtypes(pd.concat([old, row], ignore_index=True)).drop_duplicates(subset=["date"], keep="last").tail(500)
         return _github_write_text(
             MR_BOT_PRO_JOURNAL_FILE,
             out.to_csv(index=False),
