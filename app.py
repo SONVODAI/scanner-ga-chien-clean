@@ -5244,11 +5244,16 @@ try:
         market_real=market_real,
         market_live=market_live,
         market_forecast=market_forecast,
+        trading_today=trading_today if "trading_today" in globals() else True,
     )
 
 except Exception as e:
     st.warning(f"Brain Controller: {e}")
-    brain_result = None
+
+    brain_result = {
+        "status": "ERROR",
+        "error": str(e),
+    }
 live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in scan_df.columns else 0
 safe_mode_count = int((scan_df["live_source"].astype(str).str.contains("SAFE_MODE|NO_DATA|BAD", na=False)).sum()) if "live_source" in scan_df.columns else 0
 
