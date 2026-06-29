@@ -365,4 +365,43 @@ def thinking_summary(row: dict) -> str:
     if not row:
         return "Chưa có Thinking Journal."
 
+# =========================================================
+# CONTROLLER API
+# =========================================================
+
+def get_thinking_summary(brain):
+    """
+    API chuẩn cho Brain Controller.
+    Trả về suy nghĩ mới nhất của Bot.
+    """
+    try:
+        row = latest_thinking(brain)
+
+        if not row:
+            return {
+                "module": "thinking_engine",
+                "status": "NO_DATA",
+                "message": "Chưa có Thinking Journal.",
+            }
+
+        return {
+            "module": "thinking_engine",
+            "status": row.get("status", "UNKNOWN"),
+            "market_mood": row.get("market_mood", ""),
+            "nav_suggestion": row.get("nav_suggestion", ""),
+            "nav_reason": row.get("nav_reason", ""),
+            "priority_groups": row.get("priority_groups", ""),
+            "avoid_groups": row.get("avoid_groups", ""),
+            "similar_count": row.get("similar_count", 0),
+            "thinking": row.get("thinking", ""),
+        }
+
+    except Exception as e:
+        return {
+            "module": "thinking_engine",
+            "status": "ERROR",
+            "error": str(e),
+        }
+    
+
     return row.get("thinking", "Chưa có nội dung suy nghĩ.")
