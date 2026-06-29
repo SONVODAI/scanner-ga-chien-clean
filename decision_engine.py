@@ -510,22 +510,6 @@ def load_decision_history(brain):
     return brain.recall(DECISION_TABLE)
 
 
-def build_decision_view(decision):
-    if not decision:
-        return pd.DataFrame()
-
-    row = {
-        "Ngày": decision.get("decision_date"),
-        "Hành động": decision.get("action"),
-        "Confidence": decision.get("confidence"),
-        "Risk": decision.get("risk_level"),
-        "NAV gợi ý": decision.get("suggested_nav"),
-        "Nhóm ưu tiên": " | ".join(decision.get("priority_groups", [])),
-        "Lý do": " | ".join(decision.get("reason", [])),
-    }
-
-    return pd.DataFrame([row])
-
 
 def build_decision_history_view(brain, n=20):
     df = load_decision_history(brain)
@@ -560,8 +544,7 @@ def build_decision_history_view(brain, n=20):
 
 if __name__ == "__main__":
 
-    from brainmanager import get_brain
-
+    from brain_manager import get_brain
     brain = get_brain()
 
     decision = make_market_decision(
