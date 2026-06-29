@@ -778,7 +778,44 @@ def build_report_markdown(report):
 
     return str(report.get("report_text", ""))
 
+# =========================================================
+# CONTROLLER API
+# =========================================================
 
+def get_optimizer_summary(brain):
+    """
+    API chuẩn cho Brain Controller.
+    Trả về khuyến nghị tối ưu mới nhất.
+    """
+    try:
+        report = load_latest_optimizer_report(brain)
+        recommendation = load_latest_recommendation(brain)
+
+        weights = recommendation.get("weights", {})
+        notes = recommendation.get("notes", [])
+
+        return {
+            "module": "brain_optimizer",
+            "status": recommendation.get("status", "WARMUP"),
+            "optimizer_confidence": recommendation.get("confidence", 0),
+            "apply_mode": recommendation.get("apply_mode", "SUGGEST_ONLY"),
+            "pattern_count": report.get("pattern_count", 0) if report else 0,
+            "decision_count": report.get("decision_count", 0) if report else 0,
+            "learning_count": report.get("learning_count", 0) if report else 0,
+            "forecast_penalty": weights.get("forecast_penalty"),
+            "forecast_ahead_bonus": weights.get("forecast_ahead_bonus"),
+            "confidence_bonus": weights.get("confidence_bonus"),
+            "min_buy_confidence": weights.get("min_buy_confidence"),
+            "notes": notes,
+            "report_text": report.get("report_text", "") if report else "",
+        }
+
+    except Exception as e:
+        return {
+            "module": "brain_optimizer",
+            "status": "ERROR",
+            "error": str(e),
+        }
 # =========================================================
 # QUICK TEST
 # =========================================================
