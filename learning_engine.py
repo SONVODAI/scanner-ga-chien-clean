@@ -481,7 +481,6 @@ def find_similar_lessons(brain, latest_snapshot=None, top_n=10):
 
     return df.tail(top_n)
 
-
 def build_learning_view(df):
     if df is None or df.empty:
         return pd.DataFrame()
@@ -501,7 +500,8 @@ def build_learning_view(df):
     if "date" in out.columns:
         out = out.sort_values("date", ascending=False)
 
-    # =========================================================
+    return out
+# =========================================================
 # CONTROLLER API
 # =========================================================
 
