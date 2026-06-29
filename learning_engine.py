@@ -501,4 +501,49 @@ def build_learning_view(df):
     if "date" in out.columns:
         out = out.sort_values("date", ascending=False)
 
+    # =========================================================
+# CONTROLLER API
+# =========================================================
+
+def get_learning_summary(brain):
+    """
+    API chuẩn cho Brain Controller.
+    Trả về tóm tắt bài học kinh nghiệm mới nhất.
+    """
+    try:
+        df = brain.recall(LEARNING_TABLE)
+
+        if df is None or df.empty:
+            return {
+                "module": "learning_engine",
+                "status": "NO_DATA",
+                "samples": 0,
+                "message": "Chưa có dữ liệu học tập.",
+            }
+
+        summary = summarize_learning(df)
+
+        latest = df.tail(1).iloc[0].to_dict()
+
+        return {
+            "module": "learning_engine",
+            "status": "OK",
+            "samples": summary.get("count", 0),
+            "days": summary.get("days", 0),
+            "avg_t5_return": summary.get("avg_t5_return", np.nan),
+            "avg_t5_winrate": summary.get("avg_t5_winrate", np.nan),
+            "lesson_type_count": summary.get("lesson_type_count", {}),
+            "latest_lesson_type": latest.get("lesson_type", ""),
+            "latest_condition": latest.get("condition_key", ""),
+            "latest_lesson": latest.get("lesson", ""),
+            "message": summary.get("message", ""),
+        }
+
+    except Exception as e:
+        return {
+            "module": "learning_engine",
+            "status": "ERROR",
+            "error": str(e),
+        }
+
     return out
