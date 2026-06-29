@@ -31,6 +31,12 @@ try:
     from brain_manager import get_brain
     from learning_engine import save_experience_learning, build_learning_view
     from decision_engine import make_market_decision, build_decision_view, build_decision_history_view
+    from brain_optimizer import (
+    run_brain_optimizer,
+    build_optimizer_view,
+    build_recommendation_view,
+    build_report_markdown,
+)
 except Exception as e:
     get_brain = None
     save_experience_learning = None
@@ -38,6 +44,10 @@ except Exception as e:
     make_market_decision = None
     build_decision_view = None
     build_decision_history_view = None
+    run_brain_optimizer = None
+    build_optimizer_view = None
+    build_recommendation_view = None
+    build_report_markdown = None
     BRAIN_IMPORT_ERROR = str(e)
 else:
     BRAIN_IMPORT_ERROR = ""
@@ -5331,6 +5341,26 @@ brain, v21_experience_df, v21_decision, v21_brain_status, v21_brain_summary = ru
     market_forecast=market_forecast,
     trading_today=trading_today,
 )
+# =========================================================
+# V21 BRAIN OPTIMIZER
+# =========================================================
+v21_optimizer_report = {}
+v21_optimizer_recommendation = {}
+v21_optimizer_save_result = None
+
+if brain is not None and run_brain_optimizer is not None:
+    try:
+        v21_optimizer_report, v21_optimizer_recommendation, v21_optimizer_save_result = run_brain_optimizer(
+            brain=brain,
+            save=True,
+        )
+    except Exception as e:
+        v21_optimizer_report = {
+            "status": "OPTIMIZER_ERROR",
+            "report_text": str(e),
+        }
+        v21_optimizer_recommendation = {}
+        v21_optimizer_save_result = None
 mr_bot_profile_old = read_mr_bot_pro_profile()
 mr_bot_profile_after = build_mr_bot_pro_profile(
     old_profile=mr_bot_profile_old,
@@ -5391,7 +5421,29 @@ with st.expander("🤖 Hồ sơ Mr.BOT PRO / Nhân cách / Đề xuất / Câu h
 # V21 BRAIN DASHBOARD
 # =========================================================
 st.markdown("## 🧠 V21 BRAIN - EXPERIENCE DECISION")
+with st.expander("🧬 Brain Optimizer - Bot tự đánh giá"):
+    if isinstance(v21_optimizer_report, dict) and v21_optimizer_report:
+        st.dataframe(
+            build_optimizer_view(v21_optimizer_report),
+            use_container_width=True,
+            hide_index=True,
+        )
 
+        if isinstance(v21_optimizer_recommendation, dict) and v21_optimizer_recommendation:
+            st.markdown("**Recommendation:**")
+            st.dataframe(
+                build_recommendation_view(v21_optimizer_recommendation),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        st.markdown("**Brain Report:**")
+        st.code(
+            build_report_markdown(v21_optimizer_report),
+            language="text",
+        )
+    else:
+        st.caption("Brain Optimizer đang chờ đủ dữ liệu.")
 if v21_brain_status in ["SAVED", "LOCAL_ONLY"] or str(v21_brain_status).startswith("SKIP"):
     st.caption(f"Brain status: {v21_brain_status}")
 else:
