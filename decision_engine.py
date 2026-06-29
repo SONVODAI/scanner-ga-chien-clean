@@ -561,6 +561,40 @@ def build_decision_view(decision):
 
     return pd.DataFrame([row])
 # =========================================================
+# CONTROLLER API
+# =========================================================
+
+def get_decision_summary(brain):
+    """
+    API chuẩn cho Brain Controller.
+    Trả về bản tóm tắt Decision mới nhất.
+    """
+    try:
+        decision = make_market_decision(
+            brain=brain,
+            latest_snapshot=None,
+            save=False,
+        )
+
+        return {
+            "module": "decision_engine",
+            "status": "OK",
+            "action": decision.get("action"),
+            "confidence": decision.get("confidence"),
+            "risk_level": decision.get("risk_level"),
+            "suggested_nav": decision.get("suggested_nav"),
+            "priority_groups": decision.get("priority_groups", []),
+            "reason": decision.get("reason", []),
+            "decision_text": decision.get("decision_text", ""),
+        }
+
+    except Exception as e:
+        return {
+            "module": "decision_engine",
+            "status": "ERROR",
+            "error": str(e),
+        }   
+# =========================================================
 # QUICK TEST
 # =========================================================
 
