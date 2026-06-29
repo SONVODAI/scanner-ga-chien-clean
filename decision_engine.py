@@ -537,7 +537,29 @@ def build_decision_history_view(brain, n=20):
         ascending=False
     )
 
+# =========================================================
+# STREAMLIT VIEW
+# =========================================================
 
+def build_decision_view(decision):
+    """
+    Chuyển decision dict thành DataFrame để Streamlit hiển thị.
+    """
+
+    if decision is None:
+        return pd.DataFrame()
+
+    row = {
+        "Ngày": decision.get("decision_date"),
+        "Hành động": decision.get("action"),
+        "Confidence": decision.get("confidence"),
+        "Risk": decision.get("risk_level"),
+        "NAV gợi ý": decision.get("suggested_nav"),
+        "Nhóm ưu tiên": ", ".join(decision.get("priority_groups", [])),
+        "Lý do": " | ".join(decision.get("reason", [])),
+    }
+
+    return pd.DataFrame([row])
 # =========================================================
 # QUICK TEST
 # =========================================================
