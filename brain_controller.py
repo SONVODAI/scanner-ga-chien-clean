@@ -1,203 +1,134 @@
-from __future__ import annotations
+# =========================================================
+# MR.BOT V21 - BRAIN CONTROLLER
+# Điều phối Brain theo kiến trúc hiện tại của app.py
+# =========================================================
 
+import pandas as pd
+import numpy as np
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from brain_manager import BrainManager
-from learning_engine import LearningEngine
-from decision_engine import DecisionEngine
-from brain_optimizer import BrainOptimizer
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 
 
-class BrainController:
+def now_str():
+    return datetime.now(VN_TZ).strftime("%Y-%m-%d %H:%M:%S")
 
-    def __init__(self):
 
-        self.manager = BrainManager()
-        self.learning = LearningEngine()
-        self.decision = DecisionEngine()
-        self.optimizer = BrainOptimizer()
+try:
+    from brain_manager import get_brain
+    from learning_engine import save_experience_learning
+    from decision_engine import make_market_decision
+    from brain_optimizer import run_brain_optimizer
+except Exception as e:
+    get_brain = None
+    save_experience_learning = None
+    make_market_decision = None
+    run_brain_optimizer = None
+    IMPORT_ERROR = str(e)
+else:
+    IMPORT_ERROR = ""
 
-    # ==========================================================
-    # MAIN
-    # ==========================================================
 
-    def run(
-        self,
-        scan_df,
-        market_snapshot: dict,
-    ):
+def build_market_snapshot_df(scan_df, market_real, market_live, market_forecast):
+    return pd.DataFrame([{
+        "date": datetime.now(VN_TZ).strftime("%Y-%m-%d"),
+        "time": datetime.now(VN_TZ).strftime("%H:%M:%S"),
+        "session_slot": "EOD" if datetime.now(VN_TZ).hour >= 15 else "INTRADAY",
 
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "market_real": market_real,
+        "market_live": market_live,
+        "market_forecast": market_forecast,
 
-        print("")
-        print("=" * 70)
-        print("🧠 BRAIN START")
-        print(now)
-        print("=" * 70)
+        "pull_dep": int((scan_df["group"] == "PULL ĐẸP").sum()) if "group" in scan_df.columns else 0,
+        "pull_vua": int((scan_df["group"] == "PULL VỪA").sum()) if "group" in scan_df.columns else 0,
+        "mua_early": int((scan_df["group"] == "MUA EARLY").sum()) if "group" in scan_df.columns else 0,
+        "cp_manh": int((scan_df["group"] == "CP MẠNH").sum()) if "group" in scan_df.columns else 0,
+        "ga_tang_toc": int((scan_df["group"] == "GÀ TĂNG TỐC").sum()) if "group" in scan_df.columns else 0,
 
-        # -----------------------------------------------------
-        # 1. Quan sát
-        # -----------------------------------------------------
+        "obv_green_pct": round((scan_df["obv_status"] == "🟢").mean() * 100, 2) if "obv_status" in scan_df.columns else np.nan,
+        "slope_positive_pct": round((scan_df["ema9_ma20_slope"] > 0).mean() * 100, 2) if "ema9_ma20_slope" in scan_df.columns else np.nan,
+        "rsi_above_50_pct": round((scan_df["rsi14"] > 50).mean() * 100, 2) if "rsi14" in scan_df.columns else np.nan,
+    }])
 
-        observation = self.observe(
-            scan_df,
-            market_snapshot,
-        )
 
-        # -----------------------------------------------------
-        # 2. Đánh giá
-        # -----------------------------------------------------
-
-        evaluation = self.evaluate(
-            observation
-        )
-
-        # -----------------------------------------------------
-        # 3. Ra quyết định
-        # -----------------------------------------------------
-
-        decision = self.decision.make_decision(
-            evaluation
-        )
-
-        # -----------------------------------------------------
-        # 4. Ghi trí nhớ
-        # -----------------------------------------------------
-
-        self.manager.save_snapshot(
-
-            observation=observation,
-
-            evaluation=evaluation,
-
-            decision=decision
-
-        )
-
-        # -----------------------------------------------------
-        # 5. Học
-        # -----------------------------------------------------
-
-        self.learning.learn()
-
-        # -----------------------------------------------------
-        # 6. Tối ưu
-        # -----------------------------------------------------
-
-        self.optimizer.optimize()
-
-        print("🧠 Brain finished.")
-
+def run_brain_controller(
+    scan_df,
+    market_real,
+    market_live,
+    market_forecast,
+    trading_today=True,
+):
+    if get_brain is None:
         return {
-
-            "observation": observation,
-
-            "evaluation": evaluation,
-
-            "decision": decision,
-
+            "status": "IMPORT_ERROR",
+            "error": IMPORT_ERROR,
         }
 
-    # ==========================================================
-    # OBSERVE
-    # ==========================================================
+    brain = get_brain()
 
-    def observe(
-        self,
-        scan_df,
-        market_snapshot,
-    ):
+    state = {
+        "created_at": now_str(),
+        "status": "RUNNING",
+        "brain": brain,
+        "learning": {},
+        "decision": {},
+        "optimizer": {},
+    }
 
-        market_real = market_snapshot.get("market_real", 0)
+    try:
+        market_snapshot_df = build_market_snapshot_df(
+            scan_df=scan_df,
+            market_real=market_real,
+            market_live=market_live,
+            market_forecast=market_forecast,
+        )
 
-        forecast = market_snapshot.get("forecast", 0)
+        brain.remember(
+            table="market_snapshot",
+            data=market_snapshot_df,
+            key=["date", "session_slot"],
+            keep_days=720,
+            date_col="date",
+            sort_by=["date", "time"],
+            sync_github=False,
+        )
 
-        breadth = market_snapshot.get("breadth", 0)
-
-        leaders = len(scan_df)
-
-        early = 0
-        pull = 0
-        strong = 0
-
-        if "group" in scan_df.columns:
-
-            early = (
-                scan_df["group"]
-                .astype(str)
-                .str.contains("EARLY", case=False)
-                .sum()
-            )
-
-            pull = (
-                scan_df["group"]
-                .astype(str)
-                .str.contains("PULL", case=False)
-                .sum()
-            )
-
-            strong = (
-                scan_df["group"]
-                .astype(str)
-                .str.contains("MẠNH|STRONG", case=False)
-                .sum()
-            )
-
-        return {
-
-            "market_real": market_real,
-
-            "forecast": forecast,
-
-            "breadth": breadth,
-
-            "leaders": leaders,
-
-            "early": int(early),
-
-            "pull": int(pull),
-
-            "strong": int(strong),
-
-        }
-
-    # ==========================================================
-    # EVALUATE
-    # ==========================================================
-
-    def evaluate(
-        self,
-        observation,
-    ):
-
-        score = 0
-
-        score += observation["forecast"] * 2
-
-        score += observation["market_real"]
-
-        score += observation["pull"] * 0.4
-
-        score += observation["early"] * 0.3
-
-        score += observation["strong"] * 0.5
-
-        if score < 10:
-
-            regime = "DEFENSIVE"
-
-        elif score < 25:
-
-            regime = "NEUTRAL"
-
+        if save_experience_learning is not None and trading_today:
+            experience_df, experience_status, experience_summary = save_experience_learning(brain)
+            state["learning"] = {
+                "status": experience_status,
+                "summary": experience_summary,
+            }
         else:
+            state["learning"] = {
+                "status": "SKIP_NO_MODULE_OR_NO_TRADING",
+                "summary": {},
+            }
 
-            regime = "AGGRESSIVE"
+        if make_market_decision is not None:
+            decision = make_market_decision(brain=brain, save=True)
+            state["decision"] = decision
+        else:
+            state["decision"] = {}
 
-        return {
+        if run_brain_optimizer is not None:
+            report, recommendation, save_result = run_brain_optimizer(
+                brain=brain,
+                save=True,
+            )
+            state["optimizer"] = {
+                "report": report,
+                "recommendation": recommendation,
+                "save_result": save_result,
+            }
+        else:
+            state["optimizer"] = {}
 
-            "brain_score": round(score, 2),
+        state["status"] = "READY"
+        return state
 
-            "regime": regime,
-
-        }
+    except Exception as e:
+        state["status"] = "ERROR"
+        state["error"] = str(e)
+        return state
