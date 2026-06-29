@@ -24,7 +24,23 @@ try:
     import yfinance as yf
 except Exception:
     yf = None
-
+# =========================================================
+# V21 BRAIN / EXPERIENCE / DECISION MODULES
+# =========================================================
+try:
+    from brainmanager import get_brain
+    from learning_engine import save_experience_learning, build_learning_view
+    from decision_engine import make_market_decision, build_decision_view, build_decision_history_view
+except Exception as e:
+    get_brain = None
+    save_experience_learning = None
+    build_learning_view = None
+    make_market_decision = None
+    build_decision_view = None
+    build_decision_history_view = None
+    BRAIN_IMPORT_ERROR = str(e)
+else:
+    BRAIN_IMPORT_ERROR = ""
 # =========================================================
 # PAGE CONFIG
 # =========================================================
@@ -5046,7 +5062,101 @@ def show_compact_table(
                 height=min(700, height + 160),
             )
 
+# =========================================================
+# V21 BRAIN SYNC BRIDGE
+# =========================================================
+def build_market_snapshot_for_brain(scan_df, market_real, market_live, market_forecast):
+    return pd.DataFrame([{
+        "date": today_str(),
+        "time": vn_time_str("%H:%M:%S"),
+        "session_slot": "EOD" if vn_now().hour >= 15 else "INTRADAY",
 
+        "market_real": market_real,
+        "market_live": market_live,
+        "market_forecast": market_forecast,
+
+        "pull_dep": int((scan_df["group"] == "PULL ĐẸP").sum()),
+        "pull_vua": int((scan_df["group"] == "PULL VỪA").sum()),
+        "mua_early": int((scan_df["group"] == "MUA EARLY").sum()),
+        "cp_manh": int((scan_df["group"] == "CP MẠNH").sum()),
+        "ga_tang_toc": int((scan_df["group"] == "GÀ TĂNG TỐC").sum()),
+
+        "obv_green_pct": round((scan_df["obv_status"] == "🟢").mean() * 100, 2) if "obv_status" in scan_df.columns else np.nan,
+        "slope_positive_pct": round((scan_df["ema9_ma20_slope"] > 0).mean() * 100, 2) if "ema9_ma20_slope" in scan_df.columns else np.nan,
+        "rsi_above_50_pct": round((scan_df["rsi14"] > 50).mean() * 100, 2) if "rsi14" in scan_df.columns else np.nan,
+    }])
+
+
+def run_v21_brain_cycle(
+    scan_df,
+    evo_saved_df,
+    buy_elite_history_df,
+    market_real,
+    market_live,
+    market_forecast,
+    trading_today,
+):
+    if get_brain is None:
+        return None, None, None, "BRAIN_IMPORT_ERROR", BRAIN_IMPORT_ERROR
+
+    try:
+        brain = get_brain()
+
+        market_snapshot_df = build_market_snapshot_for_brain(
+            scan_df=scan_df,
+            market_real=market_real,
+            market_live=market_live,
+            market_forecast=market_forecast,
+        )
+
+        brain.remember(
+            table="market_snapshot",
+            data=market_snapshot_df,
+            key=["date", "session_slot"],
+            keep_days=720,
+            date_col="date",
+            sort_by=["date", "time"],
+            sync_github=False,
+        )
+
+        if isinstance(evo_saved_df, pd.DataFrame) and not evo_saved_df.empty:
+            brain.remember(
+                table="group_evolution_history",
+                data=evo_saved_df,
+                key=["date", "symbol"],
+                keep_days=720,
+                date_col="date",
+                sort_by=["date", "symbol"],
+                sync_github=False,
+            )
+
+        if isinstance(buy_elite_history_df, pd.DataFrame) and not buy_elite_history_df.empty:
+            brain.remember(
+                table="buy_elite_learning_history",
+                data=buy_elite_history_df,
+                key=["date", "symbol"],
+                keep_days=720,
+                date_col="date",
+                sort_by=["date", "symbol"],
+                sync_github=False,
+            )
+
+        if save_experience_learning is not None and trading_today:
+            experience_df, experience_status, experience_summary = save_experience_learning(brain)
+        else:
+            experience_df = brain.recall("bot_experience_learning")
+            experience_status = "SKIP_INTRADAY_OR_NO_MODULE"
+            experience_summary = {}
+
+        if make_market_decision is not None:
+            decision = make_market_decision(brain=brain, save=True)
+        else:
+            decision = {}
+
+        return brain, experience_df, decision, experience_status, experience_summary
+
+    except Exception as e:
+        return None, None, None, "BRAIN_CYCLE_ERROR", str(e)
 # =========================================================
 # UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
@@ -5209,7 +5319,18 @@ thinking_profile_after = build_buy_elite_thinking_profile(
 thinking_profile_status = write_buy_elite_thinking_profile(thinking_profile_after)
 thinking_journal_status = append_thinking_journal(thinking_profile_after)
 thinking_summary = build_thinking_summary(thinking_profile_after)
-
+# =========================================================
+# V21 BRAIN / EXPERIENCE LEARNING / DECISION CYCLE
+# =========================================================
+brain, v21_experience_df, v21_decision, v21_brain_status, v21_brain_summary = run_v21_brain_cycle(
+    scan_df=scan_df,
+    evo_saved_df=evo_saved_df,
+    buy_elite_history_df=buy_elite_history_df,
+    market_real=market_real,
+    market_live=market_live,
+    market_forecast=market_forecast,
+    trading_today=trading_today,
+)
 mr_bot_profile_old = read_mr_bot_pro_profile()
 mr_bot_profile_after = build_mr_bot_pro_profile(
     old_profile=mr_bot_profile_old,
@@ -5266,7 +5387,49 @@ with st.expander("🤖 Hồ sơ Mr.BOT PRO / Nhân cách / Đề xuất / Câu h
     if log_show:
         st.markdown("**Nhật ký tiến hóa gần nhất:**")
         st.dataframe(pd.DataFrame(log_show[-12:]), use_container_width=True, hide_index=True)
+# =========================================================
+# V21 BRAIN DASHBOARD
+# =========================================================
+st.markdown("## 🧠 V21 BRAIN - EXPERIENCE DECISION")
 
+if v21_brain_status in ["SAVED", "LOCAL_ONLY"] or str(v21_brain_status).startswith("SKIP"):
+    st.caption(f"Brain status: {v21_brain_status}")
+else:
+    st.warning(f"Brain status: {v21_brain_status} | {v21_brain_summary}")
+
+if isinstance(v21_decision, dict) and v21_decision:
+    d1, d2, d3, d4 = st.columns(4)
+
+    with d1:
+        st.metric("ACTION", v21_decision.get("action", ""))
+    with d2:
+        st.metric("CONFIDENCE", v21_decision.get("confidence", 0))
+    with d3:
+        st.metric("RISK", v21_decision.get("risk_level", ""))
+    with d4:
+        st.metric("NAV", f"{v21_decision.get('suggested_nav', 0)}%")
+
+    st.info(v21_decision.get("decision_text", ""))
+
+    with st.expander("🔎 V21 Decision chi tiết"):
+        st.dataframe(
+            build_decision_view(v21_decision),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        if brain is not None and build_decision_history_view is not None:
+            hist_view = build_decision_history_view(brain, n=20)
+            if hist_view is not None and not hist_view.empty:
+                st.markdown("**Decision history gần nhất:**")
+                st.dataframe(hist_view, use_container_width=True, hide_index=True)
+
+if isinstance(v21_experience_df, pd.DataFrame) and not v21_experience_df.empty:
+    with st.expander("📚 V21 Experience Learning"):
+        view = build_learning_view(v21_experience_df) if build_learning_view is not None else v21_experience_df
+        st.dataframe(view.tail(30), use_container_width=True, hide_index=True)
+else:
+    st.caption("V21 Experience Learning: đang chờ dữ liệu đủ để học.")
 st.markdown("## 👑 BUY ELITE - DECISION ENGINE")
 
 elite_summary = build_buy_elite_today_summary(buy_elite_df, market_real, market_forecast)
