@@ -519,6 +519,229 @@ class LifecycleAnalyzer:
             )
 
         print()
+# ==========================================================
+# LƯU lifecycle_history.csv
+# ==========================================================
 
+    def save_lifecycle(self):
+
+        if self.lifecycle.empty:
+            self.build_lifecycle()
+
+        self.lifecycle.to_csv(
+
+            LIFECYCLE_HISTORY,
+
+            index=False,
+
+            encoding="utf-8-sig"
+
+        )
+
+        print(
+
+            f"💾 Saved: {LIFECYCLE_HISTORY.name}"
+
+        )
+
+
+
+# ==========================================================
+# LƯU transition_history.csv
+# ==========================================================
+
+    def save_transition(self):
+
+        if self.transition.empty:
+            self.build_transition_history()
+
+        self.transition.to_csv(
+
+            TRANSITION_HISTORY,
+
+            index=False,
+
+            encoding="utf-8-sig"
+
+        )
+
+        print(
+
+            f"💾 Saved: {TRANSITION_HISTORY.name}"
+
+        )
+
+
+
+# ==========================================================
+# TẠO SUMMARY
+# ==========================================================
+
+    def build_summary(self):
+
+        if self.history.empty:
+            self.build_history()
+
+        rows = []
+
+        for symbol, df in self.history.groupby("symbol"):
+
+            df = df.sort_values("date")
+
+            rows.append({
+
+                "symbol": symbol,
+
+                "days":
+
+                    len(df),
+
+                "first":
+
+                    df.iloc[0]["group"],
+
+                "last":
+
+                    df.iloc[-1]["group"],
+
+                "highest_rank":
+
+                    df["group_rank"].max(),
+
+                "highest_group":
+
+                    df.loc[
+
+                        df["group_rank"].idxmax(),
+
+                        "group"
+
+                    ],
+
+                "transition":
+
+                    max(
+
+                        len(df)-1,
+
+                        0
+
+                    )
+
+            })
+
+        summary = pd.DataFrame(rows)
+
+        summary = summary.sort_values(
+
+            [
+
+                "highest_rank",
+
+                "days"
+
+            ],
+
+            ascending=False
+
+        )
+
+        self.summary = summary
+
+        return summary
+
+
+
+# ==========================================================
+# LƯU SUMMARY
+# ==========================================================
+
+    def save_summary(self):
+
+        if self.summary.empty:
+
+            self.build_summary()
+
+        self.summary.to_csv(
+
+            LIFECYCLE_SUMMARY,
+
+            index=False,
+
+            encoding="utf-8-sig"
+
+        )
+
+        print(
+
+            f"💾 Saved: {LIFECYCLE_SUMMARY.name}"
+
+        )
+
+
+
+# ==========================================================
+# EXPORT TOÀN BỘ
+# ==========================================================
+
+    def export_all(self):
+
+        self.save_lifecycle()
+
+        self.save_transition()
+
+        self.save_summary()
+
+        print()
+
+        print("✅ Export hoàn tất.")
+
+        print()
+
+
+
+# ==========================================================
+# CHẠY TOÀN BỘ ENGINE
+# ==========================================================
+
+    def run(self):
+
+        print()
+
+        print("="*70)
+
+        print("🧠 BRAIN : LIFECYCLE ANALYZER")
+
+        print("="*70)
+
+        print()
+
+        self.build_history()
+
+        self.build_lifecycle()
+
+        self.build_transition_history()
+
+        self.build_summary()
+
+        self.export_all()
+
+        print()
+
+        print("🧠 Lifecycle Analyzer Finished")
+
+        print()
+
+
+
+# ==========================================================
+# TEST ĐỘC LẬP
+# ==========================================================
+
+if __name__ == "__main__":
+
+    brain = LifecycleAnalyzer()
+
+    brain.run()
 
         return history
