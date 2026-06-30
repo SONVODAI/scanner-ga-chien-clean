@@ -15,7 +15,7 @@ import json
 import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-
+from brain.behavior_analyzer import BehaviorAnalyzer
 import numpy as np
 import pandas as pd
 import streamlit as st
