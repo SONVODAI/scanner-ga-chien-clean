@@ -20,10 +20,8 @@ import pandas as pd
 import numpy as np
 import os
 
-
-
 # ==========================================================
-# THƯ MỤC
+# ROOT
 # ==========================================================
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -33,8 +31,6 @@ SNAPSHOT_DIR = ROOT / "snapshot"
 BRAIN_DATA = ROOT / "brain_data"
 
 BRAIN_DATA.mkdir(exist_ok=True)
-
-
 
 # ==========================================================
 # OUTPUT
@@ -46,8 +42,15 @@ LIFECYCLE_SUMMARY = BRAIN_DATA / "lifecycle_summary.csv"
 
 TRANSITION_HISTORY = BRAIN_DATA / "transition_history.csv"
 
+# ---------- NEW ----------
 
+BEHAVIOR_DAILY = BRAIN_DATA / "behavior_daily.csv"
 
+BEHAVIOR_PATTERN = BRAIN_DATA / "behavior_pattern.csv"
+
+BEHAVIOR_SUMMARY = BRAIN_DATA / "behavior_summary.csv"
+
+BEHAVIOR_TRANSITION = BRAIN_DATA / "behavior_transition.csv"
 # ==========================================================
 # THỨ TỰ TIẾN HÓA
 # ==========================================================
@@ -82,18 +85,27 @@ class LifecycleAnalyzer:
 
     def __init__(self):
 
-        self.snapshot_files = []
+    self.snapshot_files = []
 
-        self.history = pd.DataFrame()
+    self.history = pd.DataFrame()
 
-        self.lifecycle = pd.DataFrame()
+    self.lifecycle = pd.DataFrame()
 
-        self.summary = pd.DataFrame()
+    self.summary = pd.DataFrame()
 
-        self.transition = pd.DataFrame()
+    self.transition = pd.DataFrame()
 
+    # ===========================
+    # Behavior
+    # ===========================
 
+    self.behavior_daily = pd.DataFrame()
 
+    self.behavior_pattern = pd.DataFrame()
+
+    self.behavior_summary = pd.DataFrame()
+
+    self.behavior_transition = pd.DataFrame()
 # ==========================================================
 # TÌM TOÀN BỘ SNAPSHOT
 # ==========================================================
@@ -386,7 +398,115 @@ class LifecycleAnalyzer:
             self.build_history()
 
         rows = []
+    # ==========================================================
+# BUILD BEHAVIOR DAILY
+# ==========================================================
 
+    def build_behavior_daily(self):
+
+        if self.history.empty:
+            self.build_history()
+
+        if self.history.empty:
+            return pd.DataFrame()
+
+        rows = []
+
+        for date, df in self.history.groupby("date"):
+
+            total = len(df)
+
+            early = (df["group"] == "MUA EARLY").sum()
+
+            pull = (
+                (df["group"] == "PULL VỪA").sum()
+                +
+                (df["group"] == "PULL ĐẸP").sum()
+            )
+
+            strong = (df["group"] == "CP MẠNH").sum()
+
+            breakout = (df["group"] == "MUA BREAK").sum()
+
+            rocket = (df["group"] == "GÀ TĂNG TỐC").sum()
+
+            rows.append({
+
+                "date": date,
+
+                "total": total,
+
+                "early": early,
+
+                "pull": pull,
+
+                "strong": strong,
+
+                "break": breakout,
+
+                "rocket": rocket,
+
+                "early_ratio": round(early / total * 100, 2) if total else 0,
+
+                "pull_ratio": round(pull / total * 100, 2) if total else 0,
+
+                "strong_ratio": round(strong / total * 100, 2) if total else 0,
+
+            })
+
+        self.behavior_daily = pd.DataFrame(rows)
+
+        return self.behavior_daily
+
+
+
+# ==========================================================
+# BUILD BEHAVIOR TRANSITION
+# ==========================================================
+
+    def build_behavior_transition(self):
+
+        if self.transition.empty:
+            self.build_transition_history()
+
+        if self.transition.empty:
+            return pd.DataFrame()
+
+        df = self.transition.copy()
+
+        result = (
+
+            df.groupby(
+
+                [
+
+                    "from_group",
+
+                    "to_group"
+
+                ]
+
+            )
+
+            .size()
+
+            .reset_index(name="count")
+
+            .sort_values(
+
+                "count",
+
+                ascending=False
+
+            )
+
+            .reset_index(drop=True)
+
+        )
+
+        self.behavior_transition = result
+
+        return result
         for symbol, df in self.history.groupby("symbol"):
 
             df = df.sort_values("date").reset_index(drop=True)
@@ -661,7 +781,11 @@ class LifecycleAnalyzer:
         if self.summary.empty:
 
             self.build_summary()
+        self.build_behavior_daily()
 
+self.build_behavior_transition()
+
+self.build_behavior_summary()
         self.summary.to_csv(
 
             LIFECYCLE_SUMMARY,
@@ -678,7 +802,81 @@ class LifecycleAnalyzer:
 
         )
 
+# ==========================================================
+# SAVE BEHAVIOR
+# ==========================================================
 
+    def save_behavior(self):
+
+        if self.behavior_daily.empty:
+            self.build_behavior_daily()
+
+        if self.behavior_transition.empty:
+            self.build_behavior_transition()
+
+        self.behavior_daily.to_csv(
+            BEHAVIOR_DAILY,
+            index=False,
+            encoding="utf-8-sig"
+        )
+
+        self.behavior_transition.to_csv(
+            BEHAVIOR_TRANSITION,
+            index=False,
+            encoding="utf-8-sig"
+        )
+
+        print(f"💾 Saved: {BEHAVIOR_DAILY.name}")
+        print(f"💾 Saved: {BEHAVIOR_TRANSITION.name}")
+
+
+# ==========================================================
+# BUILD BEHAVIOR SUMMARY
+# ==========================================================
+
+    def build_behavior_summary(self):
+
+        if self.behavior_daily.empty:
+            self.build_behavior_daily()
+
+        if self.behavior_transition.empty:
+            self.build_behavior_transition()
+
+        summary = {}
+
+        if len(self.behavior_daily):
+
+            summary["snapshot_days"] = len(self.behavior_daily)
+
+            summary["avg_early"] = round(
+                self.behavior_daily["early"].mean(), 2
+            )
+
+            summary["avg_pull"] = round(
+                self.behavior_daily["pull"].mean(), 2
+            )
+
+            summary["avg_strong"] = round(
+                self.behavior_daily["strong"].mean(), 2
+            )
+
+        if len(self.behavior_transition):
+
+            summary["transition_count"] = len(
+                self.behavior_transition
+            )
+
+        self.behavior_summary = pd.DataFrame([summary])
+
+        self.behavior_summary.to_csv(
+            BEHAVIOR_SUMMARY,
+            index=False,
+            encoding="utf-8-sig"
+        )
+
+        print(f"💾 Saved: {BEHAVIOR_SUMMARY.name}")
+
+        return self.behavior_summary
 
 # ==========================================================
 # EXPORT TOÀN BỘ
@@ -686,18 +884,19 @@ class LifecycleAnalyzer:
 
     def export_all(self):
 
-        self.save_lifecycle()
+    self.save_lifecycle()
 
-        self.save_transition()
+    self.save_transition()
 
-        self.save_summary()
+    self.save_summary()
 
-        print()
+    self.save_behavior()
 
-        print("✅ Export hoàn tất.")
+    print()
 
-        print()
+    print("✅ Export hoàn tất.")
 
+    print()
 
 
 # ==========================================================
