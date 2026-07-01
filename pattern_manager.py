@@ -82,6 +82,6 @@ def save_pattern_history(
     key=["date", "symbol"],
     keep_days=720,
     sort_by=["date", "symbol"],
-    sync_github=False,
+    sync_github=True,
 )
 
