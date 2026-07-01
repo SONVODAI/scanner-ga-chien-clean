@@ -5829,7 +5829,7 @@ for c, g in zip(cols, GROUP_ORDER):
 
 try:
     brain = get_brain()
-
+    print(brain.status())
     save_pattern_history(
         brain=brain,
         scan_df=scan_df,
