@@ -2,12 +2,12 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "WARMUP",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-07-01 23:06:32",
+  "updated_at": "2026-07-01 23:15:53",
   "completed_t5": 0,
   "baseline_winrate": null,
   "observation": {
     "date": "2026-07-01",
-    "time": "23:06:32",
+    "time": "23:15:53",
     "market_real": 7.7,
     "market_forecast": 2.3,
     "regime": "🟡 TRUNG TÍNH",
@@ -15,7 +15,7 @@
     "signals_today": 30,
     "top_watch": "SHS, MBS, BAF",
     "avg_winprob": 77.0,
-    "avg_elite_score": 79.8,
+    "avg_elite_score": 80.3,
     "high_consensus_count": 17
   },
   "hypotheses": [],
