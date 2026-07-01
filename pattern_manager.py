@@ -85,5 +85,3 @@ def save_pattern_history(
     sync_github=False,
 )
 
-print("PATTERN STATUS =", status)
-print("PATTERN ROWS =", len(saved))
