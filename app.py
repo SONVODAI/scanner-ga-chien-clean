@@ -15,7 +15,7 @@ import json
 import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from brain.behavior_analyzer import BehaviorAnalyzer
+# from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
 import numpy as np
 import pandas as pd
