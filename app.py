@@ -5829,14 +5829,14 @@ for c, g in zip(cols, GROUP_ORDER):
 
 try:
     brain = get_brain()
-    print(brain.status())
+    print(">>> SAVE PATTERN START")
     save_pattern_history(
         brain=brain,
         scan_df=scan_df,
         market_real=market_real,
         market_forecast=market_forecast,
     )
-
+    print(">>> SAVE PATTERN DONE")
 except Exception as e:
     print(f"Pattern Memory Error: {e}")
 # =========================================================
