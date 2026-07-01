@@ -76,6 +76,7 @@ class BrainStorage:
         self.repo_name = repo_name
         self.token_getter = token_getter
         self.base_dir = base_dir
+        print("BRAIN BASE DIR =", self.base_dir)
         self.github_dir = github_dir.strip("/")
 
     # =====================================================
