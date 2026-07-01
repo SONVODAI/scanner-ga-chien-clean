@@ -215,6 +215,7 @@ class BrainStorage:
         local_status = "LOCAL_SKIP"
         try:
             path = self.local_path(table)
+            print("WRITE TO =", path)
             df.to_csv(path, index=False)
             local_status = "LOCAL_OK"
         except Exception as e:
