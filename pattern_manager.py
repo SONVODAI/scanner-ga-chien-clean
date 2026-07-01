@@ -75,7 +75,8 @@ def save_pattern_history(
     df["t1_win"] = None
     df["t3_win"] = None
     df["t5_win"] = None
-
+    print("PATTERN DF ROWS =", len(df))
+    print(df.head())
     saved, status = brain.remember(
     table="pattern_history",
     data=df,
@@ -84,4 +85,5 @@ def save_pattern_history(
     sort_by=["date", "symbol"],
     sync_github=True,
 )
-
+    print("PATTERN STATUS =", status)
+    print("PATTERN SAVED =", len(saved))
