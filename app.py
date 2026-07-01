@@ -16,6 +16,7 @@ import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from brain.behavior_analyzer import BehaviorAnalyzer
+from pattern_manager import save_pattern_history
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -5822,7 +5823,22 @@ cols = st.columns(len(GROUP_ORDER))
 for c, g in zip(cols, GROUP_ORDER):
     with c:
         st.metric(g, int((scan_df["group"] == g).sum()))
+# ==========================================================
+# PATTERN MEMORY
+# ==========================================================
 
+try:
+    brain = get_brain()
+
+    save_pattern_history(
+        brain=brain,
+        scan_df=scan_df,
+        market_real=market_real,
+        market_forecast=market_forecast,
+    )
+
+except Exception as e:
+    print(f"Pattern Memory Error: {e}")
 # =========================================================
 # OPTIONAL / LEGACY TABLES
 # =========================================================
