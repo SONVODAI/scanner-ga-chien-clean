@@ -5234,6 +5234,16 @@ market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
 market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
+try:
+    _, pattern_status = save_pattern_history(
+        brain=None,
+        scan_df=scan_df,
+        market_real=market_real,
+        market_forecast=market_forecast,
+    )
+    st.caption(f"Pattern Memory: {pattern_status}")
+except Exception as e:
+    st.warning(f"Pattern Memory Error: {e}")
 # =========================================================
 # MR.BOT BRAIN CONTROLLER
 # =========================================================
