@@ -57,19 +57,19 @@ def save_pattern_history(
         "dist_from_ema9_pct",
         "obv_status",
     ]
-    learn_groups = [
-    "MUA EARLY",
-    "PULL VỪA",
-    "PULL ĐẸP",
-    "CP MẠNH",
-]
+        learn_groups = [
+        "MUA EARLY",
+        "PULL VỪA",
+        "PULL ĐẸP",
+        "CP MẠNH",
+    ]
 
-df = scan_df[
-    scan_df["group"].isin(learn_groups)
-].copy()
+    df = scan_df[
+        scan_df["group"].isin(learn_groups)
+    ].copy()
 
-cols = [c for c in keep_cols if c in df.columns]
-df = df[cols]
+    cols = [c for c in keep_cols if c in df.columns]
+    df = df[cols]
     
 
     df["date"] = today_str()
