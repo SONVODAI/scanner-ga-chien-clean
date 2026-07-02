@@ -57,7 +57,7 @@ def save_pattern_history(
         "dist_from_ema9_pct",
         "obv_status",
     ]
-        learn_groups = [
+    learn_groups = [
         "MUA EARLY",
         "PULL VỪA",
         "PULL ĐẸP",
