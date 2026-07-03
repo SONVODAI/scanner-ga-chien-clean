@@ -568,9 +568,8 @@ def build_final_decision(
     if group_col:
         keep.append(group_col)
 
-    if sector_col:
+    if sector_col and sector_col != group_col:
         keep.append(sector_col)
-
     if price_col:
         keep.append(price_col)
 
@@ -618,7 +617,7 @@ def build_final_decision(
             risk_col: "RỦI RO",
         }
     )
-
+        result = result.loc[:, ~result.columns.duplicated()].copy()
     return (
         result.reset_index(drop=True),
         f"Tìm được {len(result)} cổ phiếu tinh hoa."
