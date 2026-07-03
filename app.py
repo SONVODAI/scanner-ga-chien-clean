@@ -4842,8 +4842,8 @@ def build_buy_elite_decision_engine(
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
     # -----------------------------------------------------
-mr = to_float(market_real, 0)
-base["ĐÈN"] = np.select(
+    mr = to_float(market_real, 0)
+    base["ĐÈN"] = np.select(
         [
             (mr < 6),
             hard_bad,
