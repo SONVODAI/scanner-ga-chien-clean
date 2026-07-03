@@ -4844,8 +4844,7 @@ base["ĐÈN"] = np.select(
         ["🟡", "🔴", "🟢", "🟢", "🟡"],
         default="⚪",
     )
-
-    base["KẾT LUẬN"] = np.select(
+base["KẾT LUẬN"] = np.select(
         [
             mr < 6,
             hard_bad,
