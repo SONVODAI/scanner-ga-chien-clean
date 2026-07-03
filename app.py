@@ -4825,9 +4825,9 @@ base["WinProb"] = (
     .astype(int)
 ) 
 
-    base["WinProb"] = base["WinProb"].round(0).astype(int)
-    base["⭐"] = base["WinProb"].apply(elite_star)
-    base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
+base["WinProb"] = base["WinProb"].round(0).astype(int)
+base["⭐"] = base["WinProb"].apply(elite_star)
+base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
 
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
