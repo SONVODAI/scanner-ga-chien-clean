@@ -5693,30 +5693,6 @@ if not buy_elite_df.empty:
 else:
     st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
 # =========================================================
-# FINAL DECISION ENGINE
-# =========================================================
-st.markdown("---")
-st.markdown("## 👑 FINAL DECISION ENGINE - TOP 10")
-
-final_decision_df, final_decision_summary = build_final_decision(
-    buy_elite_df=buy_elite_df,
-    green_red_df=green_red_df,
-    max_top=10,
-    max_per_sector=3,
-)
-
-st.caption(final_decision_summary)
-
-if final_decision_df is not None and not final_decision_df.empty:
-    st.dataframe(
-        final_decision_df,
-        use_container_width=True,
-        hide_index=True,
-        height=420,
-    )
-else:
-    st.info("Hôm nay chưa có mã nào đủ chuẩn FINAL DECISION.")
-# =========================================================
 # XANH MUA - ĐỎ BÁN LAB
 # =========================================================
 st.markdown("---")
