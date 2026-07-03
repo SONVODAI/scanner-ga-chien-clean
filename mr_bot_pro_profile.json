@@ -3,7 +3,7 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-03 09:37:31",
+  "updated_at": "2026-07-03 09:49:18",
   "age_days": 8,
   "bot_version_number": 4.021,
   "status": "WARMUP",
@@ -37,15 +37,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-06-30 18:24:30",
-      "status": "WARMUP",
-      "personality": "HỌC VIỆC THẬN TRỌNG",
-      "confidence": 0.0,
-      "completed_t5": 0,
-      "market_real": 6.5,
-      "message": "Tôi đang WARMUP: đã ghi 90 tín hiệu, nhưng mới có 0/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
-    },
     {
       "time": "2026-06-30 21:02:11",
       "status": "WARMUP",
@@ -755,6 +746,15 @@
       "confidence": 30.5,
       "completed_t5": 21,
       "market_real": 6.9,
+      "message": "Tôi đang WARMUP: đã ghi 160 tín hiệu, nhưng mới có 21/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
+    },
+    {
+      "time": "2026-07-03 09:49:18",
+      "status": "WARMUP",
+      "personality": "HỌC VIỆC THẬN TRỌNG",
+      "confidence": 30.5,
+      "completed_t5": 21,
+      "market_real": 7.1,
       "message": "Tôi đang WARMUP: đã ghi 160 tín hiệu, nhưng mới có 21/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
     }
   ]
