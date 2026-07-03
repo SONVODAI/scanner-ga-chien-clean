@@ -4798,37 +4798,47 @@ def build_buy_elite_decision_engine(
 
     # Market là trần xác suất, không để điểm đẹp đánh lừa khi thị trường yếu.
     
-# ==========================================================
-# MARKET FIRST
-# Điều chỉnh WinProb theo sức khỏe thị trường
-# nhưng vẫn giữ nguyên thứ hạng giữa các cổ phiếu.
-# ==========================================================
 
-mr = to_float(market_real, 0)
+    # -----------------------------------------------------
+    # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
+    # -----------------------------------------------------
+    base["WinProb"] = (
+        28
+        + base["EliteScore"] * 0.55
+        + base["ConsensusCount"] * 4.0
+        + np.where(group.eq("PULL ĐẸP"), 6, 0)
+        + np.where(group.eq("PULL VỪA"), 3, 0)
+        + np.where(base["InEarlyLab"], 5, 0)
+        - np.where(rsi > 72, 8, 0)
+        - np.where(dist > 3.5, 7, 0)
+        - np.where(hard_bad, 35, 0)
+    )
 
-if mr < 6:
-    market_factor = 0.72
-    market_cap = 55
+    # -----------------------------------------------------
+    # MARKET FIRST: điều chỉnh WinProb theo sức khỏe thị trường
+    # nhưng vẫn giữ thứ hạng giữa các cổ phiếu
+    # -----------------------------------------------------
+    mr = to_float(market_real, 0)
 
-elif mr < 8:
-    market_factor = 0.88
-    market_cap = 78
+    if mr < 6:
+        market_factor = 0.72
+        market_cap = 55
+    elif mr < 8:
+        market_factor = 0.88
+        market_cap = 78
+    else:
+        market_factor = 1.00
+        market_cap = 95
 
-else:
-    market_factor = 1.00
-    market_cap = 95
+    base["WinProb"] = (
+        (base["WinProb"] * market_factor)
+        .clip(0, market_cap)
+        .round()
+        .astype(int)
+    )
 
-base["WinProb"] = (
-    (base["WinProb"] * market_factor)
-    .clip(0, market_cap)
-    .round()
-    .astype(int)
-) 
-
-
-base["⭐"] = base["WinProb"].apply(elite_star)
-base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
-
+    base["⭐"] = base["WinProb"].apply(elite_star)
+    base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
     # -----------------------------------------------------
