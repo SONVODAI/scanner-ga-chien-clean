@@ -5687,7 +5687,52 @@ if not buy_elite_df.empty:
         )
 else:
     st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
+# =========================================================
+# ELITE PRIME
+# =========================================================
 
+st.markdown("---")
+st.markdown("## 👑👑 ELITE PRIME")
+
+elite_prime_df = build_elite_prime(
+    buy_elite_df=buy_elite_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+
+if not elite_prime_df.empty:
+
+    prime_cols = [
+        "⭐",
+        "MÃ",
+        "PRIME SCORE",
+        "XÁC SUẤT",
+        "NHÓM",
+        "GIÁ",
+        "VÙNG MUA",
+        "NAV",
+        "LÝ DO",
+    ]
+
+    prime_cols = [c for c in prime_cols if c in elite_prime_df.columns]
+
+    st.dataframe(
+        elite_prime_df[prime_cols],
+        use_container_width=True,
+        hide_index=True,
+        height=320,
+    )
+
+    with st.expander("🔎 Mở đầy đủ ELITE PRIME"):
+        st.dataframe(
+            elite_prime_df,
+            use_container_width=True,
+            hide_index=True,
+            height=650,
+        )
+
+else:
+    st.info("Hôm nay chưa có mã đạt chuẩn ELITE PRIME.")
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
 # =========================================================
