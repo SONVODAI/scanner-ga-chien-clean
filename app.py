@@ -4839,10 +4839,12 @@ def build_buy_elite_decision_engine(
 
     base["⭐"] = base["WinProb"].apply(elite_star)
     base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
+    
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
     # -----------------------------------------------------
     mr = to_float(market_real, 0)
+
     base["ĐÈN"] = np.select(
         [
             (mr < 6),
@@ -4854,7 +4856,8 @@ def build_buy_elite_decision_engine(
         ["🟡", "🔴", "🟢", "🟢", "🟡"],
         default="⚪",
     )
-base["KẾT LUẬN"] = np.select(
+
+    base["KẾT LUẬN"] = np.select(
         [
             mr < 6,
             hard_bad,
@@ -4872,20 +4875,26 @@ base["KẾT LUẬN"] = np.select(
         default="CHƯA ĐỦ ĐỒNG THUẬN",
     )
 
-    base["NAV ELITE"] = [elite_nav_v2(c, p, market_real) for c, p in zip(base["KẾT LUẬN"], base["WinProb"])]
+    base["NAV ELITE"] = [
+        elite_nav_v2(c, p, market_real)
+        for c, p in zip(base["KẾT LUẬN"], base["WinProb"])
+    ]
 
     # Vùng mua ưu tiên lấy từ Xanh/Đỏ; nếu không có thì tự tính quanh EMA9/giá.
     base["VÙNG MUA ELITE"] = base.get("GR_VÙNG MUA", "").astype(str)
     empty_zone = base["VÙNG MUA ELITE"].isin(["", "-", "nan", "None"])
     ema9_num = pd.to_numeric(base.get("ema9", np.nan), errors="coerce")
     price_num = pd.to_numeric(base.get("price", np.nan), errors="coerce")
+
     auto_zone = np.where(
         ema9_num.notna(),
-        (ema9_num * 0.99).round(0).astype("Int64").astype(str) + " - " + (ema9_num * 1.01).round(0).astype("Int64").astype(str),
+        (ema9_num * 0.99).round(0).astype("Int64").astype(str)
+        + " - "
+        + (ema9_num * 1.01).round(0).astype("Int64").astype(str),
         price_num.round(0).astype("Int64").astype(str),
     )
-    base.loc[empty_zone, "VÙNG MUA ELITE"] = auto_zone[empty_zone]
 
+    base.loc[empty_zone, "VÙNG MUA ELITE"] = auto_zone[empty_zone]
     # -----------------------------------------------------
     # 10) LÝ DO: phải giải thích được vì sao được chọn
     # -----------------------------------------------------
