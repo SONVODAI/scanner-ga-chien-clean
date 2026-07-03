@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
-from elite_prime import build_elite_prime
+from final_decision_engine import build_final_decision
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -5688,51 +5688,29 @@ if not buy_elite_df.empty:
 else:
     st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
 # =========================================================
-# ELITE PRIME
+# FINAL DECISION ENGINE
 # =========================================================
-
 st.markdown("---")
-st.markdown("## 👑👑 ELITE PRIME")
+st.markdown("## 👑 FINAL DECISION ENGINE - TOP 10")
 
-elite_prime_df = build_elite_prime(
+final_decision_df, final_decision_summary = build_final_decision(
     buy_elite_df=buy_elite_df,
-    market_real=market_real,
-    market_forecast=market_forecast,
+    green_red_df=green_red_df,
+    max_top=10,
+    max_per_sector=3,
 )
 
-if not elite_prime_df.empty:
+st.caption(final_decision_summary)
 
-    prime_cols = [
-        "⭐",
-        "MÃ",
-        "PRIME SCORE",
-        "XÁC SUẤT",
-        "NHÓM",
-        "GIÁ",
-        "VÙNG MUA",
-        "NAV",
-        "LÝ DO",
-    ]
-
-    prime_cols = [c for c in prime_cols if c in elite_prime_df.columns]
-
+if final_decision_df is not None and not final_decision_df.empty:
     st.dataframe(
-        elite_prime_df[prime_cols],
+        final_decision_df,
         use_container_width=True,
         hide_index=True,
-        height=320,
+        height=420,
     )
-
-    with st.expander("🔎 Mở đầy đủ ELITE PRIME"):
-        st.dataframe(
-            elite_prime_df,
-            use_container_width=True,
-            hide_index=True,
-            height=650,
-        )
-
 else:
-    st.info("Hôm nay chưa có mã đạt chuẩn ELITE PRIME.")
+    st.info("Hôm nay chưa có mã nào đủ chuẩn FINAL DECISION.")
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
 # =========================================================
