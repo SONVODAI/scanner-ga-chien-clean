@@ -4832,7 +4832,7 @@ base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
     # -----------------------------------------------------
-    mr = to_float(market_real, 0)
+        mr = to_float(market_real, 0)
     base["ĐÈN"] = np.select(
         [
             (mr < 6),
