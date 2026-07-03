@@ -5725,7 +5725,7 @@ st.info(final_note)
 if not final_df.empty:
 
     st.dataframe(
-        style_final_decision(final_df),
+        final_df.astype(str),
         use_container_width=True,
         hide_index=True,
         height=520,
