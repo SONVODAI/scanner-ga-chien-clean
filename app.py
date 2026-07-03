@@ -4797,12 +4797,33 @@ def build_buy_elite_decision_engine(
     )
 
     # Market là trần xác suất, không để điểm đẹp đánh lừa khi thị trường yếu.
-    if to_float(market_real, 0) < 6:
-        base["WinProb"] = base["WinProb"].clip(0, 55)
-    elif to_float(market_real, 0) < 8:
-        base["WinProb"] = base["WinProb"].clip(0, 78)
-    else:
-        base["WinProb"] = base["WinProb"].clip(0, 95)
+    
+# ==========================================================
+# MARKET FIRST
+# Điều chỉnh WinProb theo sức khỏe thị trường
+# nhưng vẫn giữ nguyên thứ hạng giữa các cổ phiếu.
+# ==========================================================
+
+mr = to_float(market_real, 0)
+
+if mr < 6:
+    market_factor = 0.72
+    market_cap = 55
+
+elif mr < 8:
+    market_factor = 0.88
+    market_cap = 78
+
+else:
+    market_factor = 1.00
+    market_cap = 95
+
+base["WinProb"] = (
+    (base["WinProb"] * market_factor)
+    .clip(0, market_cap)
+    .round()
+    .astype(int)
+) 
 
     base["WinProb"] = base["WinProb"].round(0).astype(int)
     base["⭐"] = base["WinProb"].apply(elite_star)
