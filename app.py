@@ -5669,13 +5669,13 @@ if not buy_elite_df.empty:
         "Storm", "Persistence", "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE", "RỦI RO"
     ]
     elite_compact_cols = [c for c in elite_compact_cols if c in buy_elite_df.columns]
-
     st.dataframe(
-        style_buy_elite_board(buy_elite_df[elite_compact_cols]),
-        use_container_width=True,
-        hide_index=True,
-        height=540,
-    )
+    final_df,
+    use_container_width=True,
+    hide_index=True,
+    height=520,
+)
+    
 
     with st.expander("🔎 Mở đầy đủ cột BUY ELITE"):
         st.dataframe(
