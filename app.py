@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
-from final_decision_engine import build_final_decision
+from final_decision_engine import build_final_decision, style_final_decision
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -5378,7 +5378,10 @@ buy_elite_df = build_buy_elite_decision_engine(
     market_forecast=market_forecast,
     learning_profile=learning_profile,
 )
-
+final_df, final_note = build_final_decision(
+    buy_elite_df,
+    green_red_df,
+)
 buy_elite_history_df, learning_profile_after, learning_hist_status, learning_profile_status = run_buy_elite_learning_cycle(
     buy_elite_df=buy_elite_df,
     scan_df=scan_df,
@@ -5714,6 +5717,23 @@ else:
 # =========================================================
 # XANH MUA - ĐỎ BÁN LAB
 # =========================================================
+st.markdown("---")
+st.markdown("## 👑 FINAL DECISION")
+
+st.info(final_note)
+
+if not final_df.empty:
+
+    st.dataframe(
+        style_final_decision(final_df),
+        use_container_width=True,
+        hide_index=True,
+        height=520,
+    )
+
+else:
+
+    st.warning("Không có cổ phiếu đủ chuẩn giải ngân.")
 if show_green_red:
     st.markdown("---")
     st.markdown("## 🟢🔴 XANH MUA - ĐỎ BÁN LAB")
