@@ -5670,7 +5670,9 @@ if not buy_elite_df.empty:
     ]
     elite_compact_cols = [c for c in elite_compact_cols if c in buy_elite_df.columns]
     st.dataframe(
-    final_df,
+    style_buy_elite_board(
+        buy_elite_df[elite_compact_cols]
+    ),
     use_container_width=True,
     hide_index=True,
     height=520,
