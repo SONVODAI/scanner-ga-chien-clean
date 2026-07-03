@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
+from elite_prime import build_elite_prime
 import numpy as np
 import pandas as pd
 import streamlit as st
