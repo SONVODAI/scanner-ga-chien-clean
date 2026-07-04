@@ -30,7 +30,27 @@ import numpy as np
 # CONFIG
 # =========================================================
 DEFAULT_WATCHLIST = ""
+# =========================================================
+# PORTFOLIO MEMORY
+# =========================================================
 
+PORTFOLIO_FILE = "portfolio_symbols.txt"
+
+
+def load_portfolio():
+
+    try:
+        with open(PORTFOLIO_FILE, "r", encoding="utf-8") as f:
+            return f.read()
+
+    except:
+        return DEFAULT_WATCHLIST
+
+
+def save_portfolio(text):
+
+    with open(PORTFOLIO_FILE, "w", encoding="utf-8") as f:
+        f.write(text)
 SIGNAL_HOLD = "🟢 GIỮ"
 SIGNAL_WARNING = "🟡 CẢNH BÁO"
 SIGNAL_SELL = "🔴 BÁN"
