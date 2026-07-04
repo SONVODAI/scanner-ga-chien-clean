@@ -3,16 +3,16 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-03 23:12:26",
-  "age_days": 8,
-  "bot_version_number": 4.021,
+  "updated_at": "2026-07-04 08:58:52",
+  "age_days": 9,
+  "bot_version_number": 4.059,
   "status": "WARMUP",
   "personality": "HỌC VIỆC THẬN TRỌNG",
-  "confidence": 30.5,
+  "confidence": 12.9,
   "experience": {
     "observations": 4939,
     "signals": 191,
-    "completed_t5": 21,
+    "completed_t5": 59,
     "hypotheses": 0,
     "beliefs": 0,
     "reflections": 0,
@@ -26,7 +26,7 @@
     "Sẵn sàng thừa nhận sai khi dữ liệu chứng minh điều ngược lại.",
     "Học chậm, đổi chậm, tránh ảo tưởng AI."
   ],
-  "current_message": "Tôi đang WARMUP: đã ghi 191 tín hiệu, nhưng mới có 21/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh.",
+  "current_message": "Tôi đang WARMUP: đã ghi 191 tín hiệu, nhưng mới có 59/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh.",
   "proposals": [
     "Chưa đề xuất đổi trọng số: cần đủ tối thiểu 80 mẫu T+5."
   ],
@@ -37,15 +37,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-07-02 08:04:49",
-      "status": "WARMUP",
-      "personality": "HỌC VIỆC THẬN TRỌNG",
-      "confidence": 0.0,
-      "completed_t5": 0,
-      "market_real": 7.7,
-      "message": "Tôi đang WARMUP: đã ghi 125 tín hiệu, nhưng mới có 0/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
-    },
     {
       "time": "2026-07-02 08:05:14",
       "status": "WARMUP",
@@ -756,6 +747,15 @@
       "completed_t5": 21,
       "market_real": 6.2,
       "message": "Tôi đang WARMUP: đã ghi 191 tín hiệu, nhưng mới có 21/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
+    },
+    {
+      "time": "2026-07-04 08:58:52",
+      "status": "WARMUP",
+      "personality": "HỌC VIỆC THẬN TRỌNG",
+      "confidence": 12.9,
+      "completed_t5": 59,
+      "market_real": 6.2,
+      "message": "Tôi đang WARMUP: đã ghi 191 tín hiệu, nhưng mới có 59/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
     }
   ]
 }
