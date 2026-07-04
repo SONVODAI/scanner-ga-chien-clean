@@ -117,8 +117,8 @@ def guardian_header():
     watch_text = st.text_area(
 
     "Nhập các mã đang nắm giữ (mỗi mã một dòng hoặc ngăn cách bằng dấu phẩy)",
+    value=load_portfolio(),
 
-    value=DEFAULT_WATCHLIST,
 
     placeholder="""
 Ví dụ:
@@ -135,7 +135,7 @@ SSI,PVD,BSR
     height=150,
 
 )
-
+    save_portfolio(watch_text)    
 
     return parse_watchlist(watch_text)
 
