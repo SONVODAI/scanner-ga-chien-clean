@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
 from final_decision_engine import build_final_decision, style_final_decision
+from position_guardian import render_guardian
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -5973,7 +5974,13 @@ if show_legacy:
                     ]
                     show_cols = [c for c in show_cols if c in sub.columns]
                     st.dataframe(sub[show_cols], use_container_width=True, hide_index=True, height=min(600, 80 + len(sub) * 35))
+# =========================================================
+# POSITION GUARDIAN
+# =========================================================
 
+st.markdown("---")
+
+render_guardian(scan_df)
 if show_detail:
     with st.expander("📋 Bảng chi tiết đầy đủ", expanded=True):
         detail_cols = [
