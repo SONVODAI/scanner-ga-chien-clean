@@ -5,7 +5,7 @@
 # Mr.BOT PROJECT
 #
 # Sprint 1
-# ----------------------------------------
+# ---------------------------------------------------------
 # ✓ Watchlist
 # ✓ EMA9
 # ✓ MA20
@@ -13,7 +13,7 @@
 # ✓ Green / Yellow / Red Signal
 #
 # Future
-# ----------------------------------------
+# ---------------------------------------------------------
 # V1.1 Holding Days
 # V1.2 Cost Price
 # V1.3 Profit %
@@ -37,20 +37,13 @@ DEFAULT_WATCHLIST = (
     "VND,SHS,HCM"
 )
 
-
-# =========================================================
-# SIGNAL CONSTANT
-# =========================================================
-
 SIGNAL_HOLD = "🟢 GIỮ"
-
 SIGNAL_WARNING = "🟡 CẢNH BÁO"
-
 SIGNAL_SELL = "🔴 BÁN"
 
 
 # =========================================================
-# SAFE COLUMN
+# SAFE VALUE
 # =========================================================
 
 def safe_value(row, column, default=np.nan):
@@ -58,7 +51,12 @@ def safe_value(row, column, default=np.nan):
     if column not in row.index:
         return default
 
-    return row[column]
+    value = row[column]
+
+    if pd.isna(value):
+        return default
+
+    return value
 
 
 # =========================================================
@@ -71,52 +69,25 @@ def parse_watchlist(text):
         return []
 
     text = text.upper()
-
     text = text.replace("\n", ",")
 
     symbols = []
 
-    for x in text.split(","):
+    for item in text.split(","):
 
-        x = x.strip()
+        item = item.strip()
 
-        if x == "":
+        if item == "":
             continue
 
-        if x not in symbols:
-            symbols.append(x)
+        if item not in symbols:
+            symbols.append(item)
 
     return symbols
 
 
 # =========================================================
-# FILTER DATA
-# =========================================================
-
-def build_watchlist_df(
-    scan_df,
-    symbols,
-):
-
-    if scan_df is None:
-
-        return pd.DataFrame()
-
-    if len(symbols) == 0:
-
-        return pd.DataFrame()
-
-    df = scan_df.copy()
-
-    df["symbol"] = df["symbol"].astype(str)
-
-    df = df[df["symbol"].isin(symbols)]
-
-    return df.reset_index(drop=True)
-
-
-# =========================================================
-# UI HEADER
+# HEADER
 # =========================================================
 
 def guardian_header():
@@ -126,64 +97,89 @@ def guardian_header():
     st.subheader("🛡️ POSITION GUARDIAN")
 
     st.caption(
-        "Quản lý các cổ phiếu đang nắm giữ"
+        "Theo dõi trạng thái các cổ phiếu đang nắm giữ"
     )
 
     watch_text = st.text_area(
 
-        "Watchlist",
+        "Danh sách theo dõi",
 
         value=DEFAULT_WATCHLIST,
 
         height=90,
 
+    )
+
+    return parse_watchlist(watch_text)
+
+
 # =========================================================
-# GENERATE SIGNAL
+# BUILD WATCHLIST
+# =========================================================
+
+def build_watchlist_df(scan_df, symbols):
+
+    if scan_df is None:
+        return pd.DataFrame()
+
+    if len(symbols) == 0:
+        return pd.DataFrame()
+
+    df = scan_df.copy()
+
+    df["symbol"] = (
+        df["symbol"]
+        .astype(str)
+        .str.upper()
+    )
+
+    df = df[df["symbol"].isin(symbols)]
+
+    df = df.reset_index(drop=True)
+
+    return df
+
+
+# =========================================================
+# FORMAT NUMBER
+# =========================================================
+
+def fmt2(value):
+
+    if pd.isna(value):
+        return ""
+
+    return round(float(value), 2)
+
+
+def fmt0(value):
+
+    if pd.isna(value):
+        return ""
+
+    return round(float(value), 0)
+
+# =========================================================
+# SIGNAL ENGINE
 # =========================================================
 
 def generate_signal(row):
 
     price = safe_value(row, "price")
-
     ema9 = safe_value(row, "ema9")
-
     ma20 = safe_value(row, "ma20")
 
     obv = safe_value(row, "obv")
-
     obv_ema9 = safe_value(row, "obv_ema9")
 
     signal = SIGNAL_HOLD
-
     reason = "Xu hướng khỏe"
 
-    # ------------------------------------
-    # SELL
-    # ------------------------------------
+    score = 0
 
-    if (
-        pd.notna(ema9)
-        and pd.notna(ma20)
-        and ema9 < ma20
-    ):
-
-        signal = SIGNAL_SELL
-
-        reason = "EMA9 cắt xuống MA20"
-
-        if (
-            pd.notna(obv)
-            and pd.notna(obv_ema9)
-            and obv < obv_ema9
-        ):
-
-            reason += " + OBV xác nhận"
-
-        return signal, reason
-
-    # ------------------------------------
-    # WARNING
-    # ------------------------------------
+    # ----------------------------------------
+    # PRICE < EMA9
+    # ----------------------------------------
 
     if (
         pd.notna(price)
@@ -191,13 +187,61 @@ def generate_signal(row):
         and price < ema9
     ):
 
+        score += 40
+
         signal = SIGNAL_WARNING
 
         reason = "Giá dưới EMA9"
 
-        return signal, reason
+    # ----------------------------------------
+    # EMA9 < MA20
+    # ----------------------------------------
 
-    return signal, reason
+    if (
+        pd.notna(ema9)
+        and pd.notna(ma20)
+        and ema9 < ma20
+    ):
+
+        score += 60
+
+        signal = SIGNAL_SELL
+
+        reason = "EMA9 dưới MA20"
+
+    # ----------------------------------------
+    # OBV CONFIRM
+    # ----------------------------------------
+
+    if (
+        signal == SIGNAL_SELL
+        and pd.notna(obv)
+        and pd.notna(obv_ema9)
+        and obv < obv_ema9
+    ):
+
+        score += 20
+
+        reason += " + OBV xác nhận"
+
+    score = min(score, 100)
+
+    return signal, reason, score
+
+
+# =========================================================
+# SELL SCORE COLOR
+# =========================================================
+
+def score_color(score):
+
+    if score >= 80:
+        return "🔴"
+
+    if score >= 40:
+        return "🟡"
+
+    return "🟢"
 
 
 # =========================================================
@@ -206,27 +250,37 @@ def generate_signal(row):
 
 def build_position_table(df):
 
-    rows = []
-
     if df.empty:
-
         return pd.DataFrame()
+
+    rows = []
 
     for _, row in df.iterrows():
 
-        signal, reason = generate_signal(row)
+        signal, reason, score = generate_signal(row)
 
         rows.append({
 
             "Mã": safe_value(row, "symbol", ""),
 
-            "Giá": round(safe_value(row, "price"), 2),
+            "Giá": fmt2(
+                safe_value(row, "price")
+            ),
 
-            "EMA9": round(safe_value(row, "ema9"), 2),
+            "EMA9": fmt2(
+                safe_value(row, "ema9")
+            ),
 
-            "MA20": round(safe_value(row, "ma20"), 2),
+            "MA20": fmt2(
+                safe_value(row, "ma20")
+            ),
 
-            "OBV": round(safe_value(row, "obv"), 0),
+            "OBV": fmt0(
+                safe_value(row, "obv")
+            ),
+            "score": score,
+            "Sell Score":
+                f"{score_color(score)} {score}",
 
             "Trạng thái": signal,
 
@@ -234,13 +288,22 @@ def build_position_table(df):
 
         })
 
-    return pd.DataFrame(rows)      
+    result = pd.DataFrame(rows)
+
+    result = result.sort_values(
+
+        by="Score",
+
+        ascending=False,
+
     )
+    result = result.drop(
+    columns=["score"]
+)
+    return result.reset_index(drop=True)
 
-    return parse_watchlist(watch_text)
-
-  # =========================================================
-# COLOR ENGINE
+# =========================================================
+# ROW COLOR
 # =========================================================
 
 def row_color(row):
@@ -250,18 +313,55 @@ def row_color(row):
     if "🔴" in signal:
 
         return [
-            "background-color:#ffd6d6"
+            "background-color:#ffd9d9"
         ] * len(row)
 
     if "🟡" in signal:
 
         return [
-            "background-color:#fff5cc"
+            "background-color:#fff6cc"
         ] * len(row)
 
     return [
         "background-color:#ddffdd"
     ] * len(row)
+
+
+# =========================================================
+# SUMMARY
+# =========================================================
+
+def render_summary(df):
+
+    total = len(df)
+
+    sell = (
+        df["Trạng thái"]
+        .str.contains("🔴")
+        .sum()
+    )
+
+    warning = (
+        df["Trạng thái"]
+        .str.contains("🟡")
+        .sum()
+    )
+
+    hold = (
+        df["Trạng thái"]
+        .str.contains("🟢")
+        .sum()
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    c1.metric("Theo dõi", total)
+
+    c2.metric("🟢 Giữ", hold)
+
+    c3.metric("🟡 Cảnh báo", warning)
+
+    c4.metric("🔴 Bán", sell)
 
 
 # =========================================================
@@ -280,7 +380,7 @@ def render_guardian(scan_df):
     if watch_df.empty:
 
         st.info(
-            "Chưa có cổ phiếu trong Watchlist."
+            "Không có cổ phiếu trong Watchlist."
         )
 
         return
@@ -289,14 +389,13 @@ def render_guardian(scan_df):
         watch_df
     )
 
+    render_summary(result)
+
     st.dataframe(
 
         result.style.apply(
-
             row_color,
-
             axis=1,
-
         ),
 
         use_container_width=True,
@@ -307,14 +406,9 @@ def render_guardian(scan_df):
 
     st.caption(
 
-        "🟢 Giữ  |  🟡 Cảnh báo  |  🔴 Bán"
+        "🟢 Giữ  |  🟡 Giá dưới EMA9  |  🔴 EMA9 dưới MA20"
 
     )
-
-
-
-
-
 
 
 
