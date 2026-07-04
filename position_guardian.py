@@ -29,13 +29,7 @@ import numpy as np
 # =========================================================
 # CONFIG
 # =========================================================
-
-DEFAULT_WATCHLIST = (
-    "SSI,MBB,TCB,VPB,"
-    "STB,CTG,ACB,"
-    "PVD,PVS,BSR,"
-    "VND,SHS,HCM"
-)
+DEFAULT_WATCHLIST = ""
 
 SIGNAL_HOLD = "🟢 GIỮ"
 SIGNAL_WARNING = "🟡 CẢNH BÁO"
