@@ -275,12 +275,14 @@ def build_position_table(df):
                 safe_value(row, "ma20")
             ),
 
-            "OBV": fmt0(
-                safe_value(row, "obv")
-            ),
-            "score": score,
-            "Sell Score":
-                f"{score_color(score)} {score}",
+    "OBV": fmt0(
+        safe_value(row, "obv")
+),
+
+    "score": score,
+
+    "Sell Score":
+        f"{score_color(score)} {score}",
 
             "Trạng thái": signal,
 
