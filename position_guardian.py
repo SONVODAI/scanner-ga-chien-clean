@@ -294,7 +294,7 @@ def build_position_table(df):
 
     result = result.sort_values(
 
-        by="Score",
+        by="score",
 
         ascending=False,
 
