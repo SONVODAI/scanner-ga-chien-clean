@@ -151,21 +151,24 @@ def build_watchlist_df(scan_df, symbols):
 # FORMAT NUMBER
 # =========================================================
 
-def fmt2(value):
+# =========================================================
+# FORMAT NUMBER
+# =========================================================
+
+def fmt_price(value):
 
     if pd.isna(value):
         return ""
 
-    return round(float(value), 2)
+    return f"{float(value):,.2f}"
 
 
-def fmt0(value):
+def fmt_number(value):
 
     if pd.isna(value):
         return ""
 
-    return round(float(value), 0)
-
+    return f"{float(value):,.0f}"
 # =========================================================
 # SIGNAL ENGINE
 # =========================================================
@@ -269,20 +272,17 @@ def build_position_table(df):
         rows.append({
 
             "Mã": safe_value(row, "symbol", ""),
-
-            "Giá": fmt2(
+            "Giá": fmt_price(
                 safe_value(row, "price")
             ),
-
-            "EMA9": fmt2(
+            "EMA9": fmt_price(
+        
                 safe_value(row, "ema9")
             ),
-
-            "MA20": fmt2(
+            "MA20": fmt_price(
                 safe_value(row, "ma20")
             ),
-
-    "OBV": fmt0(
+    "OBV": fmt_number(
         safe_value(row, "obv")
 ),
 
