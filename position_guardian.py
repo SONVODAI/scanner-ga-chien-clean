@@ -96,13 +96,26 @@ def guardian_header():
 
     watch_text = st.text_area(
 
-        "Danh sách theo dõi",
+    "Nhập các mã đang nắm giữ (mỗi mã một dòng hoặc ngăn cách bằng dấu phẩy)",
 
-        value=DEFAULT_WATCHLIST,
+    value=DEFAULT_WATCHLIST,
 
-        height=90,
+    placeholder="""
+Ví dụ:
 
-    )
+SSI
+PVD
+BSR
+
+hoặc
+
+SSI,PVD,BSR
+""",
+
+    height=150,
+
+)
+
 
     return parse_watchlist(watch_text)
 
