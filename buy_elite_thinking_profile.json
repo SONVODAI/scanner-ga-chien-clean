@@ -2,12 +2,12 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "WARMUP",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-07-03 23:12:23",
-  "completed_t5": 21,
-  "baseline_winrate": 0.6667,
+  "updated_at": "2026-07-04 08:58:50",
+  "completed_t5": 59,
+  "baseline_winrate": 0.4746,
   "observation": {
-    "date": "2026-07-03",
-    "time": "23:12:23",
+    "date": "2026-07-04",
+    "time": "08:58:50",
     "market_real": 6.2,
     "market_forecast": 1.7,
     "regime": "🟡 TRUNG TÍNH",
@@ -21,7 +21,7 @@
   "hypotheses": [],
   "beliefs": [],
   "reflections": [],
-  "current_thought": "Ta mới có 21 trải nghiệm T+5. Chưa đủ để phản biện hệ thống, nhưng đã bắt đầu ghi nhớ.",
-  "note": "Đã có 21/80 mẫu T+5. Bot chỉ quan sát, chưa kết luận.",
-  "avg_t5_return": 0.656
+  "current_thought": "Ta mới có 59 trải nghiệm T+5. Chưa đủ để phản biện hệ thống, nhưng đã bắt đầu ghi nhớ.",
+  "note": "Đã có 59/80 mẫu T+5. Bot chỉ quan sát, chưa kết luận.",
+  "avg_t5_return": 0.552
 }
