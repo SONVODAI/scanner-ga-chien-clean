@@ -3,20 +3,20 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-06 16:33:03",
-  "age_days": 11,
-  "bot_version_number": 4.059,
-  "status": "WARMUP",
-  "personality": "HỌC VIỆC THẬN TRỌNG",
-  "confidence": 12.9,
+  "updated_at": "2026-07-07 16:10:04",
+  "age_days": 12,
+  "bot_version_number": 4.091,
+  "status": "LEARNING",
+  "personality": "PHÒNG THỦ",
+  "confidence": 16.7,
   "experience": {
-    "observations": 5106,
-    "signals": 206,
-    "completed_t5": 59,
+    "observations": 5278,
+    "signals": 226,
+    "completed_t5": 90,
     "hypotheses": 0,
     "beliefs": 0,
-    "reflections": 0,
-    "discarded_beliefs": 0
+    "reflections": 1,
+    "discarded_beliefs": 1
   },
   "constitution": [
     "Không cố đoán tương lai.",
@@ -26,9 +26,10 @@
     "Sẵn sàng thừa nhận sai khi dữ liệu chứng minh điều ngược lại.",
     "Học chậm, đổi chậm, tránh ảo tưởng AI."
   ],
-  "current_message": "Market REAL 3.8 < 6. Tôi chỉ lập watchlist (MBS, LHG, DTD), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
+  "current_message": "Market REAL 5.2 < 6. Tôi chỉ lập watchlist (AAA, LHG, DTD), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
   "proposals": [
-    "Chưa đề xuất đổi trọng số: cần đủ tối thiểu 80 mẫu T+5."
+    "Duy trì quyền phủ quyết của Market khi Market REAL < 6.",
+    "Ưu tiên các giả thuyết đã qua phản biện; giảm vai trò giả thuyết bị dữ liệu bác bỏ."
   ],
   "self_questions": [
     "Hôm nay tôi sai ở đâu nếu BUY ELITE không hiệu quả?",
@@ -37,15 +38,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-07-04 22:03:41",
-      "status": "WARMUP",
-      "personality": "HỌC VIỆC THẬN TRỌNG",
-      "confidence": 12.9,
-      "completed_t5": 59,
-      "market_real": 6.2,
-      "message": "Tôi đang WARMUP: đã ghi 191 tín hiệu, nhưng mới có 59/80 mẫu T+5. Tôi quan sát trước khi tự điều chỉnh."
-    },
     {
       "time": "2026-07-04 22:03:58",
       "status": "WARMUP",
@@ -756,6 +748,15 @@
       "completed_t5": 59,
       "market_real": 3.8,
       "message": "Market REAL 3.8 < 6. Tôi chỉ lập watchlist (MBS, LHG, DTD), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    },
+    {
+      "time": "2026-07-07 16:10:04",
+      "status": "LEARNING",
+      "personality": "PHÒNG THỦ",
+      "confidence": 16.7,
+      "completed_t5": 90,
+      "market_real": 5.2,
+      "message": "Market REAL 5.2 < 6. Tôi chỉ lập watchlist (AAA, LHG, DTD), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
     }
   ]
 }
