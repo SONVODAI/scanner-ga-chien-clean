@@ -19,6 +19,7 @@ from zoneinfo import ZoneInfo
 from pattern_manager import save_pattern_history
 from final_decision_engine import build_final_decision, style_final_decision
 from position_guardian import render_guardian
+from modules.evolution_health import *
 import numpy as np
 import pandas as pd
 import streamlit as st
