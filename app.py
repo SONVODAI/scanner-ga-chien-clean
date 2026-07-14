@@ -478,6 +478,7 @@ def render_earning_money_board(
     *,
     title: str = "🏆 EARNING MONEY BOARD",
     height: int = 720,
+ )   
     process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
