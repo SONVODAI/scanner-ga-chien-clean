@@ -478,7 +478,6 @@ def render_earning_money_board(
     *,
     title: str = "🏆 EARNING MONEY BOARD",
     height: int = 720,
- )   
     
 ) -> pd.DataFrame:
     """
