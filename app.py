@@ -479,10 +479,7 @@ def render_earning_money_board(
     title: str = "🏆 EARNING MONEY BOARD",
     height: int = 720,
  )   
-    process_and_render_daily_summary(
-    scan_df,
-    title="📊 DAILY EARNING MONEY REPORT",
-)
+    
 ) -> pd.DataFrame:
     """
     Render Streamlit nếu streamlit có sẵn.
@@ -5809,7 +5806,10 @@ render_earning_money_board(
     title="🏆 EARNING MONEY BOARD",
     height=720,
 )
-
+process_and_render_daily_summary(
+    scan_df,
+    title="📊 DAILY EARNING MONEY REPORT",
+)
 if market_real < 6:
     st.error(market_action)
 elif market_real < 8:
