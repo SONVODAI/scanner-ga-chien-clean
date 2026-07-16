@@ -8,7 +8,12 @@ from modules.cache_manager import (
 
 class TurboRuntime:
 
-    def has(self, name: str) -> bool:
+    def __init__(self):
+        self.scan_df = None
+        self.market = None
+        self.last_scan_time = None
+
+    def has(self, name: str):
         return exists(name)
 
     def load(self, name: str):
@@ -18,6 +23,9 @@ class TurboRuntime:
         save_dataframe(name, df)
 
     def clear(self):
+        self.scan_df = None
+        self.market = None
+        self.last_scan_time = None
         clear_cache()
 
 
