@@ -280,30 +280,31 @@ def _build_reason(row: pd.Series) -> str:
 
 
 def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Thêm Evolution Health vào scan_df và trả về DataFrame đã sắp xếp.
 
-    Hàm không sửa trực tiếp DataFrame đầu vào.
-    """
     if scan_df is None or not isinstance(scan_df, pd.DataFrame):
         raise TypeError("scan_df phải là pandas DataFrame")
 
     if scan_df.empty:
-        out = scan_df.copy()
-        for col in [
-            "evolution_health_score",
-            "evolution_health_group",
-            "evolution_health_rank",
-            "evolution_action",
-            "evolution_reason",
-        ]:
-            out[col] = pd.Series(dtype="object")
-        return out
+        return scan_df.copy()
 
     out = scan_df.copy()
     scores = _technical_scores(out)
 
-    # Trọng số v1.0. Tổng = 1.00.
+    idx = out.index
+
+    rs5 = _num(out.get("rs5"), idx)
+    rs10 = _num(out.get("rs10"), idx)
+    rsi14 = _num(out.get("rsi14"), idx)
+    ema_slope = _num(out.get("ema9_ma20_slope"), idx)
+    ema_change = _num(out.get("ema9_ma20_slope_change"), idx)
+    rsi_slope = _num(out.get("rsi_slope"), idx)
+
+    out = pd.concat([out, scores], axis=1)
+
+    # =====================================================
+    # ĐIỂM CƠ SỞ
+    # =====================================================
+
     health_score = (
         scores["_health_rs"] * 0.24
         + scores["_health_ema"] * 0.20
@@ -314,12 +315,36 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         + scores["_health_pattern"] * 0.06
     )
 
-    idx = out.index
-    ema_slope = _num(out.get("ema9_ma20_slope"), idx)
-    ema_change = _num(out.get("ema9_ma20_slope_change"), idx)
-    rsi_slope = _num(out.get("rsi_slope"), idx)
-    rs5 = _num(out.get("rs5"), idx)
-    rs10 = _num(out.get("rs10"), idx)
+    # =====================================================
+    # SUPER STOCK BONUS
+    # =====================================================
+
+    bonus = pd.Series(0.0, index=idx)
+
+    bonus += np.where(rs5 > 0, 3, -3)
+
+    bonus += np.where(rs10 > 0, 3, -3)
+
+    bonus += np.where(rs5 > rs10, 3, 0)
+
+    bonus += np.where((rsi14 >= 55) & (rsi14 <= 68), 4, 0)
+
+    bonus += np.where(ema_slope > 0, 4, -4)
+
+    obv_good = (
+        out["obv_status"]
+        .astype(str)
+        .str.upper()
+        .str.contains("TỐT|GOOD|POS|UP|STRONG|GREEN|DƯƠNG")
+    )
+
+    bonus += np.where(obv_good, 5, -5)
+
+    health_score = (health_score + bonus).clip(0, 100)
+
+    # =====================================================
+    # WEAKENING
+    # =====================================================
 
     weakening_votes = (
         (ema_slope < 0).astype(int)
@@ -328,63 +353,15 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         + (rs5 < rs10).astype(int)
         + (rs5 < 0).astype(int)
     )
+
     weakening = weakening_votes >= 3
 
-    # ==========================================================
-    # HEALTH QUALITY GATE V1.1
-    # ==========================================================
-
-    rsi14 = _num(out.get("rsi14"), idx)
-
-    obv_good = (
-        out.get("obv_status", "")
-        .astype(str)
-        .str.upper()
-        .str.contains("POS|GOOD|STRONG|UP|TỐT", regex=True)
-    )
-
-    quality_gate = (
-        (rsi14 >= 53)
-        & (rsi14 <= 70)
-        & (rs5 > 0)
-        & (rs10 > 0)
-        & (ema_slope > 0)
-        & (obv_good)
-    )
-
-    out = pd.concat([out, scores], axis=1)
-
     out["evolution_health_score"] = health_score.round(1)
-st.write(
-    out[
-        [
-            "symbol",
-            "rsi14",
-            "rs5",
-            "rs10",
-            "ema9_ma20_slope",
-            "obv_status",
-        ]
-    ].head(20)
-)
+
     out["evolution_health_group"] = _assign_group(
         out["evolution_health_score"],
         weakening,
     )
-
-    # ==========================================================
-    # QUALITY GATE
-    # ==========================================================
-
-    mask = (
-        (out["evolution_health_group"] == "🌱 ĐANG HỒI")
-        & (~quality_gate)
-    )
-
-    out.loc[
-        mask,
-        "evolution_health_group",
-    ] = "🟡 TRUNG TÍNH"
 
     out["evolution_health_rank"] = (
         out["evolution_health_group"]
@@ -397,32 +374,38 @@ st.write(
         _action_from_group
     )
 
-    out["evolution_reason"] = out.apply(_build_reason, axis=1)
-    sort_cols: list[str] = [
+    out["evolution_reason"] = out.apply(
+        _build_reason,
+        axis=1,
+    )
+
+    sort_cols = [
         "evolution_health_rank",
         "evolution_health_score",
+        "rs5",
+        "rs10",
+        "symbol",
     ]
-    ascending: list[bool] = [True, False]
 
-    if "rs5" in out.columns:
-        sort_cols.append("rs5")
-        ascending.append(False)
-    if "rs10" in out.columns:
-        sort_cols.append("rs10")
-        ascending.append(False)
-    if "symbol" in out.columns:
-        sort_cols.append("symbol")
-        ascending.append(True)
+    ascending = [
+        True,
+        False,
+        False,
+        False,
+        True,
+    ]
 
-    out = out.sort_values(
-        sort_cols,
-        ascending=ascending,
-        na_position="last",
-        kind="stable",
-    ).reset_index(drop=True)
+    out = (
+        out.sort_values(
+            sort_cols,
+            ascending=ascending,
+            na_position="last",
+            kind="stable",
+        )
+        .reset_index(drop=True)
+    )
 
     return out
-
 
 def get_earning_money_board(scan_df: pd.DataFrame) -> pd.DataFrame:
     """
