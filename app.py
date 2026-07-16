@@ -418,6 +418,21 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         out["evolution_health_score"],
         weakening,
     )
+        # ==========================================================
+    # QUALITY FILTER
+    # Chỉ những mã đủ "combo ngon - bổ - rẻ"
+    # mới được giữ trong ĐANG HỒI
+    # ==========================================================
+
+    mask = (
+        (out["evolution_health_group"] == "🌱 ĐANG HỒI")
+        & (~quality_gate)
+    )
+
+    out.loc[
+        mask,
+        "evolution_health_group",
+    ] = "🟡 TRUNG TÍNH"
     out["evolution_health_rank"] = (
         out["evolution_health_group"]
         .map(HEALTH_ORDER)
