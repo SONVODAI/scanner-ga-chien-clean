@@ -329,61 +329,64 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         + (rs5 < 0).astype(int)
     )
     weakening = weakening_votes >= 3
-# ==========================================================
-# HEALTH QUALITY GATE V1.1
-# Chỉ giữ lại những cổ phiếu có "combo ngon - bổ - rẻ"
-# ==========================================================
 
-rsi14 = _num(out.get("rsi14"), idx)
+    # ==========================================================
+    # HEALTH QUALITY GATE V1.1
+    # ==========================================================
 
-obv_good = (
-    out.get("obv_status", "")
-    .astype(str)
-    .str.upper()
-    .str.contains("POS|GOOD|STRONG|UP|TỐT", regex=True)
-)
+    rsi14 = _num(out.get("rsi14"), idx)
 
-quality_gate = (
-    (rsi14 >= 53)
-    & (rsi14 <= 70)
-    & (rs5 > 0)
-    & (rs10 > 0)
-    & (ema_slope > 0)
-    & (obv_good)
-)
+    obv_good = (
+        out.get("obv_status", "")
+        .astype(str)
+        .str.upper()
+        .str.contains("POS|GOOD|STRONG|UP|TỐT", regex=True)
+    )
+
+    quality_gate = (
+        (rsi14 >= 53)
+        & (rsi14 <= 70)
+        & (rs5 > 0)
+        & (rs10 > 0)
+        & (ema_slope > 0)
+        & (obv_good)
+    )
+
     out = pd.concat([out, scores], axis=1)
+
     out["evolution_health_score"] = health_score.round(1)
-out["evolution_health_group"] = _assign_group(
-    out["evolution_health_score"],
-    weakening,
-)
 
-# ==========================================================
-# QUALITY GATE
-# Những mã điểm cao nhưng chưa đủ "combo mạnh"
-# sẽ chuyển xuống Trung tính
-# ==========================================================
+    out["evolution_health_group"] = _assign_group(
+        out["evolution_health_score"],
+        weakening,
+    )
 
-mask = (
-    (out["evolution_health_group"] == "🌱 ĐANG HỒI")
-    & (~quality_gate)
-)
+    # ==========================================================
+    # QUALITY GATE
+    # ==========================================================
 
-out.loc[
-    mask,
-    "evolution_health_group",
-] = "🟡 TRUNG TÍNH"
-        out["evolution_health_rank"] = (
+    mask = (
+        (out["evolution_health_group"] == "🌱 ĐANG HỒI")
+        & (~quality_gate)
+    )
+
+    out.loc[
+        mask,
+        "evolution_health_group",
+    ] = "🟡 TRUNG TÍNH"
+
+    out["evolution_health_rank"] = (
         out["evolution_health_group"]
         .map(HEALTH_ORDER)
         .fillna(99)
         .astype(int)
     )
+
     out["evolution_action"] = out["evolution_health_group"].map(
         _action_from_group
     )
-    out["evolution_reason"] = out.apply(_build_reason, axis=1)
 
+    out["evolution_reason"] = out.apply(_build_reason, axis=1)
     sort_cols: list[str] = [
         "evolution_health_rank",
         "evolution_health_score",
