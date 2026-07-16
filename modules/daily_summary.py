@@ -617,7 +617,31 @@ def run_daily_summary(
 
     holding_detail = build_holding_detail(effective_history, periods)
     holding_summary = build_holding_summary(holding_detail, periods)
+# =====================================================
+# TURBO CACHE
+# =====================================================
 
+if has_cache("summary"):
+
+    summary = load_cache("summary")
+    movement = load_cache("movement")
+    holding_detail = load_cache("holding_detail")
+    holding_summary = load_cache("holding_summary")
+
+else:
+
+    movement = compare_snapshot(snapshot)
+
+    summary = build_summary(movement)
+
+    holding_detail = build_holding_detail(history_df)
+
+    holding_summary = build_holding_summary(holding_detail)
+
+    save_cache("summary", summary)
+    save_cache("movement", movement)
+    save_cache("holding_detail", holding_detail)
+    save_cache("holding_summary", holding_summary)
     session_count = effective_history["snapshot_date"].dropna().astype(str).nunique()
     if current.empty:
         status = "Không có dữ liệu để tạo snapshot."
