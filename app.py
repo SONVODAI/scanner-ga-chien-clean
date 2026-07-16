@@ -389,7 +389,29 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         + (rs5 < 0).astype(int)
     )
     weakening = weakening_votes >= 3
+    # ==========================================================
+    # QUALITY GATE V1.1
+    # ==========================================================
+    rsi14 = _num(out.get("rsi14"), idx)
 
+    obv_good = (
+        out.get("obv_status", "")
+        .astype(str)
+        .str.upper()
+        .str.contains(
+            "POS|GOOD|STRONG|UP|TỐT|MẠNH|GREEN",
+            regex=True,
+        )
+    )
+
+    quality_gate = (
+        (rsi14 >= 53)
+        & (rsi14 <= 70)
+        & (rs5 > 0)
+        & (rs10 > 0)
+        & (ema_slope > 0)
+        & (obv_good)
+    )
     out = pd.concat([out, scores], axis=1)
     out["evolution_health_score"] = health_score.round(1)
     out["evolution_health_group"] = _assign_group(
