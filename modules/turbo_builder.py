@@ -88,3 +88,51 @@ def clear_cache():
             path.unlink()
 
     logger.info("Turbo cache cleared.")
+
+# ==========================================================
+# BUILD DAILY SUMMARY CACHE
+# ==========================================================
+
+from modules.daily_summary import (
+    build_snapshot,
+    compare_snapshot,
+    build_summary,
+    build_holding_detail,
+    build_holding_summary,
+)
+
+
+def build_daily_cache(current_df: pd.DataFrame, history_df: pd.DataFrame):
+
+    """
+    Sinh toàn bộ cache Daily Summary.
+    Chỉ chạy sau khi kết phiên hoặc khi cache chưa tồn tại.
+    """
+
+    snapshot = build_snapshot(current_df)
+
+    movement = compare_snapshot(snapshot)
+
+    summary = build_summary(movement)
+
+    holding_detail = build_holding_detail(history_df)
+
+    holding_summary = build_holding_summary(holding_detail)
+
+    save_cache("summary", summary)
+
+    save_cache("movement", movement)
+
+    save_cache("holding_detail", holding_detail)
+
+    save_cache("holding_summary", holding_summary)
+
+    logger.info("Turbo cache built successfully.")
+
+
+
+
+
+
+
+
