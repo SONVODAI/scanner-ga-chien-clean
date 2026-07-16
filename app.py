@@ -5763,19 +5763,21 @@ market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
 market_forecast, market_forecast_text = calc_market_forecast(scan_df)
 market_status, market_action = market_status_text(market_real)
-try:
-    _, pattern_status = save_pattern_history(
-        brain=None,
-        scan_df=scan_df,
-        market_real=market_real,
-        market_forecast=market_forecast,
-    )
-    st.caption(f"Pattern Memory: {pattern_status}")
-except Exception as e:
-    st.warning(f"Pattern Memory Error: {e}")
+if AFTER_MARKET_CLOSE:
+    try:
+        _, pattern_status = save_pattern_history(
+            brain=None,
+            scan_df=scan_df,
+            market_real=market_real,
+            market_forecast=market_forecast,
+        )
+        st.caption(f"Pattern Memory: {pattern_status}")
+    except Exception as e:
+        st.warning(f"Pattern Memory Error: {e}")
 # =========================================================
 # MR.BOT BRAIN CONTROLLER
 # =========================================================
+if AFTER_MARKET_CLOSE:
 try:
     from brain_controller import run_brain_controller
 
@@ -5820,10 +5822,11 @@ render_earning_money_board(
     title="🏆 EARNING MONEY BOARD",
     height=720,
 )
-process_and_render_daily_summary(
-    scan_df,
-    title="📊 DAILY EARNING MONEY REPORT",
-)
+if AFTER_MARKET_CLOSE:
+    process_and_render_daily_summary(
+        scan_df,
+        title="📊 DAILY EARNING MONEY REPORT",
+    )
 if market_real < 6:
     st.error(market_action)
 elif market_real < 8:
