@@ -5717,15 +5717,22 @@ if "last_auto_refresh" not in st.session_state:
     st.session_state["last_auto_refresh"] = time.time()
 
 if scan_btn:
+    # Quét thủ công: làm mới toàn bộ dữ liệu.
     st.cache_data.clear()
 
 if auto_refresh:
     now_ts = time.time()
     if now_ts - st.session_state["last_auto_refresh"] >= refresh_seconds:
         st.session_state["last_auto_refresh"] = now_ts
-        st.cache_data.clear()
-        st.rerun()
 
+        # Auto refresh chỉ làm mới giá realtime.
+        # Không xóa cache dữ liệu lịch sử D1.
+        try:
+            fetch_live_price.clear()
+        except Exception:
+            pass
+
+        st.rerun()
 # =========================================================
 # RUN SCAN
 # =========================================================
