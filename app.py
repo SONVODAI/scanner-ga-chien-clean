@@ -735,7 +735,10 @@ def slope_state_text(slope: float) -> str:
 def vn_now() -> datetime:
     """Luôn lấy giờ Việt Nam, tránh lệch UTC trên server Streamlit Cloud."""
     return datetime.now(VN_TZ)
-
+def is_after_market_close() -> bool:
+    """Sau 15h10 giờ Việt Nam thì cho phép chạy tác vụ cuối ngày."""
+    now = vn_now()
+    return (now.hour, now.minute) >= (15, 10)
 
 def today_str() -> str:
     return vn_now().strftime("%Y-%m-%d")
@@ -5736,6 +5739,8 @@ if auto_refresh:
             pass
 
         st.rerun()
+
+AFTER_MARKET_CLOSE = is_after_market_close()
 # =========================================================
 # RUN SCAN
 # =========================================================
