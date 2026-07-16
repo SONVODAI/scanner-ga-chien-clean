@@ -355,7 +355,18 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
     out = pd.concat([out, scores], axis=1)
 
     out["evolution_health_score"] = health_score.round(1)
-
+st.write(
+    out[
+        [
+            "symbol",
+            "rsi14",
+            "rs5",
+            "rs10",
+            "ema9_ma20_slope",
+            "obv_status",
+        ]
+    ].head(20)
+)
     out["evolution_health_group"] = _assign_group(
         out["evolution_health_score"],
         weakening,
