@@ -357,7 +357,8 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
     weakening = weakening_votes >= 3
 
     out["evolution_health_score"] = health_score.round(1)
-
+    import streamlit as st
+st.write(out[["symbol","evolution_health_score","rs5","rs10","rsi14"]].head(20))
     out["evolution_health_group"] = _assign_group(
         out["evolution_health_score"],
         weakening,
