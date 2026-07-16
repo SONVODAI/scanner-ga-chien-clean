@@ -24,7 +24,7 @@ from modules.daily_summary import process_and_render_daily_summary
 import numpy as np
 import pandas as pd
 import streamlit as st
-
+from modules.turbo_runtime import turbo
 try:
     import yfinance as yf
 except Exception:
