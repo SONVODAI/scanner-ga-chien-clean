@@ -24,6 +24,9 @@ from modules.daily_summary import process_and_render_daily_summary
 import numpy as np
 import pandas as pd
 import streamlit as st
+import time
+
+APP_START = time.perf_counter()
 from modules.turbo_runtime import turbo
 try:
     import yfinance as yf
@@ -6495,3 +6498,8 @@ if show_detail:
 
 st.markdown("---")
 st.caption("Mr.BOT PRO V4.0 | Market → Decision → Learning → Thinking → Evolution | Observe • Learn • Think • Evolve | Khi không chắc, đứng ngoài.")
+st.caption(
+    f"⏱️ App render: {time.perf_counter() - APP_START:.2f} s"
+)
+
+
