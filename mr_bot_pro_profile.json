@@ -3,7 +3,7 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-17 13:25:30",
+  "updated_at": "2026-07-17 13:26:16",
   "age_days": 22,
   "bot_version_number": 4.284,
   "status": "LEARNING",
@@ -26,7 +26,7 @@
     "Sẵn sàng thừa nhận sai khi dữ liệu chứng minh điều ngược lại.",
     "Học chậm, đổi chậm, tránh ảo tưởng AI."
   ],
-  "current_message": "Market REAL 2.1 < 6. Tôi chỉ lập watchlist (MSB, GMD, BMP), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
+  "current_message": "Market REAL 2.2 < 6. Tôi chỉ lập watchlist (MSB, GMD, BMP), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
   "proposals": [
     "Duy trì quyền phủ quyết của Market khi Market REAL < 6.",
     "Ưu tiên các giả thuyết đã qua phản biện; giảm vai trò giả thuyết bị dữ liệu bác bỏ."
@@ -38,15 +38,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-07-16 21:33:24",
-      "status": "LEARNING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 42.1,
-      "completed_t5": 274,
-      "market_real": 2.7,
-      "message": "Market REAL 2.7 < 6. Tôi chỉ lập watchlist (PVD, MSB, BMP), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-07-16 21:33:30",
       "status": "LEARNING",
@@ -757,6 +748,15 @@
       "completed_t5": 283,
       "market_real": 2.1,
       "message": "Market REAL 2.1 < 6. Tôi chỉ lập watchlist (MSB, GMD, BMP), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    },
+    {
+      "time": "2026-07-17 13:26:16",
+      "status": "LEARNING",
+      "personality": "PHÒNG THỦ",
+      "confidence": 43.5,
+      "completed_t5": 283,
+      "market_real": 2.2,
+      "message": "Market REAL 2.2 < 6. Tôi chỉ lập watchlist (MSB, GMD, BMP), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
     }
   ]
 }
