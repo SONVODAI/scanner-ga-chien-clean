@@ -280,16 +280,35 @@ def _build_reason(row: pd.Series) -> str:
 
 
 def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Thêm Evolution Health vào scan_df.
 
+    Quy tắc nhóm 🌱 ĐANG HỒI được quyết định trực tiếp bởi combo đã chốt:
+    - RS5 >= 2
+    - RS10 >= 2
+    - RS5 > RS10
+    - RSI14 trong khoảng 55-70
+    - OBV dương/tốt
+
+    Các nhóm còn lại vẫn giữ cách phân loại cũ theo health score và weakening.
+    """
     if scan_df is None or not isinstance(scan_df, pd.DataFrame):
         raise TypeError("scan_df phải là pandas DataFrame")
 
     if scan_df.empty:
-        return scan_df.copy()
+        out = scan_df.copy()
+        for col in [
+            "evolution_health_score",
+            "evolution_health_group",
+            "evolution_health_rank",
+            "evolution_action",
+            "evolution_reason",
+        ]:
+            out[col] = pd.Series(dtype="object")
+        return out
 
     out = scan_df.copy()
     scores = _technical_scores(out)
-
     idx = out.index
 
     rs5 = _num(out.get("rs5"), idx)
@@ -301,10 +320,6 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
 
     out = pd.concat([out, scores], axis=1)
 
-    # =====================================================
-    # ĐIỂM CƠ SỞ
-    # =====================================================
-
     health_score = (
         scores["_health_rs"] * 0.24
         + scores["_health_ema"] * 0.20
@@ -315,36 +330,26 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         + scores["_health_pattern"] * 0.06
     )
 
-    # =====================================================
-    # SUPER STOCK BONUS
-    # =====================================================
-
     bonus = pd.Series(0.0, index=idx)
-
     bonus += np.where(rs5 > 0, 3, -3)
-
     bonus += np.where(rs10 > 0, 3, -3)
-
     bonus += np.where(rs5 > rs10, 3, 0)
-
     bonus += np.where((rsi14 >= 55) & (rsi14 <= 68), 4, 0)
-
     bonus += np.where(ema_slope > 0, 4, -4)
 
-    obv_good = (
-        out["obv_status"]
-        .astype(str)
-        .str.upper()
-        .str.contains("TỐT|GOOD|POS|UP|STRONG|GREEN|DƯƠNG")
+    obv_text = out.get(
+        "obv_status",
+        pd.Series("", index=idx, dtype="object"),
+    ).astype(str).str.upper().str.strip()
+
+    obv_good = obv_text.str.contains(
+        "TỐT|GOOD|POS|UP|STRONG|GREEN|DƯƠNG|MANH|MẠNH|TANG|TĂNG|GIU|GIỮ|DUONG|OK|🟢",
+        regex=True,
+        na=False,
     )
 
     bonus += np.where(obv_good, 5, -5)
-
     health_score = (health_score + bonus).clip(0, 100)
-
-    # =====================================================
-    # WEAKENING
-    # =====================================================
 
     weakening_votes = (
         (ema_slope < 0).astype(int)
@@ -353,73 +358,60 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         + (rs5 < rs10).astype(int)
         + (rs5 < 0).astype(int)
     )
-
     weakening = weakening_votes >= 3
 
     out["evolution_health_score"] = health_score.round(1)
-    
     out["evolution_health_group"] = _assign_group(
         out["evolution_health_score"],
         weakening,
     )
-    print("=" * 60)
-print(out["evolution_health_group"].value_counts())
-print(out["evolution_health_score"].describe())
-print("=" * 60)
+
+    # Nhóm 🌱 chỉ do combo đã chốt quyết định.
+    out.loc[
+        out["evolution_health_group"] == "🌱 ĐANG HỒI",
+        "evolution_health_group",
+    ] = "🟡 TRUNG TÍNH"
+
     combo_recovery = (
         (rs5 >= 2)
         & (rs10 >= 2)
         & (rs5 > rs10)
         & (rsi14 >= 55)
         & (rsi14 <= 70)
-        & (
-            out["obv_status"]
-            .astype(str)
-            .str.upper()
-            .str.contains(
-                "TỐT|GOOD|POS|UP|STRONG|GREEN|DƯƠNG",
-                regex=True,
-            )
-        )
+        & obv_good
     )
 
-    out.loc[
-        combo_recovery,
-        "evolution_health_group",
-    ] = "🌱 ĐANG HỒI"    
+    out.loc[combo_recovery, "evolution_health_group"] = "🌱 ĐANG HỒI"
+
     out["evolution_health_rank"] = (
-    out["evolution_health_group"]
-    .map(HEALTH_ORDER)
-    .fillna(99)
-    .astype(int)
+        out["evolution_health_group"]
+        .map(HEALTH_ORDER)
+        .fillna(99)
+        .astype(int)
     )
 
     out["evolution_action"] = out["evolution_health_group"].map(
         _action_from_group
     )
-
-    out["evolution_reason"] = out.apply(
-        _build_reason,
-        axis=1,
-    )
+    out["evolution_reason"] = out.apply(_build_reason, axis=1)
 
     sort_cols = [
         "evolution_health_rank",
         "evolution_health_score",
-        "rs5",
-        "rs10",
-        "symbol",
     ]
+    ascending = [True, False]
 
-    ascending = [
-        True,
-        False,
-        False,
-        False,
-        True,
-    ]
+    if "rs5" in out.columns:
+        sort_cols.append("rs5")
+        ascending.append(False)
+    if "rs10" in out.columns:
+        sort_cols.append("rs10")
+        ascending.append(False)
+    if "symbol" in out.columns:
+        sort_cols.append("symbol")
+        ascending.append(True)
 
-    out = (
+    return (
         out.sort_values(
             sort_cols,
             ascending=ascending,
@@ -428,8 +420,6 @@ print("=" * 60)
         )
         .reset_index(drop=True)
     )
-
-    return out
 
 def get_earning_money_board(scan_df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -518,4 +508,3 @@ def export_earning_money_board_csv(
     """Dữ liệu cho st.download_button nếu cần."""
     board = get_earning_money_board(scan_df)
     return board.to_csv(index=False).encode("utf-8-sig")
-
