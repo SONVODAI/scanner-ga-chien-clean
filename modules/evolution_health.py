@@ -17,6 +17,7 @@ Thiết kế:
 """
 
 from __future__ import annotations
+from modules.earning_learning import update_learning
 
 from typing import Final
 
