@@ -379,13 +379,13 @@ good_recovery = (
         .str.upper()
         .str.contains("POS|GOOD|UP", regex=True)
     )
-
+)
 out.loc[
     (out["evolution_health_group"] == "🌱 ĐANG HỒI")
     & (~good_recovery),
     "evolution_health_group"
 ] = "🟡 TRUNG TÍNH"
-    out["evolution_health_rank"] = (
+out["evolution_health_rank"] = (
         out["evolution_health_group"]
         .map(HEALTH_ORDER)
         .fillna(99)
