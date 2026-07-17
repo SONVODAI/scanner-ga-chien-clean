@@ -362,10 +362,7 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         out["evolution_health_score"],
         weakening,
     )
-    print(
-    out["evolution_health_group"]
-    .value_counts()
-    )
+   
     out["evolution_health_rank"] = (
         out["evolution_health_group"]
         .map(HEALTH_ORDER)
