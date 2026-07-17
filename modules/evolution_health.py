@@ -362,6 +362,10 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         out["evolution_health_score"],
         weakening,
     )
+    print("=" * 60)
+print(out["evolution_health_group"].value_counts())
+print(out["evolution_health_score"].describe())
+print("=" * 60)
     combo_recovery = (
         (rs5 >= 2)
         & (rs10 >= 2)
