@@ -3,7 +3,7 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-17 09:06:56",
+  "updated_at": "2026-07-17 09:07:52",
   "age_days": 22,
   "bot_version_number": 4.284,
   "status": "LEARNING",
@@ -38,15 +38,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-07-16 17:01:05",
-      "status": "LEARNING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 42.1,
-      "completed_t5": 274,
-      "market_real": 2.7,
-      "message": "Market REAL 2.7 < 6. Tôi chỉ lập watchlist (PVD, MSB, BMP), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-07-16 17:03:22",
       "status": "LEARNING",
@@ -751,6 +742,15 @@
     },
     {
       "time": "2026-07-17 09:06:56",
+      "status": "LEARNING",
+      "personality": "PHÒNG THỦ",
+      "confidence": 43.5,
+      "completed_t5": 283,
+      "market_real": 3.2,
+      "message": "Market REAL 3.2 < 6. Tôi chỉ lập watchlist (ORS, PVD, MSB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    },
+    {
+      "time": "2026-07-17 09:07:52",
       "status": "LEARNING",
       "personality": "PHÒNG THỦ",
       "confidence": 43.5,
