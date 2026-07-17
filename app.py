@@ -61,7 +61,7 @@ else:
 # EVOLUTION HEALTH ENGINE
 # Tách thành module độc lập để app.py nhẹ hơn và chỉ điều phối.
 # =========================================================
-from evolution_health import (
+from modules.evolution_health import (
     add_evolution_health,
     export_earning_money_board_csv,
     get_earning_money_board,
