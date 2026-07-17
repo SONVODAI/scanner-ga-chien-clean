@@ -440,8 +440,8 @@ def render_earning_money_board(
     
     board = get_earning_money_board(scan_df)
 
-# Learning chỉ ghi nhớ, không ảnh hưởng Bot
-update_learning(board)
+    # Learning chỉ ghi nhớ, không ảnh hưởng Bot
+    update_learning(board)
     try:
         import streamlit as st
     except ImportError:
