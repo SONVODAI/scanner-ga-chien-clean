@@ -362,7 +362,27 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         out["evolution_health_score"],
         weakening,
     )
-    
+combo_recovery = (
+    (rs5 >= 2)
+    & (rs10 >= 2)
+    & (rs5 > rs10)
+    & (rsi14 >= 55)
+    & (rsi14 <= 70)
+    & (
+            out["obv_status"]
+            .astype(str)
+            .str.upper()
+            .str.contains(
+                "TỐT|GOOD|POS|UP|STRONG|GREEN|DƯƠNG",
+                regex=True,
+            )
+        )
+    )
+
+    out.loc[
+        combo_recovery,
+        "evolution_health_group",
+    ] = "🌱 ĐANG HỒI"    
     out["evolution_health_rank"] = (
     out["evolution_health_group"]
     .map(HEALTH_ORDER)
