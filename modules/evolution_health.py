@@ -363,12 +363,12 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         weakening,
     )
 combo_recovery = (
-    (rs5 >= 2)
-    & (rs10 >= 2)
-    & (rs5 > rs10)
-    & (rsi14 >= 55)
-    & (rsi14 <= 70)
-    & (
+        (rs5 >= 2)
+        & (rs10 >= 2)
+        & (rs5 > rs10)
+        & (rsi14 >= 55)
+        & (rsi14 <= 70)
+        & (
             out["obv_status"]
             .astype(str)
             .str.upper()
