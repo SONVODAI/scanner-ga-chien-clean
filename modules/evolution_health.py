@@ -379,7 +379,6 @@ good_recovery = (
         .str.upper()
         .str.contains("POS|GOOD|UP", regex=True)
     )
-)
 
 out.loc[
     (out["evolution_health_group"] == "🌱 ĐANG HỒI")
