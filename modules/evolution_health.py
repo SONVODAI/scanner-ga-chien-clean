@@ -437,8 +437,11 @@ def render_earning_money_board(
     Render Streamlit khi được gọi trong app.
     Luôn trả về DataFrame để có thể test hoặc export.
     """
+    
     board = get_earning_money_board(scan_df)
 
+# Learning chỉ ghi nhớ, không ảnh hưởng Bot
+update_learning(board)
     try:
         import streamlit as st
     except ImportError:
