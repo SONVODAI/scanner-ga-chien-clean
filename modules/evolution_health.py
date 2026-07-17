@@ -337,7 +337,7 @@ def add_evolution_health(scan_df: pd.DataFrame) -> pd.DataFrame:
         .str.upper()
         .str.contains("TỐT|GOOD|POS|UP|STRONG|GREEN|DƯƠNG")
     )
-) 
+
     bonus += np.where(obv_good, 5, -5)
 
     health_score = (health_score + bonus).clip(0, 100)
