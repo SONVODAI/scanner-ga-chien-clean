@@ -5,7 +5,7 @@
 #   1) Một nguồn dữ liệu sống duy nhất: scan_df
 #   2) Live price được bơm vào cây nến cuối TRƯỚC khi tính indicator
 #   3) Market / bảng nhóm / bảng chi tiết / bảng hành động / evolution dùng chung scan_df
-#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch phaF
+#   4) Không còn tình trạng price đúng nhưng group/evo/detail lệch pha
 # =========================================================
 
 import os
@@ -17,9 +17,9 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
-from final_decision_engine import build_final_decision, style_final_decision
+from final_decision_engine import build_final_decision
 from position_guardian import render_guardian
-from modules.evolution_health import *
+# Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
 import numpy as np
 import pandas as pd
@@ -478,7 +478,7 @@ def render_earning_money_board(
     *,
     title: str = "🏆 EARNING MONEY BOARD",
     height: int = 720,
-    
+
 ) -> pd.DataFrame:
     """
     Render Streamlit nếu streamlit có sẵn.
@@ -541,7 +541,7 @@ WATCHLIST = sorted(list(set([
     "PLX", "PVS", "PVD", "PVB", "PVC", "PVT", "BSR", "OIL", "GAS",
     "HAH", "VSC", "GMD", "VOS", "VTO", "ACV", "HVN", "VJC",
     "MSH", "TNG", "TCM", "GIL", "VHC", "ANV", "PTB", "VGT",
-    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP", 
+    "BFC", "DCM", "DPM", "CSV", "DDV", "LAS", "BMP", "NTP",
     "MSR", "REE", "GEE", "GEX", "PC1", "HDG", "GEG", "NT2",
     "DGC", "POW",
     "C4G", "FCN", "CII", "KSB", "HPG", "HSG",
@@ -555,7 +555,7 @@ WATCHLIST = sorted(list(set([
     "VGC", "SZC", "IDC", "KBC", "IJC",
     "GVR", "SIP", "DPR", "PHR", "DRI",
     "FPT", "VGI", "CTR", "VTP", "CMG", "FOX",
-    "BVH", "SBT", "PNJ", 
+    "BVH", "SBT", "PNJ",
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
     "EVF", "SAB", "VPL", "PDR", "DPG", "NHA", "HDC", "NTL", "HHS",
     "NLG", "KDH", "HUT",
@@ -1355,7 +1355,7 @@ def classify_group(row: dict) -> str:
         and price >= ema9_ * 0.97
     )
 
-    
+
     if (
         pd.notna(slope_)
         and slope_ > 2
@@ -1385,7 +1385,7 @@ def classify_group(row: dict) -> str:
     ):
         return "MUA BREAK"
 
-   
+
     if (
         leader
         and pd.notna(dist_from_ema9)
@@ -1470,7 +1470,7 @@ def analyze_symbol(symbol: str) -> dict | None:
 )
 
     total_score = E + R + O + S + RS + V
-    
+
     pull_label = classify_pull_label(
             dist_from_ema9=dist_from_ema9,
             rsi_=rsi_,
@@ -1478,9 +1478,9 @@ def analyze_symbol(symbol: str) -> dict | None:
             obv_=obv_,
             obv_ema9_=obv_ema9_,
         )
-    
+
     obv_status = "🟢" if pd.notna(obv_) and pd.notna(obv_ema9_) and obv_ >= obv_ema9_ else "🔴"
-    
+
     row = {
             "symbol": symbol,
             "date": last.get("date", None),
@@ -1523,11 +1523,11 @@ def analyze_symbol(symbol: str) -> dict | None:
             "body_pct": safe_round(last.get("body_pct", np.nan), 2),
             "total_score": total_score,
         }
-    
+
     row["group"] = classify_group(row)
     row["warning"] = build_warning(price, ema9_, rsi_, rsi_slope_, obv_, obv_ema9_, pull_label, slope_)
     row["status"] = build_status(total_score, row["warning"], row["group"])
-    
+
     return row
 
 
@@ -1969,7 +1969,7 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
             "volume": r.get("volume", np.nan),
             "vol_ma20": r.get("vol_ma20", np.nan),
             "is_live_adjusted": r.get("is_live_adjusted", False),
-            
+
         })
 
     new_df = guard_dataframe_dtypes(pd.DataFrame(rows))
@@ -2089,7 +2089,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     "PULL ĐẸP",
     "PULL VỪA",
     ]
-    
+
 
     out = current[
         (current["storm_score"] > 0)
@@ -2138,7 +2138,7 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
     ]
 
     cols = [c for c in cols if c in out.columns]
-   
+
     return out[cols].head(20)
 
 # =========================================================
@@ -2285,50 +2285,50 @@ def build_evolution_tables(scan_df: pd.DataFrame):
         base = hist.merge(current, on="symbol", how="outer")
     evo_scores = []
     recent_changes = []
-    
+
     persistences = []
     dna_flags = []
-    
+
     evo_quality_scores = []
     smooth_scores = []
     evo_final_scores = []
-    
+
     arrows = []
     status_icons = []
-    
+
     for _, r in base.iterrows():
-    
+
         hist_groups = []
-    
+
         for d in dates:
             g = r.get(d, np.nan)
-    
+
             if pd.notna(g):
                 hist_groups.append(g)
-    
+
         today_group = r.get("TODAY", np.nan)
         today_rank = GROUP_RANK.get(today_group, 0)
-    
+
         if hist_groups:
-    
+
             first_rank = GROUP_RANK.get(hist_groups[0], 0)
             last_rank = GROUP_RANK.get(hist_groups[-1], 0)
-    
+
             evolution = today_rank - first_rank
             recent_change = today_rank - last_rank
-    
+
             ranks = [GROUP_RANK.get(g, 0) for g in hist_groups]
-    
+
             if pd.notna(today_group):
                 ranks.append(today_rank)
-    
+
             persistence = round(sum(ranks) / len(ranks), 1)
-    
+
             evo_quality, smoothness = calculate_evolution_quality(
                 hist_groups,
                 today_rank
             )
-    
+
             evo_final = round(
                 evo_quality * 0.50
                 + smoothness * 0.25
@@ -2336,64 +2336,64 @@ def build_evolution_tables(scan_df: pd.DataFrame):
                 + evolution * 0.10,
                 1
             )
-    
+
             if persistence >= 5.0:
                 dna = "🟢 DNA MẠNH"
-    
+
             elif persistence >= 3.5:
                 dna = "🟡 BỀN"
-    
+
             else:
                 dna = "⚪ MỚI"
-    
+
         else:
-    
+
             evolution = 0
             recent_change = 0
             persistence = 0
-    
+
             evo_quality = 0
             smoothness = 0
             evo_final = 0
-    
+
             dna = "⚪ MỚI"
-    
+
         evo_scores.append(evolution)
         recent_changes.append(recent_change)
-    
+
         persistences.append(persistence)
         dna_flags.append(dna)
-    
+
         evo_quality_scores.append(evo_quality)
         smooth_scores.append(smoothness)
         evo_final_scores.append(evo_final)
-    
+
         if recent_change > 0:
             arrows.append("⬆️")
         elif recent_change < 0:
             arrows.append("⬇️")
         else:
             arrows.append("➡️")
-    
+
         if evolution > 0:
             status_icons.append("🟢")
         elif evolution < 0:
             status_icons.append("🔴")
         else:
             status_icons.append("⚪")
-    
+
     base["evolution"] = evo_scores
     base["recent_change"] = recent_changes
-    
+
     base["Persistence"] = persistences
     base["DNA"] = dna_flags
-    
+
     base["EvoQuality"] = evo_quality_scores
     base["Smooth"] = smooth_scores
     base["EvoFinal"] = evo_final_scores
-    
+
     base["arrow"] = arrows
-    base["status"] = status_icons   
+    base["status"] = status_icons
     sort_cols = [
     "EvoFinal",
     "Persistence",
@@ -2801,7 +2801,7 @@ def build_tinh_hoa_leaders(
     })
 
     cols = [
-        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ", "DNA_GOC", "DNA_SCORE",    
+        "Rank", "Tier", "MÃ", "TinhHoa", "Số bảng", "NHÓM", "GIÁ", "DNA_GOC", "DNA_SCORE",
         "DNA", "RSI", "SLOPE", "Storm", "Green2", "TIẾN HÓA", "GẦN NHẤT",
         "SCORE", "OBV", "DIST EMA9%", "Hành động", "CẢNH BÁO"
     ]
@@ -5267,7 +5267,7 @@ def build_buy_elite_decision_engine(
     )
 
     # Market là trần xác suất, không để điểm đẹp đánh lừa khi thị trường yếu.
-    
+
 
     # -----------------------------------------------------
     # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
@@ -5309,7 +5309,7 @@ def build_buy_elite_decision_engine(
 
     base["⭐"] = base["WinProb"].apply(elite_star)
     base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
-    
+
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
     # -----------------------------------------------------
@@ -6173,7 +6173,7 @@ if show_advanced_analysis:
         hide_index=True,
         height=520,
     )
-    
+
 
         with st.expander("🔎 Mở đầy đủ cột BUY ELITE"):
             st.dataframe(
@@ -6232,7 +6232,7 @@ if show_advanced_analysis:
                 "VÙNG MUA",
                 "NAV",
             ]
-    
+
             st.dataframe(
                 style_green_red_board(
                     green_red_df[compact_cols]
@@ -6241,7 +6241,7 @@ if show_advanced_analysis:
                 hide_index=True,
                 height=560,
             )
-    
+
             with st.expander("🔎 Mở đầy đủ cột Xanh/Đỏ"):
                 st.dataframe(
                     style_green_red_board(green_red_df),
@@ -6249,7 +6249,7 @@ if show_advanced_analysis:
                     hide_index=True,
                     height=700,
                 )
-            
+
                 st.caption(
                     "TrendScore đo sức khỏe cổ phiếu. BuyScore đo chất lượng điểm mua. "
                     "Đèn xanh tốt nhất là mã vừa khỏe vừa có điểm mua gần EMA9, RSI hợp lý, OBV còn giữ."
