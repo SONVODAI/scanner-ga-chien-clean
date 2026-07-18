@@ -1246,6 +1246,119 @@ def market_status_text(score: float) -> tuple[str, str]:
 
 
 # =========================================================
+# RSI BREADTH REPORT - ĐỘ RỘNG THỊ TRƯỜNG TỪ EARNING MONEY BOARD
+# =========================================================
+def build_rsi_breadth_report(scan_df: pd.DataFrame) -> dict:
+    """Tổng hợp độ rộng RSI và sinh kết luận hành động từ chính scan_df.
+
+    Hàm chỉ đọc dữ liệu đã có nên gần như không phát sinh thêm tải cho app.
+    Breadth Score dùng tỷ lệ cổ phiếu có RSI > 50 trên toàn bộ mẫu hợp lệ.
+    """
+    empty_report = {
+        "total": 0,
+        "counts": {60: 0, 50: 0, 40: 0, 30: 0, 20: 0, 10: 0},
+        "percentages": {60: 0.0, 50: 0.0, 40: 0.0, 30: 0.0, 20: 0.0, 10: 0.0},
+        "score": 0,
+        "level": "KHÔNG CÓ DỮ LIỆU",
+        "icon": "⚪",
+        "message": "Chưa có đủ dữ liệu RSI để đánh giá độ rộng thị trường.",
+        "tone": "info",
+    }
+
+    if scan_df is None or scan_df.empty or "rsi14" not in scan_df.columns:
+        return empty_report
+
+    rsi = pd.to_numeric(scan_df["rsi14"], errors="coerce").dropna()
+    total = int(len(rsi))
+    if total == 0:
+        return empty_report
+
+    thresholds = [60, 50, 40, 30, 20, 10]
+    counts = {level: int((rsi > level).sum()) for level in thresholds}
+    percentages = {
+        level: round(counts[level] / total * 100, 1)
+        for level in thresholds
+    }
+
+    breadth_score = int(round(percentages[50]))
+    pct60 = percentages[60]
+    pct50 = percentages[50]
+    pct40 = percentages[40]
+    below50 = round(100 - pct50, 1)
+
+    if pct50 >= 70:
+        icon, level, tone = "🟢", "RẤT KHỎE", "success"
+        action = "Độ rộng lan tỏa mạnh; có thể ưu tiên các cổ phiếu dẫn dắt và gia tăng vị thế có kiểm soát."
+    elif pct50 >= 50:
+        icon, level, tone = "🟢", "KHỎE", "success"
+        action = "Phần lớn cổ phiếu giữ động lượng tích cực; ưu tiên mua đúng điểm và tiếp tục nắm giữ mã khỏe."
+    elif pct50 >= 30:
+        icon, level, tone = "🟡", "TRUNG TÍNH", "warning"
+        action = "Cơ hội có nhưng chưa lan tỏa; chỉ chọn nhóm top đầu, mua nhỏ và tránh đuổi giá."
+    elif pct50 >= 15:
+        icon, level, tone = "🟠", "YẾU", "warning"
+        action = "Dòng tiền chỉ tập trung ở số ít cổ phiếu; ưu tiên phòng thủ và chỉ theo dõi các mã dẫn dắt thật sự."
+    else:
+        icon, level, tone = "🔴", "RẤT YẾU", "error"
+        action = "Xác suất kiếm tiền thấp; ưu tiên bảo toàn vốn và không cố tìm cơ hội trong nhóm cổ phiếu yếu."
+
+    if pct60 < 5:
+        leadership = "Số cổ phiếu thật sự mạnh gần như cạn kiệt."
+    elif pct60 < 15:
+        leadership = "Nhóm dẫn dắt rất hẹp, sức mạnh chưa lan tỏa."
+    else:
+        leadership = "Thị trường vẫn có một lớp cổ phiếu dẫn dắt đáng kể."
+
+    message = (
+        f"{icon} **RSI Breadth: {breadth_score}/100 – {level}.** "
+        f"Có **{counts[50]}/{total} cổ phiếu ({pct50:.1f}%)** duy trì RSI trên 50; "
+        f"**{counts[60]} mã ({pct60:.1f}%)** ở vùng sức mạnh cao và "
+        f"**{below50:.1f}%** đã nằm dưới RSI 50. {leadership} {action}"
+    )
+
+    return {
+        "total": total,
+        "counts": counts,
+        "percentages": percentages,
+        "score": breadth_score,
+        "level": level,
+        "icon": icon,
+        "message": message,
+        "tone": tone,
+        "pct40": pct40,
+    }
+
+
+def render_rsi_breadth_report(scan_df: pd.DataFrame) -> dict:
+    """Hiển thị bảng thống kê RSI và lời kết luận tự động của Mr.BOT."""
+    report = build_rsi_breadth_report(scan_df)
+
+    st.markdown("### 🩺 RSI MARKET BREADTH")
+    st.caption("Đo sức khỏe thực tế của toàn bộ cổ phiếu trong Earning Money Board, không chỉ nhìn điểm số VNIndex.")
+
+    thresholds = [60, 50, 40, 30, 20, 10]
+    cols = st.columns(6)
+    for col, level in zip(cols, thresholds):
+        count = report["counts"][level]
+        pct = report["percentages"][level]
+        with col:
+            st.metric(f"RSI > {level}", f"{count}", f"{pct:.1f}%")
+
+    tone = report.get("tone", "info")
+    message = report.get("message", "")
+    if tone == "success":
+        st.success(message)
+    elif tone == "warning":
+        st.warning(message)
+    elif tone == "error":
+        st.error(message)
+    else:
+        st.info(message)
+
+    return report
+
+
+# =========================================================
 # BUY RECOMMENDATION
 # =========================================================
 def nav_suggestion(action: str, market_real: float) -> str:
@@ -5352,6 +5465,10 @@ render_earning_money_board(
     title="🏆 EARNING MONEY BOARD",
     height=720,
 )
+
+# Độ rộng RSI + lời kết luận tự động của Mr.BOT.
+rsi_breadth_report = render_rsi_breadth_report(scan_df)
+
 process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
