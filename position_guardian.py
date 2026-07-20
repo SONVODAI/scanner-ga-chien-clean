@@ -133,7 +133,7 @@ SSI,PVD,BSR
 """,
 
     height=150,
-
+key="position_guardian_watchlist",
 )
     save_portfolio(watch_text)    
 
