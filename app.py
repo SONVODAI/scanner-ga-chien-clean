@@ -22,7 +22,7 @@ from position_guardian import render_guardian
 # Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
-from accumulation_opportunity import render_accumulation_board
+from modules.accumulation_opportunity import render_accumulation_board
 import numpy as np
 import pandas as pd
 import streamlit as st
