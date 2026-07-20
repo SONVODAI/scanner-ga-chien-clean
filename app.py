@@ -6157,8 +6157,6 @@ render_guardian(scan_df)
 # =========================================================
 
 st.markdown("---")
-
-render_guardian(scan_df)
 if show_detail:
     with st.expander("📋 Bảng chi tiết đầy đủ", expanded=True):
         detail_cols = [
