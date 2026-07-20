@@ -22,6 +22,7 @@ from position_guardian import render_guardian
 # Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
+from accumulation_opportunity import render_accumulation_board
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -6136,6 +6137,21 @@ if show_legacy:
                     ]
                     show_cols = [c for c in show_cols if c in sub.columns]
                     st.dataframe(sub[show_cols], use_container_width=True, hide_index=True, height=min(600, 80 + len(sub) * 35))
+# =========================================================
+# ACCUMULATION OPPORTUNITY
+# =========================================================
+
+st.markdown("---")
+
+render_accumulation_board(scan_df)
+
+# =========================================================
+# POSITION GUARDIAN
+# =========================================================
+
+st.markdown("---")
+
+render_guardian(scan_df)                    
 # =========================================================
 # POSITION GUARDIAN
 # =========================================================
