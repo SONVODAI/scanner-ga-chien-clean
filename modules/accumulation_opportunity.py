@@ -72,11 +72,14 @@ def safe_bool(value):
 # SCORE ENGINE
 # ==========================================================
 
+# ==========================================================
+# OPPORTUNITY SCORE ENGINE V2
+# ==========================================================
+
 def calculate_accumulation_score(row):
 
-    score = 0
-    confidence = 0
-
+    score = 0.0
+    confidence = 0.0
     reasons = []
 
     rsi = safe_float(row.get("rsi14"))
@@ -92,106 +95,165 @@ def calculate_accumulation_score(row):
     volume = safe_float(row.get("volume"))
     vol_ma20 = safe_float(row.get("vol_ma20"))
 
-    obv = str(row.get("obv_status", "")).lower()
-
     slope = safe_float(row.get("ema9_ma20_slope"))
 
-    # ------------------------------------------------------
+    obv = str(row.get("obv_status", "")).lower()
+
+    # ======================================================
     # RSI
-    # ------------------------------------------------------
+    # ======================================================
 
-    if 25 <= rsi <= 45:
-        score += RSI_WEIGHT
-        confidence += 18
-        reasons.append("RSI vùng tích lũy")
+    if 30 <= rsi <= 40:
+        score += 25
+        confidence += 20
+        reasons.append("RSI vùng tích lũy đẹp")
 
-    elif 45 < rsi <= 55:
-        score += RSI_WEIGHT * 0.8
-        confidence += 14
-        reasons.append("RSI cải thiện")
+    elif 40 < rsi <= 50:
+        score += 22
+        confidence += 17
+        reasons.append("RSI bắt đầu hồi")
 
-    elif rsi < 25:
-        score += RSI_WEIGHT * 0.4
+    elif 50 < rsi <= 60:
+        score += 14
+        confidence += 10
+
+    elif rsi < 30:
+        score += 10
         confidence += 6
         reasons.append("RSI quá thấp")
 
-    # ------------------------------------------------------
-    # RS
-    # ------------------------------------------------------
+    # ======================================================
+    # RS Improvement
+    # ======================================================
 
-    if rs5 > rs10:
+    rs_gap = rs5 - rs10
 
-        diff = rs5 - rs10
-
-        if diff >= 2:
-            score += RS_WEIGHT
-            confidence += 18
-            reasons.append("RS5 vượt RS10")
-
-        elif diff > 0:
-            score += RS_WEIGHT * 0.7
-            confidence += 12
-            reasons.append("RS cải thiện")
-
-    # ------------------------------------------------------
-    # Bottom
-    # ------------------------------------------------------
-
-    if near60 <= 20:
-        score += BOTTOM_WEIGHT
+    if rs_gap >= 4:
+        score += 22
         confidence += 18
+        reasons.append("RS tăng mạnh")
+
+    elif rs_gap >= 2:
+        score += 18
+        confidence += 15
+        reasons.append("RS cải thiện")
+
+    elif rs_gap > 0:
+        score += 12
+        confidence += 10
+
+    # ======================================================
+    # Bottom
+    # ======================================================
+
+    if near60 <= 10:
+        score += 20
+        confidence += 18
+        reasons.append("Sát đáy 60 phiên")
+
+    elif near60 <= 20:
+        score += 16
+        confidence += 15
         reasons.append("Gần đáy 60 phiên")
 
-    elif near20 <= 15:
-        score += BOTTOM_WEIGHT * 0.7
+    elif near20 <= 10:
+        score += 12
         confidence += 10
-        reasons.append("Gần đáy 20 phiên")
 
-    # ------------------------------------------------------
+    # ======================================================
     # OBV
-    # ------------------------------------------------------
+    # ======================================================
 
-    if "positive" in obv or "bull" in obv:
-        score += OBV_WEIGHT
+    if "positive" in obv:
+
+        score += 15
         confidence += 15
-        reasons.append("OBV tích cực")
+        reasons.append("OBV xác nhận")
+
+    elif "bull" in obv:
+
+        score += 13
+        confidence += 12
 
     elif "neutral" in obv:
-        score += OBV_WEIGHT * 0.5
+
+        score += 8
         confidence += 8
-        reasons.append("OBV ổn định")
 
-    # ------------------------------------------------------
-    # Dry Volume
-    # ------------------------------------------------------
+    # ======================================================
+    # Dry Up
+    # ======================================================
 
-    if dry5 < 0.8 or dry10 < 0.8:
-        score += VOLUME_WEIGHT
-        confidence += 10
-        reasons.append("Thanh khoản cạn")
+    if dry5 < 0.6:
 
-    # ------------------------------------------------------
+        score += 10
+        confidence += 8
+        reasons.append("Cạn cung mạnh")
+
+    elif dry10 < 0.8:
+
+        score += 7
+        confidence += 6
+
+    # ======================================================
     # Liquidity
-    # ------------------------------------------------------
+    # ======================================================
 
-    if volume > vol_ma20 * 0.4:
-        score += LIQUIDITY_WEIGHT
-        confidence += 10
+    if vol_ma20 > 0:
 
-    # ------------------------------------------------------
-    # Trend penalty
-    # ------------------------------------------------------
+        ratio = volume / vol_ma20
 
-    if slope < 0:
-        score -= 8
-        confidence -= 5
+        if ratio > 0.6:
+            score += 8
 
-    score = max(0, min(MAX_SCORE, round(score)))
+        elif ratio > 0.3:
+            score += 5
+
+    # ======================================================
+    # Trend Penalty
+    # ======================================================
+
+    if slope < -0.5:
+
+        score -= 12
+        confidence -= 10
+        reasons.append("Xu hướng còn yếu")
+
+    elif slope < 0:
+
+        score -= 6
+        confidence -= 4
+
+    # ======================================================
+    # Bonus
+    # ======================================================
+
+    bonus = 0
+
+    if rs_gap > 2 and 30 <= rsi <= 50:
+        bonus += 4
+
+    if near60 < 15 and "positive" in obv:
+        bonus += 4
+
+    if dry5 < 0.6 and rs_gap > 2:
+        bonus += 3
+
+    score += bonus
+
+    # ======================================================
+    # Normalize
+    # ======================================================
+
+    score = max(0, min(100, round(score)))
 
     confidence = max(0, min(100, round(confidence)))
 
-    return score, confidence, ", ".join(reasons)
-
+    return (
+        score,
+        confidence,
+        " • ".join(reasons)
+    )
 
 # ==========================================================
 # DECISION ENGINE
@@ -298,3 +360,122 @@ def render_accumulation_board(scan_df):
         use_container_width=True,
         hide_index=True,
     )
+# ==========================================================
+# FORMAT ENGINE
+# ==========================================================
+
+def format_accumulation_board(df):
+
+    if df.empty:
+        return df
+
+    board = df.copy()
+
+    # Score
+    if "opportunity_score" in board.columns:
+        board["Opportunity"] = board["opportunity_score"].astype(int)
+
+    # Confidence
+    if "confidence" in board.columns:
+        board["Confidence"] = board["confidence"].astype(int).astype(str) + "%"
+
+    # Price
+    if "price" in board.columns:
+        board["Giá"] = board["price"].round(2)
+
+    # Symbol
+    if "symbol" in board.columns:
+        board["Mã"] = board["symbol"]
+
+    # Stage
+    if "stage" in board.columns:
+        board["Giai đoạn"] = board["stage"]
+
+    # Action
+    if "action" in board.columns:
+        board["Hành động"] = board["action"]
+
+    # Reason
+    if "reason" in board.columns:
+        board["Lý do"] = board["reason"]
+
+    cols = [
+        "Mã",
+        "Giá",
+        "Opportunity",
+        "Confidence",
+        "Giai đoạn",
+        "Hành động",
+        "Lý do",
+    ]
+
+    cols = [c for c in cols if c in board.columns]
+
+    return board[cols]
+
+
+# ==========================================================
+# SUMMARY ENGINE
+# ==========================================================
+
+def accumulation_summary(df):
+
+    if df.empty:
+        st.info("Không có cơ hội tích lũy phù hợp.")
+        return
+
+    strong = (df["Opportunity"] >= 85).sum()
+
+    good = ((df["Opportunity"] >= 75) &
+            (df["Opportunity"] < 85)).sum()
+
+    watch = ((df["Opportunity"] >= 60) &
+             (df["Opportunity"] < 75)).sum()
+
+    avg_score = df["Opportunity"].mean()
+
+    avg_conf = (
+        df["Confidence"]
+        .str.replace("%", "", regex=False)
+        .astype(int)
+        .mean()
+    )
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+    c1.metric("⭐⭐⭐⭐⭐", strong)
+
+    c2.metric("⭐⭐⭐⭐", good)
+
+    c3.metric("⭐⭐⭐", watch)
+
+    c4.metric("TB Score", f"{avg_score:.1f}")
+
+    c5.metric("TB Confidence", f"{avg_conf:.0f}%")
+
+
+# ==========================================================
+# MAIN RENDER
+# ==========================================================
+
+def render_accumulation_board(scan_df):
+
+    board = build_accumulation_board(scan_df)
+
+    board = format_accumulation_board(board)
+
+    st.markdown("---")
+
+    st.subheader("🌱 Accumulation Opportunity Board")
+
+    accumulation_summary(board)
+
+    st.dataframe(
+        board,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+
+
