@@ -23,7 +23,7 @@ from position_guardian import render_guardian
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
 from modules.accumulation_opportunity import render_accumulation_board
-from modules.leader_brain_board import show_leader_brain
+
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -6144,9 +6144,20 @@ if show_legacy:
 # =========================================================
 # LEADER BRAIN
 # =========================================================
-
 st.markdown("---")
-show_leader_brain()
+st.markdown("## 🧠 LEADER MEMORY")
+
+leader_df = load_memory()
+
+if leader_df.empty:
+    st.info("Chưa có dữ liệu Leader Memory.")
+else:
+    st.dataframe(
+        leader_df,
+        use_container_width=True,
+        hide_index=True,
+        height=350,
+    )
 
 # =========================================================
 # ACCUMULATION OPPORTUNITY
