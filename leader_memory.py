@@ -84,6 +84,7 @@ def save_memory(df):
 # ==========================================================
 
 def update_memory(df_today):
+     print(">>> UPDATE MEMORY CALLED")
     """
     Placeholder.
     Sprint 1 chưa xử lý.
