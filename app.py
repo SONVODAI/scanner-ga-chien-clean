@@ -23,6 +23,7 @@ from position_guardian import render_guardian
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
 from modules.accumulation_opportunity import render_accumulation_board
+from leader_memory import update_memory
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -6072,6 +6073,11 @@ try:
         market_forecast=market_forecast,
     )
     print(">>> SAVE PATTERN DONE")
+    try:
+    update_memory(scan_df)
+    print(">>> LEADER MEMORY DONE")
+except Exception as e:
+    print(f"Leader Memory Error: {e}")
 except Exception as e:
     print(f"Pattern Memory Error: {e}")
 # =========================================================
