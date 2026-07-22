@@ -15,6 +15,7 @@ import json
 import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from modules.leader_brain_board import show_leader_brain
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
 from final_decision_engine import build_final_decision
@@ -6142,23 +6143,10 @@ if show_legacy:
                     show_cols = [c for c in show_cols if c in sub.columns]
                     st.dataframe(sub[show_cols], use_container_width=True, hide_index=True, height=min(600, 80 + len(sub) * 35))
 # =========================================================
-# LEADER BRAIN
+# LEADER BRAIN DASHBOARD
 # =========================================================
 st.markdown("---")
-st.markdown("## 🧠 LEADER MEMORY")
-
-leader_df = load_memory()
-
-if leader_df.empty:
-    st.info("Chưa có dữ liệu Leader Memory.")
-else:
-    st.dataframe(
-        leader_df,
-        use_container_width=True,
-        hide_index=True,
-        height=350,
-    )
-
+show_leader_brain()                    
 # =========================================================
 # ACCUMULATION OPPORTUNITY
 # =========================================================
