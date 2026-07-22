@@ -6073,11 +6073,8 @@ try:
         market_forecast=market_forecast,
     )
     print(">>> SAVE PATTERN DONE")
-    try:
     update_memory(scan_df)
     print(">>> LEADER MEMORY DONE")
-except Exception as e:
-    print(f"Leader Memory Error: {e}")
 except Exception as e:
     print(f"Pattern Memory Error: {e}")
 # =========================================================
