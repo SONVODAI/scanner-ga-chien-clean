@@ -23,7 +23,6 @@ from position_guardian import render_guardian
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
 from modules.accumulation_opportunity import render_accumulation_board
-from leader_memory import update_memory, load_memory
 from modules.leader_brain_board import show_leader_brain
 import numpy as np
 import pandas as pd
