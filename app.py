@@ -6075,22 +6075,7 @@ try:
     print(">>> SAVE PATTERN DONE")
     update_memory(scan_df)
     print(">>> LEADER MEMORY DONE")
-    from leader_memory import load_memory
-
-st.markdown("---")
-st.markdown("## 🧠 LEADER MEMORY")
-
-leader_df = load_memory()
-
-if leader_df.empty:
-    st.info("Chưa có dữ liệu Leader Memory.")
-else:
-    st.dataframe(
-        leader_df,
-        use_container_width=True,
-        hide_index=True,
-        height=350,
-    )
+   
 except Exception as e:
     print(f"Pattern Memory Error: {e}")
 # =========================================================
