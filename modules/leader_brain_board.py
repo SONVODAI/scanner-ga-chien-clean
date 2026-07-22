@@ -29,7 +29,7 @@ import streamlit as st
 _BACKEND_IMPORT_ERROR: Optional[Exception] = None
 
 try:
-    from modules.leader_memory import (
+    from leader_memory import (
         get_active_leaders,
         get_engine_status,
         get_intelligence_tables,
