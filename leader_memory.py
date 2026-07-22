@@ -1,48 +1,45 @@
 """
 leader_memory.py
-Mr.Bot Pro V4.0
+Mr.BOT PRO V4.0
 
 Leader Memory Engine
-Version : 1.0
+Sprint 1
 
 Chức năng:
 - Tự tạo leader_memory.csv nếu chưa tồn tại
 - Đọc Leader Memory
 - Ghi Leader Memory
-- Chuẩn bị cho các phiên bản sau
 """
 
 from pathlib import Path
 import pandas as pd
 
-
 # ==========================================================
-# CẤU HÌNH
+# FILE
 # ==========================================================
 
-DATA_DIR = Path("data")
-DATA_DIR.mkdir(exist_ok=True)
-
-MEMORY_FILE = DATA_DIR / "leader_memory.csv"
+MEMORY_FILE = Path("leader_memory.csv")
 
 
 # ==========================================================
-# KHỞI TẠO
+# CREATE
 # ==========================================================
 
 def create_empty_memory():
-    """
-    Tạo file Leader Memory rỗng nếu chưa tồn tại.
-    """
 
     columns = [
         "symbol",
         "first_seen",
-        "last_seen"
+        "last_seen",
     ]
 
     df = pd.DataFrame(columns=columns)
-    df.to_csv(MEMORY_FILE, index=False, encoding="utf-8-sig")
+
+    df.to_csv(
+        MEMORY_FILE,
+        index=False,
+        encoding="utf-8-sig",
+    )
 
     return df
 
@@ -52,10 +49,6 @@ def create_empty_memory():
 # ==========================================================
 
 def load_memory():
-    """
-    Đọc Leader Memory.
-    Nếu chưa có sẽ tự tạo.
-    """
 
     if not MEMORY_FILE.exists():
         return create_empty_memory()
@@ -68,14 +61,11 @@ def load_memory():
 # ==========================================================
 
 def save_memory(df):
-    """
-    Lưu Leader Memory.
-    """
 
     df.to_csv(
         MEMORY_FILE,
         index=False,
-        encoding="utf-8-sig"
+        encoding="utf-8-sig",
     )
 
 
@@ -84,20 +74,10 @@ def save_memory(df):
 # ==========================================================
 
 def update_memory(df_today):
-     print(">>> UPDATE MEMORY CALLED")
-    """
-    Placeholder.
-    Sprint 1 chưa xử lý.
 
-    Sprint 2 sẽ:
-        - cập nhật mã mới
-        - cập nhật last_seen
-        - thêm first_seen
-    """
+    print(">>> UPDATE MEMORY CALLED")
 
     memory = load_memory()
-
-    # Chưa làm ở Sprint 1
 
     save_memory(memory)
 
