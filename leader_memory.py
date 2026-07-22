@@ -72,13 +72,60 @@ def save_memory(df):
 # ==========================================================
 # UPDATE
 # ==========================================================
+from datetime import datetime
+
 
 def update_memory(df_today):
 
     print(">>> UPDATE MEMORY CALLED")
 
+    if df_today is None or len(df_today) == 0:
+        return load_memory()
+
     memory = load_memory()
 
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # tên cột mã cổ phiếu
+    symbol_col = None
+
+    for c in ["symbol", "Symbol", "ticker", "Ticker", "Mã", "ma"]:
+        if c in df_today.columns:
+            symbol_col = c
+            break
+
+    if symbol_col is None:
+        print("LeaderMemory: Không tìm thấy cột Symbol")
+        return memory
+
+    # ======================================================
+    # thêm cổ phiếu mới
+    # ======================================================
+
+    for symbol in df_today[symbol_col].dropna().unique():
+
+        symbol = str(symbol).strip()
+
+        if symbol == "":
+            continue
+
+        if symbol not in memory["symbol"].values:
+
+            memory.loc[len(memory)] = {
+                "symbol": symbol,
+                "first_seen": today,
+                "last_seen": today,
+            }
+
+        else:
+
+            idx = memory.index[memory["symbol"] == symbol][0]
+            memory.loc[idx, "last_seen"] = today
+
+    memory = memory.sort_values("symbol").reset_index(drop=True)
+
     save_memory(memory)
+
+    print(f">>> Leader Memory: {len(memory)} symbols")
 
     return memory
