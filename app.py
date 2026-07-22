@@ -23,7 +23,7 @@ from position_guardian import render_guardian
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
 from modules.accumulation_opportunity import render_accumulation_board
-from leader_memory import update_memory
+from leader_memory import update_memory, load_memory
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -6075,6 +6075,22 @@ try:
     print(">>> SAVE PATTERN DONE")
     update_memory(scan_df)
     print(">>> LEADER MEMORY DONE")
+    from leader_memory import load_memory
+
+st.markdown("---")
+st.markdown("## 🧠 LEADER MEMORY")
+
+leader_df = load_memory()
+
+if leader_df.empty:
+    st.info("Chưa có dữ liệu Leader Memory.")
+else:
+    st.dataframe(
+        leader_df,
+        use_container_width=True,
+        hide_index=True,
+        height=350,
+    )
 except Exception as e:
     print(f"Pattern Memory Error: {e}")
 # =========================================================
