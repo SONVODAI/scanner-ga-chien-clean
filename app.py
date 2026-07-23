@@ -5482,16 +5482,7 @@ process_and_render_daily_summary(
     title="📊 DAILY EARNING MONEY REPORT",
 )
 try:
-    learning_result = update_learning(
-        earning_board_df=scan_df,
-        market_context={
-            "market_score": market_real,
-            "market_regime": market_forecast_text,
-        },
-    )
-except Exception as e:
-    st.warning(f"Earning Learning: {e}")
-# =========================================================
+    # =========================================================
 # EARNING LEARNING ENGINE
 # =========================================================
 try:
