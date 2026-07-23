@@ -5481,7 +5481,7 @@ process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
 )
-try:
+
     # =========================================================
 # EARNING LEARNING ENGINE
 # =========================================================
