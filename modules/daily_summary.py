@@ -9,6 +9,13 @@ from zoneinfo import ZoneInfo
 import numpy as np
 import pandas as pd
 
+from .snapshot_storage import (
+    get_last_storage_status,
+    load_history as storage_load_history,
+    merge_upsert as storage_merge_upsert,
+    save_history as storage_save_history,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 SNAPSHOT_FILE = DATA_DIR / "earning_money_snapshots.csv"
@@ -209,13 +216,23 @@ def build_snapshot(
 
 
 def load_snapshot_history(snapshot_file: str | Path = SNAPSHOT_FILE) -> pd.DataFrame:
+    """
+    Đọc lịch sử snapshot qua Snapshot Storage V2.
+
+    Storage sẽ ưu tiên GitHub khi có GITHUB_TOKEN, sau đó fallback về
+    file local và backup. Phần dưới chỉ chuẩn hóa dữ liệu cho Daily Summary.
+    """
     path = Path(snapshot_file)
-    if not path.exists() or path.stat().st_size == 0:
-        return _empty_snapshot()
 
     try:
-        history = pd.read_csv(path, encoding="utf-8-sig")
-    except (pd.errors.EmptyDataError, UnicodeDecodeError, OSError):
+        history = storage_load_history(
+            path,
+            SNAPSHOT_COLUMNS,
+            key_columns=("snapshot_date", "symbol"),
+            prefer_remote=True,
+        )
+    except Exception:
+        # Không làm app crash nếu hệ lưu trữ gặp lỗi ngoài dự kiến.
         return _empty_snapshot()
 
     for col in SNAPSHOT_COLUMNS:
@@ -247,40 +264,45 @@ def merge_snapshot_into_history(
     history: pd.DataFrame,
     snapshot: pd.DataFrame,
 ) -> pd.DataFrame:
-    base = _empty_snapshot() if history is None or history.empty else history.copy()
-    if snapshot is None or snapshot.empty:
-        return base.reindex(columns=SNAPSHOT_COLUMNS)
+    """
+    Upsert theo khóa snapshot_date + symbol.
 
-    current = snapshot.reindex(columns=SNAPSHOT_COLUMNS).copy()
-    key_date = str(current["snapshot_date"].iloc[0])
-    symbols = set(current["symbol"].astype(str))
-
-    if not base.empty:
-        mask = (
-            base["snapshot_date"].astype(str).eq(key_date)
-            & base["symbol"].astype(str).isin(symbols)
-        )
-        base = base.loc[~mask].copy()
-
-    merged = pd.concat([base, current], ignore_index=True)
-    merged = merged.drop_duplicates(["snapshot_date", "symbol"], keep="last")
-    return merged.sort_values(
-        ["snapshot_date", "health_rank", "symbol"], kind="stable"
-    ).reset_index(drop=True).reindex(columns=SNAPSHOT_COLUMNS)
+    Dữ liệu ngày cũ được giữ nguyên; nếu cùng ngày/cùng mã thì chỉ cập nhật
+    bản mới nhất. Không giới hạn số phiên lịch sử.
+    """
+    return storage_merge_upsert(
+        history,
+        snapshot,
+        SNAPSHOT_COLUMNS,
+        key_columns=("snapshot_date", "symbol"),
+    )
 
 
 def save_snapshot(
     snapshot: pd.DataFrame,
     snapshot_file: str | Path = SNAPSHOT_FILE,
 ) -> pd.DataFrame:
+    """
+    Lưu snapshot bằng cơ chế:
+    load bền -> merge/upsert -> validate -> backup -> atomic local -> GitHub.
+
+    Tuyệt đối không ghi đè lịch sử bằng snapshot rỗng.
+    """
     path = Path(snapshot_file)
+
     if snapshot is None or snapshot.empty:
         return load_snapshot_history(path)
 
-    path.parent.mkdir(parents=True, exist_ok=True)
     history = load_snapshot_history(path)
     merged = merge_snapshot_into_history(history, snapshot)
-    merged.to_csv(path, index=False, encoding="utf-8-sig")
+
+    storage_save_history(
+        merged,
+        path,
+        SNAPSHOT_COLUMNS,
+        key_columns=("snapshot_date", "symbol"),
+        push_remote=True,
+    )
     return merged
 
 
@@ -806,6 +828,12 @@ def render_daily_summary(
         )
 
     st.caption(result.status)
+
+    storage_status = get_last_storage_status()
+    st.caption(
+        "🛡️ Snapshot Storage: "
+        f"{storage_status.as_text()}"
+    )
     return result
 
 
