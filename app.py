@@ -1648,20 +1648,20 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date"])
     # =====================================================
-# DATA ASSET PROTECTION
-# Giữ toàn bộ lịch sử để phục vụ T+ và Brain Learning.
-# Không cắt 120 ngày như phiên bản cũ.
-# =====================================================
-evo_df = evo_df.sort_values(
-    ["date", "symbol"]
-).reset_index(drop=True)
-
-evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")    
+    # DATA ASSET PROTECTION
+    # Giữ toàn bộ lịch sử để phục vụ T+ và Brain Learning.
+    # Không cắt 120 ngày như phiên bản cũ.
+    # =====================================================
+    evo_df = evo_df.sort_values(
+        ["date", "symbol"]
+    ).reset_index(drop=True)
+    
+    evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")    
     evo_df = guard_dataframe_dtypes(evo_df)
-
+    
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
-    # =========================================================
+# =========================================================
 # STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
 # =========================================================
 def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
