@@ -5489,6 +5489,10 @@ try:
             "market_regime": market_forecast_text,
         },
     )
+
+    st.write("LEARNING RESULT")
+    st.json(learning_result)
+
 except Exception as e:
     st.warning(f"Earning Learning: {e}")
 # =========================================================
