@@ -1657,7 +1657,6 @@ evo_df = evo_df.sort_values(
 ).reset_index(drop=True)
 
 evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")    
-    time("%Y-%m-%d")
     evo_df = guard_dataframe_dtypes(evo_df)
 
     save_status = write_evolution_history(evo_df)
