@@ -16,6 +16,7 @@ import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from modules.leader_brain_board import show_leader_brain
+from leader_memory import update_memory
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
 from final_decision_engine import build_final_decision
@@ -6076,9 +6077,9 @@ try:
     print(">>> SAVE PATTERN DONE")
     update_memory(scan_df)
     print(">>> LEADER MEMORY DONE")
-   
 except Exception as e:
-    print(f"Pattern Memory Error: {e}")
+    st.error(f"Pattern / Leader Memory Error: {e}")   
+
 # =========================================================
 # OPTIONAL / LEGACY TABLES
 # =========================================================
