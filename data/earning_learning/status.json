@@ -1,7 +1,7 @@
 {
   "ok": true,
   "module_version": "2.0.0",
-  "trade_date": "2026-07-26",
+  "trade_date": "2026-07-24",
   "input_rows": 142,
   "valid_rows": 142,
   "observations_added": 0,
@@ -12,5 +12,5 @@
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-07-26T03:16:57Z"
+  "last_run_at": "2026-07-26T03:17:01Z"
 }
