@@ -3,16 +3,16 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-24 19:43:47",
-  "age_days": 29,
-  "bot_version_number": 4.312,
+  "updated_at": "2026-07-26 10:13:25",
+  "age_days": 31,
+  "bot_version_number": 4.321,
   "status": "THINKING",
   "personality": "PHÒNG THỦ",
   "confidence": 46.0,
   "experience": {
     "observations": 7278,
     "signals": 340,
-    "completed_t5": 311,
+    "completed_t5": 320,
     "hypotheses": 1,
     "beliefs": 0,
     "reflections": 1,
@@ -38,15 +38,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-07-22 22:34:34",
-      "status": "THINKING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 46.0,
-      "completed_t5": 300,
-      "market_real": 0.6,
-      "message": "Market REAL 0.6 < 6. Tôi chỉ lập watchlist (-), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-07-22 22:35:17",
       "status": "THINKING",
@@ -755,6 +746,15 @@
       "personality": "PHÒNG THỦ",
       "confidence": 46.0,
       "completed_t5": 311,
+      "market_real": 1.1,
+      "message": "Market REAL 1.1 < 6. Tôi chỉ lập watchlist (STB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    },
+    {
+      "time": "2026-07-26 10:13:25",
+      "status": "THINKING",
+      "personality": "PHÒNG THỦ",
+      "confidence": 46.0,
+      "completed_t5": 320,
       "market_real": 1.1,
       "message": "Market REAL 1.1 < 6. Tôi chỉ lập watchlist (STB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
     }
