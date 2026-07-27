@@ -3,15 +3,15 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-07-27 09:00:13",
+  "updated_at": "2026-07-27 16:10:32",
   "age_days": 32,
   "bot_version_number": 4.321,
   "status": "THINKING",
   "personality": "PHÒNG THỦ",
   "confidence": 46.0,
   "experience": {
-    "observations": 7278,
-    "signals": 340,
+    "observations": 7423,
+    "signals": 343,
     "completed_t5": 320,
     "hypotheses": 1,
     "beliefs": 0,
@@ -26,7 +26,7 @@
     "Sẵn sàng thừa nhận sai khi dữ liệu chứng minh điều ngược lại.",
     "Học chậm, đổi chậm, tránh ảo tưởng AI."
   ],
-  "current_message": "Market REAL 1.1 < 6. Tôi chỉ lập watchlist (STB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
+  "current_message": "Market REAL 0.5 < 6. Tôi chỉ lập watchlist (LPB, VNM, STB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội.",
   "proposals": [
     "Duy trì quyền phủ quyết của Market khi Market REAL < 6.",
     "Ưu tiên các giả thuyết đã qua phản biện; giảm vai trò giả thuyết bị dữ liệu bác bỏ."
@@ -38,15 +38,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-07-22 23:11:55",
-      "status": "THINKING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 46.0,
-      "completed_t5": 300,
-      "market_real": 0.6,
-      "message": "Market REAL 0.6 < 6. Tôi chỉ lập watchlist (-), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-07-22 23:35:25",
       "status": "THINKING",
@@ -757,6 +748,15 @@
       "completed_t5": 320,
       "market_real": 1.1,
       "message": "Market REAL 1.1 < 6. Tôi chỉ lập watchlist (STB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
+    },
+    {
+      "time": "2026-07-27 16:10:32",
+      "status": "THINKING",
+      "personality": "PHÒNG THỦ",
+      "confidence": 46.0,
+      "completed_t5": 320,
+      "market_real": 0.5,
+      "message": "Market REAL 0.5 < 6. Tôi chỉ lập watchlist (LPB, VNM, STB), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
     }
   ]
 }
