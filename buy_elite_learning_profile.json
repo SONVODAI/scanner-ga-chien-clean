@@ -2,8 +2,8 @@
   "version": "BUY_ELITE_LEARNING_V3",
   "mode": "ACTIVE_LEARNING",
   "created_at": "2026-06-25 16:55:06",
-  "updated_at": "2026-07-28 15:26:40",
-  "completed_t5": 322,
+  "updated_at": "2026-07-29 07:49:47",
+  "completed_t5": 325,
   "baseline_winrate": 0.3292,
   "min_completed_to_learn": 80,
   "min_feature_samples": 20,
@@ -32,17 +32,17 @@
     "SPRING": {}
   },
   "insights": [
-    "Completed T+5: 322",
+    "Completed T+5: 325",
     "Baseline WinRate: 32.9%",
-    "Average T+5: -1.19%",
+    "Average T+5: -1.21%",
     "market: good: n=190, winrate=36.3%, baseline=32.9%, mult=1.015, blended=1.014",
-    "action: good: n=321, winrate=32.7%, baseline=32.9%, mult=0.999, blended=0.999",
-    "storm: good: n=149, winrate=33.6%, baseline=32.9%, mult=1.003, blended=1.004",
-    "evo: good: n=235, winrate=35.3%, baseline=32.9%, mult=1.011, blended=1.01",
-    "zone: good: n=294, winrate=32.3%, baseline=32.9%, mult=0.997, blended=0.997",
-    "obv: good: n=322, winrate=32.9%, baseline=32.9%, mult=1.0, blended=1.0",
-    "Regime WINTER: n=132, winrate=28.0%, seasonal=0.988",
+    "action: good: n=324, winrate=32.7%, baseline=32.9%, mult=0.999, blended=0.999",
+    "storm: good: n=150, winrate=33.3%, baseline=32.9%, mult=1.002, blended=1.004",
+    "evo: good: n=237, winrate=35.0%, baseline=32.9%, mult=1.009, blended=1.01",
+    "zone: good: n=297, winrate=32.3%, baseline=32.9%, mult=0.997, blended=0.997",
+    "obv: good: n=325, winrate=32.9%, baseline=32.9%, mult=1.0, blended=1.0",
+    "Regime WINTER: n=135, winrate=28.1%, seasonal=0.988",
     "Regime NEUTRAL: n=190, winrate=36.3%, seasonal=1.008"
   ],
-  "avg_t5_return": -1.192
+  "avg_t5_return": -1.209
 }
