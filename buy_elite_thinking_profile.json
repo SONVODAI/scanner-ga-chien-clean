@@ -2,21 +2,21 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "HYPOTHESIS",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-07-30 12:35:58",
+  "updated_at": "2026-07-30 16:44:00",
   "completed_t5": 327,
   "baseline_winrate": 0.3333,
   "observation": {
     "date": "2026-07-30",
-    "time": "12:35:58",
-    "market_real": 2.7,
+    "time": "16:44:00",
+    "market_real": 4.3,
     "market_forecast": 0.0,
     "regime": "🔴 MÙA ĐÔNG",
     "regime_note": "Market yếu: chỉ lập watchlist, chưa giải ngân thật.",
     "signals_today": 4,
-    "top_watch": "LPB, HCM, STB",
-    "avg_winprob": 48.0,
-    "avg_elite_score": 47.8,
-    "high_consensus_count": 1
+    "top_watch": "SBT, BAF, TCX",
+    "avg_winprob": 48.8,
+    "avg_elite_score": 47.4,
+    "high_consensus_count": 0
   },
   "hypotheses": [
     "🟠 Pull trong Mùa Đông: n=84, WinRate=27.4%, AvgT+5=-2.14, lệch baseline -6.0% → GIẢ THUYẾT"
