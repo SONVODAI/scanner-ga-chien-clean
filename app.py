@@ -5482,6 +5482,19 @@ daily_result = process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
 )
+# =========================================================
+# EXPERIENCE ENGINE
+# =========================================================
+try:
+    experience_result = run_experience_engine(
+        holding_detail=daily_result.holding_detail,
+        save=True,
+    )
+
+    st.caption("🧠 " + experience_result.status)
+
+except Exception as e:
+    st.warning(f"Experience Engine: {e}")
     # =========================================================
 # EARNING LEARNING ENGINE
 # =========================================================
