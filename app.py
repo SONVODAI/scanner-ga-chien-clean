@@ -5478,11 +5478,10 @@ render_earning_money_board(
 # Độ rộng RSI + lời kết luận tự động của Mr.BOT.
 rsi_breadth_report = render_rsi_breadth_report(scan_df)
 
-process_and_render_daily_summary(
+daily_result = process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
 )
-
     # =========================================================
 # EARNING LEARNING ENGINE
 # =========================================================
