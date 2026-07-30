@@ -4,13 +4,13 @@
   "trade_date": "2026-07-30",
   "input_rows": 142,
   "valid_rows": 142,
-  "observations_added": 142,
-  "observations_updated": 0,
-  "outcomes_added": 284,
+  "observations_added": 0,
+  "observations_updated": 142,
+  "outcomes_added": 0,
   "knowledge_rows": 238,
   "storage_mode": "GITHUB_PRIMARY",
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-07-30T05:20:15Z"
+  "last_run_at": "2026-07-30T05:20:36Z"
 }
