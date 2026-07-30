@@ -25,6 +25,7 @@ from position_guardian import render_guardian
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
 from modules.accumulation_opportunity import render_accumulation_board
+from modules.experience_engine import run_experience_engine
 
 import numpy as np
 import pandas as pd
