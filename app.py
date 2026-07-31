@@ -1208,9 +1208,6 @@ def calc_market_live(df: pd.DataFrame) -> float:
     return round(min(score, 13), 1)
 
 
-from forecast_engine import ForecastEngine
-
-forecast_engine = ForecastEngine()
 
 
 def calc_market_forecast(df: pd.DataFrame):
@@ -5433,7 +5430,12 @@ scan_df = add_evolution_health(scan_df)
 # =========================================================
 market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
-market_forecast, market_forecast_text = calc_market_forecast(scan_df)
+
+forecast_result = calc_market_forecast(scan_df)
+
+market_forecast = forecast_result.score
+market_forecast_text = forecast_result.text
+
 market_status, market_action = market_status_text(market_real)
 try:
     _, pattern_status = save_pattern_history(
