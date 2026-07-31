@@ -5503,7 +5503,8 @@ with m5:
     st.metric("LIVE OK", live_count)
 with m6:
     st.metric("WATCHLIST", len(WATCHLIST))
-
+with m7:
+    st.metric("WATCHLIST", len(WATCHLIST))
 # =========================================================
 # EARNING MONEY BOARD - BẢNG ĐIỀU KHIỂN CHÍNH
 # =========================================================
