@@ -1208,10 +1208,20 @@ def calc_market_live(df: pd.DataFrame) -> float:
     return round(min(score, 13), 1)
 
 
+from forecast_engine import ForecastEngine
+
+forecast_engine = ForecastEngine()
+
+
 def calc_market_forecast(df: pd.DataFrame):
+
     total = len(df)
+
     if total == 0:
-        return 0, "Không có dữ liệu"
+        return forecast_engine.build_result(
+            score=0,
+            text="Không có dữ liệu",
+        )
 
     strong = len(df[df["group"] == "CP MẠNH"])
     accel = len(df[df["group"] == "GÀ TĂNG TỐC"])
@@ -1223,6 +1233,7 @@ def calc_market_forecast(df: pd.DataFrame):
     slope_good = len(df[df["ema9_ma20_slope"] > 0]) / total
 
     score = 0
+
     score += min(accel / 5, 2)
     score += min(strong / 10, 2)
     score += min(breakout / 8, 2)
@@ -1230,20 +1241,25 @@ def calc_market_forecast(df: pd.DataFrame):
     score += obv_good * 1
     score += slope_good * 1
     score -= min(weak / 15, 2)
+
     score = round(max(min(score, 10), 0), 1)
 
     if score >= 8:
         text = "🟢 Forecast tốt 5-10 ngày"
+
     elif score >= 6:
         text = "🟡 Forecast trung tính-khá"
+
     elif score >= 4:
         text = "🟠 Forecast yếu"
+
     else:
         text = "🔴 Forecast rủi ro"
 
-    return score, text
-
-
+    return forecast_engine.build_result(
+        score=score,
+        text=text,
+    )
 def market_status_text(score: float) -> tuple[str, str]:
     if score >= 8:
         return "🟢 THỊ TRƯỜNG KHỎE", "✅ Có thể vào tiền"
