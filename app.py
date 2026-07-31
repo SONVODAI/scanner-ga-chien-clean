@@ -1269,11 +1269,12 @@ def calc_market_forecast(df: pd.DataFrame):
 
     else:
         text = "🔴 Forecast rủi ro"
-
     return _FORECAST_ENGINE.build_result(
         score=score,
         text=text,
+        confidence=confidence,
     )
+    
 def market_status_text(score: float) -> tuple[str, str]:
     if score >= 8:
         return "🟢 THỊ TRƯỜNG KHỎE", "✅ Có thể vào tiền"
