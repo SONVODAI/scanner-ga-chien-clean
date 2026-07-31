@@ -5490,7 +5490,7 @@ live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in sca
 safe_mode_count = int((scan_df["live_source"].astype(str).str.contains("SAFE_MODE|NO_DATA|BAD", na=False)).sum()) if "live_source" in scan_df.columns else 0
 
 st.markdown("## 🌍 MARKET FIRST")
-m1, m2, m3, m4, m5, m6 = st.columns(6)
+m1, m2, m3, m4, m5, m6, m7 = st.columns(7)
 with m1:
     st.metric("REAL", f"{market_real}/13")
 with m2:
