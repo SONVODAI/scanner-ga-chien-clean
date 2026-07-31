@@ -1215,10 +1215,10 @@ def calc_market_forecast(df: pd.DataFrame):
     total = len(df)
 
     if total == 0:
-        return forecast_engine.build_result(
+        return _FORECAST_ENGINE.build_result(
             score=0,
             text="Không có dữ liệu",
-        )
+        ) 
 
     strong = len(df[df["group"] == "CP MẠNH"])
     accel = len(df[df["group"] == "GÀ TĂNG TỐC"])
