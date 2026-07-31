@@ -5453,7 +5453,7 @@ forecast_result = calc_market_forecast(scan_df)
 
 market_forecast = forecast_result.score
 market_forecast_text = forecast_result.text
-
+market_confidence = forecast_result.confidence
 market_status, market_action = market_status_text(market_real)
 try:
     _, pattern_status = save_pattern_history(
