@@ -5498,11 +5498,14 @@ with m2:
 with m3:
     st.metric("FORECAST", f"{market_forecast}/10")
 with m4:
-    st.metric("SCAN OK", len(scan_df))
+    st.metric("CONFIDENCE", f"{market_confidence:.0f}%")
+
 with m5:
-    st.metric("LIVE OK", live_count)
+    st.metric("SCAN OK", len(scan_df))
+
 with m6:
-    st.metric("WATCHLIST", len(WATCHLIST))
+    st.metric("LIVE OK", live_count)
+
 with m7:
     st.metric("WATCHLIST", len(WATCHLIST))
 # =========================================================
