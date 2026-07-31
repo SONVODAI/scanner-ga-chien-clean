@@ -1253,7 +1253,7 @@ def calc_market_forecast(df: pd.DataFrame):
     else:
         text = "🔴 Forecast rủi ro"
 
-    return forecast_engine.build_result(
+    return _FORECAST_ENGINE.build_result(
         score=score,
         text=text,
     )
