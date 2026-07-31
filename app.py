@@ -1240,7 +1240,23 @@ def calc_market_forecast(df: pd.DataFrame):
     score -= min(weak / 15, 2)
 
     score = round(max(min(score, 10), 0), 1)
+    # =====================================================
+    # FORECAST CONFIDENCE V1
+    # =====================================================
 
+    confidence = 50.0
+
+    confidence += min(accel * 3, 12)
+    confidence += min(strong * 2, 10)
+    confidence += min(breakout * 2, 10)
+    confidence += min(pull_good * 2, 10)
+
+    confidence += obv_good * 10
+    confidence += slope_good * 10
+
+    confidence -= min(weak * 2, 20)
+
+    confidence = round(max(0.0, min(confidence, 100.0)), 1)
     if score >= 8:
         text = "🟢 Forecast tốt 5-10 ngày"
 
