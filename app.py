@@ -1215,11 +1215,7 @@ def calc_market_forecast(df: pd.DataFrame):
     total = len(df)
 
     if total == 0:
-        return _FORECAST_ENGINE.build_result(
-            score=score,
-            text=text,
-        confidence=confidence,
-        )
+        
         return _FORECAST_ENGINE.build_result(
             score=0,
             text="Không có dữ liệu",
