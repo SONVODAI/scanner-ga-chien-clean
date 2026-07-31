@@ -2,44 +2,44 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "HYPOTHESIS",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-07-30 22:33:42",
-  "completed_t5": 327,
-  "baseline_winrate": 0.3333,
+  "updated_at": "2026-07-31 10:20:49",
+  "completed_t5": 328,
+  "baseline_winrate": 0.3323,
   "observation": {
-    "date": "2026-07-30",
-    "time": "22:33:42",
-    "market_real": 4.3,
+    "date": "2026-07-31",
+    "time": "10:20:49",
+    "market_real": 4.1,
     "market_forecast": 0.0,
     "regime": "🔴 MÙA ĐÔNG",
     "regime_note": "Market yếu: chỉ lập watchlist, chưa giải ngân thật.",
     "signals_today": 4,
-    "top_watch": "BAF, SBT, OIL",
-    "avg_winprob": 47.8,
-    "avg_elite_score": 44.8,
-    "high_consensus_count": 0
+    "top_watch": "HCM, SBT, ORS",
+    "avg_winprob": 50.8,
+    "avg_elite_score": 49.0,
+    "high_consensus_count": 1
   },
   "hypotheses": [
-    "🟠 Pull trong Mùa Đông: n=84, WinRate=27.4%, AvgT+5=-2.14, lệch baseline -6.0% → GIẢ THUYẾT"
+    "🟠 Pull trong Mùa Đông: n=85, WinRate=27.1%, AvgT+5=-2.15, lệch baseline -6.2% → GIẢ THUYẾT"
   ],
   "beliefs": [],
   "reflections": [
     "🪞 Chưa có đủ mẫu để phản biện một niềm tin cụ thể. Bot giữ thái độ: mọi kết luận chỉ đúng cho đến khi dữ liệu mới chứng minh điều ngược lại."
   ],
-  "current_thought": "🟠 Pull trong Mùa Đông: n=84, WinRate=27.4%, AvgT+5=-2.14, lệch baseline -6.0% → GIẢ THUYẾT",
-  "note": "Thinking Engine V3.1 đang ở chế độ HYPOTHESIS. Baseline WinRate T+5 = 33.3%, Avg T+5 = -1.18%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
-  "avg_t5_return": -1.178,
+  "current_thought": "🟠 Pull trong Mùa Đông: n=85, WinRate=27.1%, AvgT+5=-2.15, lệch baseline -6.2% → GIẢ THUYẾT",
+  "note": "Thinking Engine V3.1 đang ở chế độ HYPOTHESIS. Baseline WinRate T+5 = 33.2%, Avg T+5 = -1.18%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
+  "avg_t5_return": -1.183,
   "observations": [
-    "⚪ Xa EMA9 >4%: n=3, WinRate=0.0%, AvgT+5=-4.94, lệch baseline -33.3% → QUAN SÁT",
-    "⚪ RSI > 72: n=2, WinRate=0.0%, AvgT+5=-2.29, lệch baseline -33.3% → QUAN SÁT",
-    "⚪ Nhóm Break: n=2, WinRate=50.0%, AvgT+5=-0.14, lệch baseline 16.7% → QUAN SÁT",
-    "⚪ Storm trong Mùa Đông: n=75, WinRate=25.3%, AvgT+5=-2.27, lệch baseline -8.0% → QUAN SÁT",
-    "⚪ Storm >= 15: n=34, WinRate=26.5%, AvgT+5=-0.33, lệch baseline -6.9% → QUAN SÁT",
-    "⚪ Persistence >= 5.0: n=13, WinRate=38.5%, AvgT+5=-0.83, lệch baseline 5.1% → QUAN SÁT",
-    "⚪ Nhóm Early: n=124, WinRate=29.0%, AvgT+5=-1.78, lệch baseline -4.3% → QUAN SÁT",
-    "⚪ Market REAL < 6: n=137, WinRate=29.2%, AvgT+5=-2.18, lệch baseline -4.1% → QUAN SÁT",
-    "⚪ RSI 55-65: n=209, WinRate=37.3%, AvgT+5=-0.81, lệch baseline 4.0% → QUAN SÁT",
-    "⚪ Persistence >= 3.5: n=89, WinRate=37.1%, AvgT+5=-0.57, lệch baseline 3.7% → QUAN SÁT",
-    "⚪ Market REAL >= 6: n=190, WinRate=36.3%, AvgT+5=-0.45, lệch baseline 3.0% → QUAN SÁT",
-    "⚪ Nhóm Pull: n=175, WinRate=35.4%, AvgT+5=-0.91, lệch baseline 2.1% → QUAN SÁT"
+    "⚪ Xa EMA9 >4%: n=3, WinRate=0.0%, AvgT+5=-4.94, lệch baseline -33.2% → QUAN SÁT",
+    "⚪ RSI > 72: n=2, WinRate=0.0%, AvgT+5=-2.29, lệch baseline -33.2% → QUAN SÁT",
+    "⚪ Nhóm Break: n=2, WinRate=50.0%, AvgT+5=-0.14, lệch baseline 16.8% → QUAN SÁT",
+    "⚪ Storm trong Mùa Đông: n=76, WinRate=25.0%, AvgT+5=-2.28, lệch baseline -8.2% → QUAN SÁT",
+    "⚪ Storm >= 15: n=34, WinRate=26.5%, AvgT+5=-0.33, lệch baseline -6.8% → QUAN SÁT",
+    "⚪ Persistence >= 5.0: n=13, WinRate=38.5%, AvgT+5=-0.83, lệch baseline 5.2% → QUAN SÁT",
+    "⚪ Market REAL < 6: n=138, WinRate=29.0%, AvgT+5=-2.19, lệch baseline -4.2% → QUAN SÁT",
+    "⚪ Nhóm Early: n=124, WinRate=29.0%, AvgT+5=-1.78, lệch baseline -4.2% → QUAN SÁT",
+    "⚪ RSI 55-65: n=210, WinRate=37.1%, AvgT+5=-0.82, lệch baseline 3.9% → QUAN SÁT",
+    "⚪ Persistence >= 3.5: n=89, WinRate=37.1%, AvgT+5=-0.57, lệch baseline 3.8% → QUAN SÁT",
+    "⚪ Market REAL >= 6: n=190, WinRate=36.3%, AvgT+5=-0.45, lệch baseline 3.1% → QUAN SÁT",
+    "⚪ Nhóm Pull: n=176, WinRate=35.2%, AvgT+5=-0.92, lệch baseline 2.0% → QUAN SÁT"
   ]
 }
