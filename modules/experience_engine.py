@@ -2,7 +2,7 @@ from __future__ import annotations
 
 """
 experience_engine.py
-Mr.BOT PRO - Experience Engine V1.1
+Mr.BOT PRO - Experience Engine V2.0
 
 Mục tiêu
 --------
@@ -13,12 +13,14 @@ Mục tiêu
 - Không làm mất T+ cũ khi batch mới thiếu một kỳ.
 - Lưu local an toàn bằng cơ chế validate + backup + atomic write của
   snapshot_storage.py.
-- Chưa tác động đến Learning Engine hoặc Final Decision.
+- Mang toàn bộ DNA ngày gốc từ Daily Summary vào từng Experience.
+- Cung cấp Learning View đầy đủ cho Learning Engine ở Sprint tiếp theo.
+- Chưa tác động trực tiếp đến Final Decision.
 
 Lưu ý an toàn quan trọng
 ------------------------
 snapshot_storage.py hiện dùng chung biến cấu hình `GITHUB_SNAPSHOT_PATH`.
-Vì vậy V1.1 chủ động:
+Vì vậy V2.0 tiếp tục chủ động:
 - prefer_remote=False
 - push_remote=False
 
@@ -49,17 +51,75 @@ VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 DEFAULT_PERIODS: tuple[int, ...] = (3, 5, 10)
 
 
-EXPERIENCE_COLUMNS = [
-    "experience_id",
-    "origin_date",
-    "symbol",
-
-    "origin_health",
+# DNA ngày gốc phải khớp với daily_summary.py V3.
+ORIGIN_NUMERIC_COLUMNS = [
     "origin_rank",
     "origin_price",
     "origin_rs5",
     "origin_rs10",
     "origin_rsi14",
+    "origin_rsi_slope",
+    "origin_ema9",
+    "origin_ma20",
+    "origin_ema9_ma20_slope",
+    "origin_ema9_ma20_slope_change",
+    "origin_dist_from_ema9_pct",
+    "origin_obv",
+    "origin_obv_ema9",
+    "origin_volume",
+    "origin_vol_ma20",
+    "origin_volume_ratio20",
+    "origin_dryup_ratio_5",
+    "origin_dryup_ratio_10",
+    "origin_near_bottom_20_pct",
+    "origin_near_bottom_60_pct",
+    "origin_dist_high20_pct",
+    "origin_body_pct",
+    "origin_total_score",
+    "origin_E",
+    "origin_R",
+    "origin_O",
+    "origin_S",
+    "origin_RS",
+    "origin_V",
+    "origin_market_real",
+    "origin_market_live",
+    "origin_market_forecast",
+    "origin_market_breadth",
+    "origin_market_breadth_score",
+]
+
+ORIGIN_TEXT_COLUMNS = [
+    "origin_health",
+    "origin_action",
+    "origin_reason",
+    "origin_obv_status",
+    "origin_group",
+    "origin_pull_label",
+    "origin_warning",
+    "origin_status",
+    "origin_green_2_confirm",
+    "origin_early_green2",
+    "origin_early_dry_green2",
+    "origin_slope_state",
+    "origin_market_regime",
+]
+
+ORIGIN_BOOLEAN_COLUMNS = [
+    "origin_is_live_adjusted",
+]
+
+ORIGIN_FEATURE_COLUMNS = (
+    ORIGIN_TEXT_COLUMNS
+    + ORIGIN_NUMERIC_COLUMNS
+    + ORIGIN_BOOLEAN_COLUMNS
+)
+
+EXPERIENCE_COLUMNS = [
+    "experience_id",
+    "origin_date",
+    "symbol",
+    *ORIGIN_FEATURE_COLUMNS,
 
     "t3_date",
     "t3_price",
@@ -182,6 +242,18 @@ def _is_missing(value: Any) -> bool:
     return False
 
 
+def _to_bool(value: Any) -> bool:
+    if _is_missing(value):
+        return False
+    if isinstance(value, (bool, np.bool_)):
+        return bool(value)
+    if isinstance(value, (int, float, np.integer, np.floating)):
+        return bool(value)
+    return str(value).strip().lower() in {
+        "1", "true", "yes", "y", "ok", "x", "có", "co", "đúng", "dung"
+    }
+
+
 def _first_available(row: pd.Series, *columns: str) -> Any:
     for column in columns:
         if column in row.index and not _is_missing(row[column]):
@@ -215,16 +287,18 @@ def _prepare_holding_detail(
 
     detail = holding_detail.copy()
 
-    # Thêm các cột tùy chọn để xử lý thống nhất.
-    optional_columns = [
-        "origin_rank",
-        "origin_rs5",
-        "origin_rs10",
-        "origin_rsi14",
-    ]
-    for column in optional_columns:
+    # Schema cũ vẫn chạy: trường DNA chưa có sẽ được bổ sung rỗng.
+    for column in ORIGIN_TEXT_COLUMNS:
+        if column not in detail.columns:
+            detail[column] = ""
+
+    for column in ORIGIN_NUMERIC_COLUMNS:
         if column not in detail.columns:
             detail[column] = np.nan
+
+    for column in ORIGIN_BOOLEAN_COLUMNS:
+        if column not in detail.columns:
+            detail[column] = False
 
     detail["origin_date"] = detail["origin_date"].map(_normalize_date)
     detail["target_date"] = detail["target_date"].map(_normalize_date)
@@ -236,16 +310,23 @@ def _prepare_holding_detail(
     ).astype("Int64")
 
     numeric_columns = [
-        "origin_rank",
-        "origin_price",
         "target_price",
         "return_pct",
-        "origin_rs5",
-        "origin_rs10",
-        "origin_rsi14",
+        *ORIGIN_NUMERIC_COLUMNS,
     ]
     for column in numeric_columns:
         detail[column] = pd.to_numeric(detail[column], errors="coerce")
+
+    for column in ORIGIN_TEXT_COLUMNS:
+        detail[column] = (
+            detail[column]
+            .astype("object")
+            .where(detail[column].notna(), "")
+            .astype(str)
+        )
+
+    for column in ORIGIN_BOOLEAN_COLUMNS:
+        detail[column] = detail[column].map(_to_bool)
 
     detail = detail[
         detail["origin_date"].notna()
@@ -266,7 +347,6 @@ def _prepare_holding_detail(
         ["origin_date", "symbol", "holding_period"],
         kind="stable",
     ).reset_index(drop=True)
-
 
 def _recalculate_derived_fields(
     row: dict[str, Any],
@@ -348,17 +428,13 @@ def build_experiences(
             "experience_id": _make_experience_id(origin_date, symbol),
             "origin_date": origin_date,
             "symbol": symbol,
-
-            "origin_health": _first_available(origin, "origin_health"),
-            "origin_rank": _first_available(origin, "origin_rank"),
-            "origin_price": _first_available(origin, "origin_price"),
-            "origin_rs5": _first_available(origin, "origin_rs5"),
-            "origin_rs10": _first_available(origin, "origin_rs10"),
-            "origin_rsi14": _first_available(origin, "origin_rsi14"),
-
             "created_at": now_text,
             "updated_at": now_text,
         }
+
+        # Đóng băng toàn bộ DNA tại ngày gốc trên cùng một Experience.
+        for feature in ORIGIN_FEATURE_COLUMNS:
+            row[feature] = _first_available(origin, feature)
 
         for period in normalized_periods:
             prefix = f"t{period}"
@@ -416,7 +492,7 @@ def load_experience_history(
     """
     Đọc lịch sử Experience local.
 
-    V1.1 không đọc GitHub để tránh dùng nhầm GITHUB_SNAPSHOT_PATH.
+    V2.0 không đọc GitHub để tránh dùng nhầm GITHUB_SNAPSHOT_PATH.
     """
     path = Path(experience_file)
 
@@ -439,6 +515,20 @@ def load_experience_history(
 
     history["origin_date"] = history["origin_date"].map(_normalize_date)
     history["symbol"] = history["symbol"].map(_normalize_symbol)
+
+    for column in ORIGIN_NUMERIC_COLUMNS:
+        history[column] = pd.to_numeric(history[column], errors="coerce")
+
+    for column in ORIGIN_TEXT_COLUMNS:
+        history[column] = (
+            history[column]
+            .astype("object")
+            .where(history[column].notna(), "")
+            .astype(str)
+        )
+
+    for column in ORIGIN_BOOLEAN_COLUMNS:
+        history[column] = history[column].map(_to_bool)
 
     for period in DEFAULT_PERIODS:
         date_column = f"t{period}_date"
@@ -603,7 +693,7 @@ def save_experience_history(
     - backup file cũ,
     - atomic write.
 
-    Không push GitHub ở V1.1 để tránh ghi nhầm remote snapshot.
+    Không push GitHub ở V2.0 để tránh ghi nhầm remote snapshot.
     """
     if history is None or history.empty:
         raise ValueError("Từ chối lưu Experience history rỗng.")
@@ -732,9 +822,10 @@ def build_learning_view(
     target_period: int = 3,
 ) -> pd.DataFrame:
     """
-    Sinh bảng đầu vào phẳng cho Learning Engine ở Sprint tiếp theo.
+    Sinh bảng đầu vào phẳng cho Learning Engine.
 
-    Hàm này chưa tự học và chưa thay đổi trọng số.
+    Toàn bộ DNA ngày gốc được giữ lại tự động; target_return và target_win
+    là nhãn của kỳ T+ được chọn.
     """
     if history is None:
         history = load_experience_history(experience_file)
@@ -749,31 +840,29 @@ def build_learning_view(
     if return_column not in history.columns:
         raise ValueError(f"Không có dữ liệu T{period} trong Experience schema.")
 
-    view = history[
-        pd.to_numeric(
-            history[return_column],
-            errors="coerce",
-        ).notna()
-    ][
-        [
-            "experience_id",
-            "origin_date",
-            "symbol",
-            "origin_health",
-            "origin_rank",
-            "origin_price",
-            "origin_rs5",
-            "origin_rs10",
-            "origin_rsi14",
-            return_column,
-            win_column,
-            "best_period",
-            "best_return",
-            "worst_period",
-            "worst_return",
-            "experience_status",
-        ]
-    ].copy()
+    base_columns = [
+        "experience_id",
+        "origin_date",
+        "symbol",
+        *ORIGIN_FEATURE_COLUMNS,
+        return_column,
+        win_column,
+        "best_period",
+        "best_return",
+        "worst_period",
+        "worst_return",
+        "experience_status",
+    ]
+    available_columns = [
+        column for column in base_columns if column in history.columns
+    ]
+
+    mask = pd.to_numeric(
+        history[return_column],
+        errors="coerce",
+    ).notna()
+
+    view = history.loc[mask, available_columns].copy()
 
     return view.rename(
         columns={
@@ -781,3 +870,4 @@ def build_learning_view(
             win_column: "target_win",
         }
     ).reset_index(drop=True)
+
