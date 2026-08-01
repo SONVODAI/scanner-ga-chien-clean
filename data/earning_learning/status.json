@@ -1,7 +1,7 @@
 {
   "ok": true,
-  "module_version": "3.0.0",
-  "trade_date": "2026-07-31",
+  "module_version": "3.1.0",
+  "trade_date": "2026-08-01",
   "input_rows": 142,
   "valid_rows": 142,
   "observations_added": 0,
@@ -10,9 +10,13 @@
   "knowledge_rows": 353,
   "lifecycle_rows": 852,
   "continuation_rows": 209,
+  "snapshot_rows": 1278,
+  "history_rows": 1278,
   "storage_mode": "GITHUB_PRIMARY",
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-01T05:51:44Z"
+  "last_run_at": "2026-08-01T06:09:33Z",
+  "brain_generation": "GEN2",
+  "feature_version": "DNA_V3"
 }
