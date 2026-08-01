@@ -9,8 +9,8 @@
   "outcomes_added": 0,
   "knowledge_rows": 353,
   "storage_mode": "GITHUB_PRIMARY",
-  "github_sync": "GITHUB_OK",
+  "github_sync": "GITHUB_PARTIAL",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-01T02:21:53Z"
+  "last_run_at": "2026-08-01T02:22:08Z"
 }
