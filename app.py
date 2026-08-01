@@ -23,7 +23,13 @@ from final_decision_engine import build_final_decision
 from position_guardian import render_guardian
 # Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
-from modules.earning_learning import update_learning
+from modules.earning_learning import (
+    update_learning,
+    get_learning_metadata,
+    get_pattern_snapshot,
+    get_pattern_lifecycle,
+    get_continuation_knowledge,
+)
 from modules.accumulation_opportunity import render_accumulation_board
 from modules.experience_engine import run_experience_engine
 from forecast_engine import ForecastEngine
@@ -380,6 +386,506 @@ def safe_read_csv_text(text: str | None) -> pd.DataFrame:
         return pd.read_csv(StringIO(text))
     except Exception:
         return pd.DataFrame()
+
+
+# =========================================================
+# BOT LEARNING INSIGHT PANEL - READ ONLY
+# Chỉ đọc dữ liệu Learning V3.1; tuyệt đối không ghi/xóa dữ liệu học.
+# =========================================================
+def _insight_numeric(series) -> pd.Series:
+    """Ép một Series về numeric an toàn cho bảng Insight."""
+    if series is None:
+        return pd.Series(dtype="float64")
+    return pd.to_numeric(series, errors="coerce")
+
+
+def _insight_pct(numerator: int, denominator: int) -> float:
+    if denominator <= 0:
+        return np.nan
+    return round(float(numerator) / float(denominator) * 100.0, 1)
+
+
+def _insight_band_label(left: float, right: float) -> str:
+    if np.isneginf(left):
+        return f"< {right:g}"
+    if np.isposinf(right):
+        return f"≥ {left:g}"
+    return f"{left:g}–{right:g}"
+
+
+def _best_numeric_feature_band(
+    df: pd.DataFrame,
+    feature: str,
+    success_mask: pd.Series,
+    eligible_mask: pd.Series,
+    bins: list[float],
+    *,
+    min_samples: int,
+) -> dict | None:
+    """Tìm vùng feature có tỷ lệ thành công cao nhất, có chặn mẫu nhỏ."""
+    if df is None or df.empty or feature not in df.columns:
+        return None
+
+    values = _insight_numeric(df[feature])
+    eligible = eligible_mask.fillna(False) & values.notna()
+    if int(eligible.sum()) < max(1, min_samples):
+        return None
+
+    temp = pd.DataFrame({
+        "value": values,
+        "eligible": eligible,
+        "success": success_mask.fillna(False),
+    })
+    temp = temp[temp["eligible"]].copy()
+    if temp.empty:
+        return None
+
+    edges = [-np.inf, *bins, np.inf]
+    temp["band"] = pd.cut(
+        temp["value"],
+        bins=edges,
+        include_lowest=True,
+        right=False,
+    )
+
+    stats = (
+        temp.groupby("band", observed=True)
+        .agg(samples=("success", "size"), wins=("success", "sum"))
+        .reset_index()
+    )
+    stats["rate"] = np.where(
+        stats["samples"] > 0,
+        stats["wins"] / stats["samples"] * 100.0,
+        np.nan,
+    )
+    stats = stats[stats["samples"] >= max(1, min_samples)].copy()
+    if stats.empty:
+        return None
+
+    # Ưu tiên tỷ lệ, sau đó ưu tiên mẫu lớn hơn.
+    stats = stats.sort_values(
+        ["rate", "samples"], ascending=[False, False], kind="stable"
+    )
+    best = stats.iloc[0]
+    interval = best["band"]
+    return {
+        "feature": feature,
+        "label": _insight_band_label(float(interval.left), float(interval.right)),
+        "samples": int(best["samples"]),
+        "wins": int(best["wins"]),
+        "rate": round(float(best["rate"]), 1),
+    }
+
+
+def _best_category_feature(
+    df: pd.DataFrame,
+    feature: str,
+    success_mask: pd.Series,
+    eligible_mask: pd.Series,
+    *,
+    min_samples: int,
+) -> dict | None:
+    """Tìm trạng thái/cụm chữ có tỷ lệ thành công cao nhất."""
+    if df is None or df.empty or feature not in df.columns:
+        return None
+
+    values = df[feature].astype("string").fillna("").str.strip()
+    eligible = eligible_mask.fillna(False) & values.ne("")
+    if int(eligible.sum()) < max(1, min_samples):
+        return None
+
+    temp = pd.DataFrame({
+        "value": values,
+        "eligible": eligible,
+        "success": success_mask.fillna(False),
+    })
+    temp = temp[temp["eligible"]].copy()
+    stats = (
+        temp.groupby("value", dropna=False)
+        .agg(samples=("success", "size"), wins=("success", "sum"))
+        .reset_index()
+    )
+    stats["rate"] = np.where(
+        stats["samples"] > 0,
+        stats["wins"] / stats["samples"] * 100.0,
+        np.nan,
+    )
+    stats = stats[stats["samples"] >= max(1, min_samples)].copy()
+    if stats.empty:
+        return None
+
+    stats = stats.sort_values(
+        ["rate", "samples"], ascending=[False, False], kind="stable"
+    )
+    best = stats.iloc[0]
+    return {
+        "feature": feature,
+        "label": str(best["value"]),
+        "samples": int(best["samples"]),
+        "wins": int(best["wins"]),
+        "rate": round(float(best["rate"]), 1),
+    }
+
+
+def _friendly_pattern_key(pattern_key: str) -> str:
+    """Rút gọn pattern_key để đọc được trên giao diện."""
+    text = str(pattern_key or "").strip()
+    if not text:
+        return ""
+    parts = [part for part in text.split("|") if part and part != "NA"]
+    # Giữ các mảnh có ý nghĩa nhất, tránh một câu quá dài trên mobile.
+    preferred = []
+    for part in parts:
+        upper = part.upper()
+        if any(token in upper for token in (
+            "RECOVER", "NEUTRAL", "WEAK", "RSI", "EARLY", "PULL",
+            "DRYUP", "POSITIVE", "NEGATIVE", "G2", ">=", "60-", "55-",
+        )):
+            preferred.append(part)
+    chosen = preferred[:6] if preferred else parts[:6]
+    return " + ".join(chosen)
+
+
+def _latest_matching_symbols(
+    snapshot: pd.DataFrame,
+    pattern_key: str,
+    *,
+    limit: int = 5,
+) -> list[str]:
+    if (
+        snapshot is None
+        or snapshot.empty
+        or not pattern_key
+        or "pattern_key" not in snapshot.columns
+        or "symbol" not in snapshot.columns
+    ):
+        return []
+
+    matched = snapshot[snapshot["pattern_key"].astype(str) == str(pattern_key)].copy()
+    if matched.empty:
+        return []
+
+    date_col = "trade_date" if "trade_date" in matched.columns else "entry_date"
+    if date_col in matched.columns:
+        matched[date_col] = pd.to_datetime(matched[date_col], errors="coerce")
+        latest_date = matched[date_col].max()
+        if pd.notna(latest_date):
+            matched = matched[matched[date_col] == latest_date]
+
+    return (
+        matched["symbol"]
+        .astype(str)
+        .str.upper()
+        .drop_duplicates()
+        .head(max(1, int(limit)))
+        .tolist()
+    )
+
+
+def render_bot_learning_insight() -> dict:
+    """
+    Hiển thị điều BOT học được từ T3/T5/T10.
+
+    Đây là lớp READ ONLY:
+    - Không gọi update_learning().
+    - Không ghi CSV/JSON.
+    - Lỗi Insight không được phép làm sập app hoặc ảnh hưởng dữ liệu học.
+    """
+    st.markdown("## 🧠 BOT LEARNING INSIGHT")
+    st.caption(
+        "BOT tự rút kinh nghiệm từ các cổ phiếu đã hoàn thành T3/T5/T10. "
+        "Bảng này chỉ đọc bộ nhớ Learning, không thay đổi dữ liệu và không can thiệp logic giao dịch."
+    )
+
+    try:
+        metadata = get_learning_metadata()
+        snapshot = get_pattern_snapshot()
+        lifecycle = get_pattern_lifecycle()
+        continuation = get_continuation_knowledge(min_samples=1)
+    except Exception as exc:
+        st.info(
+            "⏳ BOT chưa đọc được kho Learning Insight. "
+            "Learning Engine vẫn hoạt động độc lập và dữ liệu không bị ảnh hưởng."
+        )
+        st.caption(f"Insight read-only: {type(exc).__name__}: {exc}")
+        return {"ok": False, "status": "READ_ERROR", "error": str(exc)}
+
+    metadata = metadata if isinstance(metadata, dict) else {}
+    snapshot = snapshot if isinstance(snapshot, pd.DataFrame) else pd.DataFrame()
+    lifecycle = lifecycle if isinstance(lifecycle, pd.DataFrame) else pd.DataFrame()
+    continuation = continuation if isinstance(continuation, pd.DataFrame) else pd.DataFrame()
+
+    if lifecycle.empty:
+        t3 = pd.Series(dtype="float64")
+        t5 = pd.Series(dtype="float64")
+        t10 = pd.Series(dtype="float64")
+    else:
+        t3 = _insight_numeric(lifecycle.get("t3_return_pct"))
+        t5 = _insight_numeric(lifecycle.get("t5_return_pct"))
+        t10 = _insight_numeric(lifecycle.get("t10_return_pct"))
+
+    t3_samples = int(t3.notna().sum())
+    t5_samples = int(t5.notna().sum())
+    t10_samples = int(t10.notna().sum())
+    observation_rows = int(
+        metadata.get("observations_rows", len(snapshot)) or len(snapshot)
+    )
+
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.metric("DNA đã lưu", f"{observation_rows:,}")
+    with m2:
+        st.metric("Đủ T3", f"{t3_samples:,}", f"{_insight_pct(t3_samples, max(observation_rows, 1)):.1f}%")
+    with m3:
+        st.metric("Đủ T5", f"{t5_samples:,}", f"{_insight_pct(t5_samples, max(observation_rows, 1)):.1f}%")
+    with m4:
+        st.metric("Đủ T10", f"{t10_samples:,}", f"{_insight_pct(t10_samples, max(observation_rows, 1)):.1f}%")
+
+    # Ba tầng tin cậy: đang học -> nhận xét sớm -> đủ nền để kết luận đáng tin hơn.
+    reliable_targets = {"T3": 200, "T5": 100, "T10": 50}
+    provisional_targets = {"T3": 30, "T5": 20, "T10": 10}
+
+    if t3_samples < provisional_targets["T3"] or t5_samples < provisional_targets["T5"]:
+        stage = "LEARNING"
+        st.info(
+            "⏳ **BOT đang tích lũy dữ liệu.** "
+            f"Cần tối thiểu khoảng {provisional_targets['T3']} mẫu T3 và "
+            f"{provisional_targets['T5']} mẫu T5 để bắt đầu phát biểu nhận xét sớm; "
+            "đến lúc đó bảng sẽ tự chuyển trạng thái, không cần sửa code."
+        )
+    elif t10_samples < reliable_targets["T10"]:
+        stage = "PROVISIONAL"
+        st.warning(
+            "🟡 **BOT đã có thể đưa ra nhận xét sớm**, nhưng mẫu T10 còn mỏng. "
+            "Các kết luận bên dưới chỉ dùng để tham khảo và sẽ tự mạnh lên khi bộ nhớ dày hơn."
+        )
+    else:
+        stage = "RELIABLE"
+        st.success(
+            "🟢 **BOT đã có đủ nền dữ liệu để diễn giải vòng đời T3 → T5 → T10.** "
+            "Kết luận vẫn được chặn mẫu nhỏ và tiếp tục tự cập nhật sau mỗi phiên."
+        )
+
+    if lifecycle.empty or t3_samples == 0:
+        st.caption(
+            f"Tiến độ mục tiêu tin cậy: T3 {t3_samples}/{reliable_targets['T3']} • "
+            f"T5 {t5_samples}/{reliable_targets['T5']} • "
+            f"T10 {t10_samples}/{reliable_targets['T10']}"
+        )
+        return {
+            "ok": True,
+            "status": stage,
+            "t3_samples": t3_samples,
+            "t5_samples": t5_samples,
+            "t10_samples": t10_samples,
+        }
+
+    has_t3 = t3.notna()
+    has_t5 = t5.notna()
+    has_t10 = t10.notna()
+    t3_win = t3 > 0
+    t5_win = t5 > 0
+    t10_win = t10 > 0
+
+    t3_wins = int((has_t3 & t3_win).sum())
+    eligible_t3_t5 = int((has_t5 & t3_win).sum())
+    continued_t3_t5 = int((has_t5 & t3_win & t5_win).sum())
+    eligible_t5_t10 = int((has_t10 & t5_win).sum())
+    continued_t5_t10 = int((has_t10 & t5_win & t10_win).sum())
+    eligible_t3_t10 = int((has_t10 & t3_win).sum())
+    continued_t3_t10 = int((has_t10 & t3_win & t10_win).sum())
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.metric("Winrate T3", f"{_insight_pct(t3_wins, t3_samples):.1f}%", f"{t3_wins}/{t3_samples}")
+    with c2:
+        value = _insight_pct(continued_t3_t5, eligible_t3_t5)
+        st.metric("T3+ → T5+", "—" if pd.isna(value) else f"{value:.1f}%", f"{continued_t3_t5}/{eligible_t3_t5}")
+    with c3:
+        value = _insight_pct(continued_t5_t10, eligible_t5_t10)
+        st.metric("T5+ → T10+", "—" if pd.isna(value) else f"{value:.1f}%", f"{continued_t5_t10}/{eligible_t5_t10}")
+    with c4:
+        value = _insight_pct(continued_t3_t10, eligible_t3_t10)
+        st.metric("T3+ → T10+", "—" if pd.isna(value) else f"{value:.1f}%", f"{continued_t3_t10}/{eligible_t3_t10}")
+
+    # Chỉ phát biểu DNA khi có đủ số mẫu trong từng cụm.
+    min_band_samples = 5 if stage == "PROVISIONAL" else 10
+    eligible_t3_to_t5 = has_t5 & t3_win
+    success_t3_to_t5 = has_t5 & t3_win & t5_win
+    eligible_t3_to_t10 = has_t10 & t3_win
+    success_t3_to_t10 = has_t10 & t3_win & t10_win
+
+    findings: list[str] = []
+
+    rsi_best = _best_numeric_feature_band(
+        lifecycle,
+        "rsi14",
+        success_t3_to_t5,
+        eligible_t3_to_t5,
+        [45, 50, 55, 60, 65, 70],
+        min_samples=min_band_samples,
+    )
+    if rsi_best:
+        findings.append(
+            f"**RSI {rsi_best['label']}** đang có tỷ lệ giữ lãi từ T3 sang T5 tốt nhất: "
+            f"**{rsi_best['rate']:.1f}%** ({rsi_best['wins']}/{rsi_best['samples']} mẫu)."
+        )
+
+    rs_best = _best_numeric_feature_band(
+        lifecycle,
+        "rs10",
+        success_t3_to_t5,
+        eligible_t3_to_t5,
+        [-2, 0, 2, 5, 10],
+        min_samples=min_band_samples,
+    )
+    if rs_best:
+        findings.append(
+            f"Vùng **RS10 {rs_best['label']}** cho độ bền T3→T5 cao nhất: "
+            f"**{rs_best['rate']:.1f}%** trên {rs_best['samples']} mẫu."
+        )
+
+    leader_best = _best_numeric_feature_band(
+        lifecycle,
+        "leader_score",
+        success_t3_to_t10,
+        eligible_t3_to_t10,
+        [40, 60, 75, 85],
+        min_samples=min_band_samples,
+    )
+    if leader_best:
+        findings.append(
+            f"**Leader Score {leader_best['label']}** hiện là vùng giữ lãi tới T10 tốt nhất: "
+            f"**{leader_best['rate']:.1f}%** ({leader_best['wins']}/{leader_best['samples']} mẫu)."
+        )
+
+    obv_best = _best_category_feature(
+        lifecycle,
+        "obv_status",
+        success_t3_to_t5,
+        eligible_t3_to_t5,
+        min_samples=min_band_samples,
+    )
+    if obv_best:
+        findings.append(
+            f"Trạng thái **OBV {obv_best['label']}** đang dẫn đầu độ bền T3→T5 với "
+            f"**{obv_best['rate']:.1f}%** trên {obv_best['samples']} mẫu."
+        )
+
+    market_best = _best_numeric_feature_band(
+        lifecycle,
+        "market_score",
+        success_t3_to_t10,
+        eligible_t3_to_t10,
+        [4, 6, 8],
+        min_samples=min_band_samples,
+    )
+    if market_best:
+        findings.append(
+            f"Bối cảnh **Market Real {market_best['label']}** đang tạo xác suất T3→T10 tốt nhất: "
+            f"**{market_best['rate']:.1f}%** trên {market_best['samples']} mẫu."
+        )
+
+    health_best = _best_category_feature(
+        lifecycle,
+        "health_group",
+        success_t3_to_t5,
+        eligible_t3_to_t5,
+        min_samples=min_band_samples,
+    )
+    if health_best:
+        findings.append(
+            f"Nhóm **{health_best['label']}** đang có hiệu suất tiếp diễn T3→T5 tốt nhất: "
+            f"**{health_best['rate']:.1f}%** trên {health_best['samples']} mẫu."
+        )
+
+    if findings:
+        st.markdown("### BOT học được gì")
+        for sentence in findings[:6]:
+            st.markdown(f"- {sentence}")
+    else:
+        st.info(
+            "BOT đã có Outcome nhưng từng cụm DNA vẫn còn quá ít mẫu để kết luận. "
+            "Bảng sẽ tự phát biểu khi một vùng RSI/RS/OBV/Market đạt ngưỡng mẫu tối thiểu."
+        )
+
+    # Mẫu chính xác mạnh nhất: chỉ dùng khi có mẫu đủ lớn trong continuation_knowledge.
+    if not continuation.empty:
+        cont = continuation.copy()
+        for col in (
+            "eligible_t3_to_t5", "eligible_t3_to_t10", "samples_t10",
+            "t3_to_t5_rate_pct", "t3_to_t10_rate_pct",
+            "t3_to_t10_lower_bound_pct", "continuation_score", "avg_t10_return_pct",
+        ):
+            if col in cont.columns:
+                cont[col] = pd.to_numeric(cont[col], errors="coerce")
+
+        exact_min = 5 if stage == "PROVISIONAL" else 10
+        eligible_col = "eligible_t3_to_t10" if "eligible_t3_to_t10" in cont.columns else "samples_t10"
+        eligible_exact = cont[eligible_col].fillna(0) >= exact_min
+        exact = cont[eligible_exact].copy()
+        if not exact.empty:
+            sort_cols = [c for c in ("continuation_score", "t3_to_t10_lower_bound_pct", eligible_col) if c in exact.columns]
+            exact = exact.sort_values(sort_cols, ascending=[False] * len(sort_cols), kind="stable")
+            top = exact.iloc[0]
+            key = str(top.get("pattern_key", ""))
+            readable = _friendly_pattern_key(key)
+            rate = to_float(top.get("t3_to_t10_rate_pct", np.nan))
+            lower = to_float(top.get("t3_to_t10_lower_bound_pct", np.nan))
+            avg_t10 = to_float(top.get("avg_t10_return_pct", np.nan))
+            samples = int(to_float(top.get(eligible_col, 0), 0))
+
+            st.markdown("### 🧬 DNA bền nhất hiện tại")
+            details = []
+            if readable:
+                details.append(f"**{readable}**")
+            if pd.notna(rate):
+                details.append(f"T3→T10: **{rate:.1f}%**")
+            if pd.notna(lower):
+                details.append(f"cận tin cậy: **{lower:.1f}%**")
+            if pd.notna(avg_t10):
+                details.append(f"lợi nhuận T10 TB: **{avg_t10:+.2f}%**")
+            details.append(f"mẫu đủ điều kiện: **{samples}**")
+            st.success(" • ".join(details))
+
+            symbols = _latest_matching_symbols(snapshot, key, limit=5)
+            if symbols:
+                st.caption(
+                    "Các mã mới nhất đang mang DNA tương tự: "
+                    + ", ".join(f"**{symbol}**" for symbol in symbols)
+                    + ". Đây là gợi ý nghiên cứu, không phải lệnh mua tự động."
+                )
+
+    # Cảnh báo flash winner giúp quyết định chốt sớm/thêm vốn.
+    if "flash_winner" in lifecycle.columns:
+        flash = lifecycle["flash_winner"].map(bool)
+        flash_samples = int(flash.sum())
+        if t3_wins > 0 and flash_samples > 0:
+            flash_rate = _insight_pct(flash_samples, t3_wins)
+            if pd.notna(flash_rate) and flash_rate >= 30:
+                st.warning(
+                    f"⚠️ Có **{flash_samples}/{t3_wins} mẫu thắng T3 ({flash_rate:.1f}%)** "
+                    "đã trở thành Flash Winner — thắng sớm nhưng không giữ được lãi về sau. "
+                    "BOT sẽ tiếp tục học nhóm này để hỗ trợ chốt sớm và hạn chế gia tăng vốn sai thời điểm."
+                )
+
+    st.caption(
+        f"Tiến độ mục tiêu tin cậy: T3 {t3_samples}/{reliable_targets['T3']} • "
+        f"T5 {t5_samples}/{reliable_targets['T5']} • "
+        f"T10 {t10_samples}/{reliable_targets['T10']} • "
+        f"Brain {metadata.get('brain_generation', 'GEN2')} • "
+        f"Feature {metadata.get('feature_version', 'DNA_V3')}"
+    )
+
+    return {
+        "ok": True,
+        "status": stage,
+        "t3_samples": t3_samples,
+        "t5_samples": t5_samples,
+        "t10_samples": t10_samples,
+        "findings": findings,
+    }
+
 
 # =========================================================
 # DATA DOWNLOAD
@@ -5550,6 +6056,15 @@ try:
     )
 except Exception as e:
     st.warning(f"Earning Learning: {e}")
+
+# Learning Insight đọc kho dữ liệu sau khi update_learning đã hoàn tất.
+# Đây là lớp hiển thị READ ONLY, lỗi của bảng không ảnh hưởng Learning/Decision.
+try:
+    learning_insight_result = render_bot_learning_insight()
+except Exception as e:
+    st.info("🧠 BOT Learning Insight đang tạm ẩn; dữ liệu học vẫn được bảo toàn.")
+    st.caption(f"Learning Insight Error: {type(e).__name__}: {e}")
+
 if market_real < 6:
     st.error(market_action)
 elif market_real < 8:
