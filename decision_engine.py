@@ -1,5 +1,5 @@
 # =========================================================
-# MR.BOT V21 - DECISION ENGINE
+# MR.BOT V22 - DECISION ENGINE + LEARNING V3
 # File: decision_engine.py
 #
 # Nhiệm vụ:
@@ -18,11 +18,31 @@ from zoneinfo import ZoneInfo
 import numpy as np
 import pandas as pd
 
+try:
+    from .earning_learning import (
+        get_continuation_knowledge,
+        get_pattern_knowledge,
+    )
+except Exception:
+    try:
+        from earning_learning import (
+            get_continuation_knowledge,
+            get_pattern_knowledge,
+        )
+    except Exception:
+        get_continuation_knowledge = None
+        get_pattern_knowledge = None
+
 
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 
 DECISION_TABLE = "bot_decision_history"
 LEARNING_TABLE = "bot_experience_learning"
+
+MIN_PATTERN_SAMPLES = 5
+MIN_CONTINUATION_SAMPLES = 5
+MAX_V3_LEARNING_BONUS = 18
+MAX_V3_LEARNING_PENALTY = -18
 
 
 def de_now():
@@ -190,7 +210,293 @@ def summarize_similar_learning(df):
         out["good_env_count"] = int(vc.get("GOOD_ENV", 0))
         out["bad_env_count"] = int(vc.get("BAD_ENV", 0))
 
+
     return out
+
+
+# =========================================================
+# LEARNING V3 - PATTERN & CONTINUATION KNOWLEDGE
+# =========================================================
+
+def _market_pattern_bucket(snapshot):
+    real = safe_num(snapshot.get("market_real"))
+
+    if pd.isna(real):
+        return None
+    if real < 4:
+        return "<4"
+    if real < 6:
+        return "4-6"
+    if real < 8:
+        return "6-8"
+    return ">=8"
+
+
+def _pattern_key_matches_market(pattern_key, market_bucket):
+    if not market_bucket:
+        return True
+
+    text = safe_text(pattern_key)
+    token = f"|{market_bucket}"
+    return text.endswith(token) or token + "|" in text
+
+
+def _weighted_average(df, value_col, weight_col):
+    if df is None or df.empty:
+        return np.nan
+
+    values = pd.to_numeric(df.get(value_col), errors="coerce")
+    weights = pd.to_numeric(df.get(weight_col), errors="coerce")
+
+    valid = values.notna() & weights.notna() & weights.gt(0)
+    if not valid.any():
+        return np.nan
+
+    return float(np.average(values[valid], weights=weights[valid]))
+
+
+def get_v3_learning_summary(snapshot, min_pattern_samples=MIN_PATTERN_SAMPLES,
+                            min_continuation_samples=MIN_CONTINUATION_SAMPLES):
+    """
+    Đọc Learning Engine V3 theo cơ chế fail-safe.
+
+    Decision Engine chỉ dùng tri thức khi đã có mẫu tối thiểu. Nếu Learning V3
+    chưa có dữ liệu, lỗi import hoặc lỗi lưu trữ, kết quả trả về là trạng thái
+    chưa sẵn sàng và BOT vẫn dùng logic cũ.
+    """
+    summary = {
+        "v3_ready": False,
+        "market_bucket": _market_pattern_bucket(snapshot),
+        "pattern_rows": 0,
+        "pattern_samples": 0,
+        "pattern_score": np.nan,
+        "pattern_winrate_t5": np.nan,
+        "pattern_winrate_t10": np.nan,
+        "continuation_rows": 0,
+        "continuation_samples_t10": 0,
+        "continuation_score": np.nan,
+        "t3_to_t5_rate": np.nan,
+        "t5_to_t10_rate": np.nan,
+        "t3_to_t10_rate": np.nan,
+        "t3_to_t10_lower_bound": np.nan,
+        "avg_t10_return": np.nan,
+        "strong_runners": 0,
+        "persistent_winners": 0,
+        "flash_winners": 0,
+        "error": None,
+    }
+
+    if get_pattern_knowledge is None or get_continuation_knowledge is None:
+        summary["error"] = "Learning V3 API chưa sẵn sàng."
+        return summary
+
+    try:
+        pattern = get_pattern_knowledge(min_samples=max(1, int(min_pattern_samples)))
+        continuation = get_continuation_knowledge(
+            min_samples=max(1, int(min_continuation_samples))
+        )
+    except Exception as exc:
+        summary["error"] = f"{type(exc).__name__}: {exc}"
+        return summary
+
+    market_bucket = summary["market_bucket"]
+
+    if pattern is not None and not pattern.empty:
+        pattern = pattern.copy()
+        if "pattern_key" in pattern.columns and market_bucket:
+            matched = pattern[
+                pattern["pattern_key"].map(
+                    lambda value: _pattern_key_matches_market(value, market_bucket)
+                )
+            ].copy()
+            if not matched.empty:
+                pattern = matched
+
+        samples = pd.to_numeric(pattern.get("samples"), errors="coerce").fillna(0)
+        pattern = pattern[samples >= max(1, int(min_pattern_samples))].copy()
+
+        if not pattern.empty:
+            summary["pattern_rows"] = len(pattern)
+            summary["pattern_samples"] = int(
+                pd.to_numeric(pattern.get("samples"), errors="coerce")
+                .fillna(0).sum()
+            )
+            summary["pattern_score"] = _weighted_average(
+                pattern, "knowledge_score", "samples"
+            )
+
+            horizon = pd.to_numeric(pattern.get("horizon"), errors="coerce")
+            p5 = pattern[horizon.eq(5)]
+            p10 = pattern[horizon.eq(10)]
+            summary["pattern_winrate_t5"] = _weighted_average(
+                p5, "win_rate_pct", "samples"
+            )
+            summary["pattern_winrate_t10"] = _weighted_average(
+                p10, "win_rate_pct", "samples"
+            )
+
+    if continuation is not None and not continuation.empty:
+        continuation = continuation.copy()
+        if "pattern_key" in continuation.columns and market_bucket:
+            matched = continuation[
+                continuation["pattern_key"].map(
+                    lambda value: _pattern_key_matches_market(value, market_bucket)
+                )
+            ].copy()
+            if not matched.empty:
+                continuation = matched
+
+        samples_t10 = pd.to_numeric(
+            continuation.get("samples_t10"), errors="coerce"
+        ).fillna(0)
+        continuation = continuation[
+            samples_t10 >= max(1, int(min_continuation_samples))
+        ].copy()
+
+        if not continuation.empty:
+            summary["continuation_rows"] = len(continuation)
+            summary["continuation_samples_t10"] = int(
+                pd.to_numeric(
+                    continuation.get("samples_t10"), errors="coerce"
+                ).fillna(0).sum()
+            )
+            summary["continuation_score"] = _weighted_average(
+                continuation, "continuation_score", "samples_t10"
+            )
+            summary["t3_to_t5_rate"] = _weighted_average(
+                continuation, "t3_to_t5_rate_pct", "eligible_t3_to_t5"
+            )
+            summary["t5_to_t10_rate"] = _weighted_average(
+                continuation, "t5_to_t10_rate_pct", "eligible_t5_to_t10"
+            )
+            summary["t3_to_t10_rate"] = _weighted_average(
+                continuation, "t3_to_t10_rate_pct", "eligible_t3_to_t10"
+            )
+            summary["t3_to_t10_lower_bound"] = _weighted_average(
+                continuation, "t3_to_t10_lower_bound_pct", "eligible_t3_to_t10"
+            )
+            summary["avg_t10_return"] = _weighted_average(
+                continuation, "avg_t10_return_pct", "samples_t10"
+            )
+            summary["strong_runners"] = int(
+                pd.to_numeric(
+                    continuation.get("strong_runners"), errors="coerce"
+                ).fillna(0).sum()
+            )
+            summary["persistent_winners"] = int(
+                pd.to_numeric(
+                    continuation.get("persistent_winners"), errors="coerce"
+                ).fillna(0).sum()
+            )
+            summary["flash_winners"] = int(
+                pd.to_numeric(
+                    continuation.get("flash_winners"), errors="coerce"
+                ).fillna(0).sum()
+            )
+
+    summary["v3_ready"] = (
+        summary["pattern_samples"] >= min_pattern_samples
+        or summary["continuation_samples_t10"] >= min_continuation_samples
+    )
+    return summary
+
+
+def score_learning_v3(summary):
+    """
+    Chấm điểm Learning V3 có kiểm soát.
+
+    Điểm bị giới hạn trong [-18, +18] để dữ liệu học không thể lấn át hoàn toàn
+    Market REAL/Forecast. Mẫu nhỏ không được phép cộng điểm.
+    """
+    score = 0.0
+    reasons = []
+
+    if not summary.get("v3_ready"):
+        error = summary.get("error")
+        if error:
+            reasons.append(f"Learning V3 chưa dùng được: {error}")
+        else:
+            reasons.append("Learning V3 đang chờ đủ mẫu T3/T5/T10.")
+        return 0.0, reasons
+
+    continuation_samples = int(summary.get("continuation_samples_t10", 0) or 0)
+    lower_bound = safe_num(summary.get("t3_to_t10_lower_bound"))
+    t5_to_t10 = safe_num(summary.get("t5_to_t10_rate"))
+    avg_t10 = safe_num(summary.get("avg_t10_return"))
+    continuation_score = safe_num(summary.get("continuation_score"))
+    pattern_samples = int(summary.get("pattern_samples", 0) or 0)
+    pattern_t10 = safe_num(summary.get("pattern_winrate_t10"))
+
+    if continuation_samples >= MIN_CONTINUATION_SAMPLES:
+        if pd.notna(lower_bound):
+            if lower_bound >= 65:
+                score += 8
+                reasons.append(
+                    f"Mẫu bền có cận dưới T3→T10 cao: {lower_bound:.1f}%."
+                )
+            elif lower_bound >= 50:
+                score += 4
+                reasons.append(
+                    f"Cận dưới T3→T10 đạt mức khá: {lower_bound:.1f}%."
+                )
+            elif lower_bound < 30:
+                score -= 8
+                reasons.append(
+                    f"Cận dưới T3→T10 thấp: {lower_bound:.1f}%."
+                )
+
+        if pd.notna(t5_to_t10):
+            if t5_to_t10 >= 70:
+                score += 5
+                reasons.append(
+                    f"Khả năng T5 thắng tiếp T10 cao: {t5_to_t10:.1f}%."
+                )
+            elif t5_to_t10 < 45:
+                score -= 5
+                reasons.append(
+                    f"Nhiều mẫu mất sức từ T5 sang T10: {t5_to_t10:.1f}%."
+                )
+
+        if pd.notna(avg_t10):
+            if avg_t10 >= 5:
+                score += 4
+                reasons.append(f"Lợi nhuận T10 trung bình tốt: {avg_t10:+.2f}%.")
+            elif avg_t10 >= 1:
+                score += 2
+                reasons.append(f"Lợi nhuận T10 trung bình dương: {avg_t10:+.2f}%.")
+            elif avg_t10 < 0:
+                score -= 4
+                reasons.append(f"Lợi nhuận T10 trung bình âm: {avg_t10:+.2f}%.")
+
+        if pd.notna(continuation_score):
+            if continuation_score >= 65:
+                score += 3
+            elif continuation_score < 35:
+                score -= 3
+
+    if pattern_samples >= MIN_PATTERN_SAMPLES and pd.notna(pattern_t10):
+        if pattern_t10 >= 65:
+            score += 3
+            reasons.append(
+                f"WinRate T10 của pattern trong bối cảnh hiện tại: {pattern_t10:.1f}%."
+            )
+        elif pattern_t10 < 40:
+            score -= 3
+            reasons.append(
+                f"WinRate T10 của pattern hiện tại thấp: {pattern_t10:.1f}%."
+            )
+
+    persistent = int(summary.get("persistent_winners", 0) or 0)
+    flash = int(summary.get("flash_winners", 0) or 0)
+    if persistent >= 3 and persistent > flash:
+        score += 2
+        reasons.append("Mẫu thắng bền nhiều hơn mẫu thắng ngắn.")
+    elif flash >= 3 and flash > persistent:
+        score -= 2
+        reasons.append("Mẫu thắng ngắn đang nhiều hơn mẫu thắng bền.")
+
+    score = max(MAX_V3_LEARNING_PENALTY, min(MAX_V3_LEARNING_BONUS, score))
+    return float(score), reasons
 
 
 # =========================================================
@@ -436,7 +742,16 @@ def make_market_decision(brain, latest_snapshot=None, save=True):
     learning_summary = summarize_similar_learning(similar)
     learning_score, learning_reasons = score_learning(learning_summary)
 
-    confidence = clamp(market_score + learning_score)
+    v3_learning_summary = get_v3_learning_summary(snapshot)
+    v3_learning_score, v3_learning_reasons = score_learning_v3(
+        v3_learning_summary
+    )
+
+    confidence = clamp(
+        market_score
+        + learning_score
+        + v3_learning_score
+    )
 
     risk = decide_risk(confidence, snapshot)
     nav = decide_nav(confidence, risk)
@@ -464,13 +779,39 @@ def make_market_decision(brain, latest_snapshot=None, save=True):
         "similar_t5_return": learning_summary.get("avg_t5_return", np.nan),
         "similar_t5_winrate": learning_summary.get("avg_t5_winrate", np.nan),
 
+        "v3_learning_ready": v3_learning_summary.get("v3_ready", False),
+        "v3_market_bucket": v3_learning_summary.get("market_bucket"),
+        "v3_pattern_samples": v3_learning_summary.get("pattern_samples", 0),
+        "v3_continuation_samples_t10": v3_learning_summary.get(
+            "continuation_samples_t10", 0
+        ),
+        "v3_t3_to_t5_rate": v3_learning_summary.get(
+            "t3_to_t5_rate", np.nan
+        ),
+        "v3_t5_to_t10_rate": v3_learning_summary.get(
+            "t5_to_t10_rate", np.nan
+        ),
+        "v3_t3_to_t10_rate": v3_learning_summary.get(
+            "t3_to_t10_rate", np.nan
+        ),
+        "v3_t3_to_t10_lower_bound": v3_learning_summary.get(
+            "t3_to_t10_lower_bound", np.nan
+        ),
+        "v3_avg_t10_return": v3_learning_summary.get(
+            "avg_t10_return", np.nan
+        ),
+        "v3_continuation_score": v3_learning_summary.get(
+            "continuation_score", np.nan
+        ),
+        "v3_learning_adjustment": round(float(v3_learning_score), 2),
+
         "confidence": round(float(confidence), 2),
         "risk_level": risk,
         "suggested_nav": nav,
         "priority_groups": priority_groups,
         "action": action,
 
-        "reason": market_reasons + learning_reasons,
+        "reason": market_reasons + learning_reasons + v3_learning_reasons,
     }
 
     decision["decision_text"] = build_decision_text(decision)
@@ -527,6 +868,9 @@ def build_decision_history_view(brain, n=20):
         "priority_groups",
         "similar_t5_return",
         "similar_t5_winrate",
+        "v3_learning_adjustment",
+        "v3_t3_to_t10_lower_bound",
+        "v3_avg_t10_return",
         "decision_text",
     ]
 
