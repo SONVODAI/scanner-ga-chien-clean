@@ -1,5 +1,5 @@
 """
-MR.BOT PRO - EARNING MONEY LEARNING ENGINE V2
+MR.BOT PRO - EARNING MONEY LEARNING ENGINE V3
 ==============================================
 
 Mục tiêu
@@ -58,7 +58,7 @@ except Exception:  # pragma: no cover - cho phép test module ngoài Streamlit
     st = None  # type: ignore[assignment]
 
 
-MODULE_VERSION = "2.0.0"
+MODULE_VERSION = "3.0.0"
 DEFAULT_HORIZONS: Tuple[int, ...] = (3, 5, 10)
 
 DEFAULT_DATA_DIR = Path("data") / "earning_learning"
@@ -70,12 +70,16 @@ DEFAULT_GITHUB_BRANCH = "main"
 OBSERVATIONS_FILE = "observations.csv"
 OUTCOMES_FILE = "outcomes.csv"
 KNOWLEDGE_FILE = "pattern_knowledge.csv"
+LIFECYCLE_FILE = "pattern_lifecycle.csv"
+CONTINUATION_FILE = "continuation_knowledge.csv"
 STATUS_FILE = "status.json"
 
 _DATA_FILES = (
     OBSERVATIONS_FILE,
     OUTCOMES_FILE,
     KNOWLEDGE_FILE,
+    LIFECYCLE_FILE,
+    CONTINUATION_FILE,
     STATUS_FILE,
 )
 
@@ -135,6 +139,22 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
     "sector": ("sector", "industry", "ngành", "Ngành"),
     "market_score": ("market_score", "market_real", "market_health"),
     "market_regime": ("market_regime", "regime", "market_state"),
+    "market_live": ("market_live", "live_score"),
+    "market_forecast": ("market_forecast", "forecast_score"),
+    "breadth": ("breadth", "market_breadth", "breadth_pct"),
+    "ema9_slope": ("ema9_slope",),
+    "ma20_slope": ("ma20_slope",),
+    "obv": ("obv", "obv_value"),
+    "obv_ema9": ("obv_ema9",),
+    "volume_ratio": ("volume_ratio", "vol_ratio", "volume_ratio20"),
+    "dryup": ("dryup", "dry_up", "volume_dryup"),
+    "near_bottom20": ("near_bottom20", "near_bottom_20"),
+    "near_bottom60": ("near_bottom60", "near_bottom_60"),
+    "leader_score": ("leader_score",),
+    "storm_score": ("storm_score",),
+    "evolution_score": ("evolution_score",),
+    "total_score": ("total_score", "health_score"),
+    "group_rank": ("group_rank",),
 }
 
 NUMERIC_FIELDS = (
@@ -156,9 +176,24 @@ NUMERIC_FIELDS = (
     "near_bottom_60_pct",
     "dist_high20",
     "market_score",
+    "market_live",
+    "market_forecast",
+    "breadth",
+    "ema9_slope",
+    "ma20_slope",
+    "obv",
+    "obv_ema9",
+    "volume_ratio",
+    "near_bottom20",
+    "near_bottom60",
+    "leader_score",
+    "storm_score",
+    "evolution_score",
+    "total_score",
+    "group_rank",
 )
 
-BOOLEAN_FIELDS = ("green2", "early", "pull")
+BOOLEAN_FIELDS = ("green2", "early", "pull", "dryup")
 
 
 @dataclass(frozen=True)
@@ -172,6 +207,8 @@ class LearningResult:
     observations_updated: int
     outcomes_added: int
     knowledge_rows: int
+    lifecycle_rows: int = 0
+    continuation_rows: int = 0
     storage_mode: str = "LOCAL_ONLY"
     github_sync: str = "NOT_ATTEMPTED"
     skipped_reason: Optional[str] = None
@@ -843,7 +880,7 @@ def _adapt_board(
 
     context = dict(market_context or {})
 
-    for field in ("market_score", "market_regime"):
+    for field in ("market_score", "market_live", "market_forecast", "breadth", "market_regime"):
         if canonical[field].isna().all() and field in context:
             canonical[field] = context[field]
 
@@ -957,7 +994,23 @@ def _adapt_board(
         "pull",
         "group",
         "sector",
+        "ema9_slope",
+        "ma20_slope",
+        "obv",
+        "obv_ema9",
+        "volume_ratio",
+        "dryup",
+        "near_bottom20",
+        "near_bottom60",
+        "leader_score",
+        "storm_score",
+        "evolution_score",
+        "total_score",
+        "group_rank",
         "market_score",
+        "market_live",
+        "market_forecast",
+        "breadth",
         "market_regime",
     ]
 
@@ -1267,6 +1320,10 @@ def _ensure_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
         "green2": False,
         "early": False,
         "pull": False,
+        "dryup": False,
+        "leader_score": np.nan,
+        "market_forecast": np.nan,
+        "breadth": np.nan,
         "market_score": np.nan,
     }
 
@@ -1328,6 +1385,24 @@ def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
     out["p_pull"] = out["pull"].map(
         lambda value: "PULL" if _safe_bool(value) else "NO_PULL"
     )
+    out["p_dryup"] = out["dryup"].map(
+        lambda value: "DRYUP" if _safe_bool(value) else "NO_DRYUP"
+    )
+    out["p_leader"] = _bucket_numeric(
+        out["leader_score"],
+        (40, 60, 75, 85),
+        ("<40", "40-60", "60-75", "75-85", ">=85"),
+    )
+    out["p_forecast"] = _bucket_numeric(
+        out["market_forecast"],
+        (4, 6, 8),
+        ("<4", "4-6", "6-8", ">=8"),
+    )
+    out["p_breadth"] = _bucket_numeric(
+        out["breadth"],
+        (20, 40, 60, 80),
+        ("<20", "20-40", "40-60", "60-80", ">=80"),
+    )
     out["p_market"] = _bucket_numeric(
         out["market_score"],
         (4, 6, 8),
@@ -1345,6 +1420,10 @@ def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
         "p_green2",
         "p_early",
         "p_pull",
+        "p_dryup",
+        "p_leader",
+        "p_forecast",
+        "p_breadth",
         "p_market",
     ]
 
@@ -1458,6 +1537,210 @@ def _build_pattern_knowledge(
         kind="stable",
     ).reset_index(drop=True)
 
+
+
+def _build_pattern_lifecycle(
+    observations: pd.DataFrame,
+    outcomes: pd.DataFrame,
+) -> pd.DataFrame:
+    """Ghép T3/T5/T10 của cùng Observation thành một vòng đời duy nhất."""
+    if observations.empty or outcomes.empty:
+        return pd.DataFrame()
+
+    obs = _add_pattern_columns(observations)
+    out = outcomes.copy()
+    out["horizon"] = pd.to_numeric(out["horizon"], errors="coerce").astype("Int64")
+    out = out[out["horizon"].isin(DEFAULT_HORIZONS)].copy()
+    if out.empty:
+        return pd.DataFrame()
+
+    value_columns = [
+        "target_date", "target_price", "return_pct",
+        "max_gain_pct", "max_drawdown_pct", "is_win", "is_leader",
+    ]
+    frames = []
+    for value_column in value_columns:
+        pivot = out.pivot_table(
+            index=["observation_id", "symbol", "entry_date", "entry_price"],
+            columns="horizon",
+            values=value_column,
+            aggfunc="last",
+        )
+        pivot.columns = [f"t{int(h)}_{value_column}" for h in pivot.columns]
+        frames.append(pivot)
+
+    lifecycle = pd.concat(frames, axis=1).reset_index()
+    lifecycle = lifecycle.merge(
+        obs,
+        on=["observation_id", "symbol"],
+        how="left",
+        suffixes=("", "_origin"),
+    )
+
+    for horizon in DEFAULT_HORIZONS:
+        win_col = f"t{horizon}_is_win"
+        return_col = f"t{horizon}_return_pct"
+        if win_col in lifecycle.columns:
+            lifecycle[win_col] = lifecycle[win_col].map(_safe_bool)
+        if return_col not in lifecycle.columns:
+            lifecycle[return_col] = np.nan
+
+    t3 = pd.to_numeric(lifecycle.get("t3_return_pct"), errors="coerce")
+    t5 = pd.to_numeric(lifecycle.get("t5_return_pct"), errors="coerce")
+    t10 = pd.to_numeric(lifecycle.get("t10_return_pct"), errors="coerce")
+
+    lifecycle["completed_horizons"] = pd.concat([t3, t5, t10], axis=1).notna().sum(axis=1)
+    lifecycle["t3_to_t5_delta_pct"] = t5 - t3
+    lifecycle["t5_to_t10_delta_pct"] = t10 - t5
+    lifecycle["t3_to_t10_delta_pct"] = t10 - t3
+    lifecycle["persistent_win_t5"] = (t3 > 0) & (t5 > 0)
+    lifecycle["persistent_win_t10"] = (t3 > 0) & (t5 > 0) & (t10 > 0)
+    lifecycle["flash_winner"] = (t3 > 0) & ((t5 <= 0) | (t10 <= 0))
+    lifecycle["slow_burner"] = (t3 <= 0) & (t5 > 0) & (t10 > 0)
+    lifecycle["gain_accelerating"] = (t3 > 0) & (t5 > t3) & (t10 > t5)
+
+    lifecycle["lifecycle_class"] = np.select(
+        [
+            lifecycle["gain_accelerating"],
+            lifecycle["persistent_win_t10"],
+            lifecycle["flash_winner"],
+            lifecycle["slow_burner"],
+            (t3 <= 0) & (t5 <= 0) & (t10 <= 0),
+        ],
+        [
+            "STRONG_RUNNER",
+            "PERSISTENT_WINNER",
+            "FLASH_WINNER",
+            "SLOW_BURNER",
+            "PERSISTENT_LOSER",
+        ],
+        default="MIXED",
+    )
+    lifecycle["updated_at"] = _utc_now_iso()
+    lifecycle["module_version"] = MODULE_VERSION
+    return lifecycle.sort_values(["entry_date", "symbol"], kind="stable").reset_index(drop=True)
+
+
+def _wilson_lower_bound(wins: pd.Series, samples: pd.Series) -> pd.Series:
+    z = 1.2815515655446004
+    n = pd.to_numeric(samples, errors="coerce").astype(float)
+    w = pd.to_numeric(wins, errors="coerce").astype(float)
+    p = np.where(n > 0, w / n, 0.0)
+    denominator = 1.0 + z * z / n
+    centre = p + z * z / (2.0 * n)
+    margin = z * np.sqrt((p * (1.0 - p) + z * z / (4.0 * n)) / n)
+    return pd.Series(np.where(n > 0, (centre - margin) / denominator * 100.0, np.nan), index=samples.index)
+
+
+def _build_continuation_knowledge(lifecycle: pd.DataFrame) -> pd.DataFrame:
+    """Học xác suất mẫu thắng T3 tiếp tục thắng T5 và T10."""
+    if lifecycle.empty or "pattern_key" not in lifecycle.columns:
+        return pd.DataFrame()
+
+    df = lifecycle.copy()
+    t3 = pd.to_numeric(df.get("t3_return_pct"), errors="coerce")
+    t5 = pd.to_numeric(df.get("t5_return_pct"), errors="coerce")
+    t10 = pd.to_numeric(df.get("t10_return_pct"), errors="coerce")
+
+    df["has_t3"] = t3.notna()
+    df["has_t5"] = t5.notna()
+    df["has_t10"] = t10.notna()
+    df["t3_win_int"] = (t3 > 0).astype(int)
+    df["t5_win_int"] = (t5 > 0).astype(int)
+    df["t10_win_int"] = (t10 > 0).astype(int)
+    df["t3_t5_continue_int"] = ((t3 > 0) & (t5 > 0)).astype(int)
+    df["t5_t10_continue_int"] = ((t5 > 0) & (t10 > 0)).astype(int)
+    df["t3_t10_continue_int"] = ((t3 > 0) & (t10 > 0)).astype(int)
+
+    rows = []
+    for pattern_key, group in df.groupby("pattern_key", dropna=False):
+        t3_available = group[group["has_t3"]]
+        t5_available = group[group["has_t5"]]
+        t10_available = group[group["has_t10"]]
+        t3_winners = group[(group["has_t3"]) & (group["t3_win_int"] == 1)]
+        t5_winners = group[(group["has_t5"]) & (group["t5_win_int"] == 1)]
+
+        row = {
+            "pattern_key": pattern_key,
+            "samples_t3": len(t3_available),
+            "wins_t3": int(t3_available["t3_win_int"].sum()),
+            "samples_t5": len(t5_available),
+            "wins_t5": int(t5_available["t5_win_int"].sum()),
+            "samples_t10": len(t10_available),
+            "wins_t10": int(t10_available["t10_win_int"].sum()),
+            "eligible_t3_to_t5": int(t3_winners["has_t5"].sum()),
+            "continued_t3_to_t5": int(t3_winners.loc[t3_winners["has_t5"], "t5_win_int"].sum()),
+            "eligible_t5_to_t10": int(t5_winners["has_t10"].sum()),
+            "continued_t5_to_t10": int(t5_winners.loc[t5_winners["has_t10"], "t10_win_int"].sum()),
+            "eligible_t3_to_t10": int(t3_winners["has_t10"].sum()),
+            "continued_t3_to_t10": int(t3_winners.loc[t3_winners["has_t10"], "t10_win_int"].sum()),
+            "avg_t3_return_pct": float(t3_available["t3_return_pct"].mean()) if len(t3_available) else np.nan,
+            "avg_t5_return_pct": float(t5_available["t5_return_pct"].mean()) if len(t5_available) else np.nan,
+            "avg_t10_return_pct": float(t10_available["t10_return_pct"].mean()) if len(t10_available) else np.nan,
+            "strong_runners": int(group.get("gain_accelerating", pd.Series(False, index=group.index)).map(_safe_bool).sum()),
+            "persistent_winners": int(group.get("persistent_win_t10", pd.Series(False, index=group.index)).map(_safe_bool).sum()),
+            "flash_winners": int(group.get("flash_winner", pd.Series(False, index=group.index)).map(_safe_bool).sum()),
+            "first_seen": group["entry_date"].min(),
+            "last_seen": group["entry_date"].max(),
+        }
+        rows.append(row)
+
+    result = pd.DataFrame(rows)
+    if result.empty:
+        return result
+
+    def pct(num: str, den: str) -> pd.Series:
+        denominator = pd.to_numeric(result[den], errors="coerce")
+        numerator = pd.to_numeric(result[num], errors="coerce")
+        return np.where(denominator > 0, numerator / denominator * 100.0, np.nan)
+
+    result["t3_win_rate_pct"] = pct("wins_t3", "samples_t3")
+    result["t5_win_rate_pct"] = pct("wins_t5", "samples_t5")
+    result["t10_win_rate_pct"] = pct("wins_t10", "samples_t10")
+    result["t3_to_t5_rate_pct"] = pct("continued_t3_to_t5", "eligible_t3_to_t5")
+    result["t5_to_t10_rate_pct"] = pct("continued_t5_to_t10", "eligible_t5_to_t10")
+    result["t3_to_t10_rate_pct"] = pct("continued_t3_to_t10", "eligible_t3_to_t10")
+    result["t3_to_t10_lower_bound_pct"] = _wilson_lower_bound(
+        result["continued_t3_to_t10"], result["eligible_t3_to_t10"]
+    )
+    result["continuation_score"] = (
+        0.40 * result["t3_to_t10_lower_bound_pct"].fillna(0)
+        + 0.25 * result["t5_to_t10_rate_pct"].fillna(0)
+        + 0.20 * result["t3_to_t5_rate_pct"].fillna(0)
+        + 0.10 * pd.to_numeric(result["avg_t10_return_pct"], errors="coerce").clip(-20, 30).fillna(0)
+        + 0.05 * np.log1p(pd.to_numeric(result["samples_t10"], errors="coerce").fillna(0)) * 10
+    )
+    result["updated_at"] = _utc_now_iso()
+    result["module_version"] = MODULE_VERSION
+    return result.sort_values(
+        ["continuation_score", "samples_t10"],
+        ascending=[False, False],
+        kind="stable",
+    ).reset_index(drop=True)
+
+
+def get_pattern_lifecycle(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    *,
+    remote_dir: Optional[str] = None,
+) -> pd.DataFrame:
+    storage = _make_storage(data_dir, remote_dir)
+    lifecycle, _ = _read_csv_from_storage(storage, LIFECYCLE_FILE)
+    return lifecycle
+
+
+def get_continuation_knowledge(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    min_samples: int = 3,
+    *,
+    remote_dir: Optional[str] = None,
+) -> pd.DataFrame:
+    storage = _make_storage(data_dir, remote_dir)
+    knowledge, _ = _read_csv_from_storage(storage, CONTINUATION_FILE)
+    if knowledge.empty:
+        return knowledge
+    samples = pd.to_numeric(knowledge.get("samples_t10"), errors="coerce")
+    return knowledge[samples >= max(1, int(min_samples))].copy().reset_index(drop=True)
 
 def _storage_mode(
     storage: GitHubLocalStorage,
@@ -1619,6 +1902,8 @@ def update_learning(
                     observations_updated=0,
                     outcomes_added=0,
                     knowledge_rows=0,
+                    lifecycle_rows=0,
+                    continuation_rows=0,
                     storage_mode=(
                         "GITHUB_PRIMARY"
                         if storage.github.enabled
@@ -1677,6 +1962,11 @@ def update_learning(
                 observations,
                 outcomes,
             )
+            lifecycle = _build_pattern_lifecycle(
+                observations,
+                outcomes,
+            )
+            continuation = _build_continuation_knowledge(lifecycle)
 
             write_results = []
 
@@ -1720,6 +2010,32 @@ def update_learning(
                     )
                 )
 
+            if not lifecycle.empty:
+                write_results.append(
+                    _write_csv_to_storage(
+                        storage,
+                        LIFECYCLE_FILE,
+                        lifecycle,
+                        commit_message=(
+                            "Mr.BOT update pattern lifecycle "
+                            f"{trade_date_value}"
+                        ),
+                    )
+                )
+
+            if not continuation.empty:
+                write_results.append(
+                    _write_csv_to_storage(
+                        storage,
+                        CONTINUATION_FILE,
+                        continuation,
+                        commit_message=(
+                            "Mr.BOT update continuation knowledge "
+                            f"{trade_date_value}"
+                        ),
+                    )
+                )
+
             failed_everywhere = any(
                 not write.local_ok and not write.github_ok
                 for write in write_results
@@ -1749,6 +2065,8 @@ def update_learning(
                 observations_updated=updated,
                 outcomes_added=outcomes_added,
                 knowledge_rows=len(knowledge),
+                lifecycle_rows=len(lifecycle),
+                continuation_rows=len(continuation),
                 storage_mode=storage_mode,
                 github_sync=github_sync,
             )
@@ -1815,4 +2133,6 @@ __all__ = [
     "learn_from_earning_board",
     "get_learning_status",
     "get_pattern_knowledge",
+    "get_pattern_lifecycle",
+    "get_continuation_knowledge",
 ]
