@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "module_version": "2.0.0",
+  "module_version": "3.0.0",
   "trade_date": "2026-08-01",
   "input_rows": 142,
   "valid_rows": 142,
@@ -8,9 +8,11 @@
   "observations_updated": 142,
   "outcomes_added": 0,
   "knowledge_rows": 353,
+  "lifecycle_rows": 852,
+  "continuation_rows": 209,
   "storage_mode": "GITHUB_PRIMARY",
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-01T05:38:09Z"
+  "last_run_at": "2026-08-01T05:39:50Z"
 }
