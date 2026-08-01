@@ -30,10 +30,56 @@ HEALTH_ORDER: dict[str, int] = {
     "⛔ RẤT YẾU": 4,
 }
 
-SNAPSHOT_COLUMNS = [
+# Snapshot V3: lưu DNA tại ngày gốc để Learning Engine có thể học
+# đặc điểm của các mẫu đi tiếp từ T3 -> T5 -> T10.
+BASE_SNAPSHOT_COLUMNS = [
     "snapshot_date", "symbol", "health", "health_rank", "price",
     "rs5", "rs10", "rsi14", "action", "reason", "saved_at",
 ]
+
+DNA_NUMERIC_COLUMNS = [
+    "rsi_slope",
+    "ema9", "ma20", "ema9_ma20_slope", "ema9_ma20_slope_change",
+    "dist_from_ema9_pct",
+    "obv", "obv_ema9",
+    "volume", "vol_ma20", "volume_ratio20",
+    "dryup_ratio_5", "dryup_ratio_10",
+    "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct",
+    "body_pct", "total_score",
+    "E", "R", "O", "S", "RS", "V",
+    "market_real", "market_live", "market_forecast",
+    "market_breadth", "market_breadth_score",
+]
+
+DNA_TEXT_COLUMNS = [
+    "obv_status", "group", "pull_label", "warning", "status",
+    "green_2_confirm", "early_green2", "early_dry_green2",
+    "slope_state", "market_regime",
+]
+
+DNA_BOOLEAN_COLUMNS = [
+    "is_live_adjusted",
+]
+
+SNAPSHOT_COLUMNS = (
+    BASE_SNAPSHOT_COLUMNS
+    + DNA_NUMERIC_COLUMNS
+    + DNA_TEXT_COLUMNS
+    + DNA_BOOLEAN_COLUMNS
+)
+
+# Cho phép đọc nhiều tên cột tương đương từ scan_df mà không làm app lỗi
+# khi một module dùng tên cũ hoặc tên mới.
+SNAPSHOT_SOURCE_ALIASES: dict[str, tuple[str, ...]] = {
+    "volume_ratio20": ("volume_ratio20", "volume_ratio", "vol_ratio20"),
+    "dist_high20_pct": ("dist_high20_pct", "dist_high20"),
+    "market_real": ("market_real", "market_score", "market_health"),
+    "market_live": ("market_live",),
+    "market_forecast": ("market_forecast", "forecast_score"),
+    "market_breadth": ("market_breadth", "breadth", "breadth_pct"),
+    "market_breadth_score": ("market_breadth_score", "breadth_score"),
+    "market_regime": ("market_regime", "regime", "market_state"),
+}
 
 
 @dataclass
@@ -62,8 +108,58 @@ def _safe_numeric(series: pd.Series | None, index: pd.Index) -> pd.Series:
     return pd.to_numeric(series, errors="coerce").reindex(index)
 
 
-def _first_existing(df: pd.DataFrame, names: list[str]) -> str | None:
+def _first_existing(df: pd.DataFrame, names: Iterable[str]) -> str | None:
     return next((name for name in names if name in df.columns), None)
+
+
+def _safe_text_series(series: pd.Series | None, index: pd.Index) -> pd.Series:
+    if series is None:
+        return pd.Series("", index=index, dtype="object")
+    out = series.reindex(index).astype("object")
+    return out.where(pd.notna(out), "").astype(str)
+
+
+def _safe_bool_series(series: pd.Series | None, index: pd.Index) -> pd.Series:
+    if series is None:
+        return pd.Series(False, index=index, dtype="bool")
+
+    def convert(value: Any) -> bool:
+        if isinstance(value, (bool, np.bool_)):
+            return bool(value)
+        if value is None:
+            return False
+        try:
+            if pd.isna(value):
+                return False
+        except (TypeError, ValueError):
+            pass
+        if isinstance(value, (int, float, np.integer, np.floating)):
+            return bool(value)
+        return str(value).strip().lower() in {
+            "1", "true", "yes", "y", "ok", "x", "có", "co", "đúng", "dung"
+        }
+
+    return series.reindex(index).map(convert).astype(bool)
+
+
+def _source_series(scan_df: pd.DataFrame, canonical_name: str) -> pd.Series | None:
+    aliases = SNAPSHOT_SOURCE_ALIASES.get(canonical_name, (canonical_name,))
+    source_col = _first_existing(scan_df, aliases)
+    return scan_df[source_col] if source_col is not None else None
+
+
+def _append_dna_columns(scan_df: pd.DataFrame, out: pd.DataFrame) -> pd.DataFrame:
+    """Sao chép DNA cổ phiếu vào snapshot theo schema cố định, fail-safe."""
+    for column in DNA_NUMERIC_COLUMNS:
+        out[column] = _safe_numeric(_source_series(scan_df, column), scan_df.index)
+
+    for column in DNA_TEXT_COLUMNS:
+        out[column] = _safe_text_series(_source_series(scan_df, column), scan_df.index)
+
+    for column in DNA_BOOLEAN_COLUMNS:
+        out[column] = _safe_bool_series(_source_series(scan_df, column), scan_df.index)
+
+    return out
 
 
 def _normalize_symbol(value: Any) -> str:
@@ -201,6 +297,9 @@ def build_snapshot(
     )
     out["saved_at"] = datetime.now(VN_TZ).isoformat(timespec="seconds")
 
+    # V3: giữ toàn bộ DNA có sẵn tại đúng ngày xuất phát.
+    out = _append_dna_columns(scan_df, out)
+
     out = out[
         out["symbol"].ne("")
         & out["symbol"].ne("NAN")
@@ -245,8 +344,14 @@ def load_snapshot_history(snapshot_file: str | Path = SNAPSHOT_FILE) -> pd.DataF
     history["health"] = history["health"].map(_normalize_health)
     history["health_rank"] = pd.to_numeric(history["health_rank"], errors="coerce")
 
-    for col in ["price", "rs5", "rs10", "rsi14"]:
+    for col in ["price", "rs5", "rs10", "rsi14", *DNA_NUMERIC_COLUMNS]:
         history[col] = pd.to_numeric(history[col], errors="coerce")
+
+    for col in DNA_TEXT_COLUMNS:
+        history[col] = history[col].astype("object").where(history[col].notna(), "").astype(str)
+
+    for col in DNA_BOOLEAN_COLUMNS:
+        history[col] = _safe_bool_series(history[col], history.index)
 
     history = history[
         history["snapshot_date"].notna()
@@ -478,34 +583,67 @@ def build_holding_detail(
     holding_periods: Iterable[int] = HOLDING_PERIODS,
 ) -> pd.DataFrame:
     periods = _normalize_periods(holding_periods)
+
+    # Tất cả trường DNA được đóng băng ở ngày gốc và mang tiền tố origin_.
+    origin_dna_columns = [
+        f"origin_{column}"
+        for column in (DNA_NUMERIC_COLUMNS + DNA_TEXT_COLUMNS + DNA_BOOLEAN_COLUMNS)
+    ]
     columns = [
         "origin_date", "target_date", "holding_period", "symbol",
         "origin_health", "origin_rank", "origin_price", "target_price",
         "return_pct", "win", "origin_rs5", "origin_rs10", "origin_rsi14",
+        *origin_dna_columns,
     ]
     if history is None or history.empty:
         return pd.DataFrame(columns=columns)
 
     hist = history.copy()
     hist["snapshot_date"] = hist["snapshot_date"].astype(str)
-    for col in ["health_rank", "price", "rs5", "rs10", "rsi14"]:
+
+    numeric_history_columns = [
+        "health_rank", "price", "rs5", "rs10", "rsi14", *DNA_NUMERIC_COLUMNS
+    ]
+    for col in numeric_history_columns:
+        if col not in hist.columns:
+            hist[col] = np.nan
         hist[col] = pd.to_numeric(hist[col], errors="coerce")
+
+    for col in DNA_TEXT_COLUMNS:
+        if col not in hist.columns:
+            hist[col] = ""
+        hist[col] = hist[col].astype("object").where(hist[col].notna(), "").astype(str)
+
+    for col in DNA_BOOLEAN_COLUMNS:
+        if col not in hist.columns:
+            hist[col] = False
+        hist[col] = _safe_bool_series(hist[col], hist.index)
 
     hist = hist.drop_duplicates(["snapshot_date", "symbol"], keep="last")
     dates = sorted(hist["snapshot_date"].dropna().unique())
     frames = []
 
+    origin_source_columns = [
+        "symbol", "health", "health_rank", "price", "rs5", "rs10", "rsi14",
+        *DNA_NUMERIC_COLUMNS, *DNA_TEXT_COLUMNS, *DNA_BOOLEAN_COLUMNS,
+    ]
+    origin_rename = {
+        "health": "origin_health",
+        "health_rank": "origin_rank",
+        "price": "origin_price",
+        "rs5": "origin_rs5",
+        "rs10": "origin_rs10",
+        "rsi14": "origin_rsi14",
+        **{column: f"origin_{column}" for column in (
+            DNA_NUMERIC_COLUMNS + DNA_TEXT_COLUMNS + DNA_BOOLEAN_COLUMNS
+        )},
+    }
+
     for pos, origin_date in enumerate(dates):
-        origin = hist[hist["snapshot_date"].eq(origin_date)][
-            ["symbol", "health", "health_rank", "price", "rs5", "rs10", "rsi14"]
-        ].rename(columns={
-            "health": "origin_health",
-            "health_rank": "origin_rank",
-            "price": "origin_price",
-            "rs5": "origin_rs5",
-            "rs10": "origin_rs10",
-            "rsi14": "origin_rsi14",
-        })
+        origin = (
+            hist[hist["snapshot_date"].eq(origin_date)][origin_source_columns]
+            .rename(columns=origin_rename)
+        )
         origin["origin_date"] = origin_date
 
         for period in periods:
