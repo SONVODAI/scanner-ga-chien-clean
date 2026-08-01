@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "last_learning_at": "2026-08-01T06:09:21Z",
+  "last_trade_date": "2026-08-01",
+  "module_version": "3.1.0",
+  "brain_generation": "GEN2",
+  "feature_version": "DNA_V3",
+  "observations_rows": 1278,
+  "outcomes_rows": 1420,
+  "knowledge_rows": 353,
+  "lifecycle_rows": 852,
+  "continuation_rows": 209,
+  "pattern_snapshot_rows": 1278,
+  "pattern_history_rows": 1278
+}
