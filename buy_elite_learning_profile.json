@@ -2,8 +2,8 @@
   "version": "BUY_ELITE_LEARNING_V3",
   "mode": "ACTIVE_LEARNING",
   "created_at": "2026-06-25 16:55:06",
-  "updated_at": "2026-07-31 22:11:18",
-  "completed_t5": 328,
+  "updated_at": "2026-08-01 09:21:01",
+  "completed_t5": 331,
   "baseline_winrate": 0.3323,
   "min_completed_to_learn": 80,
   "min_feature_samples": 20,
@@ -11,7 +11,7 @@
   "multipliers": {
     "market": 1.014,
     "action": 0.999,
-    "storm": 1.001,
+    "storm": 1.0,
     "evo": 1.01,
     "zone": 0.997,
     "obv": 1.0,
@@ -20,9 +20,9 @@
   },
   "regime_multipliers": {
     "WINTER": {
-      "action": 0.989,
-      "storm": 0.989,
-      "zone": 1.011
+      "action": 0.99,
+      "storm": 0.99,
+      "zone": 1.01
     },
     "NEUTRAL": {
       "action": 1.008,
@@ -32,17 +32,17 @@
     "SPRING": {}
   },
   "insights": [
-    "Completed T+5: 328",
+    "Completed T+5: 331",
     "Baseline WinRate: 33.2%",
-    "Average T+5: -1.18%",
+    "Average T+5: -1.17%",
     "market: good: n=190, winrate=36.3%, baseline=33.2%, mult=1.014, blended=1.014",
-    "action: good: n=327, winrate=33.0%, baseline=33.2%, mult=0.999, blended=0.999",
-    "storm: good: n=151, winrate=33.1%, baseline=33.2%, mult=0.999, blended=1.001",
-    "evo: good: n=238, winrate=35.3%, baseline=33.2%, mult=1.009, blended=1.01",
-    "zone: good: n=300, winrate=32.7%, baseline=33.2%, mult=0.997, blended=0.997",
-    "obv: good: n=328, winrate=33.2%, baseline=33.2%, mult=1.0, blended=1.0",
-    "Regime WINTER: n=138, winrate=29.0%, seasonal=0.989",
+    "action: good: n=330, winrate=33.0%, baseline=33.2%, mult=0.999, blended=0.999",
+    "storm: good: n=152, winrate=32.9%, baseline=33.2%, mult=0.998, blended=1.0",
+    "evo: good: n=240, winrate=35.4%, baseline=33.2%, mult=1.01, blended=1.01",
+    "zone: good: n=303, winrate=32.7%, baseline=33.2%, mult=0.997, blended=0.997",
+    "obv: good: n=331, winrate=33.2%, baseline=33.2%, mult=1.0, blended=1.0",
+    "Regime WINTER: n=141, winrate=29.1%, seasonal=0.99",
     "Regime NEUTRAL: n=190, winrate=36.3%, seasonal=1.008"
   ],
-  "avg_t5_return": -1.183
+  "avg_t5_return": -1.174
 }
