@@ -58,7 +58,9 @@ except Exception:  # pragma: no cover - cho phép test module ngoài Streamlit
     st = None  # type: ignore[assignment]
 
 
-MODULE_VERSION = "3.0.0"
+MODULE_VERSION = "3.1.0"
+BRAIN_GENERATION = "GEN2"
+FEATURE_VERSION = "DNA_V3"
 DEFAULT_HORIZONS: Tuple[int, ...] = (3, 5, 10)
 
 DEFAULT_DATA_DIR = Path("data") / "earning_learning"
@@ -72,6 +74,9 @@ OUTCOMES_FILE = "outcomes.csv"
 KNOWLEDGE_FILE = "pattern_knowledge.csv"
 LIFECYCLE_FILE = "pattern_lifecycle.csv"
 CONTINUATION_FILE = "continuation_knowledge.csv"
+PATTERN_SNAPSHOT_FILE = "pattern_snapshot.csv"
+PATTERN_HISTORY_FILE = "pattern_history.csv"
+LEARNING_METADATA_FILE = "learning_status.json"
 STATUS_FILE = "status.json"
 
 _DATA_FILES = (
@@ -80,6 +85,9 @@ _DATA_FILES = (
     KNOWLEDGE_FILE,
     LIFECYCLE_FILE,
     CONTINUATION_FILE,
+    PATTERN_SNAPSHOT_FILE,
+    PATTERN_HISTORY_FILE,
+    LEARNING_METADATA_FILE,
     STATUS_FILE,
 )
 
@@ -209,6 +217,8 @@ class LearningResult:
     knowledge_rows: int
     lifecycle_rows: int = 0
     continuation_rows: int = 0
+    snapshot_rows: int = 0
+    history_rows: int = 0
     storage_mode: str = "LOCAL_ONLY"
     github_sync: str = "NOT_ATTEMPTED"
     skipped_reason: Optional[str] = None
@@ -952,6 +962,8 @@ def _adapt_board(
 
     canonical["recorded_at"] = _utc_now_iso()
     canonical["module_version"] = MODULE_VERSION
+    canonical["brain_generation"] = BRAIN_GENERATION
+    canonical["feature_version"] = FEATURE_VERSION
 
     canonical = canonical.drop_duplicates(
         subset=["trade_date", "symbol"],
@@ -963,6 +975,8 @@ def _adapt_board(
         "trade_date",
         "recorded_at",
         "module_version",
+        "brain_generation",
+        "feature_version",
         "symbol",
         "price",
         "health_group",
@@ -1219,6 +1233,8 @@ def _build_outcomes(
                         ),
                         "evaluated_at": _utc_now_iso(),
                         "module_version": MODULE_VERSION,
+                        "brain_generation": BRAIN_GENERATION,
+                        "feature_version": FEATURE_VERSION,
                     }
                 )
 
@@ -1530,6 +1546,8 @@ def _build_pattern_knowledge(
 
     knowledge["updated_at"] = _utc_now_iso()
     knowledge["module_version"] = MODULE_VERSION
+    knowledge["brain_generation"] = BRAIN_GENERATION
+    knowledge["feature_version"] = FEATURE_VERSION
 
     return knowledge.sort_values(
         ["horizon", "knowledge_score", "samples"],
@@ -1618,6 +1636,8 @@ def _build_pattern_lifecycle(
     )
     lifecycle["updated_at"] = _utc_now_iso()
     lifecycle["module_version"] = MODULE_VERSION
+    lifecycle["brain_generation"] = BRAIN_GENERATION
+    lifecycle["feature_version"] = FEATURE_VERSION
     return lifecycle.sort_values(["entry_date", "symbol"], kind="stable").reset_index(drop=True)
 
 
@@ -1712,11 +1732,205 @@ def _build_continuation_knowledge(lifecycle: pd.DataFrame) -> pd.DataFrame:
     )
     result["updated_at"] = _utc_now_iso()
     result["module_version"] = MODULE_VERSION
+    result["brain_generation"] = BRAIN_GENERATION
+    result["feature_version"] = FEATURE_VERSION
     return result.sort_values(
         ["continuation_score", "samples_t10"],
         ascending=[False, False],
         kind="stable",
     ).reset_index(drop=True)
+
+
+
+def _stamp_versions(df: pd.DataFrame) -> pd.DataFrame:
+    """Gắn phiên bản bộ não/feature mà không làm mất dữ liệu schema cũ."""
+    if df is None:
+        return pd.DataFrame()
+    out = df.copy()
+    out["module_version"] = MODULE_VERSION
+    out["brain_generation"] = BRAIN_GENERATION
+    out["feature_version"] = FEATURE_VERSION
+    return out
+
+
+def _build_pattern_snapshot(
+    observations: pd.DataFrame,
+    lifecycle: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Tạo kho nguyên liệu phẳng: một Observation + toàn bộ DNA + T3/T5/T10.
+
+    Snapshot vẫn được tạo ngay cả khi chưa đủ T3 để không mất DNA ban đầu.
+    """
+    if observations is None or observations.empty:
+        return pd.DataFrame()
+
+    obs = _add_pattern_columns(observations)
+    if lifecycle is None or lifecycle.empty:
+        snapshot = obs.copy()
+    else:
+        lifecycle_only = lifecycle.copy()
+        duplicate_cols = [
+            col for col in lifecycle_only.columns
+            if col in obs.columns and col not in {"observation_id", "symbol"}
+        ]
+        lifecycle_only = lifecycle_only.drop(columns=duplicate_cols, errors="ignore")
+        snapshot = obs.merge(
+            lifecycle_only,
+            on=["observation_id", "symbol"],
+            how="left",
+            validate="one_to_one",
+        )
+
+    snapshot["snapshot_updated_at"] = _utc_now_iso()
+    snapshot = _stamp_versions(snapshot)
+    snapshot = snapshot.drop_duplicates("observation_id", keep="last")
+    sort_cols = [c for c in ("trade_date", "symbol") if c in snapshot.columns]
+    if sort_cols:
+        snapshot = snapshot.sort_values(sort_cols, kind="stable")
+    return snapshot.reset_index(drop=True)
+
+
+def _stable_row_hash(df: pd.DataFrame) -> pd.Series:
+    """Hash nội dung ổn định để chỉ append những mẫu mới hoặc đã đổi Outcome."""
+    if df.empty:
+        return pd.Series(dtype=str)
+    ignored = {
+        "snapshot_updated_at", "history_recorded_at", "history_run_id",
+        "row_hash", "recorded_at", "updated_at", "evaluated_at",
+    }
+    columns = sorted(col for col in df.columns if col not in ignored)
+    normalized = df.reindex(columns=columns).copy()
+    for col in columns:
+        normalized[col] = normalized[col].map(_safe_text)
+    return normalized.astype(str).agg("|".join, axis=1).map(
+        lambda value: hashlib.sha1(value.encode("utf-8")).hexdigest()
+    )
+
+
+def _append_pattern_history(
+    existing_history: pd.DataFrame,
+    current_snapshot: pd.DataFrame,
+    trade_date_value: Optional[str],
+) -> Tuple[pd.DataFrame, int]:
+    """
+    Append-only nhưng chống phình dữ liệu: chỉ ghi mẫu mới hoặc mẫu có Outcome thay đổi.
+    """
+    if current_snapshot is None or current_snapshot.empty:
+        return (existing_history.copy() if existing_history is not None else pd.DataFrame(), 0)
+
+    current = current_snapshot.copy()
+    current["row_hash"] = _stable_row_hash(current)
+
+    old = existing_history.copy() if existing_history is not None else pd.DataFrame()
+    latest_hash: Dict[str, str] = {}
+    if not old.empty and "observation_id" in old.columns:
+        if "history_recorded_at" in old.columns:
+            old = old.sort_values("history_recorded_at", kind="stable")
+        if "row_hash" not in old.columns:
+            old["row_hash"] = _stable_row_hash(old)
+        latest = old.drop_duplicates("observation_id", keep="last")
+        latest_hash = dict(zip(latest["observation_id"].astype(str), latest["row_hash"].astype(str)))
+
+    changed_mask = [
+        latest_hash.get(str(obs_id)) != str(row_hash)
+        for obs_id, row_hash in zip(current["observation_id"], current["row_hash"])
+    ]
+    changed = current.loc[changed_mask].copy()
+    if changed.empty:
+        return old.reset_index(drop=True), 0
+
+    recorded_at = _utc_now_iso()
+    changed["history_recorded_at"] = recorded_at
+    changed["history_trade_date"] = trade_date_value or ""
+    changed["history_run_id"] = _hash_payload(
+        (recorded_at, trade_date_value, MODULE_VERSION, BRAIN_GENERATION)
+    )
+    changed = _stamp_versions(changed)
+
+    history = pd.concat([old, changed], ignore_index=True, sort=False)
+    history = history.drop_duplicates(
+        ["history_run_id", "observation_id", "row_hash"],
+        keep="last",
+    )
+    if "history_recorded_at" in history.columns:
+        history = history.sort_values(
+            ["history_recorded_at", "symbol"], kind="stable"
+        )
+    return history.reset_index(drop=True), int(len(changed))
+
+
+def _build_learning_metadata(
+    *,
+    trade_date_value: Optional[str],
+    observations: pd.DataFrame,
+    outcomes: pd.DataFrame,
+    knowledge: pd.DataFrame,
+    lifecycle: pd.DataFrame,
+    continuation: pd.DataFrame,
+    snapshot: pd.DataFrame,
+    history: pd.DataFrame,
+) -> Dict[str, Any]:
+    return {
+        "ok": True,
+        "last_learning_at": _utc_now_iso(),
+        "last_trade_date": trade_date_value,
+        "module_version": MODULE_VERSION,
+        "brain_generation": BRAIN_GENERATION,
+        "feature_version": FEATURE_VERSION,
+        "observations_rows": int(len(observations)),
+        "outcomes_rows": int(len(outcomes)),
+        "knowledge_rows": int(len(knowledge)),
+        "lifecycle_rows": int(len(lifecycle)),
+        "continuation_rows": int(len(continuation)),
+        "pattern_snapshot_rows": int(len(snapshot)),
+        "pattern_history_rows": int(len(history)),
+    }
+
+
+def get_pattern_snapshot(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    *,
+    remote_dir: Optional[str] = None,
+) -> pd.DataFrame:
+    storage = _make_storage(data_dir, remote_dir)
+    snapshot, _ = _read_csv_from_storage(storage, PATTERN_SNAPSHOT_FILE)
+    return snapshot
+
+
+def get_pattern_history(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    *,
+    remote_dir: Optional[str] = None,
+) -> pd.DataFrame:
+    storage = _make_storage(data_dir, remote_dir)
+    history, _ = _read_csv_from_storage(storage, PATTERN_HISTORY_FILE)
+    return history
+
+
+def get_learning_metadata(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    *,
+    remote_dir: Optional[str] = None,
+) -> Dict[str, Any]:
+    storage = _make_storage(data_dir, remote_dir)
+    result = storage.read_text(LEARNING_METADATA_FILE)
+    if result.text is None:
+        return {
+            "ok": True,
+            "status": "NO_METADATA_YET",
+            "module_version": MODULE_VERSION,
+            "brain_generation": BRAIN_GENERATION,
+            "feature_version": FEATURE_VERSION,
+        }
+    try:
+        return json.loads(result.text)
+    except Exception as exc:
+        return {
+            "ok": False,
+            "status": "METADATA_READ_ERROR",
+            "error": f"{type(exc).__name__}: {exc}",
+        }
 
 
 def get_pattern_lifecycle(
@@ -1781,6 +1995,8 @@ def _save_status(
 ) -> StorageWriteResult:
     payload = result.to_dict()
     payload["last_run_at"] = _utc_now_iso()
+    payload["brain_generation"] = BRAIN_GENERATION
+    payload["feature_version"] = FEATURE_VERSION
 
     return _write_json_to_storage(
         storage,
@@ -1968,6 +2184,28 @@ def update_learning(
             )
             continuation = _build_continuation_knowledge(lifecycle)
 
+            # Data Foundation: kho phẳng hiện tại + lịch sử append-only có chống trùng.
+            snapshot = _build_pattern_snapshot(observations, lifecycle)
+            old_history, _ = _read_csv_from_storage(
+                storage,
+                PATTERN_HISTORY_FILE,
+            )
+            history, history_added = _append_pattern_history(
+                old_history,
+                snapshot,
+                trade_date_value,
+            )
+            metadata = _build_learning_metadata(
+                trade_date_value=trade_date_value,
+                observations=observations,
+                outcomes=outcomes,
+                knowledge=knowledge,
+                lifecycle=lifecycle,
+                continuation=continuation,
+                snapshot=snapshot,
+                history=history,
+            )
+
             write_results = []
 
             write_results.append(
@@ -2036,6 +2274,44 @@ def update_learning(
                     )
                 )
 
+            if not snapshot.empty:
+                write_results.append(
+                    _write_csv_to_storage(
+                        storage,
+                        PATTERN_SNAPSHOT_FILE,
+                        snapshot,
+                        commit_message=(
+                            "Mr.BOT update pattern snapshot "
+                            f"{trade_date_value}"
+                        ),
+                    )
+                )
+
+            if not history.empty:
+                write_results.append(
+                    _write_csv_to_storage(
+                        storage,
+                        PATTERN_HISTORY_FILE,
+                        history,
+                        commit_message=(
+                            "Mr.BOT append pattern history "
+                            f"{trade_date_value} +{history_added}"
+                        ),
+                    )
+                )
+
+            write_results.append(
+                _write_json_to_storage(
+                    storage,
+                    LEARNING_METADATA_FILE,
+                    metadata,
+                    commit_message=(
+                        "Mr.BOT update learning metadata "
+                        f"{trade_date_value}"
+                    ),
+                )
+            )
+
             failed_everywhere = any(
                 not write.local_ok and not write.github_ok
                 for write in write_results
@@ -2067,6 +2343,8 @@ def update_learning(
                 knowledge_rows=len(knowledge),
                 lifecycle_rows=len(lifecycle),
                 continuation_rows=len(continuation),
+                snapshot_rows=len(snapshot),
+                history_rows=len(history),
                 storage_mode=storage_mode,
                 github_sync=github_sync,
             )
@@ -2129,10 +2407,15 @@ learn_from_earning_board = update_learning
 __all__ = [
     "MODULE_VERSION",
     "DEFAULT_HORIZONS",
+    "BRAIN_GENERATION",
+    "FEATURE_VERSION",
     "update_learning",
     "learn_from_earning_board",
     "get_learning_status",
     "get_pattern_knowledge",
     "get_pattern_lifecycle",
     "get_continuation_knowledge",
+    "get_pattern_snapshot",
+    "get_pattern_history",
+    "get_learning_metadata",
 ]
