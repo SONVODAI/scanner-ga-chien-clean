@@ -15,6 +15,8 @@ import json
 import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from modules.leader_brain_board import show_leader_brain
+from leader_memory import update_memory
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
 from final_decision_engine import build_final_decision
@@ -22,6 +24,11 @@ from position_guardian import render_guardian
 # Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import update_learning
+from modules.accumulation_opportunity import render_accumulation_board
+from modules.experience_engine import run_experience_engine
+from forecast_engine import ForecastEngine
+
+_FORECAST_ENGINE = ForecastEngine()
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -1201,10 +1208,18 @@ def calc_market_live(df: pd.DataFrame) -> float:
     return round(min(score, 13), 1)
 
 
+
+
 def calc_market_forecast(df: pd.DataFrame):
+
     total = len(df)
+
     if total == 0:
-        return 0, "Không có dữ liệu"
+        
+        return _FORECAST_ENGINE.build_result(
+            score=0,
+            text="Không có dữ liệu",
+        ) 
 
     strong = len(df[df["group"] == "CP MẠNH"])
     accel = len(df[df["group"] == "GÀ TĂNG TỐC"])
@@ -1216,6 +1231,7 @@ def calc_market_forecast(df: pd.DataFrame):
     slope_good = len(df[df["ema9_ma20_slope"] > 0]) / total
 
     score = 0
+
     score += min(accel / 5, 2)
     score += min(strong / 10, 2)
     score += min(breakout / 8, 2)
@@ -1223,20 +1239,42 @@ def calc_market_forecast(df: pd.DataFrame):
     score += obv_good * 1
     score += slope_good * 1
     score -= min(weak / 15, 2)
-    score = round(max(min(score, 10), 0), 1)
 
+    score = round(max(min(score, 10), 0), 1)
+    # =====================================================
+    # FORECAST CONFIDENCE V1
+    # =====================================================
+
+    confidence = 50.0
+
+    confidence += min(accel * 3, 12)
+    confidence += min(strong * 2, 10)
+    confidence += min(breakout * 2, 10)
+    confidence += min(pull_good * 2, 10)
+
+    confidence += obv_good * 10
+    confidence += slope_good * 10
+
+    confidence -= min(weak * 2, 20)
+
+    confidence = round(max(0.0, min(confidence, 100.0)), 1)
     if score >= 8:
         text = "🟢 Forecast tốt 5-10 ngày"
+
     elif score >= 6:
         text = "🟡 Forecast trung tính-khá"
+
     elif score >= 4:
         text = "🟠 Forecast yếu"
+
     else:
         text = "🔴 Forecast rủi ro"
-
-    return score, text
-
-
+    return _FORECAST_ENGINE.build_result(
+        score=score,
+        text=text,
+        confidence=confidence,
+    )
+    
 def market_status_text(score: float) -> tuple[str, str]:
     if score >= 8:
         return "🟢 THỊ TRƯỜNG KHỎE", "✅ Có thể vào tiền"
@@ -1643,17 +1681,21 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
     evo_df = evo_df.drop_duplicates(subset=["date", "symbol"], keep="last")
     evo_df["date"] = pd.to_datetime(evo_df["date"], errors="coerce")
     evo_df = evo_df.dropna(subset=["date"])
-
-    last_dates = sorted(evo_df["date"].dt.strftime("%Y-%m-%d").unique())[-120:]
-    evo_df["date_str"] = evo_df["date"].dt.strftime("%Y-%m-%d")
-    evo_df = evo_df[evo_df["date_str"].isin(last_dates)].copy()
-    evo_df = evo_df.drop(columns=["date_str"])
-    evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")
+    # =====================================================
+    # DATA ASSET PROTECTION
+    # Giữ toàn bộ lịch sử để phục vụ T+ và Brain Learning.
+    # Không cắt 120 ngày như phiên bản cũ.
+    # =====================================================
+    evo_df = evo_df.sort_values(
+        ["date", "symbol"]
+    ).reset_index(drop=True)
+    
+    evo_df["date"] = evo_df["date"].dt.strftime("%Y-%m-%d")    
     evo_df = guard_dataframe_dtypes(evo_df)
-
+    
     save_status = write_evolution_history(evo_df)
     return evo_df, save_status
-    # =========================================================
+# =========================================================
 # STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
 # =========================================================
 def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
@@ -5406,7 +5448,12 @@ scan_df = add_evolution_health(scan_df)
 # =========================================================
 market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
-market_forecast, market_forecast_text = calc_market_forecast(scan_df)
+
+forecast_result = calc_market_forecast(scan_df)
+
+market_forecast = forecast_result.score
+market_forecast_text = forecast_result.text
+market_confidence = forecast_result.confidence
 market_status, market_action = market_status_text(market_real)
 try:
     _, pattern_status = save_pattern_history(
@@ -5443,7 +5490,7 @@ live_count = int(scan_df["is_live_adjusted"].sum()) if "is_live_adjusted" in sca
 safe_mode_count = int((scan_df["live_source"].astype(str).str.contains("SAFE_MODE|NO_DATA|BAD", na=False)).sum()) if "live_source" in scan_df.columns else 0
 
 st.markdown("## 🌍 MARKET FIRST")
-m1, m2, m3, m4, m5, m6 = st.columns(6)
+m1, m2, m3, m4, m5, m6, m7 = st.columns(7)
 with m1:
     st.metric("REAL", f"{market_real}/13")
 with m2:
@@ -5451,12 +5498,16 @@ with m2:
 with m3:
     st.metric("FORECAST", f"{market_forecast}/10")
 with m4:
-    st.metric("SCAN OK", len(scan_df))
-with m5:
-    st.metric("LIVE OK", live_count)
-with m6:
-    st.metric("WATCHLIST", len(WATCHLIST))
+    st.metric("CONFIDENCE", f"{market_confidence:.0f}%")
 
+with m5:
+    st.metric("SCAN OK", len(scan_df))
+
+with m6:
+    st.metric("LIVE OK", live_count)
+
+with m7:
+    st.metric("WATCHLIST", len(WATCHLIST))
 # =========================================================
 # EARNING MONEY BOARD - BẢNG ĐIỀU KHIỂN CHÍNH
 # =========================================================
@@ -5469,10 +5520,36 @@ render_earning_money_board(
 # Độ rộng RSI + lời kết luận tự động của Mr.BOT.
 rsi_breadth_report = render_rsi_breadth_report(scan_df)
 
-process_and_render_daily_summary(
+daily_result = process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
 )
+# =========================================================
+# EXPERIENCE ENGINE
+# =========================================================
+try:
+    experience_result = run_experience_engine(
+        holding_detail=daily_result.holding_detail,
+        save=True,
+    )
+
+    st.caption("🧠 " + experience_result.status)
+
+except Exception as e:
+    st.warning(f"Experience Engine: {e}")
+    # =========================================================
+# EARNING LEARNING ENGINE
+# =========================================================
+try:
+    learning_result = update_learning(
+        earning_board_df=scan_df,
+        market_context={
+            "market_score": market_real,
+            "market_regime": market_forecast_text,
+        },
+    )
+except Exception as e:
+    st.warning(f"Earning Learning: {e}")
 if market_real < 6:
     st.error(market_action)
 elif market_real < 8:
@@ -6071,8 +6148,11 @@ try:
         market_forecast=market_forecast,
     )
     print(">>> SAVE PATTERN DONE")
+    update_memory(scan_df)
+    print(">>> LEADER MEMORY DONE")
 except Exception as e:
-    print(f"Pattern Memory Error: {e}")
+    st.error(f"Pattern / Leader Memory Error: {e}")   
+
 # =========================================================
 # OPTIONAL / LEGACY TABLES
 # =========================================================
@@ -6137,12 +6217,33 @@ if show_legacy:
                     show_cols = [c for c in show_cols if c in sub.columns]
                     st.dataframe(sub[show_cols], use_container_width=True, hide_index=True, height=min(600, 80 + len(sub) * 35))
 # =========================================================
+# LEADER BRAIN DASHBOARD
+# =========================================================
+st.markdown("---")
+show_leader_brain()                    
+# =========================================================
+# ACCUMULATION OPPORTUNITY
+# =========================================================
+# =========================================================
+# ACCUMULATION OPPORTUNITY
+# =========================================================
+
+st.markdown("---")
+
+render_accumulation_board(scan_df)
+
+# =========================================================
 # POSITION GUARDIAN
 # =========================================================
 
 st.markdown("---")
 
-render_guardian(scan_df)
+render_guardian(scan_df)                    
+# =========================================================
+# POSITION GUARDIAN
+# =========================================================
+
+st.markdown("---")
 if show_detail:
     with st.expander("📋 Bảng chi tiết đầy đủ", expanded=True):
         detail_cols = [
