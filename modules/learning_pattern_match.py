@@ -450,7 +450,6 @@ def build_pattern_match(scan_df: pd.DataFrame) -> pd.DataFrame:
     # =====================================================
     try:
         leaders = get_active_leaders(limit=1000)
-        
         if not leaders.empty:
 
             keep = [
@@ -672,14 +671,26 @@ def show_pattern_match(scan_df: pd.DataFrame):
 
         return
 
+    # Tên hiển thị dễ hiểu: đây là mức độ giống DNA thắng, không phải lệnh mua.
+    display_result = result.rename(
+        columns={
+            "pattern_match": "DNA Match (%)",
+            "leader_score": "Leader Score",
+            "confidence": "Confidence",
+        }
+    )
+
     st.dataframe(
-
-        result,
-
+        display_result,
         width="stretch",
-
         hide_index=True,
-
+        column_config={
+            "DNA Match (%)": st.column_config.NumberColumn(
+                "DNA Match (%)",
+                help="Mức độ tương đồng với DNA thắng mà BOT đã học trong bối cảnh hiện tại.",
+                format="%.2f%%",
+            ),
+        },
     )
 
     # =====================================================
@@ -724,12 +735,9 @@ def show_pattern_match(scan_df: pd.DataFrame):
     # Export
     # =====================================================
 
-    csv = result.to_csv(
-
+    csv = display_result.to_csv(
         index=False,
-
         encoding="utf-8-sig",
-
     )
 
     st.download_button(
@@ -759,5 +767,4 @@ def run(scan_df):
     """
 
     show_pattern_match(scan_df)
-
 
