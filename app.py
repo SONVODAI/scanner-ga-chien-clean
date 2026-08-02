@@ -6679,11 +6679,23 @@ try:
         market_forecast=market_forecast,
     )
     print(">>> SAVE PATTERN DONE")
-    update_memory(scan_df)
     print(">>> LEADER MEMORY DONE")
 except Exception as e:
     st.error(f"Pattern / Leader Memory Error: {e}")   
-
+# =========================================================
+# LEADER MEMORY - CẬP NHẬT TRƯỚC PATTERN MATCH
+# =========================================================
+try:
+    leader_brain_df = update_memory(
+        scan_df,
+        market_real=market_real,
+        market_forecast=market_forecast,
+        market_regime=market_forecast_text,
+        raise_errors=True,
+    )
+    st.caption(f"🧠 Leader Memory: {len(leader_brain_df)} mã")
+except Exception as e:
+    st.warning(f"Leader Memory Update: {type(e).__name__}: {e}")
 # =========================================================
 # OPTIONAL / LEGACY TABLES
 # =========================================================
