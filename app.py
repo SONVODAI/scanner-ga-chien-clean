@@ -82,7 +82,9 @@ from modules.evolution_health import (
     get_earning_money_board,
     render_earning_money_board,
 )
-
+from modules.learning_pattern_match import (
+    run as show_pattern_match,
+)
 # =========================================================
 # PAGE CONFIG
 # =========================================================
@@ -6057,7 +6059,21 @@ try:
     )
 except Exception as e:
     st.warning(f"Earning Learning: {e}")
+try:
+    learning_insight_result = render_bot_learning_insight()
+except Exception as e:
+    st.info("🧠 BOT Learning Insight đang tạm ẩn; dữ liệu học vẫn được bảo toàn.")
+    st.caption(f"Learning Insight Error: {type(e).__name__}: {e}")
 
+# =========================================================
+# TOP PATTERN MATCH
+# =========================================================
+try:
+    show_pattern_match(scan_df)
+except Exception as e:
+    st.warning(f"Pattern Match: {e}")
+
+if market_real < 6:
 # Learning Insight đọc kho dữ liệu sau khi update_learning đã hoàn tất.
 # Đây là lớp hiển thị READ ONLY, lỗi của bảng không ảnh hưởng Learning/Decision.
 try:
