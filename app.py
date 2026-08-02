@@ -6046,7 +6046,7 @@ try:
 
 except Exception as e:
     st.warning(f"Experience Engine: {e}")
-    # =========================================================
+# =========================================================
 # EARNING LEARNING ENGINE
 # =========================================================
 try:
@@ -6059,20 +6059,25 @@ try:
     )
 except Exception as e:
     st.warning(f"Earning Learning: {e}")
-   
-               
+
 # =========================================================
 # LEADER MEMORY ENGINE
+# Cập nhật trước khi Pattern Match đọc Leader Brain.
 # =========================================================
 try:
-    update_memory(
+    leader_memory_df = update_memory(
         df_today=scan_df,
         market_real=market_real,
         market_forecast=market_forecast,
         market_regime=market_forecast_text,
+        raise_errors=True,
     )
 except Exception as e:
-    st.warning(f"Leader Memory: {e}")
+    st.warning(f"Leader Memory: {type(e).__name__}: {e}")
+
+# =========================================================
+# BOT LEARNING INSIGHT - CHỈ HIỂN THỊ MỘT LẦN
+# =========================================================
 try:
     learning_insight_result = render_bot_learning_insight()
 except Exception as e:
@@ -6081,15 +6086,12 @@ except Exception as e:
 
 # =========================================================
 # TOP PATTERN MATCH
+# Hiển thị sau Insight: BOT học gì → mã nào giống DNA thắng nhất.
 # =========================================================
 try:
     show_pattern_match(scan_df)
 except Exception as e:
-    st.warning(f"Pattern Match: {e}")
-
-# Learning Insight đọc kho dữ liệu sau khi update_learning đã hoàn tất.
-# Đây là lớp hiển thị READ ONLY, lỗi của bảng không ảnh hưởng Learning/Decision.
-try:
+    st.warning(f"Pattern Match: {type(e).__name__}: {e}")
 
 if market_real < 6:
     st.error(market_action)
