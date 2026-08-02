@@ -6073,7 +6073,6 @@ try:
 except Exception as e:
     st.warning(f"Pattern Match: {e}")
 
-if market_real < 6:
 # Learning Insight đọc kho dữ liệu sau khi update_learning đã hoàn tất.
 # Đây là lớp hiển thị READ ONLY, lỗi của bảng không ảnh hưởng Learning/Decision.
 try:
