@@ -450,7 +450,9 @@ def build_pattern_match(scan_df: pd.DataFrame) -> pd.DataFrame:
     # =====================================================
     try:
         leaders = get_active_leaders(limit=1000)
-
+            st.write("Leader rows:", len(leaders))
+            st.write(leaders.head())
+            st.stop()
         if not leaders.empty:
 
             keep = [
