@@ -41,9 +41,9 @@ from modules.earning_learning import (
 # ----------------------------------------------------------
 # Leader Brain
 # ----------------------------------------------------------
-
 from leader_memory import (
     load_pattern_library,
+    get_active_leaders,
 )
 
 # ==========================================================
@@ -445,7 +445,34 @@ def build_pattern_match(scan_df: pd.DataFrame) -> pd.DataFrame:
 
     if scan_df.empty:
         return pd.DataFrame()
+    # =====================================================
+    # Merge Leader Brain
+    # =====================================================
+    try:
+        leaders = get_active_leaders(limit=1000)
 
+        if not leaders.empty:
+
+            keep = [
+                c
+                for c in (
+                    "symbol",
+                    "leader_score",
+                    "confidence_score",
+                )
+                if c in leaders.columns
+            ]
+
+            leaders = leaders[keep]
+
+            scan_df = scan_df.merge(
+                leaders,
+                on="symbol",
+                how="left",
+            )
+
+    except Exception as e:
+        st.warning(f"Leader Merge Error: {e}")
     dna = build_pattern_dna()
 
     rows = []
