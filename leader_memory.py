@@ -1140,8 +1140,7 @@ def update_memory(
     market_forecast: Optional[Any] = None,
     market_regime: Optional[Any] = None,
     raise_errors: bool = False,
-) -> pd.DataFrame:
-    raise Exception("UPDATE_MEMORY_START")  
+) -> pd.DataFrame: 
     config = _load_config()
     try:
         with _PROCESS_LOCK:
