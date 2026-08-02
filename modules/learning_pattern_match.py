@@ -632,9 +632,7 @@ def explain_pattern(row: pd.Series) -> List[str]:
 # ==========================================================
 
 def show_pattern_match(scan_df: pd.DataFrame):
-    st.write("=== SCAN_DF COLUMNS ===")
-    st.write(scan_df.columns.tolist())
-    st.stop()
+    
     st.markdown("---")
     st.subheader("🧠 TOP PATTERN MATCH")
 
