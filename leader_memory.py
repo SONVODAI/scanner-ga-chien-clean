@@ -1141,6 +1141,7 @@ def update_memory(
     market_regime: Optional[Any] = None,
     raise_errors: bool = False,
 ) -> pd.DataFrame:
+    raise Exception("UPDATE_MEMORY_START")  
     config = _load_config()
     try:
         with _PROCESS_LOCK:
