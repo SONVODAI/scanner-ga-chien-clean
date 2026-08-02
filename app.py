@@ -6059,20 +6059,9 @@ try:
     )
 except Exception as e:
     st.warning(f"Earning Learning: {e}")
-    # =========================================================
-# LEADER MEMORY ENGINE
-# =========================================================
-try:
-    update_memory(
-        df_today=scan_df,
-        market_real=market_real,
-        market_forecast=market_forecast,
-        market_regime=market_forecast_text,
-    )
-except Exception as e:
-    st.warning(f"Leader Memory: {e}"
+   
                
- # =========================================================
+# =========================================================
 # LEADER MEMORY ENGINE
 # =========================================================
 try:
