@@ -1299,10 +1299,7 @@ def rebuild_all() -> Dict[str, int]:
         with FileLock(LOCK_FILE):
             history = _safe_read_csv(HISTORY_FILE, HISTORY_COLUMNS)
             history = _update_outcomes(history, config)
-            brain = _build_brain(history, config)
-            print("HISTORY =", len(history))
-            print("BRAIN =", len(brain))
-            print(brain.head())  
+            brain = _build_brain(history, config)  
             patterns = _build_patterns(history, config)
             hof = _build_hof(brain, config)
             rec = _build_recommendations(brain, patterns, config)
