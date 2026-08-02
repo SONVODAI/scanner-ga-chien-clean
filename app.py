@@ -6090,10 +6090,6 @@ except Exception as e:
 # Learning Insight đọc kho dữ liệu sau khi update_learning đã hoàn tất.
 # Đây là lớp hiển thị READ ONLY, lỗi của bảng không ảnh hưởng Learning/Decision.
 try:
-    learning_insight_result = render_bot_learning_insight()
-except Exception as e:
-    st.info("🧠 BOT Learning Insight đang tạm ẩn; dữ liệu học vẫn được bảo toàn.")
-    st.caption(f"Learning Insight Error: {type(e).__name__}: {e}")
 
 if market_real < 6:
     st.error(market_action)
