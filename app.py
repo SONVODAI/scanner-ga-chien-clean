@@ -14,6 +14,7 @@ import base64
 import json
 import requests
 from datetime import datetime, timedelta
+from modules.learning_pattern_match import run as show_pattern_match
 from zoneinfo import ZoneInfo
 from modules.leader_brain_board import show_leader_brain
 from leader_memory import update_memory
