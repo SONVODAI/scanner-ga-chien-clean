@@ -1,7 +1,7 @@
 {
   "ok": true,
   "module_version": "3.1.0",
-  "trade_date": "2026-07-31",
+  "trade_date": "2026-08-02",
   "input_rows": 142,
   "valid_rows": 142,
   "observations_added": 0,
@@ -16,7 +16,7 @@
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-02T08:23:21Z",
+  "last_run_at": "2026-08-02T08:23:40Z",
   "brain_generation": "GEN2",
   "feature_version": "DNA_V3"
 }
