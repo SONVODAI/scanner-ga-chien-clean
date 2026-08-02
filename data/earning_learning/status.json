@@ -4,9 +4,9 @@
   "trade_date": "2026-08-02",
   "input_rows": 142,
   "valid_rows": 142,
-  "observations_added": 142,
-  "observations_updated": 0,
-  "outcomes_added": 284,
+  "observations_added": 0,
+  "observations_updated": 142,
+  "outcomes_added": 0,
   "knowledge_rows": 422,
   "lifecycle_rows": 994,
   "continuation_rows": 251,
@@ -16,7 +16,7 @@
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-02T06:13:24Z",
+  "last_run_at": "2026-08-02T06:13:55Z",
   "brain_generation": "GEN2",
   "feature_version": "DNA_V3"
 }
