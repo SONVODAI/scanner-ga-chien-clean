@@ -13,10 +13,10 @@
   "snapshot_rows": 1420,
   "history_rows": 1420,
   "storage_mode": "GITHUB_PRIMARY",
-  "github_sync": "GITHUB_OK",
+  "github_sync": "GITHUB_PARTIAL",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-02T15:39:36Z",
+  "last_run_at": "2026-08-02T15:40:06Z",
   "brain_generation": "GEN2",
   "feature_version": "DNA_V3"
 }
