@@ -1,15 +1,15 @@
 {
   "ok": true,
-  "last_learning_at": "2026-08-02T15:42:25Z",
-  "last_trade_date": "2026-07-31",
+  "last_learning_at": "2026-08-03T08:52:44Z",
+  "last_trade_date": "2026-08-03",
   "module_version": "3.1.0",
   "brain_generation": "GEN2",
   "feature_version": "DNA_V3",
-  "observations_rows": 1420,
-  "outcomes_rows": 1704,
-  "knowledge_rows": 422,
-  "lifecycle_rows": 994,
-  "continuation_rows": 251,
-  "pattern_snapshot_rows": 1420,
-  "pattern_history_rows": 1420
+  "observations_rows": 1562,
+  "outcomes_rows": 2130,
+  "knowledge_rows": 562,
+  "lifecycle_rows": 1136,
+  "continuation_rows": 290,
+  "pattern_snapshot_rows": 1562,
+  "pattern_history_rows": 1562
 }
