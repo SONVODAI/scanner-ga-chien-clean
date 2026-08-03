@@ -2,7 +2,7 @@ from __future__ import annotations
 
 """
 experience_engine.py
-Mr.BOT PRO - Experience Engine V2.0
+Mr.BOT PRO - Experience Engine V3.0
 
 Mục tiêu
 --------
@@ -14,8 +14,10 @@ Mục tiêu
 - Lưu local an toàn bằng cơ chế validate + backup + atomic write của
   snapshot_storage.py.
 - Mang toàn bộ DNA ngày gốc từ Daily Summary vào từng Experience.
-- Cung cấp Learning View đầy đủ cho Learning Engine ở Sprint tiếp theo.
-- Chưa tác động trực tiếp đến Final Decision.
+- Cung cấp Learning View đầy đủ cho Learning Engine.
+- Sinh Experience DNA, Market Context, Pattern Family và Trust Score.
+- Cung cấp Dynamic Weights để Pattern Match/Leader Brain dùng chung.
+- Chưa tự thay đổi Final Decision; chỉ cung cấp tri thức qua API công khai.
 
 Lưu ý an toàn quan trọng
 ------------------------
@@ -29,6 +31,9 @@ trên GitHub. File Experience vẫn được lưu local, có backup và atomic w
 """
 
 from dataclasses import dataclass
+import hashlib
+import json
+import math
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
@@ -115,11 +120,24 @@ ORIGIN_FEATURE_COLUMNS = (
     + ORIGIN_BOOLEAN_COLUMNS
 )
 
+INTELLIGENCE_COLUMNS = [
+    "stock_dna_key",
+    "market_context_key",
+    "decision_context_key",
+    "pattern_family",
+    "verified_level",
+    "outcome_score",
+    "trust_score",
+    "experience_quality",
+]
+
+
 EXPERIENCE_COLUMNS = [
     "experience_id",
     "origin_date",
     "symbol",
     *ORIGIN_FEATURE_COLUMNS,
+    *INTELLIGENCE_COLUMNS,
 
     "t3_date",
     "t3_price",
@@ -348,6 +366,142 @@ def _prepare_holding_detail(
         kind="stable",
     ).reset_index(drop=True)
 
+def _bucket_number(value: Any, edges: tuple[float, ...], labels: tuple[str, ...]) -> str:
+    number = _to_number(value)
+    if pd.isna(number):
+        return "NA"
+    for edge, label in zip(edges, labels):
+        if number < edge:
+            return label
+    return labels[-1]
+
+
+def _normalize_text_token(value: Any, fallback: str = "NA") -> str:
+    if _is_missing(value):
+        return fallback
+    text = str(value).strip().upper()
+    safe = "".join(ch if ch.isalnum() else "_" for ch in text)
+    safe = "_".join(part for part in safe.split("_") if part)
+    return safe[:40] or fallback
+
+
+def _obv_token(value: Any) -> str:
+    text = _normalize_text_token(value)
+    if any(token in text for token in ("UP", "TANG", "DUONG", "XANH", "POSITIVE", "MANH")):
+        return "OBV_POSITIVE"
+    if any(token in text for token in ("DOWN", "GIAM", "AM", "DO", "NEGATIVE", "YEU")):
+        return "OBV_NEGATIVE"
+    return "OBV_NEUTRAL"
+
+
+def _derive_pattern_family(row: dict[str, Any]) -> str:
+    group = _normalize_text_token(row.get("origin_group"))
+    pull = _normalize_text_token(row.get("origin_pull_label"))
+    if bool(row.get("origin_early_green2")) or bool(row.get("origin_early_dry_green2")) or "EARLY" in group:
+        return "EARLY"
+    if "PULL" in group or "PULL" in pull:
+        return "PULLBACK"
+    if "BREAK" in group:
+        return "BREAKOUT"
+    if "HOI" in group or "RECOVER" in group:
+        return "RECOVERY"
+    if "MANH" in group or "TANG_TOC" in group or "MOMENTUM" in group:
+        return "MOMENTUM"
+    if "TICH_LUY" in group or "ACCUM" in group:
+        return "ACCUMULATION"
+    return "GENERAL"
+
+
+def _derive_stock_dna_key(row: dict[str, Any]) -> str:
+    parts = [
+        _derive_pattern_family(row),
+        "RSI_" + _bucket_number(row.get("origin_rsi14"), (40, 45, 50, 55, 60, 70, math.inf), ("LT40", "40_45", "45_50", "50_55", "55_60", "60_70", "70P")),
+        "RS5_" + _bucket_number(row.get("origin_rs5"), (-2, 0, 2, 5, 10, math.inf), ("LTN2", "N2_0", "0_2", "2_5", "5_10", "10P")),
+        "RS10_" + _bucket_number(row.get("origin_rs10"), (-2, 0, 2, 5, 10, math.inf), ("LTN2", "N2_0", "0_2", "2_5", "5_10", "10P")),
+        _obv_token(row.get("origin_obv_status")),
+        "SLOPE_" + _bucket_number(row.get("origin_ema9_ma20_slope"), (-0.2, 0, 0.2, math.inf), ("STRONG_NEG", "NEG", "POS", "STRONG_POS")),
+        "VOL_" + _bucket_number(row.get("origin_volume_ratio20"), (0.7, 1.0, 1.2, 1.5, math.inf), ("DRY", "LOW", "NORMAL", "HIGH", "SURGE")),
+    ]
+    return "|".join(parts)
+
+
+def _derive_market_context_key(row: dict[str, Any]) -> str:
+    regime = _normalize_text_token(row.get("origin_market_regime"), "UNKNOWN")
+    real_bucket = _bucket_number(row.get("origin_market_real"), (2, 4, 6, 8, math.inf), ("REAL_LT2", "REAL_2_4", "REAL_4_6", "REAL_6_8", "REAL_8P"))
+    forecast_bucket = _bucket_number(row.get("origin_market_forecast"), (2, 4, 6, 8, math.inf), ("FC_LT2", "FC_2_4", "FC_4_6", "FC_6_8", "FC_8P"))
+    breadth_bucket = _bucket_number(row.get("origin_market_breadth"), (10, 25, 45, 65, math.inf), ("BR_LT10", "BR_10_25", "BR_25_45", "BR_45_65", "BR_65P"))
+    return "|".join(("REGIME_" + regime, real_bucket, forecast_bucket, breadth_bucket))
+
+
+def _derive_verified_level(row: dict[str, Any]) -> str:
+    completed = int(_to_number(row.get("completed_periods")) or 0)
+    latest = _to_number(row.get("latest_completed_period"))
+    if completed <= 0 or pd.isna(latest):
+        return "PENDING"
+    return f"T{int(latest)}_VERIFIED"
+
+
+def _derive_outcome_score(row: dict[str, Any], periods: tuple[int, ...]) -> float:
+    weighted_returns: list[tuple[float, float]] = []
+    max_period = max(periods) if periods else 10
+    for period in periods:
+        value = _to_number(row.get(f"t{period}_return"))
+        if pd.notna(value):
+            weighted_returns.append((value, period / max_period))
+    if not weighted_returns:
+        return np.nan
+    total_weight = sum(weight for _, weight in weighted_returns)
+    weighted_return = sum(value * weight for value, weight in weighted_returns) / total_weight
+    best = _to_number(row.get("best_return"))
+    worst = _to_number(row.get("worst_return"))
+    risk_penalty = abs(min(worst, 0.0)) * 1.5 if pd.notna(worst) else 0.0
+    upside_bonus = max(best, 0.0) * 0.35 if pd.notna(best) else 0.0
+    raw = 50.0 + weighted_return * 4.0 + upside_bonus - risk_penalty
+    return round(float(min(max(raw, 0.0), 100.0)), 2)
+
+
+def _derive_trust_score(row: dict[str, Any], periods: tuple[int, ...]) -> float:
+    completed = int(_to_number(row.get("completed_periods")) or 0)
+    if completed <= 0:
+        return 0.0
+    completion = completed / max(len(periods), 1)
+    returns = [
+        _to_number(row.get(f"t{period}_return"))
+        for period in periods
+        if pd.notna(_to_number(row.get(f"t{period}_return")))
+    ]
+    consistency = 1.0
+    if len(returns) >= 2:
+        consistency = max(0.0, 1.0 - min(float(np.std(returns)) / 12.0, 1.0))
+    direction = abs(sum(1 if value > 0 else -1 if value < 0 else 0 for value in returns)) / len(returns)
+    latest = max((period for period in periods if pd.notna(_to_number(row.get(f"t{period}_return")))), default=0)
+    maturity = latest / max(periods)
+    score = 100.0 * (0.45 * completion + 0.25 * consistency + 0.20 * direction + 0.10 * maturity)
+    return round(float(min(max(score, 0.0), 100.0)), 2)
+
+
+def _apply_intelligence_fields(row: dict[str, Any], periods: tuple[int, ...]) -> dict[str, Any]:
+    row["pattern_family"] = _derive_pattern_family(row)
+    row["stock_dna_key"] = _derive_stock_dna_key(row)
+    row["market_context_key"] = _derive_market_context_key(row)
+    raw_key = f"{row['market_context_key']}||{row['stock_dna_key']}"
+    row["decision_context_key"] = "CTX-" + hashlib.sha1(raw_key.encode("utf-8")).hexdigest()[:16].upper()
+    row["verified_level"] = _derive_verified_level(row)
+    row["outcome_score"] = _derive_outcome_score(row, periods)
+    row["trust_score"] = _derive_trust_score(row, periods)
+    if row["trust_score"] >= 75 and (pd.notna(row["outcome_score"]) and row["outcome_score"] >= 65):
+        row["experience_quality"] = "HIGH_CONFIDENCE_WIN"
+    elif row["trust_score"] >= 55 and (pd.notna(row["outcome_score"]) and row["outcome_score"] >= 55):
+        row["experience_quality"] = "CONFIRMED_WIN"
+    elif row["trust_score"] >= 55 and (pd.notna(row["outcome_score"]) and row["outcome_score"] < 45):
+        row["experience_quality"] = "CONFIRMED_LOSS"
+    elif row["verified_level"] == "PENDING":
+        row["experience_quality"] = "PENDING"
+    else:
+        row["experience_quality"] = "MIXED"
+    return row
+
+
 def _recalculate_derived_fields(
     row: dict[str, Any],
     periods: tuple[int, ...],
@@ -390,7 +544,7 @@ def _recalculate_derived_fields(
     else:
         row["experience_status"] = "COMPLETED"
 
-    return row
+    return _apply_intelligence_fields(row, periods)
 
 
 def build_experiences(
@@ -534,6 +688,14 @@ def load_experience_history(
         date_column = f"t{period}_date"
         if date_column in history.columns:
             history[date_column] = history[date_column].map(_normalize_date)
+
+    # V3: tự backfill Intelligence cho lịch sử V2 mà không cần migrate thủ công.
+    history = history.apply(
+        lambda item: pd.Series(
+            _apply_intelligence_fields(item.to_dict(), DEFAULT_PERIODS)
+        ),
+        axis=1,
+    )
 
     # Tái tạo khóa nếu file cũ bị thiếu experience_id.
     history["experience_id"] = history.apply(
@@ -870,4 +1032,157 @@ def build_learning_view(
             win_column: "target_win",
         }
     ).reset_index(drop=True)
+
+def build_experience_knowledge(
+    history: pd.DataFrame | None = None,
+    *,
+    experience_file: str | Path = EXPERIENCE_FILE,
+    target_period: int = 5,
+    min_samples: int = 2,
+) -> pd.DataFrame:
+    """Tổng hợp Verified Experience theo Market Context + Stock DNA."""
+    if history is None:
+        history = load_experience_history(experience_file)
+    if history is None or history.empty:
+        return pd.DataFrame()
+    period = int(target_period)
+    return_col = f"t{period}_return"
+    if return_col not in history.columns:
+        raise ValueError(f"Experience schema không có kỳ T{period}.")
+    data = history.copy()
+    data[return_col] = pd.to_numeric(data[return_col], errors="coerce")
+    data = data[data[return_col].notna()].copy()
+    if data.empty:
+        return pd.DataFrame()
+    data["_win"] = (data[return_col] > 0).astype(int)
+    data["trust_score"] = pd.to_numeric(data["trust_score"], errors="coerce").fillna(0)
+    grouped = (
+        data.groupby(
+            ["market_context_key", "stock_dna_key", "pattern_family"],
+            dropna=False,
+        )
+        .agg(
+            samples=("experience_id", "count"),
+            symbols=("symbol", "nunique"),
+            wins=("_win", "sum"),
+            avg_return=(return_col, "mean"),
+            median_return=(return_col, "median"),
+            avg_trust=("trust_score", "mean"),
+            first_seen=("origin_date", "min"),
+            last_seen=("origin_date", "max"),
+        )
+        .reset_index()
+    )
+    grouped = grouped[grouped["samples"] >= max(int(min_samples), 1)].copy()
+    if grouped.empty:
+        return grouped
+    grouped["winrate"] = grouped["wins"] / grouped["samples"] * 100.0
+    sample_confidence = np.minimum(grouped["samples"] / 20.0, 1.0) * 100.0
+    grouped["experience_confidence"] = (
+        grouped["winrate"] * 0.45
+        + grouped["avg_trust"] * 0.30
+        + sample_confidence * 0.25
+    ).clip(0, 100).round(2)
+    grouped["experience_score"] = (
+        grouped["experience_confidence"] * 0.55
+        + (50 + grouped["avg_return"] * 5).clip(0, 100) * 0.45
+    ).clip(0, 100).round(2)
+    grouped["target_period"] = period
+    grouped["updated_at"] = _now_text()
+    return grouped.sort_values(
+        ["experience_score", "samples"],
+        ascending=[False, False],
+        kind="stable",
+    ).reset_index(drop=True)
+
+
+def get_dynamic_weights(
+    history: pd.DataFrame | None = None,
+    *,
+    experience_file: str | Path = EXPERIENCE_FILE,
+    target_period: int = 5,
+) -> dict[str, float]:
+    """Ước lượng trọng số động từ khả năng phân tách thắng/thua của từng feature."""
+    defaults = {
+        "rsi": 22.0,
+        "rs": 18.0,
+        "obv": 15.0,
+        "leader": 20.0,
+        "market": 15.0,
+        "continuation": 10.0,
+    }
+    if history is None:
+        history = load_experience_history(experience_file)
+    if history is None or history.empty:
+        return defaults
+    period = int(target_period)
+    return_col = f"t{period}_return"
+    if return_col not in history.columns:
+        return defaults
+    data = history.copy()
+    data[return_col] = pd.to_numeric(data[return_col], errors="coerce")
+    data = data[data[return_col].notna()].copy()
+    if len(data) < 12:
+        return defaults
+    data["_win"] = (data[return_col] > 0).astype(int)
+    feature_groups = {
+        "rsi": ["origin_rsi14", "origin_rsi_slope"],
+        "rs": ["origin_rs5", "origin_rs10", "origin_RS"],
+        "obv": ["origin_obv", "origin_obv_ema9"],
+        "leader": ["origin_total_score", "origin_rank"],
+        "market": ["origin_market_real", "origin_market_forecast", "origin_market_breadth"],
+        "continuation": ["t3_return", "t5_return"],
+    }
+    raw: dict[str, float] = {}
+    for name, columns in feature_groups.items():
+        strengths: list[float] = []
+        for column in columns:
+            if column not in data.columns:
+                continue
+            values = pd.to_numeric(data[column], errors="coerce")
+            valid = values.notna()
+            if valid.sum() < 8 or values[valid].nunique() < 2:
+                continue
+            winners = values[valid & data["_win"].eq(1)]
+            losers = values[valid & data["_win"].eq(0)]
+            if winners.empty or losers.empty:
+                continue
+            pooled = float(values[valid].std(ddof=0))
+            if not math.isfinite(pooled) or pooled <= 1e-9:
+                continue
+            strengths.append(abs(float(winners.mean() - losers.mean())) / pooled)
+        raw[name] = float(np.mean(strengths)) if strengths else 0.0
+    if sum(raw.values()) <= 1e-9:
+        return defaults
+    total_budget = sum(defaults.values())
+    floor = 5.0
+    remaining = total_budget - floor * len(defaults)
+    strength_sum = sum(raw.values())
+    weights = {
+        name: round(floor + remaining * raw.get(name, 0.0) / strength_sum, 2)
+        for name in defaults
+    }
+    return weights
+
+
+def get_experience_brain(
+    history: pd.DataFrame | None = None,
+    *,
+    experience_file: str | Path = EXPERIENCE_FILE,
+    target_period: int = 5,
+) -> dict[str, Any]:
+    """API chung để Pattern Match và Leader Brain lấy cùng một nguồn tri thức."""
+    if history is None:
+        history = load_experience_history(experience_file)
+    return {
+        "history": history,
+        "knowledge": build_experience_knowledge(
+            history, target_period=target_period
+        ),
+        "dynamic_weights": get_dynamic_weights(
+            history, target_period=target_period
+        ),
+        "target_period": int(target_period),
+        "generated_at": _now_text(),
+    }
 
