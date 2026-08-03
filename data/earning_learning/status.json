@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "module_version": "3.1.0",
+  "module_version": "4.0.0",
   "trade_date": "2026-08-03",
   "input_rows": 142,
   "valid_rows": 142,
@@ -12,11 +12,13 @@
   "continuation_rows": 290,
   "snapshot_rows": 1562,
   "history_rows": 1562,
+  "decision_archive_rows": 1562,
+  "verified_decisions_rows": 1136,
   "storage_mode": "GITHUB_PRIMARY",
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-03T12:53:51Z",
-  "brain_generation": "GEN2",
-  "feature_version": "DNA_V3"
+  "last_run_at": "2026-08-03T16:07:40Z",
+  "brain_generation": "GEN3_EXPERIENCE",
+  "feature_version": "DECISION_CONTEXT_V1"
 }
