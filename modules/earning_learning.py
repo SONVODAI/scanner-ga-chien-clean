@@ -58,9 +58,9 @@ except Exception:  # pragma: no cover - cho phép test module ngoài Streamlit
     st = None  # type: ignore[assignment]
 
 
-MODULE_VERSION = "3.1.0"
-BRAIN_GENERATION = "GEN2"
-FEATURE_VERSION = "DNA_V3"
+MODULE_VERSION = "4.0.0"
+BRAIN_GENERATION = "GEN3_EXPERIENCE"
+FEATURE_VERSION = "DECISION_CONTEXT_V1"
 DEFAULT_HORIZONS: Tuple[int, ...] = (3, 5, 10)
 
 DEFAULT_DATA_DIR = Path("data") / "earning_learning"
@@ -76,6 +76,8 @@ LIFECYCLE_FILE = "pattern_lifecycle.csv"
 CONTINUATION_FILE = "continuation_knowledge.csv"
 PATTERN_SNAPSHOT_FILE = "pattern_snapshot.csv"
 PATTERN_HISTORY_FILE = "pattern_history.csv"
+DECISION_ARCHIVE_FILE = "decision_archive.csv"
+VERIFIED_DECISIONS_FILE = "verified_decisions.csv"
 LEARNING_METADATA_FILE = "learning_status.json"
 STATUS_FILE = "status.json"
 
@@ -87,6 +89,8 @@ _DATA_FILES = (
     CONTINUATION_FILE,
     PATTERN_SNAPSHOT_FILE,
     PATTERN_HISTORY_FILE,
+    DECISION_ARCHIVE_FILE,
+    VERIFIED_DECISIONS_FILE,
     LEARNING_METADATA_FILE,
     STATUS_FILE,
 )
@@ -219,6 +223,8 @@ class LearningResult:
     continuation_rows: int = 0
     snapshot_rows: int = 0
     history_rows: int = 0
+    decision_archive_rows: int = 0
+    verified_decisions_rows: int = 0
     storage_mode: str = "LOCAL_ONLY"
     github_sync: str = "NOT_ATTEMPTED"
     skipped_reason: Optional[str] = None
@@ -960,6 +966,8 @@ def _adapt_board(
         )
     ]
 
+    canonical["decision_id"] = canonical["observation_id"]
+    canonical["decision_status"] = "PENDING_OUTCOME"
     canonical["recorded_at"] = _utc_now_iso()
     canonical["module_version"] = MODULE_VERSION
     canonical["brain_generation"] = BRAIN_GENERATION
@@ -972,6 +980,8 @@ def _adapt_board(
 
     ordered = [
         "observation_id",
+        "decision_id",
+        "decision_status",
         "trade_date",
         "recorded_at",
         "module_version",
@@ -1041,6 +1051,8 @@ def _normalise_observation_schema(df: pd.DataFrame) -> pd.DataFrame:
         "trade_date": "",
         "symbol": "",
         "observation_id": "",
+        "decision_id": "",
+        "decision_status": "PENDING_OUTCOME",
     }
 
     for column, default in required.items():
@@ -1061,6 +1073,10 @@ def _normalise_observation_schema(df: pd.DataFrame) -> pd.DataFrame:
                 out.loc[missing_id, "symbol"],
             )
         ]
+
+    missing_decision_id = out["decision_id"].astype(str).str.strip().isin({"", "nan", "None"})
+    out.loc[missing_decision_id, "decision_id"] = out.loc[missing_decision_id, "observation_id"]
+    out["decision_status"] = out["decision_status"].replace({"": "PENDING_OUTCOME", "nan": "PENDING_OUTCOME"}).fillna("PENDING_OUTCOME")
 
     return out
 
@@ -1425,7 +1441,7 @@ def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
         ("<4", "4-6", "6-8", ">=8"),
     )
 
-    fields = [
+    stock_fields = [
         "p_health",
         "p_rsi",
         "p_rs10",
@@ -1438,14 +1454,20 @@ def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
         "p_pull",
         "p_dryup",
         "p_leader",
+    ]
+    market_fields = [
         "p_forecast",
         "p_breadth",
         "p_market",
     ]
 
-    out["pattern_key"] = out[fields].astype(str).agg(
-        "|".join,
-        axis=1,
+    # V4: tách DNA cổ phiếu khỏi bức ảnh thị trường.
+    # pattern_key vẫn là khóa kết hợp để tương thích ngược với các bảng hiện tại.
+    out["stock_pattern_key"] = out[stock_fields].astype(str).agg("|".join, axis=1)
+    out["market_context_key"] = out[market_fields].astype(str).agg("|".join, axis=1)
+    out["pattern_key"] = (
+        "CTX[" + out["market_context_key"].astype(str) + "]::DNA["
+        + out["stock_pattern_key"].astype(str) + "]"
     )
 
     return out
@@ -1484,7 +1506,7 @@ def _build_pattern_knowledge(
 
     knowledge = (
         merged.groupby(
-            ["pattern_key", "horizon"],
+            ["market_context_key", "stock_pattern_key", "pattern_key", "horizon"],
             dropna=False,
         )
         .agg(
@@ -1860,6 +1882,58 @@ def _append_pattern_history(
     return history.reset_index(drop=True), int(len(changed))
 
 
+def _build_decision_archive(
+    snapshot: pd.DataFrame,
+) -> pd.DataFrame:
+    """Một dòng cho mỗi quyết định; giữ đầy đủ Context, DNA và Outcome hiện có."""
+    if snapshot is None or snapshot.empty:
+        return pd.DataFrame()
+
+    archive = snapshot.copy()
+    if "decision_id" not in archive.columns:
+        archive["decision_id"] = archive.get("observation_id", "")
+    archive["decision_id"] = archive["decision_id"].astype(str)
+
+    completed = pd.to_numeric(
+        archive.get("completed_horizons", pd.Series(0, index=archive.index)),
+        errors="coerce",
+    ).fillna(0).astype(int)
+    archive["decision_status"] = np.where(
+        completed > 0, "VERIFIED_PARTIAL", "PENDING_OUTCOME"
+    )
+    archive.loc[completed >= len(DEFAULT_HORIZONS), "decision_status"] = "VERIFIED_COMPLETE"
+    archive["decision_updated_at"] = _utc_now_iso()
+    archive = _stamp_versions(archive)
+    return archive.drop_duplicates("decision_id", keep="last").reset_index(drop=True)
+
+
+def _build_verified_decisions(
+    decision_archive: pd.DataFrame,
+) -> pd.DataFrame:
+    """Chỉ trả các quyết định đã có ít nhất một Outcome T3/T5/T10."""
+    if decision_archive is None or decision_archive.empty:
+        return pd.DataFrame()
+
+    verified = decision_archive.copy()
+    completed = pd.to_numeric(
+        verified.get("completed_horizons", pd.Series(0, index=verified.index)),
+        errors="coerce",
+    ).fillna(0).astype(int)
+    verified = verified.loc[completed > 0].copy()
+    if verified.empty:
+        return verified
+
+    verified["verified_level"] = np.select(
+        [completed.loc[verified.index] >= 3, completed.loc[verified.index] >= 2],
+        ["T10_COMPLETE", "T5_COMPLETE"],
+        default="T3_COMPLETE",
+    )
+    verified["verified_at"] = _utc_now_iso()
+    verified["is_fully_verified"] = completed.loc[verified.index] >= len(DEFAULT_HORIZONS)
+    verified = _stamp_versions(verified)
+    return verified.drop_duplicates("decision_id", keep="last").reset_index(drop=True)
+
+
 def _build_learning_metadata(
     *,
     trade_date_value: Optional[str],
@@ -1870,6 +1944,8 @@ def _build_learning_metadata(
     continuation: pd.DataFrame,
     snapshot: pd.DataFrame,
     history: pd.DataFrame,
+    decision_archive: pd.DataFrame,
+    verified_decisions: pd.DataFrame,
 ) -> Dict[str, Any]:
     return {
         "ok": True,
@@ -1885,6 +1961,8 @@ def _build_learning_metadata(
         "continuation_rows": int(len(continuation)),
         "pattern_snapshot_rows": int(len(snapshot)),
         "pattern_history_rows": int(len(history)),
+        "decision_archive_rows": int(len(decision_archive)),
+        "verified_decisions_rows": int(len(verified_decisions)),
     }
 
 
@@ -1906,6 +1984,26 @@ def get_pattern_history(
     storage = _make_storage(data_dir, remote_dir)
     history, _ = _read_csv_from_storage(storage, PATTERN_HISTORY_FILE)
     return history
+
+
+def get_decision_archive(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    *,
+    remote_dir: Optional[str] = None,
+) -> pd.DataFrame:
+    storage = _make_storage(data_dir, remote_dir)
+    archive, _ = _read_csv_from_storage(storage, DECISION_ARCHIVE_FILE)
+    return archive
+
+
+def get_verified_decisions(
+    data_dir: Optional[os.PathLike[str] | str] = None,
+    *,
+    remote_dir: Optional[str] = None,
+) -> pd.DataFrame:
+    storage = _make_storage(data_dir, remote_dir)
+    verified, _ = _read_csv_from_storage(storage, VERIFIED_DECISIONS_FILE)
+    return verified
 
 
 def get_learning_metadata(
@@ -2195,6 +2293,8 @@ def update_learning(
                 snapshot,
                 trade_date_value,
             )
+            decision_archive = _build_decision_archive(snapshot)
+            verified_decisions = _build_verified_decisions(decision_archive)
             metadata = _build_learning_metadata(
                 trade_date_value=trade_date_value,
                 observations=observations,
@@ -2204,6 +2304,8 @@ def update_learning(
                 continuation=continuation,
                 snapshot=snapshot,
                 history=history,
+                decision_archive=decision_archive,
+                verified_decisions=verified_decisions,
             )
 
             write_results = []
@@ -2300,6 +2402,32 @@ def update_learning(
                     )
                 )
 
+            if not decision_archive.empty:
+                write_results.append(
+                    _write_csv_to_storage(
+                        storage,
+                        DECISION_ARCHIVE_FILE,
+                        decision_archive,
+                        commit_message=(
+                            "Mr.BOT update decision archive "
+                            f"{trade_date_value}"
+                        ),
+                    )
+                )
+
+            if not verified_decisions.empty:
+                write_results.append(
+                    _write_csv_to_storage(
+                        storage,
+                        VERIFIED_DECISIONS_FILE,
+                        verified_decisions,
+                        commit_message=(
+                            "Mr.BOT update verified decisions "
+                            f"{trade_date_value}"
+                        ),
+                    )
+                )
+
             write_results.append(
                 _write_json_to_storage(
                     storage,
@@ -2345,6 +2473,8 @@ def update_learning(
                 continuation_rows=len(continuation),
                 snapshot_rows=len(snapshot),
                 history_rows=len(history),
+                decision_archive_rows=len(decision_archive),
+                verified_decisions_rows=len(verified_decisions),
                 storage_mode=storage_mode,
                 github_sync=github_sync,
             )
@@ -2417,5 +2547,7 @@ __all__ = [
     "get_continuation_knowledge",
     "get_pattern_snapshot",
     "get_pattern_history",
+    "get_decision_archive",
+    "get_verified_decisions",
     "get_learning_metadata",
 ]
