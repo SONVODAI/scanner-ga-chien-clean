@@ -1,12 +1,12 @@
 {
   "ok": true,
   "module_version": "4.0.0",
-  "trade_date": "2026-08-04",
+  "trade_date": "2026-08-03",
   "input_rows": 142,
   "valid_rows": 142,
-  "observations_added": 142,
-  "observations_updated": 0,
-  "outcomes_added": 426,
+  "observations_added": 0,
+  "observations_updated": 142,
+  "outcomes_added": 0,
   "knowledge_rows": 672,
   "lifecycle_rows": 1278,
   "continuation_rows": 327,
@@ -18,7 +18,7 @@
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-04T00:06:48Z",
+  "last_run_at": "2026-08-04T00:07:19Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
