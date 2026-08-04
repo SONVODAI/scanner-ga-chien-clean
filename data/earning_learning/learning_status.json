@@ -1,17 +1,17 @@
 {
   "ok": true,
-  "last_learning_at": "2026-08-03T23:55:53Z",
-  "last_trade_date": "2026-08-03",
+  "last_learning_at": "2026-08-04T00:06:32Z",
+  "last_trade_date": "2026-08-04",
   "module_version": "4.0.0",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1",
-  "observations_rows": 1562,
-  "outcomes_rows": 2130,
-  "knowledge_rows": 562,
-  "lifecycle_rows": 1136,
-  "continuation_rows": 290,
-  "pattern_snapshot_rows": 1562,
-  "pattern_history_rows": 1562,
-  "decision_archive_rows": 1562,
-  "verified_decisions_rows": 1136
+  "observations_rows": 1704,
+  "outcomes_rows": 2556,
+  "knowledge_rows": 672,
+  "lifecycle_rows": 1278,
+  "continuation_rows": 327,
+  "pattern_snapshot_rows": 1704,
+  "pattern_history_rows": 1704,
+  "decision_archive_rows": 1704,
+  "verified_decisions_rows": 1278
 }
