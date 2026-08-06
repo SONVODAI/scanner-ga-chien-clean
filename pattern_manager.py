@@ -1,110 +1,199 @@
 # =========================================================
-# MR.BOT V22 - PATTERN MEMORY
-# Ghi trực tiếp pattern_history.csv
-# Không phụ thuộc brain.remember()
+# GENESIS V23
+# CORE SCHEMA
 # =========================================================
 
-import os
-import base64
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from io import StringIO
+SCHEMA_VERSION = "GENESIS_V23"
 
-import pandas as pd
-import requests
-import streamlit as st
+LEARNING_GROUPS = (
+    "MUA EARLY",
+    "PULL VỪA",
+    "PULL ĐẸP",
+    "CP MẠNH",
+)
 
-VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+IDENTITY_COLUMNS = [
+    "sample_id",
+    "date",
+    "time",
+    "schema_version",
+    "symbol",
+]
 
-PATTERN_FILE = "pattern_history.csv"
-GITHUB_REPO_OWNER = "SONVODAI"
-GITHUB_REPO_NAME = "scanner-ga-chien-clean"
-GITHUB_PATTERN_PATH = PATTERN_FILE
+CONTEXT_COLUMNS = [
+    "market_real",
+    "market_forecast",
+]
 
+DNA_COLUMNS = [
+    "group",
+    "price",
+    "total_score",
 
-def today_str():
-    return datetime.now(VN_TZ).strftime("%Y-%m-%d")
+    "E",
+    "R",
+    "O",
+    "S",
+    "RS",
+    "V",
 
+    "rsi14",
+    "ema9_ma20_slope",
+    "dist_from_ema9_pct",
+    "obv_status",
 
-def now_time_str():
-    return datetime.now(VN_TZ).strftime("%H:%M:%S")
+    "volume",
+    "vol_ma20",
 
+    "green_2_confirm",
+    "early_green2",
+    "early_dry_green2",
 
-def get_github_token():
-    try:
-        return st.secrets.get("GITHUB_TOKEN", None)
-    except Exception:
-        return None
+    "warning",
+]
 
+OUTCOME_COLUMNS = [
+    "t1_return",
+    "t3_return",
+    "t5_return",
+    "t10_return",
 
-def read_pattern_history() -> pd.DataFrame:
-    token = get_github_token()
+    "t1_win",
+    "t3_win",
+    "t5_win",
+    "t10_win",
+]
 
-    if token:
-        try:
-            url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_PATTERN_PATH}"
-            headers = {"Authorization": f"token {token}"}
-            r = requests.get(url, headers=headers, timeout=10)
+ALL_COLUMNS = (
+    IDENTITY_COLUMNS
+    + CONTEXT_COLUMNS
+    + DNA_COLUMNS
+    + OUTCOME_COLUMNS
+# =========================================================
+# FILTER
+# =========================================================
 
-            if r.status_code == 200:
-                content = r.json().get("content", "")
-                if content:
-                    decoded = base64.b64decode(content).decode("utf-8")
-                    if decoded.strip():
-                        return pd.read_csv(StringIO(decoded))
-        except Exception as e:
-            print("READ PATTERN GITHUB ERROR:", e)
+def filter_learning_samples(scan_df: pd.DataFrame) -> pd.DataFrame:
 
-    try:
-        if os.path.exists(PATTERN_FILE) and os.path.getsize(PATTERN_FILE) > 1:
-            return pd.read_csv(PATTERN_FILE)
-    except Exception as e:
-        print("READ PATTERN LOCAL ERROR:", e)
+    if scan_df is None:
+        return pd.DataFrame()
 
-    return pd.DataFrame()
+    if scan_df.empty:
+        return pd.DataFrame()
 
+    if "group" not in scan_df.columns:
+        return pd.DataFrame()
 
-def write_pattern_history(df: pd.DataFrame) -> str:
-    if df is None:
-        return "NO_DF"
+    return (
+        scan_df[
+            scan_df["group"].isin(LEARNING_GROUPS)
+        ]
+        .copy()
+        .reset_index(drop=True)
+    )
+    
+# =========================================================
+# BUILDERS
+# =========================================================
 
-    df = df.copy()
-    df.to_csv(PATTERN_FILE, index=False)
+def build_identity(df: pd.DataFrame) -> pd.DataFrame:
 
-    token = get_github_token()
-    if not token:
-        return "LOCAL_ONLY"
+    out = df.copy()
 
-    try:
-        csv_content = df.to_csv(index=False)
-        encoded_content = base64.b64encode(csv_content.encode("utf-8")).decode("utf-8")
+    out["date"] = today_str()
+    out["time"] = now_time_str()
 
-        url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_PATTERN_PATH}"
-        headers = {"Authorization": f"token {token}"}
+    out["schema_version"] = SCHEMA_VERSION
 
-        sha = None
-        get_r = requests.get(url, headers=headers, timeout=10)
-        if get_r.status_code == 200:
-            sha = get_r.json().get("sha")
+    out["sample_id"] = (
+        out["date"].astype(str)
+        + "_"
+        + out["symbol"].astype(str)
+    )
 
-        payload = {
-            "message": f"Update pattern history {today_str()} {now_time_str()}",
-            "content": encoded_content,
-        }
+    return out
+def build_context(
+    df,
+    market_real,
+    market_forecast,
+):
 
-        if sha:
-            payload["sha"] = sha
+    out = df.copy()
 
-        put_r = requests.put(url, headers=headers, json=payload, timeout=15)
+    out["market_real"] = market_real
+    out["market_forecast"] = market_forecast
 
-        if put_r.status_code in [200, 201]:
-            return "GITHUB_OK"
+    return out
+def build_outcome(df):
 
-        return f"GITHUB_FAIL_{put_r.status_code}: {put_r.text[:200]}"
+    out = df.copy()
 
-    except Exception as e:
-        return f"GITHUB_ERROR: {e}"
+    for col in OUTCOME_COLUMNS:
 
+        if col not in out.columns:
+            out[col] = None
+
+    return out
+def normalize_schema(df):
+
+    out = df.copy()
+
+    for col in ALL_COLUMNS:
+
+        if col not in out.columns:
+            out[col] = None
+
+    return out[ALL_COLUMNS]
+# =========================================================
+# HISTORY MERGE
+# =========================================================
+
+def merge_history(
+    old_df: pd.DataFrame,
+    new_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Ghép lịch sử cũ và dữ liệu mới.
+    Luôn giữ record mới nhất của cùng 1 ngày + 1 mã.
+    """
+
+    if old_df is None or old_df.empty:
+        return normalize_schema(new_df)
+
+    old_df = normalize_schema(old_df)
+    new_df = normalize_schema(new_df)
+
+    out = pd.concat(
+        [
+            old_df,
+            new_df,
+        ],
+        ignore_index=True,
+    )
+
+    out = (
+        out
+        .drop_duplicates(
+            subset=[
+                "date",
+                "symbol",
+            ],
+            keep="last",
+        )
+        .sort_values(
+            [
+                "date",
+                "symbol",
+            ]
+        )
+        .reset_index(drop=True)
+    )
+
+    return out
+
+# =========================================================
+# MAIN SAVE ENGINE
+# =========================================================
 
 def save_pattern_history(
     brain,
@@ -112,75 +201,919 @@ def save_pattern_history(
     market_real,
     market_forecast,
 ):
+
     if scan_df is None or scan_df.empty:
-        print("PATTERN SKIP: scan_df empty")
+        print("PATTERN SKIP : EMPTY SCAN")
         return pd.DataFrame(), "EMPTY_SCAN"
 
-    learn_groups = [
-        "MUA EARLY",
-        "PULL VỪA",
-        "PULL ĐẸP",
-        "CP MẠNH",
-    ]
-
-    df = scan_df[scan_df["group"].isin(learn_groups)].copy()
+    df = filter_learning_samples(scan_df)
 
     if df.empty:
-        print("PATTERN SKIP: no learn groups")
-        return pd.DataFrame(), "EMPTY_LEARN_GROUP"
+        print("PATTERN SKIP : EMPTY LEARNING GROUP")
+        return pd.DataFrame(), "EMPTY_LEARNING"
 
     keep_cols = [
-        "symbol",
+        c
+        for c in DNA_COLUMNS
+        if c in df.columns
+    ]
+
+    df = df[
+        ["symbol"] + keep_cols
+    ].copy()
+
+    df = build_identity(df)
+
+    df = build_context(
+        df,
+        market_real,
+        market_forecast,
+    )
+
+    df = build_outcome(df)
+
+    df = normalize_schema(df)
+
+    old_df = read_pattern_history()
+
+    history = merge_history(
+        old_df,
+        df,
+    )
+
+    status = write_pattern_history(history)
+
+    print("=" * 60)
+    print("PATTERN HISTORY")
+    print("=" * 60)
+    print("TODAY :", len(df))
+    print("TOTAL :", len(history))
+    print("STATUS:", status)
+
+    return history, status
+# =========================================================
+# T+ UPDATE ENGINE
+# =========================================================
+
+def _safe_float(x):
+    try:
+        if pd.isna(x):
+            return None
+        return float(x)
+    except Exception:
+        return None
+
+
+def _calc_return(buy_price, sell_price):
+
+    buy = _safe_float(buy_price)
+    sell = _safe_float(sell_price)
+
+    if buy is None:
+        return None
+
+    if sell is None:
+        return None
+
+    if buy <= 0:
+        return None
+
+    return round((sell - buy) / buy * 100, 2)
+
+
+def _calc_win(ret):
+
+    if ret is None:
+        return None
+
+    return int(ret > 0)
+# =========================================================
+# UPDATE T+
+# =========================================================
+
+def update_tplus_result(
+    history_df: pd.DataFrame,
+    today_price_df: pd.DataFrame,
+    hold_days: int,
+):
+
+    if history_df is None:
+        return history_df
+
+    if history_df.empty:
+        return history_df
+
+    if today_price_df is None:
+        return history_df
+
+    if today_price_df.empty:
+        return history_df
+
+    return_col = f"t{hold_days}_return"
+    win_col = f"t{hold_days}_win"
+
+    if return_col not in history_df.columns:
+        history_df[return_col] = None
+
+    if win_col not in history_df.columns:
+        history_df[win_col] = None
+
+    price_map = (
+        today_price_df
+        .set_index("symbol")["price"]
+        .to_dict()
+    )
+
+    history = history_df.copy()
+
+    for idx in history.index:
+
+        if pd.notna(history.at[idx, return_col]):
+            continue
+
+        symbol = history.at[idx, "symbol"]
+
+        if symbol not in price_map:
+            continue
+
+        buy_price = history.at[idx, "price"]
+
+        sell_price = price_map[symbol]
+
+        ret = _calc_return(
+            buy_price,
+            sell_price,
+        )
+
+        history.at[idx, return_col] = ret
+
+        history.at[idx, win_col] = _calc_win(ret)
+
+    return history
+# =========================================================
+# WRAPPER
+# =========================================================
+
+def update_all_tplus(
+    history_df,
+    t1_price_df=None,
+    t3_price_df=None,
+    t5_price_df=None,
+    t10_price_df=None,
+):
+
+    out = history_df.copy()
+
+    if t1_price_df is not None:
+        out = update_tplus_result(
+            out,
+            t1_price_df,
+            1,
+        )
+
+    if t3_price_df is not None:
+        out = update_tplus_result(
+            out,
+            t3_price_df,
+            3,
+        )
+
+    if t5_price_df is not None:
+        out = update_tplus_result(
+            out,
+            t5_price_df,
+            5,
+        )
+
+    if t10_price_df is not None:
+        out = update_tplus_result(
+            out,
+            t10_price_df,
+            10,
+        )
+
+    return out
+# =========================================================
+# LEARNING STATISTICS ENGINE
+# =========================================================
+
+def build_pattern_statistics(history_df: pd.DataFrame):
+
+    if history_df is None:
+        return pd.DataFrame()
+
+    if history_df.empty:
+        return pd.DataFrame()
+
+    df = history_df.copy()
+
+    stats = []
+
+    feature_cols = [
         "group",
-        "price",
-        "total_score",
         "E",
         "R",
         "O",
         "S",
         "RS",
         "V",
-        "rsi14",
-        "ema9_ma20_slope",
-        "dist_from_ema9_pct",
-        "obv_status",
-        "volume",
-        "vol_ma20",
         "green_2_confirm",
         "early_green2",
         "early_dry_green2",
         "warning",
     ]
 
-    cols = [c for c in keep_cols if c in df.columns]
-    df = df[cols].copy()
+    for feature in feature_cols:
 
-    df["date"] = today_str()
-    df["time"] = now_time_str()
-    df["market_real"] = market_real
-    df["market_forecast"] = market_forecast
+        if feature not in df.columns:
+            continue
 
-    df["t1_return"] = None
-    df["t3_return"] = None
-    df["t5_return"] = None
-    df["t1_win"] = None
-    df["t3_win"] = None
-    df["t5_win"] = None
+        values = (
+            df[feature]
+            .dropna()
+            .unique()
+        )
 
-    old_df = read_pattern_history()
+        for value in values:
 
-    if old_df.empty:
-        out = df
-    else:
-        out = pd.concat([old_df, df], ignore_index=True)
+            sub = df[
+                df[feature] == value
+            ]
 
-    out = out.drop_duplicates(subset=["date", "symbol"], keep="last")
-    out = out.sort_values(["date", "symbol"]).reset_index(drop=True)
+            row = {
+                "feature": feature,
+                "value": value,
+                "samples": len(sub),
+            }
 
-    status = write_pattern_history(out)
+            for t in [1,3,5,10]:
 
-    print("PATTERN ROWS TODAY =", len(df))
-    print("PATTERN TOTAL ROWS =", len(out))
-    print("PATTERN STATUS =", status)
+                ret_col = f"t{t}_return"
+                win_col = f"t{t}_win"
 
-    return out, status
+                if ret_col in sub.columns:
+
+                    row[f"avg_t{t}"] = round(
+                        sub[ret_col].dropna().mean(),
+                        2
+                    )
+
+                if win_col in sub.columns:
+
+                    row[f"winrate_t{t}"] = round(
+                        sub[win_col].dropna().mean()*100,
+                        1
+                    )
+
+            stats.append(row)
+
+    return pd.DataFrame(stats)
+# =========================================================
+# BEST DNA
+# =========================================================
+
+def build_best_pattern(stats_df):
+
+    if stats_df.empty:
+        return pd.DataFrame()
+
+    df = stats_df.copy()
+
+    if "winrate_t5" in df.columns:
+
+        df = df.sort_values(
+
+            by=[
+                "winrate_t5",
+                "avg_t5",
+                "samples",
+            ],
+
+            ascending=False,
+
+        )
+
+    return df.reset_index(drop=True)
+# =========================================================
+# LEARNING SNAPSHOT
+# =========================================================
+
+def build_learning_snapshot(history_df):
+
+    stats = build_pattern_statistics(history_df)
+
+    best = build_best_pattern(stats)
+
+    return {
+
+        "history_rows": len(history_df),
+
+        "patterns": len(best),
+
+        "best_pattern": best.head(30),
+
+    }
+# =========================================================
+# DNA SIGNATURE
+# =========================================================
+
+def build_pattern_signature(row):
+
+    parts = [
+
+        f"G={row.get('group','')}",
+
+        f"E={row.get('E','')}",
+        f"R={row.get('R','')}",
+        f"O={row.get('O','')}",
+        f"S={row.get('S','')}",
+        f"RS={row.get('RS','')}",
+        f"V={row.get('V','')}",
+
+        f"RSI={round(float(row.get('rsi14',0)),1)}",
+
+        f"OBV={row.get('obv_status','')}",
+
+        f"G2={row.get('green_2_confirm','')}",
+
+        f"EARLY={row.get('early_green2','')}",
+    ]
+
+    return "|".join(parts)
+# =========================================================
+# BUILD DNA
+# =========================================================
+
+def build_pattern_dna(history_df):
+
+    df = history_df.copy()
+
+    df["pattern_signature"] = df.apply(
+
+        build_pattern_signature,
+
+        axis=1,
+
+    )
+
+    return df
+# =========================================================
+# DNA STATISTICS
+# =========================================================
+
+def build_dna_statistics(history_df):
+
+    if history_df.empty:
+
+        return pd.DataFrame()
+
+    df = build_pattern_dna(history_df)
+
+    rows = []
+
+    for dna, sub in df.groupby("pattern_signature"):
+
+        row = {
+
+            "pattern_signature": dna,
+
+            "samples": len(sub),
+
+        }
+
+        for t in [1,3,5,10]:
+
+            r = f"t{t}_return"
+
+            w = f"t{t}_win"
+
+            if r in sub.columns:
+
+                row[f"avg_t{t}"] = round(
+
+                    sub[r].dropna().mean(),
+
+                    2,
+
+                )
+
+            if w in sub.columns:
+
+                row[f"winrate_t{t}"] = round(
+
+                    sub[w].dropna().mean()*100,
+
+                    1,
+
+                )
+
+        rows.append(row)
+
+    out = pd.DataFrame(rows)
+
+    if out.empty:
+
+        return out
+
+    return out.sort_values(
+
+        by=[
+
+            "winrate_t5",
+
+            "avg_t5",
+
+            "samples",
+
+        ],
+
+        ascending=False,
+
+    ).reset_index(drop=True)
+# =========================================================
+# EXPORT LEARNING
+# =========================================================
+
+def export_learning_snapshot(history_df):
+
+    feature_stats = build_pattern_statistics(
+
+        history_df,
+
+    )
+
+    dna_stats = build_dna_statistics(
+
+        history_df,
+
+    )
+
+    return {
+
+        "feature_stats": feature_stats,
+
+        "dna_stats": dna_stats,
+
+        "best_dna": dna_stats.head(20),
+
+    }
+# =========================================================
+# FEATURE NORMALIZATION
+# =========================================================
+
+def normalize_rsi(rsi):
+
+    r = _safe_float(rsi)
+
+    if r is None:
+        return "UNKNOWN"
+
+    if r < 40:
+        return "<40"
+
+    if r < 45:
+        return "40-45"
+
+    if r < 50:
+        return "45-50"
+
+    if r < 55:
+        return "50-55"
+
+    if r < 60:
+        return "55-60"
+
+    if r < 65:
+        return "60-65"
+
+    if r < 70:
+        return "65-70"
+
+    return ">=70"
+
+
+def normalize_rs(rs):
+
+    r = _safe_float(rs)
+
+    if r is None:
+        return "?"
+
+    if r <= -4:
+        return "<=-4"
+
+    if r <= -2:
+        return "-4~-2"
+
+    if r <= 0:
+        return "-2~0"
+
+    if r <= 2:
+        return "0~2"
+
+    if r <= 4:
+        return "2~4"
+
+    return ">4"
+# =========================================================
+# NORMALIZE OBV
+# =========================================================
+
+def normalize_obv(value):
+
+    if pd.isna(value):
+        return "UNKNOWN"
+
+    s = str(value).upper()
+
+    if "GREEN" in s:
+        return "GREEN"
+
+    if "RED" in s:
+        return "RED"
+
+    if "UP" in s:
+        return "UP"
+
+    if "DOWN" in s:
+        return "DOWN"
+
+    return s
+def build_pattern_signature(row):
+
+    parts = [
+
+        f"G={row.get('group','')}",
+
+        f"RS={normalize_rs(row.get('RS'))}",
+
+        f"RSI={normalize_rsi(row.get('rsi14'))}",
+
+        f"OBV={normalize_obv(row.get('obv_status'))}",
+
+        f"E={row.get('E','')}",
+
+        f"R={row.get('R','')}",
+
+        f"S={row.get('S','')}",
+
+        f"G2={row.get('green_2_confirm','')}",
+
+        f"EARLY={row.get('early_green2','')}",
+    ]
+
+    return "|".join(parts)
+# =========================================================
+# MIN SAMPLE FILTER
+# =========================================================
+
+MIN_PATTERN_SAMPLE = 5
+
+
+def filter_valid_patterns(stats_df):
+
+    if stats_df is None:
+        return pd.DataFrame()
+
+    if stats_df.empty:
+        return pd.DataFrame()
+
+    return (
+        stats_df[
+            stats_df["samples"] >= MIN_PATTERN_SAMPLE
+        ]
+        .copy()
+        .reset_index(drop=True)
+    )
+# =========================================================
+# SCORE PATTERN
+# =========================================================
+
+def score_pattern(row):
+
+    score = 0
+
+    samples = row.get("samples", 0)
+
+    score += min(samples, 30)
+
+    for t in [3,5,10]:
+
+        wr = row.get(f"winrate_t{t}")
+
+        if pd.notna(wr):
+
+            score += wr * 0.40
+
+        avg = row.get(f"avg_t{t}")
+
+        if pd.notna(avg):
+
+            score += max(avg,0) * 3
+
+    return round(score,2)
+# =========================================================
+# RANK PATTERN
+# =========================================================
+
+def rank_patterns(stats_df):
+
+    if stats_df.empty:
+
+        return stats_df
+
+    df = filter_valid_patterns(stats_df)
+
+    if df.empty:
+
+        return df
+
+    df["learning_score"] = df.apply(
+
+        score_pattern,
+
+        axis=1,
+
+    )
+
+    df = df.sort_values(
+
+        by=[
+
+            "learning_score",
+
+            "samples",
+
+        ],
+
+        ascending=False,
+
+    )
+
+    return df.reset_index(drop=True)
+# =========================================================
+# SAVE LEARNING TABLE
+# =========================================================
+
+def export_learning_table(history_df):
+
+    stats = build_pattern_statistics(
+
+        history_df,
+
+    )
+
+    stats = rank_patterns(
+
+        stats,
+
+    )
+
+    return stats
+# =========================================================
+# CONFIDENCE ENGINE
+# =========================================================
+
+def calculate_pattern_confidence(row):
+
+    samples = row.get("samples", 0)
+
+    wr = row.get("winrate_t5")
+
+    if pd.isna(wr):
+        wr = 0
+
+    if samples < 5:
+        return "LOW"
+
+    if samples < 10:
+
+        if wr >= 80:
+            return "MEDIUM"
+
+        return "LOW"
+
+    if samples < 20:
+
+        if wr >= 75:
+            return "HIGH"
+
+        if wr >= 60:
+            return "MEDIUM"
+
+        return "LOW"
+
+    if wr >= 75:
+        return "VERY_HIGH"
+
+    if wr >= 60:
+        return "HIGH"
+
+    return "MEDIUM"
+# =========================================================
+# ENRICH LEARNING TABLE
+# =========================================================
+
+def enrich_learning_table(df):
+
+    if df.empty:
+        return df
+
+    out = df.copy()
+
+    out["confidence"] = out.apply(
+        calculate_pattern_confidence,
+        axis=1,
+    )
+
+    return out
+def export_learning_table(history_df):
+
+    stats = build_pattern_statistics(
+        history_df,
+    )
+
+    stats = rank_patterns(
+        stats,
+    )
+
+    stats = enrich_learning_table(
+        stats,
+    )
+
+    return stats
+# =========================================================
+# TOP LEARNING PATTERNS
+# =========================================================
+
+def get_best_learning_patterns(
+    history_df,
+    top_n=20,
+):
+
+    table = export_learning_table(
+        history_df,
+    )
+
+    if table.empty:
+        return table
+
+    return (
+        table[
+            table["confidence"].isin(
+                [
+                    "VERY_HIGH",
+                    "HIGH",
+                ]
+            )
+        ]
+        .head(top_n)
+        .reset_index(drop=True)
+    )
+# =========================================================
+# LEARNING INSIGHT ENGINE
+# =========================================================
+
+def build_learning_insight(history_df):
+
+    table = get_best_learning_patterns(
+        history_df,
+        top_n=30,
+    )
+
+    if table.empty:
+        return {
+            "patterns": [],
+            "summary": {},
+        }
+
+    insight = []
+
+    for _, row in table.iterrows():
+
+        insight.append({
+
+            "pattern": row["pattern_signature"],
+
+            "confidence": row["confidence"],
+
+            "samples": int(row["samples"]),
+
+            "winrate": row.get("winrate_t5"),
+
+            "avg_return": row.get("avg_t5"),
+
+            "learning_score": row.get("learning_score"),
+
+        })
+
+    summary = {
+
+        "total_patterns": len(insight),
+
+        "very_high": sum(
+            p["confidence"] == "VERY_HIGH"
+            for p in insight
+        ),
+
+        "high": sum(
+            p["confidence"] == "HIGH"
+            for p in insight
+        ),
+
+    }
+
+    return {
+
+        "patterns": insight,
+
+        "summary": summary,
+
+    }
+# =========================================================
+# MATCH ENGINE
+# =========================================================
+
+def match_pattern(
+    scan_row,
+    learning_patterns,
+):
+
+    dna = build_pattern_signature(
+        scan_row,
+    )
+
+    for p in learning_patterns:
+
+        if p["pattern"] == dna:
+
+            return {
+
+                "matched": True,
+
+                "confidence": p["confidence"],
+
+                "winrate": p["winrate"],
+
+                "avg_return": p["avg_return"],
+
+                "learning_score": p["learning_score"],
+
+            }
+
+    return {
+
+        "matched": False,
+
+    }
+# =========================================================
+# SCORE BOOST
+# =========================================================
+
+def calculate_learning_bonus(match):
+
+    if not match["matched"]:
+        return 0
+
+    bonus = 0
+
+    if match["confidence"] == "VERY_HIGH":
+        bonus += 25
+
+    elif match["confidence"] == "HIGH":
+        bonus += 18
+
+    elif match["confidence"] == "MEDIUM":
+        bonus += 10
+
+    wr = match.get("winrate")
+
+    if wr is not None:
+        bonus += wr / 20
+
+    return round(bonus,2)
+# =========================================================
+# PUBLIC API
+# =========================================================
+
+def learning_bonus_for_stock(
+    scan_row,
+    history_df,
+):
+
+    insight = build_learning_insight(
+        history_df,
+    )
+
+    match = match_pattern(
+
+        scan_row,
+
+        insight["patterns"],
+
+    )
+
+    return calculate_learning_bonus(
+        match,
+    )
+
