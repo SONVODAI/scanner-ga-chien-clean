@@ -19,7 +19,11 @@ from zoneinfo import ZoneInfo
 from modules.leader_brain_board import show_leader_brain
 from leader_memory import update_memory
 # from behavior_analyzer import BehaviorAnalyzer
-from pattern_manager import save_pattern_history
+from pattern_manager import (
+    save_pattern_history,
+    read_pattern_history,
+    explain_learning_match,
+)
 from final_decision_engine import build_final_decision
 from position_guardian import render_guardian
 # Evolution Health is implemented locally below as the single source of truth.
@@ -5356,6 +5360,10 @@ def build_buy_elite_decision_engine(
     # V3: áp dụng trọng số tự học rất chậm từ lịch sử BUY ELITE.
     # Nếu dữ liệu chưa đủ, learning_profile trả về multiplier = 1.0 nên V2 vẫn chạy y nguyên.
     learn_mult = get_learning_multipliers(learning_profile, regime_name)
+    # =====================================================
+# PATTERN LEARNING
+# =====================================================
+pattern_history = read_pattern_history()
     for _k in ["market", "action", "storm", "evo", "zone", "obv"]:
         weights[_k] = weights.get(_k, 1.0) * learn_mult.get(_k, 1.0)
 
@@ -5445,18 +5453,23 @@ def build_buy_elite_decision_engine(
     base["Penalty"] += np.where(rsi > 75, 8 * rsi_penalty_mult, 0)
     base["Penalty"] += np.where(group.eq("GÀ TĂNG TỐC"), 10, 0)
     base["Penalty"] += np.where(group.eq("CP MẠNH") & (dist > 3), 10, 0)
+# =====================================================
+# PATTERN BONUS (tạm thời = 0 để chuẩn bị tích hợp)
+# =====================================================
+base["PatternBonus"] = 0.0
+    base["PatternBonus"] = 0.0
 
-    base["EliteScore"] = (
-        base["MarketScore"]
-        + base["ActionScore"]
-        + base["StormScore"]
-        + base["EvoScore"]
-        + base["ZoneScore"]
-        + base["ObvScore"]
-        + base["ConsensusCount"] * 2.0
-        - base["Penalty"]
-    ).clip(0, 100).round(1)
-
+base["EliteScore"] = (
+    base["MarketScore"]
+    + base["ActionScore"]
+    + base["StormScore"]
+    + base["EvoScore"]
+    + base["ZoneScore"]
+    + base["ObvScore"]
+    + base["ConsensusCount"] * 2.0
+    + base["PatternBonus"]
+    - base["Penalty"]
+).clip(0, 100).round(1)
     hard_bad = (
         warn.str.contains("OBV gãy", na=False)
         | warn.str.contains("Giá dưới EMA9", na=False)
