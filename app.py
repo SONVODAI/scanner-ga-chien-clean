@@ -84,6 +84,7 @@ from modules.evolution_health import (
 )
 from modules.learning_pattern_match import (
     run as show_pattern_match,
+    build_pattern_match,
 )
 # =========================================================
 # PAGE CONFIG
@@ -5243,6 +5244,7 @@ def build_buy_elite_decision_engine(
     market_real: float,
     market_forecast: float,
     learning_profile: dict | None = None,
+    pattern_match_df: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """
     BUY ELITE V3 = Decision Engine có xác suất ước lượng, đồng thuận, trọng số theo mùa và Learning Engine.
@@ -5349,6 +5351,33 @@ def build_buy_elite_decision_engine(
     base["InEarlyLab"] = base["symbol"].astype(str).isin(early_symbols)
 
     # -----------------------------------------------------
+    # 4B) GHÉP PATTERN MATCH: Pattern chỉ cộng điểm, chưa tham gia Consensus
+    # -----------------------------------------------------
+    if (
+        pattern_match_df is not None
+        and not pattern_match_df.empty
+        and {"symbol", "pattern_match"}.issubset(pattern_match_df.columns)
+    ):
+        pm = pattern_match_df[["symbol", "pattern_match"]].copy()
+        pm["symbol"] = pm["symbol"].astype(str)
+        pm["pattern_match"] = pd.to_numeric(pm["pattern_match"], errors="coerce").fillna(0)
+        pm = pm.drop_duplicates(subset=["symbol"], keep="first")
+        base = base.merge(pm, on="symbol", how="left")
+    else:
+        base["pattern_match"] = 0.0
+
+    base["pattern_match"] = pd.to_numeric(base["pattern_match"], errors="coerce").fillna(0).clip(0, 100)
+
+    # Chỉ Pattern Match >= 70 mới được cộng điểm.
+    # 70 = 0 điểm; 90 trở lên = tối đa 8 điểm.
+    # Mục tiêu: Pattern có tiếng nói nhưng chưa được lấn át Rule/Market/Action.
+    base["PatternScore"] = np.where(
+        base["pattern_match"] >= 70,
+        ((base["pattern_match"] - 70) / 20.0 * 8.0).clip(0, 8),
+        0.0,
+    ).round(2)
+
+    # -----------------------------------------------------
     # 5) TÍNH ĐIỂM THEO CÁC CHUYÊN GIA + TRỌNG SỐ THEO MÙA
     # -----------------------------------------------------
     regime_name, weights, regime_note = elite_regime(market_real, market_forecast)
@@ -5453,6 +5482,7 @@ def build_buy_elite_decision_engine(
         + base["EvoScore"]
         + base["ZoneScore"]
         + base["ObvScore"]
+        + base["PatternScore"]
         + base["ConsensusCount"] * 2.0
         - base["Penalty"]
     ).clip(0, 100).round(1)
@@ -5603,6 +5633,8 @@ def build_buy_elite_decision_engine(
             rs.append("✅ Early Lab")
         if str(r.get("obv_status", "")) == "🟢":
             rs.append("✅ OBV giữ")
+        if to_float(r.get("pattern_match", 0), 0) >= 70:
+            rs.append(f"✅ Pattern Match {to_float(r.get('pattern_match', 0), 0):.1f}%")
         if to_float(market_real, 0) < 6:
             rk.append("❌ Market yếu")
         if r.get("Penalty", 0) > 0:
@@ -5631,8 +5663,8 @@ def build_buy_elite_decision_engine(
     cols = [
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN", "EliteScore",
         "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE", "REGIME", "LearningMode",
-        "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "Penalty",
-        "GR_SIGNAL", "GR_BUY_SCORE", "Storm", "Persistence", "DNA", "evolution", "recent_change",
+        "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "PatternScore", "Penalty",
+        "pattern_match", "GR_SIGNAL", "GR_BUY_SCORE", "Storm", "Persistence", "DNA", "evolution", "recent_change",
         "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE", "RỦI RO", "CẢNH BÁO",
     ]
     cols = [c for c in cols if c in out.columns]
@@ -6137,6 +6169,16 @@ green_red_df = build_green_red_board(
 
 learning_profile = read_buy_elite_learning_profile()
 
+# PATTERN -> DECISION BRIDGE
+# Dùng Market Real hiện tại để Pattern Match chấm đúng bối cảnh phiên đang chạy.
+try:
+    pattern_input_df = scan_df.copy()
+    pattern_input_df["market_real"] = market_real
+    pattern_match_df = build_pattern_match(pattern_input_df)
+except Exception as e:
+    pattern_match_df = pd.DataFrame()
+    st.warning(f"Pattern -> Decision Bridge: {type(e).__name__}: {e}")
+
 buy_elite_df = build_buy_elite_decision_engine(
     scan_df=scan_df,
     green_red_df=green_red_df,
@@ -6147,6 +6189,7 @@ buy_elite_df = build_buy_elite_decision_engine(
     market_real=market_real,
     market_forecast=market_forecast,
     learning_profile=learning_profile,
+    pattern_match_df=pattern_match_df,
 )
 final_df, final_note = build_final_decision(
     buy_elite_df,
