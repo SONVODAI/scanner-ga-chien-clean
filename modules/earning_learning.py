@@ -1663,115 +1663,513 @@ def _build_pattern_lifecycle(
     return lifecycle.sort_values(["entry_date", "symbol"], kind="stable").reset_index(drop=True)
 
 
-def _wilson_lower_bound(wins: pd.Series, samples: pd.Series) -> pd.Series:
+def _wilson_lower_bound(
+    wins: pd.Series,
+    samples: pd.Series,
+) -> pd.Series:
+    """
+    Wilson lower bound 80%.
+
+    Dùng cận dưới thay cho win-rate thô để tránh mẫu rất ít
+    nhưng thắng 100% bị xếp quá cao.
+    """
     z = 1.2815515655446004
+
     n = pd.to_numeric(samples, errors="coerce").astype(float)
     w = pd.to_numeric(wins, errors="coerce").astype(float)
-    p = np.where(n > 0, w / n, 0.0)
-    denominator = 1.0 + z * z / n
-    centre = p + z * z / (2.0 * n)
-    margin = z * np.sqrt((p * (1.0 - p) + z * z / (4.0 * n)) / n)
-    return pd.Series(np.where(n > 0, (centre - margin) / denominator * 100.0, np.nan), index=samples.index)
+
+    valid = n > 0
+
+    p = pd.Series(np.nan, index=n.index, dtype=float)
+    p.loc[valid] = w.loc[valid] / n.loc[valid]
+
+    denominator = pd.Series(np.nan, index=n.index, dtype=float)
+    denominator.loc[valid] = (
+        1.0 + (z * z) / n.loc[valid]
+    )
+
+    centre = pd.Series(np.nan, index=n.index, dtype=float)
+    centre.loc[valid] = (
+        p.loc[valid]
+        + (z * z) / (2.0 * n.loc[valid])
+    )
+
+    margin = pd.Series(np.nan, index=n.index, dtype=float)
+    margin.loc[valid] = z * np.sqrt(
+        (
+            p.loc[valid] * (1.0 - p.loc[valid])
+            + (z * z) / (4.0 * n.loc[valid])
+        )
+        / n.loc[valid]
+    )
+
+    lower = pd.Series(np.nan, index=n.index, dtype=float)
+    lower.loc[valid] = (
+        (centre.loc[valid] - margin.loc[valid])
+        / denominator.loc[valid]
+        * 100.0
+    )
+
+    return lower
 
 
-def _build_continuation_knowledge(lifecycle: pd.DataFrame) -> pd.DataFrame:
-    """Học xác suất mẫu thắng T3 tiếp tục thắng T5 và T10."""
-    if lifecycle.empty or "pattern_key" not in lifecycle.columns:
+def _build_continuation_knowledge(
+    lifecycle: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Học sức bền của mẫu từ T3 -> T5 -> T10.
+
+    V4:
+    - Giữ riêng DNA cổ phiếu.
+    - Giữ riêng bối cảnh thị trường.
+    - Không đánh đồng cùng một DNA xuất hiện trong các mùa thị trường khác nhau.
+    - Học xác suất thắng tiếp sau khi đã thắng T3/T5.
+    """
+    if lifecycle is None or lifecycle.empty:
         return pd.DataFrame()
 
     df = lifecycle.copy()
-    t3 = pd.to_numeric(df.get("t3_return_pct"), errors="coerce")
-    t5 = pd.to_numeric(df.get("t5_return_pct"), errors="coerce")
-    t10 = pd.to_numeric(df.get("t10_return_pct"), errors="coerce")
+
+    required_defaults: Dict[str, Any] = {
+        "pattern_key": "",
+        "stock_pattern_key": "",
+        "market_context_key": "",
+        "entry_date": "",
+        "t3_return_pct": np.nan,
+        "t5_return_pct": np.nan,
+        "t10_return_pct": np.nan,
+        "gain_accelerating": False,
+        "persistent_win_t10": False,
+        "flash_winner": False,
+    }
+
+    for column, default in required_defaults.items():
+        if column not in df.columns:
+            df[column] = default
+
+    # Tương thích dữ liệu cũ:
+    # nếu chưa có hai khóa V4 thì vẫn giữ pattern_key làm fallback.
+    missing_stock_key = (
+        df["stock_pattern_key"]
+        .astype(str)
+        .str.strip()
+        .isin({"", "nan", "None"})
+    )
+    if missing_stock_key.any():
+        df.loc[
+            missing_stock_key,
+            "stock_pattern_key",
+        ] = df.loc[
+            missing_stock_key,
+            "pattern_key",
+        ].astype(str)
+
+    missing_market_key = (
+        df["market_context_key"]
+        .astype(str)
+        .str.strip()
+        .isin({"", "nan", "None"})
+    )
+    if missing_market_key.any():
+        df.loc[
+            missing_market_key,
+            "market_context_key",
+        ] = "LEGACY_CONTEXT"
+
+    t3 = pd.to_numeric(
+        df["t3_return_pct"],
+        errors="coerce",
+    )
+    t5 = pd.to_numeric(
+        df["t5_return_pct"],
+        errors="coerce",
+    )
+    t10 = pd.to_numeric(
+        df["t10_return_pct"],
+        errors="coerce",
+    )
 
     df["has_t3"] = t3.notna()
     df["has_t5"] = t5.notna()
     df["has_t10"] = t10.notna()
-    df["t3_win_int"] = (t3 > 0).astype(int)
-    df["t5_win_int"] = (t5 > 0).astype(int)
-    df["t10_win_int"] = (t10 > 0).astype(int)
-    df["t3_t5_continue_int"] = ((t3 > 0) & (t5 > 0)).astype(int)
-    df["t5_t10_continue_int"] = ((t5 > 0) & (t10 > 0)).astype(int)
-    df["t3_t10_continue_int"] = ((t3 > 0) & (t10 > 0)).astype(int)
+
+    df["t3_win_int"] = (
+        df["has_t3"] & (t3 > 0)
+    ).astype(int)
+
+    df["t5_win_int"] = (
+        df["has_t5"] & (t5 > 0)
+    ).astype(int)
+
+    df["t10_win_int"] = (
+        df["has_t10"] & (t10 > 0)
+    ).astype(int)
 
     rows = []
-    for pattern_key, group in df.groupby("pattern_key", dropna=False):
-        t3_available = group[group["has_t3"]]
-        t5_available = group[group["has_t5"]]
-        t10_available = group[group["has_t10"]]
-        t3_winners = group[(group["has_t3"]) & (group["t3_win_int"] == 1)]
-        t5_winners = group[(group["has_t5"]) & (group["t5_win_int"] == 1)]
+
+    group_fields = [
+        "market_context_key",
+        "stock_pattern_key",
+        "pattern_key",
+    ]
+
+    for keys, group in df.groupby(
+        group_fields,
+        dropna=False,
+        sort=False,
+    ):
+        (
+            market_context_key,
+            stock_pattern_key,
+            pattern_key,
+        ) = keys
+
+        t3_available = group[
+            group["has_t3"]
+        ]
+
+        t5_available = group[
+            group["has_t5"]
+        ]
+
+        t10_available = group[
+            group["has_t10"]
+        ]
+
+        # Chỉ những mẫu đã thắng T3 mới đủ điều kiện
+        # để đo xác suất tiếp tục thắng T5/T10.
+        t3_winners = group[
+            group["has_t3"]
+            & (group["t3_win_int"] == 1)
+        ]
+
+        # Chỉ những mẫu đã thắng T5 mới đủ điều kiện
+        # để đo khả năng kéo dài tới T10.
+        t5_winners = group[
+            group["has_t5"]
+            & (group["t5_win_int"] == 1)
+        ]
+
+        eligible_t3_to_t5 = t3_winners[
+            t3_winners["has_t5"]
+        ]
+
+        eligible_t5_to_t10 = t5_winners[
+            t5_winners["has_t10"]
+        ]
+
+        eligible_t3_to_t10 = t3_winners[
+            t3_winners["has_t10"]
+        ]
 
         row = {
+            "market_context_key": market_context_key,
+            "stock_pattern_key": stock_pattern_key,
             "pattern_key": pattern_key,
-            "samples_t3": len(t3_available),
-            "wins_t3": int(t3_available["t3_win_int"].sum()),
-            "samples_t5": len(t5_available),
-            "wins_t5": int(t5_available["t5_win_int"].sum()),
-            "samples_t10": len(t10_available),
-            "wins_t10": int(t10_available["t10_win_int"].sum()),
-            "eligible_t3_to_t5": int(t3_winners["has_t5"].sum()),
-            "continued_t3_to_t5": int(t3_winners.loc[t3_winners["has_t5"], "t5_win_int"].sum()),
-            "eligible_t5_to_t10": int(t5_winners["has_t10"].sum()),
-            "continued_t5_to_t10": int(t5_winners.loc[t5_winners["has_t10"], "t10_win_int"].sum()),
-            "eligible_t3_to_t10": int(t3_winners["has_t10"].sum()),
-            "continued_t3_to_t10": int(t3_winners.loc[t3_winners["has_t10"], "t10_win_int"].sum()),
-            "avg_t3_return_pct": float(t3_available["t3_return_pct"].mean()) if len(t3_available) else np.nan,
-            "avg_t5_return_pct": float(t5_available["t5_return_pct"].mean()) if len(t5_available) else np.nan,
-            "avg_t10_return_pct": float(t10_available["t10_return_pct"].mean()) if len(t10_available) else np.nan,
-            "strong_runners": int(group.get("gain_accelerating", pd.Series(False, index=group.index)).map(_safe_bool).sum()),
-            "persistent_winners": int(group.get("persistent_win_t10", pd.Series(False, index=group.index)).map(_safe_bool).sum()),
-            "flash_winners": int(group.get("flash_winner", pd.Series(False, index=group.index)).map(_safe_bool).sum()),
-            "first_seen": group["entry_date"].min(),
-            "last_seen": group["entry_date"].max(),
+
+            "samples_t3": int(len(t3_available)),
+            "wins_t3": int(
+                t3_available["t3_win_int"].sum()
+            ),
+
+            "samples_t5": int(len(t5_available)),
+            "wins_t5": int(
+                t5_available["t5_win_int"].sum()
+            ),
+
+            "samples_t10": int(len(t10_available)),
+            "wins_t10": int(
+                t10_available["t10_win_int"].sum()
+            ),
+
+            "eligible_t3_to_t5": int(
+                len(eligible_t3_to_t5)
+            ),
+            "continued_t3_to_t5": int(
+                eligible_t3_to_t5[
+                    "t5_win_int"
+                ].sum()
+            ),
+
+            "eligible_t5_to_t10": int(
+                len(eligible_t5_to_t10)
+            ),
+            "continued_t5_to_t10": int(
+                eligible_t5_to_t10[
+                    "t10_win_int"
+                ].sum()
+            ),
+
+            "eligible_t3_to_t10": int(
+                len(eligible_t3_to_t10)
+            ),
+            "continued_t3_to_t10": int(
+                eligible_t3_to_t10[
+                    "t10_win_int"
+                ].sum()
+            ),
+
+            "avg_t3_return_pct": (
+                float(
+                    pd.to_numeric(
+                        t3_available[
+                            "t3_return_pct"
+                        ],
+                        errors="coerce",
+                    ).mean()
+                )
+                if len(t3_available)
+                else np.nan
+            ),
+
+            "avg_t5_return_pct": (
+                float(
+                    pd.to_numeric(
+                        t5_available[
+                            "t5_return_pct"
+                        ],
+                        errors="coerce",
+                    ).mean()
+                )
+                if len(t5_available)
+                else np.nan
+            ),
+
+            "avg_t10_return_pct": (
+                float(
+                    pd.to_numeric(
+                        t10_available[
+                            "t10_return_pct"
+                        ],
+                        errors="coerce",
+                    ).mean()
+                )
+                if len(t10_available)
+                else np.nan
+            ),
+
+            "strong_runners": int(
+                group[
+                    "gain_accelerating"
+                ]
+                .map(_safe_bool)
+                .sum()
+            ),
+
+            "persistent_winners": int(
+                group[
+                    "persistent_win_t10"
+                ]
+                .map(_safe_bool)
+                .sum()
+            ),
+
+            "flash_winners": int(
+                group[
+                    "flash_winner"
+                ]
+                .map(_safe_bool)
+                .sum()
+            ),
+
+            "first_seen": (
+                group["entry_date"].min()
+            ),
+
+            "last_seen": (
+                group["entry_date"].max()
+            ),
         }
+
         rows.append(row)
 
     result = pd.DataFrame(rows)
+
     if result.empty:
         return result
 
-    def pct(num: str, den: str) -> pd.Series:
-        denominator = pd.to_numeric(result[den], errors="coerce")
-        numerator = pd.to_numeric(result[num], errors="coerce")
-        return np.where(denominator > 0, numerator / denominator * 100.0, np.nan)
+    def pct(
+        numerator_column: str,
+        denominator_column: str,
+    ) -> pd.Series:
+        denominator = pd.to_numeric(
+            result[denominator_column],
+            errors="coerce",
+        )
 
-    result["t3_win_rate_pct"] = pct("wins_t3", "samples_t3")
-    result["t5_win_rate_pct"] = pct("wins_t5", "samples_t5")
-    result["t10_win_rate_pct"] = pct("wins_t10", "samples_t10")
-    result["t3_to_t5_rate_pct"] = pct("continued_t3_to_t5", "eligible_t3_to_t5")
-    result["t5_to_t10_rate_pct"] = pct("continued_t5_to_t10", "eligible_t5_to_t10")
-    result["t3_to_t10_rate_pct"] = pct("continued_t3_to_t10", "eligible_t3_to_t10")
-    result["t3_to_t10_lower_bound_pct"] = _wilson_lower_bound(
-        result["continued_t3_to_t10"], result["eligible_t3_to_t10"]
+        numerator = pd.to_numeric(
+            result[numerator_column],
+            errors="coerce",
+        )
+
+        values = pd.Series(
+            np.nan,
+            index=result.index,
+            dtype=float,
+        )
+
+        valid = denominator > 0
+
+        values.loc[valid] = (
+            numerator.loc[valid]
+            / denominator.loc[valid]
+            * 100.0
+        )
+
+        return values
+
+    result["t3_win_rate_pct"] = pct(
+        "wins_t3",
+        "samples_t3",
     )
+
+    result["t5_win_rate_pct"] = pct(
+        "wins_t5",
+        "samples_t5",
+    )
+
+    result["t10_win_rate_pct"] = pct(
+        "wins_t10",
+        "samples_t10",
+    )
+
+    result["t3_to_t5_rate_pct"] = pct(
+        "continued_t3_to_t5",
+        "eligible_t3_to_t5",
+    )
+
+    result["t5_to_t10_rate_pct"] = pct(
+        "continued_t5_to_t10",
+        "eligible_t5_to_t10",
+    )
+
+    result["t3_to_t10_rate_pct"] = pct(
+        "continued_t3_to_t10",
+        "eligible_t3_to_t10",
+    )
+
+    # Cận dưới Wilson rất quan trọng:
+    # mẫu ít không được phép đứng đầu chỉ vì thắng 100%.
+    result["t3_to_t10_lower_bound_pct"] = (
+        _wilson_lower_bound(
+            result["continued_t3_to_t10"],
+            result["eligible_t3_to_t10"],
+        )
+    )
+
+    # Chất lượng của một mẫu bền:
+    # 1. Thắng từ T3 tới T10
+    # 2. T5 tiếp tục thắng T10
+    # 3. T3 tiếp tục thắng T5
+    # 4. T10 có lợi nhuận thực
+    # 5. Có đủ số mẫu để đáng tin
     result["continuation_score"] = (
-        0.40 * result["t3_to_t10_lower_bound_pct"].fillna(0)
-        + 0.25 * result["t5_to_t10_rate_pct"].fillna(0)
-        + 0.20 * result["t3_to_t5_rate_pct"].fillna(0)
-        + 0.10 * pd.to_numeric(result["avg_t10_return_pct"], errors="coerce").clip(-20, 30).fillna(0)
-        + 0.05 * np.log1p(pd.to_numeric(result["samples_t10"], errors="coerce").fillna(0)) * 10
+        0.40
+        * result[
+            "t3_to_t10_lower_bound_pct"
+        ].fillna(0.0)
+
+        + 0.25
+        * result[
+            "t5_to_t10_rate_pct"
+        ].fillna(0.0)
+
+        + 0.20
+        * result[
+            "t3_to_t5_rate_pct"
+        ].fillna(0.0)
+
+        + 0.10
+        * pd.to_numeric(
+            result["avg_t10_return_pct"],
+            errors="coerce",
+        )
+        .clip(-20, 30)
+        .fillna(0.0)
+
+        + 0.05
+        * np.log1p(
+            pd.to_numeric(
+                result["samples_t10"],
+                errors="coerce",
+            ).fillna(0.0)
+        )
+        * 10.0
     )
+
+    # Tỷ lệ mẫu thực sự chạy dai.
+    sample_base = pd.to_numeric(
+        result["samples_t10"],
+        errors="coerce",
+    )
+
+    result["persistent_winner_rate_pct"] = np.where(
+        sample_base > 0,
+        pd.to_numeric(
+            result["persistent_winners"],
+            errors="coerce",
+        )
+        / sample_base
+        * 100.0,
+        np.nan,
+    )
+
+    result["strong_runner_rate_pct"] = np.where(
+        sample_base > 0,
+        pd.to_numeric(
+            result["strong_runners"],
+            errors="coerce",
+        )
+        / sample_base
+        * 100.0,
+        np.nan,
+    )
+
+    result["flash_winner_rate_pct"] = np.where(
+        sample_base > 0,
+        pd.to_numeric(
+            result["flash_winners"],
+            errors="coerce",
+        )
+        / sample_base
+        * 100.0,
+        np.nan,
+    )
+
     result["updated_at"] = _utc_now_iso()
     result["module_version"] = MODULE_VERSION
     result["brain_generation"] = BRAIN_GENERATION
     result["feature_version"] = FEATURE_VERSION
+
     return result.sort_values(
-        ["continuation_score", "samples_t10"],
-        ascending=[False, False],
+        [
+            "continuation_score",
+            "samples_t10",
+            "avg_t10_return_pct",
+        ],
+        ascending=[
+            False,
+            False,
+            False,
+        ],
         kind="stable",
     ).reset_index(drop=True)
-
-
-
 def _stamp_versions(df: pd.DataFrame) -> pd.DataFrame:
-    """Gắn phiên bản bộ não/feature mà không làm mất dữ liệu schema cũ."""
+    """
+    Gắn thông tin version vào dataframe.
+
+    Không ghi đè dữ liệu cũ nếu cột đã tồn tại,
+    chỉ cập nhật theo version hiện tại.
+    """
     if df is None:
         return pd.DataFrame()
+
     out = df.copy()
+
     out["module_version"] = MODULE_VERSION
     out["brain_generation"] = BRAIN_GENERATION
     out["feature_version"] = FEATURE_VERSION
+
     return out
 
 
@@ -1780,56 +2178,137 @@ def _build_pattern_snapshot(
     lifecycle: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Tạo kho nguyên liệu phẳng: một Observation + toàn bộ DNA + T3/T5/T10.
+    Snapshot = 1 Observation + toàn bộ DNA + toàn bộ Outcome.
 
-    Snapshot vẫn được tạo ngay cả khi chưa đủ T3 để không mất DNA ban đầu.
+    Đây là bảng nền để:
+        Pattern History
+        Decision Archive
+        Verified Decisions
+
+    đều dùng chung một nguồn.
     """
+
     if observations is None or observations.empty:
         return pd.DataFrame()
 
     obs = _add_pattern_columns(observations)
+
     if lifecycle is None or lifecycle.empty:
         snapshot = obs.copy()
+
     else:
-        lifecycle_only = lifecycle.copy()
-        duplicate_cols = [
-            col for col in lifecycle_only.columns
-            if col in obs.columns and col not in {"observation_id", "symbol"}
+        life = lifecycle.copy()
+
+        duplicated_columns = [
+            c
+            for c in life.columns
+            if c in obs.columns
+            and c not in {
+                "observation_id",
+                "symbol",
+            }
         ]
-        lifecycle_only = lifecycle_only.drop(columns=duplicate_cols, errors="ignore")
+
+        if duplicated_columns:
+            life = life.drop(
+                columns=duplicated_columns,
+                errors="ignore",
+            )
+
         snapshot = obs.merge(
-            lifecycle_only,
-            on=["observation_id", "symbol"],
+            life,
+            on=[
+                "observation_id",
+                "symbol",
+            ],
             how="left",
             validate="one_to_one",
         )
 
     snapshot["snapshot_updated_at"] = _utc_now_iso()
+
     snapshot = _stamp_versions(snapshot)
-    snapshot = snapshot.drop_duplicates("observation_id", keep="last")
-    sort_cols = [c for c in ("trade_date", "symbol") if c in snapshot.columns]
-    if sort_cols:
-        snapshot = snapshot.sort_values(sort_cols, kind="stable")
-    return snapshot.reset_index(drop=True)
 
-
-def _stable_row_hash(df: pd.DataFrame) -> pd.Series:
-    """Hash nội dung ổn định để chỉ append những mẫu mới hoặc đã đổi Outcome."""
-    if df.empty:
-        return pd.Series(dtype=str)
-    ignored = {
-        "snapshot_updated_at", "history_recorded_at", "history_run_id",
-        "row_hash", "recorded_at", "updated_at", "evaluated_at",
-    }
-    columns = sorted(col for col in df.columns if col not in ignored)
-    normalized = df.reindex(columns=columns).copy()
-    for col in columns:
-        normalized[col] = normalized[col].map(_safe_text)
-    return normalized.astype(str).agg("|".join, axis=1).map(
-        lambda value: hashlib.sha1(value.encode("utf-8")).hexdigest()
+    snapshot = snapshot.drop_duplicates(
+        "observation_id",
+        keep="last",
     )
 
+    sort_columns = [
+        c
+        for c in (
+            "trade_date",
+            "symbol",
+        )
+        if c in snapshot.columns
+    ]
 
+    if sort_columns:
+        snapshot = snapshot.sort_values(
+            sort_columns,
+            kind="stable",
+        )
+
+    snapshot.reset_index(
+        drop=True,
+        inplace=True,
+    )
+
+    return snapshot
+
+
+def _stable_row_hash(
+    df: pd.DataFrame,
+) -> pd.Series:
+    """
+    Hash ổn định.
+
+    Chỉ thay đổi khi dữ liệu thực sự thay đổi.
+
+    Không phụ thuộc:
+        updated_at
+        snapshot_updated_at
+        history_recorded_at
+        ...
+    """
+
+    if df is None or df.empty:
+        return pd.Series(dtype=str)
+
+    ignore_columns = {
+        "snapshot_updated_at",
+        "history_recorded_at",
+        "history_trade_date",
+        "history_run_id",
+        "recorded_at",
+        "updated_at",
+        "evaluated_at",
+        "row_hash",
+    }
+
+    columns = sorted(
+        c
+        for c in df.columns
+        if c not in ignore_columns
+    )
+
+    normalized = df.loc[:, columns].copy()
+
+    for c in columns:
+        normalized[c] = normalized[c].map(
+            _safe_text
+        )
+
+    payload = normalized.astype(str).agg(
+        "|".join,
+        axis=1,
+    )
+
+    return payload.map(
+        lambda x: hashlib.sha1(
+            x.encode("utf-8")
+        ).hexdigest()
+    )
 def _append_pattern_history(
     existing_history: pd.DataFrame,
     current_snapshot: pd.DataFrame,
