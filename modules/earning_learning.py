@@ -2661,7 +2661,32 @@ def get_pattern_knowledge(
     return knowledge[
         samples >= max(1, int(min_samples))
     ].copy().reset_index(drop=True)
+def _load_learning_tables(
+    data_dir=None,
+    remote_dir=None,
+):
+    """
+    Đọc các bảng học.
+    Nếu lỗi thì trả DataFrame rỗng để
+    Decision Engine vẫn chạy.
+    """
+    try:
+        pattern = get_pattern_knowledge(
+            data_dir=data_dir,
+            remote_dir=remote_dir,
+        )
+    except Exception:
+        pattern = pd.DataFrame()
 
+    try:
+        continuation = get_continuation_knowledge(
+            data_dir=data_dir,
+            remote_dir=remote_dir,
+        )
+    except Exception:
+        continuation = pd.DataFrame()
+
+    return pattern, continuation
 
 def update_learning(
     earning_board_df: pd.DataFrame,
