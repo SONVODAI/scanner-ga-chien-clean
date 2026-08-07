@@ -3047,12 +3047,30 @@ def apply_learning_experience(
         return decision_df
 
     out = decision_df.copy()
+    # Chuẩn bị các khóa để nối với Learning Engine.
+if "stock_pattern_key" not in out.columns:
+    out["stock_pattern_key"] = ""
 
+if "market_context_key" not in out.columns:
+    out["market_context_key"] = ""
+
+if "pattern_key" not in out.columns:
+    out["pattern_key"] = ""
     out["ExperienceAdjustment"] = 0.0
     out["ExperienceSamples"] = 0
     out["LearnedWinRate"] = np.nan
     out["ContinuationScore"] = np.nan
+    
+    # ===== Sprint V1.0 =====
+    out["MatchedPattern"] = ""
+    out["MatchedMarketContext"] = ""
+    out["LearningStatus"] = "NOT_CONNECTED"
+    # Sprint V1.0:
+# Hiện tại mới tạo cầu nối.
+# Việc đọc continuation_knowledge và pattern_knowledge
+# sẽ được bổ sung ở bước tiếp theo.
 
+out["LearningStatus"] = "READY_FOR_CONNECTION"
     return out
 learn_from_earning_board = update_learning
 
