@@ -5259,12 +5259,32 @@ def build_buy_elite_decision_engine(
     """
     if scan_df is None or scan_df.empty:
         return pd.DataFrame()
+needed = [
+    "symbol",
+    "group",
+    "price",
+    "ema9",
+    "total_score",
+    "rsi14",
+    "rsi_slope",
+    "ema9_ma20_slope",
+    "dist_from_ema9_pct",
+    "obv_status",
+    "warning",
+    "green_2_confirm",
+    "early_dry_green2",
+    "volume",
+    "vol_ma20",
+    "is_live_adjusted",
 
-    needed = [
-        "symbol", "group", "price", "ema9", "total_score", "rsi14", "rsi_slope",
-        "ema9_ma20_slope", "dist_from_ema9_pct", "obv_status", "warning",
-        "green_2_confirm", "early_dry_green2", "volume", "vol_ma20", "is_live_adjusted",
-    ]
+    # ===== Learning Engine =====
+    "health_group",
+    "rs10",
+    "rs_spread",
+    "volume_ratio20",
+    "obv_status",
+]
+    
     base = scan_df[[c for c in needed if c in scan_df.columns]].copy()
     if base.empty or "symbol" not in base.columns:
         return pd.DataFrame()
