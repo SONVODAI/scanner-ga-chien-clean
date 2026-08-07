@@ -1167,11 +1167,6 @@ def _build_outcomes(
         ["symbol", "trade_date"],
         kind="stable",
     )
-pattern_key_col = (
-    "pattern_key_v2"
-    if "pattern_key_v2" in df.columns
-    else "pattern_key"
-)
     rows = []
 
     for symbol, symbol_df in df.groupby("symbol", sort=False):
@@ -1474,13 +1469,13 @@ def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
     out["stock_pattern_key"] = out[stock_fields].astype(str).agg("|".join, axis=1)
     out["market_context_key"] = out[market_fields].astype(str).agg("|".join, axis=1)
     out["pattern_key"] = (
-    "CTX[" + out["market_context_key"].astype(str) + "]::DNA["
-    + out["stock_pattern_key"].astype(str)
-    + "]"
-)
+        "CTX[" + out["market_context_key"].astype(str) + "]::DNA["
+        + out["stock_pattern_key"].astype(str)
+        + "]"
+    )
 
-# Giữ khóa cũ để toàn bộ code phía sau vẫn chạy bình thường.
-out["pattern_key_v2"] = out["pattern_key"]
+    # Khóa V4 tương thích ngược; hiện tại cùng giá trị với pattern_key.
+    out["pattern_key_v2"] = out["pattern_key"]
 
     return out
 
@@ -1517,15 +1512,15 @@ def _build_pattern_knowledge(
         return pd.DataFrame()
 
     knowledge = (
-    merged.groupby(
-        [
-            "market_context_key",
-            "stock_pattern_key",
-            "pattern_key",
-            "horizon",
-        ],
-        dropna=False,
-    )
+        merged.groupby(
+            [
+                "market_context_key",
+                "stock_pattern_key",
+                "pattern_key",
+                "horizon",
+            ],
+            dropna=False,
+        )
         .agg(
             samples=("outcome_id", "count"),
             wins=("is_win", "sum"),
@@ -1747,8 +1742,7 @@ def _build_continuation_knowledge(
         return pd.DataFrame()
 
     df = lifecycle.copy()
-if "pattern_key_v2" not in df.columns:
-    df["pattern_key_v2"] = df["pattern_key"]
+
     required_defaults: Dict[str, Any] = {
         "pattern_key": "",
         "pattern_key_v2": "",
@@ -1766,6 +1760,23 @@ if "pattern_key_v2" not in df.columns:
     for column, default in required_defaults.items():
         if column not in df.columns:
             df[column] = default
+
+    # Tương thích dữ liệu cũ: nếu chưa có pattern_key_v2,
+    # dùng pattern_key hiện có làm fallback.
+    missing_pattern_key_v2 = (
+        df["pattern_key_v2"]
+        .astype(str)
+        .str.strip()
+        .isin({"", "nan", "None"})
+    )
+    if missing_pattern_key_v2.any():
+        df.loc[
+            missing_pattern_key_v2,
+            "pattern_key_v2",
+        ] = df.loc[
+            missing_pattern_key_v2,
+            "pattern_key",
+        ].astype(str)
 
     # Tương thích dữ liệu cũ:
     # nếu chưa có hai khóa V4 thì vẫn giữ pattern_key làm fallback.
@@ -1827,11 +1838,11 @@ if "pattern_key_v2" not in df.columns:
 
     rows = []
     group_fields = [
-    "market_context_key",
-    "stock_pattern_key",
-    "pattern_key_v2",
-]
-    
+        "market_context_key",
+        "stock_pattern_key",
+        "pattern_key_v2",
+    ]
+
     for keys, group in df.groupby(
         group_fields,
         dropna=False,
@@ -1842,8 +1853,7 @@ if "pattern_key_v2" not in df.columns:
             stock_pattern_key,
             pattern_key_v2,
         ) = keys
-          pattern_key = pattern_key_v2  
-
+        pattern_key = pattern_key_v2
         t3_available = group[
             group["has_t3"]
         ]
@@ -2661,33 +2671,6 @@ def get_pattern_knowledge(
     return knowledge[
         samples >= max(1, int(min_samples))
     ].copy().reset_index(drop=True)
-def _load_learning_tables(
-    data_dir=None,
-    remote_dir=None,
-):
-    """
-    Đọc các bảng học.
-    Nếu lỗi thì trả DataFrame rỗng để
-    Decision Engine vẫn chạy.
-    """
-    try:
-        pattern = get_pattern_knowledge(
-            data_dir=data_dir,
-            remote_dir=remote_dir,
-        )
-    except Exception:
-        pattern = pd.DataFrame()
-
-    try:
-        continuation = get_continuation_knowledge(
-            data_dir=data_dir,
-            remote_dir=remote_dir,
-        )
-    except Exception:
-        continuation = pd.DataFrame()
-
-    return pattern, continuation
-
 def update_learning(
     earning_board_df: pd.DataFrame,
     *,
@@ -3063,40 +3046,36 @@ def apply_learning_experience(
     """
     Cầu nối giữa Learning Engine và Decision Engine.
 
-    Phiên bản đầu tiên:
-    - Chưa điều chỉnh điểm.
-    - Chỉ tạo các cột Experience để kiểm tra luồng.
+    Sprint V1.0:
+    - Chưa điều chỉnh điểm quyết định.
+    - Chuẩn bị các cột Experience và khóa ghép để kiểm tra luồng.
+    - Giữ fail-safe: không làm thay đổi logic giao dịch hiện tại.
     """
-
     if decision_df is None or decision_df.empty:
         return decision_df
 
     out = decision_df.copy()
-    # Chuẩn bị các khóa để nối với Learning Engine.
-if "stock_pattern_key" not in out.columns:
-    out["stock_pattern_key"] = ""
 
-if "market_context_key" not in out.columns:
-    out["market_context_key"] = ""
+    # Chuẩn bị các khóa để nối với Learning Engine ở Sprint tiếp theo.
+    if "stock_pattern_key" not in out.columns:
+        out["stock_pattern_key"] = ""
 
-if "pattern_key" not in out.columns:
-    out["pattern_key"] = ""
+    if "market_context_key" not in out.columns:
+        out["market_context_key"] = ""
+
+    if "pattern_key" not in out.columns:
+        out["pattern_key"] = ""
+
     out["ExperienceAdjustment"] = 0.0
     out["ExperienceSamples"] = 0
     out["LearnedWinRate"] = np.nan
     out["ContinuationScore"] = np.nan
-    
-    # ===== Sprint V1.0 =====
     out["MatchedPattern"] = ""
     out["MatchedMarketContext"] = ""
-    out["LearningStatus"] = "NOT_CONNECTED"
-    # Sprint V1.0:
-# Hiện tại mới tạo cầu nối.
-# Việc đọc continuation_knowledge và pattern_knowledge
-# sẽ được bổ sung ở bước tiếp theo.
+    out["LearningStatus"] = "READY_FOR_CONNECTION"
 
-out["LearningStatus"] = "READY_FOR_CONNECTION"
     return out
+
 learn_from_earning_board = update_learning
 
 
