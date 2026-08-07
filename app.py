@@ -30,6 +30,7 @@ from modules.earning_learning import (
     get_pattern_snapshot,
     get_pattern_lifecycle,
     get_continuation_knowledge,
+    apply_learning_experience,
 )
 from modules.accumulation_opportunity import render_accumulation_board
 from modules.experience_engine import run_experience_engine
@@ -6190,6 +6191,11 @@ buy_elite_df = build_buy_elite_decision_engine(
     market_forecast=market_forecast,
     learning_profile=learning_profile,
     pattern_match_df=pattern_match_df,
+)
+buy_elite_df = apply_learning_experience(
+    decision_df=buy_elite_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
 )
 final_df, final_note = build_final_decision(
     buy_elite_df,
