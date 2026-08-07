@@ -3009,7 +3009,30 @@ def update_learning(
 
         return result.to_dict()
 
+def apply_learning_experience(
+    decision_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    Cầu nối giữa Learning Engine và Decision Engine.
 
+    Phiên bản đầu tiên:
+    - Chưa điều chỉnh điểm.
+    - Chỉ tạo các cột Experience để kiểm tra luồng.
+    """
+
+    if decision_df is None or decision_df.empty:
+        return decision_df
+
+    out = decision_df.copy()
+
+    out["ExperienceAdjustment"] = 0.0
+    out["ExperienceSamples"] = 0
+    out["LearnedWinRate"] = np.nan
+    out["ContinuationScore"] = np.nan
+
+    return out
 learn_from_earning_board = update_learning
 
 
@@ -3029,4 +3052,5 @@ __all__ = [
     "get_decision_archive",
     "get_verified_decisions",
     "get_learning_metadata",
+    "apply_learning_experience",
 ]
