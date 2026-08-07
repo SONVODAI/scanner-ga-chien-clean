@@ -3055,7 +3055,13 @@ def apply_learning_experience(
         return decision_df
 
     out = decision_df.copy()
+    pattern_df = get_pattern_knowledge(
+    min_samples=1,
+    )
 
+    continuation_df = get_continuation_knowledge(
+    min_samples=1,
+    )
     # Chuẩn bị các khóa để nối với Learning Engine ở Sprint tiếp theo.
     if "stock_pattern_key" not in out.columns:
         out["stock_pattern_key"] = ""
