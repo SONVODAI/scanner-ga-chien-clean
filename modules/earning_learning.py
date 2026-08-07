@@ -1167,7 +1167,11 @@ def _build_outcomes(
         ["symbol", "trade_date"],
         kind="stable",
     )
-
+pattern_key_col = (
+    "pattern_key_v2"
+    if "pattern_key_v2" in df.columns
+    else "pattern_key"
+)
     rows = []
 
     for symbol, symbol_df in df.groupby("symbol", sort=False):
@@ -1357,6 +1361,11 @@ def _ensure_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
         "market_forecast": np.nan,
         "breadth": np.nan,
         "market_score": np.nan,
+
+        # ===== V4 =====
+        # Giữ tương thích với dữ liệu cũ.
+        "stock_pattern_key": "",
+        "market_context_key": "",
     }
 
     for column, default in defaults.items():
@@ -1364,7 +1373,6 @@ def _ensure_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
             out[column] = default
 
     return out
-
 
 def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
     out = _ensure_pattern_columns(df)
@@ -1466,9 +1474,13 @@ def _add_pattern_columns(df: pd.DataFrame) -> pd.DataFrame:
     out["stock_pattern_key"] = out[stock_fields].astype(str).agg("|".join, axis=1)
     out["market_context_key"] = out[market_fields].astype(str).agg("|".join, axis=1)
     out["pattern_key"] = (
-        "CTX[" + out["market_context_key"].astype(str) + "]::DNA["
-        + out["stock_pattern_key"].astype(str) + "]"
-    )
+    "CTX[" + out["market_context_key"].astype(str) + "]::DNA["
+    + out["stock_pattern_key"].astype(str)
+    + "]"
+)
+
+# Giữ khóa cũ để toàn bộ code phía sau vẫn chạy bình thường.
+out["pattern_key_v2"] = out["pattern_key"]
 
     return out
 
@@ -1505,10 +1517,15 @@ def _build_pattern_knowledge(
         return pd.DataFrame()
 
     knowledge = (
-        merged.groupby(
-            ["market_context_key", "stock_pattern_key", "pattern_key", "horizon"],
-            dropna=False,
-        )
+    merged.groupby(
+        [
+            "market_context_key",
+            "stock_pattern_key",
+            "pattern_key",
+            "horizon",
+        ],
+        dropna=False,
+    )
         .agg(
             samples=("outcome_id", "count"),
             wins=("is_win", "sum"),
@@ -1565,7 +1582,8 @@ def _build_pattern_knowledge(
             errors="coerce",
         ).clip(-20, 40)
     )
-
+    knowledge["pattern_version"] = "V4"
+    knowledge["context_version"] = "MARKET_CONTEXT_V1"
     knowledge["updated_at"] = _utc_now_iso()
     knowledge["module_version"] = MODULE_VERSION
     knowledge["brain_generation"] = BRAIN_GENERATION
@@ -1729,9 +1747,11 @@ def _build_continuation_knowledge(
         return pd.DataFrame()
 
     df = lifecycle.copy()
-
+if "pattern_key_v2" not in df.columns:
+    df["pattern_key_v2"] = df["pattern_key"]
     required_defaults: Dict[str, Any] = {
         "pattern_key": "",
+        "pattern_key_v2": "",
         "stock_pattern_key": "",
         "market_context_key": "",
         "entry_date": "",
@@ -1806,13 +1826,12 @@ def _build_continuation_knowledge(
     ).astype(int)
 
     rows = []
-
     group_fields = [
-        "market_context_key",
-        "stock_pattern_key",
-        "pattern_key",
-    ]
-
+    "market_context_key",
+    "stock_pattern_key",
+    "pattern_key_v2",
+]
+    
     for keys, group in df.groupby(
         group_fields,
         dropna=False,
@@ -1821,8 +1840,9 @@ def _build_continuation_knowledge(
         (
             market_context_key,
             stock_pattern_key,
-            pattern_key,
+            pattern_key_v2,
         ) = keys
+          pattern_key = pattern_key_v2  
 
         t3_available = group[
             group["has_t3"]
@@ -2135,7 +2155,8 @@ def _build_continuation_knowledge(
         * 100.0,
         np.nan,
     )
-
+    result["pattern_version"] = "V4"
+    result["context_version"] = "MARKET_CONTEXT_V1"
     result["updated_at"] = _utc_now_iso()
     result["module_version"] = MODULE_VERSION
     result["brain_generation"] = BRAIN_GENERATION
