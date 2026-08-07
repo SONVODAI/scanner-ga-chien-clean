@@ -3048,40 +3048,77 @@ def apply_learning_experience(
 
     Sprint V1.0:
     - Chưa điều chỉnh điểm quyết định.
-    - Chuẩn bị các cột Experience và khóa ghép để kiểm tra luồng.
-    - Giữ fail-safe: không làm thay đổi logic giao dịch hiện tại.
+    - Chuẩn bị các cột Experience và khóa ghép.
+    - Fail-safe: nếu Learning lỗi thì Decision vẫn chạy bình thường.
     """
     if decision_df is None or decision_df.empty:
         return decision_df
 
     out = decision_df.copy()
-    pattern_df = get_pattern_knowledge(
-    min_samples=1,
-    )
 
-    continuation_df = get_continuation_knowledge(
-    min_samples=1,
-    )
-    # Chuẩn bị các khóa để nối với Learning Engine ở Sprint tiếp theo.
-    if "stock_pattern_key" not in out.columns:
-        out["stock_pattern_key"] = ""
+    # --------------------------------------------------
+    # Đọc dữ liệu Learning
+    # --------------------------------------------------
+    try:
+        pattern_df = get_pattern_knowledge(min_samples=1)
+    except Exception:
+        pattern_df = pd.DataFrame()
 
-    if "market_context_key" not in out.columns:
-        out["market_context_key"] = ""
+    try:
+        continuation_df = get_continuation_knowledge(min_samples=1)
+    except Exception:
+        continuation_df = pd.DataFrame()
 
-    if "pattern_key" not in out.columns:
-        out["pattern_key"] = ""
+    # --------------------------------------------------
+    # Chuẩn bị các cột
+    # --------------------------------------------------
+    defaults = {
+        "stock_pattern_key": "",
+        "market_context_key": "",
+        "pattern_key": "",
+        "ExperienceAdjustment": 0.0,
+        "ExperienceSamples": 0,
+        "LearnedWinRate": np.nan,
+        "ContinuationScore": np.nan,
+        "MatchedPattern": "",
+        "MatchedMarketContext": "",
+        "LearningStatus": "READY_FOR_CONNECTION",
+    }
 
-    out["ExperienceAdjustment"] = 0.0
-    out["ExperienceSamples"] = 0
-    out["LearnedWinRate"] = np.nan
-    out["ContinuationScore"] = np.nan
-    out["MatchedPattern"] = ""
-    out["MatchedMarketContext"] = ""
-    out["LearningStatus"] = "READY_FOR_CONNECTION"
+    for col, default in defaults.items():
+        if col not in out.columns:
+            out[col] = default
+    # --------------------------------------------------
+    # Sprint V1.1 - xác nhận Pattern Knowledge
+    # --------------------------------------------------
+    if not pattern_df.empty:
+        out["LearningStatus"] = "PATTERN_LOADED"
+
+        if "samples" in pattern_df.columns:
+            out["ExperienceSamples"] = int(
+                pattern_df["samples"].max()
+            )
+
+        if "win_rate_pct" in pattern_df.columns:
+            out["LearnedWinRate"] = float(
+                pattern_df["win_rate_pct"].max()
+            )
+
+    # --------------------------------------------------
+    # Sprint V1.2 - xác nhận Continuation Knowledge
+    # --------------------------------------------------
+    if not continuation_df.empty:
+        out["LearningStatus"] = (
+            "PATTERN_AND_CONTINUATION_LOADED"
+        )
+
+        if "continuation_score" in continuation_df.columns:
+            out["ContinuationScore"] = float(
+                continuation_df["continuation_score"].max()
+            )
 
     return out
-
+    
 learn_from_earning_board = update_learning
 
 
