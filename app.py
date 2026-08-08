@@ -6248,11 +6248,17 @@ except Exception as e:
 # EARNING LEARNING ENGINE
 # =========================================================
 try:
+    learning_breadth_report = build_rsi_breadth_report(scan_df)
+    learning_breadth = learning_breadth_report["percentages"][50]
+
     learning_result = update_learning(
         earning_board_df=scan_df,
         market_context={
             "market_score": market_real,
             "market_regime": market_forecast_text,
+            "market_live": market_live,
+            "market_forecast": market_forecast,
+            "breadth": learning_breadth,
         },
     )
 except Exception as e:
