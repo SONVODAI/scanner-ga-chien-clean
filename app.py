@@ -6692,8 +6692,11 @@ st.info(final_note)
 
 if not final_df.empty:
 
+    # FINAL DECISION: render plain DataFrame for maximum runtime stability.
+    # Styling is cosmetic only and must never block the decision board.
+    final_display_df = format_final_decision_for_display(final_df)
     st.dataframe(
-        style_final_decision(format_final_decision_for_display(final_df)),
+        final_display_df,
         use_container_width=True,
         hide_index=True,
         height=520,
