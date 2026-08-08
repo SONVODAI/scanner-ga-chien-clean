@@ -3103,7 +3103,7 @@ def _decision_rows_for_pattern_keys(
         canonical["market_forecast"] = forecast
     breadth_value = _safe_float(breadth)
     if canonical["breadth"].isna().all() and math.isfinite(breadth_value):
-    canonical["breadth"] = breadth_value
+        canonical["breadth"] = breadth_value
     for field in NUMERIC_FIELDS:
         if field in canonical.columns:
             canonical[field] = canonical[field].map(_safe_float)
@@ -3513,7 +3513,7 @@ def _row_experience_from_keys(
         float(result["ExperienceAdjustment"]),
     )
     return result
- def apply_learning_experience(
+def apply_learning_experience(
     decision_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
