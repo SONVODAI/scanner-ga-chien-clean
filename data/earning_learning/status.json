@@ -1,7 +1,7 @@
 {
   "ok": true,
   "module_version": "4.0.0",
-  "trade_date": "2026-08-08",
+  "trade_date": "2026-08-07",
   "input_rows": 142,
   "valid_rows": 142,
   "observations_added": 0,
@@ -18,7 +18,7 @@
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-08T11:39:51Z",
+  "last_run_at": "2026-08-08T11:40:37Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
