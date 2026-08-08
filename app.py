@@ -5655,10 +5655,10 @@ base["EliteScore"] = (
     + effective_experience_adj
     + effective_leader_memory_adj
 ).clip(0, 100).round(1)
-    # -----------------------------------------------------
-    # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
-    # -----------------------------------------------------
-    base["WinProb"] = (
+# -----------------------------------------------------
+# 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
+# -----------------------------------------------------
+base["WinProb"] = (
         28
         + base["EliteScore"] * 0.55
         + base["ConsensusCount"] * 4.0
