@@ -826,6 +826,9 @@ def finalize_forward_shadow_snapshot(
         market_real=market_real,
         market_forecast=market_forecast,
         breadth=breadth,
+        brain=brain,
+        history=history,
+        session_date=session_date,
     )
 
     shadow_df = build_shadow_with_recall(

@@ -147,7 +147,7 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
     "dist_high20": ("dist_high20", "dist_high20_pct"),
     "green2": ("green_2_confirm", "green2", "early_green2"),
     "early": ("early", "early_signal", "early_dry_green2", "InEarlyLab"),
-    "pull": ("pull", "pull_label", "pull_signal", "InPullback"),
+    "pull": ("pull", "pull_label", "pull_signal", "InPullback", "pullback"),
     "group": ("group", "evolution_stage", "stage"),
     "sector": ("sector", "industry", "ngành", "Ngành"),
     "market_score": ("market_score", "market_real", "market_health"),
@@ -3127,11 +3127,162 @@ def _experience_int(value: Any, default: int = 0) -> int:
     if not math.isfinite(parsed):
         return default
     return int(parsed)
+
+
+# Leader Memory brain columns → canonical observation fields for DNA keys.
+_LIVE_BRAIN_TO_CANONICAL: Dict[str, str] = {
+    "current_rs5": "rs5",
+    "current_rs10": "rs10",
+    "current_rsi14": "rsi14",
+    "current_obv_status": "obv_status",
+}
+
+# Production recommendation row columns → canonical observation fields.
+_LIVE_REC_TO_CANONICAL: Dict[str, str] = {
+    "current_rs5": "rs5",
+    "current_rs10": "rs10",
+    "current_rsi14": "rsi14",
+    "current_obv_status": "obv_status",
+    "current_group": "health_group",
+}
+
+
+def _is_missing_canonical_value(value: Any) -> bool:
+    if value is None:
+        return True
+    try:
+        if pd.isna(value):
+            return True
+    except Exception:
+        pass
+    if isinstance(value, str) and not value.strip():
+        return True
+    if isinstance(value, float) and not math.isfinite(value):
+        return True
+    return False
+
+
+def _looks_like_health_group_label(value: Any) -> bool:
+    """True when text matches evolution health labels stored in live scan/history."""
+    text = _safe_text(value)
+    if not text:
+        return False
+    lowered = text.lower()
+    health_tokens = (
+        "đang hồi",
+        "dang hoi",
+        "trung tính",
+        "trung tinh",
+        "yếu dần",
+        "yeu dan",
+        "rất yếu",
+        "rat yeu",
+        "yếu",
+        "yeu",
+        "🌱",
+        "🟡",
+        "⚠️",
+        "🔴",
+        "⛔",
+    )
+    return any(token in lowered or token in text for token in health_tokens)
+
+
+def _fill_missing_column(
+    frame: pd.DataFrame,
+    target: str,
+    values: pd.Series,
+) -> None:
+    if target not in frame.columns:
+        frame[target] = values
+        return
+    missing = frame[target].map(_is_missing_canonical_value)
+    if missing.any():
+        frame.loc[missing, target] = values.loc[missing]
+
+
+def enrich_decision_frame_for_pattern_keys(
+    decision_df: pd.DataFrame,
+    brain_df: Optional[pd.DataFrame] = None,
+) -> pd.DataFrame:
+    """
+    Fill canonical DNA source fields on live/shadow decision rows before
+    _add_pattern_columns(). Reuses authoritative brain and live scan columns;
+    does not invent values when genuinely unavailable.
+    """
+    if decision_df is None or decision_df.empty:
+        return decision_df
+
+    out = decision_df.copy(deep=True)
+
+    if "pull" not in out.columns and "pullback" in out.columns:
+        out["pull"] = out["pullback"]
+
+    # health_group: prefer explicit health/evolution columns; fall back to group
+    # only when group carries evolution-health semantics (live history pattern).
+    if "health_group" not in out.columns:
+        out["health_group"] = pd.Series([None] * len(out), dtype=object)
+    else:
+        out["health_group"] = out["health_group"].astype(object)
+
+    health_missing = out["health_group"].map(_is_missing_canonical_value)
+    for source_col in ("evolution_health_group", "health_group", "current_group"):
+        if source_col not in out.columns:
+            continue
+        fill_mask = health_missing & out[source_col].map(
+            lambda v: not _is_missing_canonical_value(v)
+        )
+        if fill_mask.any():
+            out.loc[fill_mask, "health_group"] = out.loc[fill_mask, source_col].astype(str).values
+            health_missing = out["health_group"].map(_is_missing_canonical_value)
+    if "group" in out.columns and health_missing.any():
+        group_mask = health_missing & out["group"].map(_looks_like_health_group_label)
+        if group_mask.any():
+            out.loc[group_mask, "health_group"] = out.loc[group_mask, "group"].astype(str).values
+
+    brain_by_symbol: Dict[str, Mapping[str, Any]] = {}
+    if brain_df is not None and not brain_df.empty and "symbol" in brain_df.columns:
+        for _, brow in brain_df.iterrows():
+            sym = _normalise_symbol(brow.get("symbol"))
+            if sym:
+                brain_by_symbol[sym] = dict(brow)
+
+    if "symbol" in out.columns:
+        for text_col in ("health_group", "obv_status", "group", "pull"):
+            if text_col in out.columns:
+                out[text_col] = out[text_col].astype(object)
+        for idx, row in out.iterrows():
+            sym = _normalise_symbol(row.get("symbol"))
+            brain_row = brain_by_symbol.get(sym, {})
+            for src, dst in _LIVE_BRAIN_TO_CANONICAL.items():
+                if src in brain_row and _is_missing_canonical_value(out.at[idx, dst] if dst in out.columns else None):
+                    if dst not in out.columns:
+                        out[dst] = pd.Series([None] * len(out), dtype=object)
+                    elif dst in ("obv_status", "health_group"):
+                        out[dst] = out[dst].astype(object)
+                    out.at[idx, dst] = brain_row[src]
+            for src, dst in _LIVE_REC_TO_CANONICAL.items():
+                if src in row.index and _is_missing_canonical_value(out.at[idx, dst] if dst in out.columns else None):
+                    if not _is_missing_canonical_value(row.get(src)):
+                        if dst not in out.columns:
+                            out[dst] = pd.Series([None] * len(out), dtype=object)
+                        elif dst in ("obv_status", "health_group"):
+                            out[dst] = out[dst].astype(object)
+                        out.at[idx, dst] = row[src]
+            if _is_missing_canonical_value(out.at[idx, "health_group"] if "health_group" in out.columns else None):
+                cg = brain_row.get("current_group") or row.get("current_group")
+                if _looks_like_health_group_label(cg):
+                    out.at[idx, "health_group"] = cg
+
+    return out
+
+
 def _decision_rows_for_pattern_keys(
     decision_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
     breadth: float | None = None,
+    brain_df: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:
 
     """
@@ -3139,7 +3290,10 @@ def _decision_rows_for_pattern_keys(
     update_learning(), then derive keys via _add_pattern_columns().
     Preserves the original index for row-aligned merge back.
     """
-    source = decision_df.copy(deep=True)
+    source = enrich_decision_frame_for_pattern_keys(
+        decision_df.copy(deep=True),
+        brain_df=brain_df,
+    )
     canonical = pd.DataFrame(index=source.index)
 
     for canonical_name, aliases in COLUMN_ALIASES.items():
@@ -3587,6 +3741,7 @@ def apply_learning_experience(
     market_real: float,
     market_forecast: float,
     breadth: float | None = None,
+    brain_df: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:   
 
     """
@@ -3622,6 +3777,7 @@ def apply_learning_experience(
             market_real=market_real,
             market_forecast=market_forecast,
             breadth=breadth,
+            brain_df=brain_df,
             )
         
         
@@ -3698,4 +3854,5 @@ __all__ = [
     "get_verified_decisions",
     "get_learning_metadata",
     "apply_learning_experience",
+    "enrich_decision_frame_for_pattern_keys",
 ]

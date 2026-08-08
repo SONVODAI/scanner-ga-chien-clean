@@ -16,6 +16,10 @@ from typing import Any, Dict, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from modules.earning_learning import (
+    _decision_rows_for_pattern_keys,
+    _safe_float as _el_safe_float,
+)
 from modules.regime_alpha import (
     RECALL_LEVEL_EXACT,
     RECALL_LEVEL_FAMILY,
@@ -128,6 +132,46 @@ def _shadow_reason(recall_level: str, recall_confidence: float, score_delta: flo
     return prefix + f"Historical recall {direction} shadow score by {abs(score_delta):.1f} points."
 
 
+def _canonical_pattern_keys_for_shadow_row(
+    symbol: str,
+    brain_row: Mapping[str, Any],
+    rec_row: Mapping[str, Any],
+    exp_row: Mapping[str, Any],
+    *,
+    market_real: Optional[Any] = None,
+    market_forecast: Optional[Any] = None,
+    breadth: Optional[Any] = None,
+    brain_df: Optional[pd.DataFrame] = None,
+) -> tuple[str, str]:
+    """Derive stock/market DNA keys via the same canonical path as historical observations."""
+    merged = {**dict(brain_row), **dict(rec_row), **dict(exp_row)}
+    merged["symbol"] = symbol
+    # leader_score is not a T0 scan field; historical observations use NA bucket.
+    if "leader_score" not in exp_row:
+        merged.pop("leader_score", None)
+    frame = pd.DataFrame([merged])
+    mr = _el_safe_float(market_real)
+    mf = _el_safe_float(market_forecast)
+    bw = _el_safe_float(breadth)
+    keyed = _decision_rows_for_pattern_keys(
+        frame,
+        market_real=mr,
+        market_forecast=mf,
+        breadth=bw if np.isfinite(bw) else None,
+        brain_df=brain_df,
+    )
+    if keyed.empty:
+        return (
+            str(exp_row.get("stock_pattern_key", "")),
+            str(exp_row.get("market_context_key", "")),
+        )
+    row = keyed.iloc[0]
+    return (
+        str(row.get("stock_pattern_key", "")),
+        str(row.get("market_context_key", "")),
+    )
+
+
 def build_shadow_with_recall(
     production_rec: pd.DataFrame,
     brain: pd.DataFrame,
@@ -136,6 +180,9 @@ def build_shadow_with_recall(
     session_date: str,
     recall_index: Optional[pd.DataFrame] = None,
     baseline_rank_scores: Optional[pd.DataFrame] = None,
+    market_real: Optional[Any] = None,
+    market_forecast: Optional[Any] = None,
+    breadth: Optional[Any] = None,
 ) -> pd.DataFrame:
     """
     Build shadow audit rows with baseline vs recall experience comparison.
@@ -172,8 +219,22 @@ def build_shadow_with_recall(
         symbol = str(rec_row.get("symbol", "")).strip().upper()
         brain_row = brain_by_symbol.get(symbol, {})
         exp_row = exp_by_symbol.get(symbol, {})
-        market_context_key = str(exp_row.get("market_context_key", ""))
-        stock_pattern_key = str(exp_row.get("stock_pattern_key", ""))
+        exp_stock_key = str(exp_row.get("stock_pattern_key", ""))
+        exp_market_key = str(exp_row.get("market_context_key", ""))
+        if exp_stock_key and "|NA|" not in exp_stock_key:
+            stock_pattern_key = exp_stock_key
+            market_context_key = exp_market_key
+        else:
+            stock_pattern_key, market_context_key = _canonical_pattern_keys_for_shadow_row(
+                symbol,
+                brain_row,
+                dict(rec_row),
+                exp_row,
+                market_real=market_real,
+                market_forecast=market_forecast,
+                breadth=breadth,
+                brain_df=brain,
+            )
 
         technical_prior = compute_technical_prior(
             {**brain_row, **dict(rec_row)},

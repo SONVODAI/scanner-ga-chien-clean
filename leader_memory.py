@@ -89,6 +89,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "sector": ["sector", "industry", "NGÀNH", "nganh"],
         "rs5": ["rs5", "RS5", "relative_strength_5"],
         "rs10": ["rs10", "RS10", "relative_strength_10"],
+        "rs_spread": ["rs_spread", "RS_SPREAD", "rs spread"],
         "rsi14": ["rsi14", "RSI14", "rsi", "RSI"],
         "obv": ["obv", "OBV", "obv_value"],
         "obv_status": ["obv_status", "OBV_STATUS", "obv_trend", "DÒNG TIỀN"],
@@ -102,14 +103,15 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "dist_from_ema9_pct": ["dist_from_ema9_pct", "DIST_EMA9_PCT"],
         "volume": ["volume", "vol", "VOLUME", "VOL"],
         "vol_ma20": ["vol_ma20", "volume_ma20", "VOL_MA20"],
+        "volume_ratio20": ["volume_ratio20", "volume_ratio", "vol_ratio"],
         "market_real": ["market_real", "MARKET_REAL"],
         "market_forecast": ["market_forecast", "MARKET_FORECAST"],
         "market_regime": ["market_regime", "regime", "MARKET_REGIME"],
         "storm": ["storm", "Storm", "STORM"],
-        "early": ["early", "EARLY"],
-        "pullback": ["pullback", "PULLBACK"],
-        "green2": ["green2", "GREEN2"],
-        "dryup": ["dryup", "dry_up", "DRYUP"],
+        "early": ["early", "EARLY", "early_dry_green2", "InEarlyLab"],
+        "pullback": ["pullback", "PULLBACK", "pull_label"],
+        "green2": ["green2", "GREEN2", "green_2_confirm"],
+        "dryup": ["dryup", "dry_up", "DRYUP", "dryup_ok"],
         "health_group": [
             "evolution_health_group", "health_group", "health",
             "Health", "Trạng thái",
@@ -140,10 +142,26 @@ DEFAULT_CONFIG: Dict[str, Any] = {
 }
 
 
+# Raw T0 fields consumed by modules.earning_learning._add_pattern_columns().
+CANONICAL_T0_DNA_FIELDS = (
+    "health_group",
+    "rsi14",
+    "rs5",
+    "rs10",
+    "rs_spread",
+    "ema9_ma20_slope",
+    "volume_ratio",
+    "obv_status",
+    "green2",
+    "early",
+    "pullback",
+    "dryup",
+)
+
 BASE_FEATURE_COLUMNS = [
     "session_date", "snapshot_time", "symbol", "price", "group", "sector",
-    "rs5", "rs10", "rsi14", "obv", "obv_status", "total_score",
-    "trend_score", "buy_score", "source_persistence", "evolution",
+    "health_group", "rs5", "rs10", "rs_spread", "rsi14", "obv", "obv_status",
+    "total_score", "trend_score", "buy_score", "source_persistence", "evolution",
     "recent_change", "ema9_ma20_slope", "dist_from_ema9_pct",
     "volume", "vol_ma20", "volume_ratio", "market_real",
     "market_forecast", "market_regime", "storm", "early", "pullback",
@@ -241,6 +259,115 @@ class UpdateResult:
 
 
 _PROCESS_LOCK = threading.RLock()
+_CURRENT_T0_BY_SESSION: Dict[str, pd.DataFrame] = {}
+
+
+def reset_t0_snapshot_cache() -> None:
+    """Test helper — clears in-memory authoritative T0 snapshot cache."""
+    _CURRENT_T0_BY_SESSION.clear()
+
+
+def _is_valid_t0_value(value: Any) -> bool:
+    if value is None:
+        return False
+    try:
+        if pd.isna(value):
+            return False
+    except Exception:
+        pass
+    if isinstance(value, str) and not value.strip():
+        return False
+    if isinstance(value, float) and not math.isfinite(value):
+        return False
+    return True
+
+
+def _overlay_t0_fields(
+    base: pd.DataFrame,
+    overlay: pd.DataFrame,
+    *,
+    overlay_wins: bool = False,
+) -> pd.DataFrame:
+    """
+    Fill missing T0 fields in base from overlay per symbol.
+    When overlay_wins=True, authoritative overlay values replace base values.
+    Never overwrite a valid existing value with NaN/empty.
+    """
+    if base is None or base.empty:
+        return overlay.copy() if overlay is not None else pd.DataFrame()
+    if overlay is None or overlay.empty or "symbol" not in overlay.columns:
+        return base.copy()
+
+    result = base.copy()
+    overlay_by_symbol = {
+        _normalize_symbol(row.get("symbol")): row
+        for _, row in overlay.iterrows()
+    }
+    t0_fields = list(CANONICAL_T0_DNA_FIELDS) + [
+        "price", "volume", "vol_ma20", "group", "sector",
+    ]
+    for idx, row in result.iterrows():
+        sym = _normalize_symbol(row.get("symbol"))
+        source = overlay_by_symbol.get(sym)
+        if source is None:
+            continue
+        for field in t0_fields:
+            if field not in result.columns:
+                result[field] = np.nan
+            overlay_val = source.get(field)
+            if not _is_valid_t0_value(overlay_val):
+                continue
+            if overlay_wins or not _is_valid_t0_value(result.at[idx, field]):
+                result.at[idx, field] = overlay_val
+    return result
+
+
+def _cache_t0_snapshot(snapshot: pd.DataFrame, session_date: Any) -> None:
+    if snapshot is None or snapshot.empty:
+        return
+    key = _normalize_session_date(session_date)
+    _CURRENT_T0_BY_SESSION[key] = _ensure_columns(snapshot, HISTORY_COLUMNS).copy()
+
+
+def _resolve_experience_t0_snapshot(
+    snapshot: Optional[pd.DataFrame] = None,
+    history: Optional[pd.DataFrame] = None,
+    session_date: Optional[Any] = None,
+) -> pd.DataFrame:
+    """
+    Resolve T0 DNA source rows with priority:
+    current authoritative in-memory snapshot → process cache → persisted history.
+    """
+    session = _normalize_session_date(session_date) if session_date else None
+    resolved = pd.DataFrame()
+
+    if snapshot is not None and not snapshot.empty:
+        resolved = _ensure_columns(snapshot, HISTORY_COLUMNS).copy()
+
+    if session and session in _CURRENT_T0_BY_SESSION:
+        cached = _CURRENT_T0_BY_SESSION[session]
+        resolved = (
+            cached.copy()
+            if resolved.empty
+            else _overlay_t0_fields(resolved, cached)
+        )
+
+    if history is not None and not history.empty:
+        persisted = _latest_session_experience_snapshot(history)
+        if session and not persisted.empty and "session_date" in persisted.columns:
+            mask = persisted["session_date"].astype(str).str.strip() == session
+            persisted = persisted[mask].copy()
+        if not persisted.empty:
+            if resolved.empty:
+                resolved = persisted.copy()
+            else:
+                resolved = _overlay_t0_fields(
+                    persisted, resolved, overlay_wins=True
+                )
+
+    if "pull" not in resolved.columns and "pullback" in resolved.columns:
+        resolved["pull"] = resolved["pullback"]
+    return resolved.reset_index(drop=True)
 
 
 class FileLock:
@@ -551,10 +678,10 @@ def _prepare_snapshot(
     frame["symbol"] = scan_df[symbol_col].map(_normalize_symbol)
 
     names = [
-        "price", "group", "sector", "rs5", "rs10", "rsi14", "obv",
+        "price", "group", "sector", "rs5", "rs10", "rs_spread", "rsi14", "obv",
         "obv_status", "total_score", "trend_score", "buy_score",
         "persistence", "evolution", "recent_change", "ema9_ma20_slope",
-        "dist_from_ema9_pct",         "volume", "vol_ma20", "market_real",
+        "dist_from_ema9_pct", "volume", "vol_ma20", "market_real",
         "market_forecast", "market_regime", "storm", "early", "pullback",
         "green2", "dryup", "health_group", "action", "reason",
     ]
@@ -571,7 +698,7 @@ def _prepare_snapshot(
     frame = frame.rename(columns={"persistence": "source_persistence"})
 
     numeric_cols = [
-        "price", "rs5", "rs10", "rsi14", "obv", "total_score",
+        "price", "rs5", "rs10", "rs_spread", "rsi14", "obv", "total_score",
         "trend_score", "buy_score", "source_persistence", "evolution",
         "recent_change", "ema9_ma20_slope", "dist_from_ema9_pct",
         "volume", "vol_ma20", "market_real", "market_forecast",
@@ -579,16 +706,30 @@ def _prepare_snapshot(
     for col in numeric_cols:
         frame[col] = _numeric_series(frame[col])
 
+    supplied_rs_spread = pd.to_numeric(frame.get("rs_spread"), errors="coerce")
+    calculated_rs_spread = frame["rs5"] - frame["rs10"]
+    frame["rs_spread"] = calculated_rs_spread.where(
+        calculated_rs_spread.notna(), supplied_rs_spread
+    )
+
     for col in ["storm", "early", "pullback", "green2", "dryup"]:
         frame[col] = frame[col].map(_safe_bool)
 
-    for col in ["group", "sector", "obv_status", "market_regime", "action", "reason"]:
+    for col in [
+        "group", "sector", "obv_status", "market_regime", "action", "reason",
+        "health_group",
+    ]:
         frame[col] = frame[col].map(_clean_text)
 
     frame["volume_ratio"] = np.where(
         frame["vol_ma20"].fillna(0) > 0,
         frame["volume"] / frame["vol_ma20"],
         np.nan,
+    )
+    supplied_volume_ratio = _series(scan_df, "volume_ratio20", config)
+    supplied_volume_ratio = pd.to_numeric(supplied_volume_ratio, errors="coerce")
+    frame["volume_ratio"] = frame["volume_ratio"].where(
+        frame["volume_ratio"].notna(), supplied_volume_ratio
     )
     frame["feature_signature"] = frame.apply(
         lambda r: _feature_signature(r.to_dict()), axis=1
@@ -1083,17 +1224,27 @@ def _build_experience_frame(
     market_real: Optional[Any],
     market_forecast: Optional[Any],
     breadth: Optional[Any] = None,
+    brain: Optional[pd.DataFrame] = None,
+    history: Optional[pd.DataFrame] = None,
+    session_date: Optional[Any] = None,
 ) -> pd.DataFrame:
     """
     Attach canonical T3/T5/T10 earning-learning evidence via STEP 1 lookup.
     Does not recalculate knowledge; reuses apply_learning_experience().
     """
-    if snapshot is None or snapshot.empty or "symbol" not in snapshot.columns:
+    frame = _resolve_experience_t0_snapshot(
+        snapshot=snapshot,
+        history=history,
+        session_date=session_date,
+    )
+    if frame is None or frame.empty or "symbol" not in frame.columns:
         return pd.DataFrame()
 
-    frame = snapshot.copy()
     if "pull" not in frame.columns and "pullback" in frame.columns:
         frame["pull"] = frame["pullback"]
+
+    t0_cols = [c for c in BASE_FEATURE_COLUMNS if c in frame.columns]
+    frame = frame[t0_cols].copy()
 
     try:
         from modules.earning_learning import apply_learning_experience
@@ -1106,6 +1257,7 @@ def _build_experience_frame(
             market_real=mr if not math.isnan(mr) else np.nan,
             market_forecast=mf if not math.isnan(mf) else np.nan,
             breadth=bw if not math.isnan(bw) else None,
+            brain_df=brain,
         )
     except Exception:
         logger.exception("Canonical earning-learning attach failed safely")
@@ -1275,6 +1427,9 @@ def _persist_recommendation_shadow(
     brain: pd.DataFrame,
     experience_df: Optional[pd.DataFrame],
     session_date: Any,
+    market_real: Optional[Any] = None,
+    market_forecast: Optional[Any] = None,
+    breadth: Optional[Any] = None,
 ) -> None:
     """N3/N3.7 shadow audit — separate files only; production rec unchanged."""
     try:
@@ -1289,6 +1444,9 @@ def _persist_recommendation_shadow(
             brain,
             experience_df,
             session_date=_normalize_session_date(session_date),
+            market_real=market_real,
+            market_forecast=market_forecast,
+            breadth=breadth,
         )
         summary = summarize_shadow_comparison(shadow_df)
         persist_shadow_audit(
@@ -1345,6 +1503,9 @@ def _latest_session_experience_snapshot(history: pd.DataFrame) -> pd.DataFrame:
 
     latest = session_dates.max()
     snapshot = hist[session_dates == latest].copy()
+    cached = _CURRENT_T0_BY_SESSION.get(latest)
+    if cached is not None and not cached.empty:
+        snapshot = _overlay_t0_fields(snapshot, cached, overlay_wins=True)
     if "pull" not in snapshot.columns and "pullback" in snapshot.columns:
         snapshot["pull"] = snapshot["pullback"]
     return snapshot.reset_index(drop=True)
@@ -1379,6 +1540,8 @@ def update_memory(
                     logger.warning("SNAPSHOT EMPTY: %s", warnings)
                     return load_memory()
 
+                _cache_t0_snapshot(snapshot, session_date)
+
                 history = _safe_read_csv(HISTORY_FILE, HISTORY_COLUMNS)
                 history = _merge_snapshot(history, snapshot, config)
                 history = _update_outcomes(history, config)
@@ -1391,6 +1554,9 @@ def update_memory(
                     market_real=market_real,
                     market_forecast=market_forecast,
                     breadth=breadth,
+                    brain=brain,
+                    history=history,
+                    session_date=session_date,
                 )
                 rec = _build_recommendations(
                     brain,
@@ -1411,6 +1577,9 @@ def update_memory(
                     brain,
                     experience_df,
                     session_date,
+                    market_real=market_real,
+                    market_forecast=market_forecast,
+                    breadth=breadth,
                 )
 
                 legacy_cols = [
@@ -1574,6 +1743,9 @@ def rebuild_all(
                     market_real=effective_market_real,
                     market_forecast=effective_market_forecast,
                     breadth=effective_breadth,
+                    brain=brain,
+                    history=history,
+                    session_date=snapshot["session_date"].iloc[0] if not snapshot.empty else None,
                 )
 
             rec = _build_recommendations(

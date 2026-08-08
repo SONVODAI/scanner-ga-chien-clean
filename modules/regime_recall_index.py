@@ -505,6 +505,19 @@ def _is_usable_recall_index(df: pd.DataFrame) -> bool:
     return versions == [REBUILD_VERSION]
 
 
+def _sources_signature(base: Path) -> str:
+    """Fingerprint rebuild sources so cache retry tracks availability changes."""
+    parts: list[str] = []
+    for name in (OBSERVATIONS_FILE, LIFECYCLE_FILE):
+        path = base / name
+        if path.exists():
+            stat = path.stat()
+            parts.append(f"{name}:{stat.st_mtime_ns}:{stat.st_size}")
+        else:
+            parts.append(f"{name}:missing")
+    return "|".join(parts)
+
+
 def ensure_recall_index(
     data_dir: Optional[Path | str] = None,
     *,
@@ -519,20 +532,20 @@ def ensure_recall_index(
     """
     base = Path(data_dir) if data_dir is not None else DEFAULT_DATA_DIR
     key = _runtime_key(base)
-    state = _RUNTIME_STATE.setdefault(
-        key, {"cache": None, "attempted": False, "auto_rebuilt": False}
-    )
+    state = _RUNTIME_STATE.setdefault(key, {})
 
-    if state["cache"] is not None:
-        return state["cache"]
+    usable = state.get("usable_cache")
+    if usable is not None:
+        return usable
 
     path = base / RECALL_INDEX_FILE
     if path.exists() and path.stat().st_size > 0:
         try:
             df = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
             if _is_usable_recall_index(df):
-                state["cache"] = df
-                state["attempted"] = True
+                state["usable_cache"] = df
+                state.pop("rebuild_exhausted", None)
+                state.pop("rebuild_sources_sig", None)
                 logger.info("Loaded recall index: %s (%s rows)", path, len(df))
                 return df
             logger.warning(
@@ -543,25 +556,32 @@ def ensure_recall_index(
         except Exception:
             logger.exception("Failed reading recall index at %s", path)
 
-    if state["attempted"] or not auto_rebuild:
-        state["attempted"] = True
-        state["cache"] = _empty_recall_index()
-        return state["cache"]
+    if not auto_rebuild:
+        return _empty_recall_index()
 
-    state["attempted"] = True
-    if not _sources_available_for_rebuild(base):
+    sources_sig = _sources_signature(base)
+    sources_ok = _sources_available_for_rebuild(base)
+
+    # Missing sources: return empty without poisoning future retries.
+    if not sources_ok:
         logger.info(
             "Recall index unavailable and rebuild sources missing under %s",
             base,
         )
-        state["cache"] = _empty_recall_index()
-        return state["cache"]
+        return _empty_recall_index()
+
+    # Sources present but prior rebuild for this signature already failed: skip loop.
+    if state.get("rebuild_exhausted") and state.get("rebuild_sources_sig") == sources_sig:
+        return state.get("last_empty") or _empty_recall_index()
 
     try:
         index_df, summary, _ = rebuild_recall_index(base, write=write)
         if _is_usable_recall_index(index_df):
-            state["cache"] = index_df
+            state["usable_cache"] = index_df
             state["auto_rebuilt"] = True
+            state.pop("rebuild_exhausted", None)
+            state.pop("rebuild_sources_sig", None)
+            state.pop("last_empty", None)
             logger.info(
                 "Auto-rebuilt recall index at %s (%s rows, GLOBAL T3-ready=%s)",
                 path,
@@ -576,8 +596,10 @@ def ensure_recall_index(
     except Exception:
         logger.exception("Auto-rebuild recall index failed for %s", base)
 
-    state["cache"] = _empty_recall_index()
-    return state["cache"]
+    state["rebuild_exhausted"] = True
+    state["rebuild_sources_sig"] = sources_sig
+    state["last_empty"] = _empty_recall_index()
+    return state["last_empty"]
 
 
 def load_recall_index(data_dir: Optional[Path | str] = None) -> pd.DataFrame:

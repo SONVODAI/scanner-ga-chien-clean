@@ -202,6 +202,9 @@ class TestRecallIndexRuntimeActivation(unittest.TestCase):
             tmp_path = Path(tmp)
             recall = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
             self.assertTrue(recall.empty)
+            # Second call with still-missing sources must remain empty but not poison retry.
+            recall2 = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
+            self.assertTrue(recall2.empty)
 
 
 class TestCompileImport(unittest.TestCase):
