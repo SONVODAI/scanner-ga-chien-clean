@@ -110,6 +110,12 @@ PREFERRED_RECOMMENDATION_COLUMNS = [
     "pattern_match_score",
     "matched_pattern_id",
     "reason",
+    "ExperienceAdjustment",
+    "ExperienceSamples",
+    "LearnedWinRate",
+    "ContextMatchMode",
+    "MatchedMarketContext",
+    "LearningStatus",
 ]
 
 PREFERRED_HOF_COLUMNS = [

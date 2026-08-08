@@ -874,6 +874,60 @@ def _find_source_column(
     return None
 
 
+MARKET_CONTEXT_FIELDS = (
+    "market_score",
+    "market_live",
+    "market_forecast",
+    "breadth",
+    "market_regime",
+)
+
+
+def _is_missing_market_numeric(value: Any) -> bool:
+    return not math.isfinite(_safe_float(value))
+
+
+def _is_missing_market_text(value: Any) -> bool:
+    return not _safe_text(value).strip()
+
+
+def _fill_market_context_rowwise(
+    canonical: pd.DataFrame,
+    context: Optional[Mapping[str, Any]],
+) -> pd.DataFrame:
+    """Fill missing market-context fields per row; never overwrite valid values."""
+    if canonical is None or canonical.empty:
+        return canonical
+
+    context_map = dict(context or {})
+    for field in MARKET_CONTEXT_FIELDS:
+        if field not in context_map or field not in canonical.columns:
+            continue
+
+        ctx_val = context_map[field]
+        if field == "market_regime":
+            if _is_missing_market_text(ctx_val):
+                continue
+            fill_val = _safe_text(ctx_val)
+            missing_mask = canonical[field].map(_is_missing_market_text)
+            if missing_mask.any():
+                canonical[field] = canonical[field].astype(object)
+                canonical.loc[missing_mask, field] = fill_val
+        else:
+            fill_val = _safe_float(ctx_val)
+            if not math.isfinite(fill_val):
+                continue
+            missing_mask = canonical[field].map(_is_missing_market_numeric)
+            if missing_mask.any():
+                canonical[field] = pd.to_numeric(
+                    canonical[field],
+                    errors="coerce",
+                )
+                canonical.loc[missing_mask, field] = fill_val
+
+    return canonical
+
+
 def _adapt_board(
     board_df: pd.DataFrame,
     market_context: Optional[Mapping[str, Any]] = None,
@@ -896,10 +950,10 @@ def _adapt_board(
         )
 
     context = dict(market_context or {})
-
-    for field in ("market_score", "market_live", "market_forecast", "breadth", "market_regime"):
-        if canonical[field].isna().all() and field in context:
-            canonical[field] = context[field]
+    canonical = _fill_market_context_rowwise(
+        canonical,
+        context,
+    )
 
     canonical["symbol"] = canonical["symbol"].map(_normalise_symbol)
     canonical = canonical[canonical["symbol"] != ""].copy()
@@ -3096,15 +3150,18 @@ def _decision_rows_for_pattern_keys(
             else np.nan
         )
 
+    decision_context: Dict[str, Any] = {}
     market_score = _safe_float(market_real)
     forecast = _safe_float(market_forecast)
-    if canonical["market_score"].isna().all() and math.isfinite(market_score):
-        canonical["market_score"] = market_score
-    if canonical["market_forecast"].isna().all() and math.isfinite(forecast):
-        canonical["market_forecast"] = forecast
     breadth_value = _safe_float(breadth)
-    if canonical["breadth"].isna().all() and math.isfinite(breadth_value):
-        canonical["breadth"] = breadth_value
+    if math.isfinite(market_score):
+        decision_context["market_score"] = market_score
+    if math.isfinite(forecast):
+        decision_context["market_forecast"] = forecast
+    if math.isfinite(breadth_value):
+        decision_context["breadth"] = breadth_value
+    canonical = _fill_market_context_rowwise(canonical, decision_context)
+
     for field in NUMERIC_FIELDS:
         if field in canonical.columns:
             canonical[field] = canonical[field].map(_safe_float)

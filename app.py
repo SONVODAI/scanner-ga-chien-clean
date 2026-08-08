@@ -221,6 +221,21 @@ def to_float(value, default=np.nan):
         return default
 
 
+def _learning_breadth_score(rsi_breadth_report) -> float | None:
+    """Normalized RSI breadth score shared by P1 storage and P4 read paths."""
+    if not isinstance(rsi_breadth_report, dict):
+        return None
+    score = rsi_breadth_report.get("score")
+    if score is None:
+        return None
+    try:
+        if pd.notna(score):
+            return float(score)
+    except (TypeError, ValueError):
+        pass
+    return None
+
+
 def is_valid_price(value) -> bool:
     v = to_float(value)
     return pd.notna(v) and v > 0
@@ -5249,6 +5264,7 @@ def build_buy_elite_decision_engine(
     early_buy_lab_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
+    breadth: float | None = None,
     learning_profile: dict | None = None,
     pattern_match_df: pd.DataFrame | None = None,
     leader_memory_df: pd.DataFrame | None = None,
@@ -5603,6 +5619,7 @@ def build_buy_elite_decision_engine(
         base,
         market_real=market_real,
         market_forecast=market_forecast,
+        breadth=breadth,
     )
     experience_adj = (
         pd.to_numeric(base.get("ExperienceAdjustment", 0.0), errors="coerce")
@@ -6227,6 +6244,7 @@ render_earning_money_board(
 
 # Độ rộng RSI + lời kết luận tự động của Mr.BOT.
 rsi_breadth_report = render_rsi_breadth_report(scan_df)
+_learning_breadth = _learning_breadth_score(rsi_breadth_report)
 
 daily_result = process_and_render_daily_summary(
     scan_df,
@@ -6254,14 +6272,8 @@ try:
         "market_forecast": market_forecast,
         "market_regime": market_forecast_text,
     }
-    if isinstance(rsi_breadth_report, dict):
-        _breadth_score = rsi_breadth_report.get("score")
-        if _breadth_score is not None:
-            try:
-                if pd.notna(_breadth_score):
-                    _learning_market_context["breadth"] = float(_breadth_score)
-            except (TypeError, ValueError):
-                pass
+    if _learning_breadth is not None:
+        _learning_market_context["breadth"] = _learning_breadth
     learning_result = update_learning(
         earning_board_df=scan_df,
         market_context=_learning_market_context,
@@ -6279,6 +6291,7 @@ try:
         market_real=market_real,
         market_forecast=market_forecast,
         market_regime=market_forecast_text,
+        breadth=_learning_breadth,
         raise_errors=True,
     )
 except Exception as e:
@@ -6365,6 +6378,7 @@ buy_elite_df = build_buy_elite_decision_engine(
     early_buy_lab_df=early_buy_lab_df,
     market_real=market_real,
     market_forecast=market_forecast,
+    breadth=_learning_breadth,
     learning_profile=learning_profile,
     pattern_match_df=pattern_match_df,
     leader_memory_df=leader_memory_df,
@@ -6923,6 +6937,7 @@ try:
         market_real=market_real,
         market_forecast=market_forecast,
         market_regime=market_forecast_text,
+        breadth=_learning_breadth,
         raise_errors=True,
     )
     st.caption(f"🧠 Leader Memory: {len(leader_brain_df)} mã")

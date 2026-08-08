@@ -17,7 +17,6 @@ Thiết kế:
 """
 
 from __future__ import annotations
-from modules.earning_learning import update_learning
 
 from typing import Final
 
@@ -440,8 +439,8 @@ def render_earning_money_board(
     
     board = get_earning_money_board(scan_df)
 
-    # Learning chỉ ghi nhớ, không ảnh hưởng Bot
-    update_learning(board)
+    # Learning persistence: canonical path is app.py update_learning(scan_df,
+    # market_context=...) after RSI breadth is available.
     try:
         import streamlit as st
     except ImportError:

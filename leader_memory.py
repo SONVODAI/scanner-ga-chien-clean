@@ -208,7 +208,7 @@ RECOMMENDATION_COLUMNS = [
     "pattern_match_score", "matched_pattern_id", "reason", "updated_at",
     "ExperienceAdjustment", "ExperienceSamples", "LearnedWinRate",
     "ContinuationScore", "MatchedPattern", "MatchedMarketContext",
-    "LearningStatus",
+    "ContextMatchMode", "LearningStatus",
 ]
 
 # Canonical earning-learning (STEP 1) rank bridge — separate from Leader Memory pattern library.
@@ -1082,6 +1082,7 @@ def _build_experience_frame(
     snapshot: pd.DataFrame,
     market_real: Optional[Any],
     market_forecast: Optional[Any],
+    breadth: Optional[Any] = None,
 ) -> pd.DataFrame:
     """
     Attach canonical T3/T5/T10 earning-learning evidence via STEP 1 lookup.
@@ -1099,10 +1100,12 @@ def _build_experience_frame(
 
         mr = _safe_float(market_real, np.nan)
         mf = _safe_float(market_forecast, np.nan)
+        bw = _safe_float(breadth, np.nan)
         return apply_learning_experience(
             frame,
             market_real=mr if not math.isnan(mr) else np.nan,
             market_forecast=mf if not math.isnan(mf) else np.nan,
+            breadth=bw if not math.isnan(bw) else None,
         )
     except Exception:
         logger.exception("Canonical earning-learning attach failed safely")
@@ -1257,12 +1260,41 @@ def load_recommendations() -> pd.DataFrame:
     return _safe_read_csv(RECOMMENDATION_FILE, RECOMMENDATION_COLUMNS)
 
 
+def _latest_session_experience_snapshot(history: pd.DataFrame) -> pd.DataFrame:
+    if history is None or history.empty:
+        return pd.DataFrame()
+
+    hist = _ensure_columns(history, HISTORY_COLUMNS)
+    if "session_date" not in hist.columns:
+        return pd.DataFrame()
+
+    session_dates = hist["session_date"].astype(str).str.strip()
+    session_dates = session_dates[session_dates != ""]
+    if session_dates.empty:
+        return pd.DataFrame()
+
+    latest = session_dates.max()
+    snapshot = hist[session_dates == latest].copy()
+    if "pull" not in snapshot.columns and "pullback" in snapshot.columns:
+        snapshot["pull"] = snapshot["pullback"]
+    return snapshot.reset_index(drop=True)
+
+
+def _infer_session_market_value(series: pd.Series) -> Optional[float]:
+    numeric = pd.to_numeric(series, errors="coerce")
+    valid = numeric.dropna()
+    if valid.empty:
+        return None
+    return float(valid.median())
+
+
 def update_memory(
     df_today: pd.DataFrame,
     session_date: Optional[Any] = None,
     market_real: Optional[Any] = None,
     market_forecast: Optional[Any] = None,
     market_regime: Optional[Any] = None,
+    breadth: Optional[Any] = None,
     raise_errors: bool = False,
 ) -> pd.DataFrame: 
     config = _load_config()
@@ -1288,6 +1320,7 @@ def update_memory(
                     snapshot,
                     market_real=market_real,
                     market_forecast=market_forecast,
+                    breadth=breadth,
                 )
                 rec = _build_recommendations(
                     brain,
@@ -1429,7 +1462,12 @@ def backup_brain(destination_dir: Optional[Any] = None) -> Path:
     return destination
 
 
-def rebuild_all() -> Dict[str, int]:
+def rebuild_all(
+    *,
+    market_real: Optional[float] = None,
+    market_forecast: Optional[float] = None,
+    breadth: Optional[float] = None,
+) -> Dict[str, int]:
     config = _load_config()
     with _PROCESS_LOCK:
         with FileLock(LOCK_FILE):
@@ -1438,7 +1476,38 @@ def rebuild_all() -> Dict[str, int]:
             brain = _build_brain(history, config)  
             patterns = _build_patterns(history, config)
             hof = _build_hof(brain, config)
-            rec = _build_recommendations(brain, patterns, config)
+
+            snapshot = _latest_session_experience_snapshot(history)
+            effective_market_real = market_real
+            effective_market_forecast = market_forecast
+            effective_breadth = breadth
+            if not snapshot.empty:
+                if effective_market_real is None:
+                    effective_market_real = _infer_session_market_value(
+                        snapshot.get("market_real", pd.Series(dtype=float))
+                    )
+                if effective_market_forecast is None:
+                    effective_market_forecast = _infer_session_market_value(
+                        snapshot.get("market_forecast", pd.Series(dtype=float))
+                    )
+
+            experience_df = pd.DataFrame()
+            if not snapshot.empty:
+                experience_df = _build_experience_frame(
+                    snapshot,
+                    market_real=effective_market_real,
+                    market_forecast=effective_market_forecast,
+                    breadth=effective_breadth,
+                )
+
+            rec = _build_recommendations(
+                brain,
+                patterns,
+                config,
+                experience_df=experience_df if not experience_df.empty else None,
+                market_real=effective_market_real,
+                market_forecast=effective_market_forecast,
+            )
 
             _atomic_write_csv(history, HISTORY_FILE)
             _atomic_write_csv(brain, BRAIN_FILE)
