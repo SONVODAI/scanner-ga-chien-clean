@@ -6704,7 +6704,7 @@ if not final_df.empty:
     final_display_df = format_final_decision_for_display(final_df)
 
     st.dataframe(
-        final_display_df,
+        style_final_decision(final_display_df),
         use_container_width=True,
         hide_index=True,
         height=520,

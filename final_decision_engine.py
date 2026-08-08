@@ -490,6 +490,32 @@ def build_final_decision(
     return final, note
 
 
+def _decision_score_gradient_style(series):
+    """CSS-only DecisionScore ramp (YlGn-like); avoids matplotlib optional dep."""
+    numeric = pd.to_numeric(series, errors="coerce")
+    vmin = numeric.min(skipna=True)
+    vmax = numeric.max(skipna=True)
+    styles = []
+    for value in numeric:
+        if pd.isna(value):
+            styles.append("")
+            continue
+        if pd.isna(vmin) or pd.isna(vmax) or vmax == vmin:
+            t = 1.0
+        else:
+            t = max(0.0, min(1.0, (float(value) - float(vmin)) / (float(vmax) - float(vmin))))
+        # Approximate YlGn: #ffffcc (low) -> #006837 (high)
+        red = int(255 * (1.0 - t))
+        green = int(255 - 151 * t)
+        blue = int(204 - 149 * t)
+        text_color = "#ffffff" if t > 0.65 else "#1a1a1a"
+        styles.append(
+            f"background-color: rgb({red},{green},{blue}); "
+            f"color: {text_color}; font-weight: 600"
+        )
+    return styles
+
+
 def style_final_decision(df):
     if df is None or df.empty:
         return df
@@ -499,10 +525,7 @@ def style_final_decision(df):
 
     return (
         df.style
-        .background_gradient(
-            subset=["DecisionScore"],
-            cmap="YlGn",
-        )
+        .apply(_decision_score_gradient_style, subset=["DecisionScore"])
         .format(
             {
                 "DecisionScore": lambda v: format_display_number(
