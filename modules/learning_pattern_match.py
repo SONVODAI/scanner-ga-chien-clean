@@ -767,4 +767,3 @@ def run(scan_df):
     """
 
     show_pattern_match(scan_df)
-
