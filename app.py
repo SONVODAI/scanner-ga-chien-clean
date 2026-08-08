@@ -5596,7 +5596,7 @@ def build_buy_elite_decision_engine(
         | warn.str.contains("Giá dưới EMA9", na=False)
     )
     mr = to_float(market_real, 0)
-                group.eq("PULL VỪA"),
+            group.eq("PULL VỪA"),
             group.eq("MUA EARLY") & base["InEarlyLab"],
             group.eq("MUA EARLY"),
             base["InPullback"],
