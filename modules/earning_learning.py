@@ -127,6 +127,7 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
     "rsi_slope": ("rsi_slope", "rsi14_slope", "RSI slope"),
     "rs5": ("rs5", "RS5", "rs_5"),
     "rs10": ("rs10", "RS10", "rs_10"),
+    "rs_spread": ("rs_spread", "RS_SPREAD", "rs spread"),
     "ema9": ("ema9", "EMA9"),
     "ma20": ("ma20", "sma20", "MA20", "SMA20"),
     "ema9_ma20_slope": (
@@ -145,8 +146,8 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
     "near_bottom_60_pct": ("near_bottom_60_pct",),
     "dist_high20": ("dist_high20", "dist_high20_pct"),
     "green2": ("green_2_confirm", "green2", "early_green2"),
-    "early": ("early", "early_signal", "early_dry_green2"),
-    "pull": ("pull", "pull_label", "pull_signal"),
+    "early": ("early", "early_signal", "early_dry_green2", "InEarlyLab"),
+    "pull": ("pull", "pull_label", "pull_signal", "InPullback"),
     "group": ("group", "evolution_stage", "stage"),
     "sector": ("sector", "industry", "ngành", "Ngành"),
     "market_score": ("market_score", "market_real", "market_health"),
@@ -3109,9 +3110,18 @@ def _decision_rows_for_pattern_keys(
         if field in canonical.columns:
             canonical[field] = canonical[field].map(_safe_bool)
 
-    canonical["rs_spread"] = (
+    # Preserve rs_spread supplied by BUY ELITE when rs5 is not carried into
+    # the compact decision frame.  Previously it was overwritten with NaN,
+    # which changed stock_pattern_key and prevented historical matches.
+    supplied_rs_spread = pd.to_numeric(
+        canonical.get("rs_spread"), errors="coerce"
+    )
+    calculated_rs_spread = (
         pd.to_numeric(canonical.get("rs5"), errors="coerce")
         - pd.to_numeric(canonical.get("rs10"), errors="coerce")
+    )
+    canonical["rs_spread"] = calculated_rs_spread.where(
+        calculated_rs_spread.notna(), supplied_rs_spread
     )
 
     vol_ma20 = pd.to_numeric(canonical.get("vol_ma20"), errors="coerce")
@@ -3202,6 +3212,19 @@ def _continuation_knowledge_lookup(
     return lookup
 
 
+def _market_context_family(market_context_key: str) -> Tuple[str, str]:
+    """Return (forecast_bucket, market_bucket), intentionally ignoring breadth.
+
+    BUY ELITE currently receives market_real and market_forecast but not breadth.
+    Exact context matching remains first priority.  This reduced key is only a
+    conservative fallback when breadth is unavailable in the decision frame.
+    """
+    parts = str(market_context_key).split("|")
+    if len(parts) >= 3:
+        return parts[0], parts[2]
+    return str(market_context_key), ""
+
+
 def _lookup_pattern_row(
     lookup: Dict[Tuple[str, str, int], pd.Series],
     market_context_key: str,
@@ -3213,12 +3236,29 @@ def _lookup_pattern_row(
     if not lookup:
         return None
 
+    # 1) Exact pair: market context + stock DNA.
     for horizon in (preferred_horizon, fallback_horizon):
-        row = lookup.get(
-            (market_context_key, stock_pattern_key, horizon)
-        )
+        row = lookup.get((market_context_key, stock_pattern_key, horizon))
         if row is not None:
             return row
+
+    # 2) Breadth-safe fallback: same forecast bucket + same Market Real bucket
+    # and exactly the same stock DNA.  Never crosses market regime or stock DNA.
+    target_family = _market_context_family(market_context_key)
+    for horizon in (preferred_horizon, fallback_horizon):
+        candidates = []
+        for (ctx_key, stock_key, h), row in lookup.items():
+            if (
+                stock_key == stock_pattern_key
+                and h == horizon
+                and _market_context_family(ctx_key) == target_family
+            ):
+                candidates.append(row)
+        if candidates:
+            return max(
+                candidates,
+                key=lambda r: _experience_int(r.get("samples")),
+            )
 
     return None
 
@@ -3230,7 +3270,26 @@ def _lookup_continuation_row(
 ) -> Optional[pd.Series]:
     if not lookup:
         return None
-    return lookup.get((market_context_key, stock_pattern_key))
+
+    row = lookup.get((market_context_key, stock_pattern_key))
+    if row is not None:
+        return row
+
+    target_family = _market_context_family(market_context_key)
+    candidates = [
+        candidate
+        for (ctx_key, stock_key), candidate in lookup.items()
+        if (
+            stock_key == stock_pattern_key
+            and _market_context_family(ctx_key) == target_family
+        )
+    ]
+    if not candidates:
+        return None
+    return max(
+        candidates,
+        key=lambda r: _experience_int(r.get("samples_t10")),
+    )
 
 
 def _compute_experience_adjustment(
@@ -3436,7 +3495,12 @@ def _row_experience_from_keys(
             else np.nan
         )
 
-    result["MatchedMarketContext"] = market_context_key
+    matched_context = ""
+    if pattern_row is not None:
+        matched_context = _safe_text(pattern_row.get("market_context_key"))
+    if not matched_context and continuation_row is not None:
+        matched_context = _safe_text(continuation_row.get("market_context_key"))
+    result["MatchedMarketContext"] = matched_context or market_context_key
     result["ExperienceAdjustment"] = _compute_experience_adjustment(
         pattern_row,
         continuation_row,
