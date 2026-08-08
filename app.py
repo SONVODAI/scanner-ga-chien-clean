@@ -5251,6 +5251,7 @@ def build_buy_elite_decision_engine(
     market_forecast: float,
     learning_profile: dict | None = None,
     pattern_match_df: pd.DataFrame | None = None,
+    leader_memory_df: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """
     BUY ELITE V3 = Decision Engine có xác suất ước lượng, đồng thuận, trọng số theo mùa và Learning Engine.
@@ -6240,6 +6241,7 @@ buy_elite_df = build_buy_elite_decision_engine(
     market_forecast=market_forecast,
     learning_profile=learning_profile,
     pattern_match_df=pattern_match_df,
+    leader_memory_df=leader_memory_df,
 )
 final_df, final_note = build_final_decision(
     buy_elite_df,
