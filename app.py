@@ -5811,7 +5811,8 @@ base["EliteScore"] = (
 
     cols = [
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN", "EliteScore",
-        "EliteScoreBase", "ExperienceAdjustment", "ExperienceSamples", "LearnedWinRate",
+        "EliteScoreBase", "LeaderMemoryScore", "LeaderMemoryConfidence", "LeaderMemoryAdjustment",
+        "ExperienceAdjustment", "ExperienceSamples", "LearnedWinRate",
         "ContinuationScore", "MatchedPattern", "MatchedMarketContext", "LearningStatus",
         "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE", "REGIME", "LearningMode",
         "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "PatternScore", "Penalty",
