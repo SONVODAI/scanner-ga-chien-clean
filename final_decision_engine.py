@@ -2,6 +2,8 @@
 # MR.BOT FINAL DECISION ENGINE V2
 # =========================================================
 
+import math
+
 import pandas as pd
 import numpy as np
 import re
@@ -9,6 +11,19 @@ import re
 
 MAX_TOP = 10
 MAX_PER_SECTOR = 3
+
+# Upstream Buy Elite (STEP 2) already applies ExperienceAdjustment to EliteScore/WinProb.
+# Final Decision must NOT add ExperienceAdjustment again.
+LEARNING_AUDIT_COLS = (
+    "EliteScoreBase",
+    "ExperienceAdjustment",
+    "ExperienceSamples",
+    "LearnedWinRate",
+    "ContinuationScore",
+    "MatchedPattern",
+    "MatchedMarketContext",
+    "LearningStatus",
+)
 
 
 # =========================================================
@@ -106,6 +121,133 @@ def _safe_str(x):
     return str(x)
 
 
+# =========================================================
+# DISPLAY FORMATTING (presentation layer only)
+# =========================================================
+
+FINAL_DECISION_TEXT_COLS = frozenset({
+    "#",
+    "⭐",
+    "MÃ",
+    "KẾT LUẬN",
+    "Lý do chọn",
+    "NHÓM",
+    "VÙNG MUA ELITE",
+    "NAV ELITE",
+    "ĐỘ TIN CẬY",
+    "ĐỒNG THUẬN",
+    "LÝ DO ELITE",
+    "RỦI RO",
+    "MatchedPattern",
+    "MatchedMarketContext",
+    "LearningStatus",
+})
+
+FINAL_DECISION_INT_COLS = frozenset({
+    "ExperienceSamples",
+    "GIÁ",
+})
+
+FINAL_DECISION_SCORE_COLS = frozenset({
+    "DecisionScoreBase",
+    "DecisionScoreLearningDelta",
+    "EliteScore",
+    "EliteScoreBase",
+    "ExperienceAdjustment",
+    "LearnedWinRate",
+    "ContinuationScore",
+})
+
+
+def format_display_number(value, max_decimals=2, prefer_int=True):
+    """Format a numeric value for UI/export only; does not alter calculation inputs."""
+    if value is None:
+        return ""
+
+    try:
+        if pd.isna(value):
+            return ""
+    except (TypeError, ValueError):
+        pass
+
+    if isinstance(value, float) and (math.isnan(value) or not math.isfinite(value)):
+        return ""
+
+    if isinstance(value, str):
+        text = value.strip()
+        if not text or text.lower() in {"nan", "none", "-"}:
+            return ""
+        pct_suffix = text.endswith("%")
+        raw = text[:-1].strip() if pct_suffix else text
+        try:
+            number = float(raw.replace(",", ""))
+        except ValueError:
+            return value
+        formatted = _format_display_float(number, max_decimals, prefer_int)
+        return f"{formatted}%" if pct_suffix else formatted
+
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+
+    if math.isnan(number) or not math.isfinite(number):
+        return ""
+
+    return _format_display_float(number, max_decimals, prefer_int)
+
+
+def _format_display_float(number, max_decimals, prefer_int):
+    if prefer_int and abs(number - round(number)) < 1e-4:
+        return str(int(round(number)))
+
+    rounded = round(number, max_decimals)
+    if prefer_int and abs(rounded - round(rounded)) < 1e-4:
+        return str(int(round(rounded)))
+
+    text = f"{rounded:.{max_decimals}f}"
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text
+
+
+def _format_winprob_display(value):
+    formatted = format_display_number(value, max_decimals=0, prefer_int=True)
+    if not formatted:
+        return ""
+    if formatted.endswith("%"):
+        return formatted
+    return f"{formatted}%"
+
+
+def format_final_decision_for_display(df):
+    """Return a presentation copy; upstream numeric precision is unchanged."""
+    if df is None or df.empty:
+        return df
+
+    out = df.copy()
+
+    for col in out.columns:
+        if col == "DecisionScore":
+            continue
+        if col == "WinProb":
+            out[col] = out[col].map(_format_winprob_display)
+            continue
+        if col in FINAL_DECISION_TEXT_COLS:
+            continue
+        if col in FINAL_DECISION_INT_COLS:
+            out[col] = out[col].map(
+                lambda v: format_display_number(v, max_decimals=0, prefer_int=True)
+            )
+            continue
+        if col in FINAL_DECISION_SCORE_COLS:
+            out[col] = out[col].map(
+                lambda v: format_display_number(v, max_decimals=2, prefer_int=True)
+            )
+
+    return out
+
+
 def _has_col(df, col):
     return isinstance(df, pd.DataFrame) and col in df.columns
 
@@ -195,6 +337,8 @@ def _apply_sector_limit(df, max_top=MAX_TOP, max_per_sector=MAX_PER_SECTOR):
 def _build_score(df, green_set):
     out = df.copy()
 
+    # Learning influence enters here exactly once: via upstream EliteScore / WinProb
+    # (already adjusted in Buy Elite STEP 2). No second ExperienceAdjustment term.
     out["_elite_score"] = out["EliteScore"].apply(_pct) if "EliteScore" in out.columns else 0
     out["_winprob"] = out["WinProb"].apply(_pct) if "WinProb" in out.columns else 0
     out["_trust"] = out["ĐỘ TIN CẬY"].apply(_trust_score) if "ĐỘ TIN CẬY" in out.columns else 0
@@ -214,6 +358,23 @@ def _build_score(df, green_set):
         + out["_consensus"] * 0.10
         + out["_green"] * 0.10
     ).round(2)
+
+    if "EliteScoreBase" in out.columns:
+        out["_elite_score_base"] = out["EliteScoreBase"].apply(_pct)
+        elite_learning_delta = (out["_elite_score"] - out["_elite_score_base"]).round(2)
+        # WinProb upstream already embeds learning via EliteScore * 0.55 (STEP 2).
+        winprob_learning_delta = elite_learning_delta * 0.55
+        out["_winprob_base"] = (out["_winprob"] - winprob_learning_delta).clip(0, 100)
+        out["DecisionScoreBase"] = (
+            out["_elite_score_base"] * 0.35
+            + out["_winprob_base"] * 0.25
+            + out["_trust"] * 0.20
+            + out["_consensus"] * 0.10
+            + out["_green"] * 0.10
+        ).round(2)
+        out["DecisionScoreLearningDelta"] = (
+            out["DecisionScore"] - out["DecisionScoreBase"]
+        ).round(2)
 
     out["⭐"] = out["DecisionScore"].apply(_star)
 
@@ -241,6 +402,16 @@ def _reason(row):
 
     if row.get("_green", 0) > 0:
         reasons.append("Có mặt bảng Xanh")
+
+    exp_adj = _num(row.get("ExperienceAdjustment", 0))
+    if exp_adj > 0:
+        reasons.append(f"Learning +{exp_adj:.1f} (Buy Elite)")
+    elif exp_adj < 0:
+        reasons.append(f"Learning {exp_adj:.1f} (Buy Elite)")
+
+    learning_status = _safe_str(row.get("LearningStatus", "")).strip()
+    if learning_status and learning_status not in ("READY_FOR_CONNECTION", ""):
+        reasons.append(f"LearningStatus={learning_status}")
 
     if not reasons:
         reasons.append("Đủ chuẩn MUA")
@@ -291,6 +462,8 @@ def build_final_decision(
         "⭐",
         "MÃ",
         "DecisionScore",
+        "DecisionScoreBase",
+        "DecisionScoreLearningDelta",
         "KẾT LUẬN",
         "Lý do chọn",
         "NHÓM",
@@ -303,17 +476,13 @@ def build_final_decision(
         "ĐỒNG THUẬN",
         "LÝ DO ELITE",
         "RỦI RO",
+        *LEARNING_AUDIT_COLS,
     ]
 
     cols = [c for c in cols if c in final.columns]
 
     final = final[cols].copy()
-
-    for c in final.columns:
-        if c != "DecisionScore":
-            final[c] = final[c].astype(str)
-
-    final["DecisionScore"] = final["DecisionScore"].astype(float)
+    final["DecisionScore"] = pd.to_numeric(final["DecisionScore"], errors="coerce")
 
     note = f"Tìm được {len(final)} cổ phiếu tinh hoa đủ chuẩn MUA."
 
@@ -327,7 +496,18 @@ def style_final_decision(df):
     if "DecisionScore" not in df.columns:
         return df
 
-    return df.style.background_gradient(
-        subset=["DecisionScore"],
-        cmap="YlGn",
+    return (
+        df.style
+        .background_gradient(
+            subset=["DecisionScore"],
+            cmap="YlGn",
+        )
+        .format(
+            {
+                "DecisionScore": lambda v: format_display_number(
+                    v, max_decimals=2, prefer_int=True
+                ),
+            },
+            na_rep="",
+        )
     )

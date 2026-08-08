@@ -20,7 +20,12 @@ from modules.leader_brain_board import show_leader_brain
 from leader_memory import update_memory
 # from behavior_analyzer import BehaviorAnalyzer
 from pattern_manager import save_pattern_history
-from final_decision_engine import build_final_decision
+from final_decision_engine import (
+    build_final_decision,
+    format_display_number,
+    format_final_decision_for_display,
+    style_final_decision,
+)
 from position_guardian import render_guardian
 # Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
@@ -5259,32 +5264,31 @@ def build_buy_elite_decision_engine(
     """
     if scan_df is None or scan_df.empty:
         return pd.DataFrame()
-needed = [
-    "symbol",
-    "group",
-    "price",
-    "ema9",
-    "total_score",
-    "rsi14",
-    "rsi_slope",
-    "ema9_ma20_slope",
-    "dist_from_ema9_pct",
-    "obv_status",
-    "warning",
-    "green_2_confirm",
-    "early_dry_green2",
-    "volume",
-    "vol_ma20",
-    "is_live_adjusted",
 
-    # ===== Learning Engine =====
-    "health_group",
-    "rs10",
-    "rs_spread",
-    "volume_ratio20",
-    "obv_status",
-]
-    
+    needed = [
+        "symbol",
+        "group",
+        "price",
+        "ema9",
+        "total_score",
+        "rsi14",
+        "rsi_slope",
+        "ema9_ma20_slope",
+        "dist_from_ema9_pct",
+        "obv_status",
+        "warning",
+        "green_2_confirm",
+        "early_dry_green2",
+        "volume",
+        "vol_ma20",
+        "is_live_adjusted",
+        # ===== Learning Engine =====
+        "health_group",
+        "rs10",
+        "rs_spread",
+        "volume_ratio20",
+    ]
+
     base = scan_df[[c for c in needed if c in scan_df.columns]].copy()
     if base.empty or "symbol" not in base.columns:
         return pd.DataFrame()
@@ -5496,7 +5500,31 @@ needed = [
     base["Penalty"] += np.where(group.eq("GÀ TĂNG TỐC"), 10, 0)
     base["Penalty"] += np.where(group.eq("CP MẠNH") & (dist > 3), 10, 0)
 
-    base["EliteScore"] = (
+    hard_bad = (
+        warn.str.contains("OBV gãy", na=False)
+        | warn.str.contains("Giá dưới EMA9", na=False)
+    )
+    mr = to_float(market_real, 0)
+
+    # STEP 2: attach verified earning_learning evidence before final score.
+    base = apply_learning_experience(
+        base,
+        market_real=market_real,
+        market_forecast=market_forecast,
+    )
+    experience_adj = (
+        pd.to_numeric(base.get("ExperienceAdjustment", 0.0), errors="coerce")
+        .fillna(0.0)
+        .clip(-8.0, 8.0)
+    )
+    # Safety-first: learning never boosts rows blocked by hard rules or weak market.
+    effective_experience_adj = np.where(
+        hard_bad,
+        0.0,
+        np.where(mr < 6, np.minimum(experience_adj, 0.0), experience_adj),
+    )
+
+    base["EliteScoreBase"] = (
         base["MarketScore"]
         + base["ActionScore"]
         + base["StormScore"]
@@ -5508,10 +5536,9 @@ needed = [
         - base["Penalty"]
     ).clip(0, 100).round(1)
 
-    hard_bad = (
-        warn.str.contains("OBV gãy", na=False)
-        | warn.str.contains("Giá dưới EMA9", na=False)
-    )
+    base["EliteScore"] = (
+        base["EliteScoreBase"] + effective_experience_adj
+    ).clip(0, 100).round(1)
 
     # -----------------------------------------------------
     # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
@@ -5530,27 +5557,10 @@ needed = [
 
     # Market là trần xác suất, không để điểm đẹp đánh lừa khi thị trường yếu.
 
-
-    # -----------------------------------------------------
-    # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
-    # -----------------------------------------------------
-    base["WinProb"] = (
-        28
-        + base["EliteScore"] * 0.55
-        + base["ConsensusCount"] * 4.0
-        + np.where(group.eq("PULL ĐẸP"), 6, 0)
-        + np.where(group.eq("PULL VỪA"), 3, 0)
-        + np.where(base["InEarlyLab"], 5, 0)
-        - np.where(rsi > 72, 8, 0)
-        - np.where(dist > 3.5, 7, 0)
-        - np.where(hard_bad, 35, 0)
-    )
-
     # -----------------------------------------------------
     # MARKET FIRST: điều chỉnh WinProb theo sức khỏe thị trường
     # nhưng vẫn giữ thứ hạng giữa các cổ phiếu
     # -----------------------------------------------------
-    mr = to_float(market_real, 0)
 
     if mr < 6:
         market_factor = 0.72
@@ -5575,8 +5585,6 @@ needed = [
     # -----------------------------------------------------
     # 9) ĐÈN / HÀNH ĐỘNG / NAV
     # -----------------------------------------------------
-    mr = to_float(market_real, 0)
-
     base["ĐÈN"] = np.select(
         [
             (mr < 6),
@@ -5656,6 +5664,11 @@ needed = [
             rs.append("✅ OBV giữ")
         if to_float(r.get("pattern_match", 0), 0) >= 70:
             rs.append(f"✅ Pattern Match {to_float(r.get('pattern_match', 0), 0):.1f}%")
+        exp_adj = to_float(r.get("ExperienceAdjustment", 0), 0)
+        if exp_adj > 0:
+            rs.append(f"✅ Learning +{exp_adj:.1f}")
+        elif exp_adj < 0:
+            rk.append(f"❌ Learning {exp_adj:.1f}")
         if to_float(market_real, 0) < 6:
             rk.append("❌ Market yếu")
         if r.get("Penalty", 0) > 0:
@@ -5683,6 +5696,8 @@ needed = [
 
     cols = [
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN", "EliteScore",
+        "EliteScoreBase", "ExperienceAdjustment", "ExperienceSamples", "LearnedWinRate",
+        "ContinuationScore", "MatchedPattern", "MatchedMarketContext", "LearningStatus",
         "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE", "REGIME", "LearningMode",
         "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "PatternScore", "Penalty",
         "pattern_match", "GR_SIGNAL", "GR_BUY_SCORE", "Storm", "Persistence", "DNA", "evolution", "recent_change",
@@ -5764,27 +5779,41 @@ def style_buy_elite_board(df: pd.DataFrame):
             return ["background-color: #f8d7da; color: #6b0000"] * len(row)
         return ["background-color: #f5f5f5; color: #333333"] * len(row)
 
+    score_fmt = lambda v: format_display_number(v, max_decimals=2, prefer_int=True)
+    int_fmt = lambda v: format_display_number(v, max_decimals=0, prefer_int=True)
+    winprob_fmt = lambda v: (
+        f"{format_display_number(v, max_decimals=0, prefer_int=True)}%"
+        if format_display_number(v, max_decimals=0, prefer_int=True)
+        else ""
+    )
+
     return (
         df.style
         .apply(row_style, axis=1)
         .format({
-            "EliteScore": "{:.1f}",
-            "WinProb": "{:.0f}%",
-            "GIÁ": "{:.0f}",
-            "MarketScore": "{:.1f}",
-            "ActionScore": "{:.1f}",
-            "StormScore": "{:.1f}",
-            "EvoScore": "{:.1f}",
-            "ZoneScore": "{:.1f}",
-            "Penalty": "{:.0f}",
-            "GR_BUY_SCORE": "{:.1f}",
-            "Storm": "{:.1f}",
-            "Persistence": "{:.1f}",
-            "evolution": "{:.0f}",
-            "recent_change": "{:.0f}",
-            "RSI": "{:.1f}",
-            "SLOPE": "{:.2f}",
-            "DIST EMA9%": "{:.2f}",
+            "EliteScore": score_fmt,
+            "EliteScoreBase": score_fmt,
+            "ExperienceAdjustment": score_fmt,
+            "LearnedWinRate": score_fmt,
+            "ContinuationScore": score_fmt,
+            "PatternScore": score_fmt,
+            "ExperienceSamples": int_fmt,
+            "WinProb": winprob_fmt,
+            "GIÁ": int_fmt,
+            "MarketScore": score_fmt,
+            "ActionScore": score_fmt,
+            "StormScore": score_fmt,
+            "EvoScore": score_fmt,
+            "ZoneScore": score_fmt,
+            "Penalty": int_fmt,
+            "GR_BUY_SCORE": score_fmt,
+            "Storm": score_fmt,
+            "Persistence": score_fmt,
+            "evolution": int_fmt,
+            "recent_change": int_fmt,
+            "RSI": score_fmt,
+            "SLOPE": score_fmt,
+            "DIST EMA9%": score_fmt,
         }, na_rep="")
     )
 
@@ -6212,11 +6241,6 @@ buy_elite_df = build_buy_elite_decision_engine(
     learning_profile=learning_profile,
     pattern_match_df=pattern_match_df,
 )
-buy_elite_df = apply_learning_experience(
-    decision_df=buy_elite_df,
-    market_real=market_real,
-    market_forecast=market_forecast,
-)
 final_df, final_note = build_final_decision(
     buy_elite_df,
     green_red_df,
@@ -6552,7 +6576,7 @@ st.info(final_note)
 if not final_df.empty:
 
     st.dataframe(
-        final_df.astype(str),
+        style_final_decision(format_final_decision_for_display(final_df)),
         use_container_width=True,
         hide_index=True,
         height=520,

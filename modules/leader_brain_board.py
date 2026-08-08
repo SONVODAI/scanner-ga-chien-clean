@@ -29,6 +29,11 @@ import streamlit as st
 _BACKEND_IMPORT_ERROR: Optional[Exception] = None
 
 try:
+    from final_decision_engine import format_display_number
+except Exception:  # pragma: no cover - fallback if engine unavailable at import
+    format_display_number = None
+
+try:
     from leader_memory import (
         get_active_leaders,
         get_engine_status,
@@ -194,6 +199,9 @@ def _fmt_number(value: Any, digits: int = 1, suffix: str = "") -> str:
         return "—"
     if not np.isfinite(number):
         return "—"
+    if format_display_number is not None:
+        formatted = format_display_number(number, max_decimals=digits, prefer_int=True)
+        return f"{formatted}{suffix}" if formatted else "—"
     return f"{number:,.{digits}f}{suffix}"
 
 
@@ -221,27 +229,60 @@ def _sort_if_possible(
 
 
 def _clean_for_display(df: pd.DataFrame) -> pd.DataFrame:
-    """Round numeric columns while preserving original text columns."""
+    """Presentation-only cleanup; underlying tables keep full numeric precision."""
     result = df.copy()
 
-    two_decimal_tokens = (
+    int_tokens = (
+        "sample",
+        "samples",
+        "count",
+        "rank",
+        "appearance",
+    )
+    score_tokens = (
         "score",
         "pct",
         "return",
-        "price",
         "rs5",
         "rs10",
         "rsi14",
         "drawdown",
         "persistence",
+        "adjustment",
+        "winrate",
+        "continuation",
     )
+    price_tokens = ("price",)
 
     for col in result.columns:
         lower = col.lower()
-        if any(token in lower for token in two_decimal_tokens):
-            converted = pd.to_numeric(result[col], errors="coerce")
-            if converted.notna().any():
+        converted = pd.to_numeric(result[col], errors="coerce")
+        if not converted.notna().any():
+            continue
+
+        if format_display_number is None:
+            if any(token in lower for token in score_tokens + price_tokens):
                 result[col] = converted.round(2)
+            continue
+
+        if any(token in lower for token in int_tokens):
+            result[col] = converted.map(
+                lambda v: format_display_number(v, max_decimals=0, prefer_int=True)
+                if pd.notna(v)
+                else None
+            )
+        elif any(token in lower for token in price_tokens):
+            result[col] = converted.map(
+                lambda v: format_display_number(v, max_decimals=0, prefer_int=True)
+                if pd.notna(v)
+                else None
+            )
+        elif any(token in lower for token in score_tokens):
+            result[col] = converted.map(
+                lambda v: format_display_number(v, max_decimals=2, prefer_int=True)
+                if pd.notna(v)
+                else None
+            )
 
     return result.replace({np.nan: None})
 
