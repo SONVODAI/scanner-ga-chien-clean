@@ -41,7 +41,7 @@ import time
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Optional, Protocol, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Protocol, Sequence, Tuple
 from urllib.parse import quote
 
 import numpy as np
@@ -3063,6 +3063,7 @@ def _neutral_experience_values() -> Dict[str, Any]:
         "ContinuationScore": np.nan,
         "MatchedPattern": "",
         "MatchedMarketContext": "",
+        "ContextMatchMode": "",
         "LearningStatus": "READY_FOR_CONNECTION",
     }
 
@@ -3234,15 +3235,15 @@ def _lookup_pattern_row(
     *,
     preferred_horizon: int = 5,
     fallback_horizon: int = 10,
-) -> Optional[pd.Series]:
+) -> Tuple[Optional[pd.Series], str]:
     if not lookup:
-        return None
+        return None, ""
 
     # 1) Exact pair: market context + stock DNA.
     for horizon in (preferred_horizon, fallback_horizon):
         row = lookup.get((market_context_key, stock_pattern_key, horizon))
         if row is not None:
-            return row
+            return row, "EXACT_CONTEXT"
 
     # 2) Breadth-safe fallback: same forecast bucket + same Market Real bucket
     # and exactly the same stock DNA.  Never crosses market regime or stock DNA.
@@ -3257,25 +3258,28 @@ def _lookup_pattern_row(
             ):
                 candidates.append(row)
         if candidates:
-            return max(
-                candidates,
-                key=lambda r: _experience_int(r.get("samples")),
+            return (
+                max(
+                    candidates,
+                    key=lambda r: _experience_int(r.get("samples")),
+                ),
+                "FAMILY_CONTEXT",
             )
 
-    return None
+    return None, ""
 
 
 def _lookup_continuation_row(
     lookup: Dict[Tuple[str, str], pd.Series],
     market_context_key: str,
     stock_pattern_key: str,
-) -> Optional[pd.Series]:
+) -> Tuple[Optional[pd.Series], str]:
     if not lookup:
-        return None
+        return None, ""
 
     row = lookup.get((market_context_key, stock_pattern_key))
     if row is not None:
-        return row
+        return row, "EXACT_CONTEXT"
 
     target_family = _market_context_family(market_context_key)
     candidates = [
@@ -3287,10 +3291,13 @@ def _lookup_continuation_row(
         )
     ]
     if not candidates:
-        return None
-    return max(
-        candidates,
-        key=lambda r: _experience_int(r.get("samples_t10")),
+        return None, ""
+    return (
+        max(
+            candidates,
+            key=lambda r: _experience_int(r.get("samples_t10")),
+        ),
+        "FAMILY_CONTEXT",
     )
 
 
@@ -3461,14 +3468,14 @@ def _row_experience_from_keys(
         result["LearningStatus"] = "KEY_GENERATION_FAILED"
         return result
 
-    pattern_row = _lookup_pattern_row(
+    pattern_row, pattern_match_mode = _lookup_pattern_row(
         pattern_lookup,
         market_context_key,
         stock_pattern_key,
         preferred_horizon=5,
         fallback_horizon=10,
     )
-    continuation_row = _lookup_continuation_row(
+    continuation_row, continuation_match_mode = _lookup_continuation_row(
         continuation_lookup,
         market_context_key,
         stock_pattern_key,
@@ -3503,6 +3510,11 @@ def _row_experience_from_keys(
     if not matched_context and continuation_row is not None:
         matched_context = _safe_text(continuation_row.get("market_context_key"))
     result["MatchedMarketContext"] = matched_context or market_context_key
+
+    if pattern_match_mode:
+        result["ContextMatchMode"] = pattern_match_mode
+    elif continuation_match_mode:
+        result["ContextMatchMode"] = continuation_match_mode
     result["ExperienceAdjustment"] = _compute_experience_adjustment(
         pattern_row,
         continuation_row,

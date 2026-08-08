@@ -5284,6 +5284,7 @@ def build_buy_elite_decision_engine(
         "vol_ma20",
         "is_live_adjusted",
         # ===== Learning Engine =====
+        "evolution_health_group",
         "health_group",
         "rs10",
         "rs_spread",
@@ -5813,7 +5814,7 @@ def build_buy_elite_decision_engine(
         "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN", "EliteScore",
         "EliteScoreBase", "LeaderMemoryScore", "LeaderMemoryConfidence", "LeaderMemoryAdjustment",
         "ExperienceAdjustment", "ExperienceSamples", "LearnedWinRate",
-        "ContinuationScore", "MatchedPattern", "MatchedMarketContext", "LearningStatus",
+        "ContinuationScore", "MatchedPattern", "MatchedMarketContext", "ContextMatchMode", "LearningStatus",
         "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE", "REGIME", "LearningMode",
         "MarketScore", "ActionScore", "StormScore", "EvoScore", "ZoneScore", "PatternScore", "Penalty",
         "pattern_match", "GR_SIGNAL", "GR_BUY_SCORE", "Storm", "Persistence", "DNA", "evolution", "recent_change",
@@ -6248,12 +6249,22 @@ except Exception as e:
 # EARNING LEARNING ENGINE
 # =========================================================
 try:
+    _learning_market_context = {
+        "market_score": market_real,
+        "market_forecast": market_forecast,
+        "market_regime": market_forecast_text,
+    }
+    if isinstance(rsi_breadth_report, dict):
+        _breadth_score = rsi_breadth_report.get("score")
+        if _breadth_score is not None:
+            try:
+                if pd.notna(_breadth_score):
+                    _learning_market_context["breadth"] = float(_breadth_score)
+            except (TypeError, ValueError):
+                pass
     learning_result = update_learning(
         earning_board_df=scan_df,
-        market_context={
-            "market_score": market_real,
-            "market_regime": market_forecast_text,
-        },
+        market_context=_learning_market_context,
     )
 except Exception as e:
     st.warning(f"Earning Learning: {e}")

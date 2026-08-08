@@ -221,6 +221,7 @@ EARNING_LEARNING_AUDIT_COLS = (
     "ContinuationScore",
     "MatchedPattern",
     "MatchedMarketContext",
+    "ContextMatchMode",
     "LearningStatus",
 )
 
