@@ -5677,22 +5677,22 @@ base["WinProb"] = (
     # nhưng vẫn giữ thứ hạng giữa các cổ phiếu
     # -----------------------------------------------------
 
-    if mr < 6:
-        market_factor = 0.72
-        market_cap = 55
-    elif mr < 8:
-        market_factor = 0.88
-        market_cap = 78
-    else:
-        market_factor = 1.00
-        market_cap = 95
+if mr < 6:
+    market_factor = 0.72
+    market_cap = 55
+elif mr < 8:
+    market_factor = 0.88
+    market_cap = 78
+else:
+    market_factor = 1.00
+    market_cap = 95
 
-    base["WinProb"] = (
-        (base["WinProb"] * market_factor)
-        .clip(0, market_cap)
-        .round()
-        .astype(int)
-    )
+base["WinProb"] = (
+    (base["WinProb"] * market_factor)
+    .clip(0, market_cap)
+    .round()
+    .astype(int)
+)
 
     base["⭐"] = base["WinProb"].apply(elite_star)
     base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
