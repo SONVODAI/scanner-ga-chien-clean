@@ -6791,7 +6791,16 @@ if show_legacy:
 # LEADER BRAIN DASHBOARD
 # =========================================================
 st.markdown("---")
-show_leader_brain()                    
+show_leader_brain()
+# =========================================================
+# SHADOW OBSERVATION BOARD (read-only)
+# =========================================================
+try:
+    from modules.shadow_observation_board import render_shadow_observation_board
+
+    render_shadow_observation_board()
+except Exception as _shadow_board_error:
+    st.caption(f"BOT Shadow board skipped: {_shadow_board_error}")
 # =========================================================
 # ACCUMULATION OPPORTUNITY
 # =========================================================
