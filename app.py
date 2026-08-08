@@ -5293,7 +5293,97 @@ def build_buy_elite_decision_engine(
     base = scan_df[[c for c in needed if c in scan_df.columns]].copy()
     if base.empty or "symbol" not in base.columns:
         return pd.DataFrame()
+# -----------------------------------------------------
+# LEADER MEMORY -> BUY ELITE
+# Ghép kinh nghiệm Leader Brain theo từng mã.
+# Chưa tác động EliteScore ở bước này.
+# -----------------------------------------------------
+if (
+    leader_memory_df is not None
+    and not leader_memory_df.empty
+    and "symbol" in leader_memory_df.columns
+):
+    leader_cols = [
+        "symbol",
+        "leader_score",
+        "confidence_score",
+        "persistence_20_pct",
+        "winrate_t5_pct",
+        "avg_return_t5_pct",
+        "performance_score",
+        "market_fit_score",
+        "recommendation",
+    ]
+    leader_cols = [
+        c for c in leader_cols
+        if c in leader_memory_df.columns
+    ]
 
+    leader_bridge = leader_memory_df[leader_cols].copy()
+
+    leader_bridge = leader_bridge.rename(columns={
+        "leader_score": "LeaderMemoryScore",
+        "confidence_score": "LeaderMemoryConfidence",
+        "persistence_20_pct": "LeaderMemoryPersistence",
+        "winrate_t5_pct": "LeaderMemoryWinRateT5",
+        "avg_return_t5_pct": "LeaderMemoryReturnT5",
+        "performance_score": "LeaderMemoryPerformance",
+        "market_fit_score": "LeaderMemoryMarketFit",
+        "recommendation": "LeaderMemoryRecommendation",
+    })
+
+    base = base.merge(
+        leader_bridge,
+        on="symbol",
+        how="left",
+    )
+    # -----------------------------------------------------
+# LEADER MEMORY ADJUSTMENT
+# Chỉ tạo tín hiệu kinh nghiệm; chưa cộng vào EliteScore.
+# Giới hạn +/-5 điểm để Leader Memory không lấn át tín hiệu hiện tại.
+# -----------------------------------------------------
+base["LeaderMemoryAdjustment"] = 0.0
+
+if "LeaderMemoryScore" in base.columns:
+    lm_score = pd.to_numeric(
+        base["LeaderMemoryScore"], errors="coerce"
+    ).fillna(50.0)
+
+    lm_conf = pd.to_numeric(
+        base.get(
+            "LeaderMemoryConfidence",
+            pd.Series(0.0, index=base.index)
+        ),
+        errors="coerce",
+    ).fillna(0.0)
+
+    lm_perf = pd.to_numeric(
+        base.get(
+            "LeaderMemoryPerformance",
+            pd.Series(50.0, index=base.index)
+        ),
+        errors="coerce",
+    ).fillna(50.0)
+
+    lm_market = pd.to_numeric(
+        base.get(
+            "LeaderMemoryMarketFit",
+            pd.Series(50.0, index=base.index)
+        ),
+        errors="coerce",
+    ).fillna(50.0)
+
+    confidence_factor = (lm_conf / 60.0).clip(0.0, 1.0)
+
+    raw_memory_adj = (
+        (lm_score - 60.0) * 0.15
+        + (lm_perf - 50.0) * 0.05
+        + (lm_market - 50.0) * 0.05
+    )
+
+    base["LeaderMemoryAdjustment"] = (
+        raw_memory_adj * confidence_factor
+    ).clip(-5.0, 5.0)
     # -----------------------------------------------------
     # 1) GHÉP XANH MUA - ĐỎ BÁN: bảng hành động trung tâm
     # -----------------------------------------------------
