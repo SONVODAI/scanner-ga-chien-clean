@@ -110,6 +110,10 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "pullback": ["pullback", "PULLBACK"],
         "green2": ["green2", "GREEN2"],
         "dryup": ["dryup", "dry_up", "DRYUP"],
+        "health_group": [
+            "evolution_health_group", "health_group", "health",
+            "Health", "Trạng thái",
+        ],
         "action": ["action", "ACTION", "mua_ban", "MUA_BÁN"],
         "reason": ["reason", "REASON", "ly_do", "LÝ_DO"],
     },
@@ -202,7 +206,23 @@ RECOMMENDATION_COLUMNS = [
     "current_rs5", "current_rs10", "current_rsi14",
     "current_obv_status", "winrate_t5_pct", "avg_return_t5_pct",
     "pattern_match_score", "matched_pattern_id", "reason", "updated_at",
+    "ExperienceAdjustment", "ExperienceSamples", "LearnedWinRate",
+    "ContinuationScore", "MatchedPattern", "MatchedMarketContext",
+    "LearningStatus",
 ]
+
+# Canonical earning-learning (STEP 1) rank bridge — separate from Leader Memory pattern library.
+_EXPERIENCE_MAX_ADJUSTMENT = 8.0
+_EXPERIENCE_RANK_WEIGHT = 0.25
+EARNING_LEARNING_AUDIT_COLS = (
+    "ExperienceAdjustment",
+    "ExperienceSamples",
+    "LearnedWinRate",
+    "ContinuationScore",
+    "MatchedPattern",
+    "MatchedMarketContext",
+    "LearningStatus",
+)
 
 
 @dataclass
@@ -533,9 +553,9 @@ def _prepare_snapshot(
         "price", "group", "sector", "rs5", "rs10", "rsi14", "obv",
         "obv_status", "total_score", "trend_score", "buy_score",
         "persistence", "evolution", "recent_change", "ema9_ma20_slope",
-        "dist_from_ema9_pct", "volume", "vol_ma20", "market_real",
+        "dist_from_ema9_pct",         "volume", "vol_ma20", "market_real",
         "market_forecast", "market_regime", "storm", "early", "pullback",
-        "green2", "dryup", "action", "reason",
+        "green2", "dryup", "health_group", "action", "reason",
     ]
     for name in names:
         frame[name] = _series(scan_df, name, config)
@@ -1029,21 +1049,114 @@ def _best_pattern(signature: Any, patterns: pd.DataFrame) -> Tuple[float, str]:
     return round(best_score, 2), best_id
 
 
+def _effective_experience_adjustment(
+    experience_adjustment: Any,
+    market_real: Optional[Any],
+    *,
+    obv_status: Any = None,
+) -> float:
+    """
+    Safety-first gate for canonical earning-learning rank influence.
+    leader_score is independent of Buy Elite; this applies ExperienceAdjustment once here.
+    """
+    adj = _safe_float(experience_adjustment, 0.0)
+    if math.isnan(adj):
+        adj = 0.0
+    adj = float(np.clip(adj, -_EXPERIENCE_MAX_ADJUSTMENT, _EXPERIENCE_MAX_ADJUSTMENT))
+    if adj == 0.0:
+        return 0.0
+
+    mr = _safe_float(market_real, np.nan)
+    if not math.isnan(mr) and mr < 6:
+        adj = min(adj, 0.0)
+
+    obv = _upper_text(obv_status)
+    if obv == "DOWN" and adj > 0:
+        adj = 0.0
+
+    return adj
+
+
+def _build_experience_frame(
+    snapshot: pd.DataFrame,
+    market_real: Optional[Any],
+    market_forecast: Optional[Any],
+) -> pd.DataFrame:
+    """
+    Attach canonical T3/T5/T10 earning-learning evidence via STEP 1 lookup.
+    Does not recalculate knowledge; reuses apply_learning_experience().
+    """
+    if snapshot is None or snapshot.empty or "symbol" not in snapshot.columns:
+        return pd.DataFrame()
+
+    frame = snapshot.copy()
+    if "pull" not in frame.columns and "pullback" in frame.columns:
+        frame["pull"] = frame["pullback"]
+
+    try:
+        from modules.earning_learning import apply_learning_experience
+
+        mr = _safe_float(market_real, np.nan)
+        mf = _safe_float(market_forecast, np.nan)
+        return apply_learning_experience(
+            frame,
+            market_real=mr if not math.isnan(mr) else np.nan,
+            market_forecast=mf if not math.isnan(mf) else np.nan,
+        )
+    except Exception:
+        logger.exception("Canonical earning-learning attach failed safely")
+        return frame
+
+
+def _experience_row_map(experience_df: pd.DataFrame) -> Dict[str, Mapping[str, Any]]:
+    if experience_df is None or experience_df.empty or "symbol" not in experience_df.columns:
+        return {}
+
+    lookup: Dict[str, Mapping[str, Any]] = {}
+    for _, row in experience_df.iterrows():
+        symbol = _normalize_symbol(row.get("symbol"))
+        if symbol:
+            lookup[symbol] = row
+    return lookup
+
+
 def _build_recommendations(
     brain: pd.DataFrame,
     patterns: pd.DataFrame,
     config: Mapping[str, Any],
+    *,
+    experience_df: Optional[pd.DataFrame] = None,
+    market_real: Optional[Any] = None,
+    market_forecast: Optional[Any] = None,
 ) -> pd.DataFrame:
     if brain.empty:
         return pd.DataFrame(columns=RECOMMENDATION_COLUMNS)
 
+    experience_by_symbol = _experience_row_map(experience_df)
     rows = []
     for _, item in brain.iterrows():
         action = _clean_text(item.get("recommendation"))
         if action in {"TRÁNH / CHỜ PHỤC HỒI", "CHƯA HÀNH ĐỘNG"}:
             continue
         match_score, pattern_id = _best_pattern(item.get("feature_signature"), patterns)
-        rows.append({
+        symbol = _normalize_symbol(item.get("symbol"))
+        exp = experience_by_symbol.get(symbol, {})
+        experience_adj = _effective_experience_adjustment(
+            exp.get("ExperienceAdjustment", 0.0),
+            market_real,
+            obv_status=item.get("current_obv_status"),
+        )
+        reason = _clean_text(item.get("recommendation_reason"))
+        raw_adj = _safe_float(exp.get("ExperienceAdjustment", 0.0), 0.0)
+        learning_status = _clean_text(exp.get("LearningStatus", ""))
+        if not math.isnan(raw_adj) and raw_adj > 0:
+            reason = (reason + ". " if reason else "") + f"Earning-learning +{raw_adj:.1f}"
+        elif not math.isnan(raw_adj) and raw_adj < 0:
+            reason = (reason + ". " if reason else "") + f"Earning-learning {raw_adj:.1f}"
+        if learning_status and learning_status not in {"READY_FOR_CONNECTION", ""}:
+            reason = (reason + ". " if reason else "") + f"LearningStatus={learning_status}"
+
+        row = {
             "symbol": item.get("symbol"),
             "recommendation": action,
             "confidence_score": item.get("confidence_score"),
@@ -1059,22 +1172,32 @@ def _build_recommendations(
             "avg_return_t5_pct": item.get("avg_return_t5_pct"),
             "pattern_match_score": match_score,
             "matched_pattern_id": pattern_id,
-            "reason": item.get("recommendation_reason"),
+            "reason": reason,
             "updated_at": _now(),
-        })
+            "_experience_rank_adj": experience_adj,
+        }
+        for col in EARNING_LEARNING_AUDIT_COLS:
+            row[col] = exp.get(col, np.nan if col in {
+                "LearnedWinRate", "ContinuationScore",
+            } else "")
+        rows.append(row)
 
     if not rows:
         return pd.DataFrame(columns=RECOMMENDATION_COLUMNS)
 
     rec = pd.DataFrame(rows)
+    # Leader Memory pattern library + leader history scores (unchanged weights).
+    # Canonical earning-learning enters once via verified ExperienceAdjustment.
     rec["_rank_score"] = (
         pd.to_numeric(rec["leader_score"], errors="coerce").fillna(0) * 0.55
         + pd.to_numeric(rec["confidence_score"], errors="coerce").fillna(0) * 0.20
         + pd.to_numeric(rec["pattern_match_score"], errors="coerce").fillna(0) * 0.25
+        + pd.to_numeric(rec["_experience_rank_adj"], errors="coerce").fillna(0)
+        * _EXPERIENCE_RANK_WEIGHT
     )
     rec = rec.sort_values(["_rank_score", "leader_score"], ascending=[False, False], kind="stable").reset_index(drop=True)
     rec["rank"] = np.arange(1, len(rec) + 1)
-    rec = rec.drop(columns=["_rank_score"])
+    rec = rec.drop(columns=["_rank_score", "_experience_rank_adj"])
     return _ensure_columns(rec, RECOMMENDATION_COLUMNS).head(
         int(config.get("max_recommendation_rows", 100))
     )
@@ -1160,7 +1283,19 @@ def update_memory(
                 brain = _build_brain(history, config)
                 patterns = _build_patterns(history, config)
                 hof = _build_hof(brain, config)
-                rec = _build_recommendations(brain, patterns, config)
+                experience_df = _build_experience_frame(
+                    snapshot,
+                    market_real=market_real,
+                    market_forecast=market_forecast,
+                )
+                rec = _build_recommendations(
+                    brain,
+                    patterns,
+                    config,
+                    experience_df=experience_df,
+                    market_real=market_real,
+                    market_forecast=market_forecast,
+                )
 
                 _atomic_write_csv(history, HISTORY_FILE)
                 _atomic_write_csv(brain, BRAIN_FILE)
