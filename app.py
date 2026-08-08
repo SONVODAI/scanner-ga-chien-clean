@@ -6700,18 +6700,17 @@ st.markdown("---")
 st.markdown("## 👑 FINAL DECISION")
 
 st.info(final_note)
-
 if not final_df.empty:
+    final_display_df = format_final_decision_for_display(final_df)
 
     st.dataframe(
-        style_final_decision(format_final_decision_for_display(final_df)),
+        final_display_df,
         use_container_width=True,
         hide_index=True,
         height=520,
     )
 
 else:
-
     st.warning("Không có cổ phiếu đủ chuẩn giải ngân.")
 if show_advanced_analysis:
     if show_green_red:
