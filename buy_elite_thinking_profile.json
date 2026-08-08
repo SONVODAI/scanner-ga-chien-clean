@@ -2,12 +2,12 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "HYPOTHESIS",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-08-08 08:05:01",
+  "updated_at": "2026-08-08 15:00:40",
   "completed_t5": 356,
   "baseline_winrate": 0.3399,
   "observation": {
     "date": "2026-08-08",
-    "time": "08:05:01",
+    "time": "15:00:40",
     "market_real": 6.8,
     "market_forecast": 1.6,
     "regime": "🟡 TRUNG TÍNH",
@@ -15,7 +15,7 @@
     "signals_today": 30,
     "top_watch": "GMD, MSB, SAB",
     "avg_winprob": 63.9,
-    "avg_elite_score": 59.8,
+    "avg_elite_score": 59.7,
     "high_consensus_count": 3
   },
   "hypotheses": [
