@@ -1260,6 +1260,76 @@ def load_recommendations() -> pd.DataFrame:
     return _safe_read_csv(RECOMMENDATION_FILE, RECOMMENDATION_COLUMNS)
 
 
+def load_shadow_recommendations() -> pd.DataFrame:
+    try:
+        from modules.regime_alpha_shadow import load_shadow_recommendations as _load
+
+        return _load()
+    except Exception:
+        logger.exception("Shadow recommendation load failed safely")
+        return pd.DataFrame()
+
+
+def _persist_recommendation_shadow(
+    rec: pd.DataFrame,
+    brain: pd.DataFrame,
+    experience_df: Optional[pd.DataFrame],
+    session_date: Any,
+) -> None:
+    """N3/N3.7 shadow audit — separate files only; production rec unchanged."""
+    try:
+        from modules.regime_alpha_shadow import (
+            build_shadow_with_recall,
+            persist_shadow_audit,
+            summarize_shadow_comparison,
+        )
+
+        shadow_df = build_shadow_with_recall(
+            rec,
+            brain,
+            experience_df,
+            session_date=_normalize_session_date(session_date),
+        )
+        summary = summarize_shadow_comparison(shadow_df)
+        persist_shadow_audit(
+            shadow_df,
+            comparison_summary=summary,
+            freeze_ledger=False,
+            mature_outcomes=False,
+        )
+    except Exception:
+        logger.exception("Shadow recommendation persist failed safely")
+
+
+def finalize_session_forward_shadow(
+    session_date: Any,
+    *,
+    trading_today: Optional[bool] = None,
+    market_real: Optional[Any] = None,
+    market_forecast: Optional[Any] = None,
+    breadth: Optional[Any] = None,
+) -> Dict[str, Any]:
+    """
+    N3.7C canonical forward freeze — call after is_vnindex_trading_today() in app pipeline.
+    """
+    try:
+        from modules.regime_alpha_forward_eval import finalize_forward_shadow_snapshot
+
+        mr = _safe_float(market_real, np.nan)
+        mf = _safe_float(market_forecast, np.nan)
+        bw = _safe_float(breadth, np.nan)
+        return finalize_forward_shadow_snapshot(
+            session_date=_normalize_session_date(session_date),
+            trading_today=trading_today,
+            market_real=mr if not math.isnan(mr) else None,
+            market_forecast=mf if not math.isnan(mf) else None,
+            breadth=bw if not math.isnan(bw) else None,
+        )
+    except Exception:
+        logger.exception("Forward shadow finalize failed safely")
+        return {"ok": False, "reason": "error", "frozen_rows": 0}
+
+
 def _latest_session_experience_snapshot(history: pd.DataFrame) -> pd.DataFrame:
     if history is None or history.empty:
         return pd.DataFrame()
@@ -1336,6 +1406,12 @@ def update_memory(
                 _atomic_write_csv(patterns, PATTERN_FILE)
                 _atomic_write_csv(hof, HALL_OF_FAME_FILE)
                 _atomic_write_csv(rec, RECOMMENDATION_FILE)
+                _persist_recommendation_shadow(
+                    rec,
+                    brain,
+                    experience_df,
+                    session_date,
+                )
 
                 legacy_cols = [
                     "symbol", "first_seen", "last_seen", "appearances",
@@ -1514,6 +1590,12 @@ def rebuild_all(
             _atomic_write_csv(patterns, PATTERN_FILE)
             _atomic_write_csv(hof, HALL_OF_FAME_FILE)
             _atomic_write_csv(rec, RECOMMENDATION_FILE)
+            _persist_recommendation_shadow(
+                rec,
+                brain,
+                experience_df if not experience_df.empty else None,
+                session_date=_today(),
+            )
 
     return {
         "history_rows": len(history),
@@ -1549,7 +1631,8 @@ __all__ = [
     "create_empty_memory", "load_memory", "save_memory",
     "update_memory", "update_memory_with_result",
     "load_history", "load_pattern_library",
-    "load_hall_of_fame", "load_recommendations",
+    "load_hall_of_fame", "load_recommendations", "load_shadow_recommendations",
+    "finalize_session_forward_shadow",
     "get_active_leaders", "get_intelligence_tables",
     "get_engine_status", "backup_brain",
     "rebuild_all", "initialize_engine", "UpdateResult",

@@ -6110,6 +6110,22 @@ st.caption("Mr.BOT PRO V4.0: tất cả bảng vẫn dùng chung scan_df. BUY EL
 # =========================================================
 storm_df = build_storm_leaders(scan_df)
 trading_today, trading_reason = is_vnindex_trading_today()
+try:
+    from leader_memory import finalize_session_forward_shadow
+
+    _forward_finalize = finalize_session_forward_shadow(
+        session_date=daily_result.current_date,
+        trading_today=trading_today,
+        market_real=market_real,
+        market_forecast=market_forecast,
+    )
+    if _forward_finalize.get("ok"):
+        st.caption(
+            f"Forward shadow frozen: {_forward_finalize.get('frozen_rows', 0)} candidates "
+            f"({daily_result.current_date})"
+        )
+except Exception as _forward_finalize_error:
+    st.caption(f"Forward shadow finalize skipped: {_forward_finalize_error}")
 evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
 pullback_df = build_pullback_buy_list(
