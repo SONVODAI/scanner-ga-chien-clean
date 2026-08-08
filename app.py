@@ -5293,97 +5293,97 @@ def build_buy_elite_decision_engine(
     base = scan_df[[c for c in needed if c in scan_df.columns]].copy()
     if base.empty or "symbol" not in base.columns:
         return pd.DataFrame()
-# -----------------------------------------------------
-# LEADER MEMORY -> BUY ELITE
-# Ghép kinh nghiệm Leader Brain theo từng mã.
-# Chưa tác động EliteScore ở bước này.
-# -----------------------------------------------------
-if (
-    leader_memory_df is not None
-    and not leader_memory_df.empty
-    and "symbol" in leader_memory_df.columns
-):
-    leader_cols = [
-        "symbol",
-        "leader_score",
-        "confidence_score",
-        "persistence_20_pct",
-        "winrate_t5_pct",
-        "avg_return_t5_pct",
-        "performance_score",
-        "market_fit_score",
-        "recommendation",
-    ]
-    leader_cols = [
-        c for c in leader_cols
-        if c in leader_memory_df.columns
-    ]
-
-    leader_bridge = leader_memory_df[leader_cols].copy()
-
-    leader_bridge = leader_bridge.rename(columns={
-        "leader_score": "LeaderMemoryScore",
-        "confidence_score": "LeaderMemoryConfidence",
-        "persistence_20_pct": "LeaderMemoryPersistence",
-        "winrate_t5_pct": "LeaderMemoryWinRateT5",
-        "avg_return_t5_pct": "LeaderMemoryReturnT5",
-        "performance_score": "LeaderMemoryPerformance",
-        "market_fit_score": "LeaderMemoryMarketFit",
-        "recommendation": "LeaderMemoryRecommendation",
-    })
-
-    base = base.merge(
-        leader_bridge,
-        on="symbol",
-        how="left",
-    )
     # -----------------------------------------------------
-# LEADER MEMORY ADJUSTMENT
-# Chỉ tạo tín hiệu kinh nghiệm; chưa cộng vào EliteScore.
-# Giới hạn +/-5 điểm để Leader Memory không lấn át tín hiệu hiện tại.
-# -----------------------------------------------------
-base["LeaderMemoryAdjustment"] = 0.0
+    # LEADER MEMORY -> BUY ELITE
+    # Ghép kinh nghiệm Leader Brain theo từng mã.
+    # Chưa tác động EliteScore ở bước này.
+    # -----------------------------------------------------
+    if (
+        leader_memory_df is not None
+        and not leader_memory_df.empty
+        and "symbol" in leader_memory_df.columns
+    ):
+        leader_cols = [
+            "symbol",
+            "leader_score",
+            "confidence_score",
+            "persistence_20_pct",
+            "winrate_t5_pct",
+            "avg_return_t5_pct",
+            "performance_score",
+            "market_fit_score",
+            "recommendation",
+        ]
+        leader_cols = [
+            c for c in leader_cols
+            if c in leader_memory_df.columns
+        ]
 
-if "LeaderMemoryScore" in base.columns:
-    lm_score = pd.to_numeric(
-        base["LeaderMemoryScore"], errors="coerce"
-    ).fillna(50.0)
+        leader_bridge = leader_memory_df[leader_cols].copy()
 
-    lm_conf = pd.to_numeric(
-        base.get(
-            "LeaderMemoryConfidence",
-            pd.Series(0.0, index=base.index)
-        ),
-        errors="coerce",
-    ).fillna(0.0)
+        leader_bridge = leader_bridge.rename(columns={
+            "leader_score": "LeaderMemoryScore",
+            "confidence_score": "LeaderMemoryConfidence",
+            "persistence_20_pct": "LeaderMemoryPersistence",
+            "winrate_t5_pct": "LeaderMemoryWinRateT5",
+            "avg_return_t5_pct": "LeaderMemoryReturnT5",
+            "performance_score": "LeaderMemoryPerformance",
+            "market_fit_score": "LeaderMemoryMarketFit",
+            "recommendation": "LeaderMemoryRecommendation",
+        })
 
-    lm_perf = pd.to_numeric(
-        base.get(
-            "LeaderMemoryPerformance",
-            pd.Series(50.0, index=base.index)
-        ),
-        errors="coerce",
-    ).fillna(50.0)
+        base = base.merge(
+            leader_bridge,
+            on="symbol",
+            how="left",
+        )
+        # -----------------------------------------------------
+    # LEADER MEMORY ADJUSTMENT
+    # Chỉ tạo tín hiệu kinh nghiệm; chưa cộng vào EliteScore.
+    # Giới hạn +/-5 điểm để Leader Memory không lấn át tín hiệu hiện tại.
+    # -----------------------------------------------------
+    base["LeaderMemoryAdjustment"] = 0.0
 
-    lm_market = pd.to_numeric(
-        base.get(
-            "LeaderMemoryMarketFit",
-            pd.Series(50.0, index=base.index)
-        ),
-        errors="coerce",
-    ).fillna(50.0)
+    if "LeaderMemoryScore" in base.columns:
+        lm_score = pd.to_numeric(
+            base["LeaderMemoryScore"], errors="coerce"
+        ).fillna(50.0)
 
-    confidence_factor = (lm_conf / 60.0).clip(0.0, 1.0)
+        lm_conf = pd.to_numeric(
+            base.get(
+                "LeaderMemoryConfidence",
+                pd.Series(0.0, index=base.index)
+            ),
+            errors="coerce",
+        ).fillna(0.0)
 
-    raw_memory_adj = (
-        (lm_score - 60.0) * 0.15
-        + (lm_perf - 50.0) * 0.05
-        + (lm_market - 50.0) * 0.05
-    )
+        lm_perf = pd.to_numeric(
+            base.get(
+                "LeaderMemoryPerformance",
+                pd.Series(50.0, index=base.index)
+            ),
+            errors="coerce",
+        ).fillna(50.0)
 
-    base["LeaderMemoryAdjustment"] = (
-        raw_memory_adj * confidence_factor
-    ).clip(-5.0, 5.0)
+        lm_market = pd.to_numeric(
+            base.get(
+                "LeaderMemoryMarketFit",
+                pd.Series(50.0, index=base.index)
+            ),
+            errors="coerce",
+        ).fillna(50.0)
+
+        confidence_factor = (lm_conf / 60.0).clip(0.0, 1.0)
+
+        raw_memory_adj = (
+            (lm_score - 60.0) * 0.15
+            + (lm_perf - 50.0) * 0.05
+            + (lm_market - 50.0) * 0.05
+        )
+
+        base["LeaderMemoryAdjustment"] = (
+            raw_memory_adj * confidence_factor
+        ).clip(-5.0, 5.0)
     # -----------------------------------------------------
     # 1) GHÉP XANH MUA - ĐỎ BÁN: bảng hành động trung tâm
     # -----------------------------------------------------
@@ -5626,73 +5626,73 @@ if "LeaderMemoryScore" in base.columns:
         + base["ConsensusCount"] * 2.0
         - base["Penalty"]
     ).clip(0, 100).round(1)
-# Leader Memory cũng phải tuân thủ Rule Engine và Market First.
-leader_memory_adj = (
-    pd.to_numeric(
-        base.get("LeaderMemoryAdjustment", 0.0),
-        errors="coerce",
-    )
-    .fillna(0.0)
-    .clip(-5.0, 5.0)
-)
-
-effective_leader_memory_adj = np.where(
-    hard_bad,
-    0.0,
-    np.where(
-        mr < 6,
-        np.minimum(leader_memory_adj, 0.0),
-        leader_memory_adj,
-    ),
-)
-
-# Final score:
-# - EliteScoreBase = tín hiệu kỹ thuật hiện tại
-# - Experience = kinh nghiệm Pattern/Continuation T3/T5/T10
-# - Leader Memory = kinh nghiệm riêng của từng cổ phiếu
-base["EliteScore"] = (
-    base["EliteScoreBase"]
-    + effective_experience_adj
-    + effective_leader_memory_adj
-).clip(0, 100).round(1)
-# -----------------------------------------------------
-# 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
-# -----------------------------------------------------
-base["WinProb"] = (
-        28
-        + base["EliteScore"] * 0.55
-        + base["ConsensusCount"] * 4.0
-        + np.where(group.eq("PULL ĐẸP"), 6, 0)
-        + np.where(group.eq("PULL VỪA"), 3, 0)
-        + np.where(base["InEarlyLab"], 5, 0)
-        - np.where(rsi > 72, 8, 0)
-        - np.where(dist > 3.5, 7, 0)
-        - np.where(hard_bad, 35, 0)
+    # Leader Memory cũng phải tuân thủ Rule Engine và Market First.
+    leader_memory_adj = (
+        pd.to_numeric(
+            base.get("LeaderMemoryAdjustment", 0.0),
+            errors="coerce",
+        )
+        .fillna(0.0)
+        .clip(-5.0, 5.0)
     )
 
-    # Market là trần xác suất, không để điểm đẹp đánh lừa khi thị trường yếu.
+    effective_leader_memory_adj = np.where(
+        hard_bad,
+        0.0,
+        np.where(
+            mr < 6,
+            np.minimum(leader_memory_adj, 0.0),
+            leader_memory_adj,
+        ),
+    )
 
+    # Final score:
+    # - EliteScoreBase = tín hiệu kỹ thuật hiện tại
+    # - Experience = kinh nghiệm Pattern/Continuation T3/T5/T10
+    # - Leader Memory = kinh nghiệm riêng của từng cổ phiếu
+    base["EliteScore"] = (
+        base["EliteScoreBase"]
+        + effective_experience_adj
+        + effective_leader_memory_adj
+    ).clip(0, 100).round(1)
     # -----------------------------------------------------
-    # MARKET FIRST: điều chỉnh WinProb theo sức khỏe thị trường
-    # nhưng vẫn giữ thứ hạng giữa các cổ phiếu
+    # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
     # -----------------------------------------------------
+    base["WinProb"] = (
+            28
+            + base["EliteScore"] * 0.55
+            + base["ConsensusCount"] * 4.0
+            + np.where(group.eq("PULL ĐẸP"), 6, 0)
+            + np.where(group.eq("PULL VỪA"), 3, 0)
+            + np.where(base["InEarlyLab"], 5, 0)
+            - np.where(rsi > 72, 8, 0)
+            - np.where(dist > 3.5, 7, 0)
+            - np.where(hard_bad, 35, 0)
+        )
 
-if mr < 6:
-    market_factor = 0.72
-    market_cap = 55
-elif mr < 8:
-    market_factor = 0.88
-    market_cap = 78
-else:
-    market_factor = 1.00
-    market_cap = 95
+        # Market là trần xác suất, không để điểm đẹp đánh lừa khi thị trường yếu.
 
-base["WinProb"] = (
-    (base["WinProb"] * market_factor)
-    .clip(0, market_cap)
-    .round()
-    .astype(int)
-)
+        # -----------------------------------------------------
+        # MARKET FIRST: điều chỉnh WinProb theo sức khỏe thị trường
+        # nhưng vẫn giữ thứ hạng giữa các cổ phiếu
+        # -----------------------------------------------------
+
+    if mr < 6:
+        market_factor = 0.72
+        market_cap = 55
+    elif mr < 8:
+        market_factor = 0.88
+        market_cap = 78
+    else:
+        market_factor = 1.00
+        market_cap = 95
+
+    base["WinProb"] = (
+        (base["WinProb"] * market_factor)
+        .clip(0, market_cap)
+        .round()
+        .astype(int)
+    )
 
     base["⭐"] = base["WinProb"].apply(elite_star)
     base["ĐỘ TIN CẬY"] = base["WinProb"].apply(elite_confidence)
