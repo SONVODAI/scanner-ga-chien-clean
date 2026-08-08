@@ -5626,11 +5626,35 @@ if "LeaderMemoryScore" in base.columns:
         + base["ConsensusCount"] * 2.0
         - base["Penalty"]
     ).clip(0, 100).round(1)
+# Leader Memory cũng phải tuân thủ Rule Engine và Market First.
+leader_memory_adj = (
+    pd.to_numeric(
+        base.get("LeaderMemoryAdjustment", 0.0),
+        errors="coerce",
+    )
+    .fillna(0.0)
+    .clip(-5.0, 5.0)
+)
 
-    base["EliteScore"] = (
-        base["EliteScoreBase"] + effective_experience_adj
-    ).clip(0, 100).round(1)
+effective_leader_memory_adj = np.where(
+    hard_bad,
+    0.0,
+    np.where(
+        mr < 6,
+        np.minimum(leader_memory_adj, 0.0),
+        leader_memory_adj,
+    ),
+)
 
+# Final score:
+# - EliteScoreBase = tín hiệu kỹ thuật hiện tại
+# - Experience = kinh nghiệm Pattern/Continuation T3/T5/T10
+# - Leader Memory = kinh nghiệm riêng của từng cổ phiếu
+base["EliteScore"] = (
+    base["EliteScoreBase"]
+    + effective_experience_adj
+    + effective_leader_memory_adj
+).clip(0, 100).round(1)
     # -----------------------------------------------------
     # 8) WIN PROBABILITY V2: xác suất ước lượng để xếp hạng thực chiến
     # -----------------------------------------------------
