@@ -15,7 +15,10 @@ from modules.regime_recall_index import (
     RECALL_LEVEL_UNUSABLE,
     build_recall_index,
     classify_recall_level,
+    ensure_recall_index,
+    load_recall_index,
     rebuild_recall_index,
+    reset_recall_index_runtime_cache,
     summarize_recall_index,
     validate_against_decision_archive,
 )
@@ -151,6 +154,56 @@ class TestRecallIndexIntegration(unittest.TestCase):
             )
 
 
+class TestRecallIndexRuntimeActivation(unittest.TestCase):
+    DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "earning_learning"
+
+    def setUp(self):
+        reset_recall_index_runtime_cache()
+
+    def test_auto_rebuild_when_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            for name in (
+                "observations.csv",
+                "pattern_lifecycle.csv",
+                "outcomes.csv",
+                "decision_archive.csv",
+            ):
+                src = self.DATA_DIR / name
+                if src.exists():
+                    (tmp_path / name).write_bytes(src.read_bytes())
+
+            recall = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
+            self.assertEqual(len(recall), 2272)
+            self.assertTrue((tmp_path / "regime_recall_index.csv").exists())
+
+    def test_load_uses_cache_without_second_rebuild(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            for name in (
+                "observations.csv",
+                "pattern_lifecycle.csv",
+                "outcomes.csv",
+                "decision_archive.csv",
+            ):
+                src = self.DATA_DIR / name
+                if src.exists():
+                    (tmp_path / name).write_bytes(src.read_bytes())
+
+            first = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
+            path = tmp_path / "regime_recall_index.csv"
+            mtime = path.stat().st_mtime
+            second = load_recall_index(tmp_path)
+            self.assertEqual(len(first), len(second))
+            self.assertEqual(path.stat().st_mtime, mtime)
+
+    def test_missing_sources_degrades_safely(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            recall = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
+            self.assertTrue(recall.empty)
+
+
 class TestCompileImport(unittest.TestCase):
     def test_compile_and_import(self):
         import py_compile
@@ -160,6 +213,7 @@ class TestCompileImport(unittest.TestCase):
         import modules.regime_recall_index as rri
 
         self.assertIn("rebuild_recall_index", rri.__all__)
+        self.assertIn("ensure_recall_index", rri.__all__)
 
 
 if __name__ == "__main__":

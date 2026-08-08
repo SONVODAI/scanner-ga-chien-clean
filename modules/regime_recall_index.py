@@ -35,6 +35,10 @@ DECISION_ARCHIVE_FILE = "decision_archive.csv"
 RECALL_INDEX_FILE = "regime_recall_index.csv"
 
 REBUILD_VERSION = "1.0.0"
+MIN_USABLE_INDEX_ROWS = 100
+
+# Process-local cache: one load/rebuild attempt per resolved data_dir per worker.
+_RUNTIME_STATE: Dict[str, Dict[str, Any]] = {}
 
 RECALL_LEVEL_EXACT = "EXACT_CONTEXT"
 RECALL_LEVEL_FAMILY = "FAMILY_CONTEXT"
@@ -461,12 +465,123 @@ def rebuild_recall_index(
     return index_df, summary, diagnostics
 
 
-def load_recall_index(data_dir: Optional[Path | str] = None) -> pd.DataFrame:
+def _empty_recall_index() -> pd.DataFrame:
+    return pd.DataFrame(columns=list(RECALL_INDEX_COLUMNS))
+
+
+def _runtime_key(base: Path) -> str:
+    return str(base.resolve())
+
+
+def reset_recall_index_runtime_cache() -> None:
+    """Test helper — clears process-local recall index cache."""
+    _RUNTIME_STATE.clear()
+
+
+def _sources_available_for_rebuild(base: Path) -> bool:
+    obs = base / OBSERVATIONS_FILE
+    life = base / LIFECYCLE_FILE
+    return (
+        obs.exists()
+        and obs.stat().st_size > 0
+        and life.exists()
+        and life.stat().st_size > 0
+    )
+
+
+def _is_usable_recall_index(df: pd.DataFrame) -> bool:
+    if df is None or df.empty or len(df) < MIN_USABLE_INDEX_ROWS:
+        return False
+    required = {
+        "observation_id",
+        "recall_level",
+        "stock_pattern_key",
+        "market_context_key",
+        "rebuild_version",
+    }
+    if not required.issubset(df.columns):
+        return False
+    versions = df["rebuild_version"].astype(str).unique().tolist()
+    return versions == [REBUILD_VERSION]
+
+
+def ensure_recall_index(
+    data_dir: Optional[Path | str] = None,
+    *,
+    write: bool = True,
+    auto_rebuild: bool = True,
+) -> pd.DataFrame:
+    """
+    Load derived recall index; auto-rebuild once per process when missing or stale.
+
+    Read-only toward historical sources. Derived CSV may be written to data_dir
+    when rebuild succeeds (runtime activation for Streamlit Cloud).
+    """
     base = Path(data_dir) if data_dir is not None else DEFAULT_DATA_DIR
+    key = _runtime_key(base)
+    state = _RUNTIME_STATE.setdefault(
+        key, {"cache": None, "attempted": False, "auto_rebuilt": False}
+    )
+
+    if state["cache"] is not None:
+        return state["cache"]
+
     path = base / RECALL_INDEX_FILE
-    if not path.exists():
-        return pd.DataFrame(columns=list(RECALL_INDEX_COLUMNS))
-    return pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
+    if path.exists() and path.stat().st_size > 0:
+        try:
+            df = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
+            if _is_usable_recall_index(df):
+                state["cache"] = df
+                state["attempted"] = True
+                logger.info("Loaded recall index: %s (%s rows)", path, len(df))
+                return df
+            logger.warning(
+                "Recall index at %s missing/stale (rows=%s); will rebuild if allowed",
+                path,
+                len(df) if df is not None else 0,
+            )
+        except Exception:
+            logger.exception("Failed reading recall index at %s", path)
+
+    if state["attempted"] or not auto_rebuild:
+        state["attempted"] = True
+        state["cache"] = _empty_recall_index()
+        return state["cache"]
+
+    state["attempted"] = True
+    if not _sources_available_for_rebuild(base):
+        logger.info(
+            "Recall index unavailable and rebuild sources missing under %s",
+            base,
+        )
+        state["cache"] = _empty_recall_index()
+        return state["cache"]
+
+    try:
+        index_df, summary, _ = rebuild_recall_index(base, write=write)
+        if _is_usable_recall_index(index_df):
+            state["cache"] = index_df
+            state["auto_rebuilt"] = True
+            logger.info(
+                "Auto-rebuilt recall index at %s (%s rows, GLOBAL T3-ready=%s)",
+                path,
+                summary.total_index_rows,
+                summary.t3_ready_by_level.get(RECALL_LEVEL_GLOBAL, 0),
+            )
+            return index_df
+        logger.warning(
+            "Auto-rebuild produced unusable recall index (%s rows)",
+            len(index_df) if index_df is not None else 0,
+        )
+    except Exception:
+        logger.exception("Auto-rebuild recall index failed for %s", base)
+
+    state["cache"] = _empty_recall_index()
+    return state["cache"]
+
+
+def load_recall_index(data_dir: Optional[Path | str] = None) -> pd.DataFrame:
+    return ensure_recall_index(data_dir, write=True, auto_rebuild=True)
 
 
 __all__ = [
@@ -480,8 +595,10 @@ __all__ = [
     "RecallAuditSummary",
     "build_recall_index",
     "classify_recall_level",
+    "ensure_recall_index",
     "load_recall_index",
     "rebuild_recall_index",
+    "reset_recall_index_runtime_cache",
     "summarize_recall_index",
     "validate_against_decision_archive",
     "validate_outcomes_consistency",
