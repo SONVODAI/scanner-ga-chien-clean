@@ -3513,12 +3513,12 @@ def _row_experience_from_keys(
         float(result["ExperienceAdjustment"]),
     )
     return result
-def apply_learning_experience(
+ def apply_learning_experience(
     decision_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
     breadth: float | None = None,
-) -> pd.DataFrame:
+) -> pd.DataFrame:   
 
     """
     Cầu nối giữa Learning Engine và Decision Engine.
@@ -3554,6 +3554,7 @@ def apply_learning_experience(
             market_forecast=market_forecast,
             breadth=breadth,
             )
+        
         
     except Exception:
         _LOGGER.exception(
