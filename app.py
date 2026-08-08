@@ -5596,57 +5596,18 @@ def build_buy_elite_decision_engine(
         | warn.str.contains("Giá dưới EMA9", na=False)
     )
     mr = to_float(market_real, 0)
-            group.eq("PULL VỪA"),
-            group.eq("MUA EARLY") & base["InEarlyLab"],
-            group.eq("MUA EARLY"),
-            base["InPullback"],
-        ],
-        [18, 15, 14, 9, 12],
-        default=0,
-    ) * weights["zone"]
 
-    base["ObvScore"] = np.where(base.get("obv_status", "") == "🟢", 5, 0) * weights["obv"]
-
-    # -----------------------------------------------------
-    # 6) ĐỒNG THUẬN: đếm số chuyên gia cùng gật đầu
-    # -----------------------------------------------------
-    base["C_Market"] = to_float(market_real, 0) >= 6
-    base["C_Action"] = sig.str.startswith(("🟢", "🟡"), na=False)
-    base["C_Storm"] = base["Storm_NUM"].notna()
-    base["C_Evo"] = (base["Persistence_NUM"] >= 3.5) | (base["evolution_NUM"] > 0) | (base["recent_change_NUM"] > 0)
-    base["C_Zone"] = group.isin(["PULL ĐẸP", "PULL VỪA"]) | base["InPullback"] | base["InEarlyLab"]
-    base["C_OBV"] = base.get("obv_status", "") == "🟢"
-
-    consensus_cols = ["C_Market", "C_Action", "C_Storm", "C_Evo", "C_Zone", "C_OBV"]
-    base["ConsensusCount"] = base[consensus_cols].sum(axis=1)
-    base["ĐỒNG THUẬN"] = base["ConsensusCount"].astype(int).astype(str) + "/6"
-
-    # -----------------------------------------------------
-    # 7) RULE ENGINE: phạt và chặn điểm xấu cứng
-    # -----------------------------------------------------
-    warn = base.get("warning", "").astype(str)
-    dist = pd.to_numeric(base.get("dist_from_ema9_pct", np.nan), errors="coerce")
-    rsi = pd.to_numeric(base.get("rsi14", np.nan), errors="coerce")
-
-    base["Penalty"] = 0
-    base["Penalty"] += np.where(warn.str.contains("OBV gãy", na=False), 35, 0)
-    base["Penalty"] += np.where(warn.str.contains("Giá dưới EMA9", na=False), 30, 0)
-    base["Penalty"] += np.where(warn.str.contains("RSI yếu", na=False), 12, 0)
-    dist_penalty_mult = learn_mult.get("dist_penalty", 1.0)
-    rsi_penalty_mult = learn_mult.get("rsi_penalty", 1.0)
-    base["Penalty"] += np.where(dist > 4.5, 12 * dist_penalty_mult, 0)
-    base["Penalty"] += np.where(rsi > 75, 8 * rsi_penalty_mult, 0)
-    base["Penalty"] += np.where(group.eq("GÀ TĂNG TỐC"), 10, 0)
-    base["Penalty"] += np.where(group.eq("CP MẠNH") & (dist > 3), 10, 0)
-
-    hard_bad = (
-        warn.str.contains("OBV gãy", na=False)
-        | warn.str.contains("Giá dưới EMA9", na=False)
+    # STEP 2: attach verified earning_learning evidence before final score.
+    base = apply_learning_experience(
+        base,
+        market_real=market_real,
+        market_forecast=market_forecast,
     )
-    mr = to_float(market_real, 0)
-# Market breadth cho Experience Learning:
-# % cổ phiếu có RSI14 > 50, cùng thang 0-100 với Learning Engine.
-
+    experience_adj = (
+        pd.to_numeric(base.get("ExperienceAdjustment", 0.0), errors="coerce")
+        .fillna(0.0)
+        .clip(-8.0, 8.0)
+    )
     # Safety-first: learning never boosts rows blocked by hard rules or weak market.
     effective_experience_adj = np.where(
         hard_bad,
@@ -6287,17 +6248,11 @@ except Exception as e:
 # EARNING LEARNING ENGINE
 # =========================================================
 try:
-    learning_breadth_report = build_rsi_breadth_report(scan_df)
-    learning_breadth = learning_breadth_report["percentages"][50]
-
     learning_result = update_learning(
         earning_board_df=scan_df,
         market_context={
             "market_score": market_real,
             "market_regime": market_forecast_text,
-            "market_live": market_live,
-            "market_forecast": market_forecast,
-            "breadth": learning_breadth,
         },
     )
 except Exception as e:
@@ -6737,11 +6692,8 @@ st.info(final_note)
 
 if not final_df.empty:
 
-    # FINAL DECISION: render plain DataFrame for maximum runtime stability.
-    # Styling is cosmetic only and must never block the decision board.
-    final_display_df = format_final_decision_for_display(final_df)
     st.dataframe(
-        final_display_df,
+        style_final_decision(format_final_decision_for_display(final_df)),
         use_container_width=True,
         hide_index=True,
         height=520,
