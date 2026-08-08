@@ -5596,13 +5596,26 @@ def build_buy_elite_decision_engine(
         | warn.str.contains("Giá dưới EMA9", na=False)
     )
     mr = to_float(market_real, 0)
+# Market breadth cho Experience Learning:
+# % cổ phiếu có RSI14 > 50, cùng thang 0-100 với Learning Engine.
+learning_rsi = pd.to_numeric(
+    scan_df.get("rsi14", pd.Series(dtype=float)),
+    errors="coerce",
+).dropna()
 
+learning_breadth = (
+    float((learning_rsi > 50).mean() * 100.0)
+    if not learning_rsi.empty
+    else np.nan
+)
     # STEP 2: attach verified earning_learning evidence before final score.
     base = apply_learning_experience(
         base,
         market_real=market_real,
         market_forecast=market_forecast,
+        breadth=learning_breadth,
     )
+    
     experience_adj = (
         pd.to_numeric(base.get("ExperienceAdjustment", 0.0), errors="coerce")
         .fillna(0.0)
