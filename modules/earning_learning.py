@@ -3072,13 +3072,13 @@ def _experience_int(value: Any, default: int = 0) -> int:
     if not math.isfinite(parsed):
         return default
     return int(parsed)
-
-
 def _decision_rows_for_pattern_keys(
     decision_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
+    breadth: float | None = None,
 ) -> pd.DataFrame:
+
     """
     Map decision rows onto the same canonical observation shape used by
     update_learning(), then derive keys via _add_pattern_columns().
@@ -3101,7 +3101,9 @@ def _decision_rows_for_pattern_keys(
         canonical["market_score"] = market_score
     if canonical["market_forecast"].isna().all() and math.isfinite(forecast):
         canonical["market_forecast"] = forecast
-
+    breadth_value = _safe_float(breadth)
+    if canonical["breadth"].isna().all() and math.isfinite(breadth_value):
+    canonical["breadth"] = breadth_value
     for field in NUMERIC_FIELDS:
         if field in canonical.columns:
             canonical[field] = canonical[field].map(_safe_float)
@@ -3511,13 +3513,13 @@ def _row_experience_from_keys(
         float(result["ExperienceAdjustment"]),
     )
     return result
-
-
 def apply_learning_experience(
     decision_df: pd.DataFrame,
     market_real: float,
     market_forecast: float,
+    breadth: float | None = None,
 ) -> pd.DataFrame:
+
     """
     Cầu nối giữa Learning Engine và Decision Engine.
 
@@ -3550,7 +3552,9 @@ def apply_learning_experience(
             out,
             market_real=market_real,
             market_forecast=market_forecast,
-        )
+            breadth=breadth,
+            )
+        
     except Exception:
         _LOGGER.exception(
             "apply_learning_experience key generation failed safely"
