@@ -3038,41 +3038,21 @@ def update_learning(
 
         return result.to_dict()
 
-def apply_learning_experience(
-    decision_df: pd.DataFrame,
-    market_real: float,
-    market_forecast: float,
-) -> pd.DataFrame:
-    """
-    Cầu nối giữa Learning Engine và Decision Engine.
 
-    Sprint V1.0:
-    - Chưa điều chỉnh điểm quyết định.
-    - Chuẩn bị các cột Experience và khóa ghép.
-    - Fail-safe: nếu Learning lỗi thì Decision vẫn chạy bình thường.
-    """
-    if decision_df is None or decision_df.empty:
-        return decision_df
+# ------------------------------------------------------------------
+# Experience bridge (Decision Engine read path)
+# Thresholds mirror decision_engine.MIN_PATTERN_SAMPLES / MIN_CONTINUATION_SAMPLES.
+# Per-stock cap is intentionally lower than market-level MAX_V3_LEARNING (±18).
+# ------------------------------------------------------------------
+_EXPERIENCE_MIN_PATTERN_SAMPLES = 5
+_EXPERIENCE_MIN_CONTINUATION_SAMPLES = 5
+_EXPERIENCE_MAX_ADJUSTMENT = 8.0
+_EXPERIENCE_PATTERN_COMPONENT_CAP = 5.0
+_EXPERIENCE_CONTINUATION_COMPONENT_CAP = 3.0
 
-    out = decision_df.copy()
 
-    # --------------------------------------------------
-    # Đọc dữ liệu Learning
-    # --------------------------------------------------
-    try:
-        pattern_df = get_pattern_knowledge(min_samples=1)
-    except Exception:
-        pattern_df = pd.DataFrame()
-
-    try:
-        continuation_df = get_continuation_knowledge(min_samples=1)
-    except Exception:
-        continuation_df = pd.DataFrame()
-
-    # --------------------------------------------------
-    # Chuẩn bị các cột
-    # --------------------------------------------------
-    defaults = {
+def _neutral_experience_values() -> Dict[str, Any]:
+    return {
         "stock_pattern_key": "",
         "market_context_key": "",
         "pattern_key": "",
@@ -3085,40 +3065,481 @@ def apply_learning_experience(
         "LearningStatus": "READY_FOR_CONNECTION",
     }
 
+
+def _experience_int(value: Any, default: int = 0) -> int:
+    parsed = _safe_float(value)
+    if not math.isfinite(parsed):
+        return default
+    return int(parsed)
+
+
+def _decision_rows_for_pattern_keys(
+    decision_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    Map decision rows onto the same canonical observation shape used by
+    update_learning(), then derive keys via _add_pattern_columns().
+    Preserves the original index for row-aligned merge back.
+    """
+    source = decision_df.copy(deep=True)
+    canonical = pd.DataFrame(index=source.index)
+
+    for canonical_name, aliases in COLUMN_ALIASES.items():
+        source_col = _find_source_column(source.columns, aliases)
+        canonical[canonical_name] = (
+            source[source_col]
+            if source_col is not None
+            else np.nan
+        )
+
+    market_score = _safe_float(market_real)
+    forecast = _safe_float(market_forecast)
+    if canonical["market_score"].isna().all() and math.isfinite(market_score):
+        canonical["market_score"] = market_score
+    if canonical["market_forecast"].isna().all() and math.isfinite(forecast):
+        canonical["market_forecast"] = forecast
+
+    for field in NUMERIC_FIELDS:
+        if field in canonical.columns:
+            canonical[field] = canonical[field].map(_safe_float)
+
+    for field in BOOLEAN_FIELDS:
+        if field in canonical.columns:
+            canonical[field] = canonical[field].map(_safe_bool)
+
+    canonical["rs_spread"] = (
+        pd.to_numeric(canonical.get("rs5"), errors="coerce")
+        - pd.to_numeric(canonical.get("rs10"), errors="coerce")
+    )
+
+    vol_ma20 = pd.to_numeric(canonical.get("vol_ma20"), errors="coerce")
+    volume = pd.to_numeric(canonical.get("volume"), errors="coerce")
+    canonical["volume_ratio20"] = np.where(
+        vol_ma20.abs() > 1e-12,
+        volume / vol_ma20,
+        pd.to_numeric(canonical.get("volume_ratio"), errors="coerce"),
+    )
+
+    keyed = _add_pattern_columns(canonical)
+    return keyed[
+        [
+            "stock_pattern_key",
+            "market_context_key",
+            "pattern_key",
+        ]
+    ]
+
+
+def _pattern_knowledge_lookup(
+    pattern_df: pd.DataFrame,
+) -> Dict[Tuple[str, str, int], pd.Series]:
+    if pattern_df is None or pattern_df.empty:
+        return {}
+
+    required = {
+        "market_context_key",
+        "stock_pattern_key",
+        "horizon",
+    }
+    if not required.issubset(pattern_df.columns):
+        return {}
+
+    lookup: Dict[Tuple[str, str, int], pd.Series] = {}
+    df = pattern_df.copy()
+    df["horizon"] = pd.to_numeric(df["horizon"], errors="coerce")
+
+    for (market_key, stock_key, horizon), group in df.groupby(
+        ["market_context_key", "stock_pattern_key", "horizon"],
+        dropna=False,
+        sort=False,
+    ):
+        if pd.isna(horizon):
+            continue
+        horizon_int = int(horizon)
+        samples = pd.to_numeric(group.get("samples"), errors="coerce").fillna(0)
+        best = group.loc[samples.idxmax()] if not group.empty else group.iloc[0]
+        lookup[
+            (
+                str(market_key),
+                str(stock_key),
+                horizon_int,
+            )
+        ] = best
+
+    return lookup
+
+
+def _continuation_knowledge_lookup(
+    continuation_df: pd.DataFrame,
+) -> Dict[Tuple[str, str], pd.Series]:
+    if continuation_df is None or continuation_df.empty:
+        return {}
+
+    required = {
+        "market_context_key",
+        "stock_pattern_key",
+    }
+    if not required.issubset(continuation_df.columns):
+        return {}
+
+    lookup: Dict[Tuple[str, str], pd.Series] = {}
+    df = continuation_df.copy()
+
+    for (market_key, stock_key), group in df.groupby(
+        ["market_context_key", "stock_pattern_key"],
+        dropna=False,
+        sort=False,
+    ):
+        samples_t10 = pd.to_numeric(
+            group.get("samples_t10"),
+            errors="coerce",
+        ).fillna(0)
+        best = group.loc[samples_t10.idxmax()] if not group.empty else group.iloc[0]
+        lookup[(str(market_key), str(stock_key))] = best
+
+    return lookup
+
+
+def _lookup_pattern_row(
+    lookup: Dict[Tuple[str, str, int], pd.Series],
+    market_context_key: str,
+    stock_pattern_key: str,
+    *,
+    preferred_horizon: int = 5,
+    fallback_horizon: int = 10,
+) -> Optional[pd.Series]:
+    if not lookup:
+        return None
+
+    for horizon in (preferred_horizon, fallback_horizon):
+        row = lookup.get(
+            (market_context_key, stock_pattern_key, horizon)
+        )
+        if row is not None:
+            return row
+
+    return None
+
+
+def _lookup_continuation_row(
+    lookup: Dict[Tuple[str, str], pd.Series],
+    market_context_key: str,
+    stock_pattern_key: str,
+) -> Optional[pd.Series]:
+    if not lookup:
+        return None
+    return lookup.get((market_context_key, stock_pattern_key))
+
+
+def _compute_experience_adjustment(
+    pattern_row: Optional[Mapping[str, Any]],
+    continuation_row: Optional[Mapping[str, Any]],
+) -> float:
+    """
+    Conservative bounded adjustment for one stock row.
+
+    Thresholds (documented for Step 2 wiring):
+    - Pattern: requires samples >= 5 (same as decision_engine.MIN_PATTERN_SAMPLES).
+      Uses win_rate_lower_bound_pct when present; otherwise win_rate_pct * 0.85.
+      Positive: lower bound >= 55 (+2) or >= 65 (+4).
+      Negative: lower bound <= 45 (-2) or <= 35 (-4).
+    - Continuation: requires samples_t10 >= 5
+      (same as decision_engine.MIN_CONTINUATION_SAMPLES).
+      Uses continuation_score with t3_to_t10_lower_bound_pct as tie-breaker.
+      Positive: score >= 55 (+1.5) or >= 65 / lower bound >= 65 (+3).
+      Negative: score <= 45 (-1.5) or <= 35 / lower bound < 30 (-3).
+    - Total hard cap: +/- 8.0 per row (below market-level +/- 18).
+    """
+    pattern_adj = 0.0
+    continuation_adj = 0.0
+
+    if pattern_row is not None:
+        pattern_samples_val = _safe_float(pattern_row.get("samples"))
+        samples = (
+            int(pattern_samples_val)
+            if math.isfinite(pattern_samples_val)
+            else 0
+        )
+        if samples >= _EXPERIENCE_MIN_PATTERN_SAMPLES:
+            lower = _safe_float(pattern_row.get("win_rate_lower_bound_pct"))
+            win_rate = _safe_float(pattern_row.get("win_rate_pct"))
+            evidence = lower
+            if not math.isfinite(evidence):
+                evidence = (
+                    win_rate * 0.85
+                    if math.isfinite(win_rate)
+                    else np.nan
+                )
+            if math.isfinite(evidence):
+                if evidence >= 65:
+                    pattern_adj = 4.0
+                elif evidence >= 55:
+                    pattern_adj = 2.0
+                elif evidence <= 35:
+                    pattern_adj = -4.0
+                elif evidence <= 45:
+                    pattern_adj = -2.0
+
+            pattern_adj = float(
+                np.clip(
+                    pattern_adj,
+                    -_EXPERIENCE_PATTERN_COMPONENT_CAP,
+                    _EXPERIENCE_PATTERN_COMPONENT_CAP,
+                )
+            )
+
+    if continuation_row is not None:
+        samples_t10 = _experience_int(continuation_row.get("samples_t10"))
+        if samples_t10 >= _EXPERIENCE_MIN_CONTINUATION_SAMPLES:
+            score = _safe_float(continuation_row.get("continuation_score"))
+            lower = _safe_float(
+                continuation_row.get("t3_to_t10_lower_bound_pct")
+            )
+            if math.isfinite(score) or math.isfinite(lower):
+                if (
+                    (math.isfinite(score) and score >= 65)
+                    or (math.isfinite(lower) and lower >= 65)
+                ):
+                    continuation_adj = 3.0
+                elif (
+                    (math.isfinite(score) and score >= 55)
+                    or (math.isfinite(lower) and lower >= 50)
+                ):
+                    continuation_adj = 1.5
+                elif (
+                    (math.isfinite(score) and score <= 35)
+                    or (math.isfinite(lower) and lower < 30)
+                ):
+                    continuation_adj = -3.0
+                elif math.isfinite(score) and score <= 45:
+                    continuation_adj = -1.5
+
+            continuation_adj = float(
+                np.clip(
+                    continuation_adj,
+                    -_EXPERIENCE_CONTINUATION_COMPONENT_CAP,
+                    _EXPERIENCE_CONTINUATION_COMPONENT_CAP,
+                )
+            )
+
+    total = pattern_adj + continuation_adj
+    return float(
+        np.clip(
+            total,
+            -_EXPERIENCE_MAX_ADJUSTMENT,
+            _EXPERIENCE_MAX_ADJUSTMENT,
+        )
+    )
+
+
+def _resolve_learning_status(
+    pattern_row: Optional[Mapping[str, Any]],
+    continuation_row: Optional[Mapping[str, Any]],
+    experience_adjustment: float,
+) -> str:
+    has_pattern = pattern_row is not None
+    has_continuation = continuation_row is not None
+
+    if not has_pattern and not has_continuation:
+        return "NO_PATTERN_MATCH"
+
+    pattern_samples = _experience_int(
+        pattern_row.get("samples") if pattern_row is not None else np.nan
+    )
+    continuation_samples = _experience_int(
+        continuation_row.get("samples_t10")
+        if continuation_row is not None
+        else np.nan
+    )
+
+    pattern_ok = (
+        has_pattern
+        and pattern_samples >= _EXPERIENCE_MIN_PATTERN_SAMPLES
+    )
+    continuation_ok = (
+        has_continuation
+        and continuation_samples >= _EXPERIENCE_MIN_CONTINUATION_SAMPLES
+    )
+
+    if not pattern_ok and not continuation_ok:
+        return "INSUFFICIENT_SAMPLES"
+
+    if pattern_ok and continuation_ok:
+        if experience_adjustment != 0.0:
+            return "EXPERIENCE_ACTIVE"
+        return "PATTERN_AND_CONTINUATION_LOADED"
+
+    if pattern_ok:
+        if experience_adjustment != 0.0:
+            return "EXPERIENCE_ACTIVE"
+        return "PATTERN_LOADED"
+
+    if continuation_ok:
+        if experience_adjustment != 0.0:
+            return "EXPERIENCE_ACTIVE"
+        return "CONTINUATION_LOADED"
+
+    return "INSUFFICIENT_SAMPLES"
+
+
+def _row_experience_from_keys(
+    stock_pattern_key: str,
+    market_context_key: str,
+    pattern_key: str,
+    pattern_lookup: Dict[Tuple[str, str, int], pd.Series],
+    continuation_lookup: Dict[Tuple[str, str], pd.Series],
+) -> Dict[str, Any]:
+    result = _neutral_experience_values()
+    result["stock_pattern_key"] = stock_pattern_key
+    result["market_context_key"] = market_context_key
+    result["pattern_key"] = pattern_key
+
+    if not stock_pattern_key.strip() or not market_context_key.strip():
+        result["LearningStatus"] = "KEY_GENERATION_FAILED"
+        return result
+
+    pattern_row = _lookup_pattern_row(
+        pattern_lookup,
+        market_context_key,
+        stock_pattern_key,
+        preferred_horizon=5,
+        fallback_horizon=10,
+    )
+    continuation_row = _lookup_continuation_row(
+        continuation_lookup,
+        market_context_key,
+        stock_pattern_key,
+    )
+
+    if pattern_row is not None:
+        result["ExperienceSamples"] = _experience_int(
+            pattern_row.get("samples")
+        )
+        win_rate = _safe_float(pattern_row.get("win_rate_pct"))
+        result["LearnedWinRate"] = (
+            float(win_rate) if math.isfinite(win_rate) else np.nan
+        )
+        matched_pattern = _safe_text(pattern_row.get("pattern_key"))
+        result["MatchedPattern"] = (
+            matched_pattern or pattern_key
+        )
+
+    if continuation_row is not None:
+        continuation_score = _safe_float(
+            continuation_row.get("continuation_score")
+        )
+        result["ContinuationScore"] = (
+            float(continuation_score)
+            if math.isfinite(continuation_score)
+            else np.nan
+        )
+
+    result["MatchedMarketContext"] = market_context_key
+    result["ExperienceAdjustment"] = _compute_experience_adjustment(
+        pattern_row,
+        continuation_row,
+    )
+    result["LearningStatus"] = _resolve_learning_status(
+        pattern_row,
+        continuation_row,
+        float(result["ExperienceAdjustment"]),
+    )
+    return result
+
+
+def apply_learning_experience(
+    decision_df: pd.DataFrame,
+    market_real: float,
+    market_forecast: float,
+) -> pd.DataFrame:
+    """
+    Cầu nối giữa Learning Engine và Decision Engine.
+
+    Step 1:
+    - Gắn bằng chứng học theo từng mã (stock_pattern_key + market_context_key).
+    - Không ghi đè quyết định; ExperienceAdjustment chưa được nối vào EliteScore.
+    - Fail-safe: mọi lỗi đọc/khớp đều trả về giá trị trung tính cho từng dòng.
+    """
+    if decision_df is None or decision_df.empty:
+        return decision_df
+
+    out = decision_df.copy()
+    defaults = _neutral_experience_values()
     for col, default in defaults.items():
         if col not in out.columns:
             out[col] = default
-    # --------------------------------------------------
-    # Sprint V1.1 - xác nhận Pattern Knowledge
-    # --------------------------------------------------
-    if not pattern_df.empty:
-        out["LearningStatus"] = "PATTERN_LOADED"
 
-        if "samples" in pattern_df.columns:
-            out["ExperienceSamples"] = int(
-                pattern_df["samples"].max()
-            )
+    try:
+        pattern_df = get_pattern_knowledge(min_samples=1)
+    except Exception:
+        pattern_df = pd.DataFrame()
 
-        if "win_rate_pct" in pattern_df.columns:
-            out["LearnedWinRate"] = float(
-                pattern_df["win_rate_pct"].max()
-            )
+    try:
+        continuation_df = get_continuation_knowledge(min_samples=1)
+    except Exception:
+        continuation_df = pd.DataFrame()
 
-    # --------------------------------------------------
-    # Sprint V1.2 - xác nhận Continuation Knowledge
-    # --------------------------------------------------
-    if not continuation_df.empty:
-        out["LearningStatus"] = (
-            "PATTERN_AND_CONTINUATION_LOADED"
+    try:
+        key_frame = _decision_rows_for_pattern_keys(
+            out,
+            market_real=market_real,
+            market_forecast=market_forecast,
         )
+    except Exception:
+        _LOGGER.exception(
+            "apply_learning_experience key generation failed safely"
+        )
+        return out
 
-        if "continuation_score" in continuation_df.columns:
-            out["ContinuationScore"] = float(
-                continuation_df["continuation_score"].max()
+    if pattern_df.empty and continuation_df.empty:
+        for idx in out.index:
+            try:
+                keys = key_frame.loc[idx]
+                out.at[idx, "stock_pattern_key"] = str(
+                    keys.get("stock_pattern_key", "")
+                )
+                out.at[idx, "market_context_key"] = str(
+                    keys.get("market_context_key", "")
+                )
+                out.at[idx, "pattern_key"] = str(keys.get("pattern_key", ""))
+                out.at[idx, "LearningStatus"] = "NO_KNOWLEDGE_DATA"
+            except Exception:
+                pass
+        return out
+
+    pattern_lookup = _pattern_knowledge_lookup(pattern_df)
+    continuation_lookup = _continuation_knowledge_lookup(continuation_df)
+
+    experience_rows: List[Dict[str, Any]] = []
+    for idx in out.index:
+        try:
+            keys = key_frame.loc[idx]
+            experience_rows.append(
+                _row_experience_from_keys(
+                    stock_pattern_key=str(keys.get("stock_pattern_key", "")),
+                    market_context_key=str(
+                        keys.get("market_context_key", "")
+                    ),
+                    pattern_key=str(keys.get("pattern_key", "")),
+                    pattern_lookup=pattern_lookup,
+                    continuation_lookup=continuation_lookup,
+                )
             )
+        except Exception:
+            _LOGGER.exception(
+                "apply_learning_experience row lookup failed safely"
+            )
+            experience_rows.append(_neutral_experience_values())
+
+    experience_df = pd.DataFrame(experience_rows, index=out.index)
+    for col in defaults:
+        out[col] = experience_df[col]
 
     return out
-    
+
+
 learn_from_earning_board = update_learning
 
 
