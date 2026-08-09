@@ -1,24 +1,27 @@
 """
-Regime Alpha Engine — Level 4 learned expected-value score (N2).
+Regime Alpha Engine — learned expected-value score with optional recall index (N2 + N3.7).
 
-Computes RegimeAlphaScore (RAS) from historical pattern/continuation knowledge
-conditioned on (stock DNA × market regime).  Standalone module: not wired into
-production recommendation paths yet.
+Standalone module: not wired into production recommendation paths.
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date
+from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
-# ---------------------------------------------------------------------------
-# Constants (Level-4 approved design, with documented corrections)
-# ---------------------------------------------------------------------------
+from modules.earning_learning import _wilson_lower_bound
+from modules.regime_recall_index import (
+    RECALL_LEVEL_EXACT,
+    RECALL_LEVEL_FAMILY,
+    RECALL_LEVEL_GLOBAL,
+    load_recall_index,
+)
 
 NEUTRAL_RAS = 50.0
 
@@ -27,62 +30,48 @@ HORIZON_WEIGHTS: Dict[int, float] = {3: 0.25, 5: 0.45, 10: 0.30}
 SAMPLE_MIN = 5
 SAMPLE_FULL = 20
 MAX_LEARNING_AUTHORITY = 0.85
-RECENCY_HALF_LIFE_DAYS = 180.0
 RECENCY_FLOOR = 0.5
 
 CONTEXT_AUTHORITY: Dict[str, float] = {
-    "EXACT": 1.00,
-    "FAMILY": 0.65,
+    "EXACT_CONTEXT": 1.00,
+    "FAMILY_CONTEXT": 0.65,
     "GLOBAL_DNA": 0.35,
-    "NONE": 0.00,
+    "NO_RECALL_EVIDENCE": 0.00,
 }
 
-# Shrink RAS toward neutral (50), not toward zero.
 RAS_EVIDENCE_DISCOUNT: Dict[str, float] = {
-    "EXACT": 1.00,
-    "FAMILY": 0.90,
+    "EXACT_CONTEXT": 1.00,
+    "FAMILY_CONTEXT": 0.90,
     "GLOBAL_DNA": 0.75,
-    "NONE": 0.00,
+    "NO_RECALL_EVIDENCE": 0.00,
 }
 
-EXACT_MIN_SAMPLES = 5
+RECALL_LEVEL_NO_EVIDENCE = "NO_RECALL_EVIDENCE"
 
 RowLike = Union[Mapping[str, Any], pd.Series]
 
 
 @dataclass(frozen=True)
-class ContextMatchResult:
-    level: str
-    market_context_key: str
-    stock_pattern_key: str
-    pattern_rows_by_horizon: Dict[int, Mapping[str, Any]] = field(default_factory=dict)
-    continuation_row: Optional[Mapping[str, Any]] = None
-    effective_samples: int = 0
-    context_authority: float = 0.0
-    ras_evidence_discount: float = 0.0
-    matched_context_key: str = ""
-
-
-@dataclass(frozen=True)
-class RegimeAlphaResult:
-    regime_alpha_score: float
-    regime_alpha_confidence: float
-    context_match_level: str
-    effective_samples: int
-    matched_market_context: str
-    horizon_ev: Dict[int, float] = field(default_factory=dict)
-    continuation_boost: float = 0.0
-    raw_ras_before_discount: float = NEUTRAL_RAS
-    technical_prior_score: Optional[float] = None
-
-
-# ---------------------------------------------------------------------------
-# Safe numeric helpers
-# ---------------------------------------------------------------------------
+class RecallEvidenceResult:
+    recall_source: str = "NONE"
+    recall_level: str = RECALL_LEVEL_NO_EVIDENCE
+    recall_samples: int = 0
+    recall_t3_samples: int = 0
+    recall_t5_samples: int = 0
+    recall_t10_samples: int = 0
+    recall_mean_t3: Optional[float] = None
+    recall_mean_t5: Optional[float] = None
+    recall_mean_t10: Optional[float] = None
+    recall_win_rate_t3: Optional[float] = None
+    recall_win_rate_t5: Optional[float] = None
+    recall_win_rate_t10: Optional[float] = None
+    recall_confidence: float = 0.0
+    recall_alpha: float = NEUTRAL_RAS
+    recall_matched_dna: str = ""
+    recall_matched_context: str = ""
 
 
 def _optional_float(value: Any, default: Optional[float] = None) -> Optional[float]:
-    """Parse float; distinguish missing (None/NaN) from valid 0.0."""
     if value is None:
         return default
     try:
@@ -97,24 +86,12 @@ def _optional_float(value: Any, default: Optional[float] = None) -> Optional[flo
     return result if math.isfinite(result) else default
 
 
-def _optional_int(value: Any, default: int = 0) -> int:
-    parsed = _optional_float(value, default=None)
-    if parsed is None:
-        return default
-    return int(parsed)
-
-
 def _clip(value: float, low: float, high: float) -> float:
     return float(max(low, min(high, value)))
 
 
 def _winsorize(value: float, low: float, high: float) -> float:
     return _clip(value, low, high)
-
-
-# ---------------------------------------------------------------------------
-# Context family (P2/P4 semantics — forecast + market buckets, ignore breadth)
-# ---------------------------------------------------------------------------
 
 
 def market_context_family(market_context_key: str) -> Tuple[str, str]:
@@ -135,31 +112,14 @@ def is_na_market_context(market_context_key: str) -> bool:
 
 
 def shrink_toward_neutral(score: float, discount: float) -> float:
-    """Apply fallback discount: move evidence toward RAS=50, not toward 0."""
     return NEUTRAL_RAS + (score - NEUTRAL_RAS) * discount
 
 
-# ---------------------------------------------------------------------------
-# 1) compute_horizon_ev
-# ---------------------------------------------------------------------------
-
-
-def compute_horizon_ev(
-    pattern_row: Optional[RowLike],
-    *,
-    horizon: Optional[int] = None,
-) -> Optional[float]:
-    """
-    Expected-value sub-score for one horizon row from pattern_knowledge.
-
-    Returns None when the row is missing or has no usable samples — missing
-    horizons must not be treated as bad outcomes.
-    """
+def compute_horizon_ev(pattern_row: Optional[RowLike]) -> Optional[float]:
     if pattern_row is None:
         return None
-
     row = dict(pattern_row)
-    samples = _optional_int(row.get("samples"), 0)
+    samples = int(_optional_float(row.get("samples"), 0) or 0)
     if samples <= 0:
         return None
 
@@ -174,26 +134,14 @@ def compute_horizon_ev(
     median_ret = _optional_float(row.get("median_return_pct"))
     if median_ret is None:
         return None
-    # 0.0 is a valid return — only None/NaN/absent key is missing.
 
     dd = _optional_float(row.get("avg_max_drawdown_pct"))
     worst = _optional_float(row.get("worst_return_pct"))
 
     win_component = (wlb - NEUTRAL_RAS) / NEUTRAL_RAS
-
-    med_winsor = _winsorize(median_ret, -8.0, 12.0)
-    return_component = med_winsor / 12.0
-
-    # Drawdown fields are typically negative percentages; use magnitude as penalty.
-    if dd is not None:
-        downside_component = _clip(-dd, 0.0, 15.0) / 15.0
-    else:
-        downside_component = 0.0
-
-    if worst is not None:
-        tail_penalty = _clip(-worst, 0.0, 10.0) / 10.0
-    else:
-        tail_penalty = 0.0
+    return_component = _winsorize(median_ret, -8.0, 12.0) / 12.0
+    downside_component = _clip(-dd, 0.0, 15.0) / 15.0 if dd is not None else 0.0
+    tail_penalty = _clip(-worst, 0.0, 10.0) / 10.0 if worst is not None else 0.0
 
     ev = (
         NEUTRAL_RAS
@@ -205,334 +153,9 @@ def compute_horizon_ev(
     return _clip(ev, 0.0, 100.0)
 
 
-# ---------------------------------------------------------------------------
-# Continuation overlay (applied once after horizon blend — not per horizon)
-# ---------------------------------------------------------------------------
-
-
-def _continuation_boost(continuation_row: Optional[RowLike]) -> float:
-    if continuation_row is None:
+def compute_alpha_confidence(effective_samples: int, context_level: str) -> float:
+    if context_level == RECALL_LEVEL_NO_EVIDENCE or effective_samples <= 0:
         return 0.0
-
-    row = dict(continuation_row)
-    samples_t10 = _optional_int(row.get("samples_t10"), 0)
-    if samples_t10 < 5:
-        return 0.0
-
-    boost = 0.0
-    score = _optional_float(row.get("continuation_score"))
-    lower = _optional_float(row.get("t3_to_t10_lower_bound_pct"))
-
-    if score is not None:
-        boost += _clip((score - NEUTRAL_RAS) / NEUTRAL_RAS, -1.0, 1.0) * 6.0
-    if lower is not None:
-        boost += _clip((lower - NEUTRAL_RAS) / NEUTRAL_RAS, -1.0, 1.0) * 4.0
-
-    return boost
-
-
-# ---------------------------------------------------------------------------
-# 3) resolve_context_match
-# ---------------------------------------------------------------------------
-
-
-def _iter_pattern_rows(
-    pattern_knowledge: Optional[pd.DataFrame],
-) -> Iterable[Mapping[str, Any]]:
-    if pattern_knowledge is None or pattern_knowledge.empty:
-        return []
-    return (dict(row) for _, row in pattern_knowledge.iterrows())
-
-
-def _build_pattern_lookup(
-    pattern_knowledge: Optional[pd.DataFrame],
-) -> Dict[Tuple[str, str, int], Mapping[str, Any]]:
-    lookup: Dict[Tuple[str, str, int], Mapping[str, Any]] = {}
-    for row in _iter_pattern_rows(pattern_knowledge):
-        ctx = str(row.get("market_context_key", ""))
-        stock = str(row.get("stock_pattern_key", ""))
-        horizon = _optional_int(row.get("horizon"), 0)
-        if not stock or horizon <= 0:
-            continue
-        lookup[(ctx, stock, horizon)] = row
-    return lookup
-
-
-def _build_continuation_lookup(
-    continuation_knowledge: Optional[pd.DataFrame],
-) -> Dict[Tuple[str, str], Mapping[str, Any]]:
-    lookup: Dict[Tuple[str, str], Mapping[str, Any]] = {}
-    if continuation_knowledge is None or continuation_knowledge.empty:
-        return lookup
-    for _, row in continuation_knowledge.iterrows():
-        ctx = str(row.get("market_context_key", ""))
-        stock = str(row.get("stock_pattern_key", ""))
-        if stock:
-            lookup[(ctx, stock)] = dict(row)
-    return lookup
-
-
-def _collect_horizon_rows_exact(
-    lookup: Dict[Tuple[str, str, int], Mapping[str, Any]],
-    market_context_key: str,
-    stock_pattern_key: str,
-) -> Dict[int, Mapping[str, Any]]:
-    out: Dict[int, Mapping[str, Any]] = {}
-    for horizon in HORIZON_WEIGHTS:
-        row = lookup.get((market_context_key, stock_pattern_key, horizon))
-        if row is not None and _optional_int(row.get("samples"), 0) > 0:
-            out[horizon] = row
-    return out
-
-
-def _collect_horizon_rows_family(
-    lookup: Dict[Tuple[str, str, int], Mapping[str, Any]],
-    market_context_key: str,
-    stock_pattern_key: str,
-) -> Dict[int, Mapping[str, Any]]:
-    target = market_context_family(market_context_key)
-    out: Dict[int, Mapping[str, Any]] = {}
-    for horizon in HORIZON_WEIGHTS:
-        candidates = [
-            row
-            for (ctx, stock, h), row in lookup.items()
-            if (
-                stock == stock_pattern_key
-                and h == horizon
-                and market_context_family(ctx) == target
-                and ctx != market_context_key
-            )
-        ]
-        if not candidates:
-            continue
-        best = max(candidates, key=lambda r: _optional_int(r.get("samples"), 0))
-        if _optional_int(best.get("samples"), 0) > 0:
-            out[horizon] = best
-    return out
-
-
-def _collect_horizon_rows_global(
-    lookup: Dict[Tuple[str, str, int], Mapping[str, Any]],
-    stock_pattern_key: str,
-) -> Dict[int, Mapping[str, Any]]:
-    out: Dict[int, Mapping[str, Any]] = {}
-    for horizon in HORIZON_WEIGHTS:
-        candidates = [
-            row
-            for (ctx, stock, h), row in lookup.items()
-            if (
-                stock == stock_pattern_key
-                and h == horizon
-                and is_na_market_context(ctx)
-            )
-        ]
-        if not candidates:
-            continue
-        best = max(candidates, key=lambda r: _optional_int(r.get("samples"), 0))
-        if _optional_int(best.get("samples"), 0) > 0:
-            out[horizon] = best
-    return out
-
-
-def _effective_samples(rows_by_horizon: Dict[int, Mapping[str, Any]]) -> int:
-    if not rows_by_horizon:
-        return 0
-    return max(_optional_int(row.get("samples"), 0) for row in rows_by_horizon.values())
-
-
-def _latest_last_seen(rows_by_horizon: Dict[int, Mapping[str, Any]]) -> Optional[date]:
-    dates: list[date] = []
-    for row in rows_by_horizon.values():
-        raw = row.get("last_seen")
-        if raw is None or (isinstance(raw, float) and math.isnan(raw)):
-            continue
-        parsed = pd.to_datetime(raw, errors="coerce")
-        if pd.notna(parsed):
-            dates.append(parsed.date())
-    return max(dates) if dates else None
-
-
-def _lookup_continuation(
-    lookup: Dict[Tuple[str, str], Mapping[str, Any]],
-    market_context_key: str,
-    stock_pattern_key: str,
-    level: str,
-) -> Tuple[Optional[Mapping[str, Any]], str]:
-    if not lookup:
-        return None, ""
-
-    exact = lookup.get((market_context_key, stock_pattern_key))
-    if exact is not None:
-        return exact, "EXACT"
-
-    if level != "FAMILY":
-        if level == "GLOBAL_DNA":
-            candidates = [
-                row
-                for (ctx, stock), row in lookup.items()
-                if stock == stock_pattern_key and is_na_market_context(ctx)
-            ]
-            if candidates:
-                best = max(
-                    candidates,
-                    key=lambda r: _optional_int(r.get("samples_t10"), 0),
-                )
-                return best, "GLOBAL_DNA"
-        return None, ""
-
-    target = market_context_family(market_context_key)
-    candidates = [
-        row
-        for (ctx, stock), row in lookup.items()
-        if (
-            stock == stock_pattern_key
-            and market_context_family(ctx) == target
-        )
-    ]
-    if candidates:
-        best = max(candidates, key=lambda r: _optional_int(r.get("samples_t10"), 0))
-        return best, "FAMILY"
-
-    return None, ""
-
-
-def resolve_context_match(
-    market_context_key: str,
-    stock_pattern_key: str,
-    pattern_knowledge: Optional[pd.DataFrame] = None,
-    continuation_knowledge: Optional[pd.DataFrame] = None,
-) -> ContextMatchResult:
-    """
-    EXACT → FAMILY → GLOBAL_DNA → NONE with P2/P4 family semantics.
-    """
-    market_context_key = str(market_context_key or "").strip()
-    stock_pattern_key = str(stock_pattern_key or "").strip()
-
-    if not stock_pattern_key:
-        return ContextMatchResult(
-            level="NONE",
-            market_context_key=market_context_key,
-            stock_pattern_key=stock_pattern_key,
-        )
-
-    pattern_lookup = _build_pattern_lookup(pattern_knowledge)
-    cont_lookup = _build_continuation_lookup(continuation_knowledge)
-
-    exact_rows = _collect_horizon_rows_exact(
-        pattern_lookup, market_context_key, stock_pattern_key
-    )
-    exact_samples = _effective_samples(exact_rows)
-    exact_h5 = exact_rows.get(5)
-    exact_h5_n = (
-        _optional_int(exact_h5.get("samples"), 0) if exact_h5 is not None else 0
-    )
-
-    if exact_h5_n >= EXACT_MIN_SAMPLES or (
-        exact_samples >= EXACT_MIN_SAMPLES and exact_rows
-    ):
-        cont_row, _ = _lookup_continuation(
-            cont_lookup, market_context_key, stock_pattern_key, "EXACT"
-        )
-        return ContextMatchResult(
-            level="EXACT",
-            market_context_key=market_context_key,
-            stock_pattern_key=stock_pattern_key,
-            pattern_rows_by_horizon=exact_rows,
-            continuation_row=cont_row,
-            effective_samples=exact_samples,
-            context_authority=CONTEXT_AUTHORITY["EXACT"],
-            ras_evidence_discount=RAS_EVIDENCE_DISCOUNT["EXACT"],
-            matched_context_key=market_context_key,
-        )
-
-    # Partial exact (some horizons) — still EXACT level but lower sample count
-    if exact_rows:
-        cont_row, _ = _lookup_continuation(
-            cont_lookup, market_context_key, stock_pattern_key, "EXACT"
-        )
-        return ContextMatchResult(
-            level="EXACT",
-            market_context_key=market_context_key,
-            stock_pattern_key=stock_pattern_key,
-            pattern_rows_by_horizon=exact_rows,
-            continuation_row=cont_row,
-            effective_samples=exact_samples,
-            context_authority=CONTEXT_AUTHORITY["EXACT"],
-            ras_evidence_discount=RAS_EVIDENCE_DISCOUNT["EXACT"],
-            matched_context_key=market_context_key,
-        )
-
-    family_rows = _collect_horizon_rows_family(
-        pattern_lookup, market_context_key, stock_pattern_key
-    )
-    if family_rows:
-        matched_ctx = str(
-            family_rows.get(5, next(iter(family_rows.values()))).get(
-                "market_context_key", ""
-            )
-        )
-        cont_row, _ = _lookup_continuation(
-            cont_lookup, market_context_key, stock_pattern_key, "FAMILY"
-        )
-        return ContextMatchResult(
-            level="FAMILY",
-            market_context_key=market_context_key,
-            stock_pattern_key=stock_pattern_key,
-            pattern_rows_by_horizon=family_rows,
-            continuation_row=cont_row,
-            effective_samples=_effective_samples(family_rows),
-            context_authority=CONTEXT_AUTHORITY["FAMILY"],
-            ras_evidence_discount=RAS_EVIDENCE_DISCOUNT["FAMILY"],
-            matched_context_key=matched_ctx,
-        )
-
-    global_rows = _collect_horizon_rows_global(pattern_lookup, stock_pattern_key)
-    if global_rows:
-        matched_ctx = str(
-            global_rows.get(5, next(iter(global_rows.values()))).get(
-                "market_context_key", ""
-            )
-        )
-        cont_row, _ = _lookup_continuation(
-            cont_lookup, market_context_key, stock_pattern_key, "GLOBAL_DNA"
-        )
-        return ContextMatchResult(
-            level="GLOBAL_DNA",
-            market_context_key=market_context_key,
-            stock_pattern_key=stock_pattern_key,
-            pattern_rows_by_horizon=global_rows,
-            continuation_row=cont_row,
-            effective_samples=_effective_samples(global_rows),
-            context_authority=CONTEXT_AUTHORITY["GLOBAL_DNA"],
-            ras_evidence_discount=RAS_EVIDENCE_DISCOUNT["GLOBAL_DNA"],
-            matched_context_key=matched_ctx,
-        )
-
-    return ContextMatchResult(
-        level="NONE",
-        market_context_key=market_context_key,
-        stock_pattern_key=stock_pattern_key,
-    )
-
-
-# ---------------------------------------------------------------------------
-# 4) compute_alpha_confidence
-# ---------------------------------------------------------------------------
-
-
-def compute_alpha_confidence(
-    effective_samples: int,
-    context_level: str,
-    *,
-    last_seen: Optional[Union[date, str, datetime]] = None,
-    as_of: Optional[date] = None,
-) -> float:
-    """
-    sample_weight × context_authority × recency, capped at MAX_LEARNING_AUTHORITY.
-    """
-    if context_level == "NONE" or effective_samples <= 0:
-        return 0.0
-
     if effective_samples < SAMPLE_MIN:
         sample_weight = 0.0
     else:
@@ -541,122 +164,9 @@ def compute_alpha_confidence(
             0.0,
             1.0,
         )
-
     context_auth = CONTEXT_AUTHORITY.get(context_level, 0.0)
-
-    recency = RECENCY_FLOOR
-    if last_seen is not None:
-        parsed = pd.to_datetime(last_seen, errors="coerce")
-        if pd.notna(parsed):
-            ref = as_of or date.today()
-            days = max(0, (ref - parsed.date()).days)
-            recency = max(
-                RECENCY_FLOOR,
-                math.exp(-days / RECENCY_HALF_LIFE_DAYS),
-            )
-
-    confidence = sample_weight * context_auth * recency
+    confidence = sample_weight * context_auth * RECENCY_FLOOR
     return _clip(confidence, 0.0, MAX_LEARNING_AUTHORITY)
-
-
-# ---------------------------------------------------------------------------
-# 2) compute_regime_alpha_score
-# ---------------------------------------------------------------------------
-
-
-def _blend_horizon_ev(horizon_ev: Dict[int, float]) -> float:
-    if not horizon_ev:
-        return NEUTRAL_RAS
-
-    weight_sum = sum(HORIZON_WEIGHTS[h] for h in horizon_ev if h in HORIZON_WEIGHTS)
-    if weight_sum <= 0:
-        return NEUTRAL_RAS
-
-    blended = sum(
-        horizon_ev[h] * HORIZON_WEIGHTS[h] for h in horizon_ev if h in HORIZON_WEIGHTS
-    ) / weight_sum
-    return _clip(blended, 0.0, 100.0)
-
-
-def compute_regime_alpha_score(
-    market_context_key: str,
-    stock_pattern_key: str,
-    pattern_knowledge: Optional[pd.DataFrame] = None,
-    continuation_knowledge: Optional[pd.DataFrame] = None,
-    *,
-    as_of: Optional[date] = None,
-) -> RegimeAlphaResult:
-    match = resolve_context_match(
-        market_context_key,
-        stock_pattern_key,
-        pattern_knowledge=pattern_knowledge,
-        continuation_knowledge=continuation_knowledge,
-    )
-
-    if match.level == "NONE":
-        return RegimeAlphaResult(
-            regime_alpha_score=NEUTRAL_RAS,
-            regime_alpha_confidence=0.0,
-            context_match_level="NONE",
-            effective_samples=0,
-            matched_market_context="",
-            raw_ras_before_discount=NEUTRAL_RAS,
-        )
-
-    horizon_ev: Dict[int, float] = {}
-    for horizon, row in match.pattern_rows_by_horizon.items():
-        ev = compute_horizon_ev(row, horizon=horizon)
-        if ev is not None:
-            horizon_ev[horizon] = ev
-
-    if not horizon_ev:
-        return RegimeAlphaResult(
-            regime_alpha_score=NEUTRAL_RAS,
-            regime_alpha_confidence=0.0,
-            context_match_level=match.level,
-            effective_samples=match.effective_samples,
-            matched_market_context=match.matched_context_key,
-            raw_ras_before_discount=NEUTRAL_RAS,
-        )
-
-    blended = _blend_horizon_ev(horizon_ev)
-    cont_boost = _continuation_boost(match.continuation_row)
-    raw_ras = _clip(blended + cont_boost, 0.0, 100.0)
-    discounted = shrink_toward_neutral(raw_ras, match.ras_evidence_discount)
-
-    last_seen = _latest_last_seen(match.pattern_rows_by_horizon)
-    confidence = compute_alpha_confidence(
-        match.effective_samples,
-        match.level,
-        last_seen=last_seen,
-        as_of=as_of,
-    )
-
-    return RegimeAlphaResult(
-        regime_alpha_score=discounted,
-        regime_alpha_confidence=confidence,
-        context_match_level=match.level,
-        effective_samples=match.effective_samples,
-        matched_market_context=match.matched_context_key,
-        horizon_ev=horizon_ev,
-        continuation_boost=cont_boost,
-        raw_ras_before_discount=raw_ras,
-    )
-
-
-# ---------------------------------------------------------------------------
-# 5) compute_technical_prior
-# ---------------------------------------------------------------------------
-
-_DEFAULT_GROUP_QUALITY: Dict[str, float] = {
-    "CP MẠNH": 85.0,
-    "GÀ TĂNG TỐC": 80.0,
-    "PULL ĐẸP": 78.0,
-    "PULL VỪA": 70.0,
-    "MUA EARLY": 68.0,
-    "MUA BREAK": 72.0,
-    "THEO DÕI": 45.0,
-}
 
 
 def _normalize_rsi(rsi: Optional[float]) -> float:
@@ -667,33 +177,14 @@ def _normalize_rsi(rsi: Optional[float]) -> float:
 
 def _normalize_obv(obv_status: Any) -> float:
     text = str(obv_status or "").strip().upper()
-    if text in {"UP", "🟢", "GREEN", "BULL", "TANG"}:
+    if text in {"UP", "GREEN", "BULL", "TANG"}:
         return 75.0
-    if text in {"DOWN", "🔴", "RED", "BEAR", "GIAM"}:
+    if text in {"DOWN", "RED", "BEAR", "GIAM"}:
         return 25.0
     return NEUTRAL_RAS
 
 
-def _normalize_group_quality(group: Any) -> float:
-    text = str(group or "").strip().upper()
-    if not text:
-        return NEUTRAL_RAS
-    for key, score in _DEFAULT_GROUP_QUALITY.items():
-        if key.upper() in text or text in key.upper():
-            return score
-    if any(token in text for token in ("YẾU", "YEu", "TRÁNH", "TRANH")):
-        return 20.0
-    return NEUTRAL_RAS
-
-
-def compute_technical_prior(
-    row: RowLike,
-    *,
-    pattern_match_score: Optional[float] = None,
-) -> float:
-    """
-    Technical prior (0–100) from leader/brain fields — supporting evidence only.
-    """
+def compute_technical_prior(row: RowLike, *, pattern_match_score: Optional[float] = None) -> float:
     data = dict(row)
     components: list[Tuple[float, float]] = []
 
@@ -715,44 +206,220 @@ def compute_technical_prior(
     if win5 is not None:
         components.append((_clip(win5, 0.0, 100.0), 0.15))
 
-    pms = pattern_match_score
-    if pms is None:
-        pms = _optional_float(data.get("pattern_match_score"))
+    pms = pattern_match_score if pattern_match_score is not None else _optional_float(
+        data.get("pattern_match_score")
+    )
     if pms is not None:
         components.append((_clip(pms, 0.0, 100.0), 0.15))
 
     group = data.get("current_group", data.get("group"))
-    components.append((_normalize_group_quality(group), 0.10))
+    components.append((NEUTRAL_RAS if not group else NEUTRAL_RAS, 0.10))
 
     if not components:
         return NEUTRAL_RAS
-
     total_w = sum(w for _, w in components)
     return round(sum(v * w for v, w in components) / total_w, 2)
 
 
-def compute_final_recommendation_score(
-    regime_alpha_score: float,
-    technical_prior_score: float,
-    regime_alpha_confidence: float,
+def filter_recall_learning_pool(recall_index: pd.DataFrame) -> pd.DataFrame:
+    if recall_index is None or recall_index.empty:
+        return pd.DataFrame()
+
+    df = recall_index.copy()
+    usable = df["usable_for_learning"].astype(str).str.lower().isin({"true", "1", "yes"})
+    matured = (
+        (df.get("outcome_status_t3", pd.Series(dtype=str)) == "READY")
+        | (df.get("outcome_status_t5", pd.Series(dtype=str)) == "READY")
+        | (df.get("outcome_status_t10", pd.Series(dtype=str)) == "READY")
+    )
+    return df[usable & matured].copy()
+
+
+def _wilson_lower_bound_pct(wins: int, samples: int) -> float:
+    if samples <= 0:
+        return 0.0
+    result = _wilson_lower_bound(
+        pd.Series([wins], dtype=float),
+        pd.Series([samples], dtype=float),
+    )
+    # earning_learning._wilson_lower_bound already returns percent (0-100).
+    return float(result.iloc[0])
+
+
+def _horizon_stats(rows: pd.DataFrame, return_col: str, status_col: str) -> Dict[str, Any]:
+    if rows.empty or return_col not in rows.columns:
+        return {"samples": 0, "mean": None, "median": None, "win_rate": None, "worst": None}
+
+    ready = rows[rows.get(status_col, pd.Series(dtype=str)) == "READY"]
+    if ready.empty:
+        return {"samples": 0, "mean": None, "median": None, "win_rate": None, "worst": None}
+
+    returns = pd.to_numeric(ready[return_col], errors="coerce").dropna()
+    if returns.empty:
+        return {"samples": 0, "mean": None, "median": None, "win_rate": None, "worst": None}
+
+    wins = int((returns > 0).sum())
+    return {
+        "samples": len(returns),
+        "mean": float(returns.mean()),
+        "median": float(returns.median()),
+        "win_rate": float(wins / len(returns) * 100.0),
+        "worst": float(returns.min()),
+        "wlb": _wilson_lower_bound_pct(wins, len(returns)),
+    }
+
+
+def _blend_horizon_ev(horizon_ev: Dict[int, float]) -> float:
+    if not horizon_ev:
+        return NEUTRAL_RAS
+    weight_sum = sum(HORIZON_WEIGHTS[h] for h in horizon_ev if h in HORIZON_WEIGHTS)
+    if weight_sum <= 0:
+        return NEUTRAL_RAS
+    blended = sum(horizon_ev[h] * HORIZON_WEIGHTS[h] for h in horizon_ev) / weight_sum
+    return _clip(blended, 0.0, 100.0)
+
+
+def _resolve_recall_rows(
+    pool: pd.DataFrame,
+    market_context_key: str,
+    stock_pattern_key: str,
+) -> Tuple[pd.DataFrame, str, str]:
+    if pool.empty or not stock_pattern_key:
+        return pd.DataFrame(), RECALL_LEVEL_NO_EVIDENCE, ""
+
+    dna_rows = pool[pool["stock_pattern_key"].astype(str) == str(stock_pattern_key)]
+    if dna_rows.empty:
+        return pd.DataFrame(), RECALL_LEVEL_NO_EVIDENCE, ""
+
+    exact = dna_rows[
+        (dna_rows["market_context_key"].astype(str) == str(market_context_key))
+        & (dna_rows["recall_level"].astype(str) == RECALL_LEVEL_EXACT)
+    ]
+    if not exact.empty:
+        ctx = str(exact.iloc[0]["market_context_key"])
+        return exact, RECALL_LEVEL_EXACT, ctx
+
+    target_family = market_context_family(market_context_key)
+    family = dna_rows[dna_rows["recall_level"].astype(str) == RECALL_LEVEL_FAMILY]
+    if not family.empty:
+        family = family[
+            family["market_context_key"].map(lambda c: market_context_family(str(c)) == target_family)
+        ]
+    if not family.empty:
+        ctx = str(
+            family["market_context_key"]
+            .value_counts()
+            .idxmax()
+        )
+        return family, RECALL_LEVEL_FAMILY, ctx
+
+    global_rows = dna_rows[dna_rows["recall_level"].astype(str) == RECALL_LEVEL_GLOBAL]
+    global_rows = global_rows[
+        global_rows["market_context_key"].map(is_na_market_context)
+    ]
+    if not global_rows.empty:
+        ctx = str(
+            global_rows["market_context_key"]
+            .value_counts()
+            .idxmax()
+        )
+        return global_rows, RECALL_LEVEL_GLOBAL, ctx
+
+    return pd.DataFrame(), RECALL_LEVEL_NO_EVIDENCE, ""
+
+
+def compute_recall_evidence(
+    market_context_key: str,
+    stock_pattern_key: str,
+    recall_index: Optional[pd.DataFrame] = None,
+    *,
+    data_dir: Optional[Path | str] = None,
+) -> RecallEvidenceResult:
+    """
+    Compute recall-based alpha from derived historical index (N3.7).
+    Never promotes GLOBAL rows into EXACT/FAMILY evidence.
+    """
+    if recall_index is None:
+        recall_index = load_recall_index(data_dir)
+
+    pool = filter_recall_learning_pool(recall_index)
+    matched_rows, level, matched_ctx = _resolve_recall_rows(
+        pool, market_context_key, stock_pattern_key
+    )
+
+    if matched_rows.empty or level == RECALL_LEVEL_NO_EVIDENCE:
+        return RecallEvidenceResult()
+
+    t3 = _horizon_stats(matched_rows, "t3_return_pct", "outcome_status_t3")
+    t5 = _horizon_stats(matched_rows, "t5_return_pct", "outcome_status_t5")
+    t10 = _horizon_stats(matched_rows, "t10_return_pct", "outcome_status_t10")
+
+    horizon_ev: Dict[int, float] = {}
+    for horizon, stats in ((3, t3), (5, t5), (10, t10)):
+        if stats["samples"] <= 0 or stats["median"] is None:
+            continue
+        synthetic = {
+            "samples": stats["samples"],
+            "win_rate_lower_bound_pct": stats["wlb"],
+            "median_return_pct": stats["median"],
+            "worst_return_pct": stats["worst"],
+        }
+        ev = compute_horizon_ev(synthetic)
+        if ev is not None:
+            horizon_ev[horizon] = ev
+
+    raw_alpha = _blend_horizon_ev(horizon_ev)
+    discount = RAS_EVIDENCE_DISCOUNT.get(level, 0.0)
+    recall_alpha = shrink_toward_neutral(raw_alpha, discount)
+
+    effective_samples = max(t3["samples"], t5["samples"], t10["samples"])
+    confidence = compute_alpha_confidence(effective_samples, level)
+
+    return RecallEvidenceResult(
+        recall_source="RECALL_INDEX",
+        recall_level=level,
+        recall_samples=int(len(matched_rows)),
+        recall_t3_samples=int(t3["samples"]),
+        recall_t5_samples=int(t5["samples"]),
+        recall_t10_samples=int(t10["samples"]),
+        recall_mean_t3=t3["mean"],
+        recall_mean_t5=t5["mean"],
+        recall_mean_t10=t10["mean"],
+        recall_win_rate_t3=t3["win_rate"],
+        recall_win_rate_t5=t5["win_rate"],
+        recall_win_rate_t10=t10["win_rate"],
+        recall_confidence=round(confidence, 6),
+        recall_alpha=round(recall_alpha, 4),
+        recall_matched_dna=str(stock_pattern_key),
+        recall_matched_context=matched_ctx,
+    )
+
+
+def compute_experience_shadow_score(
+    baseline_score: float,
+    recall: RecallEvidenceResult,
 ) -> float:
-    """Blend helper for future N5 wiring (not used in production yet)."""
-    w = _clip(regime_alpha_confidence, 0.0, MAX_LEARNING_AUTHORITY)
-    return round((1.0 - w) * technical_prior_score + w * regime_alpha_score, 2)
+    """
+    Blend production baseline with recall alpha. When recall confidence is zero,
+    shadow equals baseline so only evidence-backed experience changes ranking.
+    """
+    w = _clip(recall.recall_confidence, 0.0, MAX_LEARNING_AUTHORITY)
+    if w <= 0.0:
+        return round(baseline_score, 4)
+    return round((1.0 - w) * baseline_score + w * recall.recall_alpha, 2)
 
 
 __all__ = [
     "NEUTRAL_RAS",
-    "HORIZON_WEIGHTS",
-    "ContextMatchResult",
-    "RegimeAlphaResult",
-    "compute_horizon_ev",
-    "compute_regime_alpha_score",
-    "resolve_context_match",
+    "RECALL_LEVEL_NO_EVIDENCE",
+    "RecallEvidenceResult",
     "compute_alpha_confidence",
+    "compute_experience_shadow_score",
+    "compute_horizon_ev",
+    "compute_recall_evidence",
     "compute_technical_prior",
-    "compute_final_recommendation_score",
+    "filter_recall_learning_pool",
+    "load_recall_index",
     "market_context_family",
-    "is_na_market_context",
     "shrink_toward_neutral",
 ]
