@@ -1260,6 +1260,41 @@ def load_recommendations() -> pd.DataFrame:
     return _safe_read_csv(RECOMMENDATION_FILE, RECOMMENDATION_COLUMNS)
 
 
+def load_shadow_recommendations() -> pd.DataFrame:
+    """Load N3 shadow audit snapshot (separate from production ai_recommendation.csv)."""
+    try:
+        from modules.regime_alpha_shadow import load_shadow_recommendations as _load_shadow
+
+        return _load_shadow()
+    except Exception:
+        logger.exception("Shadow recommendation load failed safely")
+        return pd.DataFrame()
+
+
+def _persist_recommendation_shadow(
+    rec: pd.DataFrame,
+    brain: pd.DataFrame,
+    experience_df: Optional[pd.DataFrame],
+    session_date: Any,
+) -> None:
+    """N3 shadow audit — separate files only; production rec unchanged."""
+    try:
+        from modules.regime_alpha_shadow import (
+            build_shadow_recommendations,
+            persist_shadow_audit,
+        )
+
+        shadow_df = build_shadow_recommendations(
+            rec,
+            brain,
+            experience_df,
+            session_date=_normalize_session_date(session_date),
+        )
+        persist_shadow_audit(shadow_df)
+    except Exception:
+        logger.exception("Shadow recommendation persist failed safely")
+
+
 def _latest_session_experience_snapshot(history: pd.DataFrame) -> pd.DataFrame:
     if history is None or history.empty:
         return pd.DataFrame()
@@ -1336,6 +1371,12 @@ def update_memory(
                 _atomic_write_csv(patterns, PATTERN_FILE)
                 _atomic_write_csv(hof, HALL_OF_FAME_FILE)
                 _atomic_write_csv(rec, RECOMMENDATION_FILE)
+                _persist_recommendation_shadow(
+                    rec,
+                    brain,
+                    experience_df,
+                    session_date,
+                )
 
                 legacy_cols = [
                     "symbol", "first_seen", "last_seen", "appearances",
@@ -1514,6 +1555,12 @@ def rebuild_all(
             _atomic_write_csv(patterns, PATTERN_FILE)
             _atomic_write_csv(hof, HALL_OF_FAME_FILE)
             _atomic_write_csv(rec, RECOMMENDATION_FILE)
+            _persist_recommendation_shadow(
+                rec,
+                brain,
+                experience_df if not experience_df.empty else None,
+                session_date=_today(),
+            )
 
     return {
         "history_rows": len(history),
@@ -1549,7 +1596,7 @@ __all__ = [
     "create_empty_memory", "load_memory", "save_memory",
     "update_memory", "update_memory_with_result",
     "load_history", "load_pattern_library",
-    "load_hall_of_fame", "load_recommendations",
+    "load_hall_of_fame", "load_recommendations", "load_shadow_recommendations",
     "get_active_leaders", "get_intelligence_tables",
     "get_engine_status", "backup_brain",
     "rebuild_all", "initialize_engine", "UpdateResult",
