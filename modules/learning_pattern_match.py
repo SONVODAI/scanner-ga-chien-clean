@@ -630,7 +630,71 @@ def explain_pattern(row: pd.Series) -> List[str]:
 # Streamlit UI
 # ==========================================================
 
-def show_pattern_match(scan_df: pd.DataFrame):
+_EARLY_RADAR_COLUMNS = (
+    "rank",
+    "symbol",
+    "group",
+    "price",
+    "pattern_match",
+    "leader_score",
+    "confidence",
+    "rsi14",
+    "RS",
+    "obv_status",
+)
+
+_EARLY_RADAR_DISPLAY_NAMES = {
+    "pattern_match": "DNA Match (%)",
+    "leader_score": "Leader Score",
+    "confidence": "Confidence",
+}
+
+
+def render_pattern_match_early_radar(
+    pattern_match_df: pd.DataFrame,
+    *,
+    top_n: int = 10,
+) -> None:
+    """Compact read-only Top-N radar for the default dashboard."""
+    st.markdown("---")
+    st.markdown("## 🧠 TOP PATTERN MATCH — EARLY RADAR")
+    st.caption(
+        "Radar phát hiện sớm các cổ phiếu có DNA gần mẫu thắng. "
+        "Dùng để theo dõi Early/Tích lũy trước khi trở thành Leader; "
+        "không đồng nghĩa khuyến nghị mua."
+    )
+
+    if pattern_match_df is None or pattern_match_df.empty:
+        st.info("Không có dữ liệu Pattern Match.")
+        return
+
+    cols = [c for c in _EARLY_RADAR_COLUMNS if c in pattern_match_df.columns]
+    if not cols:
+        st.info("Không có dữ liệu Pattern Match.")
+        return
+
+    display = pattern_match_df.head(max(1, int(top_n)))[cols].copy()
+    display = display.rename(columns=_EARLY_RADAR_DISPLAY_NAMES)
+
+    st.dataframe(
+        display,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "DNA Match (%)": st.column_config.NumberColumn(
+                "DNA Match (%)",
+                help="Mức độ tương đồng với DNA thắng mà BOT đã học trong bối cảnh hiện tại.",
+                format="%.2f%%",
+            ),
+        },
+    )
+
+
+def show_pattern_match(
+    scan_df: pd.DataFrame,
+    *,
+    pattern_match_df: Optional[pd.DataFrame] = None,
+):
     
     st.markdown("---")
     st.subheader("🧠 TOP PATTERN MATCH")
@@ -663,7 +727,11 @@ def show_pattern_match(scan_df: pd.DataFrame):
 
         st.warning(f"Learning DNA unavailable : {e}")
 
-    result = build_pattern_match(scan_df)
+    result = (
+        pattern_match_df.copy()
+        if pattern_match_df is not None
+        else build_pattern_match(scan_df)
+    )
 
     if result.empty:
 

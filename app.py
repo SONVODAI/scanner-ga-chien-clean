@@ -14,7 +14,6 @@ import base64
 import json
 import requests
 from datetime import datetime, timedelta
-from modules.learning_pattern_match import run as show_pattern_match
 from zoneinfo import ZoneInfo
 from modules.leader_brain_board import show_leader_brain, show_ai_recommendation
 from leader_memory import update_memory
@@ -91,6 +90,7 @@ from modules.evolution_health import (
 from modules.learning_pattern_match import (
     run as show_pattern_match,
     build_pattern_match,
+    render_pattern_match_early_radar,
 )
 # =========================================================
 # PAGE CONFIG
@@ -6595,6 +6595,8 @@ if not buy_elite_df.empty:
 else:
     st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
 
+render_pattern_match_early_radar(pattern_match_df, top_n=10)
+
 try:
     from modules.shadow_observation_board import render_shadow_observation_board
 
@@ -6914,7 +6916,7 @@ if show_advanced_analysis:
     show_leader_brain()
 
     try:
-        show_pattern_match(scan_df)
+        show_pattern_match(scan_df, pattern_match_df=pattern_match_df)
     except Exception as e:
         st.warning(f"Pattern Match: {type(e).__name__}: {e}")
 
