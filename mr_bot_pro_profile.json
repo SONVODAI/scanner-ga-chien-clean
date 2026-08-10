@@ -3,8 +3,8 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-08-09 17:20:35",
-  "age_days": 45,
+  "updated_at": "2026-08-10 12:31:25",
+  "age_days": 46,
   "bot_version_number": 4.357,
   "status": "THINKING",
   "personality": "CÂN BẰNG",
@@ -37,15 +37,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-08-01 09:22:03",
-      "status": "THINKING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 46.0,
-      "completed_t5": 331,
-      "market_real": 3.0,
-      "message": "Market REAL 3.0 < 6. Tôi chỉ lập watchlist (BAF, VNM, TCX), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-08-01 09:22:55",
       "status": "THINKING",
@@ -755,6 +746,15 @@
       "confidence": 46.0,
       "completed_t5": 356,
       "market_real": 6.8,
+      "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
+    },
+    {
+      "time": "2026-08-10 12:31:25",
+      "status": "THINKING",
+      "personality": "CÂN BẰNG",
+      "confidence": 46.0,
+      "completed_t5": 356,
+      "market_real": 7.9,
       "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
     }
   ]
