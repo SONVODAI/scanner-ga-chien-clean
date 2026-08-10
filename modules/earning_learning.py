@@ -236,6 +236,12 @@ class LearningResult:
 
 
 @dataclass(frozen=True)
+class _GitHubReadPayload:
+    text: str
+    remote_size: int
+
+
+@dataclass(frozen=True)
 class GitHubConfig:
     token: Optional[str]
     owner: str
@@ -579,7 +585,26 @@ class GitHubLocalStorage:
 
         raise RuntimeError("GitHub request failed after retries")
 
-    def _github_read(self, filename: str) -> Optional[str]:
+    def _github_download_url(self, url: str) -> str:
+        """Fetch raw file bytes when Contents API omits inline content (>1 MB)."""
+        headers: Dict[str, str] = {}
+        if self.github.token:
+            headers["Authorization"] = f"Bearer {self.github.token}"
+
+        response = self._request("GET", url, headers=headers)
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"GitHub download failed: HTTP {response.status_code} "
+                f"{response.text[:300]}"
+            )
+
+        return response.content.decode("utf-8-sig")
+
+    def _github_read_inline_base64(self, encoded: str) -> str:
+        cleaned = encoded.replace("\n", "").replace("\r", "")
+        return base64.b64decode(cleaned).decode("utf-8-sig")
+
+    def _github_read(self, filename: str) -> Optional[_GitHubReadPayload]:
         if not self.github.enabled:
             return None
 
@@ -600,18 +625,61 @@ class GitHubLocalStorage:
             )
 
         payload = response.json()
-        encoded = payload.get("content", "")
-        encoding = payload.get("encoding", "base64")
+        encoded = payload.get("content") or ""
+        encoding = payload.get("encoding") or "base64"
+        remote_size = int(payload.get("size") or 0)
 
-        if not encoded:
-            return ""
+        if encoding == "base64" and encoded.strip():
+            return _GitHubReadPayload(
+                self._github_read_inline_base64(encoded),
+                remote_size,
+            )
+
+        if remote_size == 0:
+            return _GitHubReadPayload("", remote_size)
+
+        if encoding == "none" or not encoded.strip():
+            download_url = payload.get("download_url")
+            if not download_url:
+                raise RuntimeError(
+                    f"GitHub file {filename} size={remote_size} "
+                    "missing download_url for large-file read"
+                )
+            return _GitHubReadPayload(
+                self._github_download_url(download_url),
+                remote_size,
+            )
 
         if encoding != "base64":
             raise RuntimeError(
                 f"Unsupported GitHub content encoding: {encoding}"
             )
 
-        return base64.b64decode(encoded).decode("utf-8-sig")
+        raise RuntimeError(
+            f"GitHub file {filename} size={remote_size} has no readable content"
+        )
+
+    def _should_refresh_local_cache(
+        self,
+        filename: str,
+        text: str,
+        remote_size: int,
+    ) -> bool:
+        """Never replace a valid local cache with an empty GitHub payload."""
+        if text.strip():
+            return True
+
+        if remote_size == 0:
+            return True
+
+        if remote_size > 0:
+            return False
+
+        local_text = _read_local_text(self._local_path(filename))
+        if local_text is not None and local_text.strip():
+            return False
+
+        return True
 
     def _github_sha(self, filename: str) -> Optional[str]:
         response = self._request(
@@ -707,18 +775,30 @@ class GitHubLocalStorage:
 
         if self.github.enabled:
             try:
-                text = self._github_read(filename)
-                if text is not None:
-                    try:
-                        _atomic_write_text(
-                            text,
+                payload = self._github_read(filename)
+                if payload is not None:
+                    text = payload.text
+                    if self._should_refresh_local_cache(
+                        filename,
+                        text,
+                        payload.remote_size,
+                    ):
+                        try:
+                            _atomic_write_text(
+                                text,
+                                self._local_path(filename),
+                            )
+                        except Exception:
+                            _LOGGER.exception(
+                                "Cannot refresh local cache: %s",
+                                filename,
+                            )
+                    elif not text.strip():
+                        local_text = _read_local_text(
                             self._local_path(filename),
                         )
-                    except Exception:
-                        _LOGGER.exception(
-                            "Cannot refresh local cache: %s",
-                            filename,
-                        )
+                        if local_text is not None:
+                            text = local_text
                     return StorageReadResult(text=text, source="GITHUB")
             except Exception as exc:
                 github_error = f"{type(exc).__name__}: {exc}"
