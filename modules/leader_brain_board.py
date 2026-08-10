@@ -935,6 +935,33 @@ def _render_intelligence_summary(
 # Main public function
 # ---------------------------------------------------------------------
 
+def show_ai_recommendation() -> None:
+    """
+    Render AI Recommendation only — for the default main dashboard.
+
+    Leader Brain diagnostic tabs remain in ``show_leader_brain()``.
+    """
+    if _BACKEND_IMPORT_ERROR is not None:
+        st.warning(
+            "Không thể tải AI Recommendation. "
+            f"Chi tiết: {_BACKEND_IMPORT_ERROR}"
+        )
+        return
+
+    payload = _load_dashboard_data()
+    tables = payload.get("tables", {})
+    errors = payload.get("errors", [])
+
+    recommendations = _safe_dataframe(tables.get("recommendations"))
+
+    if errors:
+        with st.expander("⚠️ AI Recommendation — nguồn dữ liệu chưa đọc được", expanded=False):
+            for error in errors:
+                st.warning(error)
+
+    _render_recommendations(recommendations)
+
+
 def show_leader_brain() -> None:
     """
     Render the complete Leader Brain Dashboard.
@@ -1032,4 +1059,4 @@ def show_leader_brain() -> None:
         )
 
 
-__all__ = ["show_leader_brain"]
+__all__ = ["show_leader_brain", "show_ai_recommendation"]

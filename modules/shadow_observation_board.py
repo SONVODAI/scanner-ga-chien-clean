@@ -490,12 +490,12 @@ def _render_cohort_block(title: str, cohort: ScorecardSlice) -> None:
     )
 
 
-def render_shadow_observation_board() -> None:
+def render_shadow_observation_board(*, expanded: bool = True) -> None:
     """Render read-only Baseline vs Shadow observation board in Streamlit."""
     import streamlit as st
 
     st.markdown("---")
-    with st.expander("🤖 BOT Baseline vs BOT Shadow", expanded=False):
+    with st.expander("🤖 BOT Baseline vs BOT Shadow", expanded=expanded):
         st.markdown("### BOT BASELINE vs BOT SHADOW")
         st.caption(
             "Bảng quan sát chỉ đọc — so sánh xếp hạng Baseline (production) "
