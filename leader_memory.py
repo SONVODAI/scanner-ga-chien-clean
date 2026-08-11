@@ -1472,6 +1472,45 @@ def _persist_recommendation_shadow(
         logger.exception("Shadow recommendation persist failed safely")
 
 
+def _persist_learning_insight_candidates(
+    rec: pd.DataFrame,
+    brain: pd.DataFrame,
+    session_date: Any,
+    market_real: Optional[Any] = None,
+    market_forecast: Optional[Any] = None,
+    breadth: Optional[Any] = None,
+    patterns: Optional[pd.DataFrame] = None,
+) -> None:
+    """Research-only insight candidate snapshot — never affects production/shadow."""
+    try:
+        from modules.learning_insight_candidates import (
+            build_learning_insight_candidates,
+            persist_learning_insight_candidates,
+        )
+        from modules.regime_alpha_shadow import build_shadow_candidate_universe
+
+        config = _load_config()
+        max_shadow = int(config.get("max_shadow_candidate_rows", 250))
+        patterns_df = patterns if patterns is not None else load_pattern_library()
+        candidates = build_shadow_candidate_universe(
+            brain,
+            patterns_df,
+            rec,
+            max_candidates=max_shadow,
+        )
+        insight_df = build_learning_insight_candidates(
+            candidates,
+            brain,
+            session_date=_normalize_session_date(session_date),
+            market_real=market_real,
+            market_forecast=market_forecast,
+            breadth=breadth,
+        )
+        persist_learning_insight_candidates(insight_df)
+    except Exception:
+        logger.exception("Learning insight candidates persist failed safely")
+
+
 def finalize_session_forward_shadow(
     session_date: Any,
     *,
@@ -1589,6 +1628,15 @@ def update_memory(
                     rec,
                     brain,
                     experience_df,
+                    session_date,
+                    market_real=market_real,
+                    market_forecast=market_forecast,
+                    breadth=breadth,
+                    patterns=patterns,
+                )
+                _persist_learning_insight_candidates(
+                    rec,
+                    brain,
                     session_date,
                     market_real=market_real,
                     market_forecast=market_forecast,
@@ -1780,6 +1828,12 @@ def rebuild_all(
                 rec,
                 brain,
                 experience_df if not experience_df.empty else None,
+                session_date=_today(),
+                patterns=patterns,
+            )
+            _persist_learning_insight_candidates(
+                rec,
+                brain,
                 session_date=_today(),
                 patterns=patterns,
             )
