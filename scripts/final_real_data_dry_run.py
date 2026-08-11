@@ -3,6 +3,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import inspect
+import json
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -416,26 +420,23 @@ def insight_top10_reasons(insight: pd.DataFrame) -> List[Dict[str, Any]]:
 
 
 def forward_ledger_check() -> Dict[str, Any]:
+    from modules.regime_alpha_forward_eval import INSIGHT_IMMUTABLE_T0_FIELDS
+
     required_ranks = [
         "BaselineRank",
         "ShadowExperienceRank",
         "ProductionRank",
     ]
     missing = [f for f in required_ranks if f not in IMMUTABLE_T0_FIELDS]
-    insight_in_immutable = "InsightRank" in IMMUTABLE_T0_FIELDS
     ledger_path = ROOT / "brain" / "regime_alpha_shadow_ledger.csv"
     ledger_cols = list(pd.read_csv(ledger_path, nrows=0).columns) if ledger_path.exists() else []
     return {
         "immutable_t0_fields_count": len(IMMUTABLE_T0_FIELDS),
         "rank_fields_in_immutable": {f: f in IMMUTABLE_T0_FIELDS for f in required_ranks + ["InsightRank"]},
         "missing_required": missing,
-        "insight_rank_frozen_in_ledger": insight_in_immutable,
-        "note_insight": (
-            "InsightRank is stored in brain/learning_insight_candidates.csv (separate research snapshot), "
-            "not in shadow forward ledger — by design."
-            if not insight_in_immutable
-            else "InsightRank in IMMUTABLE_T0_FIELDS"
-        ),
+        "insight_immutable_fields_count": len(INSIGHT_IMMUTABLE_T0_FIELDS),
+        "InsightRank_in_insight_immutable": "InsightRank" in INSIGHT_IMMUTABLE_T0_FIELDS,
+        "InsightEvidenceStatus_in_insight_immutable": "InsightEvidenceStatus" in INSIGHT_IMMUTABLE_T0_FIELDS,
         "ledger_has_baseline_and_shadow_ranks": all(c in ledger_cols for c in ["BaselineRank", "ShadowExperienceRank", "ProductionRank"]),
     }
 
