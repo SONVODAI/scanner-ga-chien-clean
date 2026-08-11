@@ -271,7 +271,7 @@ class TestRecallIndexCacheRecovery(unittest.TestCase):
 
             self._copy_sources(tmp_path)
             second = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
-            self.assertEqual(len(second), 2272)
+            self.assertEqual(len(second), 2414)
 
     @unittest.skipUnless(
         (Path(__file__).resolve().parents[1] / "data" / "earning_learning" / "observations.csv").exists(),
@@ -282,7 +282,7 @@ class TestRecallIndexCacheRecovery(unittest.TestCase):
             tmp_path = Path(tmp)
             self._copy_sources(tmp_path)
             first = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
-            self.assertEqual(len(first), 2272)
+            self.assertEqual(len(first), 2414)
 
             with mock.patch(
                 "modules.regime_recall_index.rebuild_recall_index",
@@ -290,7 +290,7 @@ class TestRecallIndexCacheRecovery(unittest.TestCase):
             ) as mocked:
                 second = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
                 mocked.assert_not_called()
-            self.assertEqual(len(second), 2272)
+            self.assertEqual(len(second), 2414)
 
     @unittest.skipUnless(
         (Path(__file__).resolve().parents[1] / "data" / "earning_learning" / "observations.csv").exists(),

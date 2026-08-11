@@ -76,18 +76,18 @@ class TestRecallIndexIntegration(unittest.TestCase):
 
     def test_rebuild_population_counts(self):
         index_df, summary, _ = rebuild_recall_index(self.DATA_DIR, write=False)
-        self.assertEqual(summary.total_index_rows, 2272)
+        self.assertEqual(summary.total_index_rows, 2414)
         self.assertEqual(summary.duplicate_observation_ids, 0)
         self.assertEqual(summary.by_level.get(RECALL_LEVEL_GLOBAL, 0), 1562)
-        self.assertEqual(summary.by_level.get(RECALL_LEVEL_EXACT, 0), 142)
+        self.assertEqual(summary.by_level.get(RECALL_LEVEL_EXACT, 0), 284)
         self.assertEqual(summary.by_level.get(RECALL_LEVEL_UNUSABLE, 0), 568)
         self.assertEqual(summary.weekend_rows, 568)
         self.assertEqual(
             summary.t3_ready_by_level.get(RECALL_LEVEL_GLOBAL, 0),
-            1420,
+            1562,
         )
         exact = index_df[index_df["recall_level"] == RECALL_LEVEL_EXACT]
-        self.assertEqual(len(exact), 142)
+        self.assertEqual(len(exact), 284)
         self.assertTrue((exact["outcome_status_t3"] == "PENDING").all())
 
     def test_archive_key_match_rate(self):
@@ -118,7 +118,7 @@ class TestRecallIndexIntegration(unittest.TestCase):
             (index_df["recall_level"] == RECALL_LEVEL_EXACT)
             & (index_df["outcome_status_t3"] == "PENDING")
         ]
-        self.assertEqual(len(pending_exact), 142)
+        self.assertEqual(len(pending_exact), 284)
         self.assertTrue(
             pending_exact["market_context_key"]
             .astype(str)
@@ -174,7 +174,7 @@ class TestRecallIndexRuntimeActivation(unittest.TestCase):
                     (tmp_path / name).write_bytes(src.read_bytes())
 
             recall = ensure_recall_index(tmp_path, write=True, auto_rebuild=True)
-            self.assertEqual(len(recall), 2272)
+            self.assertEqual(len(recall), 2414)
             self.assertTrue((tmp_path / "regime_recall_index.csv").exists())
 
     def test_load_uses_cache_without_second_rebuild(self):
