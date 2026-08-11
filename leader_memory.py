@@ -74,6 +74,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "max_pattern_rows": 500,
     "max_hall_of_fame_rows": 200,
     "max_recommendation_rows": 100,
+    "max_shadow_candidate_rows": 250,
     "dedupe_keys": ["session_date", "symbol"],
     "leader_score_weights": {
         "strength": 0.30,
@@ -1430,17 +1431,29 @@ def _persist_recommendation_shadow(
     market_real: Optional[Any] = None,
     market_forecast: Optional[Any] = None,
     breadth: Optional[Any] = None,
+    patterns: Optional[pd.DataFrame] = None,
 ) -> None:
     """N3/N3.7 shadow audit — separate files only; production rec unchanged."""
     try:
         from modules.regime_alpha_shadow import (
+            build_shadow_candidate_universe,
             build_shadow_with_recall,
             persist_shadow_audit,
             summarize_shadow_comparison,
         )
 
-        shadow_df = build_shadow_with_recall(
+        config = _load_config()
+        max_shadow = int(config.get("max_shadow_candidate_rows", 250))
+        patterns_df = patterns if patterns is not None else load_pattern_library()
+        shadow_candidates = build_shadow_candidate_universe(
+            brain,
+            patterns_df,
             rec,
+            max_candidates=max_shadow,
+        )
+
+        shadow_df = build_shadow_with_recall(
+            shadow_candidates,
             brain,
             experience_df,
             session_date=_normalize_session_date(session_date),
@@ -1580,6 +1593,7 @@ def update_memory(
                     market_real=market_real,
                     market_forecast=market_forecast,
                     breadth=breadth,
+                    patterns=patterns,
                 )
 
                 legacy_cols = [
@@ -1767,6 +1781,7 @@ def rebuild_all(
                 brain,
                 experience_df if not experience_df.empty else None,
                 session_date=_today(),
+                patterns=patterns,
             )
 
     return {

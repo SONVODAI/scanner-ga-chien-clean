@@ -307,6 +307,97 @@ def _apply_shadow_experience_rerank(shadow_df: pd.DataFrame) -> pd.DataFrame:
     return out.reindex(columns=list(SHADOW_COLUMNS))
 
 
+def build_shadow_candidate_universe(
+    brain: pd.DataFrame,
+    patterns: pd.DataFrame,
+    production_rec: pd.DataFrame,
+    *,
+    max_candidates: int = 250,
+) -> pd.DataFrame:
+    """
+    Shadow-only candidate pool: all actionable brain symbols, preferring production
+    rec rows when present. Allows outsiders to enter Shadow Top 10.
+    """
+    from leader_memory import RECOMMENDATION_COLUMNS, _best_pattern, _clean_text, _normalize_symbol
+
+    if brain is None or brain.empty:
+        return production_rec.copy() if production_rec is not None else pd.DataFrame()
+
+    prod_by_symbol: Dict[str, Mapping[str, Any]] = {}
+    if production_rec is not None and not production_rec.empty:
+        for _, row in production_rec.iterrows():
+            sym = _normalize_symbol(row.get("symbol"))
+            if sym:
+                prod_by_symbol[sym] = dict(row)
+
+    rows: list[Dict[str, Any]] = []
+    seen: set[str] = set()
+    for _, item in brain.iterrows():
+        action = _clean_text(item.get("recommendation"))
+        if action in {"TRÁNH / CHỜ PHỤC HỒI", "CHƯA HÀNH ĐỘNG"}:
+            continue
+        symbol = _normalize_symbol(item.get("symbol"))
+        if not symbol or symbol in seen:
+            continue
+        seen.add(symbol)
+
+        if symbol in prod_by_symbol:
+            rows.append(dict(prod_by_symbol[symbol]))
+            continue
+
+        match_score, pattern_id = _best_pattern(item.get("feature_signature"), patterns)
+        rows.append(
+            {
+                "symbol": item.get("symbol"),
+                "recommendation": action,
+                "confidence_score": item.get("confidence_score"),
+                "leader_score": item.get("leader_score"),
+                "leader_level": item.get("leader_level"),
+                "current_group": item.get("current_group"),
+                "current_price": item.get("current_price"),
+                "current_rs5": item.get("current_rs5"),
+                "current_rs10": item.get("current_rs10"),
+                "current_rsi14": item.get("current_rsi14"),
+                "current_obv_status": item.get("current_obv_status"),
+                "winrate_t5_pct": item.get("winrate_t5_pct"),
+                "avg_return_t5_pct": item.get("avg_return_t5_pct"),
+                "pattern_match_score": match_score,
+                "matched_pattern_id": pattern_id,
+                "reason": _clean_text(item.get("recommendation_reason")),
+                "updated_at": item.get("updated_at", ""),
+                "rank": np.nan,
+                "ProductionRank": np.nan,
+            }
+        )
+
+    if not rows:
+        return production_rec.copy() if production_rec is not None else pd.DataFrame(
+            columns=list(RECOMMENDATION_COLUMNS)
+        )
+
+    universe = pd.DataFrame(rows)
+    universe["_pure_rank_score"] = universe.apply(
+        lambda r: compute_pure_baseline_score(dict(r)),
+        axis=1,
+    )
+    universe = (
+        universe.sort_values(
+            ["_pure_rank_score", "leader_score", "symbol"],
+            ascending=[False, False, True],
+            kind="stable",
+        )
+        .head(max(1, int(max_candidates)))
+        .drop(columns=["_pure_rank_score"])
+        .reset_index(drop=True)
+    )
+
+    for col in RECOMMENDATION_COLUMNS:
+        if col not in universe.columns:
+            universe[col] = np.nan
+
+    return universe.reindex(columns=list(RECOMMENDATION_COLUMNS))
+
+
 def build_shadow_with_recall(
     production_rec: pd.DataFrame,
     brain: pd.DataFrame,
@@ -607,6 +698,7 @@ def load_shadow_recommendations() -> pd.DataFrame:
 __all__ = [
     "SHADOW_COLUMNS",
     "ShadowComparisonSummary",
+    "build_shadow_candidate_universe",
     "build_shadow_with_recall",
     "load_shadow_recommendations",
     "persist_shadow_audit",
