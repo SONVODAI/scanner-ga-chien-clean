@@ -111,6 +111,66 @@ def is_na_market_context(market_context_key: str) -> bool:
     return text in {"NA", "NA|NA", "NA|NA|NA"}
 
 
+def _parse_market_context_parts(market_context_key: str) -> Tuple[str, str, str]:
+    parts = str(market_context_key or "").split("|")
+    while len(parts) < 3:
+        parts.append("")
+    return parts[0], parts[1], parts[2]
+
+
+_CONTEXT_MATCH_PRIORITY: Dict[str, int] = {
+    RECALL_LEVEL_EXACT: 3,
+    RECALL_LEVEL_FAMILY: 2,
+    RECALL_LEVEL_GLOBAL: 1,
+    RECALL_LEVEL_NO_EVIDENCE: 0,
+}
+
+
+def classify_context_match(query_key: str, row_key: str) -> str:
+    """
+    Classify how well a historical row's market context matches a live query.
+
+    Resolution is query-time: stored recall_level on the index row reflects T0
+    field availability at observation time, not whether the row can support
+    EXACT/FAMILY evidence for today's candidate context.
+    """
+    query = str(query_key or "").strip()
+    row = str(row_key or "").strip()
+    if not query or not row:
+        return RECALL_LEVEL_NO_EVIDENCE
+
+    if query == row:
+        return RECALL_LEVEL_EXACT
+
+    q_forecast, q_breadth, q_market = _parse_market_context_parts(query)
+    r_forecast, r_breadth, r_market = _parse_market_context_parts(row)
+
+    # Full three-part alignment when both sides recorded real forecast/breadth.
+    if (
+        q_forecast not in ("", "NA")
+        and r_forecast not in ("", "NA")
+        and q_forecast == r_forecast
+        and q_breadth == r_breadth
+        and q_market == r_market
+    ):
+        return RECALL_LEVEL_FAMILY
+
+    # Legacy family tuple match for non-NA historical rows.
+    if not is_na_market_context(row) and r_forecast not in ("", "NA"):
+        if market_context_family(query) == market_context_family(row):
+            return RECALL_LEVEL_FAMILY
+
+    # Near-context: historical rows often store NA|NA|<market_bucket> when T0
+    # lacked forecast/breadth — match on the market regime bucket (3rd segment).
+    if q_market not in ("", "NA") and q_market == r_market:
+        return RECALL_LEVEL_FAMILY
+
+    if is_na_market_context(row):
+        return RECALL_LEVEL_GLOBAL
+
+    return RECALL_LEVEL_NO_EVIDENCE
+
+
 def shrink_toward_neutral(score: float, discount: float) -> float:
     return NEUTRAL_RAS + (score - NEUTRAL_RAS) * discount
 
@@ -291,39 +351,35 @@ def _resolve_recall_rows(
     if dna_rows.empty:
         return pd.DataFrame(), RECALL_LEVEL_NO_EVIDENCE, ""
 
-    exact = dna_rows[
-        (dna_rows["market_context_key"].astype(str) == str(market_context_key))
-        & (dna_rows["recall_level"].astype(str) == RECALL_LEVEL_EXACT)
-    ]
-    if not exact.empty:
-        ctx = str(exact.iloc[0]["market_context_key"])
-        return exact, RECALL_LEVEL_EXACT, ctx
+    query_key = str(market_context_key)
+    query_market = _parse_market_context_parts(query_key)[2]
 
-    target_family = market_context_family(market_context_key)
-    family = dna_rows[dna_rows["recall_level"].astype(str) == RECALL_LEVEL_FAMILY]
-    if not family.empty:
-        family = family[
-            family["market_context_key"].map(lambda c: market_context_family(str(c)) == target_family)
-        ]
-    if not family.empty:
-        ctx = str(
-            family["market_context_key"]
-            .value_counts()
-            .idxmax()
-        )
-        return family, RECALL_LEVEL_FAMILY, ctx
+    buckets: Dict[str, list[pd.Series]] = {
+        RECALL_LEVEL_EXACT: [],
+        RECALL_LEVEL_FAMILY: [],
+        RECALL_LEVEL_GLOBAL: [],
+    }
+    for _, row in dna_rows.iterrows():
+        row_key = str(row.get("market_context_key", ""))
+        match_level = classify_context_match(query_key, row_key)
+        if match_level in buckets:
+            buckets[match_level].append(row)
 
-    global_rows = dna_rows[dna_rows["recall_level"].astype(str) == RECALL_LEVEL_GLOBAL]
-    global_rows = global_rows[
-        global_rows["market_context_key"].map(is_na_market_context)
-    ]
-    if not global_rows.empty:
-        ctx = str(
-            global_rows["market_context_key"]
-            .value_counts()
-            .idxmax()
-        )
-        return global_rows, RECALL_LEVEL_GLOBAL, ctx
+    for level in (RECALL_LEVEL_EXACT, RECALL_LEVEL_FAMILY, RECALL_LEVEL_GLOBAL):
+        matched = buckets.get(level) or []
+        if not matched:
+            continue
+        matched_df = pd.DataFrame(matched)
+        if level == RECALL_LEVEL_GLOBAL and query_market not in ("", "NA"):
+            bucket_subset = matched_df[
+                matched_df["market_context_key"].astype(str).map(
+                    lambda k: _parse_market_context_parts(k)[2] == query_market
+                )
+            ]
+            if not bucket_subset.empty:
+                matched_df = bucket_subset
+        ctx = str(matched_df["market_context_key"].value_counts().idxmax())
+        return matched_df, level, ctx
 
     return pd.DataFrame(), RECALL_LEVEL_NO_EVIDENCE, ""
 
@@ -337,7 +393,9 @@ def compute_recall_evidence(
 ) -> RecallEvidenceResult:
     """
     Compute recall-based alpha from derived historical index (N3.7).
-    Never promotes GLOBAL rows into EXACT/FAMILY evidence.
+
+    Evidence resolves EXACT -> FAMILY/NEAR -> GLOBAL at query time. GLOBAL rows
+    are only used when no stronger context match exists for the same DNA.
     """
     if recall_index is None:
         recall_index = load_recall_index(data_dir)
@@ -418,6 +476,7 @@ __all__ = [
     "compute_horizon_ev",
     "compute_recall_evidence",
     "compute_technical_prior",
+    "classify_context_match",
     "filter_recall_learning_pool",
     "load_recall_index",
     "market_context_family",

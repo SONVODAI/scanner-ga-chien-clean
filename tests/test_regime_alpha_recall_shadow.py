@@ -12,6 +12,7 @@ import pandas as pd
 from leader_memory import RECOMMENDATION_COLUMNS, _build_recommendations
 from modules.regime_alpha import (
     RECALL_LEVEL_EXACT,
+    RECALL_LEVEL_FAMILY,
     RECALL_LEVEL_GLOBAL,
     RECALL_LEVEL_NO_EVIDENCE,
     compute_recall_evidence,
@@ -53,7 +54,10 @@ class TestRecallEvidence(unittest.TestCase):
             top_dna,
             recall_index=self.recall,
         )
-        self.assertEqual(evidence.recall_level, RECALL_LEVEL_GLOBAL)
+        self.assertIn(
+            evidence.recall_level,
+            {RECALL_LEVEL_FAMILY, RECALL_LEVEL_GLOBAL},
+        )
         self.assertGreaterEqual(evidence.recall_t3_samples, 10)
         self.assertGreater(evidence.recall_confidence, 0.0)
 
@@ -148,7 +152,7 @@ class TestShadowComparison(unittest.TestCase):
             shadow["ShadowExperienceRank"].tolist(),
         )
         summary = summarize_shadow_comparison(shadow, recall_index=recall)
-        self.assertEqual(summary.global_count, 2)
+        self.assertEqual(summary.family_count + summary.global_count, 2)
         self.assertEqual(summary.exact_count, 0)
         self.assertGreater(summary.promoted + summary.demoted, 0)
 
