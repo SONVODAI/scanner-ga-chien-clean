@@ -48,6 +48,12 @@ RAS_EVIDENCE_DISCOUNT: Dict[str, float] = {
 
 RECALL_LEVEL_NO_EVIDENCE = "NO_RECALL_EVIDENCE"
 
+SHADOW_PATTERN_MAX_ADJ = 12.0
+SHADOW_CONTINUATION_MAX_ADJ = 10.0
+SHADOW_HORIZON_MAX_ADJ = 8.0
+SHADOW_MIN_PATTERN_SAMPLES = 5
+SHADOW_MIN_CONTINUATION_SAMPLES = 5
+
 RowLike = Union[Mapping[str, Any], pd.Series]
 
 
@@ -69,6 +75,197 @@ class RecallEvidenceResult:
     recall_alpha: float = NEUTRAL_RAS
     recall_matched_dna: str = ""
     recall_matched_context: str = ""
+
+
+@dataclass(frozen=True)
+class ShadowScoreResult:
+    pure_baseline_score: float
+    shadow_final_score: float
+    pattern_adjustment: float = 0.0
+    pattern_confidence: float = 0.0
+    continuation_adjustment: float = 0.0
+    continuation_confidence: float = 0.0
+    horizon_adjustment: float = 0.0
+    recall_component: float = 0.0
+    learned_win_rate: Optional[float] = None
+    continuation_score: Optional[float] = None
+    experience_samples: int = 0
+    matched_pattern: str = ""
+    matched_market_context: str = ""
+    context_match_mode: str = ""
+
+
+def _shadow_sample_weight(samples: int) -> float:
+    if samples < SHADOW_MIN_PATTERN_SAMPLES:
+        return 0.0
+    return _clip(
+        (samples - SAMPLE_MIN) / (SAMPLE_FULL - SAMPLE_MIN),
+        0.0,
+        1.0,
+    )
+
+
+def compute_pure_baseline_score(row: RowLike) -> float:
+    """Control-group score — leader + confidence + pattern match only."""
+    data = dict(row)
+    leader = _optional_float(data.get("leader_score"), 0.0) or 0.0
+    confidence = _optional_float(data.get("confidence_score"), 0.0) or 0.0
+    pattern = _optional_float(data.get("pattern_match_score"), 0.0) or 0.0
+    score = leader * 0.55 + confidence * 0.20 + pattern * 0.25
+    return round(score, 4)
+
+
+def _shadow_pattern_adjustment(
+    pattern_row: Optional[RowLike],
+) -> Tuple[float, float, Optional[float], int]:
+    if pattern_row is None:
+        return 0.0, 0.0, None, 0
+    row = dict(pattern_row)
+    samples = int(_optional_float(row.get("samples"), 0) or 0)
+    if samples < SHADOW_MIN_PATTERN_SAMPLES:
+        return 0.0, 0.0, None, samples
+
+    wlb = _optional_float(row.get("win_rate_lower_bound_pct"))
+    win_rate = _optional_float(row.get("win_rate_pct"))
+    if wlb is None and win_rate is not None:
+        wlb = win_rate * 0.85
+    if wlb is None:
+        return 0.0, 0.0, win_rate, samples
+
+    raw_adj = (wlb - NEUTRAL_RAS) / NEUTRAL_RAS * SHADOW_PATTERN_MAX_ADJ
+    raw_adj = _clip(raw_adj, -SHADOW_PATTERN_MAX_ADJ, SHADOW_PATTERN_MAX_ADJ)
+    confidence = _shadow_sample_weight(samples)
+    return round(raw_adj * confidence, 4), confidence, win_rate, samples
+
+
+def _shadow_continuation_adjustment(
+    continuation_row: Optional[RowLike],
+) -> Tuple[float, float, Optional[float]]:
+    if continuation_row is None:
+        return 0.0, 0.0, None
+    row = dict(continuation_row)
+    samples_t10 = int(_optional_float(row.get("samples_t10"), 0) or 0)
+    if samples_t10 < SHADOW_MIN_CONTINUATION_SAMPLES:
+        return 0.0, 0.0, None
+
+    score = _optional_float(row.get("continuation_score"))
+    lower = _optional_float(row.get("t3_to_t10_lower_bound_pct"))
+    t3_t10_rate = _optional_float(row.get("t3_to_t10_rate_pct"))
+
+    evidence = score if score is not None else lower
+    if evidence is None and t3_t10_rate is not None:
+        evidence = t3_t10_rate
+    if evidence is None:
+        return 0.0, 0.0, score
+
+    raw_adj = (evidence - NEUTRAL_RAS) / NEUTRAL_RAS * SHADOW_CONTINUATION_MAX_ADJ
+    raw_adj = _clip(raw_adj, -SHADOW_CONTINUATION_MAX_ADJ, SHADOW_CONTINUATION_MAX_ADJ)
+    confidence = _shadow_sample_weight(samples_t10)
+    return round(raw_adj * confidence, 4), confidence, score
+
+
+def _shadow_horizon_adjustment(recall: RecallEvidenceResult) -> float:
+    """
+    Horizon intelligence from recall T3/T5/T10 — distinguishes short winners
+    vs compounders without future leakage (historical outcomes only).
+    """
+    if recall.recall_level == RECALL_LEVEL_NO_EVIDENCE:
+        return 0.0
+
+    components: list[Tuple[float, float]] = []
+
+    if recall.recall_t3_samples >= SAMPLE_MIN and recall.recall_mean_t3 is not None:
+        t3_only = 1.0
+        if recall.recall_t5_samples >= SAMPLE_MIN and recall.recall_mean_t5 is not None:
+            if recall.recall_mean_t5 < recall.recall_mean_t3 * 0.5:
+                t3_only = 1.25
+        components.append(
+            (_clip(recall.recall_mean_t3 / 5.0, -1.0, 1.0) * t3_only, HORIZON_WEIGHTS[3])
+        )
+
+    if recall.recall_t5_samples >= SAMPLE_MIN and recall.recall_mean_t5 is not None:
+        components.append(
+            (_clip(recall.recall_mean_t5 / 6.0, -1.0, 1.0), HORIZON_WEIGHTS[5])
+        )
+
+    if recall.recall_t10_samples >= SAMPLE_MIN and recall.recall_mean_t10 is not None:
+        compound_boost = 1.0
+        if (
+            recall.recall_t3_samples >= SAMPLE_MIN
+            and recall.recall_mean_t3 is not None
+            and recall.recall_mean_t3 > 0
+            and recall.recall_mean_t10 >= recall.recall_mean_t3
+        ):
+            compound_boost = 1.35
+        components.append(
+            (
+                _clip(recall.recall_mean_t10 / 8.0, -1.0, 1.0) * compound_boost,
+                HORIZON_WEIGHTS[10],
+            )
+        )
+
+    if not components:
+        return 0.0
+
+    weight_sum = sum(w for _, w in components)
+    blended = sum(v * w for v, w in components) / weight_sum
+    authority = CONTEXT_AUTHORITY.get(recall.recall_level, 0.0) * RECENCY_FLOOR
+    return round(
+        _clip(blended * SHADOW_HORIZON_MAX_ADJ * authority, -SHADOW_HORIZON_MAX_ADJ, SHADOW_HORIZON_MAX_ADJ),
+        4,
+    )
+
+
+def compute_shadow_final_score(
+    pure_baseline: float,
+    recall: RecallEvidenceResult,
+    *,
+    pattern_row: Optional[RowLike] = None,
+    continuation_row: Optional[RowLike] = None,
+    matched_pattern: str = "",
+    matched_market_context: str = "",
+    context_match_mode: str = "",
+) -> ShadowScoreResult:
+    """
+    Shadow-only final score: pure baseline + pattern + continuation + horizon
+    recall intelligence. Does not use production ExperienceAdjustment gates.
+    """
+    pattern_adj, pattern_conf, learned_wr, exp_samples = _shadow_pattern_adjustment(
+        pattern_row
+    )
+    cont_adj, cont_conf, cont_score = _shadow_continuation_adjustment(
+        continuation_row
+    )
+    horizon_adj = _shadow_horizon_adjustment(recall)
+
+    recall_w = _clip(recall.recall_confidence, 0.0, MAX_LEARNING_AUTHORITY)
+    if recall_w > 0.0:
+        recall_component = round(recall_w * (recall.recall_alpha - pure_baseline), 4)
+    else:
+        recall_component = 0.0
+
+    final = round(
+        pure_baseline + pattern_adj + cont_adj + horizon_adj + recall_component,
+        4,
+    )
+    final = _clip(final, 0.0, 100.0)
+
+    return ShadowScoreResult(
+        pure_baseline_score=round(pure_baseline, 4),
+        shadow_final_score=final,
+        pattern_adjustment=pattern_adj,
+        pattern_confidence=pattern_conf,
+        continuation_adjustment=cont_adj,
+        continuation_confidence=cont_conf,
+        horizon_adjustment=horizon_adj,
+        recall_component=recall_component,
+        learned_win_rate=learned_wr,
+        continuation_score=cont_score,
+        experience_samples=exp_samples,
+        matched_pattern=matched_pattern,
+        matched_market_context=matched_market_context,
+        context_match_mode=context_match_mode,
+    )
 
 
 def _optional_float(value: Any, default: Optional[float] = None) -> Optional[float]:
@@ -458,8 +655,8 @@ def compute_experience_shadow_score(
     recall: RecallEvidenceResult,
 ) -> float:
     """
-    Blend production baseline with recall alpha. When recall confidence is zero,
-    shadow equals baseline so only evidence-backed experience changes ranking.
+    Legacy blend helper — kept for backward compatibility.
+    Prefer compute_shadow_final_score for new shadow ranking paths.
     """
     w = _clip(recall.recall_confidence, 0.0, MAX_LEARNING_AUTHORITY)
     if w <= 0.0:
@@ -471,10 +668,13 @@ __all__ = [
     "NEUTRAL_RAS",
     "RECALL_LEVEL_NO_EVIDENCE",
     "RecallEvidenceResult",
+    "ShadowScoreResult",
     "compute_alpha_confidence",
     "compute_experience_shadow_score",
     "compute_horizon_ev",
+    "compute_pure_baseline_score",
     "compute_recall_evidence",
+    "compute_shadow_final_score",
     "compute_technical_prior",
     "classify_context_match",
     "filter_recall_learning_pool",

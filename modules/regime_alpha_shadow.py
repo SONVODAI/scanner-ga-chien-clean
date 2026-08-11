@@ -11,22 +11,29 @@ import os
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Sequence
+from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 
 from modules.earning_learning import (
+    _continuation_knowledge_lookup,
     _decision_rows_for_pattern_keys,
+    _lookup_continuation_row,
+    _lookup_pattern_row,
+    _pattern_knowledge_lookup,
     _safe_float as _el_safe_float,
+    get_continuation_knowledge,
+    get_pattern_knowledge,
 )
 from modules.regime_alpha import (
     RECALL_LEVEL_EXACT,
     RECALL_LEVEL_FAMILY,
     RECALL_LEVEL_GLOBAL,
     RECALL_LEVEL_NO_EVIDENCE,
-    compute_experience_shadow_score,
+    compute_pure_baseline_score,
     compute_recall_evidence,
+    compute_shadow_final_score,
     compute_technical_prior,
     load_recall_index,
 )
@@ -37,8 +44,6 @@ MODULE_DIR = Path(__file__).resolve().parent.parent
 BRAIN_DIR = MODULE_DIR / "brain"
 SHADOW_SNAPSHOT_FILE = BRAIN_DIR / "ai_recommendation_shadow.csv"
 SHADOW_COMPARISON_FILE = BRAIN_DIR / "regime_alpha_shadow_comparison.csv"
-
-EXPERIENCE_RANK_WEIGHT = 0.25
 
 SHADOW_COLUMNS: Sequence[str] = (
     "session_date",
@@ -53,8 +58,20 @@ SHADOW_COLUMNS: Sequence[str] = (
     "TechnicalPrior",
     "BaselineScore",
     "BaselineRank",
+    "PureBaselineScore",
+    "ShadowFinalScore",
     "ShadowExperienceScore",
     "ShadowExperienceRank",
+    "PatternKnowledgeAdj",
+    "ContinuationAdj",
+    "HorizonAdj",
+    "RecallComponent",
+    "LearnedWinRate",
+    "ContinuationScore",
+    "ExperienceSamples",
+    "MatchedPattern",
+    "MatchedMarketContext",
+    "ContextMatchMode",
     "ScoreDelta",
     "RankDelta",
     "ShadowMovement",
@@ -78,8 +95,8 @@ SHADOW_COLUMNS: Sequence[str] = (
     "updated_at",
 )
 
-_SHADOW_EXPERIENCE_RANK_SORT_COLUMNS: Sequence[str] = (
-    "ShadowExperienceScore",
+_SHADOW_RANK_SORT_COLUMNS: Sequence[str] = (
+    "ShadowFinalScore",
     "RecallConfidence",
     "BaselineScore",
     "leader_score",
@@ -103,18 +120,48 @@ class ShadowComparisonSummary:
     avg_t3_demoted: Optional[float] = None
 
 
-def _compute_baseline_score(row: Mapping[str, Any]) -> float:
-    leader = pd.to_numeric(row.get("leader_score"), errors="coerce")
-    confidence = pd.to_numeric(row.get("confidence_score"), errors="coerce")
-    pattern = pd.to_numeric(row.get("pattern_match_score"), errors="coerce")
-    exp_adj = pd.to_numeric(row.get("_experience_rank_adj"), errors="coerce")
-    score = (
-        float(leader if pd.notna(leader) else 0) * 0.55
-        + float(confidence if pd.notna(confidence) else 0) * 0.20
-        + float(pattern if pd.notna(pattern) else 0) * 0.25
-        + float(exp_adj if pd.notna(exp_adj) else 0) * EXPERIENCE_RANK_WEIGHT
+def _load_shadow_knowledge_lookups() -> Tuple[Dict, Dict]:
+    try:
+        pattern_df = get_pattern_knowledge(min_samples=1)
+    except Exception:
+        pattern_df = pd.DataFrame()
+    try:
+        continuation_df = get_continuation_knowledge(min_samples=1)
+    except Exception:
+        continuation_df = pd.DataFrame()
+    return _pattern_knowledge_lookup(pattern_df), _continuation_knowledge_lookup(
+        continuation_df
     )
-    return round(score, 4)
+
+
+def _shadow_knowledge_rows(
+    stock_pattern_key: str,
+    market_context_key: str,
+    pattern_lookup: Mapping,
+    continuation_lookup: Mapping,
+) -> Tuple[Optional[Mapping[str, Any]], Optional[Mapping[str, Any]], str, str]:
+    pattern_row, pattern_mode = _lookup_pattern_row(
+        pattern_lookup,
+        market_context_key,
+        stock_pattern_key,
+        preferred_horizon=5,
+        fallback_horizon=10,
+    )
+    continuation_row, continuation_mode = _lookup_continuation_row(
+        continuation_lookup,
+        market_context_key,
+        stock_pattern_key,
+    )
+    match_mode = pattern_mode or continuation_mode or ""
+    matched_pattern = ""
+    if pattern_row is not None:
+        matched_pattern = str(pattern_row.get("pattern_key", ""))
+    matched_context = market_context_key
+    if pattern_row is not None and pattern_row.get("market_context_key"):
+        matched_context = str(pattern_row.get("market_context_key"))
+    elif continuation_row is not None and continuation_row.get("market_context_key"):
+        matched_context = str(continuation_row.get("market_context_key"))
+    return pattern_row, continuation_row, matched_pattern, match_mode
 
 
 def _movement(baseline_rank: int, shadow_rank: int) -> str:
@@ -125,21 +172,38 @@ def _movement(baseline_rank: int, shadow_rank: int) -> str:
     return "UNCHANGED"
 
 
-def _shadow_reason(recall_level: str, recall_confidence: float, score_delta: float) -> str:
-    if recall_level == RECALL_LEVEL_NO_EVIDENCE or recall_confidence <= 0:
-        return "No usable recall evidence; shadow follows technical prior only."
-    if recall_level == RECALL_LEVEL_GLOBAL:
-        prefix = "GLOBAL_DNA recall only — not regime-specific proof. "
-    elif recall_level == RECALL_LEVEL_FAMILY:
-        prefix = "FAMILY_CONTEXT recall. "
-    elif recall_level == RECALL_LEVEL_EXACT:
-        prefix = "EXACT_CONTEXT recall. "
-    else:
-        prefix = ""
+def _shadow_reason(
+    recall_level: str,
+    recall_confidence: float,
+    score_delta: float,
+    *,
+    pattern_adj: float = 0.0,
+    continuation_adj: float = 0.0,
+    horizon_adj: float = 0.0,
+) -> str:
+    parts: list[str] = []
+    if abs(pattern_adj) >= 0.5:
+        parts.append(f"pattern {pattern_adj:+.1f}")
+    if abs(continuation_adj) >= 0.5:
+        parts.append(f"continuation {continuation_adj:+.1f}")
+    if abs(horizon_adj) >= 0.5:
+        parts.append(f"horizon {horizon_adj:+.1f}")
+    if recall_level != RECALL_LEVEL_NO_EVIDENCE and recall_confidence > 0:
+        if recall_level == RECALL_LEVEL_GLOBAL:
+            parts.append("GLOBAL_DNA recall")
+        elif recall_level == RECALL_LEVEL_FAMILY:
+            parts.append("FAMILY recall")
+        elif recall_level == RECALL_LEVEL_EXACT:
+            parts.append("EXACT recall")
+
+    if not parts:
+        return "No strong learning evidence; shadow follows pure baseline."
+
+    detail = ", ".join(parts)
     if abs(score_delta) <= 1.0:
-        return prefix + "Recall evidence present but score delta is minimal."
+        return f"Learning signals present ({detail}) but net score delta is minimal."
     direction = "raises" if score_delta > 0 else "lowers"
-    return prefix + f"Historical recall {direction} shadow score by {abs(score_delta):.1f} points."
+    return f"Shadow {direction} score by {abs(score_delta):.1f} via {detail}."
 
 
 def _canonical_pattern_keys_for_shadow_row(
@@ -156,7 +220,6 @@ def _canonical_pattern_keys_for_shadow_row(
     """Derive stock/market DNA keys via the same canonical path as historical observations."""
     merged = {**dict(brain_row), **dict(rec_row), **dict(exp_row)}
     merged["symbol"] = symbol
-    # leader_score is not a T0 scan field; historical observations use NA bucket.
     if "leader_score" not in exp_row:
         merged.pop("leader_score", None)
     frame = pd.DataFrame([merged])
@@ -183,7 +246,7 @@ def _canonical_pattern_keys_for_shadow_row(
 
 
 def _apply_shadow_experience_rerank(shadow_df: pd.DataFrame) -> pd.DataFrame:
-    """Assign deterministic ShadowExperienceRank/ShadowRank and sort CSV by shadow rank."""
+    """Assign deterministic shadow ranks from ShadowFinalScore."""
     if shadow_df is None or shadow_df.empty:
         return shadow_df
 
@@ -195,20 +258,31 @@ def _apply_shadow_experience_rerank(shadow_df: pd.DataFrame) -> pd.DataFrame:
         out.get("rank", pd.NA),
     )
 
+    if "ShadowFinalScore" not in out.columns:
+        out["ShadowFinalScore"] = out.get("ShadowExperienceScore", np.nan)
+    if "ShadowExperienceScore" not in out.columns:
+        out["ShadowExperienceScore"] = out["ShadowFinalScore"]
+    else:
+        out["ShadowExperienceScore"] = out["ShadowFinalScore"]
+
+    if "PureBaselineScore" not in out.columns:
+        out["PureBaselineScore"] = out.get("BaselineScore", np.nan)
+    out["BaselineScore"] = out["PureBaselineScore"]
+
     out["BaselineRank"] = (
         pd.to_numeric(out["BaselineScore"], errors="coerce")
         .rank(method="first", ascending=False)
         .astype(int)
     )
 
-    for col in _SHADOW_EXPERIENCE_RANK_SORT_COLUMNS:
+    for col in _SHADOW_RANK_SORT_COLUMNS:
         if col == "symbol":
             out[col] = out[col].astype(str).str.strip().str.upper()
         else:
             out[col] = pd.to_numeric(out[col], errors="coerce")
 
     out = out.sort_values(
-        by=list(_SHADOW_EXPERIENCE_RANK_SORT_COLUMNS),
+        by=list(_SHADOW_RANK_SORT_COLUMNS),
         ascending=[False, False, False, False, True],
         kind="stable",
         na_position="last",
@@ -216,6 +290,10 @@ def _apply_shadow_experience_rerank(shadow_df: pd.DataFrame) -> pd.DataFrame:
 
     out["ShadowExperienceRank"] = range(1, len(out) + 1)
     out["ShadowRank"] = out["ShadowExperienceRank"]
+    out["ScoreDelta"] = (
+        pd.to_numeric(out["ShadowFinalScore"], errors="coerce")
+        - pd.to_numeric(out["BaselineScore"], errors="coerce")
+    ).round(4)
     out["RankDelta"] = out["BaselineRank"] - out["ShadowExperienceRank"]
     out["ShadowMovement"] = out.apply(
         lambda r: _movement(int(r["BaselineRank"]), int(r["ShadowExperienceRank"])),
@@ -242,13 +320,15 @@ def build_shadow_with_recall(
     breadth: Optional[Any] = None,
 ) -> pd.DataFrame:
     """
-    Build shadow audit rows with baseline vs recall experience comparison.
+    Build shadow audit rows: pure baseline control vs ShadowFinalScore challenger.
     """
     if production_rec is None or production_rec.empty:
         return pd.DataFrame(columns=list(SHADOW_COLUMNS))
 
     if recall_index is None:
         recall_index = load_recall_index()
+
+    pattern_lookup, continuation_lookup = _load_shadow_knowledge_lookups()
 
     brain_by_symbol: Dict[str, Mapping[str, Any]] = {}
     if brain is not None and not brain.empty:
@@ -264,12 +344,12 @@ def build_shadow_with_recall(
             if sym:
                 exp_by_symbol[sym] = dict(row)
 
-    baseline_scores = {}
+    pure_baseline_scores: Dict[str, float] = {}
     if baseline_rank_scores is not None and not baseline_rank_scores.empty:
         for _, row in baseline_rank_scores.iterrows():
             sym = str(row.get("symbol", "")).strip().upper()
             if sym:
-                baseline_scores[sym] = float(row.get("_rank_score", 0))
+                pure_baseline_scores[sym] = float(row.get("_rank_score", 0))
 
     rows = []
     for _, rec_row in production_rec.iterrows():
@@ -293,6 +373,15 @@ def build_shadow_with_recall(
                 brain_df=brain,
             )
 
+        pattern_row, continuation_row, matched_pattern, match_mode = (
+            _shadow_knowledge_rows(
+                stock_pattern_key,
+                market_context_key,
+                pattern_lookup,
+                continuation_lookup,
+            )
+        )
+
         technical_prior = compute_technical_prior(
             {**brain_row, **dict(rec_row)},
             pattern_match_score=rec_row.get("pattern_match_score"),
@@ -303,15 +392,24 @@ def build_shadow_with_recall(
             recall_index=recall_index,
         )
 
-        baseline_row = dict(rec_row)
-        baseline_row["_experience_rank_adj"] = exp_row.get("ExperienceAdjustment", 0)
-        baseline_score = baseline_scores.get(symbol)
-        if baseline_score is None:
-            baseline_score = _compute_baseline_score(baseline_row)
+        pure_baseline = pure_baseline_scores.get(symbol)
+        if pure_baseline is None:
+            pure_baseline = compute_pure_baseline_score(dict(rec_row))
 
-        shadow_score = compute_experience_shadow_score(baseline_score, recall)
+        shadow_result = compute_shadow_final_score(
+            pure_baseline,
+            recall,
+            pattern_row=pattern_row,
+            continuation_row=continuation_row,
+            matched_pattern=matched_pattern or str(exp_row.get("MatchedPattern", "")),
+            matched_market_context=market_context_key,
+            context_match_mode=match_mode or str(exp_row.get("ContextMatchMode", "")),
+        )
 
-        score_delta = round(shadow_score - baseline_score, 4)
+        score_delta = round(
+            shadow_result.shadow_final_score - shadow_result.pure_baseline_score,
+            4,
+        )
         production_rank = rec_row.get("rank")
 
         rows.append(
@@ -325,11 +423,23 @@ def build_shadow_with_recall(
                 "market_context_key": market_context_key,
                 "stock_pattern_key": stock_pattern_key,
                 "TechnicalPrior": technical_prior,
-                "BaselineScore": baseline_score,
+                "BaselineScore": shadow_result.pure_baseline_score,
                 "BaselineRank": np.nan,
-                "ShadowExperienceScore": shadow_score,
+                "PureBaselineScore": shadow_result.pure_baseline_score,
+                "ShadowFinalScore": shadow_result.shadow_final_score,
+                "ShadowExperienceScore": shadow_result.shadow_final_score,
                 "ShadowExperienceRank": np.nan,
                 "ShadowRank": np.nan,
+                "PatternKnowledgeAdj": shadow_result.pattern_adjustment,
+                "ContinuationAdj": shadow_result.continuation_adjustment,
+                "HorizonAdj": shadow_result.horizon_adjustment,
+                "RecallComponent": shadow_result.recall_component,
+                "LearnedWinRate": shadow_result.learned_win_rate,
+                "ContinuationScore": shadow_result.continuation_score,
+                "ExperienceSamples": shadow_result.experience_samples,
+                "MatchedPattern": shadow_result.matched_pattern,
+                "MatchedMarketContext": shadow_result.matched_market_context,
+                "ContextMatchMode": shadow_result.context_match_mode,
                 "ScoreDelta": score_delta,
                 "RankDelta": np.nan,
                 "ShadowMovement": "",
@@ -350,7 +460,12 @@ def build_shadow_with_recall(
                 "RecallMatchedDNA": recall.recall_matched_dna,
                 "RecallMatchedContext": recall.recall_matched_context,
                 "ShadowReason": _shadow_reason(
-                    recall.recall_level, recall.recall_confidence, score_delta
+                    recall.recall_level,
+                    recall.recall_confidence,
+                    score_delta,
+                    pattern_adj=shadow_result.pattern_adjustment,
+                    continuation_adj=shadow_result.continuation_adjustment,
+                    horizon_adj=shadow_result.horizon_adjustment,
                 ),
                 "updated_at": rec_row.get("updated_at", ""),
             }
@@ -459,7 +574,6 @@ def persist_shadow_audit(
     if shadow_df is None:
         shadow_df = pd.DataFrame(columns=list(SHADOW_COLUMNS))
 
-    # Latest-session display snapshot only — not the immutable forward ledger.
     _atomic_write_csv(shadow_df, SHADOW_SNAPSHOT_FILE)
 
     if freeze_ledger:
@@ -482,7 +596,12 @@ def persist_shadow_audit(
 def load_shadow_recommendations() -> pd.DataFrame:
     if not SHADOW_SNAPSHOT_FILE.exists():
         return pd.DataFrame(columns=list(SHADOW_COLUMNS))
-    return pd.read_csv(SHADOW_SNAPSHOT_FILE, encoding="utf-8-sig", low_memory=False)
+    df = pd.read_csv(SHADOW_SNAPSHOT_FILE, encoding="utf-8-sig", low_memory=False)
+    if "ShadowFinalScore" not in df.columns and "ShadowExperienceScore" in df.columns:
+        df["ShadowFinalScore"] = df["ShadowExperienceScore"]
+    if "PureBaselineScore" not in df.columns and "BaselineScore" in df.columns:
+        df["PureBaselineScore"] = df["BaselineScore"]
+    return df
 
 
 __all__ = [
