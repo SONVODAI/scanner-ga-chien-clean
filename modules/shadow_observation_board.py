@@ -35,12 +35,19 @@ OBSERVATIONS_FILE = "observations.csv"
 
 COMPARISON_COLUMNS: Sequence[str] = (
     "symbol",
+    "ProductionRank",
     "BaselineRank",
     "ShadowExperienceRank",
     "RankDelta",
+    "PureBaselineScore",
     "BaselineScore",
+    "ShadowFinalScore",
     "ShadowExperienceScore",
     "ScoreDelta",
+    "PatternKnowledgeAdj",
+    "ContinuationAdj",
+    "LearnedWinRate",
+    "ContinuationScore",
     "movement_class",
     "RecallLevelDisplay",
     "RecallSamples",
@@ -200,6 +207,12 @@ def prepare_live_shadow_frame(shadow_df: pd.DataFrame) -> pd.DataFrame:
     if shadow_df is None or shadow_df.empty:
         return pd.DataFrame()
     out = _ensure_movement_class(shadow_df)
+    if "ShadowFinalScore" not in out.columns and "ShadowExperienceScore" in out.columns:
+        out["ShadowFinalScore"] = out["ShadowExperienceScore"]
+    if "ShadowExperienceScore" not in out.columns and "ShadowFinalScore" in out.columns:
+        out["ShadowExperienceScore"] = out["ShadowFinalScore"]
+    if "PureBaselineScore" not in out.columns and "BaselineScore" in out.columns:
+        out["PureBaselineScore"] = out["BaselineScore"]
     out["RecallLevelDisplay"] = out["RecallLevel"].map(format_recall_level_display)
     for col in (
         "ActualT3Return",
@@ -257,6 +270,7 @@ def _scorecard_from_joined(joined: pd.DataFrame) -> ForwardScorecard:
 
     baseline_slices: Dict[int, ScorecardSlice] = {}
     shadow_slices: Dict[int, ScorecardSlice] = {}
+    production_slices: Dict[int, ScorecardSlice] = {}
     for n in (5, 10, 20):
         baseline_slices[n] = _build_slice(
             f"baseline_top{n}",
@@ -268,6 +282,14 @@ def _scorecard_from_joined(joined: pd.DataFrame) -> ForwardScorecard:
             _top_n_by_session(joined, "ShadowExperienceRank", n),
             "ShadowExperienceRank",
         )
+        if "ProductionRank" in joined.columns:
+            prod = joined[joined["ProductionRank"].notna()].copy()
+            if not prod.empty:
+                production_slices[n] = _build_slice(
+                    f"production_top{n}",
+                    _top_n_by_session(prod, "ProductionRank", n),
+                    "ProductionRank",
+                )
 
     cohorts = {
         "ACTIVE_PROMOTED": joined[joined["movement_class"] == "ACTIVE_PROMOTED"],
@@ -291,6 +313,9 @@ def _scorecard_from_joined(joined: pd.DataFrame) -> ForwardScorecard:
         shadow_top5=shadow_slices[5],
         shadow_top10=shadow_slices[10],
         shadow_top20=shadow_slices[20],
+        production_top5=production_slices.get(5, ScorecardSlice("production_top5")),
+        production_top10=production_slices.get(10, ScorecardSlice("production_top10")),
+        production_top20=production_slices.get(20, ScorecardSlice("production_top20")),
         learning_lift_top10_mean_t3=lift,
         cohort_active_promoted=_build_slice(
             "ACTIVE_PROMOTED", cohorts["ACTIVE_PROMOTED"], "ShadowExperienceRank"
@@ -498,8 +523,8 @@ def render_shadow_observation_board(*, expanded: bool = True) -> None:
     with st.expander("🤖 BOT Baseline vs BOT Shadow", expanded=expanded):
         st.markdown("### BOT BASELINE vs BOT SHADOW")
         st.caption(
-            "Bảng quan sát chỉ đọc — so sánh xếp hạng Baseline (production) "
-            "với Shadow Experience (học kinh nghiệm). "
+            "Bảng quan sát chỉ đọc — so sánh Pure Baseline (control), "
+            "ShadowFinalScore (challenger), và ProductionRank (AI Recommendation). "
             f"GLOBAL_DNA = {REGIME_LABEL_GLOBAL} — không phải bằng chứng "
             "'mùa nào thức ấy'."
         )
@@ -596,13 +621,24 @@ def render_shadow_observation_board(*, expanded: bool = True) -> None:
                 f"{card.sessions} phiên | {card.candidates} ứng viên | "
                 f"Lift T3 Top10 mean: {_fmt_num(card.learning_lift_top10_mean_t3)}"
             )
-            for top_n, b_slice, s_slice in (
-                (5, card.baseline_top5, card.shadow_top5),
-                (10, card.baseline_top10, card.shadow_top10),
-                (20, card.baseline_top20, card.shadow_top20),
+            for top_n, b_slice, s_slice, p_slice in (
+                (5, card.baseline_top5, card.shadow_top5, card.production_top5),
+                (10, card.baseline_top10, card.shadow_top10, card.production_top10),
+                (20, card.baseline_top20, card.shadow_top20, card.production_top20),
             ):
                 st.markdown(f"**TOP {top_n}**")
                 tbl = _scorecard_horizon_table(f"top{top_n}", b_slice, s_slice)
+                if p_slice.n > 0:
+                    tbl["AI Rec WinRate"] = [
+                        _fmt_pct(p_slice.win_rate_t3),
+                        _fmt_pct(p_slice.win_rate_t5),
+                        _fmt_pct(p_slice.win_rate_t10),
+                    ]
+                    tbl["AI Rec Mean"] = [
+                        _fmt_num(p_slice.mean_t3),
+                        _fmt_num(p_slice.mean_t5),
+                        _fmt_num(p_slice.mean_t10),
+                    ]
                 st.dataframe(tbl, use_container_width=True, hide_index=True)
 
         # --- Movement cohort realized results ---

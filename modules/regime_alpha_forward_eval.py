@@ -49,13 +49,20 @@ IMMUTABLE_T0_FIELDS: Sequence[str] = (
     "snapshot_id",
     "session_date",
     "symbol",
+    "PureBaselineScore",
     "BaselineScore",
     "BaselineRank",
+    "ShadowFinalScore",
     "ShadowExperienceScore",
     "ShadowExperienceRank",
+    "ProductionRank",
     "RankDelta",
     "ScoreDelta",
     "ShadowMovement",
+    "PatternKnowledgeAdj",
+    "ContinuationAdj",
+    "HorizonAdj",
+    "RecallComponent",
     "TechnicalPrior",
     "stock_pattern_key",
     "market_context_key",
@@ -145,6 +152,15 @@ class ForwardScorecard:
     shadow_top5: ScorecardSlice = field(default_factory=lambda: ScorecardSlice("shadow_top5"))
     shadow_top10: ScorecardSlice = field(default_factory=lambda: ScorecardSlice("shadow_top10"))
     shadow_top20: ScorecardSlice = field(default_factory=lambda: ScorecardSlice("shadow_top20"))
+    production_top5: ScorecardSlice = field(
+        default_factory=lambda: ScorecardSlice("production_top5")
+    )
+    production_top10: ScorecardSlice = field(
+        default_factory=lambda: ScorecardSlice("production_top10")
+    )
+    production_top20: ScorecardSlice = field(
+        default_factory=lambda: ScorecardSlice("production_top20")
+    )
     learning_lift_top10_mean_t3: Optional[float] = None
     cohort_active_promoted: ScorecardSlice = field(
         default_factory=lambda: ScorecardSlice("ACTIVE_PROMOTED")
@@ -203,12 +219,17 @@ def _normalize_key(session_date: Any, symbol: Any) -> Tuple[str, str]:
 
 
 def classify_movement_class(row: Mapping[str, Any]) -> str:
-    conf = float(pd.to_numeric(row.get("RecallConfidence"), errors="coerce") or 0)
     score_delta = float(pd.to_numeric(row.get("ScoreDelta"), errors="coerce") or 0)
     movement = str(row.get("ShadowMovement", "")).strip().upper()
-    if conf > 0 and score_delta > 0.01:
+    learning_active = (
+        abs(float(pd.to_numeric(row.get("PatternKnowledgeAdj"), errors="coerce") or 0)) > 0.01
+        or abs(float(pd.to_numeric(row.get("ContinuationAdj"), errors="coerce") or 0)) > 0.01
+        or abs(float(pd.to_numeric(row.get("HorizonAdj"), errors="coerce") or 0)) > 0.01
+        or float(pd.to_numeric(row.get("RecallConfidence"), errors="coerce") or 0) > 0
+    )
+    if learning_active and score_delta > 0.01:
         return "ACTIVE_PROMOTED"
-    if conf > 0 and score_delta < -0.01:
+    if learning_active and score_delta < -0.01:
         return "ACTIVE_DEMOTED"
     if movement in {"PROMOTED", "DEMOTED"}:
         return "PASSIVE_MOVED"
@@ -633,17 +654,31 @@ def evaluate_forward_scorecard(
 
     baseline_slices: Dict[int, ScorecardSlice] = {}
     shadow_slices: Dict[int, ScorecardSlice] = {}
+    production_slices: Dict[int, ScorecardSlice] = {}
     for n in top_ns:
         baseline_slices[n] = _build_slice(
             f"baseline_top{n}",
             _top_n_by_session(joined, "BaselineRank", n),
             "BaselineRank",
         )
+        shadow_rank_col = (
+            "ShadowExperienceRank"
+            if "ShadowExperienceRank" in joined.columns
+            else "ShadowRank"
+        )
         shadow_slices[n] = _build_slice(
             f"shadow_top{n}",
-            _top_n_by_session(joined, "ShadowExperienceRank", n),
-            "ShadowExperienceRank",
+            _top_n_by_session(joined, shadow_rank_col, n),
+            shadow_rank_col,
         )
+        if "ProductionRank" in joined.columns:
+            prod = joined[joined["ProductionRank"].notna()].copy()
+            if not prod.empty:
+                production_slices[n] = _build_slice(
+                    f"production_top{n}",
+                    _top_n_by_session(prod, "ProductionRank", n),
+                    "ProductionRank",
+                )
 
     cohorts = {
         "ACTIVE_PROMOTED": joined[joined["movement_class"] == "ACTIVE_PROMOTED"],
@@ -671,6 +706,9 @@ def evaluate_forward_scorecard(
         shadow_top5=shadow_slices.get(5, ScorecardSlice("shadow_top5")),
         shadow_top10=shadow_slices.get(10, ScorecardSlice("shadow_top10")),
         shadow_top20=shadow_slices.get(20, ScorecardSlice("shadow_top20")),
+        production_top5=production_slices.get(5, ScorecardSlice("production_top5")),
+        production_top10=production_slices.get(10, ScorecardSlice("production_top10")),
+        production_top20=production_slices.get(20, ScorecardSlice("production_top20")),
         learning_lift_top10_mean_t3=lift,
         cohort_active_promoted=_build_slice(
             "ACTIVE_PROMOTED", cohorts["ACTIVE_PROMOTED"], "ShadowExperienceRank"
@@ -806,16 +844,27 @@ def finalize_forward_shadow_snapshot(
         HISTORY_FILE,
         _build_experience_frame,
         _latest_session_experience_snapshot,
+        _load_config,
         _normalize_session_date,
         _safe_read_csv,
+        load_pattern_library,
         load_recommendations,
     )
+    from modules.regime_alpha_shadow import build_shadow_candidate_universe
 
     rec = load_recommendations()
     if rec is None or rec.empty:
         return {"ok": False, "reason": "empty_recommendations", "frozen_rows": 0}
 
     brain = _safe_read_csv(BRAIN_FILE, BRAIN_COLUMNS)
+    patterns = load_pattern_library()
+    config = _load_config()
+    shadow_candidates = build_shadow_candidate_universe(
+        brain,
+        patterns,
+        rec,
+        max_candidates=int(config.get("max_shadow_candidate_rows", 250)),
+    )
     history = _safe_read_csv(HISTORY_FILE, HISTORY_COLUMNS)
     snapshot = _latest_session_experience_snapshot(history)
     if not snapshot.empty and "session_date" in snapshot.columns:
@@ -832,7 +881,7 @@ def finalize_forward_shadow_snapshot(
     )
 
     shadow_df = build_shadow_with_recall(
-        rec,
+        shadow_candidates,
         brain,
         experience_df if experience_df is not None and not experience_df.empty else None,
         session_date=_normalize_session_date(session_date),
