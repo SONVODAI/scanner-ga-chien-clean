@@ -1076,13 +1076,34 @@ def finalize_forward_shadow_snapshot(
             insight_df,
             evaluation_mode=EVAL_MODE_FORWARD_FROZEN,
         )
+    from modules.learning_trajectory_memory import (
+        build_trajectory_forward_rows_for_session,
+        freeze_trajectory_t0_ledger,
+        load_trajectory_forward_ledger,
+    )
+
+    trajectory_before = load_trajectory_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN)
+    trajectory_before_count = len(trajectory_before)
+    trajectory_rows = build_trajectory_forward_rows_for_session(
+        insight_df,
+        session_date=_normalize_session_date(session_date),
+    )
+    if not trajectory_rows.empty:
+        freeze_trajectory_t0_ledger(
+            trajectory_rows,
+            evaluation_mode=EVAL_MODE_FORWARD_FROZEN,
+        )
     mature_forward_outcomes(ledger_path=ledger_path, outcomes_path=outcomes_path)
 
     after = load_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN, ledger_path=ledger_path)
     insight_after = load_insight_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN)
+    trajectory_after = load_trajectory_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN)
     session_rows = after[after["session_date"].astype(str) == session_date]
     insight_session_rows = insight_after[
         insight_after["session_date"].astype(str) == session_date
+    ]
+    trajectory_session_rows = trajectory_after[
+        trajectory_after["session_date"].astype(str) == session_date
     ]
     qualified_count = int(
         (insight_session_rows["InsightEvidenceStatus"].astype(str) == "QUALIFIED").sum()
@@ -1091,6 +1112,12 @@ def finalize_forward_shadow_snapshot(
     universe_count = len(insight_df) if insight_df is not None else 0
     coverage_pct = (
         round(qualified_count / universe_count * 100.0, 2) if universe_count else 0.0
+    )
+    trajectory_qualified = int(
+        (trajectory_session_rows["TrajectoryEvidenceStatus"].astype(str) == "QUALIFIED").sum()
+    ) if not trajectory_session_rows.empty else 0
+    trajectory_coverage_pct = (
+        round(trajectory_qualified / universe_count * 100.0, 2) if universe_count else 0.0
     )
     return {
         "ok": True,
@@ -1103,6 +1130,10 @@ def finalize_forward_shadow_snapshot(
         "insight_qualified_count": qualified_count,
         "insight_fallback_count": fallback_count,
         "insight_coverage_pct": coverage_pct,
+        "trajectory_frozen_rows": len(trajectory_session_rows),
+        "trajectory_new_rows": max(0, len(trajectory_after) - trajectory_before_count),
+        "trajectory_qualified_count": trajectory_qualified,
+        "trajectory_coverage_pct": trajectory_coverage_pct,
     }
 
 

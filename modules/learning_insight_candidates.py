@@ -27,6 +27,12 @@ from modules.earning_learning import (
     get_continuation_knowledge,
     get_pattern_knowledge,
 )
+from modules.learning_trajectory_memory import (
+    TRAJECTORY_EVIDENCE_QUALIFIED,
+    load_evolution_history,
+    load_trajectory_knowledge,
+    resolve_trajectory_evidence_for_symbol,
+)
 
 logger = logging.getLogger("learning_insight_candidates")
 
@@ -74,6 +80,12 @@ INSIGHT_COLUMNS: Sequence[str] = (
     "PatternWinRateT10",
     "ContinuationT3ToT5Rate",
     "ContinuationT3ToT10Rate",
+    "TrajectoryPattern",
+    "TrajectoryEvidenceStatus",
+    "TrajectoryScore",
+    "TrajectoryReason",
+    "TrajectorySamplesT5",
+    "TrajectoryWinRateT5",
     "InsightReason",
     "updated_at",
 )
@@ -293,6 +305,8 @@ def build_learning_insight_candidates(
         return pd.DataFrame(columns=list(INSIGHT_COLUMNS))
 
     pattern_lookup, continuation_lookup = _load_insight_knowledge()
+    evolution_df = load_evolution_history()
+    trajectory_knowledge = load_trajectory_knowledge(min_samples=1)
     rows: list[Dict[str, Any]] = []
 
     for _, rec_row in candidate_df.iterrows():
@@ -353,6 +367,21 @@ def build_learning_insight_candidates(
             pattern_win_rate_t10=wr_t10,
         )
 
+        trajectory = resolve_trajectory_evidence_for_symbol(
+            symbol,
+            session_date,
+            market_context_key=market_context_key,
+            evolution_df=evolution_df,
+            knowledge_df=trajectory_knowledge,
+        )
+
+        reason_parts = [insight.insight_reason.rstrip(".")]
+        if trajectory.trajectory_evidence_status == TRAJECTORY_EVIDENCE_QUALIFIED:
+            reason_parts.append(trajectory.trajectory_reason.rstrip("."))
+        elif trajectory.trajectory_pattern:
+            reason_parts.append(trajectory.trajectory_reason.rstrip("."))
+        combined_reason = ". ".join(part for part in reason_parts if part) + "."
+
         rows.append(
             {
                 "session_date": session_date,
@@ -379,7 +408,13 @@ def build_learning_insight_candidates(
                 "PatternWinRateT10": insight.pattern_win_rate_t10,
                 "ContinuationT3ToT5Rate": insight.continuation_t3_to_t5_rate,
                 "ContinuationT3ToT10Rate": insight.continuation_t3_to_t10_rate,
-                "InsightReason": insight.insight_reason,
+                "TrajectoryPattern": trajectory.trajectory_pattern,
+                "TrajectoryEvidenceStatus": trajectory.trajectory_evidence_status,
+                "TrajectoryScore": trajectory.trajectory_score,
+                "TrajectoryReason": trajectory.trajectory_reason,
+                "TrajectorySamplesT5": trajectory.trajectory_samples_t5,
+                "TrajectoryWinRateT5": trajectory.trajectory_win_rate_t5,
+                "InsightReason": combined_reason,
                 "updated_at": rec_row.get("updated_at", ""),
             }
         )
