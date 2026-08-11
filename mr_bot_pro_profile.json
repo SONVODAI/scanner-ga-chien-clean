@@ -3,15 +3,15 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-08-11 13:13:16",
+  "updated_at": "2026-08-11 16:52:39",
   "age_days": 47,
   "bot_version_number": 4.387,
   "status": "THINKING",
   "personality": "CÂN BẰNG",
   "confidence": 46.0,
   "experience": {
-    "observations": 8987,
-    "signals": 487,
+    "observations": 9159,
+    "signals": 517,
     "completed_t5": 386,
     "hypotheses": 2,
     "beliefs": 0,
@@ -37,15 +37,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-08-01 13:17:11",
-      "status": "THINKING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 46.0,
-      "completed_t5": 331,
-      "market_real": 3.0,
-      "message": "Market REAL 3.0 < 6. Tôi chỉ lập watchlist (BAF, VNM, TCX), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-08-01 13:55:15",
       "status": "THINKING",
@@ -755,6 +746,15 @@
       "confidence": 46.0,
       "completed_t5": 386,
       "market_real": 9.1,
+      "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
+    },
+    {
+      "time": "2026-08-11 16:52:39",
+      "status": "THINKING",
+      "personality": "CÂN BẰNG",
+      "confidence": 46.0,
+      "completed_t5": 386,
+      "market_real": 8.5,
       "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
     }
   ]
