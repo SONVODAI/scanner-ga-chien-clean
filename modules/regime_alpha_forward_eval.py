@@ -34,6 +34,7 @@ BRAIN_DIR = MODULE_DIR / "brain"
 DATA_DIR = MODULE_DIR / "data" / "earning_learning"
 
 LEDGER_FILE = BRAIN_DIR / "regime_alpha_shadow_ledger.csv"
+INSIGHT_LEDGER_FILE = BRAIN_DIR / "learning_insight_forward_ledger.csv"
 OUTCOMES_FILE = BRAIN_DIR / "regime_alpha_forward_outcomes.csv"
 LIFECYCLE_FILE = DATA_DIR / "pattern_lifecycle.csv"
 
@@ -88,6 +89,34 @@ IMMUTABLE_T0_FIELDS: Sequence[str] = (
     "evaluation_mode",
 )
 
+INSIGHT_IMMUTABLE_T0_FIELDS: Sequence[str] = (
+    "snapshot_id",
+    "session_date",
+    "symbol",
+    "InsightRank",
+    "InsightQualifiedRank",
+    "InsightCandidateScore",
+    "InsightEvidenceStatus",
+    "PatternKnowledgeScore",
+    "ContinuationKnowledgeScore",
+    "ContextAuthority",
+    "ExperienceSamples",
+    "LearnedWinRate",
+    "ContinuationScore",
+    "MatchedPattern",
+    "MatchedMarketContext",
+    "ContextMatchMode",
+    "PatternWinRateT3",
+    "PatternWinRateT5",
+    "PatternWinRateT10",
+    "ContinuationT3ToT5Rate",
+    "ContinuationT3ToT10Rate",
+    "InsightReason",
+    "frozen_at",
+    "ledger_version",
+    "evaluation_mode",
+)
+
 LEDGER_EXTRA_COLUMNS: Sequence[str] = (
     "snapshot_id",
     "frozen_at",
@@ -99,6 +128,42 @@ LEDGER_EXTRA_COLUMNS: Sequence[str] = (
 
 LEDGER_COLUMNS: Sequence[str] = tuple(
     dict.fromkeys(list(SHADOW_COLUMNS) + list(LEDGER_EXTRA_COLUMNS))
+)
+
+INSIGHT_LEDGER_EXTRA_COLUMNS: Sequence[str] = (
+    "snapshot_id",
+    "frozen_at",
+    "ledger_version",
+    "evaluation_mode",
+    "observation_id",
+)
+
+INSIGHT_LEDGER_BASE_COLUMNS: Sequence[str] = (
+    "session_date",
+    "InsightRank",
+    "InsightQualifiedRank",
+    "symbol",
+    "InsightCandidateScore",
+    "InsightEvidenceStatus",
+    "PatternKnowledgeScore",
+    "ContinuationKnowledgeScore",
+    "ContextAuthority",
+    "ExperienceSamples",
+    "LearnedWinRate",
+    "ContinuationScore",
+    "MatchedPattern",
+    "MatchedMarketContext",
+    "ContextMatchMode",
+    "PatternWinRateT3",
+    "PatternWinRateT5",
+    "PatternWinRateT10",
+    "ContinuationT3ToT5Rate",
+    "ContinuationT3ToT10Rate",
+    "InsightReason",
+)
+
+INSIGHT_LEDGER_COLUMNS: Sequence[str] = tuple(
+    dict.fromkeys(list(INSIGHT_LEDGER_BASE_COLUMNS) + list(INSIGHT_LEDGER_EXTRA_COLUMNS))
 )
 
 OUTCOME_COLUMNS: Sequence[str] = (
@@ -372,6 +437,102 @@ def freeze_t0_ledger(
         _atomic_write_csv(ledger, ledger_path)
 
     return ledger
+
+
+def _prepare_insight_ledger_row(
+    row: Mapping[str, Any],
+    *,
+    evaluation_mode: str,
+    observation_id: str = "",
+    frozen_at: Optional[str] = None,
+) -> Dict[str, Any]:
+    session_date, symbol = _normalize_key(row.get("session_date"), row.get("symbol"))
+    out = {col: row.get(col, np.nan) for col in INSIGHT_LEDGER_BASE_COLUMNS}
+    out.update(
+        {
+            "session_date": session_date,
+            "symbol": symbol,
+            "snapshot_id": make_snapshot_id(session_date, symbol),
+            "frozen_at": frozen_at or _utc_now_iso(),
+            "ledger_version": LEDGER_VERSION,
+            "evaluation_mode": evaluation_mode,
+            "observation_id": observation_id,
+        }
+    )
+    return out
+
+
+def freeze_insight_t0_ledger(
+    insight_df: pd.DataFrame,
+    *,
+    evaluation_mode: str = EVAL_MODE_FORWARD_FROZEN,
+    ledger_path: Path = INSIGHT_LEDGER_FILE,
+    observations: Optional[pd.DataFrame] = None,
+) -> pd.DataFrame:
+    """
+    Upsert immutable T0 Learning Insight rows by (session_date, symbol).
+
+    FORWARD_FROZEN rows are never overwritten — later knowledge updates cannot
+    reconstruct historical InsightRank or evidence fields.
+    """
+    ledger = _load_csv(ledger_path, INSIGHT_LEDGER_COLUMNS)
+    if insight_df is None or insight_df.empty:
+        return ledger
+
+    obs_lookup = _lookup_observation_ids(insight_df, observations)
+    existing_forward: Dict[Tuple[str, str], pd.Series] = {}
+    if not ledger.empty:
+        forward = ledger[ledger["evaluation_mode"] == EVAL_MODE_FORWARD_FROZEN]
+        for _, existing in forward.iterrows():
+            key = _normalize_key(existing["session_date"], existing["symbol"])
+            existing_forward[key] = existing
+
+    new_rows: List[Dict[str, Any]] = []
+    for _, row in insight_df.iterrows():
+        session_date, symbol = _normalize_key(row.get("session_date"), row.get("symbol"))
+        key = (session_date, symbol)
+
+        if evaluation_mode == EVAL_MODE_FORWARD_FROZEN and key in existing_forward:
+            continue
+
+        if evaluation_mode == EVAL_MODE_RECONSTRUCTED_AUDIT:
+            prior = ledger[
+                (ledger["session_date"].astype(str) == session_date)
+                & (ledger["symbol"].astype(str).str.upper() == symbol)
+                & (ledger["evaluation_mode"] == EVAL_MODE_RECONSTRUCTED_AUDIT)
+            ]
+            if not prior.empty:
+                continue
+
+        obs_id = obs_lookup.get(key, "")
+        new_rows.append(
+            _prepare_insight_ledger_row(
+                row,
+                evaluation_mode=evaluation_mode,
+                observation_id=obs_id,
+            )
+        )
+
+    if new_rows:
+        ledger = pd.concat([ledger, pd.DataFrame(new_rows)], ignore_index=True)
+        ledger = ledger.drop_duplicates(
+            subset=["session_date", "symbol", "evaluation_mode"],
+            keep="first",
+        )
+        _atomic_write_csv(ledger, ledger_path)
+
+    return ledger
+
+
+def load_insight_forward_ledger(
+    *,
+    evaluation_mode: Optional[str] = EVAL_MODE_FORWARD_FROZEN,
+    ledger_path: Path = INSIGHT_LEDGER_FILE,
+) -> pd.DataFrame:
+    ledger = _load_csv(ledger_path, INSIGHT_LEDGER_COLUMNS)
+    if ledger.empty or evaluation_mode is None:
+        return ledger
+    return ledger[ledger["evaluation_mode"] == evaluation_mode].copy()
 
 
 def load_forward_ledger(
@@ -889,30 +1050,68 @@ def finalize_forward_shadow_snapshot(
     if shadow_df.empty:
         return {"ok": False, "reason": "empty_shadow", "frozen_rows": 0}
 
+    from modules.learning_insight_candidates import build_learning_insight_candidates
+
+    insight_df = build_learning_insight_candidates(
+        shadow_candidates,
+        brain,
+        session_date=_normalize_session_date(session_date),
+        market_real=market_real,
+        market_forecast=market_forecast,
+        breadth=breadth,
+    )
+
     before = load_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN, ledger_path=ledger_path)
     before_count = len(before)
+    insight_before = load_insight_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN)
+    insight_before_count = len(insight_before)
 
     freeze_t0_ledger(
         shadow_df,
         evaluation_mode=EVAL_MODE_FORWARD_FROZEN,
         ledger_path=ledger_path,
     )
+    if not insight_df.empty:
+        freeze_insight_t0_ledger(
+            insight_df,
+            evaluation_mode=EVAL_MODE_FORWARD_FROZEN,
+        )
     mature_forward_outcomes(ledger_path=ledger_path, outcomes_path=outcomes_path)
 
     after = load_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN, ledger_path=ledger_path)
+    insight_after = load_insight_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN)
     session_rows = after[after["session_date"].astype(str) == session_date]
+    insight_session_rows = insight_after[
+        insight_after["session_date"].astype(str) == session_date
+    ]
+    qualified_count = int(
+        (insight_session_rows["InsightEvidenceStatus"].astype(str) == "QUALIFIED").sum()
+    ) if not insight_session_rows.empty else 0
+    fallback_count = len(insight_session_rows) - qualified_count
+    universe_count = len(insight_df) if insight_df is not None else 0
+    coverage_pct = (
+        round(qualified_count / universe_count * 100.0, 2) if universe_count else 0.0
+    )
     return {
         "ok": True,
         "reason": "frozen",
         "session_date": session_date,
         "frozen_rows": len(session_rows),
         "new_rows": max(0, len(after) - before_count),
+        "insight_frozen_rows": len(insight_session_rows),
+        "insight_new_rows": max(0, len(insight_after) - insight_before_count),
+        "insight_qualified_count": qualified_count,
+        "insight_fallback_count": fallback_count,
+        "insight_coverage_pct": coverage_pct,
     }
 
 
 __all__ = [
     "EVAL_MODE_FORWARD_FROZEN",
     "EVAL_MODE_RECONSTRUCTED_AUDIT",
+    "INSIGHT_IMMUTABLE_T0_FIELDS",
+    "INSIGHT_LEDGER_COLUMNS",
+    "INSIGHT_LEDGER_FILE",
     "LEDGER_COLUMNS",
     "LEDGER_FILE",
     "OUTCOME_COLUMNS",
@@ -924,10 +1123,12 @@ __all__ = [
     "evaluate_forward_scorecard",
     "evaluate_regime_scorecard",
     "finalize_forward_shadow_snapshot",
+    "freeze_insight_t0_ledger",
     "freeze_t0_ledger",
     "is_trading_session_valid",
     "load_forward_ledger",
     "load_forward_outcomes",
+    "load_insight_forward_ledger",
     "make_snapshot_id",
     "mature_forward_outcomes",
 ]

@@ -38,6 +38,7 @@ class TestInsightCandidateScore(unittest.TestCase):
         self.assertGreater(insight.insight_candidate_score, 50.0)
         self.assertEqual(insight.context_match_mode, "FAMILY_CONTEXT")
         self.assertGreater(insight.experience_samples, 0)
+        self.assertEqual(insight.insight_evidence_status, "QUALIFIED")
 
     def test_insight_build_does_not_use_shadow_final_score(self):
         rec = pd.DataFrame(
@@ -79,6 +80,7 @@ class TestInsightCandidateScore(unittest.TestCase):
                 market_forecast=7.0,
             )
         self.assertIn("InsightCandidateScore", insight.columns)
+        self.assertIn("InsightEvidenceStatus", insight.columns)
         self.assertNotIn("ShadowFinalScore", insight.columns)
         self.assertIn("ShadowFinalScore", shadow.columns)
 

@@ -38,6 +38,10 @@ INSIGHT_MIN_PATTERN_SAMPLES = 5
 INSIGHT_MIN_CONTINUATION_SAMPLES = 5
 INSIGHT_SAMPLE_FULL = 20
 
+INSIGHT_EVIDENCE_QUALIFIED = "QUALIFIED"
+INSIGHT_EVIDENCE_INSUFFICIENT = "INSUFFICIENT_EVIDENCE"
+INSIGHT_EVIDENCE_NONE = "NO_EVIDENCE"
+
 CONTEXT_AUTHORITY: Dict[str, float] = {
     "EXACT_CONTEXT": 1.00,
     "FAMILY_CONTEXT": 0.70,
@@ -54,6 +58,8 @@ INSIGHT_COLUMNS: Sequence[str] = (
     "stock_pattern_key",
     "market_context_key",
     "InsightCandidateScore",
+    "InsightEvidenceStatus",
+    "InsightQualifiedRank",
     "PatternKnowledgeScore",
     "ContinuationKnowledgeScore",
     "ContextAuthority",
@@ -91,6 +97,32 @@ class InsightCandidateResult:
     continuation_t3_to_t5_rate: Optional[float] = None
     continuation_t3_to_t10_rate: Optional[float] = None
     insight_reason: str = ""
+    insight_evidence_status: str = INSIGHT_EVIDENCE_NONE
+
+
+def classify_insight_evidence_status(
+    *,
+    effective_conf: float,
+    pattern_row: Optional[Mapping[str, Any]] = None,
+    continuation_row: Optional[Mapping[str, Any]] = None,
+    context_match_mode: str = "",
+) -> str:
+    """
+    Distinguish genuine learning opinion from neutral leader_score fallback.
+
+    QUALIFIED: enough pattern/continuation samples and context authority to
+    express a non-neutral research score.
+    INSUFFICIENT_EVIDENCE: DNA/context rows exist but below minimum samples.
+    NO_EVIDENCE: no matched learning rows for this symbol at T0.
+    """
+    if effective_conf > 0.0:
+        return INSIGHT_EVIDENCE_QUALIFIED
+    if pattern_row is not None or continuation_row is not None:
+        return INSIGHT_EVIDENCE_INSUFFICIENT
+    mode = str(context_match_mode or "").strip()
+    if mode and mode != "NO_PATTERN_MATCH":
+        return INSIGHT_EVIDENCE_INSUFFICIENT
+    return INSIGHT_EVIDENCE_NONE
 
 
 def _clip(value: float, low: float, high: float) -> float:
@@ -175,6 +207,12 @@ def compute_insight_candidate_score(
     )
 
     effective_conf = max(pattern_conf, cont_conf) * context_auth
+    evidence_status = classify_insight_evidence_status(
+        effective_conf=effective_conf,
+        pattern_row=pattern_row,
+        continuation_row=continuation_row,
+        context_match_mode=mode,
+    )
     if effective_conf <= 0.0:
         final_score = 50.0
     else:
@@ -182,16 +220,21 @@ def compute_insight_candidate_score(
         final_score = 50.0 + (blended - 50.0) * effective_conf
 
     reasons: list[str] = []
-    if pattern_conf > 0 and samples >= INSIGHT_MIN_PATTERN_SAMPLES:
-        reasons.append(f"pattern n={samples} wr~{pattern_evidence:.0f}")
-    if cont_conf > 0 and samples_t10 >= INSIGHT_MIN_CONTINUATION_SAMPLES:
-        reasons.append(f"continuation n={samples_t10} score~{continuation_evidence:.0f}")
-    if mode:
-        reasons.append(mode.lower())
-    if not reasons:
-        reason = "Insufficient DNA/context evidence for insight ranking."
-    else:
+    if evidence_status == INSIGHT_EVIDENCE_QUALIFIED:
+        if pattern_conf > 0 and samples >= INSIGHT_MIN_PATTERN_SAMPLES:
+            reasons.append(f"pattern n={samples} wr~{pattern_evidence:.0f}")
+        if cont_conf > 0 and samples_t10 >= INSIGHT_MIN_CONTINUATION_SAMPLES:
+            reasons.append(f"continuation n={samples_t10} score~{continuation_evidence:.0f}")
+        if mode:
+            reasons.append(mode.lower())
         reason = "Insight evidence: " + ", ".join(reasons) + "."
+    elif evidence_status == INSIGHT_EVIDENCE_INSUFFICIENT:
+        reason = (
+            "Insufficient DNA/context evidence for insight ranking"
+            + (f" ({mode.lower()})." if mode else ".")
+        )
+    else:
+        reason = "No matched learning evidence; neutral fallback only."
 
     matched_pattern = ""
     matched_context = ""
@@ -218,6 +261,7 @@ def compute_insight_candidate_score(
         continuation_t3_to_t5_rate=t3_t5_rate if t3_t5_rate is not None and np.isfinite(t3_t5_rate) else None,
         continuation_t3_to_t10_rate=t3_t10_rate if t3_t10_rate is not None and np.isfinite(t3_t10_rate) else None,
         insight_reason=reason,
+        insight_evidence_status=evidence_status,
     )
 
 
@@ -319,6 +363,8 @@ def build_learning_insight_candidates(
                 "stock_pattern_key": stock_pattern_key,
                 "market_context_key": market_context_key,
                 "InsightCandidateScore": insight.insight_candidate_score,
+                "InsightEvidenceStatus": insight.insight_evidence_status,
+                "InsightQualifiedRank": np.nan,
                 "PatternKnowledgeScore": insight.pattern_knowledge_score,
                 "ContinuationKnowledgeScore": insight.continuation_knowledge_score,
                 "ContextAuthority": insight.context_authority,
@@ -348,6 +394,22 @@ def build_learning_insight_candidates(
         kind="stable",
     ).reset_index(drop=True)
     out["InsightRank"] = range(1, len(out) + 1)
+
+    qualified = out[
+        out["InsightEvidenceStatus"].astype(str) == INSIGHT_EVIDENCE_QUALIFIED
+    ].copy()
+    if not qualified.empty:
+        qualified = qualified.sort_values(
+            ["InsightCandidateScore", "ExperienceSamples", "leader_score", "symbol"],
+            ascending=[False, False, False, True],
+            kind="stable",
+        )
+        qualified_ranks = pd.Series(
+            range(1, len(qualified) + 1),
+            index=qualified.index,
+        )
+        out.loc[qualified.index, "InsightQualifiedRank"] = qualified_ranks.values
+
     return out
 
 
@@ -384,8 +446,12 @@ def load_learning_insight_candidates() -> pd.DataFrame:
 __all__ = [
     "INSIGHT_COLUMNS",
     "INSIGHT_CANDIDATES_FILE",
+    "INSIGHT_EVIDENCE_INSUFFICIENT",
+    "INSIGHT_EVIDENCE_NONE",
+    "INSIGHT_EVIDENCE_QUALIFIED",
     "InsightCandidateResult",
     "build_learning_insight_candidates",
+    "classify_insight_evidence_status",
     "compute_insight_candidate_score",
     "load_learning_insight_candidates",
     "persist_learning_insight_candidates",
