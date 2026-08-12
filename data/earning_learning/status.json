@@ -15,10 +15,10 @@
   "decision_archive_rows": 2698,
   "verified_decisions_rows": 2272,
   "storage_mode": "GITHUB_PRIMARY",
-  "github_sync": "GITHUB_OK",
+  "github_sync": "GITHUB_PARTIAL",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-12T08:41:14Z",
+  "last_run_at": "2026-08-12T08:42:30Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
