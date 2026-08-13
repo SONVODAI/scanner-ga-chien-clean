@@ -80,6 +80,7 @@ DECISION_ARCHIVE_FILE = "decision_archive.csv"
 VERIFIED_DECISIONS_FILE = "verified_decisions.csv"
 LEARNING_METADATA_FILE = "learning_status.json"
 STATUS_FILE = "status.json"
+T0_FREEZE_FILE = "t0_observation_freeze.csv"
 
 _DATA_FILES = (
     OBSERVATIONS_FILE,
@@ -150,7 +151,8 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
     "pull": ("pull", "pull_label", "pull_signal", "InPullback", "pullback"),
     "group": ("group", "evolution_stage", "stage"),
     "sector": ("sector", "industry", "ngành", "Ngành"),
-    "market_score": ("market_score", "market_real", "market_health"),
+    "market_score": ("market_score", "market_health"),
+    "market_real": ("market_real", "MARKET_REAL"),
     "market_regime": ("market_regime", "regime", "market_state"),
     "market_live": ("market_live", "live_score"),
     "market_forecast": ("market_forecast", "forecast_score"),
@@ -188,6 +190,7 @@ NUMERIC_FIELDS = (
     "near_bottom_20_pct",
     "near_bottom_60_pct",
     "dist_high20",
+    "market_real",
     "market_score",
     "market_live",
     "market_forecast",
@@ -226,6 +229,7 @@ class LearningResult:
     history_rows: int = 0
     decision_archive_rows: int = 0
     verified_decisions_rows: int = 0
+    t0_freeze_added: int = 0
     storage_mode: str = "LOCAL_ONLY"
     github_sync: str = "NOT_ATTEMPTED"
     skipped_reason: Optional[str] = None
@@ -955,6 +959,7 @@ def _find_source_column(
 
 
 MARKET_CONTEXT_FIELDS = (
+    "market_real",
     "market_score",
     "market_live",
     "market_forecast",
@@ -1005,6 +1010,21 @@ def _fill_market_context_rowwise(
                 )
                 canonical.loc[missing_mask, field] = fill_val
 
+    if (
+        "market_real" in context_map
+        and "market_score" in canonical.columns
+        and "market_real" in canonical.columns
+    ):
+        real_val = _safe_float(context_map.get("market_real"))
+        if math.isfinite(real_val):
+            score = pd.to_numeric(canonical["market_score"], errors="coerce")
+            real = pd.to_numeric(canonical["market_real"], errors="coerce")
+            canonical["market_real"] = real.where(real.notna(), real_val)
+            canonical["market_score"] = score.where(
+                score.notna(),
+                canonical["market_real"],
+            )
+
     return canonical
 
 
@@ -1034,6 +1054,16 @@ def _adapt_board(
         canonical,
         context,
     )
+
+    try:
+        from modules.learning_t0_capture import sync_market_score_from_real
+
+        canonical = sync_market_score_from_real(canonical)
+    except Exception:
+        if "market_real" in canonical.columns and "market_score" in canonical.columns:
+            real = pd.to_numeric(canonical["market_real"], errors="coerce")
+            score = pd.to_numeric(canonical["market_score"], errors="coerce")
+            canonical["market_score"] = score.where(score.notna(), real)
 
     canonical["symbol"] = canonical["symbol"].map(_normalise_symbol)
     canonical = canonical[canonical["symbol"] != ""].copy()
@@ -1166,12 +1196,17 @@ def _adapt_board(
         "evolution_score",
         "total_score",
         "group_rank",
+        "market_real",
         "market_score",
         "market_live",
         "market_forecast",
         "breadth",
         "market_regime",
     ]
+
+    for column in ordered:
+        if column not in canonical.columns:
+            canonical[column] = np.nan
 
     return canonical[ordered].reset_index(drop=True)
 
@@ -2814,6 +2849,8 @@ def update_learning(
     horizons: Sequence[int] = DEFAULT_HORIZONS,
     strict: bool = False,
     remote_dir: Optional[str] = None,
+    trading_today: Optional[bool] = None,
+    brain_dir: Optional[os.PathLike[str] | str] = None,
 ) -> Dict[str, Any]:
     """
     Lưu Earning Money Board hiện tại và cập nhật Outcome T+3/T+5/T+10.
@@ -2839,6 +2876,34 @@ def update_learning(
         else 0
     )
     storage = _make_storage(data_dir, remote_dir)
+
+    if trading_today is False:
+        result = LearningResult(
+            ok=True,
+            module_version=MODULE_VERSION,
+            trade_date=None,
+            input_rows=input_rows,
+            valid_rows=0,
+            observations_added=0,
+            observations_updated=0,
+            outcomes_added=0,
+            knowledge_rows=0,
+            lifecycle_rows=0,
+            continuation_rows=0,
+            storage_mode=(
+                "GITHUB_PRIMARY"
+                if storage.github.enabled
+                else "LOCAL_ONLY"
+            ),
+            github_sync=(
+                "NOT_ATTEMPTED"
+                if storage.github.enabled
+                else "GITHUB_DISABLED"
+            ),
+            skipped_reason="NON_TRADING_SESSION",
+        )
+        _save_status(storage, result)
+        return result.to_dict()
 
     try:
         with _LOCK:
@@ -2891,6 +2956,34 @@ def update_learning(
                 existing_observations,
                 canonical,
             )
+
+            t0_freeze_added = 0
+            try:
+                from modules.learning_t0_capture import append_t0_observation_freeze
+
+                existing_freeze, _ = _read_csv_from_storage(
+                    storage,
+                    T0_FREEZE_FILE,
+                )
+                frozen, t0_freeze_added = append_t0_observation_freeze(
+                    existing_freeze,
+                    canonical,
+                )
+                if t0_freeze_added > 0:
+                    _write_csv_to_storage(
+                        storage,
+                        T0_FREEZE_FILE,
+                        frozen,
+                        commit_message=(
+                            "Mr.BOT append T0 observation freeze "
+                            f"{trade_date_value} +{t0_freeze_added}"
+                        ),
+                    )
+            except Exception as freeze_exc:
+                _LOGGER.warning(
+                    "T0 observation freeze skipped: %s",
+                    freeze_exc,
+                )
 
             old_outcomes, _ = _read_csv_from_storage(
                 storage,
@@ -3118,6 +3211,7 @@ def update_learning(
                 history_rows=len(history),
                 decision_archive_rows=len(decision_archive),
                 verified_decisions_rows=len(verified_decisions),
+                t0_freeze_added=t0_freeze_added,
                 storage_mode=storage_mode,
                 github_sync=github_sync,
             )

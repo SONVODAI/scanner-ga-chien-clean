@@ -2229,13 +2229,13 @@ def save_evolution(scan_df: pd.DataFrame, allow_save: bool = True, reason: str =
 # =========================================================
 # STORM LEADERS - CP ĐANG MẠNH LÊN NHANH + TIỀN VÀO MẠNH
 # =========================================================
-def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
+def _compute_storm_score_frame(scan_df: pd.DataFrame) -> pd.DataFrame:
+    """Raw Storm engine output for every scanned symbol (pre-filter)."""
     if scan_df.empty:
         return pd.DataFrame()
 
     current = scan_df.copy()
 
-    # GREEN2 từ tín hiệu thật của hệ thống
     if "green_2_confirm" in current.columns:
         current["GREEN2"] = np.where(
             current["green_2_confirm"].astype(str).str.contains("GREEN 2", na=False),
@@ -2317,6 +2317,24 @@ def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
         + current["O"].fillna(0)
         + current["V"].fillna(0)
     )
+
+    return current
+
+
+def compute_storm_scores(scan_df: pd.DataFrame) -> pd.DataFrame:
+    """Return one row per symbol with raw ``storm_score`` for learning capture."""
+    current = _compute_storm_score_frame(scan_df)
+    if current.empty:
+        return pd.DataFrame(columns=["symbol", "storm_score"])
+    scores = current[["symbol", "storm_score"]].copy()
+    scores["symbol"] = scores["symbol"].astype(str).str.upper()
+    return scores.drop_duplicates(subset=["symbol"], keep="last").reset_index(drop=True)
+
+
+def build_storm_leaders(scan_df: pd.DataFrame) -> pd.DataFrame:
+    current = _compute_storm_score_frame(scan_df)
+    if current.empty:
+        return pd.DataFrame()
 
     valid_groups = [
     "PULL ĐẸP",
@@ -6264,27 +6282,10 @@ try:
 except Exception as e:
     st.warning(f"Experience Engine: {e}")
 # =========================================================
-# EARNING LEARNING ENGINE
-# =========================================================
-try:
-    _learning_market_context = {
-        "market_score": market_real,
-        "market_forecast": market_forecast,
-        "market_regime": market_forecast_text,
-    }
-    if _learning_breadth is not None:
-        _learning_market_context["breadth"] = _learning_breadth
-    learning_result = update_learning(
-        earning_board_df=scan_df,
-        market_context=_learning_market_context,
-    )
-except Exception as e:
-    st.warning(f"Earning Learning: {e}")
-
-# =========================================================
 # LEADER MEMORY ENGINE
 # Cập nhật trước khi Pattern Match đọc Leader Brain.
 # =========================================================
+leader_memory_df = pd.DataFrame()
 try:
     leader_memory_df = update_memory(
         df_today=scan_df,
@@ -6333,6 +6334,42 @@ except Exception as _forward_finalize_error:
     st.caption(f"Forward shadow finalize skipped: {_forward_finalize_error}")
 evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
+
+# =========================================================
+# EARNING LEARNING ENGINE (after Storm / Evolution / Leader)
+# =========================================================
+try:
+    from modules.learning_t0_capture import build_learning_input_df
+
+    _storm_scores = compute_storm_scores(scan_df)
+    _leader_brain = (
+        leader_memory_df
+        if isinstance(leader_memory_df, pd.DataFrame) and not leader_memory_df.empty
+        else pd.DataFrame()
+    )
+    learning_input_df = build_learning_input_df(
+        scan_df,
+        storm_scores=_storm_scores,
+        evo_table=evo_table,
+        leader_brain=_leader_brain,
+    )
+    _learning_market_context = {
+        "market_real": market_real,
+        "market_score": market_real,
+        "market_live": market_live,
+        "market_forecast": market_forecast,
+        "market_regime": market_forecast_text,
+    }
+    if _learning_breadth is not None:
+        _learning_market_context["breadth"] = _learning_breadth
+    learning_result = update_learning(
+        earning_board_df=learning_input_df,
+        market_context=_learning_market_context,
+        trading_today=trading_today,
+    )
+except Exception as e:
+    st.warning(f"Earning Learning: {type(e).__name__}: {e}")
+
 pullback_df = build_pullback_buy_list(
     scan_df=scan_df,
     evo_table=evo_table,
