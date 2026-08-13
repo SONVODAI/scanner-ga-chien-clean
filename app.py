@@ -6315,6 +6315,28 @@ st.caption("Mr.BOT PRO V4.0: tất cả bảng vẫn dùng chung scan_df. BUY EL
 # =========================================================
 storm_df = build_storm_leaders(scan_df)
 trading_today, trading_reason = is_vnindex_trading_today()
+_regime_name, _, _regime_note = elite_regime(market_real, market_forecast)
+try:
+    from modules.market_t0_capture import capture_market_t0_snapshot
+
+    _market_t0_result = capture_market_t0_snapshot(
+        scan_df=scan_df,
+        trade_date=daily_result.current_date,
+        market_real=market_real,
+        market_live=market_live,
+        market_forecast=market_forecast,
+        market_forecast_text=market_forecast_text,
+        market_confidence=market_confidence,
+        market_status=market_status,
+        market_action=market_action,
+        market_regime=_regime_name,
+        market_regime_note=_regime_note,
+        rsi_breadth_report=rsi_breadth_report,
+        trading_today=trading_today,
+        trading_reason=trading_reason,
+    )
+except Exception as _market_t0_err:
+    st.caption(f"Market T0 capture skipped: {_market_t0_err}")
 try:
     from leader_memory import finalize_session_forward_shadow
 
