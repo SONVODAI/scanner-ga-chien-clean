@@ -33,10 +33,42 @@ MODULE_DIR = Path(__file__).resolve().parent.parent
 BRAIN_DIR = MODULE_DIR / "brain"
 DATA_DIR = MODULE_DIR / "data" / "earning_learning"
 
-LEDGER_FILE = BRAIN_DIR / "regime_alpha_shadow_ledger.csv"
-INSIGHT_LEDGER_FILE = BRAIN_DIR / "learning_insight_forward_ledger.csv"
-OUTCOMES_FILE = BRAIN_DIR / "regime_alpha_forward_outcomes.csv"
+
+def _resolve_brain_dir() -> Path:
+    override = os.environ.get("MRBOT_BRAIN_DIR")
+    if override:
+        path = Path(override)
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+    return BRAIN_DIR
+
+
+def _brain_file(name: str) -> Path:
+    return _resolve_brain_dir() / name
+
+
+LEDGER_FILE = _brain_file("regime_alpha_shadow_ledger.csv")
+INSIGHT_LEDGER_FILE = _brain_file("learning_insight_forward_ledger.csv")
+OUTCOMES_FILE = _brain_file("regime_alpha_forward_outcomes.csv")
 LIFECYCLE_FILE = DATA_DIR / "pattern_lifecycle.csv"
+
+def _default_ledger_path(ledger_path: Optional[Path] = None) -> Path:
+    return ledger_path if ledger_path is not None else _brain_file(
+        "regime_alpha_shadow_ledger.csv"
+    )
+
+
+def _default_insight_ledger_path(ledger_path: Optional[Path] = None) -> Path:
+    return ledger_path if ledger_path is not None else _brain_file(
+        "learning_insight_forward_ledger.csv"
+    )
+
+
+def _default_outcomes_path(outcomes_path: Optional[Path] = None) -> Path:
+    return outcomes_path if outcomes_path is not None else _brain_file(
+        "regime_alpha_forward_outcomes.csv"
+    )
+
 
 LEDGER_VERSION = "1.0.0"
 OUTCOME_VERSION = "1.0.0"
@@ -325,15 +357,34 @@ def _corporate_action_flag(
     return ""
 
 
+def _read_earning_learning_csv(filename: str) -> pd.DataFrame:
+    """Read earning-learning CSV via the canonical GitHubLocalStorage abstraction."""
+    try:
+        from modules.earning_learning import _make_storage, _read_csv_from_storage
+
+        storage = _make_storage()
+        df, result = _read_csv_from_storage(storage, filename)
+        if df is not None and not df.empty:
+            return df
+        if result.error:
+            logger.warning(
+                "Earning-learning storage read returned empty for %s: %s",
+                filename,
+                result.error,
+            )
+    except Exception as exc:
+        logger.warning("Earning-learning storage read failed for %s: %s", filename, exc)
+    return pd.DataFrame()
+
+
 def _lookup_observation_ids(
     ledger_rows: pd.DataFrame,
     observations: Optional[pd.DataFrame] = None,
 ) -> Dict[Tuple[str, str], str]:
     if observations is None:
-        obs_path = DATA_DIR / "observations.csv"
-        if not obs_path.exists():
-            return {}
-        observations = pd.read_csv(obs_path, encoding="utf-8-sig", low_memory=False)
+        from modules.earning_learning import OBSERVATIONS_FILE
+
+        observations = _read_earning_learning_csv(OBSERVATIONS_FILE)
 
     if observations.empty or "observation_id" not in observations.columns:
         return {}
@@ -380,7 +431,7 @@ def freeze_t0_ledger(
     shadow_df: pd.DataFrame,
     *,
     evaluation_mode: str = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = LEDGER_FILE,
+    ledger_path: Optional[Path] = None,
     observations: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:
     """
@@ -390,6 +441,7 @@ def freeze_t0_ledger(
     T0 evidence or scores. RECONSTRUCTED_AUDIT rows are stored separately by mode
     and never overwrite FORWARD_FROZEN rows.
     """
+    ledger_path = _default_ledger_path(ledger_path)
     ledger = _load_csv(ledger_path, LEDGER_COLUMNS)
     if shadow_df is None or shadow_df.empty:
         return ledger
@@ -466,7 +518,7 @@ def freeze_insight_t0_ledger(
     insight_df: pd.DataFrame,
     *,
     evaluation_mode: str = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = INSIGHT_LEDGER_FILE,
+    ledger_path: Optional[Path] = None,
     observations: Optional[pd.DataFrame] = None,
 ) -> pd.DataFrame:
     """
@@ -475,6 +527,7 @@ def freeze_insight_t0_ledger(
     FORWARD_FROZEN rows are never overwritten — later knowledge updates cannot
     reconstruct historical InsightRank or evidence fields.
     """
+    ledger_path = _default_insight_ledger_path(ledger_path)
     ledger = _load_csv(ledger_path, INSIGHT_LEDGER_COLUMNS)
     if insight_df is None or insight_df.empty:
         return ledger
@@ -527,8 +580,9 @@ def freeze_insight_t0_ledger(
 def load_insight_forward_ledger(
     *,
     evaluation_mode: Optional[str] = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = INSIGHT_LEDGER_FILE,
+    ledger_path: Optional[Path] = None,
 ) -> pd.DataFrame:
+    ledger_path = _default_insight_ledger_path(ledger_path)
     ledger = _load_csv(ledger_path, INSIGHT_LEDGER_COLUMNS)
     if ledger.empty or evaluation_mode is None:
         return ledger
@@ -538,8 +592,9 @@ def load_insight_forward_ledger(
 def load_forward_ledger(
     *,
     evaluation_mode: Optional[str] = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = LEDGER_FILE,
+    ledger_path: Optional[Path] = None,
 ) -> pd.DataFrame:
+    ledger_path = _default_ledger_path(ledger_path)
     ledger = _load_csv(ledger_path, LEDGER_COLUMNS)
     if ledger.empty or evaluation_mode is None:
         return ledger
@@ -547,9 +602,14 @@ def load_forward_ledger(
 
 
 def _load_lifecycle(path: Path = LIFECYCLE_FILE) -> pd.DataFrame:
-    if not path.exists() or path.stat().st_size == 0:
-        return pd.DataFrame()
-    return pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
+    from modules.earning_learning import LIFECYCLE_FILE as LIFECYCLE_NAME
+
+    lifecycle = _read_earning_learning_csv(LIFECYCLE_NAME)
+    if not lifecycle.empty:
+        return lifecycle
+    if path.exists() and path.stat().st_size > 0:
+        return pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
+    return pd.DataFrame()
 
 
 def _lifecycle_lookup(lifecycle: pd.DataFrame) -> Dict[Tuple[str, str], pd.Series]:
@@ -583,17 +643,24 @@ def _status_or_pending(value: Any) -> str:
 
 def mature_forward_outcomes(
     *,
-    ledger_path: Path = LEDGER_FILE,
-    outcomes_path: Path = OUTCOMES_FILE,
+    ledger_path: Optional[Path] = None,
+    outcomes_path: Optional[Path] = None,
     lifecycle: Optional[pd.DataFrame] = None,
     lifecycle_path: Path = LIFECYCLE_FILE,
+    immature_session_dates: Optional[Iterable[str]] = None,
 ) -> pd.DataFrame:
     """
     Attach matured T3/T5/T10 to frozen decisions.
 
     Only the outcome table is updated. T0 ledger rows remain unchanged.
     Horizons mature independently.
+
+    ``immature_session_dates`` blocks same-pipeline-session maturation so a
+    row frozen in the current tick cannot receive T3/T5/T10 from data written
+    later in that same tick.
     """
+    ledger_path = _default_ledger_path(ledger_path)
+    outcomes_path = _default_outcomes_path(outcomes_path)
     ledger = load_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN, ledger_path=ledger_path)
     outcomes = _load_csv(outcomes_path, OUTCOME_COLUMNS)
 
@@ -603,6 +670,12 @@ def mature_forward_outcomes(
     if lifecycle is None:
         lifecycle = _load_lifecycle(lifecycle_path)
     life_by_key = _lifecycle_lookup(lifecycle)
+
+    blocked_sessions = {
+        str(d).strip()
+        for d in (immature_session_dates or [])
+        if str(d).strip()
+    }
 
     existing: Dict[str, pd.Series] = {}
     if not outcomes.empty:
@@ -633,6 +706,9 @@ def mature_forward_outcomes(
         t3 = _finite_or_none(life.get("t3_return_pct")) if life is not None else None
         t5 = _finite_or_none(life.get("t5_return_pct")) if life is not None else None
         t10 = _finite_or_none(life.get("t10_return_pct")) if life is not None else None
+
+        if session_date in blocked_sessions:
+            t3 = t5 = t10 = None
 
         prev_t3_status = _status_or_pending(row.get("outcome_status_t3"))
         prev_t5_status = _status_or_pending(row.get("outcome_status_t5"))
@@ -685,16 +761,18 @@ def mature_forward_outcomes(
     return outcomes
 
 
-def load_forward_outcomes(path: Path = OUTCOMES_FILE) -> pd.DataFrame:
-    return _load_csv(path, OUTCOME_COLUMNS)
+def load_forward_outcomes(path: Optional[Path] = None) -> pd.DataFrame:
+    return _load_csv(_default_outcomes_path(path), OUTCOME_COLUMNS)
 
 
 def _joined_forward_frame(
     *,
     evaluation_mode: str = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = LEDGER_FILE,
-    outcomes_path: Path = OUTCOMES_FILE,
+    ledger_path: Optional[Path] = None,
+    outcomes_path: Optional[Path] = None,
 ) -> pd.DataFrame:
+    ledger_path = _default_ledger_path(ledger_path)
+    outcomes_path = _default_outcomes_path(outcomes_path)
     ledger = load_forward_ledger(evaluation_mode=evaluation_mode, ledger_path=ledger_path)
     outcomes = load_forward_outcomes(outcomes_path)
     if ledger.empty:
@@ -800,11 +878,13 @@ def _top_n_by_session(df: pd.DataFrame, rank_col: str, n: int) -> pd.DataFrame:
 def evaluate_forward_scorecard(
     *,
     evaluation_mode: str = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = LEDGER_FILE,
-    outcomes_path: Path = OUTCOMES_FILE,
+    ledger_path: Optional[Path] = None,
+    outcomes_path: Optional[Path] = None,
     top_ns: Sequence[int] = (5, 10, 20),
 ) -> ForwardScorecard:
     """Read-only scorecard over frozen T0 ranks and matured outcomes."""
+    ledger_path = _default_ledger_path(ledger_path)
+    outcomes_path = _default_outcomes_path(outcomes_path)
     joined = _joined_forward_frame(
         evaluation_mode=evaluation_mode,
         ledger_path=ledger_path,
@@ -890,13 +970,15 @@ def evaluate_regime_scorecard(
     *,
     market_context_key: Optional[str] = None,
     evaluation_mode: str = EVAL_MODE_FORWARD_FROZEN,
-    ledger_path: Path = LEDGER_FILE,
-    outcomes_path: Path = OUTCOMES_FILE,
+    ledger_path: Optional[Path] = None,
+    outcomes_path: Optional[Path] = None,
     top_n: int = 10,
 ) -> Dict[str, Any]:
     """
     Regime-grouped scorecard. GLOBAL_DNA rows are labeled CONTEXT_FREE_PRIOR.
     """
+    ledger_path = _default_ledger_path(ledger_path)
+    outcomes_path = _default_outcomes_path(outcomes_path)
     joined = _joined_forward_frame(
         evaluation_mode=evaluation_mode,
         ledger_path=ledger_path,
@@ -978,16 +1060,21 @@ def finalize_forward_shadow_snapshot(
     market_real: Optional[float] = None,
     market_forecast: Optional[float] = None,
     breadth: Optional[float] = None,
-    ledger_path: Path = LEDGER_FILE,
-    outcomes_path: Path = OUTCOMES_FILE,
+    recommendations: Optional[pd.DataFrame] = None,
+    ledger_path: Optional[Path] = None,
+    outcomes_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """
     Canonical end-of-pipeline freeze for genuine forward evidence.
 
-    Reads the persisted recommendation/brain state produced by update_memory(),
-    builds shadow audit rows, and upserts immutable FORWARD_FROZEN ledger rows.
-    Idempotent per (session_date, symbol).
+    Uses the runtime recommendation DataFrame when supplied (primary). Falls back
+    to ``load_recommendations()`` for backward compatibility only.
+
+    Does NOT mature outcomes — call ``mature_forward_outcomes()`` after
+    ``update_learning()`` so lifecycle reads use fresh storage-backed data.
     """
+    ledger_path = _default_ledger_path(ledger_path)
+    outcomes_path = _default_outcomes_path(outcomes_path)
     session_date = str(session_date).strip()
     valid, reason = is_trading_session_valid(
         session_date,
@@ -1013,7 +1100,9 @@ def finalize_forward_shadow_snapshot(
     )
     from modules.regime_alpha_shadow import build_shadow_candidate_universe
 
-    rec = load_recommendations()
+    rec = recommendations.copy() if recommendations is not None else None
+    if rec is None or rec.empty:
+        rec = load_recommendations()
     if rec is None or rec.empty:
         return {"ok": False, "reason": "empty_recommendations", "frozen_rows": 0}
 
@@ -1093,7 +1182,6 @@ def finalize_forward_shadow_snapshot(
             trajectory_rows,
             evaluation_mode=EVAL_MODE_FORWARD_FROZEN,
         )
-    mature_forward_outcomes(ledger_path=ledger_path, outcomes_path=outcomes_path)
 
     after = load_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN, ledger_path=ledger_path)
     insight_after = load_insight_forward_ledger(evaluation_mode=EVAL_MODE_FORWARD_FROZEN)
@@ -1148,6 +1236,9 @@ __all__ = [
     "OUTCOME_COLUMNS",
     "OUTCOMES_FILE",
     "REGIME_LABEL_GLOBAL",
+    "_brain_file",
+    "_read_earning_learning_csv",
+    "_resolve_brain_dir",
     "ForwardScorecard",
     "ScorecardSlice",
     "classify_movement_class",

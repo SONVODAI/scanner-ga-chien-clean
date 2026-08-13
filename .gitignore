@@ -1,0 +1,9 @@
+# Runtime brain artifacts (local/Streamlit ephemeral — not source)
+brain/*.csv
+brain/.leader_memory.lock
+brain/backups/
+
+# Python / test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/

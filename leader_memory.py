@@ -261,11 +261,29 @@ class UpdateResult:
 
 _PROCESS_LOCK = threading.RLock()
 _CURRENT_T0_BY_SESSION: Dict[str, pd.DataFrame] = {}
+_LAST_RUNTIME_RECOMMENDATIONS: Optional[pd.DataFrame] = None
 
 
 def reset_t0_snapshot_cache() -> None:
     """Test helper — clears in-memory authoritative T0 snapshot cache."""
     _CURRENT_T0_BY_SESSION.clear()
+
+
+def reset_runtime_recommendations() -> None:
+    """Test helper — clears the in-memory recommendation handoff cache."""
+    global _LAST_RUNTIME_RECOMMENDATIONS
+    _LAST_RUNTIME_RECOMMENDATIONS = None
+
+
+def get_runtime_recommendations() -> Optional[pd.DataFrame]:
+    """
+    Return the recommendation DataFrame from the most recent successful
+    ``update_memory()`` tick in this process (point-in-time handoff).
+    """
+    global _LAST_RUNTIME_RECOMMENDATIONS
+    if _LAST_RUNTIME_RECOMMENDATIONS is None or _LAST_RUNTIME_RECOMMENDATIONS.empty:
+        return None
+    return _LAST_RUNTIME_RECOMMENDATIONS.copy()
 
 
 def _is_valid_t0_value(value: Any) -> bool:
@@ -1518,6 +1536,7 @@ def finalize_session_forward_shadow(
     market_real: Optional[Any] = None,
     market_forecast: Optional[Any] = None,
     breadth: Optional[Any] = None,
+    recommendations: Optional[pd.DataFrame] = None,
 ) -> Dict[str, Any]:
     """
     N3.7C canonical forward freeze — call after is_vnindex_trading_today() in app pipeline.
@@ -1534,6 +1553,7 @@ def finalize_session_forward_shadow(
             market_real=mr if not math.isnan(mr) else None,
             market_forecast=mf if not math.isnan(mf) else None,
             breadth=bw if not math.isnan(bw) else None,
+            recommendations=recommendations,
         )
     except Exception:
         logger.exception("Forward shadow finalize failed safely")
@@ -1590,6 +1610,7 @@ def update_memory(
                 )
                 if snapshot.empty:
                     logger.warning("SNAPSHOT EMPTY: %s", warnings)
+                    reset_runtime_recommendations()
                     return load_memory()
 
                 _cache_t0_snapshot(snapshot, session_date)
@@ -1618,6 +1639,8 @@ def update_memory(
                     market_real=market_real,
                     market_forecast=market_forecast,
                 )
+                global _LAST_RUNTIME_RECOMMENDATIONS
+                _LAST_RUNTIME_RECOMMENDATIONS = rec.copy()
 
                 _atomic_write_csv(history, HISTORY_FILE)
                 _atomic_write_csv(brain, BRAIN_FILE)
@@ -1665,6 +1688,7 @@ def update_memory(
 
     except Exception as exc:
         logger.exception("UPDATE MEMORY ERROR: %s", exc)
+        reset_runtime_recommendations()
         if raise_errors:
             raise
         return load_memory()
@@ -1873,6 +1897,7 @@ __all__ = [
     "update_memory", "update_memory_with_result",
     "load_history", "load_pattern_library",
     "load_hall_of_fame", "load_recommendations", "load_shadow_recommendations",
+    "get_runtime_recommendations", "reset_runtime_recommendations",
     "finalize_session_forward_shadow",
     "get_active_leaders", "get_intelligence_tables",
     "get_engine_status", "backup_brain",

@@ -191,8 +191,7 @@ class TestFinalizeIntegration(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    @mock.patch("modules.regime_alpha_forward_eval.mature_forward_outcomes")
-    @mock.patch("modules.regime_alpha_forward_eval.build_shadow_with_recall")
+    @mock.patch("modules.regime_alpha_shadow.build_shadow_with_recall")
     @mock.patch("leader_memory.load_recommendations")
     @mock.patch("leader_memory._safe_read_csv")
     @mock.patch("leader_memory._build_experience_frame")
@@ -204,7 +203,6 @@ class TestFinalizeIntegration(unittest.TestCase):
         mock_read_csv,
         mock_load_rec,
         mock_build_shadow,
-        mock_mature,
     ):
         rec, brain, exp, shadow = _sample_bundle("2026-08-12")
         mock_load_rec.return_value = rec
@@ -213,37 +211,59 @@ class TestFinalizeIntegration(unittest.TestCase):
         mock_experience.return_value = exp
         mock_build_shadow.return_value = shadow
 
-        import modules.regime_alpha_forward_eval as fe
-
-        old_ledger = fe.LEDGER_FILE
-        fe.LEDGER_FILE = self.tmp_path / "ledger.csv"
-        try:
-            result = finalize_forward_shadow_snapshot(
-                session_date="2026-08-12",
-                trading_today=True,
-                market_real=7.0,
-            )
-        finally:
-            fe.LEDGER_FILE = old_ledger
+        ledger_path = self.tmp_path / "ledger.csv"
+        result = finalize_forward_shadow_snapshot(
+            session_date="2026-08-12",
+            trading_today=True,
+            market_real=7.0,
+            ledger_path=ledger_path,
+        )
 
         self.assertTrue(result["ok"])
         self.assertEqual(result["frozen_rows"], 2)
-        mock_mature.assert_called_once()
+
+    @mock.patch("modules.regime_alpha_forward_eval.mature_forward_outcomes")
+    @mock.patch("modules.regime_alpha_shadow.build_shadow_with_recall")
+    @mock.patch("leader_memory.load_recommendations")
+    @mock.patch("leader_memory._safe_read_csv")
+    @mock.patch("leader_memory._build_experience_frame")
+    @mock.patch("leader_memory._latest_session_experience_snapshot")
+    def test_finalize_prefers_runtime_recommendations(
+        self,
+        mock_snapshot,
+        mock_experience,
+        mock_read_csv,
+        mock_load_rec,
+        mock_build_shadow,
+        mock_mature,
+    ):
+        rec, brain, exp, shadow = _sample_bundle("2026-08-12")
+        mock_load_rec.side_effect = AssertionError("disk fallback should not run")
+        mock_read_csv.return_value = brain
+        mock_snapshot.return_value = pd.DataFrame({"symbol": ["AAA"], "session_date": "2026-08-12"})
+        mock_experience.return_value = exp
+        mock_build_shadow.return_value = shadow
+
+        ledger_path = self.tmp_path / "ledger.csv"
+        result = finalize_forward_shadow_snapshot(
+            session_date="2026-08-12",
+            trading_today=True,
+            market_real=7.0,
+            recommendations=rec,
+            ledger_path=ledger_path,
+        )
+
+        self.assertTrue(result["ok"])
+        mock_mature.assert_not_called()
 
     def test_non_trading_day_finalize_skipped(self):
-        import modules.regime_alpha_forward_eval as fe
-
-        old_ledger = fe.LEDGER_FILE
         ledger_path = self.tmp_path / "ledger.csv"
-        fe.LEDGER_FILE = ledger_path
-        try:
-            result = finalize_forward_shadow_snapshot(
-                session_date="2026-08-09",
-                trading_today=False,
-                market_real=7.0,
-            )
-        finally:
-            fe.LEDGER_FILE = old_ledger
+        result = finalize_forward_shadow_snapshot(
+            session_date="2026-08-09",
+            trading_today=False,
+            market_real=7.0,
+            ledger_path=ledger_path,
+        )
         self.assertFalse(result["ok"])
         self.assertEqual(len(load_forward_ledger(ledger_path=ledger_path)), 0)
 

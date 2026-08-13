@@ -6338,14 +6338,16 @@ try:
 except Exception as _market_t0_err:
     st.caption(f"Market T0 capture skipped: {_market_t0_err}")
 try:
-    from leader_memory import finalize_session_forward_shadow
+    from leader_memory import finalize_session_forward_shadow, get_runtime_recommendations
 
+    _runtime_recommendations = get_runtime_recommendations()
     _forward_finalize = finalize_session_forward_shadow(
         session_date=daily_result.current_date,
         trading_today=trading_today,
         market_real=market_real,
         market_forecast=market_forecast,
         breadth=_learning_breadth,
+        recommendations=_runtime_recommendations,
     )
     if _forward_finalize.get("ok"):
         st.caption(
@@ -6391,6 +6393,15 @@ try:
     )
 except Exception as e:
     st.warning(f"Earning Learning: {type(e).__name__}: {e}")
+
+try:
+    from modules.regime_alpha_forward_eval import mature_forward_outcomes
+
+    mature_forward_outcomes(
+        immature_session_dates=[str(daily_result.current_date)],
+    )
+except Exception as _forward_mature_err:
+    st.caption(f"Forward outcome maturation skipped: {_forward_mature_err}")
 
 pullback_df = build_pullback_buy_list(
     scan_df=scan_df,
