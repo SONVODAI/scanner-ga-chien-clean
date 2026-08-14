@@ -29,6 +29,7 @@ def reconcile_session(
     *,
     collected_at=None,
     source: str = "vnstock4_kbs",
+    requests_per_minute: int = 0,
 ) -> tuple[RunManifest, dict[str, Any]]:
     """
     Reconcile provider data against stored session.
@@ -78,6 +79,7 @@ def reconcile_session(
     manifest.duplicate_count = upsert.duplicate_count
     manifest.universe_count = len(symbol_bars)
     manifest.symbols_success = sorted(symbol_bars.keys())
+    manifest.requests_per_minute = requests_per_minute
     manifest.finish()
 
     report = {

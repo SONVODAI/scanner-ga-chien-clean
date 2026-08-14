@@ -53,3 +53,19 @@ class IntradayConfig:
             requests_per_minute=min(rpm, COMMUNITY_RPM),
             app_py_path=Path(app_path) if app_path else cls().app_py_path,
         )
+
+
+def detect_tier() -> str:
+    """
+    Return provider tier label without exposing credentials.
+
+    Community if VNSTOCK_API_KEY is set or a persisted key file exists.
+    """
+    if os.getenv("VNSTOCK_API_KEY", "").strip():
+        return "community"
+
+    key_file = Path.home() / ".vnstock" / "api_key.json"
+    if key_file.exists() and key_file.stat().st_size > 0:
+        return "community"
+
+    return "guest"
