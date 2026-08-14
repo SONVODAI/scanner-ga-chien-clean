@@ -1,0 +1,9 @@
+# Mr.BOT Intraday Memory V1A — collector dependencies
+# Install separately from production requirements.txt to avoid breaking Legacy app.py
+#
+#   pip install -r requirements-collector.txt
+#
+# Production app.py continues to use vnstock==0.2.9.2 via requirements.txt
+
+vnstock>=4.0.5,<5
+pyarrow>=14.0.0

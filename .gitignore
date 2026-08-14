@@ -7,3 +7,6 @@ brain/backups/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Intraday memory Parquet data (local/test — not committed to Git)
+/intraday_memory/
