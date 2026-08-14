@@ -6403,6 +6403,32 @@ try:
 except Exception as _forward_mature_err:
     st.caption(f"Forward outcome maturation skipped: {_forward_mature_err}")
 
+try:
+    from modules.market_aware_sweetspot_observer import (
+        freeze_daily_observer_if_eligible,
+        mature_observer_outcomes,
+    )
+
+    _observer_board = get_earning_money_board(scan_df)
+    _observer_freeze = freeze_daily_observer_if_eligible(
+        t0_date=str(daily_result.current_date),
+        earning_board_df=_observer_board,
+        market_real=market_real,
+        market_forecast=market_forecast,
+        breadth=_learning_breadth,
+        market_regime=_regime_name,
+    )
+    if _observer_freeze.get("added", 0) > 0:
+        st.caption(
+            f"Sweetspot Observer frozen: {_observer_freeze.get('candidate_count', 0)} candidates "
+            f"({daily_result.current_date})"
+        )
+    mature_observer_outcomes(
+        immature_session_dates=[str(daily_result.current_date)],
+    )
+except Exception as _observer_err:
+    st.caption(f"Market-Aware Sweetspot Observer skipped: {_observer_err}")
+
 pullback_df = build_pullback_buy_list(
     scan_df=scan_df,
     evo_table=evo_table,
@@ -6691,6 +6717,18 @@ with st.expander("🔬 RS/RSI Sweetspot Research", expanded=False):
         render_sweetspot_research_panel()
     except Exception as _sweetspot_err:
         st.caption(f"Sweetspot research skipped: {_sweetspot_err}")
+
+with st.expander("🍯 MARKET-AWARE SWEETSPOT OBSERVER", expanded=False):
+    try:
+        from modules.market_aware_sweetspot_observer import (
+            render_market_aware_sweetspot_observer_panel,
+        )
+
+        render_market_aware_sweetspot_observer_panel(
+            t0_date=str(daily_result.current_date),
+        )
+    except Exception as _ma_observer_err:
+        st.caption(f"Market-Aware Sweetspot Observer skipped: {_ma_observer_err}")
 
 # =========================================================
 # PHÂN TÍCH CHUYÊN SÂU - BẢNG NGHIÊN CỨU / CHẨN ĐOÁN
