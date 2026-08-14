@@ -107,6 +107,24 @@ def _safe_float(value: Any) -> float:
         return np.nan
 
 
+def _safe_int(value: Any, default: int = 0) -> int:
+    num = _safe_float(value)
+    if pd.isna(num):
+        return default
+    return int(num)
+
+
+def _display_text(value: Any, default: str = "—") -> str:
+    if value is None:
+        return default
+    if isinstance(value, float) and np.isnan(value):
+        return default
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return default
+    return text
+
+
 def _normalize_universe(board_df: pd.DataFrame) -> pd.DataFrame:
     if board_df is None or board_df.empty:
         return pd.DataFrame()
@@ -225,7 +243,7 @@ def _pick_best_qualified_sweetspot(
             _safe_float(candidate.get("Winrate")),
             _safe_float(candidate.get("Avg Return")),
             _safe_float(candidate.get("Median Return")),
-            int(candidate.get("N", 0)),
+            _safe_int(candidate.get("N", 0)),
         )
         if best_row is None or sort_key > best_sort:
             best_row = candidate
@@ -297,7 +315,7 @@ def _base_row(
         }
     )
     if sweetspot is not None:
-        n = int(sweetspot.get("N", 0))
+        n = _safe_int(sweetspot.get("N", 0))
         row.update(
             {
                 "matched_sweetspot": _sweetspot_label(sweetspot),
@@ -771,17 +789,16 @@ def render_market_aware_sweetspot_observer_panel(
     with c2:
         st.metric("Context Match", str(header.get("context_match_level", "—")))
     with c3:
-        st.metric("Sweetspot Horizon", str(header.get("sweetspot_horizon", "—")))
+        st.metric("Sweetspot Horizon", _display_text(header.get("sweetspot_horizon")))
     with c4:
-        uni = int(_safe_float(header.get("earning_universe_n")) or 0)
-        st.metric("Earning Universe", str(uni))
+        st.metric("Earning Universe", str(_safe_int(header.get("earning_universe_n"))))
 
     st.caption(
         f"Market Context: `{header.get('market_context_key', '—')}` | "
         f"Regime: {header.get('market_regime_t0', '—')}"
     )
 
-    n = int(_safe_float(header.get("historical_sample_n")) or 0)
+    n = _safe_int(header.get("historical_sample_n"))
     wr = _safe_float(header.get("historical_winrate"))
     avg = _safe_float(header.get("historical_avg_return"))
     med = _safe_float(header.get("historical_median_return"))

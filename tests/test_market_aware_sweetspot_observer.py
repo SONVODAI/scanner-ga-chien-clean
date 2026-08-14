@@ -467,5 +467,98 @@ class FreezeIntegrationTests(unittest.TestCase):
             self.assertEqual(float(row2["rs5_t0"]), 0.0)
 
 
+class InsufficientUiRobustnessTests(unittest.TestCase):
+    def test_insufficient_status_nan_fields_do_not_crash_render(self):
+        import sys
+        from unittest.mock import MagicMock, call
+
+        st_mock = MagicMock()
+        col_mocks = [MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+        st_mock.columns.return_value = col_mocks
+        sys.modules["streamlit"] = st_mock
+
+        t0 = "2026-08-14"
+        ledger = pd.DataFrame(
+            [
+                {
+                    "observer_id": "status",
+                    "t0_date": t0,
+                    "symbol": "",
+                    "observer_status": STATUS_INSUFFICIENT_CONTEXT,
+                    "market_real_t0": 5.6,
+                    "market_forecast_t0": 4.0,
+                    "breadth_t0": 25.0,
+                    "market_regime_t0": "🔴 MÙA ĐÔNG",
+                    "market_context_key": "<4|20-40|4-6",
+                    "context_match_level": CONTEXT_MATCH_INSUFFICIENT,
+                    "earning_universe_n": 142,
+                    "price_t0": np.nan,
+                    "rs5_t0": np.nan,
+                    "rs10_t0": np.nan,
+                    "rsi14_t0": np.nan,
+                    "matched_sweetspot": np.nan,
+                    "sweetspot_horizon": np.nan,
+                    "historical_sample_n": np.nan,
+                    "historical_winrate": np.nan,
+                    "historical_avg_return": np.nan,
+                    "historical_median_return": np.nan,
+                    "evidence_status": np.nan,
+                    "t3_return_pct": np.nan,
+                    "t5_return_pct": np.nan,
+                    "t10_return_pct": np.nan,
+                    "created_at": "2026-08-14T12:00:00Z",
+                }
+            ]
+        )
+
+        with mock.patch(
+            "modules.market_aware_sweetspot_observer.load_observer_ledger",
+            return_value=ledger,
+        ):
+            result = render_market_aware_sweetspot_observer_panel(t0_date=t0)
+
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["candidate_count"], 0)
+        horizon_calls = [
+            c
+            for c in st_mock.metric.call_args_list
+            if c.args[0] == "Sweetspot Horizon"
+        ]
+        self.assertEqual(horizon_calls[0].args[1], "—")
+        st_mock.warning.assert_called_once()
+
+    def test_missing_historical_sample_n_safe_int(self):
+        from modules.market_aware_sweetspot_observer import _safe_int
+
+        self.assertEqual(_safe_int(np.nan), 0)
+        self.assertEqual(_safe_int(None), 0)
+        self.assertEqual(_safe_int(25), 25)
+
+    def test_insufficient_status_row_immutable_on_rerun(self):
+        t0 = "2026-08-14"
+        row = {
+            "observer_id": "s1",
+            "t0_date": t0,
+            "symbol": "",
+            "observer_status": STATUS_INSUFFICIENT_CONTEXT,
+            "market_real_t0": 5.6,
+            "sweetspot_horizon": np.nan,
+            "historical_sample_n": np.nan,
+            "earning_universe_n": 142,
+        }
+        merged, added1 = append_observer_ledger(
+            pd.DataFrame(), pd.DataFrame([row]), t0_date=t0
+        )
+        self.assertEqual(added1, 1)
+
+        row2 = dict(row)
+        row2["market_real_t0"] = 9.9
+        merged2, added2 = append_observer_ledger(
+            merged, pd.DataFrame([row2]), t0_date=t0
+        )
+        self.assertEqual(added2, 0)
+        self.assertEqual(float(merged2.iloc[0]["market_real_t0"]), 5.6)
+
+
 if __name__ == "__main__":
     unittest.main()
