@@ -14,12 +14,12 @@
   "history_rows": 11615,
   "decision_archive_rows": 2982,
   "verified_decisions_rows": 2556,
-  "t0_freeze_added": 142,
+  "t0_freeze_added": 0,
   "storage_mode": "GITHUB_PRIMARY",
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-08-14T09:01:24Z",
+  "last_run_at": "2026-08-14T09:03:21Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
