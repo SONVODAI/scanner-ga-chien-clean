@@ -21,6 +21,7 @@ from modules.market_aware_sweetspot_observer import (
     append_observer_ledger,
     compute_observer_snapshot,
     filter_lifecycle_as_of,
+    filter_stock_candidate_rows,
     freeze_daily_observer_if_eligible,
     get_frozen_day,
     load_observer_ledger,
@@ -526,6 +527,38 @@ class InsufficientUiRobustnessTests(unittest.TestCase):
         ]
         self.assertEqual(horizon_calls[0].args[1], "—")
         st_mock.warning.assert_called_once()
+        st_mock.dataframe.assert_not_called()
+        st_mock.caption.assert_any_call("No qualified candidates for this frozen T0.")
+
+    def test_insufficient_status_with_nan_symbol_counts_zero_candidates(self):
+        import sys
+        from unittest.mock import MagicMock
+
+        st_mock = MagicMock()
+        st_mock.columns.return_value = [MagicMock()] * 4
+        sys.modules["streamlit"] = st_mock
+
+        t0 = "2026-08-14"
+        ledger = pd.DataFrame(
+            [
+                {
+                    "observer_id": "status",
+                    "t0_date": t0,
+                    "symbol": np.nan,
+                    "observer_status": STATUS_INSUFFICIENT_CONTEXT,
+                    "market_real_t0": 5.6,
+                    "earning_universe_n": 142,
+                }
+            ]
+        )
+        with mock.patch(
+            "modules.market_aware_sweetspot_observer.load_observer_ledger",
+            return_value=ledger,
+        ):
+            result = render_market_aware_sweetspot_observer_panel(t0_date=t0)
+
+        self.assertEqual(result["candidate_count"], 0)
+        st_mock.dataframe.assert_not_called()
 
     def test_missing_historical_sample_n_safe_int(self):
         from modules.market_aware_sweetspot_observer import _safe_int
@@ -558,6 +591,66 @@ class InsufficientUiRobustnessTests(unittest.TestCase):
         )
         self.assertEqual(added2, 0)
         self.assertEqual(float(merged2.iloc[0]["market_real_t0"]), 5.6)
+
+
+class CandidateFilterTests(unittest.TestCase):
+    def _status_row(self, status: str, *, symbol: Any = "") -> dict:
+        return {
+            "observer_id": "status",
+            "t0_date": "2026-08-14",
+            "symbol": symbol,
+            "observer_status": status,
+        }
+
+    def _observe_row(self, symbol: str) -> dict:
+        return {
+            "observer_id": symbol,
+            "t0_date": "2026-08-14",
+            "symbol": symbol,
+            "observer_status": STATUS_OBSERVE,
+        }
+
+    def test_insufficient_status_row_is_not_candidate(self):
+        day = pd.DataFrame([self._status_row(STATUS_INSUFFICIENT_CONTEXT, symbol=np.nan)])
+        self.assertEqual(len(filter_stock_candidate_rows(day)), 0)
+
+    def test_no_qualified_status_row_is_not_candidate(self):
+        day = pd.DataFrame([self._status_row(STATUS_NO_QUALIFIED, symbol="")])
+        self.assertEqual(len(filter_stock_candidate_rows(day)), 0)
+
+    def test_zero_candidates_status_row_is_not_candidate(self):
+        day = pd.DataFrame([self._status_row(STATUS_ZERO_CANDIDATES, symbol=None)])
+        self.assertEqual(len(filter_stock_candidate_rows(day)), 0)
+
+    def test_three_observe_rows_count_as_three_candidates(self):
+        day = pd.DataFrame(
+            [self._observe_row("AAA"), self._observe_row("BBB"), self._observe_row("CCC")]
+        )
+        self.assertEqual(len(filter_stock_candidate_rows(day)), 3)
+
+    def test_status_row_plus_three_observe_rows_counts_three(self):
+        day = pd.DataFrame(
+            [
+                self._status_row(STATUS_INSUFFICIENT_CONTEXT, symbol=np.nan),
+                self._observe_row("AAA"),
+                self._observe_row("BBB"),
+                self._observe_row("CCC"),
+            ]
+        )
+        filtered = filter_stock_candidate_rows(day)
+        self.assertEqual(len(filtered), 3)
+        self.assertSetEqual(set(filtered["symbol"]), {"AAA", "BBB", "CCC"})
+
+    def test_filter_does_not_mutate_input_ledger(self):
+        day = pd.DataFrame(
+            [
+                self._status_row(STATUS_INSUFFICIENT_CONTEXT, symbol=np.nan),
+                self._observe_row("AAA"),
+            ]
+        )
+        before = day.copy()
+        _ = filter_stock_candidate_rows(day)
+        pd.testing.assert_frame_equal(day, before)
 
 
 if __name__ == "__main__":

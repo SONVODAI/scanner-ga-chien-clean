@@ -125,6 +125,32 @@ def _display_text(value: Any, default: str = "—") -> str:
     return text
 
 
+def _normalize_symbol_text(value: Any) -> str:
+    text = str(value).strip().upper()
+    if not text or text in ("NAN", "NONE", "NAT"):
+        return ""
+    return text
+
+
+def filter_stock_candidate_rows(day: pd.DataFrame) -> pd.DataFrame:
+    """
+    Return only executable stock candidate rows for UI display/counting.
+
+    Daily audit/status rows (empty/NaN symbol or non-OBSERVE status) are excluded.
+    """
+    if day is None or day.empty:
+        return pd.DataFrame()
+
+    out = day.copy()
+    symbols = out["symbol"].map(_normalize_symbol_text)
+    statuses = out.get("observer_status", pd.Series("", index=out.index)).astype(str)
+    mask = (symbols != "") & (statuses == STATUS_OBSERVE)
+    filtered = out.loc[mask].copy()
+    if not filtered.empty:
+        filtered["symbol"] = filtered["symbol"].map(_normalize_symbol_text)
+    return filtered.reset_index(drop=True)
+
+
 def _normalize_universe(board_df: pd.DataFrame) -> pd.DataFrame:
     if board_df is None or board_df.empty:
         return pd.DataFrame()
@@ -780,7 +806,7 @@ def render_market_aware_sweetspot_observer_panel(
         return {"ok": True, "status": "NOT_FROZEN", "t0_date": t0_date}
 
     header = day.iloc[0]
-    candidates = day[day["symbol"].astype(str).str.strip() != ""].copy()
+    candidates = filter_stock_candidate_rows(day)
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -819,7 +845,9 @@ def render_market_aware_sweetspot_observer_panel(
 
     st.metric("Qualified Candidates", len(candidates))
 
-    if not candidates.empty:
+    if candidates.empty:
+        st.caption("No qualified candidates for this frozen T0.")
+    else:
         display = candidates[
             [
                 "symbol",
@@ -874,6 +902,7 @@ __all__ = [
     "build_t0_market_context_key",
     "compute_observer_snapshot",
     "filter_lifecycle_as_of",
+    "filter_stock_candidate_rows",
     "freeze_daily_observer_if_eligible",
     "get_frozen_day",
     "load_observer_ledger",
