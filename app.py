@@ -6684,6 +6684,14 @@ except Exception as e:
     st.info("🧠 BOT Learning Insight đang tạm ẩn; dữ liệu học vẫn được bảo toàn.")
     st.caption(f"Learning Insight Error: {type(e).__name__}: {e}")
 
+with st.expander("🔬 RS/RSI Sweetspot Research", expanded=False):
+    try:
+        from modules.sweetspot_analyzer import render_sweetspot_research_panel
+
+        render_sweetspot_research_panel()
+    except Exception as _sweetspot_err:
+        st.caption(f"Sweetspot research skipped: {_sweetspot_err}")
+
 # =========================================================
 # PHÂN TÍCH CHUYÊN SÂU - BẢNG NGHIÊN CỨU / CHẨN ĐOÁN
 # =========================================================
