@@ -270,6 +270,46 @@ class TestCollector:
         config = IntradayConfig(data_root=tmp_data_root, app_py_path=APP_PY)
         return IntradayCollector(config=config, provider=provider)
 
+    def test_default_kbs_provider_wiring(self, monkeypatch):
+        captured: dict = {}
+
+        class RecordingKBSProvider:
+            def __init__(
+                self,
+                *,
+                requests_per_minute: int = 18,
+                max_retries: int = 3,
+                retry_base_delay: float = 2.0,
+            ) -> None:
+                captured["requests_per_minute"] = requests_per_minute
+                captured["max_retries"] = max_retries
+                captured["retry_base_delay"] = retry_base_delay
+
+        monkeypatch.setattr(
+            "modules.intraday_memory.collector.KBSProvider",
+            RecordingKBSProvider,
+        )
+        config = IntradayConfig(app_py_path=APP_PY, requests_per_minute=42)
+        IntradayCollector(config=config)
+
+        assert captured["requests_per_minute"] == 42
+        assert captured["max_retries"] == config.max_retries
+        assert captured["retry_base_delay"] == config.retry_base_delay_sec
+        assert "retry_base_delay_sec" not in captured
+
+    def test_cli_universe_initializes_collector(self, monkeypatch):
+        class StubKBSProvider:
+            def __init__(self, **kwargs: object) -> None:
+                pass
+
+        monkeypatch.setattr(
+            "modules.intraday_memory.collector.KBSProvider",
+            StubKBSProvider,
+        )
+        from modules.intraday_memory.cli import main
+
+        assert main(["universe"]) == 0
+
     def test_collect_session(self, tmp_data_root):
         session = date(2026, 8, 13)
         data = {

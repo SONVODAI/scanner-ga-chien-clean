@@ -47,7 +47,7 @@ class IntradayCollector:
         self.provider = provider or KBSProvider(
             requests_per_minute=self.config.requests_per_minute,
             max_retries=self.config.max_retries,
-            retry_base_delay_sec=self.config.retry_base_delay_sec,
+            retry_base_delay=self.config.retry_base_delay_sec,
         )
         self.data_root = Path(self.config.data_root)
         self.manifests_dir = self.data_root / "manifests"
