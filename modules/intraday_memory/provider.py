@@ -9,8 +9,13 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Protocol
+
+from modules.intraday_memory.timezone_policy import (
+    parse_provider_timestamp,
+    session_date_from_timestamp,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +30,36 @@ class ProviderAdapter(Protocol):
     def fetch_range(
         self, symbol: str, start: date, end: date
     ) -> list[dict[str, Any]]: ...
+
+
+def _filter_records_by_session_date(
+    records: list[dict[str, Any]], session_date: date
+) -> list[dict[str, Any]]:
+    """Keep only bars whose VN-local calendar date matches session_date."""
+    filtered: list[dict[str, Any]] = []
+    for record in records:
+        raw_time = record.get("time")
+        if raw_time is None:
+            continue
+        try:
+            ts = parse_provider_timestamp(raw_time)
+        except (ValueError, TypeError):
+            continue
+        if session_date_from_timestamp(ts) == session_date:
+            filtered.append(record)
+    return filtered
+
+
+def _session_transport_window(session_date: date) -> tuple[str, str]:
+    """
+    KBS/vnstock rejects start==end for 5m history.
+
+    Live evidence (vnstock 4.0.5, KBS): start=session-1, end=session+1 succeeds
+    and returns the requested session bars; end date behaves inclusive.
+    """
+    transport_start = session_date - timedelta(days=1)
+    transport_end = session_date + timedelta(days=1)
+    return transport_start.isoformat(), transport_end.isoformat()
 
 
 class KBSProvider:
@@ -118,12 +153,15 @@ class KBSProvider:
     def fetch_session(
         self, symbol: str, session_date: date
     ) -> list[dict[str, Any]]:
-        day = session_date.isoformat()
-        return self._fetch_with_retry(symbol, day, day)
+        transport_start, transport_end = _session_transport_window(session_date)
+        records = self._fetch_with_retry(symbol, transport_start, transport_end)
+        return _filter_records_by_session_date(records, session_date)
 
     def fetch_range(
         self, symbol: str, start: date, end: date
     ) -> list[dict[str, Any]]:
+        if start == end:
+            return self.fetch_session(symbol, start)
         return self._fetch_with_retry(
             symbol, start.isoformat(), end.isoformat()
         )
