@@ -1,0 +1,17 @@
+[Unit]
+Description=Mr.BOT Intraday Memory EOD collect timer
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+Requires=mrbot-intraday-collect.service
+
+[Timer]
+# Post-close primary + publication-lag retries (Asia/Ho_Chi_Minh).
+# Minimum spacing 90+ minutes — full universe ~8 min at guest 18 rpm.
+OnCalendar=Mon..Fri *-*-* 18:30:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 20:00:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 22:30:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 06:00:00 Asia/Ho_Chi_Minh
+Persistent=true
+Unit=mrbot-intraday-collect.service
+
+[Install]
+WantedBy=timers.target

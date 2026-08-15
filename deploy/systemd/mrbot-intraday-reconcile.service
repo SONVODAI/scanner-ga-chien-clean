@@ -1,0 +1,18 @@
+[Unit]
+Description=Mr.BOT Intraday Memory scheduled reconcile
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+EnvironmentFile=-/etc/mrbot/intraday.env
+ExecStart=/opt/mrbot-camera-venv/bin/python -m modules.intraday_memory.runner reconcile
+Nice=10
+IOSchedulingClass=best-effort
+Restart=no
+SuccessExitStatus=75
+
+[Install]
+WantedBy=multi-user.target

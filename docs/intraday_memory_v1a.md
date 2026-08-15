@@ -119,10 +119,20 @@ python -m modules.intraday_memory.cli reconcile --session 2026-08-13
 python -m modules.intraday_memory.cli bootstrap --start 2026-08-10 --end 2026-08-13 --symbols HPG,VNM
 ```
 
+## Unattended VPS Deployment
+
+See **[intraday_memory_deployment.md](./intraday_memory_deployment.md)** for systemd
+timer/service install, schedule rationale, recovery, and operational commands.
+
+The deployment runner (`python -m modules.intraday_memory.runner`) wraps the CLI
+collector with weekend guards, flock-based non-overlap, and manifest observability.
+It targets **once-per-session** collection — not a 5-minute whole-universe poll
+(guest 18 rpm cannot sustain ~142 symbols every 5 minutes).
+
 ## What V1A Does NOT Include
 
 - Absorption / Distribution scores
 - Smart money logic
 - BUY/SELL / AI / Elite / Learning changes
 - Streamlit UI panels
-- Scheduler deployment (cron, GitHub Actions, VPS) — separate step
+- Realtime every-5-minute whole-universe polling (see deployment doc for cadence)

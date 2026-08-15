@@ -1,0 +1,13 @@
+[Unit]
+Description=Mr.BOT Intraday Memory morning reconcile timer
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+Requires=mrbot-intraday-reconcile.service
+
+[Timer]
+# Next-morning reconciliation before the cash open (Asia/Ho_Chi_Minh).
+OnCalendar=Mon..Fri *-*-* 07:30:00 Asia/Ho_Chi_Minh
+Persistent=true
+Unit=mrbot-intraday-reconcile.service
+
+[Install]
+WantedBy=timers.target
