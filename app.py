@@ -6554,149 +6554,151 @@ mr_bot_summary = build_mr_bot_pro_summary(mr_bot_profile_after)
 # DEFAULT MAIN DASHBOARD (daily view — presentation only)
 # =========================================================
 st.markdown("---")
-show_ai_recommendation()
+with st.expander("🤖 AI Recommendation", expanded=False):
+    show_ai_recommendation()
 
 st.markdown("---")
-st.markdown("## 👑 BUY ELITE - DECISION ENGINE")
+with st.expander("👑 BUY ELITE - DECISION ENGINE", expanded=False):
+    st.markdown("## 👑 BUY ELITE - DECISION ENGINE")
 
-elite_summary = build_buy_elite_today_summary(buy_elite_df, market_real, market_forecast)
+    elite_summary = build_buy_elite_today_summary(buy_elite_df, market_real, market_forecast)
 
-s1, s2, s3, s4 = st.columns([1.8, 1.2, 1.2, 1.2])
-with s1:
-    st.metric("🎯 TODAY ACTION", elite_summary["title"])
-with s2:
-    st.metric("MARKET REGIME", elite_summary["regime"])
-with s3:
-    st.metric("TOP WATCH", elite_summary["top"])
-with s4:
-    st.metric("NAV GỢI Ý", elite_summary["nav"])
+    s1, s2, s3, s4 = st.columns([1.8, 1.2, 1.2, 1.2])
+    with s1:
+        st.metric("🎯 TODAY ACTION", elite_summary["title"])
+    with s2:
+        st.metric("MARKET REGIME", elite_summary["regime"])
+    with s3:
+        st.metric("TOP WATCH", elite_summary["top"])
+    with s4:
+        st.metric("NAV GỢI Ý", elite_summary["nav"])
 
-if market_real < 6:
-    st.warning(elite_summary["detail"])
-elif market_real < 8:
-    st.warning(elite_summary["detail"])
-else:
-    st.success(elite_summary["detail"])
-
-st.markdown("### 🧠 LEARNING ENGINE - Trí nhớ thực chiến")
-l1, l2, l3, l4, l5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.2])
-with l1:
-    st.metric("MODE", learning_summary["mode"])
-with l2:
-    st.metric("T+5 MẪU", learning_summary["completed"])
-with l3:
-    st.metric("WINRATE T+5", learning_summary["winrate"])
-with l4:
-    st.metric("AVG T+5", learning_summary["avg_t5"])
-with l5:
-    st.metric("TÍN HIỆU ĐÃ GHI", learning_summary["total_signals"])
-
-if learning_summary["mode"] == "ACTIVE_LEARNING":
-    st.success("Learning Engine đã đủ mẫu tối thiểu và đang tự chỉnh trọng số rất chậm.")
-else:
-    st.info(learning_summary["note"])
-
-with st.expander("🧠 Nhật ký học của Mr.BOT PRO"):
-    st.caption(f"History save: {learning_hist_status} | Profile save: {learning_profile_status}")
-    profile_show = learning_profile_after if isinstance(learning_profile_after, dict) else {}
-    mult = profile_show.get("multipliers", {})
-    mult_df = pd.DataFrame([{"Yếu tố": k, "Multiplier": v} for k, v in mult.items()])
-    if not mult_df.empty:
-        st.dataframe(mult_df, use_container_width=True, hide_index=True)
-    insights = profile_show.get("insights", [])
-    if insights:
-        st.markdown("**Những điều bot đang học được:**")
-        for item in insights[-12:]:
-            st.write("• " + str(item))
+    if market_real < 6:
+        st.warning(elite_summary["detail"])
+    elif market_real < 8:
+        st.warning(elite_summary["detail"])
     else:
-        st.write("Bot đang bắt đầu ghi nhớ dữ liệu. Chưa có insight đủ mạnh.")
+        st.success(elite_summary["detail"])
 
-st.markdown("### 🧠 THINKING ENGINE - Tư duy & phản biện")
-t1, t2, t3, t4, t5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.4])
-with t1:
-    st.metric("MODE", thinking_summary["mode"])
-with t2:
-    st.metric("T+5 MẪU", thinking_summary["completed"])
-with t3:
-    st.metric("NIỀM TIN", thinking_summary["beliefs"])
-with t4:
-    st.metric("GIẢ THUYẾT", thinking_summary["hypotheses"])
-with t5:
-    st.metric("PHẢN BIỆN", thinking_summary["reflections"])
+    st.markdown("### 🧠 LEARNING ENGINE - Trí nhớ thực chiến")
+    l1, l2, l3, l4, l5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.2])
+    with l1:
+        st.metric("MODE", learning_summary["mode"])
+    with l2:
+        st.metric("T+5 MẪU", learning_summary["completed"])
+    with l3:
+        st.metric("WINRATE T+5", learning_summary["winrate"])
+    with l4:
+        st.metric("AVG T+5", learning_summary["avg_t5"])
+    with l5:
+        st.metric("TÍN HIỆU ĐÃ GHI", learning_summary["total_signals"])
 
-if thinking_summary["mode"] in ["THINKING", "HYPOTHESIS"]:
-    st.success(thinking_summary["current_thought"])
-else:
-    st.info(thinking_summary["current_thought"])
+    if learning_summary["mode"] == "ACTIVE_LEARNING":
+        st.success("Learning Engine đã đủ mẫu tối thiểu và đang tự chỉnh trọng số rất chậm.")
+    else:
+        st.info(learning_summary["note"])
 
-with st.expander("🧠 Nhật ký tư duy / Quan sát / Giả thuyết / Phản biện của Mr.BOT PRO"):
-    st.caption(f"Thinking profile: {thinking_profile_status} | Thinking journal: {thinking_journal_status}")
-    st.markdown("**Quan sát phiên hiện tại:**")
-    obs_show = thinking_profile_after.get("observation", {}) if isinstance(thinking_profile_after, dict) else {}
-    obs_df = pd.DataFrame([obs_show]) if obs_show else pd.DataFrame()
-    if not obs_df.empty:
-        st.dataframe(obs_df, use_container_width=True, hide_index=True)
+    with st.expander("🧠 Nhật ký học của Mr.BOT PRO"):
+        st.caption(f"History save: {learning_hist_status} | Profile save: {learning_profile_status}")
+        profile_show = learning_profile_after if isinstance(learning_profile_after, dict) else {}
+        mult = profile_show.get("multipliers", {})
+        mult_df = pd.DataFrame([{"Yếu tố": k, "Multiplier": v} for k, v in mult.items()])
+        if not mult_df.empty:
+            st.dataframe(mult_df, use_container_width=True, hide_index=True)
+        insights = profile_show.get("insights", [])
+        if insights:
+            st.markdown("**Những điều bot đang học được:**")
+            for item in insights[-12:]:
+                st.write("• " + str(item))
+        else:
+            st.write("Bot đang bắt đầu ghi nhớ dữ liệu. Chưa có insight đủ mạnh.")
 
-    beliefs = thinking_profile_after.get("beliefs", []) if isinstance(thinking_profile_after, dict) else []
-    hypotheses = thinking_profile_after.get("hypotheses", []) if isinstance(thinking_profile_after, dict) else []
-    reflections = thinking_profile_after.get("reflections", []) if isinstance(thinking_profile_after, dict) else []
-    observations = thinking_profile_after.get("observations", []) if isinstance(thinking_profile_after, dict) else []
+    st.markdown("### 🧠 THINKING ENGINE - Tư duy & phản biện")
+    t1, t2, t3, t4, t5 = st.columns([1.2, 1.0, 1.0, 1.0, 1.4])
+    with t1:
+        st.metric("MODE", thinking_summary["mode"])
+    with t2:
+        st.metric("T+5 MẪU", thinking_summary["completed"])
+    with t3:
+        st.metric("NIỀM TIN", thinking_summary["beliefs"])
+    with t4:
+        st.metric("GIẢ THUYẾT", thinking_summary["hypotheses"])
+    with t5:
+        st.metric("PHẢN BIỆN", thinking_summary["reflections"])
 
-    if beliefs:
-        st.markdown("**Niềm tin đang hình thành:**")
-        for item in beliefs[:10]:
-            st.write("• " + str(item))
-    if hypotheses:
-        st.markdown("**Giả thuyết đáng theo dõi:**")
-        for item in hypotheses[:10]:
-            st.write("• " + str(item))
-    if observations:
-        st.markdown("**Quan sát thống kê:**")
-        for item in observations[:8]:
-            st.write("• " + str(item))
-    if reflections:
-        st.markdown("**Bot tự phản biện:**")
-        for item in reflections[:8]:
-            st.write("• " + str(item))
+    if thinking_summary["mode"] in ["THINKING", "HYPOTHESIS"]:
+        st.success(thinking_summary["current_thought"])
+    else:
+        st.info(thinking_summary["current_thought"])
 
-    st.caption("Nguyên tắc Mr.BOT PRO: không cố chứng minh mình đúng; chỉ liên tục giảm số lần sai bằng dữ liệu thực chiến.")
+    with st.expander("🧠 Nhật ký tư duy / Quan sát / Giả thuyết / Phản biện của Mr.BOT PRO"):
+        st.caption(f"Thinking profile: {thinking_profile_status} | Thinking journal: {thinking_journal_status}")
+        st.markdown("**Quan sát phiên hiện tại:**")
+        obs_show = thinking_profile_after.get("observation", {}) if isinstance(thinking_profile_after, dict) else {}
+        obs_df = pd.DataFrame([obs_show]) if obs_show else pd.DataFrame()
+        if not obs_df.empty:
+            st.dataframe(obs_df, use_container_width=True, hide_index=True)
 
-if not buy_elite_df.empty:
-    elite_compact_cols = [
-        "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN",
-        "EliteScore", "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE",
-        "Storm", "Persistence", "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE", "RỦI RO"
-    ]
-    elite_compact_cols = [c for c in elite_compact_cols if c in buy_elite_df.columns]
-    st.dataframe(
-        style_buy_elite_board(
-            buy_elite_df[elite_compact_cols]
-        ),
-        use_container_width=True,
-        hide_index=True,
-        height=520,
-    )
+        beliefs = thinking_profile_after.get("beliefs", []) if isinstance(thinking_profile_after, dict) else []
+        hypotheses = thinking_profile_after.get("hypotheses", []) if isinstance(thinking_profile_after, dict) else []
+        reflections = thinking_profile_after.get("reflections", []) if isinstance(thinking_profile_after, dict) else []
+        observations = thinking_profile_after.get("observations", []) if isinstance(thinking_profile_after, dict) else []
 
-    with st.expander("🔎 Mở đầy đủ cột BUY ELITE"):
+        if beliefs:
+            st.markdown("**Niềm tin đang hình thành:**")
+            for item in beliefs[:10]:
+                st.write("• " + str(item))
+        if hypotheses:
+            st.markdown("**Giả thuyết đáng theo dõi:**")
+            for item in hypotheses[:10]:
+                st.write("• " + str(item))
+        if observations:
+            st.markdown("**Quan sát thống kê:**")
+            for item in observations[:8]:
+                st.write("• " + str(item))
+        if reflections:
+            st.markdown("**Bot tự phản biện:**")
+            for item in reflections[:8]:
+                st.write("• " + str(item))
+
+        st.caption("Nguyên tắc Mr.BOT PRO: không cố chứng minh mình đúng; chỉ liên tục giảm số lần sai bằng dữ liệu thực chiến.")
+
+    if not buy_elite_df.empty:
+        elite_compact_cols = [
+            "ĐÈN", "⭐", "MÃ", "KẾT LUẬN", "WinProb", "ĐỘ TIN CẬY", "ĐỒNG THUẬN",
+            "EliteScore", "NHÓM", "GIÁ", "VÙNG MUA ELITE", "NAV ELITE",
+            "Storm", "Persistence", "RSI", "SLOPE", "DIST EMA9%", "OBV", "LÝ DO ELITE", "RỦI RO"
+        ]
+        elite_compact_cols = [c for c in elite_compact_cols if c in buy_elite_df.columns]
         st.dataframe(
-            style_buy_elite_board(buy_elite_df),
+            style_buy_elite_board(
+                buy_elite_df[elite_compact_cols]
+            ),
             use_container_width=True,
             hide_index=True,
-            height=760,
+            height=520,
         )
-        st.caption(
-            "Mr.BOT PRO V4.0 = Decision + Learning + Thinking + Evolution: ngoài tự học T+1/T+3/T+5, Bot còn có nhân cách, trí nhớ, câu hỏi phản biện và nhật ký tiến hóa. "
-            "Khi dữ liệu chưa đủ, hệ thống chạy WARMUP và không tự thay đổi quá mạnh."
-        )
-else:
-    st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
+
+        with st.expander("🔎 Mở đầy đủ cột BUY ELITE"):
+            st.dataframe(
+                style_buy_elite_board(buy_elite_df),
+                use_container_width=True,
+                hide_index=True,
+                height=760,
+            )
+            st.caption(
+                "Mr.BOT PRO V4.0 = Decision + Learning + Thinking + Evolution: ngoài tự học T+1/T+3/T+5, Bot còn có nhân cách, trí nhớ, câu hỏi phản biện và nhật ký tiến hóa. "
+                "Khi dữ liệu chưa đủ, hệ thống chạy WARMUP và không tự thay đổi quá mạnh."
+            )
+    else:
+        st.info("Chưa có mã đủ đồng thuận cho BUY ELITE. Mr.BOT PRO chọn đứng ngoài thay vì ép lệnh.")
 
 render_pattern_match_early_radar(pattern_match_df, top_n=10)
 
 try:
     from modules.shadow_observation_board import render_shadow_observation_board
 
-    render_shadow_observation_board()
+    render_shadow_observation_board(expanded=False)
 except Exception as _shadow_board_error:
     st.caption(f"BOT Shadow board skipped: {_shadow_board_error}")
 
@@ -6731,19 +6733,10 @@ with st.expander("🍯 MARKET-AWARE SWEETSPOT OBSERVER", expanded=False):
         st.caption(f"Market-Aware Sweetspot Observer skipped: {_ma_observer_err}")
 
 # =========================================================
-# PHÂN TÍCH CHUYÊN SÂU - BẢNG NGHIÊN CỨU / CHẨN ĐOÁN
+# SECONDARY RESEARCH / DIAGNOSTIC PANELS (collapsed by default)
 # =========================================================
-show_advanced_analysis = st.toggle(
-    "📂 PHÂN TÍCH CHUYÊN SÂU",
-    value=False,
-    help=(
-        "Mở Pullback, Early, Storm, DNA/Evolution, Leader Brain, Final Decision, "
-        "Pattern Match và các bảng chẩn đoán khác."
-    ),
-)
 
-if show_advanced_analysis:
-    st.markdown("---")
+with st.expander("🤖 Mr.BOT PRO V4.0", expanded=False):
     st.markdown("# 🤖 Mr.BOT PRO V4.0")
     st.caption("Observe • Learn • Think • Evolve | Tôi không dự đoán tương lai. Tôi học từ quá khứ để hỗ trợ quyết định hiện tại.")
 
@@ -6782,6 +6775,8 @@ if show_advanced_analysis:
             st.markdown("**Nhật ký tiến hóa gần nhất:**")
             st.dataframe(pd.DataFrame(log_show[-12:]), use_container_width=True, hide_index=True)
 
+
+with st.expander("🧠 V21 BRAIN - EXPERIENCE DECISION", expanded=False):
     st.markdown("## 🧠 V21 BRAIN - EXPERIENCE DECISION")
     with st.expander("🧬 Brain Optimizer - Bot tự đánh giá"):
         if isinstance(v21_optimizer_report, dict) and v21_optimizer_report:
@@ -6846,6 +6841,8 @@ if show_advanced_analysis:
         st.caption("V21 Experience Learning: đang chờ dữ liệu đủ để học.")
 
     st.markdown("---")
+
+with st.expander("👑 FINAL DECISION", expanded=False):
     st.markdown("## 👑 FINAL DECISION")
 
     st.info(final_note)
@@ -6861,8 +6858,8 @@ if show_advanced_analysis:
     else:
         st.warning("Không có cổ phiếu đủ chuẩn giải ngân.")
 
-    if show_green_red:
-        st.markdown("---")
+if show_green_red:
+    with st.expander("🟢🔴 XANH MUA - ĐỎ BÁN LAB", expanded=False):
         st.markdown("## 🟢🔴 XANH MUA - ĐỎ BÁN LAB")
 
         if market_real < 6:
@@ -6908,7 +6905,7 @@ if show_advanced_analysis:
         else:
             st.info("Chưa có dữ liệu cho bảng Xanh mua - Đỏ bán.")
 
-    st.markdown("---")
+with st.expander("⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU", expanded=False):
     st.markdown("## ⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU")
     if not storm_df.empty:
         show_compact_table(
@@ -6921,6 +6918,8 @@ if show_advanced_analysis:
         st.info("Chưa có mã đạt tiêu chí Storm Leaders.")
 
     st.markdown("---")
+
+with st.expander("🌱 EARLY BUY LAB - CẠN CUNG + 2 NẾN XANH GẦN ĐÁY", expanded=False):
     st.markdown("## 🌱 EARLY BUY LAB - CẠN CUNG + 2 NẾN XANH GẦN ĐÁY")
 
     if market_real < 6:
@@ -6944,6 +6943,8 @@ if show_advanced_analysis:
         st.info("Chưa có mã đạt chuẩn Early Buy Lab. Đây là bảng săn sớm nên không cần ngày nào cũng có mã.")
 
     st.markdown("---")
+
+with st.expander("🎯 PULLBACK BUY LIST - MÃ KHỎE ĐANG TEST 3-5%", expanded=False):
     st.markdown("## 🎯 PULLBACK BUY LIST - MÃ KHỎE ĐANG TEST 3-5%")
 
     if market_real < 6:
@@ -6967,6 +6968,8 @@ if show_advanced_analysis:
         st.info("Chưa có mã đạt chuẩn Pullback Buy. Đây thường là lúc nên kiên nhẫn, không ép lệnh.")
 
     st.markdown("---")
+
+with st.expander("🧬 DNA / EVOLUTION - SỨC MẠNH BỀN VÀ TIẾN HÓA", expanded=False):
     st.markdown("## 🧬 DNA / EVOLUTION - SỨC MẠNH BỀN VÀ TIẾN HÓA")
 
     saved_dates = []
@@ -7022,6 +7025,8 @@ if show_advanced_analysis:
             st.info("Chưa có cổ phiếu tiến hóa đạt điều kiện mua/theo dõi.")
 
     st.markdown("---")
+
+with st.expander("📦 NHÓM CỔ PHIẾU - SNAPSHOT", expanded=False):
     st.markdown("## 📦 NHÓM CỔ PHIẾU - SNAPSHOT")
     cols = st.columns(len(GROUP_ORDER))
     for c, g in zip(cols, GROUP_ORDER):
@@ -7029,15 +7034,19 @@ if show_advanced_analysis:
             st.metric(g, int((scan_df["group"] == g).sum()))
 
     st.markdown("---")
+
+with st.expander("🧠 LEADER BRAIN DASHBOARD", expanded=False):
     show_leader_brain()
 
+with st.expander("🧠 TOP PATTERN MATCH", expanded=False):
     try:
         show_pattern_match(scan_df, pattern_match_df=pattern_match_df)
     except Exception as e:
         st.warning(f"Pattern Match: {type(e).__name__}: {e}")
 
-    st.markdown("---")
+with st.expander("🌱 Accumulation Opportunity Board", expanded=False):
     render_accumulation_board(scan_df)
+
 
 # =========================================================
 # PATTERN MEMORY (computation — not gated by UI toggles)
