@@ -293,6 +293,15 @@ class EdgeResearchEngine:
         ledger = read_ledger("edge_hypothesis_ledger.csv", self.data_dir)
         return not ledger.empty
 
+    def has_valid_discovery_cohort(self) -> bool:
+        """True when the latest persisted discovery run has a non-empty cohort."""
+        discovery = read_discovery_run(self.data_dir)
+        run_id = str(discovery.get("run_id", "") or "")
+        if not run_id:
+            return False
+        cohort = resolve_discovery_cohort(self.data_dir, discovery_run_id=run_id)
+        return not cohort.empty
+
     @staticmethod
     def verify_learning_files_unchanged(before: Dict[str, Optional[str]]) -> bool:
         after = earning_learning_digests()

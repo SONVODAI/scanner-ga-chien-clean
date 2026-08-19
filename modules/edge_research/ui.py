@@ -17,6 +17,30 @@ def _fmt_coverage(start: Optional[str], end: Optional[str], count: int) -> str:
     return f"{start} → {end} ({count:,} lifecycle rows)"
 
 
+def compute_edge_research_button_state(
+    *,
+    coverage_start: Optional[str],
+    coverage_end: Optional[str],
+    observation_count: int,
+    has_valid_cohort: bool,
+    execution_in_progress: bool = False,
+) -> Dict[str, bool]:
+    """
+    UI gating for explicit research actions.
+
+    Discovery depends only on historical research coverage availability.
+    Challenger depends on a persisted, cohort-scoped discovery result.
+    """
+    has_research_coverage = bool(
+        coverage_start and coverage_end and observation_count > 0
+    )
+    busy = execution_in_progress
+    return {
+        "can_run_discovery": has_research_coverage and not busy,
+        "can_run_challenger": has_valid_cohort and not busy,
+    }
+
+
 def _format_research_voice(candidate: Dict[str, Any]) -> str:
     rs = candidate.get("robustness_status", "")
     edge_id = candidate.get("edge_id", "")
@@ -65,7 +89,14 @@ def render_edge_research_panel(
         discovery = engine.get_last_discovery()
         challenger = engine.get_last_challenger()
         top_candidates = engine.get_top_candidates(limit=20)
-        has_candidates = engine.has_discovery_candidates()
+        has_valid_cohort = engine.has_valid_discovery_cohort()
+        ui_state = compute_edge_research_button_state(
+            coverage_start=status.coverage_start,
+            coverage_end=status.coverage_end,
+            observation_count=status.observation_count,
+            has_valid_cohort=has_valid_cohort,
+            execution_in_progress=bool(st.session_state.get("edge_research_busy", False)),
+        )
 
         engine_label = (
             "CHALLENGER / RESEARCH ONLY"
@@ -164,19 +195,29 @@ def render_edge_research_panel(
 
         col_a, col_b = st.columns(2)
         with col_a:
-            if st.button("Run discovery (research only)", key="edge_research_run_discovery"):
+            if st.button(
+                "Run discovery (research only)",
+                key="edge_research_run_discovery",
+                disabled=not ui_state["can_run_discovery"],
+            ):
+                st.session_state["edge_research_busy"] = True
                 with st.spinner("Running controlled discovery..."):
                     result = engine.run_discovery()
+                    st.session_state["edge_research_busy"] = False
                     st.success(f"Discovery complete: {result.promoted_candidates} candidate(s).")
                     st.rerun()
+            if not ui_state["can_run_discovery"]:
+                st.caption("Historical research coverage required.")
         with col_b:
             if st.button(
                 "Run challenger (research only)",
                 key="edge_research_run_challenger",
-                disabled=not has_candidates,
+                disabled=not ui_state["can_run_challenger"],
             ):
+                st.session_state["edge_research_busy"] = True
                 with st.spinner("Running challenger robustness tests..."):
                     result = engine.run_challenger(force=True)
+                    st.session_state["edge_research_busy"] = False
                     if result.run_id == "skipped":
                         st.info("Challenger skipped — same candidate ledger already evaluated.")
                     else:
@@ -185,7 +226,7 @@ def render_edge_research_panel(
                             f"FRAGILE={result.robustness_fragile}, REJECT={result.robustness_reject}"
                         )
                     st.rerun()
-            if not has_candidates:
+            if not ui_state["can_run_challenger"]:
                 st.caption("Run discovery first.")
 
         return status.to_dict()
