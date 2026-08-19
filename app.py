@@ -6125,7 +6125,7 @@ def run_v21_brain_cycle(
 # =========================================================
 # UI CONTROLS - V20 PULLBACK FIRST
 # =========================================================
-left1, left2, left3, left4, left5, left6, left7 = st.columns([1.05, 1.15, 1.0, 1.25, 1.2, 1.2, 2.4])
+left1, left2, left3, left4, left5 = st.columns([1.05, 1.15, 1.0, 1.25, 3.55])
 
 with left1:
     scan_btn = st.button("🚀 SCAN", use_container_width=True)
@@ -6137,15 +6137,9 @@ with left3:
     refresh_seconds = st.selectbox("Nhịp", [60, 90, 120, 300, 600], index=2)
 
 with left4:
-    show_detail = st.checkbox("Chi tiết", value=False)
-
-with left5:
     show_legacy = st.checkbox("Bảng phụ", value=False)
 
-with left6:
-    show_green_red = st.checkbox("Xanh/Đỏ", value=True)
-
-with left7:
+with left5:
     st.markdown(
         f"""
         <div style="font-size:14px">
@@ -6858,52 +6852,51 @@ with st.expander("👑 FINAL DECISION", expanded=False):
     else:
         st.warning("Không có cổ phiếu đủ chuẩn giải ngân.")
 
-if show_green_red:
-    with st.expander("🟢🔴 XANH MUA - ĐỎ BÁN LAB", expanded=False):
-        st.markdown("## 🟢🔴 XANH MUA - ĐỎ BÁN LAB")
+with st.expander("🟢🔴 XANH MUA - ĐỎ BÁN LAB", expanded=False):
+    st.markdown("## 🟢🔴 XANH MUA - ĐỎ BÁN LAB")
 
-        if market_real < 6:
-            st.warning("Market REAL < 6: bảng chỉ dùng để theo dõi sớm, chưa nên mua thật.")
-        elif market_real < 8:
-            st.warning("Market trung tính: chỉ ưu tiên mã xanh có BuyScore cao, mua nhỏ và có stop gần.")
-        else:
-            st.success("Market ủng hộ: ưu tiên mã vừa TrendScore cao vừa BuyScore cao.")
+    if market_real < 6:
+        st.warning("Market REAL < 6: bảng chỉ dùng để theo dõi sớm, chưa nên mua thật.")
+    elif market_real < 8:
+        st.warning("Market trung tính: chỉ ưu tiên mã xanh có BuyScore cao, mua nhỏ và có stop gần.")
+    else:
+        st.success("Market ủng hộ: ưu tiên mã vừa TrendScore cao vừa BuyScore cao.")
 
-        if not green_red_df.empty:
-            compact_cols = [
-                "ĐÈN",
-                "MÃ",
-                "TÍN HIỆU",
-                "BUY_SCORE",
-                "NHÓM",
-                "GIÁ",
-                "VÙNG MUA",
-                "NAV",
-            ]
+    if not green_red_df.empty:
+        compact_cols = [
+            "ĐÈN",
+            "MÃ",
+            "TÍN HIỆU",
+            "BUY_SCORE",
+            "NHÓM",
+            "GIÁ",
+            "VÙNG MUA",
+            "NAV",
+        ]
 
+        st.dataframe(
+            style_green_red_board(
+                green_red_df[compact_cols]
+            ),
+            use_container_width=True,
+            hide_index=True,
+            height=560,
+        )
+
+        with st.expander("🔎 Mở đầy đủ cột Xanh/Đỏ"):
             st.dataframe(
-                style_green_red_board(
-                    green_red_df[compact_cols]
-                ),
+                style_green_red_board(green_red_df),
                 use_container_width=True,
                 hide_index=True,
-                height=560,
+                height=700,
             )
 
-            with st.expander("🔎 Mở đầy đủ cột Xanh/Đỏ"):
-                st.dataframe(
-                    style_green_red_board(green_red_df),
-                    use_container_width=True,
-                    hide_index=True,
-                    height=700,
-                )
-
-                st.caption(
-                    "TrendScore đo sức khỏe cổ phiếu. BuyScore đo chất lượng điểm mua. "
-                    "Đèn xanh tốt nhất là mã vừa khỏe vừa có điểm mua gần EMA9, RSI hợp lý, OBV còn giữ."
-                )
-        else:
-            st.info("Chưa có dữ liệu cho bảng Xanh mua - Đỏ bán.")
+            st.caption(
+                "TrendScore đo sức khỏe cổ phiếu. BuyScore đo chất lượng điểm mua. "
+                "Đèn xanh tốt nhất là mã vừa khỏe vừa có điểm mua gần EMA9, RSI hợp lý, OBV còn giữ."
+            )
+    else:
+        st.info("Chưa có dữ liệu cho bảng Xanh mua - Đỏ bán.")
 
 with st.expander("⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU", expanded=False):
     st.markdown("## ⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU")
@@ -7145,23 +7138,22 @@ if show_legacy:
                     st.dataframe(sub[show_cols], use_container_width=True, hide_index=True, height=min(600, 80 + len(sub) * 35))
 
 st.markdown("---")
-if show_detail:
-    with st.expander("📋 Bảng chi tiết đầy đủ", expanded=True):
-        detail_cols = [
-            "symbol", "date", "group", "status", "price", "daily_price_before_live", "live_source",
-            "is_live_adjusted", "ema9", "ma20", "ema9_ma20_slope", "ema9_ma20_slope_change",
-            "rsi14", "rsi_slope", "obv_status", "volume", "vol_ma20", "breakout_ref",
-            "dist_from_ema9_pct", "pull_label", "E", "R", "O", "S", "RS", "V", "rs5", "rs10",
-            "green_2_confirm", "early_green2", "early_dry_green2", "dryup_ratio_5", "dryup_ratio_10",
-            "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct", "body_pct", "total_score", "warning"
-        ]
-        detail_cols = [c for c in detail_cols if c in scan_df.columns]
-        show_compact_table(
-            scan_df[detail_cols],
-            main_cols=["symbol", "group", "status", "price", "total_score", "rsi14", "ema9_ma20_slope", "obv_status", "dist_from_ema9_pct", "warning"],
-            height=620,
-            detail_title="🔎 Mở toàn bộ cột chi tiết",
-        )
+with st.expander("📋 Bảng chi tiết đầy đủ", expanded=False):
+    detail_cols = [
+        "symbol", "date", "group", "status", "price", "daily_price_before_live", "live_source",
+        "is_live_adjusted", "ema9", "ma20", "ema9_ma20_slope", "ema9_ma20_slope_change",
+        "rsi14", "rsi_slope", "obv_status", "volume", "vol_ma20", "breakout_ref",
+        "dist_from_ema9_pct", "pull_label", "E", "R", "O", "S", "RS", "V", "rs5", "rs10",
+        "green_2_confirm", "early_green2", "early_dry_green2", "dryup_ratio_5", "dryup_ratio_10",
+        "near_bottom_20_pct", "near_bottom_60_pct", "dist_high20_pct", "body_pct", "total_score", "warning"
+    ]
+    detail_cols = [c for c in detail_cols if c in scan_df.columns]
+    show_compact_table(
+        scan_df[detail_cols],
+        main_cols=["symbol", "group", "status", "price", "total_score", "rsi14", "ema9_ma20_slope", "obv_status", "dist_from_ema9_pct", "warning"],
+        height=620,
+        detail_title="🔎 Mở toàn bộ cột chi tiết",
+    )
 
 st.markdown("---")
 st.caption("Mr.BOT PRO V4.0 | Market → Decision → Learning → Thinking → Evolution | Observe • Learn • Think • Evolve | Khi không chắc, đứng ngoài.")
