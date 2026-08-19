@@ -26,6 +26,8 @@ class RawMarketSnapshot:
     market_real: float
     market_forecast: Optional[float] = None
     breadth_score: Optional[float] = None
+    session_slot: str = ""
+    source: str = ""
 
 
 @dataclass(frozen=True)
@@ -39,27 +41,56 @@ class CanonicalMarketSnapshot:
     ambiguous: bool
     distinct_market_real_values: Tuple[float, ...]
     policy_version: str = SNAPSHOT_POLICY_VERSION
+    selected_tier: str = ""
 
 
-def classify_market_level(market_real: Optional[float]) -> str:
-    """Provisional coarse level — not optimized from outcomes."""
-    if market_real is None or not np.isfinite(market_real):
-        return "UNKNOWN"
-    mr = float(market_real)
-    for label, upper in MARKET_LEVEL_V1_THRESHOLDS:
-        if mr <= upper:
-            return label
-    return "UNKNOWN"
+def _normalize_time(time_str: str) -> str:
+    return str(time_str or "").strip()
+
+
+def _is_eod_snapshot(snapshot: RawMarketSnapshot) -> bool:
+    """Identify EOD / after-close snapshots deterministically."""
+    slot = str(snapshot.session_slot or "").upper()
+    if slot in {"AFTER_CLOSE", "EOD", "EOD_PLUS_3H"}:
+        return True
+    time_str = _normalize_time(snapshot.time)
+    if not time_str:
+        return False
+    parts = time_str.split(":")
+    if len(parts) >= 2:
+        try:
+            hour = int(parts[0])
+            return hour >= 15
+        except ValueError:
+            pass
+    return False
+
+
+def dedupe_market_snapshots(snapshots: Sequence[RawMarketSnapshot]) -> List[RawMarketSnapshot]:
+    """
+    Collapse duplicate timestamps — e.g. stock-level pattern_history rows
+    sharing the same (date, time, market_real).
+    """
+    seen: Dict[Tuple[str, str, float], RawMarketSnapshot] = {}
+    for snap in snapshots:
+        key = (snap.date, _normalize_time(snap.time), float(snap.market_real))
+        if key not in seen:
+            seen[key] = snap
+        elif _is_eod_snapshot(snap) and not _is_eod_snapshot(seen[key]):
+            seen[key] = snap
+    return sorted(seen.values(), key=lambda s: (s.date, _normalize_time(s.time)))
 
 
 def select_canonical_market_snapshot(
     snapshots: Sequence[RawMarketSnapshot],
 ) -> CanonicalMarketSnapshot:
     """
-    Policy canonical_market_t0_v1_latest_time:
-    - Preserve all raw snapshots externally (caller responsibility)
-    - Canonical row = latest time on date
-    - ambiguous=True if >1 distinct market_real on same date
+    Policy canonical_market_t0_v2_eod_preferred:
+    - Dedupe by (date, time, market_real)
+    - Prefer EOD / AFTER_CLOSE tier when available
+    - Canonical = latest time within selected tier
+    - ambiguous=True when selected tier has >1 distinct market_real
+    - If no EOD tier exists, fall back to latest intraday time with same rule
     """
     if not snapshots:
         return CanonicalMarketSnapshot(
@@ -71,12 +102,17 @@ def select_canonical_market_snapshot(
             snapshot_count=0,
             ambiguous=True,
             distinct_market_real_values=(),
+            selected_tier="none",
         )
 
-    ordered = sorted(snapshots, key=lambda s: (s.date, s.time or ""))
-    date = ordered[0].date
-    distinct_mr = tuple(sorted({float(s.market_real) for s in ordered if s.market_real is not None}))
+    deduped = dedupe_market_snapshots(list(snapshots))
+    date = deduped[0].date
+    eod = [s for s in deduped if _is_eod_snapshot(s)]
+    tier = eod if eod else deduped
+    tier_name = "eod" if eod else "intraday"
+    distinct_mr = tuple(sorted({float(s.market_real) for s in tier if s.market_real is not None}))
     ambiguous = len(distinct_mr) > 1
+    ordered = sorted(tier, key=lambda s: (s.date, _normalize_time(s.time)))
     canonical = ordered[-1]
     return CanonicalMarketSnapshot(
         date=date,
@@ -84,10 +120,22 @@ def select_canonical_market_snapshot(
         market_real=canonical.market_real,
         market_forecast=canonical.market_forecast,
         breadth_score=canonical.breadth_score,
-        snapshot_count=len(ordered),
+        snapshot_count=len(deduped),
         ambiguous=ambiguous,
         distinct_market_real_values=distinct_mr,
+        selected_tier=tier_name,
     )
+
+
+def classify_market_level(market_real: Optional[float]) -> str:
+    """Provisional coarse level — not optimized from outcomes."""
+    if market_real is None or not np.isfinite(market_real):
+        return "UNKNOWN"
+    mr = float(market_real)
+    for label, upper in MARKET_LEVEL_V1_THRESHOLDS:
+        if mr <= upper:
+            return label
+    return "UNKNOWN"
 
 
 def build_market_real_series(
@@ -107,6 +155,54 @@ def build_market_real_series(
             }
         )
     return pd.DataFrame(rows)
+
+
+def resolve_current_market_research(
+    market_real: Optional[float],
+    market_series: Optional[pd.DataFrame] = None,
+) -> Dict[str, str]:
+    """Compute live research market state/transition for UI (T0/past only)."""
+    mr = float(market_real) if market_real is not None and np.isfinite(market_real) else None
+    level = classify_market_level(mr)
+
+    if market_series is None or market_series.empty or mr is None:
+        traj = derive_research_market_trajectory(None, None)
+        state = derive_research_market_state(level, traj, ambiguous=False)
+        return {
+            "research_market_state": state,
+            "research_market_transition": derive_market_transition("UNKNOWN", state),
+            "research_market_level": level,
+            "research_market_trajectory": traj,
+        }
+
+    ms = market_series.sort_values("date").reset_index(drop=True)
+    state_history: Dict[str, str] = {}
+    for _, row in ms.iterrows():
+        d = str(row["date"])
+        enrich_date_with_market_research(d, ms, pd.DataFrame(), state_history)
+
+    dates = ms["date"].astype(str).tolist()
+    mr_lags: list[Optional[float]] = []
+    for lag in (1, 2, 3):
+        lag_idx = len(dates) - 1 - lag
+        if lag_idx >= 0:
+            val = ms.iloc[lag_idx]["market_real"]
+            mr_lags.append(None if pd.isna(val) else float(val))
+        else:
+            mr_lags.append(None)
+
+    delta_1 = compute_delta(mr, mr_lags[0] if mr_lags else None)
+    delta_3 = compute_delta(mr, mr_lags[2] if len(mr_lags) > 2 else None)
+    traj = derive_research_market_trajectory(delta_1, delta_3)
+    last_ambiguous = bool(ms.iloc[-1].get("ambiguous", False)) if len(ms) else False
+    state = derive_research_market_state(level, traj, ambiguous=last_ambiguous)
+    prior = state_history.get(dates[-1], "UNKNOWN") if dates else "UNKNOWN"
+    return {
+        "research_market_state": state,
+        "research_market_transition": derive_market_transition(str(prior), state),
+        "research_market_level": level,
+        "research_market_trajectory": traj,
+    }
 
 
 def compute_delta(current: Optional[float], prior: Optional[float]) -> Optional[float]:

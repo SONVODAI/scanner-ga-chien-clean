@@ -9,10 +9,57 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
-ENGINE_VERSION = "1.0.0-foundation"
+ENGINE_VERSION = "2.0.0-discovery"
+DISCOVERY_CONFIG_VERSION = "discovery_v1"
+FEATURE_BUCKET_CONFIG_VERSION = "feature_buckets_v1"
 MARKET_LEVEL_CONFIG_VERSION = "market_level_v1_provisional"
 MARKET_STATE_CONFIG_VERSION = "market_state_v1_provisional"
-SNAPSHOT_POLICY_VERSION = "canonical_market_t0_v1_latest_time"
+SNAPSHOT_POLICY_VERSION = "canonical_market_t0_v2_eod_preferred"
+
+# Phase 2 sample guards — research defaults, NOT optimized from returns.
+CANDIDATE_MIN_N = 20
+BASELINE_MIN_N = 50
+
+BASELINE_TYPE_SAME_TRANSITION = "SAME_TRANSITION"
+BASELINE_TYPE_SAME_STATE = "SAME_STATE"
+BASELINE_TYPE_INSUFFICIENT = "INSUFFICIENT"
+
+CANDIDATE_STATUS_DISCOVERY = "DISCOVERY"
+CANDIDATE_STATUS_CANDIDATE = "CANDIDATE"
+CANDIDATE_STATUS_INSUFFICIENT_SAMPLE = "INSUFFICIENT_SAMPLE"
+
+# Coarse feature buckets — NOT tuned from forward outcomes.
+FEATURE_BUCKETS: Dict[str, Tuple[Tuple[str, Optional[float], Optional[float], str], ...]] = {
+    "rs5": (
+        ("rs5_le_-10", None, -10.0, "<="),
+        ("rs5_-10_to_-5", -10.0, -5.0, "range"),
+        ("rs5_-5_to_0", -5.0, 0.0, "range"),
+        ("rs5_0_to_5", 0.0, 5.0, "range"),
+        ("rs5_gt_5", 5.0, None, ">"),
+    ),
+    "rs10": (
+        ("rs10_le_-10", None, -10.0, "<="),
+        ("rs10_-10_to_-5", -10.0, -5.0, "range"),
+        ("rs10_-5_to_0", -5.0, 0.0, "range"),
+        ("rs10_0_to_5", 0.0, 5.0, "range"),
+        ("rs10_gt_5", 5.0, None, ">"),
+    ),
+    "rsi14": (
+        ("rsi14_le_30", None, 30.0, "<="),
+        ("rsi14_30_to_40", 30.0, 40.0, "range"),
+        ("rsi14_40_to_50", 40.0, 50.0, "range"),
+        ("rsi14_50_to_60", 50.0, 60.0, "range"),
+        ("rsi14_gt_60", 60.0, None, ">"),
+    ),
+    "rs_spread": (
+        ("rs_spread_le_-5", None, -5.0, "<="),
+        ("rs_spread_-5_to_0", -5.0, 0.0, "range"),
+        ("rs_spread_0_to_5", 0.0, 5.0, "range"),
+        ("rs_spread_gt_5", 5.0, None, ">"),
+    ),
+}
+
+SEARCH_FEATURES: Tuple[str, ...] = ("rs10", "rsi14", "rs5", "rs_spread")
 
 # Provisional coarse buckets — NOT optimized from forward returns.
 MARKET_LEVEL_V1_THRESHOLDS: Tuple[Tuple[str, float], ...] = (
@@ -34,16 +81,63 @@ RESEARCH_MARKET_STATES: FrozenSet[str] = frozenset(
     }
 )
 
-# Future ledger schemas (header-only until Phase 2+).
 EDGE_HYPOTHESIS_LEDGER_COLUMNS: Tuple[str, ...] = (
-    "hypothesis_id",
+    "edge_id",
     "created_at",
-    "status",
+    "research_version",
     "market_state",
     "market_transition",
-    "stock_condition",
-    "horizon",
+    "baseline_type",
+    "condition_text",
+    "feature_1",
+    "operator_1",
+    "threshold_1",
+    "feature_2",
+    "operator_2",
+    "threshold_2",
+    "candidate_n",
+    "baseline_n",
+    "best_horizon",
+    "candidate_mean",
+    "baseline_mean",
+    "incremental_mean",
+    "candidate_median",
+    "baseline_median",
+    "incremental_median",
+    "candidate_win_rate",
+    "baseline_win_rate",
+    "incremental_win_rate",
+    "candidate_downside_3",
+    "baseline_downside_3",
+    "candidate_downside_5",
+    "baseline_downside_5",
+    "status",
+    "discovery_start_date",
+    "discovery_end_date",
+    "oos_status",
     "notes",
+)
+
+DISCOVERY_RUN_COLUMNS: Tuple[str, ...] = (
+    "run_id",
+    "timestamp",
+    "research_version",
+    "discovery_start_date",
+    "discovery_end_date",
+    "observation_count",
+    "eligible_observation_count",
+    "valid_market_state_count",
+    "unknown_market_state_count",
+    "valid_t3_count",
+    "valid_t5_count",
+    "valid_t10_count",
+    "distinct_states",
+    "distinct_transitions",
+    "market_contexts_analyzed",
+    "conditions_tested",
+    "rejected_insufficient_sample",
+    "rejected_no_incremental_edge",
+    "promoted_candidates",
 )
 
 EDGE_EPISODE_REGISTRY_COLUMNS: Tuple[str, ...] = (

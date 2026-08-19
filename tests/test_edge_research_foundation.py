@@ -138,18 +138,32 @@ def test_trading_session_differs_from_observation_row_semantics():
     assert res["t3_return"] == pytest.approx(100.0)
 
 
-# G. Multiple market snapshots deterministic / ambiguous
+# G. Multiple market snapshots — EOD tier ambiguity
 def test_multiple_market_snapshots_ambiguous():
     from modules.edge_research.market_state import RawMarketSnapshot, select_canonical_market_snapshot
 
     snaps = [
-        RawMarketSnapshot("2026-07-23", "09:00:00", 0.6, 0.0),
-        RawMarketSnapshot("2026-07-23", "18:00:00", 1.1, 0.0),
+        RawMarketSnapshot("2026-07-23", "16:00:00", 0.6, 0.0, session_slot="AFTER_CLOSE"),
+        RawMarketSnapshot("2026-07-23", "18:00:00", 1.1, 0.0, session_slot="AFTER_CLOSE"),
     ]
     canon = select_canonical_market_snapshot(snaps)
     assert canon.ambiguous is True
     assert canon.market_real == 1.1
-    assert canon.time == "18:00:00"
+    assert canon.selected_tier == "eod"
+
+
+def test_deduped_intraday_snapshots_not_ambiguous():
+    """Stock-level rows sharing timestamp/MR should not create false ambiguity."""
+    from modules.edge_research.market_state import RawMarketSnapshot, select_canonical_market_snapshot
+
+    snaps = [
+        RawMarketSnapshot("2026-07-23", "09:00:00", 7.7, 2.3),
+        RawMarketSnapshot("2026-07-23", "09:00:00", 7.7, 2.3),
+        RawMarketSnapshot("2026-07-23", "18:00:00", 7.7, 2.3, session_slot="AFTER_CLOSE"),
+    ]
+    canon = select_canonical_market_snapshot(snaps)
+    assert canon.ambiguous is False
+    assert canon.market_real == 7.7
 
 
 def test_market_state_unknown_when_ambiguous():
@@ -175,7 +189,7 @@ def test_empty_hypothesis_ledger(edge_data_dir):
     status = engine.get_foundation_status()
     assert status.hypotheses == 0
     assert status.validated_edges == 0
-    assert count_ledger_rows("edge_hypothesis_ledger.csv", edge_data_dir) == 0
+    assert status.independent_episodes == 0
 
 
 # J. UI renders zero-edge state (smoke — no streamlit runtime)

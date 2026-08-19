@@ -26,6 +26,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 EARNING_LEARNING_DIR = REPO_ROOT / "data" / "earning_learning"
 PATTERN_HISTORY_PATH = REPO_ROOT / "pattern_history.csv"
 BUY_ELITE_HISTORY_PATH = REPO_ROOT / "buy_elite_learning_history.csv"
+MARKET_T0_SNAPSHOT_PATH = EARNING_LEARNING_DIR / "market_t0_snapshot.csv"
+OUTCOMES_PATH = EARNING_LEARNING_DIR / "outcomes.csv"
 RESEARCH_EXPORTS_DIR = REPO_ROOT / "research_exports"
 
 
@@ -57,16 +59,29 @@ def load_raw_market_snapshots(
     """Load raw market snapshots from read-only repo sources."""
     frames: List[pd.DataFrame] = []
 
+    md = _read_csv(MARKET_T0_SNAPSHOT_PATH)
+    if not md.empty and "market_real" in md.columns:
+        date_col = "trade_date" if "trade_date" in md.columns else "date"
+        sub = md[[date_col, "time", "market_real", "market_forecast", "breadth_score"]].copy()
+        sub = sub.rename(columns={date_col: "date"})
+        sub["session_slot"] = md["session_slot"] if "session_slot" in md.columns else "AFTER_CLOSE"
+        sub["source"] = "market_t0_snapshot"
+        frames.append(sub)
+
     ph = _read_csv(PATTERN_HISTORY_PATH)
     if not ph.empty and {"date", "market_real"}.issubset(ph.columns):
         sub = ph[["date", "time", "market_real", "market_forecast", "breadth_score"]].copy()
         sub = sub.dropna(subset=["date"])
+        sub["session_slot"] = ""
+        sub["source"] = "pattern_history"
         frames.append(sub)
 
     be = _read_csv(BUY_ELITE_HISTORY_PATH)
     if not be.empty and "market_real" in be.columns:
         sub = be[["date", "time", "market_real", "market_forecast"]].copy()
         sub["breadth_score"] = np.nan
+        sub["session_slot"] = ""
+        sub["source"] = "buy_elite_history"
         frames.append(sub)
 
     if not frames:
@@ -79,6 +94,8 @@ def load_raw_market_snapshots(
         raw = raw[raw["date"] >= start]
     if end:
         raw = raw[raw["date"] <= end]
+
+    raw = raw.drop_duplicates(subset=["date", "time", "market_real"], keep="last")
 
     snapshots: List[RawMarketSnapshot] = []
     for _, row in raw.iterrows():
@@ -100,6 +117,8 @@ def load_raw_market_snapshots(
                     if pd.isna(pd.to_numeric(row.get("breadth_score"), errors="coerce"))
                     else float(pd.to_numeric(row.get("breadth_score"), errors="coerce"))
                 ),
+                session_slot=str(row.get("session_slot", "") or ""),
+                source=str(row.get("source", "") or ""),
             )
         )
     return snapshots
@@ -131,12 +150,53 @@ def build_canonical_market_series(
                 "breadth_score": canon.breadth_score,
                 "ambiguous": canon.ambiguous,
                 "snapshot_count": canon.snapshot_count,
+                "snapshot_tier": canon.selected_tier,
                 "distinct_market_real_values": "|".join(
                     str(v) for v in canon.distinct_market_real_values
                 ),
             }
         )
     return pd.DataFrame(canonical_rows)
+
+
+def attach_outcomes_from_outcomes_csv(panel: pd.DataFrame) -> pd.DataFrame:
+    """
+    Read-only join to earning_learning outcomes.csv (explicit target_date labels).
+    Does NOT use lifecycle t*_return_pct observation-row columns.
+    """
+    if panel.empty:
+        return panel.copy()
+    outcomes = _read_csv(OUTCOMES_PATH)
+    if outcomes.empty:
+        return panel.copy()
+
+    out = panel.copy()
+    out["trade_date"] = pd.to_datetime(out["trade_date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    outcomes = outcomes.copy()
+    outcomes["entry_date"] = pd.to_datetime(outcomes["entry_date"], errors="coerce").dt.strftime(
+        "%Y-%m-%d"
+    )
+    horizon_map = {3: "t3_return", 5: "t5_return", 10: "t10_return"}
+    for h, col in horizon_map.items():
+        sub = outcomes[outcomes["horizon"] == h][["symbol", "entry_date", "return_pct"]]
+        sub = sub.rename(columns={"entry_date": "trade_date", "return_pct": col})
+        out = out.merge(sub, on=["symbol", "trade_date"], how="left", suffixes=("", "_new"))
+        new_col = f"{col}_new"
+        if new_col in out.columns:
+            if col not in out.columns:
+                out[col] = out[new_col]
+            else:
+                out[col] = out[col].fillna(out[new_col])
+            out = out.drop(columns=[new_col])
+
+    has_any = out[["t3_return", "t5_return", "t10_return"]].notna().any(axis=1)
+    if "outcome_source" not in out.columns:
+        out["outcome_source"] = "unavailable"
+    out.loc[has_any, "outcome_source"] = "outcomes_csv"
+    out.loc[~has_any, "outcome_missing_reason"] = out.loc[~has_any, "outcome_missing_reason"].fillna(
+        "no_outcomes_csv_match"
+    )
+    return out
 
 
 def _stock_panel_from_lifecycle(
@@ -255,6 +315,7 @@ def build_research_panel(
         panel["t10_return"] = np.nan
         panel["outcome_source"] = "unavailable"
         panel["outcome_missing_reason"] = "ohlcv_not_provided"
+        panel = attach_outcomes_from_outcomes_csv(panel)
 
     for col in RESEARCH_OBSERVATION_COLUMNS:
         if col not in panel.columns:
