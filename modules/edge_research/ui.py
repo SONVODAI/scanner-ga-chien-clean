@@ -6,15 +6,62 @@ Display-only — no production coupling.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Mapping, MutableMapping, Optional, TypeVar
 
 from modules.edge_research.engine import EdgeResearchEngine
+
+EDGE_RESEARCH_BUSY_STRICT_VERSION = 1
+T = TypeVar("T")
 
 
 def _fmt_coverage(start: Optional[str], end: Optional[str], count: int) -> str:
     if not start or not end:
         return "No historical coverage detected"
     return f"{start} → {end} ({count:,} lifecycle rows)"
+
+
+def execution_in_progress_from_session(session_state: Mapping[str, Any]) -> bool:
+    """Only literal boolean True means busy; normalize corrupt session values."""
+    busy = session_state.get("edge_research_busy", False)
+    if busy is True:
+        return True
+    return False
+
+
+def normalize_edge_research_busy_session(
+    session_state: MutableMapping[str, Any],
+) -> None:
+    """Coerce non-boolean busy values without treating strings as active execution."""
+    busy = session_state.get("edge_research_busy", False)
+    if busy is not False and busy is not True:
+        session_state["edge_research_busy"] = False
+
+
+def recover_legacy_edge_research_busy(session_state: MutableMapping[str, Any]) -> None:
+    """
+    One-time recovery for browser sessions that inherited stale busy=True
+    from the pre-finally implementation. Does not run on every render once
+    the strict-busy version marker is present.
+    """
+    if session_state.get("_edge_research_busy_strict_v", 0) >= EDGE_RESEARCH_BUSY_STRICT_VERSION:
+        normalize_edge_research_busy_session(session_state)
+        return
+    busy = session_state.get("edge_research_busy", False)
+    if busy is not False:
+        session_state["edge_research_busy"] = False
+    session_state["_edge_research_busy_strict_v"] = EDGE_RESEARCH_BUSY_STRICT_VERSION
+
+
+def run_with_edge_research_busy_guard(
+    session_state: MutableMapping[str, Any],
+    action: Callable[[], T],
+) -> T:
+    """Exception-safe busy lifecycle for synchronous button-triggered runs."""
+    session_state["edge_research_busy"] = True
+    try:
+        return action()
+    finally:
+        session_state["edge_research_busy"] = False
 
 
 def compute_edge_research_button_state(
@@ -34,11 +81,37 @@ def compute_edge_research_button_state(
     has_research_coverage = bool(
         coverage_start and coverage_end and observation_count > 0
     )
-    busy = execution_in_progress
+    busy = execution_in_progress is True
     return {
+        "has_research_coverage": has_research_coverage,
+        "execution_in_progress": busy,
         "can_run_discovery": has_research_coverage and not busy,
         "can_run_challenger": has_valid_cohort and not busy,
     }
+
+
+def discovery_disabled_caption(ui_state: Dict[str, bool]) -> Optional[str]:
+    if ui_state.get("can_run_discovery"):
+        return None
+    if ui_state.get("execution_in_progress"):
+        return "Research run in progress..."
+    if not ui_state.get("has_research_coverage"):
+        return "Historical research coverage required."
+    return None
+
+
+def challenger_disabled_caption(
+    ui_state: Dict[str, bool],
+    *,
+    has_valid_cohort: bool,
+) -> Optional[str]:
+    if ui_state.get("can_run_challenger"):
+        return None
+    if ui_state.get("execution_in_progress"):
+        return "Research run in progress..."
+    if not has_valid_cohort:
+        return "Run discovery first."
+    return None
 
 
 def _format_research_voice(candidate: Dict[str, Any]) -> str:
@@ -90,12 +163,14 @@ def render_edge_research_panel(
         challenger = engine.get_last_challenger()
         top_candidates = engine.get_top_candidates(limit=20)
         has_valid_cohort = engine.has_valid_discovery_cohort()
+        recover_legacy_edge_research_busy(st.session_state)
+        execution_in_progress = execution_in_progress_from_session(st.session_state)
         ui_state = compute_edge_research_button_state(
             coverage_start=status.coverage_start,
             coverage_end=status.coverage_end,
             observation_count=status.observation_count,
             has_valid_cohort=has_valid_cohort,
-            execution_in_progress=bool(st.session_state.get("edge_research_busy", False)),
+            execution_in_progress=execution_in_progress,
         )
 
         engine_label = (
@@ -200,24 +275,27 @@ def render_edge_research_panel(
                 key="edge_research_run_discovery",
                 disabled=not ui_state["can_run_discovery"],
             ):
-                st.session_state["edge_research_busy"] = True
                 with st.spinner("Running controlled discovery..."):
-                    result = engine.run_discovery()
-                    st.session_state["edge_research_busy"] = False
+                    result = run_with_edge_research_busy_guard(
+                        st.session_state,
+                        engine.run_discovery,
+                    )
                     st.success(f"Discovery complete: {result.promoted_candidates} candidate(s).")
                     st.rerun()
-            if not ui_state["can_run_discovery"]:
-                st.caption("Historical research coverage required.")
+            discovery_caption = discovery_disabled_caption(ui_state)
+            if discovery_caption:
+                st.caption(discovery_caption)
         with col_b:
             if st.button(
                 "Run challenger (research only)",
                 key="edge_research_run_challenger",
                 disabled=not ui_state["can_run_challenger"],
             ):
-                st.session_state["edge_research_busy"] = True
                 with st.spinner("Running challenger robustness tests..."):
-                    result = engine.run_challenger(force=True)
-                    st.session_state["edge_research_busy"] = False
+                    result = run_with_edge_research_busy_guard(
+                        st.session_state,
+                        lambda: engine.run_challenger(force=True),
+                    )
                     if result.run_id == "skipped":
                         st.info("Challenger skipped — same candidate ledger already evaluated.")
                     else:
@@ -226,8 +304,12 @@ def render_edge_research_panel(
                             f"FRAGILE={result.robustness_fragile}, REJECT={result.robustness_reject}"
                         )
                     st.rerun()
-            if not ui_state["can_run_challenger"]:
-                st.caption("Run discovery first.")
+            challenger_caption = challenger_disabled_caption(
+                ui_state,
+                has_valid_cohort=has_valid_cohort,
+            )
+            if challenger_caption:
+                st.caption(challenger_caption)
 
         return status.to_dict()
 
