@@ -366,6 +366,9 @@ def supersede_challenger_runs(
         mask &= ledger["run_id"].astype(str) != str(exclude_run_id)
     if not mask.any():
         return
+    for col in ("report_status", "superseded_by", "superseded_reason"):
+        if col in ledger.columns:
+            ledger[col] = ledger[col].astype(object)
     ledger.loc[mask, "report_status"] = "SUPERSEDED"
     ledger.loc[mask, "superseded_by"] = superseded_by
     ledger.loc[mask, "superseded_reason"] = reason
