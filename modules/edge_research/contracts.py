@@ -9,8 +9,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
-ENGINE_VERSION = "2.0.0-discovery"
+ENGINE_VERSION = "3.0.0-challenger"
 DISCOVERY_CONFIG_VERSION = "discovery_v1"
+ROBUSTNESS_CONFIG_VERSION = "robustness_v1"
+EPISODE_CONFIG_VERSION = "episode_v1"
 FEATURE_BUCKET_CONFIG_VERSION = "feature_buckets_v1"
 MARKET_LEVEL_CONFIG_VERSION = "market_level_v1_provisional"
 MARKET_STATE_CONFIG_VERSION = "market_state_v1_provisional"
@@ -27,6 +29,17 @@ BASELINE_TYPE_INSUFFICIENT = "INSUFFICIENT"
 CANDIDATE_STATUS_DISCOVERY = "DISCOVERY"
 CANDIDATE_STATUS_CANDIDATE = "CANDIDATE"
 CANDIDATE_STATUS_INSUFFICIENT_SAMPLE = "INSUFFICIENT_SAMPLE"
+
+ROBUSTNESS_PASS = "PASS"
+ROBUSTNESS_FRAGILE = "FRAGILE"
+ROBUSTNESS_REJECT = "REJECT"
+
+# Fixed robustness thresholds — NOT optimized from returns.
+DATE_CONCENTRATION_SEVERE = 0.50
+SYMBOL_CONCENTRATION_SEVERE = 0.40
+TOP_WINNER_PCT_5 = 0.05
+TOP_WINNER_PCT_10 = 0.10
+EPISODE_DATE_GAP_MAX = 7  # calendar days between trading dates in same episode
 
 # Coarse feature buckets — NOT tuned from forward outcomes.
 FEATURE_BUCKETS: Dict[str, Tuple[Tuple[str, Optional[float], Optional[float], str], ...]] = {
@@ -84,6 +97,7 @@ RESEARCH_MARKET_STATES: FrozenSet[str] = frozenset(
 EDGE_HYPOTHESIS_LEDGER_COLUMNS: Tuple[str, ...] = (
     "edge_id",
     "created_at",
+    "discovery_run_id",
     "research_version",
     "market_state",
     "market_transition",
@@ -116,6 +130,17 @@ EDGE_HYPOTHESIS_LEDGER_COLUMNS: Tuple[str, ...] = (
     "discovery_end_date",
     "oos_status",
     "notes",
+    "robustness_status",
+    "robustness_run_id",
+    "observed_episodes",
+    "positive_episodes",
+    "negative_episodes",
+    "mixed_episodes",
+    "date_count",
+    "unique_symbol_count",
+    "fragility_flags",
+    "rejection_reasons",
+    "main_fragility_flag",
 )
 
 DISCOVERY_RUN_COLUMNS: Tuple[str, ...] = (
@@ -142,11 +167,62 @@ DISCOVERY_RUN_COLUMNS: Tuple[str, ...] = (
 
 EDGE_EPISODE_REGISTRY_COLUMNS: Tuple[str, ...] = (
     "episode_id",
-    "hypothesis_id",
-    "t0_date",
-    "market_state",
-    "symbol_count",
-    "status",
+    "episode_version",
+    "start_date",
+    "end_date",
+    "start_state",
+    "end_state",
+    "transition_sequence",
+    "min_market_real",
+    "max_market_real",
+    "number_of_trading_dates",
+    "candidate_edge_id",
+    "candidate_observations_in_episode",
+    "candidate_best_horizon",
+    "candidate_incremental_median",
+    "candidate_incremental_mean",
+    "candidate_incremental_wr",
+    "episode_result",
+)
+
+EDGE_ROBUSTNESS_HISTORY_COLUMNS: Tuple[str, ...] = (
+    "run_id",
+    "edge_id",
+    "timestamp",
+    "test_name",
+    "test_version",
+    "pre_n",
+    "post_n",
+    "pre_incremental_median",
+    "post_incremental_median",
+    "pre_incremental_mean",
+    "post_incremental_mean",
+    "pre_incremental_wr",
+    "post_incremental_wr",
+    "result",
+    "reason",
+)
+
+CHALLENGER_RUN_COLUMNS: Tuple[str, ...] = (
+    "run_id",
+    "timestamp",
+    "robustness_config_version",
+    "episode_config_version",
+    "discovery_run_id",
+    "candidate_ledger_hash",
+    "ledger_hash",
+    "report_status",
+    "superseded_by",
+    "superseded_reason",
+    "dataset_start",
+    "dataset_end",
+    "candidates_entering",
+    "candidates_entered",
+    "robustness_pass",
+    "robustness_fragile",
+    "robustness_reject",
+    "episodes_segmented",
+    "episodes_unknown",
 )
 
 EDGE_VALIDATION_HISTORY_COLUMNS: Tuple[str, ...] = (

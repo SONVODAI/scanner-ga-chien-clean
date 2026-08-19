@@ -14,11 +14,13 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import pandas as pd
 
 from modules.edge_research.contracts import (
+    CHALLENGER_RUN_COLUMNS,
     DISCOVERY_RUN_COLUMNS,
     EDGE_EPISODE_REGISTRY_COLUMNS,
     EDGE_FORWARD_LEDGER_COLUMNS,
     EDGE_HYPOTHESIS_LEDGER_COLUMNS,
     EDGE_MEMORY_COLUMNS,
+    EDGE_ROBUSTNESS_HISTORY_COLUMNS,
     EDGE_VALIDATION_HISTORY_COLUMNS,
     ENGINE_VERSION,
 )
@@ -32,10 +34,13 @@ LEDGER_FILES: Dict[str, Tuple[str, ...]] = {
     "edge_memory.csv": EDGE_MEMORY_COLUMNS,
     "edge_forward_ledger.csv": EDGE_FORWARD_LEDGER_COLUMNS,
     "discovery_runs.csv": DISCOVERY_RUN_COLUMNS,
+    "edge_robustness_history.csv": EDGE_ROBUSTNESS_HISTORY_COLUMNS,
+    "challenger_runs.csv": CHALLENGER_RUN_COLUMNS,
 }
 
 STATUS_FILE = "engine_status.json"
 DISCOVERY_RUN_FILE = "latest_discovery_run.json"
+CHALLENGER_RUN_FILE = "latest_challenger_run.json"
 PANEL_CACHE_FILE = "research_panel_cache.csv"
 
 
@@ -90,10 +95,14 @@ def read_status(data_dir: Optional[Path] = None) -> Dict[str, Any]:
 def read_ledger(name: str, data_dir: Optional[Path] = None) -> pd.DataFrame:
     root = resolve_data_dir(data_dir)
     path = root / name
+    expected_cols = LEDGER_FILES.get(name, ())
     if not path.exists():
-        cols = LEDGER_FILES.get(name, ())
-        return pd.DataFrame(columns=list(cols))
-    return pd.read_csv(path)
+        return pd.DataFrame(columns=list(expected_cols))
+    df = pd.read_csv(path)
+    for col in expected_cols:
+        if col not in df.columns:
+            df[col] = ""
+    return df
 
 
 def count_ledger_rows(name: str, data_dir: Optional[Path] = None) -> int:
@@ -174,21 +183,26 @@ def _next_edge_id(ledger: pd.DataFrame) -> str:
     return f"EDGE-{n:06d}"
 
 
+def ledger_row_condition_key(row: pd.Series) -> str:
+    """Canonical condition key matching discovery cohort identifiers."""
+    from modules.edge_research.discovery import canonical_condition_key
+    from modules.edge_research.robustness import reconstruct_clauses_from_ledger_row
+
+    transition = str(row.get("market_transition", ""))
+    clauses = reconstruct_clauses_from_ledger_row(row)
+    if not clauses:
+        return f"{transition}|{row.get('condition_text', '')}"
+    return f"{transition}|{canonical_condition_key(clauses)}"
+
+
 def load_existing_condition_keys(data_dir: Optional[Path] = None) -> set[str]:
     ledger = read_ledger("edge_hypothesis_ledger.csv", data_dir=data_dir)
     if ledger.empty:
         return set()
     keys = set()
     for _, row in ledger.iterrows():
-        transition = str(row.get("market_transition", ""))
-        f1 = str(row.get("feature_1", ""))
-        t1 = str(row.get("threshold_1", ""))
-        f2 = row.get("feature_2", "")
-        t2 = row.get("threshold_2", "")
-        parts = [f"{f1}:{t1}"]
-        if pd.notna(f2) and str(f2):
-            parts.append(f"{f2}:{t2}")
-        keys.add(f"{transition}|{'|'.join(sorted(parts))}")
+        keys.add(ledger_row_condition_key(row))
+        keys.add(f"{row.get('market_transition', '')}|{row.get('condition_text', '')}")
     return keys
 
 
@@ -196,6 +210,7 @@ def append_candidates(
     candidates: Sequence[Any],
     data_dir: Optional[Path] = None,
     existing_keys: Optional[set[str]] = None,
+    discovery_run_id: Optional[str] = None,
 ) -> int:
     """Append new candidates to hypothesis ledger; returns count of new rows."""
     from datetime import datetime, timezone
@@ -222,6 +237,7 @@ def append_candidates(
         row = {
             "edge_id": edge_id,
             "created_at": created,
+            "discovery_run_id": discovery_run_id or "",
             "research_version": ENGINE_VERSION,
             "market_state": cand.market_state,
             "market_transition": cand.market_transition,
@@ -265,11 +281,260 @@ def append_candidates(
 
 
 def read_top_candidates(data_dir: Optional[Path] = None, limit: int = 10) -> List[Dict[str, Any]]:
-    ledger = read_ledger("edge_hypothesis_ledger.csv", data_dir=data_dir)
+    ledger = resolve_discovery_cohort(data_dir=data_dir)
     if ledger.empty:
         return []
     df = ledger[ledger["status"] == "CANDIDATE"].copy()
     if df.empty:
-        return []
-    df = df.sort_values("incremental_median", ascending=False, na_position="last")
+        df = ledger.copy()
+    if "incremental_median" in df.columns:
+        df = df.sort_values("incremental_median", ascending=False, na_position="last")
     return df.head(limit).to_dict(orient="records")
+
+
+def resolve_discovery_cohort(
+    data_dir: Optional[Path] = None,
+    discovery_run_id: Optional[str] = None,
+) -> pd.DataFrame:
+    """
+    Return hypothesis ledger rows for one discovery cohort.
+
+    Prefers explicit discovery_run_id linkage. Falls back to the latest persisted
+    discovery run's condition_key set without combining multiple runs.
+    """
+    root = resolve_data_dir(data_dir)
+    ledger = read_ledger("edge_hypothesis_ledger.csv", data_dir=root)
+    if ledger.empty:
+        return ledger
+
+    discovery = read_discovery_run(root)
+    run_id = discovery_run_id or str(discovery.get("run_id", "") or "")
+    if not run_id:
+        return ledger
+
+    explicit = ledger[ledger.get("discovery_run_id", pd.Series(dtype=str)).astype(str) == run_id]
+    if not explicit.empty:
+        return explicit.reset_index(drop=True)
+
+    expected_keys = {
+        str(c.get("condition_key", ""))
+        for c in discovery.get("candidates", [])
+        if c.get("condition_key")
+    }
+    if not expected_keys:
+        # Latest run exists but no embedded keys — use most recent created_at batch.
+        latest_ts = ledger["created_at"].dropna().astype(str).max()
+        if latest_ts:
+            return ledger[ledger["created_at"].astype(str) == latest_ts].reset_index(drop=True)
+        return ledger
+
+    ledger = ledger.copy()
+    ledger["_condition_key"] = ledger.apply(ledger_row_condition_key, axis=1)
+    matched = ledger[ledger["_condition_key"].isin(expected_keys)].copy()
+    if matched.empty:
+        return pd.DataFrame(columns=ledger.columns)
+
+    # One row per condition_key — prefer latest created_at when duplicates exist.
+    matched = matched.sort_values(["created_at", "edge_id"], ascending=[False, False])
+    matched = matched.drop_duplicates(subset=["_condition_key"], keep="first")
+    return matched.drop(columns=["_condition_key"]).reset_index(drop=True)
+
+
+def cohort_ledger_hash(cohort: pd.DataFrame) -> str:
+    from modules.edge_research.challenger import _ledger_hash
+
+    return _ledger_hash(cohort)
+
+
+def supersede_challenger_runs(
+    superseded_by: str,
+    *,
+    reason: str,
+    data_dir: Optional[Path] = None,
+    exclude_run_id: Optional[str] = None,
+) -> None:
+    root = resolve_data_dir(data_dir)
+    path = root / "challenger_runs.csv"
+    if not path.exists():
+        return
+    ledger = read_ledger("challenger_runs.csv", data_dir=root)
+    if ledger.empty:
+        return
+    active = ledger.get("report_status", pd.Series(dtype=str)).fillna("ACTIVE") == "ACTIVE"
+    mask = active
+    if exclude_run_id:
+        mask &= ledger["run_id"].astype(str) != str(exclude_run_id)
+    if not mask.any():
+        return
+    ledger.loc[mask, "report_status"] = "SUPERSEDED"
+    ledger.loc[mask, "superseded_by"] = superseded_by
+    ledger.loc[mask, "superseded_reason"] = reason
+    ledger.to_csv(path, index=False)
+
+
+def write_challenger_run(payload: Dict[str, Any], data_dir: Optional[Path] = None) -> Path:
+    root = ensure_storage(data_dir)
+    path = root / CHALLENGER_RUN_FILE
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    row = {
+        "run_id": payload.get("run_id"),
+        "timestamp": payload.get("timestamp"),
+        "robustness_config_version": payload.get("robustness_config_version"),
+        "episode_config_version": payload.get("episode_config_version"),
+        "discovery_run_id": payload.get("discovery_run_id"),
+        "candidate_ledger_hash": payload.get("candidate_ledger_hash"),
+        "ledger_hash": payload.get("ledger_hash"),
+        "report_status": payload.get("report_status", "ACTIVE"),
+        "superseded_by": payload.get("superseded_by", ""),
+        "superseded_reason": payload.get("superseded_reason", ""),
+        "dataset_start": payload.get("dataset_start"),
+        "dataset_end": payload.get("dataset_end"),
+        "candidates_entering": payload.get("candidates_entering", payload.get("candidates_entered")),
+        "candidates_entered": payload.get("candidates_entered"),
+        "robustness_pass": payload.get("robustness_pass"),
+        "robustness_fragile": payload.get("robustness_fragile"),
+        "robustness_reject": payload.get("robustness_reject"),
+        "episodes_segmented": payload.get("episodes_segmented"),
+        "episodes_unknown": payload.get("episodes_unknown", 0),
+    }
+    ledger = read_ledger("challenger_runs.csv", data_dir=root)
+    ledger = pd.concat([ledger, pd.DataFrame([row])], ignore_index=True)
+    ledger.to_csv(root / "challenger_runs.csv", index=False)
+    return path
+
+
+def read_challenger_run(data_dir: Optional[Path] = None) -> Dict[str, Any]:
+    root = resolve_data_dir(data_dir)
+    path = root / CHALLENGER_RUN_FILE
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def append_robustness_history(
+    run_id: str,
+    edge_id: str,
+    timestamp: str,
+    test_records: List[Dict[str, Any]],
+    data_dir: Optional[Path] = None,
+) -> None:
+    root = ensure_storage(data_dir)
+    ledger = read_ledger("edge_robustness_history.csv", data_dir=root)
+    rows = []
+    for rec in test_records:
+        rows.append(
+            {
+                "run_id": run_id,
+                "edge_id": edge_id,
+                "timestamp": timestamp,
+                "test_name": rec.get("test_name", ""),
+                "test_version": rec.get("test_version", "robustness_v1"),
+                "pre_n": rec.get("pre_n", ""),
+                "post_n": rec.get("post_n", ""),
+                "pre_incremental_median": rec.get("pre_incremental_median", ""),
+                "post_incremental_median": rec.get("post_incremental_median", ""),
+                "pre_incremental_mean": rec.get("pre_incremental_mean", ""),
+                "post_incremental_mean": rec.get("post_incremental_mean", ""),
+                "pre_incremental_wr": rec.get("pre_incremental_wr", ""),
+                "post_incremental_wr": rec.get("post_incremental_wr", ""),
+                "result": rec.get("result", ""),
+                "reason": rec.get("reason", ""),
+            }
+        )
+    if rows:
+        ledger = pd.concat([ledger, pd.DataFrame(rows)], ignore_index=True)
+        ledger.to_csv(root / "edge_robustness_history.csv", index=False)
+
+
+def update_ledger_robustness(
+    results: List[Any],
+    run_id: str,
+    data_dir: Optional[Path] = None,
+) -> None:
+    root = ensure_storage(data_dir)
+    ledger = read_ledger("edge_hypothesis_ledger.csv", data_dir=root)
+    if ledger.empty:
+        return
+    for res in results:
+        eid = res.edge_id
+        mask = ledger["edge_id"] == eid
+        if not mask.any():
+            continue
+        ledger.loc[mask, "robustness_status"] = res.robustness_status
+        ledger.loc[mask, "robustness_run_id"] = run_id
+        ledger.loc[mask, "observed_episodes"] = res.observed_episodes
+        ledger.loc[mask, "positive_episodes"] = res.positive_episodes
+        ledger.loc[mask, "negative_episodes"] = res.negative_episodes
+        ledger.loc[mask, "mixed_episodes"] = res.mixed_episodes
+        ledger.loc[mask, "date_count"] = res.date_count
+        ledger.loc[mask, "unique_symbol_count"] = res.unique_symbol_count
+        ledger.loc[mask, "fragility_flags"] = "|".join(res.fragility_flags)
+        ledger.loc[mask, "rejection_reasons"] = "|".join(res.rejection_reasons)
+        ledger.loc[mask, "main_fragility_flag"] = res.main_fragility_flag
+    ledger.to_csv(root / "edge_hypothesis_ledger.csv", index=False)
+
+
+def write_episode_registry(
+    run_result: Any,
+    panel: pd.DataFrame,
+    data_dir: Optional[Path] = None,
+) -> None:
+    from modules.edge_research.episodes import segment_market_episodes
+
+    root = ensure_storage(data_dir)
+    episodes = segment_market_episodes(panel)
+    rows = []
+    for ep in episodes:
+        rows.append(
+            {
+                "episode_id": ep.episode_id,
+                "episode_version": ep.episode_version,
+                "start_date": ep.start_date,
+                "end_date": ep.end_date,
+                "start_state": ep.start_state,
+                "end_state": ep.end_state,
+                "transition_sequence": ep.transition_sequence,
+                "min_market_real": ep.min_market_real,
+                "max_market_real": ep.max_market_real,
+                "number_of_trading_dates": ep.number_of_trading_dates,
+                "candidate_edge_id": "",
+                "candidate_observations_in_episode": "",
+                "candidate_best_horizon": "",
+                "candidate_incremental_median": "",
+                "candidate_incremental_mean": "",
+                "candidate_incremental_wr": "",
+                "episode_result": "",
+            }
+        )
+    for res in run_result.results:
+        for detail in res.episode_summary.get("episode_details", []):
+            rows.append(
+                {
+                    "episode_id": detail.get("episode_id"),
+                    "episode_version": "episode_v1",
+                    "start_date": detail.get("start_date"),
+                    "end_date": detail.get("end_date"),
+                    "start_state": "",
+                    "end_state": "",
+                    "transition_sequence": "",
+                    "min_market_real": "",
+                    "max_market_real": "",
+                    "number_of_trading_dates": "",
+                    "candidate_edge_id": res.edge_id,
+                    "candidate_observations_in_episode": detail.get("observations"),
+                    "candidate_best_horizon": res.best_horizon,
+                    "candidate_incremental_median": "",
+                    "candidate_incremental_mean": "",
+                    "candidate_incremental_wr": "",
+                    "episode_result": detail.get("episode_result"),
+                }
+            )
+    if rows:
+        ledger = read_ledger("edge_episode_registry.csv", data_dir=root)
+        ledger = pd.concat([ledger, pd.DataFrame(rows)], ignore_index=True)
+        ledger.to_csv(root / "edge_episode_registry.csv", index=False)
+
+
+def get_challenger_ledger_hash(data_dir: Optional[Path] = None) -> str:
+    cohort = resolve_discovery_cohort(data_dir=data_dir)
+    return cohort_ledger_hash(cohort)
