@@ -8,10 +8,12 @@ import pandas as pd
 import pytest
 
 from modules.edge_research.ui import (
+    EDGE_UI_DIAG_BUILD,
     challenger_disabled_caption,
     compute_edge_research_button_state,
     discovery_disabled_caption,
     execution_in_progress_from_session,
+    format_edge_ui_diagnostic_line,
     normalize_edge_research_busy_session,
     recover_legacy_edge_research_busy,
     run_with_edge_research_busy_guard,
@@ -251,3 +253,105 @@ def test_challenger_caption_without_cohort():
     assert (
         challenger_disabled_caption(ui_state, has_valid_cohort=False) == "Run discovery first."
     )
+
+
+def _capture_pre_button_gating(
+    *,
+    session_state: dict,
+    coverage_start,
+    coverage_end,
+    observation_count: int,
+    has_valid_cohort: bool,
+):
+    """Mirror render_edge_research_panel values immediately before st.button."""
+    recover_legacy_edge_research_busy(session_state)
+    execution_in_progress = execution_in_progress_from_session(session_state)
+    ui_state = compute_edge_research_button_state(
+        coverage_start=coverage_start,
+        coverage_end=coverage_end,
+        observation_count=observation_count,
+        has_valid_cohort=has_valid_cohort,
+        execution_in_progress=execution_in_progress,
+    )
+    if "edge_research_busy" in session_state:
+        raw_busy = session_state["edge_research_busy"]
+        raw_busy_type = type(raw_busy).__name__
+    else:
+        raw_busy = "<MISSING>"
+        raw_busy_type = "missing"
+    strict_v = session_state.get("_edge_research_busy_strict_v", "<MISSING>")
+    discovery_caption = discovery_disabled_caption(ui_state)
+    challenger_caption = challenger_disabled_caption(
+        ui_state,
+        has_valid_cohort=has_valid_cohort,
+    )
+    discovery_disabled = not ui_state["can_run_discovery"]
+    challenger_disabled = not ui_state["can_run_challenger"]
+    diagnostic_line = format_edge_ui_diagnostic_line(
+        coverage_start=coverage_start,
+        coverage_end=coverage_end,
+        observation_count=observation_count,
+        raw_busy=raw_busy,
+        raw_busy_type=raw_busy_type,
+        strict_v=strict_v,
+        execution_in_progress=execution_in_progress,
+        has_valid_cohort=has_valid_cohort,
+        ui_state=ui_state,
+        discovery_caption=discovery_caption,
+        challenger_caption=challenger_caption,
+    )
+    return {
+        "ui_state": ui_state,
+        "discovery_disabled": discovery_disabled,
+        "challenger_disabled": challenger_disabled,
+        "diagnostic_line": diagnostic_line,
+    }
+
+
+def test_edge_ui_diagnostic_matches_button_gating_state(edge_data_dir):
+    from modules.edge_research.engine import EdgeResearchEngine
+
+    engine = EdgeResearchEngine(data_dir=edge_data_dir)
+    engine.initialize()
+    status = engine.get_foundation_status()
+    has_valid_cohort = engine.has_valid_discovery_cohort()
+
+    snapshot = _capture_pre_button_gating(
+        session_state={},
+        coverage_start=status.coverage_start,
+        coverage_end=status.coverage_end,
+        observation_count=status.observation_count,
+        has_valid_cohort=has_valid_cohort,
+    )
+    line = snapshot["diagnostic_line"]
+    ui_state = snapshot["ui_state"]
+
+    assert EDGE_UI_DIAG_BUILD == "EDGE_UI_DIAG_V1"
+    assert f"build={EDGE_UI_DIAG_BUILD}" in line
+    assert f"discovery_disabled={snapshot['discovery_disabled']}" in line
+    assert f"challenger_disabled={snapshot['challenger_disabled']}" in line
+    assert snapshot["discovery_disabled"] is (not ui_state["can_run_discovery"])
+    assert snapshot["challenger_disabled"] is (not ui_state["can_run_challenger"])
+    assert f"can_run_discovery={ui_state['can_run_discovery']}" in line
+    assert f"can_run_challenger={ui_state['can_run_challenger']}" in line
+    assert f"discovery_caption={discovery_disabled_caption(ui_state)!r}" in line
+    assert (
+        f"challenger_caption="
+        f"{challenger_disabled_caption(ui_state, has_valid_cohort=has_valid_cohort)!r}"
+        in line
+    )
+
+
+def test_edge_ui_diagnostic_reflects_same_busy_gating_as_buttons():
+    session_state = {"edge_research_busy": "False"}
+    snapshot = _capture_pre_button_gating(
+        session_state=session_state,
+        coverage_start="2026-07-23",
+        coverage_end="2026-08-14",
+        observation_count=2982,
+        has_valid_cohort=False,
+    )
+
+    assert snapshot["discovery_disabled"] is False
+    assert "raw_busy=False" in snapshot["diagnostic_line"]
+    assert "execution_in_progress=False" in snapshot["diagnostic_line"]

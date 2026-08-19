@@ -11,6 +11,7 @@ from typing import Any, Callable, Dict, Mapping, MutableMapping, Optional, TypeV
 from modules.edge_research.engine import EdgeResearchEngine
 
 EDGE_RESEARCH_BUSY_STRICT_VERSION = 1
+EDGE_UI_DIAG_BUILD = "EDGE_UI_DIAG_V1"
 T = TypeVar("T")
 
 
@@ -112,6 +113,42 @@ def challenger_disabled_caption(
     if not has_valid_cohort:
         return "Run discovery first."
     return None
+
+
+def format_edge_ui_diagnostic_line(
+    *,
+    coverage_start: Optional[str],
+    coverage_end: Optional[str],
+    observation_count: int,
+    raw_busy: Any,
+    raw_busy_type: str,
+    strict_v: Any,
+    execution_in_progress: bool,
+    has_valid_cohort: bool,
+    ui_state: Dict[str, bool],
+    discovery_caption: Optional[str],
+    challenger_caption: Optional[str],
+) -> str:
+    discovery_disabled = not ui_state["can_run_discovery"]
+    challenger_disabled = not ui_state["can_run_challenger"]
+    return (
+        f"EDGE UI DIAG | build={EDGE_UI_DIAG_BUILD} | "
+        f"coverage={ui_state['has_research_coverage']} | "
+        f"coverage_start={coverage_start!r} | "
+        f"coverage_end={coverage_end!r} | "
+        f"observations={observation_count!r} | "
+        f"raw_busy={raw_busy!r} | "
+        f"raw_busy_type={raw_busy_type} | "
+        f"strict_v={strict_v!r} | "
+        f"execution_in_progress={execution_in_progress} | "
+        f"cohort={has_valid_cohort} | "
+        f"can_run_discovery={ui_state['can_run_discovery']} | "
+        f"discovery_disabled={discovery_disabled} | "
+        f"can_run_challenger={ui_state['can_run_challenger']} | "
+        f"challenger_disabled={challenger_disabled} | "
+        f"discovery_caption={discovery_caption!r} | "
+        f"challenger_caption={challenger_caption!r}"
+    )
 
 
 def _format_research_voice(candidate: Dict[str, Any]) -> str:
@@ -268,12 +305,42 @@ def render_edge_research_panel(
             else:
                 st.caption("No challenger run recorded yet.")
 
+        if "edge_research_busy" in st.session_state:
+            raw_busy = st.session_state["edge_research_busy"]
+            raw_busy_type = type(raw_busy).__name__
+        else:
+            raw_busy = "<MISSING>"
+            raw_busy_type = "missing"
+        strict_v = st.session_state.get("_edge_research_busy_strict_v", "<MISSING>")
+        discovery_caption = discovery_disabled_caption(ui_state)
+        challenger_caption = challenger_disabled_caption(
+            ui_state,
+            has_valid_cohort=has_valid_cohort,
+        )
+        discovery_disabled = not ui_state["can_run_discovery"]
+        challenger_disabled = not ui_state["can_run_challenger"]
+        st.caption(
+            format_edge_ui_diagnostic_line(
+                coverage_start=status.coverage_start,
+                coverage_end=status.coverage_end,
+                observation_count=status.observation_count,
+                raw_busy=raw_busy,
+                raw_busy_type=raw_busy_type,
+                strict_v=strict_v,
+                execution_in_progress=execution_in_progress,
+                has_valid_cohort=has_valid_cohort,
+                ui_state=ui_state,
+                discovery_caption=discovery_caption,
+                challenger_caption=challenger_caption,
+            )
+        )
+
         col_a, col_b = st.columns(2)
         with col_a:
             if st.button(
                 "Run discovery (research only)",
                 key="edge_research_run_discovery",
-                disabled=not ui_state["can_run_discovery"],
+                disabled=discovery_disabled,
             ):
                 with st.spinner("Running controlled discovery..."):
                     result = run_with_edge_research_busy_guard(
@@ -282,14 +349,13 @@ def render_edge_research_panel(
                     )
                     st.success(f"Discovery complete: {result.promoted_candidates} candidate(s).")
                     st.rerun()
-            discovery_caption = discovery_disabled_caption(ui_state)
             if discovery_caption:
                 st.caption(discovery_caption)
         with col_b:
             if st.button(
                 "Run challenger (research only)",
                 key="edge_research_run_challenger",
-                disabled=not ui_state["can_run_challenger"],
+                disabled=challenger_disabled,
             ):
                 with st.spinner("Running challenger robustness tests..."):
                     result = run_with_edge_research_busy_guard(
@@ -304,10 +370,6 @@ def render_edge_research_panel(
                             f"FRAGILE={result.robustness_fragile}, REJECT={result.robustness_reject}"
                         )
                     st.rerun()
-            challenger_caption = challenger_disabled_caption(
-                ui_state,
-                has_valid_cohort=has_valid_cohort,
-            )
             if challenger_caption:
                 st.caption(challenger_caption)
 
