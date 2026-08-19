@@ -6246,6 +6246,29 @@ with m6:
 with m7:
     st.metric("WATCHLIST", len(WATCHLIST))
 # =========================================================
+# EDGE RESEARCH ENGINE V1 — FOUNDATION (RESEARCH ONLY)
+# =========================================================
+try:
+    from modules.edge_research.market_state import (
+        classify_market_level,
+        derive_research_market_state,
+        derive_research_market_trajectory,
+    )
+    from modules.edge_research.ui import render_edge_research_panel
+
+    _edge_level = classify_market_level(market_real)
+    _edge_traj = derive_research_market_trajectory(None, None)
+    _edge_state = derive_research_market_state(_edge_level, _edge_traj, ambiguous=False)
+    _edge_transition = f"UNKNOWN -> {_edge_state}"
+    render_edge_research_panel(
+        current_market_state=_edge_state,
+        current_market_transition=_edge_transition,
+    )
+except Exception as _edge_research_err:
+    st.caption(f"Edge Research panel skipped: {_edge_research_err}")
+
+st.markdown("---")
+# =========================================================
 # EARNING MONEY BOARD - BẢNG ĐIỀU KHIỂN CHÍNH
 # =========================================================
 render_earning_money_board(
