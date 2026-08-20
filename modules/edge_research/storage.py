@@ -38,6 +38,107 @@ LEDGER_FILES: Dict[str, Tuple[str, ...]] = {
     "challenger_runs.csv": CHALLENGER_RUN_COLUMNS,
 }
 
+# Challenger persistence schema — explicit dtypes before categorical assignment.
+HYPOTHESIS_LEDGER_STRING_COLUMNS: Tuple[str, ...] = (
+    "robustness_status",
+    "robustness_run_id",
+    "fragility_flags",
+    "rejection_reasons",
+    "main_fragility_flag",
+)
+
+HYPOTHESIS_LEDGER_NULLABLE_INT_COLUMNS: Tuple[str, ...] = (
+    "observed_episodes",
+    "positive_episodes",
+    "negative_episodes",
+    "mixed_episodes",
+    "date_count",
+    "unique_symbol_count",
+)
+
+ROBUSTNESS_HISTORY_STRING_COLUMNS: Tuple[str, ...] = (
+    "run_id",
+    "edge_id",
+    "timestamp",
+    "test_name",
+    "test_version",
+    "result",
+    "reason",
+)
+
+EPISODE_REGISTRY_STRING_COLUMNS: Tuple[str, ...] = (
+    "episode_id",
+    "episode_version",
+    "start_date",
+    "end_date",
+    "start_state",
+    "end_state",
+    "transition_sequence",
+    "candidate_edge_id",
+    "candidate_best_horizon",
+    "episode_result",
+)
+
+CHALLENGER_RUN_STRING_COLUMNS: Tuple[str, ...] = (
+    "run_id",
+    "timestamp",
+    "robustness_config_version",
+    "episode_config_version",
+    "discovery_run_id",
+    "candidate_ledger_hash",
+    "ledger_hash",
+    "report_status",
+    "superseded_by",
+    "superseded_reason",
+    "dataset_start",
+    "dataset_end",
+)
+
+
+def _coerce_string_columns(df: pd.DataFrame, columns: Sequence[str]) -> pd.DataFrame:
+    for col in columns:
+        if col in df.columns:
+            df[col] = df[col].astype("string")
+    return df
+
+
+def _coerce_nullable_int_columns(df: pd.DataFrame, columns: Sequence[str]) -> pd.DataFrame:
+    for col in columns:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+    return df
+
+
+def normalize_hypothesis_ledger_dtypes(ledger: pd.DataFrame) -> pd.DataFrame:
+    """Ensure challenger-written columns accept categorical strings after CSV reload."""
+    if ledger.empty:
+        return ledger
+    ledger = ledger.copy()
+    _coerce_string_columns(ledger, HYPOTHESIS_LEDGER_STRING_COLUMNS)
+    _coerce_nullable_int_columns(ledger, HYPOTHESIS_LEDGER_NULLABLE_INT_COLUMNS)
+    return ledger
+
+
+def normalize_robustness_history_dtypes(ledger: pd.DataFrame) -> pd.DataFrame:
+    if ledger.empty:
+        return ledger
+    ledger = ledger.copy()
+    return _coerce_string_columns(ledger, ROBUSTNESS_HISTORY_STRING_COLUMNS)
+
+
+def normalize_episode_registry_dtypes(ledger: pd.DataFrame) -> pd.DataFrame:
+    if ledger.empty:
+        return ledger
+    ledger = ledger.copy()
+    return _coerce_string_columns(ledger, EPISODE_REGISTRY_STRING_COLUMNS)
+
+
+def normalize_challenger_run_dtypes(ledger: pd.DataFrame) -> pd.DataFrame:
+    if ledger.empty:
+        return ledger
+    ledger = ledger.copy()
+    return _coerce_string_columns(ledger, CHALLENGER_RUN_STRING_COLUMNS)
+
 STATUS_FILE = "engine_status.json"
 DISCOVERY_RUN_FILE = "latest_discovery_run.json"
 CHALLENGER_RUN_FILE = "latest_challenger_run.json"
@@ -101,7 +202,15 @@ def read_ledger(name: str, data_dir: Optional[Path] = None) -> pd.DataFrame:
     df = pd.read_csv(path)
     for col in expected_cols:
         if col not in df.columns:
-            df[col] = ""
+            df[col] = pd.NA
+    if name == "edge_hypothesis_ledger.csv":
+        df = normalize_hypothesis_ledger_dtypes(df)
+    elif name == "edge_robustness_history.csv":
+        df = normalize_robustness_history_dtypes(df)
+    elif name == "edge_episode_registry.csv":
+        df = normalize_episode_registry_dtypes(df)
+    elif name == "challenger_runs.csv":
+        df = normalize_challenger_run_dtypes(df)
     return df
 
 
@@ -276,6 +385,7 @@ def append_candidates(
     if not new_rows:
         return 0
     ledger = pd.concat([ledger, pd.DataFrame(new_rows)], ignore_index=True)
+    ledger = normalize_hypothesis_ledger_dtypes(ledger)
     ledger.to_csv(root / "edge_hypothesis_ledger.csv", index=False)
     return len(new_rows)
 
@@ -402,6 +512,7 @@ def write_challenger_run(payload: Dict[str, Any], data_dir: Optional[Path] = Non
     }
     ledger = read_ledger("challenger_runs.csv", data_dir=root)
     ledger = pd.concat([ledger, pd.DataFrame([row])], ignore_index=True)
+    ledger = normalize_challenger_run_dtypes(ledger)
     ledger.to_csv(root / "challenger_runs.csv", index=False)
     return path
 
@@ -445,7 +556,9 @@ def append_robustness_history(
             }
         )
     if rows:
-        ledger = pd.concat([ledger, pd.DataFrame(rows)], ignore_index=True)
+        new_rows = normalize_robustness_history_dtypes(pd.DataFrame(rows))
+        ledger = pd.concat([ledger, new_rows], ignore_index=True)
+        ledger = normalize_robustness_history_dtypes(ledger)
         ledger.to_csv(root / "edge_robustness_history.csv", index=False)
 
 
@@ -458,6 +571,7 @@ def update_ledger_robustness(
     ledger = read_ledger("edge_hypothesis_ledger.csv", data_dir=root)
     if ledger.empty:
         return
+    ledger = normalize_hypothesis_ledger_dtypes(ledger)
     for res in results:
         eid = res.edge_id
         mask = ledger["edge_id"] == eid
@@ -534,7 +648,9 @@ def write_episode_registry(
             )
     if rows:
         ledger = read_ledger("edge_episode_registry.csv", data_dir=root)
-        ledger = pd.concat([ledger, pd.DataFrame(rows)], ignore_index=True)
+        new_rows = normalize_episode_registry_dtypes(pd.DataFrame(rows))
+        ledger = pd.concat([ledger, new_rows], ignore_index=True)
+        ledger = normalize_episode_registry_dtypes(ledger)
         ledger.to_csv(root / "edge_episode_registry.csv", index=False)
 
 
