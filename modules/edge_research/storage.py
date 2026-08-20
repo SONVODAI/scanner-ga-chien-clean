@@ -143,6 +143,7 @@ STATUS_FILE = "engine_status.json"
 DISCOVERY_RUN_FILE = "latest_discovery_run.json"
 CHALLENGER_RUN_FILE = "latest_challenger_run.json"
 PANEL_CACHE_FILE = "research_panel_cache.csv"
+RESEARCH_SESSIONS_DIR = "research_sessions"
 
 
 def resolve_data_dir(explicit: Optional[Path] = None) -> Path:
@@ -157,6 +158,7 @@ def resolve_data_dir(explicit: Optional[Path] = None) -> Path:
 def ensure_storage(data_dir: Optional[Path] = None) -> Path:
     root = resolve_data_dir(data_dir)
     root.mkdir(parents=True, exist_ok=True)
+    (root / RESEARCH_SESSIONS_DIR).mkdir(parents=True, exist_ok=True)
     for filename, columns in LEDGER_FILES.items():
         path = root / filename
         if not path.exists():
@@ -658,3 +660,48 @@ def write_episode_registry(
 def get_challenger_ledger_hash(data_dir: Optional[Path] = None) -> str:
     cohort = resolve_discovery_cohort(data_dir=data_dir)
     return cohort_ledger_hash(cohort)
+
+
+def research_session_path(session_id: str, data_dir: Optional[Path] = None) -> Path:
+    root = ensure_storage(data_dir)
+    safe_id = session_id.replace("/", "_").replace("\\", "_")
+    return root / RESEARCH_SESSIONS_DIR / f"{safe_id}.json"
+
+
+def write_research_graph(graph: Any, data_dir: Optional[Path] = None) -> Path:
+    """
+    Atomically persist a ResearchGraph snapshot to research_sessions/.
+
+    Separate from edge_hypothesis_ledger.csv — research memory only.
+    """
+    from modules.edge_research.research_graph import ResearchGraph
+
+    if not isinstance(graph, ResearchGraph):
+        raise TypeError("graph must be a ResearchGraph instance")
+    graph.validate()
+    path = research_session_path(graph.session.research_session_id, data_dir=data_dir)
+    tmp = path.with_suffix(".json.tmp")
+    payload = graph.serialize()
+    tmp.write_text(payload, encoding="utf-8")
+    os.replace(tmp, path)
+    return path
+
+
+def read_research_graph(
+    session_id: str,
+    data_dir: Optional[Path] = None,
+) -> Any:
+    from modules.edge_research.research_graph import ResearchGraph
+
+    path = research_session_path(session_id, data_dir=data_dir)
+    if not path.exists():
+        raise FileNotFoundError(f"Research session not found: {session_id}")
+    return ResearchGraph.deserialize(path.read_text(encoding="utf-8"))
+
+
+def list_research_session_ids(data_dir: Optional[Path] = None) -> List[str]:
+    root = ensure_storage(data_dir)
+    sessions_dir = root / RESEARCH_SESSIONS_DIR
+    if not sessions_dir.exists():
+        return []
+    return sorted(p.stem for p in sessions_dir.glob("*.json") if p.is_file())
