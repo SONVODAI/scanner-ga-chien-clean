@@ -218,6 +218,13 @@ class ResearchGraph:
         if existing and not allow_duplicate:
             raise DuplicateExperimentError(content_hash, existing)
 
+        if self.session.experiment_budget is not None:
+            if self.session.experiments_used >= self.session.experiment_budget:
+                raise ResearchGraphError(
+                    f"Experiment budget exhausted: {self.session.experiments_used}/"
+                    f"{self.session.experiment_budget}"
+                )
+
         nid = node_id or _new_id("exp")
         node = ResearchNode(
             node_id=nid,
