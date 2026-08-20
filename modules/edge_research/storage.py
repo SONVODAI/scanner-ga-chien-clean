@@ -343,6 +343,7 @@ def append_candidates(
         cp = cand.profiles.get("candidate", {})
         bp = cand.profiles.get("baseline", {})
         inc = cand.incremental
+        guardrails = getattr(cand, "guardrails", {}) or {}
         row = {
             "edge_id": edge_id,
             "created_at": created,
@@ -378,7 +379,7 @@ def append_candidates(
             "discovery_start_date": cand.discovery_start_date,
             "discovery_end_date": cand.discovery_end_date,
             "oos_status": "NOT_TESTED",
-            "notes": "",
+            "notes": json.dumps({"guardrails": guardrails}, ensure_ascii=False) if guardrails else "",
         }
         new_rows.append(row)
 

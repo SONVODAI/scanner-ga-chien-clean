@@ -212,8 +212,14 @@ class EdgeResearchEngine:
                 f"Market: {top.market_transition} | Best: {top.best_horizon}"
             )
             write_status({**self.get_foundation_status().to_dict(), "last_research_event": voice}, data_dir=self.data_dir)
-        elif result.promoted_candidates == 0:
-            write_status({**self.get_foundation_status().to_dict(), "last_research_event": "NONE"}, data_dir=self.data_dir)
+        elif result.no_edge_outcome and result.conditions_tested > 0:
+            write_status(
+                {
+                    **self.get_foundation_status().to_dict(),
+                    "last_research_event": result.no_edge_outcome,
+                },
+                data_dir=self.data_dir,
+            )
 
         publish_durable(self.data_dir)
         return result

@@ -19,6 +19,8 @@ from modules.edge_research.contracts import (
     ROBUSTNESS_FRAGILE,
     ROBUSTNESS_PASS,
     ROBUSTNESS_REJECT,
+    TOP_WINNER_PCT_5,
+    TOP_WINNER_PCT_10,
 )
 from modules.edge_research.episodes import segment_market_episodes, summarize_candidate_episodes
 from modules.edge_research.robustness import (
@@ -36,7 +38,12 @@ from modules.edge_research.robustness import (
     test_temporal_consistency,
     _candidate_metrics,
 )
-from modules.edge_research.contracts import TOP_WINNER_PCT_10, TOP_WINNER_PCT_5
+from modules.edge_research.hypothesis import ScientificStatus, derive_scientific_status
+from modules.edge_research.statistical_guardrails import (
+    compute_concentration_diagnostics,
+    compute_correlation_diagnostics,
+    evaluate_concentration_fragility,
+)
 
 
 @dataclass
@@ -58,6 +65,7 @@ class CandidateRobustnessResult:
     unique_symbol_count: int
     tests: Dict[str, Any]
     episode_summary: Dict[str, Any]
+    scientific_status: str = ScientificStatus.CANDIDATE.value
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -67,6 +75,7 @@ class CandidateRobustnessResult:
             "best_horizon": self.best_horizon,
             "candidate_n": self.candidate_n,
             "robustness_status": self.robustness_status,
+            "scientific_status": self.scientific_status,
             "fragility_flags": self.fragility_flags,
             "rejection_reasons": self.rejection_reasons,
             "main_fragility_flag": self.main_fragility_flag,
@@ -237,8 +246,12 @@ def run_challenger(
 
         pre = _candidate_metrics(candidate_rows, panel, crow, horizon)
         ep_sum = summarize_candidate_episodes(candidate_rows, episodes, best_horizon=horizon)
+        concentration = compute_concentration_diagnostics(candidate_rows, horizon=horizon)
+        correlation = compute_correlation_diagnostics(candidate_rows)
 
         tests: Dict[str, Any] = {
+            "concentration_diagnostics": concentration,
+            "correlation_diagnostics": correlation,
             "leave_best_date_out": test_leave_best_date_out(candidate_rows, panel, crow, horizon),
             "leave_top_winners_out_5pct": test_leave_top_winners_out(
                 candidate_rows, panel, crow, horizon, TOP_WINNER_PCT_5
@@ -264,6 +277,30 @@ def run_challenger(
             len(candidate_rows),
         )
 
+        notes_val = crow.get("notes", "")
+        notes_raw = "" if pd.isna(notes_val) else str(notes_val)
+        guardrails_meta: Dict[str, Any] = {}
+        if notes_raw.strip().startswith("{"):
+            try:
+                import json
+
+                guardrails_meta = json.loads(notes_raw).get("guardrails", {})
+            except json.JSONDecodeError:
+                guardrails_meta = {}
+
+        scientific_status = derive_scientific_status(
+            raw_signal=bool(guardrails_meta.get("raw_signal", True)),
+            multiple_testing_survives=bool(guardrails_meta.get("multiple_testing_survives", True)),
+            robustness_status=status,
+            concentration_fragile=evaluate_concentration_fragility(concentration),
+            episode_consistency=str(
+                (guardrails_meta.get("episode_validation") or {}).get(
+                    "episode_consistency",
+                    ep_sum.get("episode_consistency", "INSUFFICIENT"),
+                )
+            ),
+        ).value
+
         cr = CandidateRobustnessResult(
             edge_id=edge_id,
             condition_text=str(crow.get("condition_text", "")),
@@ -282,6 +319,7 @@ def run_challenger(
             unique_symbol_count=int(candidate_rows["symbol"].nunique()),
             tests=tests,
             episode_summary=ep_sum,
+            scientific_status=scientific_status,
         )
         result.results.append(cr)
         if status == ROBUSTNESS_PASS:

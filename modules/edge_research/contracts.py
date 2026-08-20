@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
 ENGINE_VERSION = "3.0.0-challenger"
+GUARDRAILS_CONFIG_VERSION = "guardrails_v1"
 DISCOVERY_CONFIG_VERSION = "discovery_v1"
 ROBUSTNESS_CONFIG_VERSION = "robustness_v1"
 EPISODE_CONFIG_VERSION = "episode_v1"

@@ -42,15 +42,15 @@ def _daily_market_summary(panel: pd.DataFrame) -> pd.DataFrame:
         )
     df = panel.copy()
     df["trade_date"] = pd.to_datetime(df["trade_date"], errors="coerce").dt.strftime("%Y-%m-%d")
-    daily = (
-        df.groupby("trade_date", sort=True)
-        .agg(
-            research_market_state=("research_market_state", "first"),
-            research_market_transition=("research_market_transition", "first"),
-            market_real=("market_real", "first"),
-        )
-        .reset_index()
-    )
+    agg_spec: Dict[str, tuple] = {
+        "research_market_state": ("research_market_state", "first"),
+        "research_market_transition": ("research_market_transition", "first"),
+    }
+    if "market_real" in df.columns:
+        agg_spec["market_real"] = ("market_real", "first")
+    daily = df.groupby("trade_date", sort=True).agg(**agg_spec).reset_index()
+    if "market_real" not in daily.columns:
+        daily["market_real"] = pd.NA
     return daily.sort_values("trade_date").reset_index(drop=True)
 
 
