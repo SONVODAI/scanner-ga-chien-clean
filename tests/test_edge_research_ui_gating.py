@@ -3,18 +3,31 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
 
 from modules.edge_research.ui import (
+    EDGE_RESEARCH_LAST_RUN_KEY,
+    EDGE_RESEARCH_PENDING_KEY,
+    build_challenger_run_record,
+    build_discovery_run_record,
     challenger_disabled_caption,
+    complete_research_run_failure,
+    complete_research_run_success,
     compute_edge_research_button_state,
     discovery_disabled_caption,
+    execute_pending_research_action,
     execution_in_progress_from_session,
+    format_research_run_status_message,
+    get_pending_research_action,
     normalize_edge_research_busy_session,
+    queue_research_action,
     recover_legacy_edge_research_busy,
+    research_run_phase_from_session,
     run_with_edge_research_busy_guard,
+    sanitize_research_error_message,
 )
 
 
@@ -251,3 +264,153 @@ def test_challenger_caption_without_cohort():
     assert (
         challenger_disabled_caption(ui_state, has_valid_cohort=False) == "Run discovery first."
     )
+
+
+# --- Two-phase UX state machine tests ---
+
+
+def test_queue_discovery_does_not_execute_immediately():
+    session_state: dict = {}
+    engine = MagicMock()
+
+    assert queue_research_action(session_state, "discovery") is True
+    assert get_pending_research_action(session_state) == "discovery"
+    assert execution_in_progress_from_session(session_state) is True
+    engine.run_discovery.assert_not_called()
+
+
+def test_queue_challenger_does_not_execute_immediately():
+    session_state: dict = {}
+    engine = MagicMock()
+
+    assert queue_research_action(session_state, "challenger") is True
+    assert get_pending_research_action(session_state) == "challenger"
+    assert execution_in_progress_from_session(session_state) is True
+    engine.run_challenger.assert_not_called()
+
+
+def test_pending_state_produces_running_phase():
+    session_state: dict = {}
+    queue_research_action(session_state, "discovery")
+    assert research_run_phase_from_session(session_state) == "RUNNING"
+
+
+def test_both_buttons_gated_while_pending():
+    session_state = {EDGE_RESEARCH_PENDING_KEY: "discovery", "edge_research_busy": True}
+    ui_state = _ui_state(has_valid_cohort=True, session_state=session_state)
+    assert ui_state["can_run_discovery"] is False
+    assert ui_state["can_run_challenger"] is False
+
+
+def test_successful_completion_clears_pending_and_busy():
+    session_state = {EDGE_RESEARCH_PENDING_KEY: "discovery", "edge_research_busy": True}
+    engine = MagicMock()
+    discovery_result = MagicMock(
+        run_id="disc123",
+        timestamp="2026-08-20T09:00:00Z",
+        promoted_candidates=2,
+        conditions_tested=100,
+        data_quality={"eligible_observations": 500},
+    )
+    engine.run_discovery.return_value = discovery_result
+
+    record = execute_pending_research_action(session_state, engine)
+
+    assert record is not None
+    assert record["status"] == "COMPLETED"
+    assert get_pending_research_action(session_state) is None
+    assert session_state["edge_research_busy"] is False
+    assert execution_in_progress_from_session(session_state) is False
+    engine.run_discovery.assert_called_once()
+
+
+def test_failed_completion_clears_pending_and_busy():
+    session_state = {EDGE_RESEARCH_PENDING_KEY: "challenger", "edge_research_busy": True}
+    engine = MagicMock()
+    engine.run_challenger.side_effect = RuntimeError("challenger failed")
+
+    record = execute_pending_research_action(session_state, engine)
+
+    assert record is not None
+    assert record["status"] == "FAILED"
+    assert record["action"] == "challenger"
+    assert get_pending_research_action(session_state) is None
+    assert session_state["edge_research_busy"] is False
+
+
+def test_completed_state_preserves_run_metadata():
+    session_state: dict = {}
+
+    class _DiscoveryResult:
+        run_id = "7a2667b95bcd"
+        timestamp = "2026-08-20T09:00:00Z"
+        promoted_candidates = 20
+        conditions_tested = 1848
+        data_quality = {"eligible_observations": 1988}
+
+    record = complete_research_run_success(
+        session_state,
+        build_discovery_run_record(_DiscoveryResult()),
+    )
+
+    assert record["run_id"] == "7a2667b95bcd"
+    assert record["discovery_run_id"] == "7a2667b95bcd"
+    assert record["action"] == "discovery"
+    assert "20 candidate(s)" in record["summary"]
+    assert research_run_phase_from_session(session_state) == "COMPLETED"
+    assert format_research_run_status_message(session_state[EDGE_RESEARCH_LAST_RUN_KEY])
+
+
+def test_challenger_record_preserves_discovery_run_id():
+    class _ChallengerResult:
+        run_id = "c9bfcf66f5f9"
+        timestamp = "2026-08-20T10:00:00Z"
+        discovery_run_id = "7a2667b95bcd"
+        robustness_pass = 0
+        robustness_fragile = 3
+        robustness_reject = 17
+
+    record = build_challenger_run_record(_ChallengerResult())
+    assert record["run_id"] == "c9bfcf66f5f9"
+    assert record["discovery_run_id"] == "7a2667b95bcd"
+    assert "PASS=0" in record["summary"]
+
+
+def test_duplicate_execution_prevented_while_busy():
+    session_state: dict = {}
+    assert queue_research_action(session_state, "discovery") is True
+    assert queue_research_action(session_state, "challenger") is False
+    assert get_pending_research_action(session_state) == "discovery"
+
+
+def test_duplicate_execution_prevented_after_queue():
+    session_state: dict = {}
+    queue_research_action(session_state, "discovery")
+    assert queue_research_action(session_state, "discovery") is False
+
+
+def test_no_secret_in_sanitize_research_error_message():
+    raw = (
+        "Auth failed Bearer super-secret-token-abc123 "
+        "EDGE_RESEARCH_DURABLE_TOKEN=leaked-value "
+        "api_key: gh_secret_12345"
+    )
+    sanitized = sanitize_research_error_message(RuntimeError(raw))
+    assert "super-secret-token" not in sanitized
+    assert "leaked-value" not in sanitized
+    assert "gh_secret_12345" not in sanitized
+    assert "[REDACTED]" in sanitized
+
+
+def test_failure_record_never_contains_token_values():
+    session_state: dict = {}
+    record = complete_research_run_failure(
+        session_state,
+        "discovery",
+        sanitize_research_error_message(
+            RuntimeError("Bearer abc123 EDGE_RESEARCH_ARTIFACT_TOKEN=xyz")
+        ),
+    )
+    assert "abc123" not in record["summary"]
+    assert "xyz" not in record["summary"]
+    assert "[REDACTED]" in record["summary"]

@@ -75,3 +75,32 @@ Or publish via HTTP client once Streamlit Secrets are configured.
 - Unit: `mrbot-edge-artifacts.service` (not `mrbot-intraday-*`)
 - Env file: `/etc/mrbot/edge-artifacts.env` (not `intraday.env`)
 - No shared writable directories with `/var/lib/mrbot/intraday_memory`
+
+## Durable Edge Research Memory V1 — Closeout Record
+
+| Field | Value |
+|-------|-------|
+| **Status** | CLOSED / PASS |
+| **Production verification date** | 2026-08-20 |
+| **Persistence stack commit** | `1cbca1ea1` |
+| **Streamlit Secrets bridge commit** | `8da14e3c` |
+
+### Production verification runs
+
+| Run | run_id | Summary |
+|-----|--------|---------|
+| Discovery | `7a2667b95bcd` | 1,988 eligible / 1,848 tested / 20 candidates |
+| Challenger | `c9bfcf66f5f9` | 0 PASS / 3 FRAGILE / 17 REJECT |
+
+- **Market episodes segmented:** 21
+- **VPS durable bundle path:** `/var/lib/mrbot/edge_research_durable/current/bundle.tar.gz`
+- **Streamlit reboot:** Successfully restored the published research state without re-running Discovery or Challenger.
+
+### Operational guarantees (unchanged)
+
+- **Production coupling:** NONE
+- **Edge Research mode:** RESEARCH ONLY
+
+### Documentation policy
+
+**Token and secret VALUES must never be documented** in this repository or operator notes derived from it. Reference configuration *names* only (for example `EDGE_RESEARCH_DURABLE_TOKEN`, `EDGE_RESEARCH_ARTIFACT_TOKEN`). Do not record bearer tokens, GitHub tokens, or any other secret value in closeout records, run logs committed to git, or deployment documentation.

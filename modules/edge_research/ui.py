@@ -6,12 +6,23 @@ Display-only — no production coupling.
 
 from __future__ import annotations
 
+import re
+from datetime import datetime, timezone
 from typing import Any, Callable, Dict, Mapping, MutableMapping, Optional, TypeVar
 
 from modules.edge_research.engine import EdgeResearchEngine
 
 EDGE_RESEARCH_BUSY_STRICT_VERSION = 1
+EDGE_RESEARCH_PENDING_KEY = "edge_research_pending"
+EDGE_RESEARCH_LAST_RUN_KEY = "edge_research_last_run"
 T = TypeVar("T")
+
+_SECRET_PATTERNS = (
+    re.compile(r"Bearer\s+\S+", re.IGNORECASE),
+    re.compile(r"(token|secret|password|api[_-]?key)\s*[=:]\s*\S+", re.IGNORECASE),
+    re.compile(r"EDGE_RESEARCH_DURABLE_TOKEN\S*", re.IGNORECASE),
+    re.compile(r"EDGE_RESEARCH_ARTIFACT_TOKEN\S*", re.IGNORECASE),
+)
 
 
 def _fmt_coverage(start: Optional[str], end: Optional[str], count: int) -> str:
@@ -21,9 +32,11 @@ def _fmt_coverage(start: Optional[str], end: Optional[str], count: int) -> str:
 
 
 def execution_in_progress_from_session(session_state: Mapping[str, Any]) -> bool:
-    """Only literal boolean True means busy; normalize corrupt session values."""
-    busy = session_state.get("edge_research_busy", False)
-    if busy is True:
+    """Only literal boolean True or a queued pending action means busy."""
+    if session_state.get("edge_research_busy") is True:
+        return True
+    pending = session_state.get(EDGE_RESEARCH_PENDING_KEY)
+    if pending in ("discovery", "challenger"):
         return True
     return False
 
@@ -52,6 +65,138 @@ def recover_legacy_edge_research_busy(session_state: MutableMapping[str, Any]) -
     session_state["_edge_research_busy_strict_v"] = EDGE_RESEARCH_BUSY_STRICT_VERSION
 
 
+def get_pending_research_action(session_state: Mapping[str, Any]) -> Optional[str]:
+    pending = session_state.get(EDGE_RESEARCH_PENDING_KEY)
+    if pending in ("discovery", "challenger"):
+        return pending
+    return None
+
+
+def consume_pending_research_action(session_state: MutableMapping[str, Any]) -> Optional[str]:
+    pending = get_pending_research_action(session_state)
+    if pending is None:
+        return None
+    session_state.pop(EDGE_RESEARCH_PENDING_KEY, None)
+    return pending
+
+
+def queue_research_action(session_state: MutableMapping[str, Any], action: str) -> bool:
+    """Record a pending research action without executing it."""
+    if action not in ("discovery", "challenger"):
+        return False
+    if execution_in_progress_from_session(session_state):
+        return False
+    session_state.pop(EDGE_RESEARCH_LAST_RUN_KEY, None)
+    session_state[EDGE_RESEARCH_PENDING_KEY] = action
+    session_state["edge_research_busy"] = True
+    return True
+
+
+def research_run_phase_from_session(session_state: Mapping[str, Any]) -> str:
+    if get_pending_research_action(session_state) or session_state.get("edge_research_busy") is True:
+        return "RUNNING"
+    last_run = session_state.get(EDGE_RESEARCH_LAST_RUN_KEY)
+    if isinstance(last_run, dict):
+        status = last_run.get("status")
+        if status == "COMPLETED":
+            return "COMPLETED"
+        if status == "FAILED":
+            return "FAILED"
+    return "IDLE"
+
+
+def sanitize_research_error_message(exc: BaseException) -> str:
+    message = str(exc) or exc.__class__.__name__
+    for pattern in _SECRET_PATTERNS:
+        message = pattern.sub("[REDACTED]", message)
+    return message[:500]
+
+
+def build_discovery_run_record(result: Any) -> Dict[str, Any]:
+    data_quality = getattr(result, "data_quality", {}) or {}
+    eligible = data_quality.get("eligible_observations", 0)
+    tested = getattr(result, "conditions_tested", 0)
+    candidates = getattr(result, "promoted_candidates", 0)
+    return {
+        "action": "discovery",
+        "status": "COMPLETED",
+        "timestamp": getattr(result, "timestamp", "") or _utc_now_iso(),
+        "run_id": getattr(result, "run_id", ""),
+        "discovery_run_id": getattr(result, "run_id", ""),
+        "summary": (
+            f"{candidates} candidate(s); {tested:,} conditions tested; "
+            f"{eligible:,} eligible observations"
+        ),
+    }
+
+
+def build_challenger_run_record(result: Any) -> Dict[str, Any]:
+    run_id = getattr(result, "run_id", "")
+    if run_id == "skipped":
+        return {
+            "action": "challenger",
+            "status": "COMPLETED",
+            "timestamp": getattr(result, "timestamp", "") or _utc_now_iso(),
+            "run_id": "skipped",
+            "discovery_run_id": getattr(result, "discovery_run_id", ""),
+            "summary": "Challenger skipped — same candidate ledger already evaluated.",
+        }
+    return {
+        "action": "challenger",
+        "status": "COMPLETED",
+        "timestamp": getattr(result, "timestamp", "") or _utc_now_iso(),
+        "run_id": run_id,
+        "discovery_run_id": getattr(result, "discovery_run_id", ""),
+        "summary": (
+            f"PASS={getattr(result, 'robustness_pass', 0)}, "
+            f"FRAGILE={getattr(result, 'robustness_fragile', 0)}, "
+            f"REJECT={getattr(result, 'robustness_reject', 0)}"
+        ),
+    }
+
+
+def complete_research_run_success(
+    session_state: MutableMapping[str, Any],
+    record: Dict[str, Any],
+) -> Dict[str, Any]:
+    session_state[EDGE_RESEARCH_LAST_RUN_KEY] = record
+    session_state.pop(EDGE_RESEARCH_PENDING_KEY, None)
+    session_state["edge_research_busy"] = False
+    return record
+
+
+def complete_research_run_failure(
+    session_state: MutableMapping[str, Any],
+    action: str,
+    error_message: str,
+) -> Dict[str, Any]:
+    record = {
+        "action": action,
+        "status": "FAILED",
+        "timestamp": _utc_now_iso(),
+        "run_id": "",
+        "discovery_run_id": "",
+        "summary": error_message,
+    }
+    session_state[EDGE_RESEARCH_LAST_RUN_KEY] = record
+    session_state.pop(EDGE_RESEARCH_PENDING_KEY, None)
+    session_state["edge_research_busy"] = False
+    return record
+
+
+def format_research_run_status_message(last_run: Mapping[str, Any]) -> str:
+    action = last_run.get("action", "research")
+    status = last_run.get("status", "")
+    summary = last_run.get("summary", "")
+    run_id = last_run.get("run_id", "")
+    parts = [f"{action.title()} {status.lower()}"]
+    if run_id:
+        parts.append(f"run_id={run_id}")
+    if summary:
+        parts.append(summary)
+    return " — ".join(parts)
+
+
 def run_with_edge_research_busy_guard(
     session_state: MutableMapping[str, Any],
     action: Callable[[], T],
@@ -62,6 +207,40 @@ def run_with_edge_research_busy_guard(
         return action()
     finally:
         session_state["edge_research_busy"] = False
+
+
+def execute_pending_research_action(
+    session_state: MutableMapping[str, Any],
+    engine: EdgeResearchEngine,
+) -> Optional[Dict[str, Any]]:
+    """Execute exactly one queued research action and persist session metadata."""
+    pending_action = consume_pending_research_action(session_state)
+    if pending_action is None:
+        return None
+
+    try:
+        if pending_action == "discovery":
+            result = run_with_edge_research_busy_guard(session_state, engine.run_discovery)
+            record = build_discovery_run_record(result)
+        elif pending_action == "challenger":
+            result = run_with_edge_research_busy_guard(
+                session_state,
+                lambda: engine.run_challenger(force=True),
+            )
+            record = build_challenger_run_record(result)
+        else:
+            raise ValueError(f"Unknown research action: {pending_action}")
+        return complete_research_run_success(session_state, record)
+    except Exception as exc:
+        return complete_research_run_failure(
+            session_state,
+            pending_action,
+            sanitize_research_error_message(exc),
+        )
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def compute_edge_research_button_state(
@@ -143,6 +322,32 @@ def _format_research_voice(candidate: Dict[str, Any]) -> str:
     )
 
 
+def _render_research_run_status(st: Any, session_state: Mapping[str, Any]) -> None:
+    phase = research_run_phase_from_session(session_state)
+    pending = get_pending_research_action(session_state)
+
+    if phase == "RUNNING":
+        label = "Discovery" if pending == "discovery" else "Challenger"
+        if pending is None:
+            last_run = session_state.get(EDGE_RESEARCH_LAST_RUN_KEY, {})
+            if isinstance(last_run, dict) and last_run.get("action") == "discovery":
+                label = "Discovery"
+            else:
+                label = "Challenger"
+        st.info(f"**RUNNING:** {label} (research only) — request accepted, execution in progress.")
+        return
+
+    last_run = session_state.get(EDGE_RESEARCH_LAST_RUN_KEY)
+    if not isinstance(last_run, dict):
+        return
+
+    message = format_research_run_status_message(last_run)
+    if last_run.get("status") == "COMPLETED":
+        st.success(message)
+    elif last_run.get("status") == "FAILED":
+        st.error(message)
+
+
 def render_edge_research_panel(
     current_market_state: Optional[str] = None,
     current_market_transition: Optional[str] = None,
@@ -164,6 +369,8 @@ def render_edge_research_panel(
         top_candidates = engine.get_top_candidates(limit=20)
         has_valid_cohort = engine.has_valid_discovery_cohort()
         recover_legacy_edge_research_busy(st.session_state)
+
+        pending_before_execute = get_pending_research_action(st.session_state)
         execution_in_progress = execution_in_progress_from_session(st.session_state)
         ui_state = compute_edge_research_button_state(
             coverage_start=status.coverage_start,
@@ -172,6 +379,8 @@ def render_edge_research_panel(
             has_valid_cohort=has_valid_cohort,
             execution_in_progress=execution_in_progress,
         )
+
+        _render_research_run_status(st, st.session_state)
 
         engine_label = (
             "CHALLENGER / RESEARCH ONLY"
@@ -283,12 +492,7 @@ def render_edge_research_panel(
                 key="edge_research_run_discovery",
                 disabled=discovery_disabled,
             ):
-                with st.spinner("Running controlled discovery..."):
-                    result = run_with_edge_research_busy_guard(
-                        st.session_state,
-                        engine.run_discovery,
-                    )
-                    st.success(f"Discovery complete: {result.promoted_candidates} candidate(s).")
+                if queue_research_action(st.session_state, "discovery"):
                     st.rerun()
             if discovery_caption:
                 st.caption(discovery_caption)
@@ -298,21 +502,20 @@ def render_edge_research_panel(
                 key="edge_research_run_challenger",
                 disabled=challenger_disabled,
             ):
-                with st.spinner("Running challenger robustness tests..."):
-                    result = run_with_edge_research_busy_guard(
-                        st.session_state,
-                        lambda: engine.run_challenger(force=True),
-                    )
-                    if result.run_id == "skipped":
-                        st.info("Challenger skipped — same candidate ledger already evaluated.")
-                    else:
-                        st.success(
-                            f"Challenger complete: PASS={result.robustness_pass}, "
-                            f"FRAGILE={result.robustness_fragile}, REJECT={result.robustness_reject}"
-                        )
+                if queue_research_action(st.session_state, "challenger"):
                     st.rerun()
             if challenger_caption:
                 st.caption(challenger_caption)
+
+        if pending_before_execute is not None:
+            spinner_label = (
+                "Running controlled discovery..."
+                if pending_before_execute == "discovery"
+                else "Running challenger robustness tests..."
+            )
+            with st.spinner(spinner_label):
+                execute_pending_research_action(st.session_state, engine)
+            st.rerun()
 
         return status.to_dict()
 
