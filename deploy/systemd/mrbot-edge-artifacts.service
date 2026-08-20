@@ -1,0 +1,18 @@
+[Unit]
+Description=Mr.BOT Edge Research durable artifact HTTP service
+Documentation=file:/opt/mrbot-camera/docs/edge_research_artifact_deployment.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/mrbot/edge-artifacts.env
+WorkingDirectory=/opt/mrbot-camera
+ExecStart=/opt/mrbot-camera-venv/bin/python -m modules.edge_research.artifact_server
+Restart=on-failure
+RestartSec=5
+# Bind loopback by default — expose via HTTPS reverse proxy only.
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

@@ -21,6 +21,7 @@ from modules.edge_research.adapters import (
 from modules.edge_research.challenger import ChallengerRunResult, run_challenger
 from modules.edge_research.contracts import ENGINE_VERSION, ROBUSTNESS_FRAGILE, ROBUSTNESS_PASS, ROBUSTNESS_REJECT
 from modules.edge_research.discovery import DiscoveryRunResult, run_discovery
+from modules.edge_research.persistence import publish_durable, try_restore_durable
 from modules.edge_research.storage import (
     append_candidates,
     append_robustness_history,
@@ -94,7 +95,9 @@ class EdgeResearchEngine:
         self.data_dir = resolve_data_dir(data_dir)
 
     def initialize(self) -> Path:
-        return ensure_storage(self.data_dir)
+        root = ensure_storage(self.data_dir)
+        try_restore_durable(self.data_dir)
+        return root
 
     def get_foundation_status(
         self,
@@ -212,6 +215,7 @@ class EdgeResearchEngine:
         elif result.promoted_candidates == 0:
             write_status({**self.get_foundation_status().to_dict(), "last_research_event": "NONE"}, data_dir=self.data_dir)
 
+        publish_durable(self.data_dir)
         return result
 
     def run_challenger(self, *, force: bool = False) -> ChallengerRunResult:
@@ -270,6 +274,7 @@ class EdgeResearchEngine:
             voice = self._format_challenger_voice(top)
             write_status({**self.get_foundation_status().to_dict(), "last_research_event": voice}, data_dir=self.data_dir)
 
+        publish_durable(self.data_dir)
         return result
 
     @staticmethod
