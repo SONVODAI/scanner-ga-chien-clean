@@ -21,6 +21,7 @@ def edge_data_dir(tmp_path, monkeypatch):
     monkeypatch.delenv("EDGE_RESEARCH_DURABLE_PATH", raising=False)
     monkeypatch.delenv("EDGE_RESEARCH_DURABLE_BACKEND", raising=False)
     monkeypatch.delenv("EDGE_RESEARCH_DURABLE_URL", raising=False)
+    monkeypatch.delenv("EDGE_RESEARCH_DURABLE_TOKEN", raising=False)
     return d
 
 
@@ -275,3 +276,125 @@ def test_publish_after_transaction(edge_data_dir, durable_dir):
     assert (durable_dir / "current" / "manifest.json").exists()
     status = read_persistence_status(edge_data_dir)
     assert status.last_operation == "publish"
+
+
+# --- Streamlit secrets bridge (EDGE_RESEARCH_DURABLE_* resolution) ---
+
+TEST_SECRET_TOKEN = "streamlit-secrets-token-placeholder"
+
+
+class _FakeSecrets:
+    def __init__(self, mapping: dict) -> None:
+        self._mapping = mapping
+
+    def get(self, name: str, default=None):
+        return self._mapping.get(name, default)
+
+
+class _FakeStreamlit:
+    def __init__(self, mapping: dict) -> None:
+        self.secrets = _FakeSecrets(mapping)
+
+
+def _clear_durable_env(monkeypatch) -> None:
+    for key in (
+        "EDGE_RESEARCH_DURABLE_BACKEND",
+        "EDGE_RESEARCH_DURABLE_URL",
+        "EDGE_RESEARCH_DURABLE_TOKEN",
+        "EDGE_RESEARCH_DURABLE_PATH",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
+def test_durable_config_from_environment(monkeypatch):
+    import modules.edge_research.durable as durable_mod
+
+    _clear_durable_env(monkeypatch)
+    monkeypatch.setattr(durable_mod, "st", None)
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_BACKEND", "http")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", "https://example.test")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", TEST_SECRET_TOKEN)
+
+    backend = durable_mod.resolve_durable_backend()
+    assert backend.name == "http"
+    assert backend.base_url == "https://example.test"
+    assert backend.token == TEST_SECRET_TOKEN
+
+
+def test_durable_config_from_streamlit_secrets(monkeypatch):
+    import modules.edge_research.durable as durable_mod
+
+    _clear_durable_env(monkeypatch)
+    monkeypatch.setattr(
+        durable_mod,
+        "st",
+        _FakeStreamlit(
+            {
+                "EDGE_RESEARCH_DURABLE_BACKEND": "http",
+                "EDGE_RESEARCH_DURABLE_URL": "https://mrbot-edge.example.test",
+                "EDGE_RESEARCH_DURABLE_TOKEN": TEST_SECRET_TOKEN,
+            }
+        ),
+    )
+
+    backend = durable_mod.resolve_durable_backend()
+    assert backend.name == "http"
+    assert backend.base_url == "https://mrbot-edge.example.test"
+    assert backend.token == TEST_SECRET_TOKEN
+
+
+def test_streamlit_secrets_take_precedence_over_env(monkeypatch):
+    import modules.edge_research.durable as durable_mod
+
+    _clear_durable_env(monkeypatch)
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_BACKEND", "none")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", "https://env-should-not-win.test")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", "env-token-should-not-win")
+    monkeypatch.setattr(
+        durable_mod,
+        "st",
+        _FakeStreamlit(
+            {
+                "EDGE_RESEARCH_DURABLE_BACKEND": "http",
+                "EDGE_RESEARCH_DURABLE_URL": "https://secrets-win.test",
+                "EDGE_RESEARCH_DURABLE_TOKEN": TEST_SECRET_TOKEN,
+            }
+        ),
+    )
+
+    backend = durable_mod.resolve_durable_backend()
+    assert backend.name == "http"
+    assert backend.base_url == "https://secrets-win.test"
+    assert backend.token == TEST_SECRET_TOKEN
+
+
+def test_missing_durable_config_remains_disabled(monkeypatch):
+    import modules.edge_research.durable as durable_mod
+
+    _clear_durable_env(monkeypatch)
+    monkeypatch.setattr(durable_mod, "st", _FakeStreamlit({}))
+
+    backend = durable_mod.resolve_durable_backend()
+    assert backend.name == "none"
+    assert backend.is_configured() is False
+
+
+def test_durable_token_not_leaked_in_persistence_status(edge_data_dir, monkeypatch):
+    import modules.edge_research.durable as durable_mod
+    from modules.edge_research.persistence import publish_durable, read_persistence_status
+
+    _clear_durable_env(monkeypatch)
+    monkeypatch.setattr(durable_mod, "st", None)
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_BACKEND", "http")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", "https://unreachable.example.test")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", TEST_SECRET_TOKEN)
+
+    _seed_reference_copy(edge_data_dir)
+    pub = publish_durable(edge_data_dir)
+    assert pub.last_result == "failed"
+    assert TEST_SECRET_TOKEN not in pub.message
+
+    status = read_persistence_status(edge_data_dir)
+    status_blob = json.dumps(status.to_dict())
+    assert TEST_SECRET_TOKEN not in status_blob
+    assert "Bearer" not in status_blob

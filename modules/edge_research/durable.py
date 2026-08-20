@@ -29,6 +29,30 @@ from modules.edge_research.bundle import (
     write_bundle_to_dir,
 )
 
+try:
+    import streamlit as st
+except Exception:  # pragma: no cover - allow tests/import outside Streamlit
+    st = None  # type: ignore[assignment]
+
+
+def _secret_or_env(name: str, default: Optional[str] = None) -> Optional[str]:
+    """Resolve config from Streamlit secrets first, then environment (earning_learning pattern)."""
+    value: Any = None
+
+    if st is not None:
+        try:
+            value = st.secrets.get(name)
+        except Exception:
+            value = None
+
+    if value in (None, ""):
+        value = os.getenv(name, default)
+
+    if value in (None, ""):
+        return None
+
+    return str(value).strip()
+
 
 class DurableBackendError(RuntimeError):
     """Durable persistence operation failed."""
@@ -306,11 +330,13 @@ def resolve_durable_backend() -> DurableBackend:
     EDGE_RESEARCH_DURABLE_PATH: root directory for local backend
     EDGE_RESEARCH_DURABLE_URL: base URL for http backend
     EDGE_RESEARCH_DURABLE_TOKEN: bearer token (Streamlit secrets / env only)
+
+    BACKEND, URL, and TOKEN resolve via Streamlit secrets when available, else os.environ.
     """
-    backend_type = (os.environ.get("EDGE_RESEARCH_DURABLE_BACKEND") or "").strip().lower()
+    backend_type = (_secret_or_env("EDGE_RESEARCH_DURABLE_BACKEND") or "").lower()
     durable_path = (os.environ.get("EDGE_RESEARCH_DURABLE_PATH") or "").strip()
-    durable_url = (os.environ.get("EDGE_RESEARCH_DURABLE_URL") or "").strip()
-    durable_token = (os.environ.get("EDGE_RESEARCH_DURABLE_TOKEN") or "").strip()
+    durable_url = _secret_or_env("EDGE_RESEARCH_DURABLE_URL") or ""
+    durable_token = _secret_or_env("EDGE_RESEARCH_DURABLE_TOKEN") or ""
 
     if backend_type in ("none", "disabled", "off"):
         return DisabledDurableBackend()
