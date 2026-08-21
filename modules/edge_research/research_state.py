@@ -352,6 +352,9 @@ class ResearchSession:
     research_realized_gain_by_branch: Optional[Dict[str, List[Dict[str, Any]]]] = None
     research_revalued_erv_history: Optional[List[Dict[str, Any]]] = None
     experiment_assessment_snapshots: Optional[Dict[str, Dict[str, Any]]] = None
+    research_line_registry: Optional[Dict[str, Any]] = None
+    research_line_marginal_audit: Optional[List[Dict[str, Any]]] = None
+    research_line_opportunity_audit: Optional[List[Dict[str, Any]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -405,6 +408,12 @@ class ResearchSession:
             payload["research_revalued_erv_history"] = list(self.research_revalued_erv_history)
         if self.experiment_assessment_snapshots:
             payload["experiment_assessment_snapshots"] = dict(self.experiment_assessment_snapshots)
+        if self.research_line_registry:
+            payload["research_line_registry"] = dict(self.research_line_registry)
+        if self.research_line_marginal_audit:
+            payload["research_line_marginal_audit"] = list(self.research_line_marginal_audit)
+        if self.research_line_opportunity_audit:
+            payload["research_line_opportunity_audit"] = list(self.research_line_opportunity_audit)
         return payload
 
     @classmethod
@@ -469,6 +478,15 @@ class ResearchSession:
             else None,
             experiment_assessment_snapshots=dict(payload["experiment_assessment_snapshots"])
             if payload.get("experiment_assessment_snapshots")
+            else None,
+            research_line_registry=dict(payload["research_line_registry"])
+            if payload.get("research_line_registry")
+            else None,
+            research_line_marginal_audit=list(payload["research_line_marginal_audit"])
+            if payload.get("research_line_marginal_audit")
+            else None,
+            research_line_opportunity_audit=list(payload["research_line_opportunity_audit"])
+            if payload.get("research_line_opportunity_audit")
             else None,
         )
 

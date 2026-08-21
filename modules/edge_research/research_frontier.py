@@ -61,6 +61,10 @@ class FrontierItem:
     transformation_type: str = ""
     enqueued_sequence: int = 0
     portfolio_score: float = 0.0
+    research_line_id: str = ""
+    research_line_identity: Optional[Dict[str, Any]] = None
+    defer_evidence_snapshot: Optional[Dict[str, Any]] = None
+    freshness_classification: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -88,6 +92,14 @@ class FrontierItem:
             "transformation_type": self.transformation_type,
             "enqueued_sequence": self.enqueued_sequence,
             "portfolio_score": self.portfolio_score,
+            "research_line_id": self.research_line_id,
+            "research_line_identity": dict(self.research_line_identity)
+            if self.research_line_identity
+            else None,
+            "defer_evidence_snapshot": dict(self.defer_evidence_snapshot)
+            if self.defer_evidence_snapshot
+            else None,
+            "freshness_classification": self.freshness_classification,
         }
 
     @classmethod
@@ -117,6 +129,14 @@ class FrontierItem:
             transformation_type=str(payload.get("transformation_type", "")),
             enqueued_sequence=int(payload.get("enqueued_sequence", 0)),
             portfolio_score=float(payload.get("portfolio_score", 0.0)),
+            research_line_id=str(payload.get("research_line_id", "")),
+            research_line_identity=dict(payload["research_line_identity"])
+            if payload.get("research_line_identity")
+            else None,
+            defer_evidence_snapshot=dict(payload["defer_evidence_snapshot"])
+            if payload.get("defer_evidence_snapshot")
+            else None,
+            freshness_classification=str(payload.get("freshness_classification", "")),
         )
 
     def to_action_candidate(self) -> "ResearchActionCandidate":
@@ -284,6 +304,9 @@ class ResearchFrontier:
             total, comp = scores.get(cand.action_id, (0.0, {}))
             feat = _extract_feature(cand)
             fid = self._next_id()
+            from modules.edge_research.research_line_identity import derive_identity_from_candidate
+
+            line_identity = derive_identity_from_candidate(cand)
             self.items[fid] = FrontierItem(
                 frontier_id=fid,
                 action_id=cand.action_id,
@@ -307,6 +330,7 @@ class ResearchFrontier:
                 transformation_type=transformation,
                 enqueued_sequence=enqueued_sequence,
                 portfolio_score=float(total),
+                research_line_identity=line_identity.to_dict() if line_identity else None,
             )
             existing_action_ids.add(cand.action_id)
             added += 1

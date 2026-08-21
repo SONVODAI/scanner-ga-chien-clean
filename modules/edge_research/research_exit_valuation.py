@@ -358,6 +358,19 @@ def prepare_post_experiment_exit_context(
         branch_root_id=branch_root_id,
     )
     record_realized_information_gain(graph, gain)
+    from modules.edge_research.research_line_registry import assign_and_record_experiment_line
+
+    frame_id = ""
+    reg = graph.get_frame_registry()
+    if reg.active_frame_id:
+        frame_id = reg.active_frame_id
+    assign_and_record_experiment_line(
+        graph,
+        experiment_node_id=experiment_node_id,
+        gain_level=gain.gain_level,
+        gain_entry=gain.to_dict(),
+        frame_id=frame_id,
+    )
 
 
 def validate_no_forbidden_exit_patterns(source: Any) -> List[str]:

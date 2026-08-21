@@ -62,6 +62,10 @@ class GlobalComparableOpportunity:
     duplicate_of_experiment_id: str = ""
     duplicate_representative_id: str = ""
     opportunity: Any = None  # ResearchOpportunity when available
+    research_line_id: str = ""
+    semantic_relationship: str = ""
+    freshness_classification: str = ""
+    semantic_marginal_audit: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -88,6 +92,10 @@ class GlobalComparableOpportunity:
             "duplicate_of_experiment_id": self.duplicate_of_experiment_id,
             "duplicate_representative_id": self.duplicate_representative_id,
             "opportunity": self.opportunity.to_dict() if self.opportunity is not None else None,
+            "research_line_id": self.research_line_id,
+            "semantic_relationship": self.semantic_relationship,
+            "freshness_classification": self.freshness_classification,
+            "semantic_marginal_audit": dict(self.semantic_marginal_audit),
         }
 
 
@@ -185,6 +193,150 @@ def _validate_frontier_temporal_legality(
     except Exception as exc:
         return False, f"temporal_validation_error:{type(exc).__name__}"
     return True, ""
+
+
+def _record_line_opportunity_audit(graph: "ResearchGraph", entry: Dict[str, Any]) -> None:
+    trail = list(getattr(graph.session, "research_line_opportunity_audit", None) or [])
+    trail.append(entry)
+    graph.session.research_line_opportunity_audit = trail[-200:]
+
+
+def enrich_opportunity_semantic_context(
+    graph: "ResearchGraph",
+    opp: GlobalComparableOpportunity,
+    assessment: "ResearchAssessment",
+    *,
+    planning_sequence: int = 0,
+    frontier_item: Optional["FrontierItem"] = None,
+) -> GlobalComparableOpportunity:
+    """Attach research-line identity, relationship, and freshness audit metadata."""
+    from modules.edge_research.research_line_decay_transfer import build_semantic_marginal_evidence
+    from modules.edge_research.research_line_freshness import (
+        EvidenceSnapshot,
+        assess_freshness,
+    )
+    from modules.edge_research.research_line_identity import (
+        ResearchLineIdentity,
+        derive_identity_from_candidate,
+        derive_identity_from_frontier_item,
+    )
+    from modules.edge_research.research_line_registry import (
+        get_line_realized_gain_history,
+        resolve_line_for_candidate,
+    )
+    from modules.edge_research.research_realized_information_gain import get_branch_realized_gain_history
+    from modules.edge_research.research_search_accounting import branch_root_id
+
+    identity: Optional[ResearchLineIdentity] = None
+    if opp.action_candidate is not None:
+        identity = derive_identity_from_candidate(opp.action_candidate)
+    elif frontier_item is not None:
+        identity = derive_identity_from_frontier_item(frontier_item)
+
+    if identity is None:
+        return opp
+
+    line_id, rel_dict = resolve_line_for_candidate(graph, identity)
+    relationship = (rel_dict or {}).get("classification", "")
+
+    defer_snap: Optional[EvidenceSnapshot] = None
+    if frontier_item and frontier_item.defer_evidence_snapshot:
+        defer_snap = EvidenceSnapshot.from_dict(frontier_item.defer_evidence_snapshot)
+    elif frontier_item and frontier_item.research_line_identity:
+        defer_snap = EvidenceSnapshot(
+            uncertainty_codes=tuple(
+                (frontier_item.research_line_identity or {}).get("uncertainty_codes") or ()
+            ),
+            observation_horizon=int(
+                (frontier_item.research_line_identity or {}).get("observation_horizon") or 0
+            ),
+            population_spec=dict(frontier_item.population_spec),
+            outcome_spec=dict(frontier_item.outcome_spec),
+            planning_sequence=frontier_item.enqueued_sequence,
+        )
+
+    current_snap = EvidenceSnapshot.from_assessment(
+        assessment, identity=identity, planning_sequence=planning_sequence
+    )
+    prior_gain = ""
+    prior_attempts = 0
+    if line_id:
+        gains = get_line_realized_gain_history(graph, line_id)
+        prior_attempts = len(gains)
+        if gains:
+            prior_gain = gains[-1]
+
+    freshness = assess_freshness(
+        identity=identity,
+        research_line_id=line_id or "",
+        defer_snapshot=defer_snap,
+        current_snapshot=current_snap,
+        prior_attempt_count=prior_attempts,
+        prior_realized_gain=prior_gain,
+        last_attempt_sequence=defer_snap.planning_sequence if defer_snap else 0,
+        erv_changed_only=opp.is_revisit and not defer_snap,
+    )
+
+    br_root = opp.branch_root_id or ""
+    if not br_root and opp.parent_experiment_node_id:
+        br_root = branch_root_id(graph, opp.parent_experiment_node_id)
+    branch_hist = get_branch_realized_gain_history(graph, br_root)
+    branch_levels = [e.get("gain_level", "UNRESOLVED") for e in branch_hist]
+    tools = tuple(assessment.branch_tools_attempted or ())
+
+    semantic_ev = build_semantic_marginal_evidence(
+        graph,
+        candidate_identity=identity,
+        branch_levels=branch_levels,
+        branch_tools_attempted=tools,
+        freshness_classification=freshness.classification,
+    )
+
+    audit_entry = {
+        "opportunity_id": opp.opportunity_id,
+        "research_line_id": line_id or semantic_ev.matched_line_id,
+        "semantic_relationship": semantic_ev.relationship_classification,
+        "freshness": freshness.to_dict(),
+        "semantic_marginal": semantic_ev.to_dict(),
+    }
+    _record_line_opportunity_audit(graph, audit_entry)
+
+    if frontier_item is not None:
+        frontier_item.research_line_id = line_id or semantic_ev.matched_line_id
+        frontier_item.freshness_classification = freshness.classification
+        if defer_snap is None:
+            frontier_item.defer_evidence_snapshot = current_snap.to_dict()
+
+    return GlobalComparableOpportunity(
+        opportunity_id=opp.opportunity_id,
+        source=opp.source,
+        action_id=opp.action_id,
+        action_candidate=opp.action_candidate,
+        frontier_id=opp.frontier_id,
+        parent_experiment_node_id=opp.parent_experiment_node_id,
+        branch_root_id=opp.branch_root_id,
+        frame_id=opp.frame_id,
+        historical_planner_score=opp.historical_planner_score,
+        current_revalued_value=opp.current_revalued_value,
+        expected_research_value=opp.expected_research_value,
+        erv_components=dict(opp.erv_components),
+        comparable=opp.comparable,
+        exclusion_reason=opp.exclusion_reason,
+        created_sequence=opp.created_sequence,
+        revalued_sequence=opp.revalued_sequence,
+        context_switch_required=opp.context_switch_required,
+        current_branch_root_id=opp.current_branch_root_id,
+        is_revisit=opp.is_revisit,
+        from_frontier=opp.from_frontier,
+        experiment_content_hash=opp.experiment_content_hash,
+        duplicate_of_experiment_id=opp.duplicate_of_experiment_id,
+        duplicate_representative_id=opp.duplicate_representative_id,
+        opportunity=opp.opportunity,
+        research_line_id=line_id or semantic_ev.matched_line_id,
+        semantic_relationship=semantic_ev.relationship_classification,
+        freshness_classification=freshness.classification,
+        semantic_marginal_audit=semantic_ev.to_dict(),
+    )
 
 
 def _reconstruct_frontier_context(
@@ -448,7 +600,25 @@ def collect_global_opportunities(
     comparable_pool, excluded = apply_experiment_identity_deduplication(
         global_opps, excluded, graph
     )
-    return comparable_pool, excluded
+
+    enriched: List[GlobalComparableOpportunity] = []
+    frontier_dirty = False
+    for g in comparable_pool:
+        frontier_item = frontier.items.get(g.frontier_id) if g.frontier_id else None
+        enriched.append(
+            enrich_opportunity_semantic_context(
+                graph,
+                g,
+                assessment,
+                planning_sequence=seq,
+                frontier_item=frontier_item,
+            )
+        )
+        if frontier_item is not None:
+            frontier_dirty = True
+    if frontier_dirty:
+        graph.persist_frontier()
+    return enriched, excluded
 
 
 def _best_erv_by_source(
@@ -644,6 +814,28 @@ def select_global_research_opportunity(
             compute_research_exit_value,
             evaluate_exit_vs_experiment,
         )
+        from modules.edge_research.research_line_decay_transfer import (
+            build_semantic_marginal_evidence,
+            record_semantic_marginal_audit,
+        )
+        from modules.edge_research.research_line_identity import derive_identity_from_candidate
+        from modules.edge_research.research_realized_information_gain import (
+            get_branch_realized_gain_history,
+        )
+
+        cand_identity = None
+        if best_experiment.action_candidate is not None:
+            cand_identity = derive_identity_from_candidate(best_experiment.action_candidate)
+        branch_hist = get_branch_realized_gain_history(graph, current_root)
+        branch_levels = [e.get("gain_level", "UNRESOLVED") for e in branch_hist]
+        semantic_ev = build_semantic_marginal_evidence(
+            graph,
+            candidate_identity=cand_identity,
+            branch_levels=branch_levels,
+            branch_tools_attempted=tuple(assessment.branch_tools_attempted or ()),
+            freshness_classification=best_experiment.freshness_classification,
+        )
+        record_semantic_marginal_audit(graph, semantic_ev)
 
         marginal = build_branch_marginal_state(
             graph=graph,
@@ -651,6 +843,9 @@ def select_global_research_opportunity(
             branch_root_id=current_root,
             experiment_node_id=experiment_node_id,
             planning_sequence=seq,
+            semantic_realized_levels=semantic_ev.merged_realized_levels,
+            semantic_relationship=semantic_ev.relationship_classification,
+            representation_novelty_only=semantic_ev.representation_novelty_only,
         )
         record_branch_marginal_state(graph, marginal)
         branch_marginal_state_str = marginal.marginal_state

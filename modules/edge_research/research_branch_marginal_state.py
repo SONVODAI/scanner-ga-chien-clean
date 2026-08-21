@@ -170,6 +170,9 @@ def build_branch_marginal_state(
     branch_root_id: str,
     experiment_node_id: Optional[str] = None,
     planning_sequence: int = 0,
+    semantic_realized_levels: Optional[Tuple[str, ...]] = None,
+    semantic_relationship: str = "",
+    representation_novelty_only: bool = False,
 ) -> ResearchBranchMarginalState:
     """Build auditable branch marginal state from evidence available before planning."""
     from modules.edge_research.research_frame import assess_frame_saturation
@@ -179,7 +182,11 @@ def build_branch_marginal_state(
     experiments_on_branch = branch.experiments_on_branch if branch else 0
 
     realized_history = get_branch_realized_gain_history(graph, branch_root_id)
-    realized_levels = [e.get("gain_level", RealizedGainLevel.UNRESOLVED.value) for e in realized_history]
+    branch_levels = [e.get("gain_level", RealizedGainLevel.UNRESOLVED.value) for e in realized_history]
+    if semantic_realized_levels is not None:
+        realized_levels = list(semantic_realized_levels)
+    else:
+        realized_levels = branch_levels
 
     revalued_history = _recent_revalued_erv(graph, branch_root_id)
     iv_history = _recent_iv_contributions(graph)
@@ -197,9 +204,12 @@ def build_branch_marginal_state(
                 redundancy.append(f"repeated_tool_attempt:{t}x{c}")
 
     novelty: List[str] = []
-    for g in realized_history[-3:]:
-        if g.get("gain_level") in (RealizedGainLevel.HIGH.value, RealizedGainLevel.MEDIUM.value):
-            novelty.append(f"experiment:{g.get('experiment_node_id', '')[:12]}")
+    if not representation_novelty_only:
+        for g in realized_history[-3:]:
+            if g.get("gain_level") in (RealizedGainLevel.HIGH.value, RealizedGainLevel.MEDIUM.value):
+                novelty.append(f"experiment:{g.get('experiment_node_id', '')[:12]}")
+    if semantic_relationship:
+        novelty.append(f"semantic_relationship:{semantic_relationship}")
 
     frame_id = ""
     frame_status = "ACTIVE"
