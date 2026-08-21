@@ -22,6 +22,7 @@ from modules.edge_research.research_state import (
     QuestionRationale,
     ResearchGraphSnapshot,
     ResearchNode,
+    ResearchQuestionContext,
     ResearchSession,
     ResearchTrigger,
     SessionStatus,
@@ -176,6 +177,7 @@ class ResearchGraph:
         parent_node_ids: Sequence[str],
         question_text: str,
         rationale: QuestionRationale,
+        question_context: Optional[ResearchQuestionContext] = None,
         node_id: Optional[str] = None,
         created_at: Optional[str] = None,
     ) -> str:
@@ -191,6 +193,7 @@ class ResearchGraph:
             parent_node_ids=list(parent_node_ids),
             question_text=question_text,
             rationale=rationale,
+            question_context=question_context,
         )
         self.nodes[nid] = node
         for pid in parent_node_ids:
@@ -308,6 +311,7 @@ class ResearchGraph:
         question_text: str,
         reason_code: str,
         evidence_summary: Optional[Dict[str, Any]] = None,
+        question_context: Optional[ResearchQuestionContext] = None,
         node_id: Optional[str] = None,
     ) -> str:
         exp = self.get_node(experiment_node_id)
@@ -323,6 +327,7 @@ class ResearchGraph:
                 prior_node_id=experiment_node_id,
                 evidence_summary=dict(evidence_summary or {}),
             ),
+            question_context=question_context,
             node_id=node_id,
         )
 
