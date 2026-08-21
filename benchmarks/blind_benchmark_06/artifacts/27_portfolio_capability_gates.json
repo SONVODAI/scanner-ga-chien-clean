@@ -1,0 +1,231 @@
+{
+  "gate_A_budget_exhausted": {
+    "result": "FAIL",
+    "evidence": 4
+  },
+  "gate_B_portfolio_decisions_audited": {
+    "result": "FAIL",
+    "evidence": "3 portfolio decisions with explanation records"
+  },
+  "gate_C_opportunity_cost_stored": {
+    "result": "PASS",
+    "evidence": "Each selection stores best alternative and why-selected"
+  },
+  "gate_D_marginal_gain_tracking": {
+    "result": "PASS",
+    "evidence": {
+      "mean_mig": 0.4
+    }
+  },
+  "gate_E_temporal_legality": {
+    "result": "PASS",
+    "evidence": {
+      "attempted_illegal_transformations": [],
+      "rejected_future_leakage_actions": 0,
+      "executed_frame_legality": [
+        {
+          "frame_id": "frame-00001",
+          "observation_horizon": 0,
+          "temporally_legal": true,
+          "outcome_field": "t5_return"
+        },
+        {
+          "frame_id": "frame-00007",
+          "observation_horizon": 5,
+          "temporally_legal": true,
+          "outcome_field": "t10_return"
+        },
+        {
+          "frame_id": "frame-00003",
+          "observation_horizon": 0,
+          "temporally_legal": true,
+          "outcome_field": "t3_return"
+        },
+        {
+          "frame_id": "frame-00007",
+          "lineage_temporal_legal": true,
+          "transformation": "OUTCOME_TO_POPULATION"
+        },
+        {
+          "frame_id": "frame-00003",
+          "lineage_temporal_legal": true,
+          "transformation": "STRUCTURAL_TRIGGER"
+        }
+      ],
+      "all_executed_frames_temporally_legal": true,
+      "outcome_to_population_legality_decisions": [
+        {
+          "frame_id": "frame-00007",
+          "legal": true
+        }
+      ]
+    }
+  },
+  "gate_F_no_runtime_failure": {
+    "result": "FAIL",
+    "evidence": {
+      "runtime_error_occurred": true,
+      "error_message": "Duplicate experiment content_hash=e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44 already recorded at node exp-5f1e13ae9c7c",
+      "session_terminal_status": "ERROR",
+      "last_completed_experiment": "exp-0f6d01eb1bb9",
+      "active_frame_id": "frame-00003",
+      "lineage_records_persisted": 2,
+      "lineage_survived_failure": true,
+      "lineage_records": [
+        {
+          "old_frame_id": "frame-00001",
+          "new_frame_id": "frame-00007",
+          "transformation": "OUTCOME_TO_POPULATION",
+          "trigger": "OUTCOME_TO_POPULATION",
+          "saturation_evidence": {},
+          "parent_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "new_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+          "new_population_hash": "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0",
+          "observation_horizon": 5,
+          "parent_observation_horizon": 0,
+          "sample_n": null,
+          "temporal_legal": true,
+          "triggering_experiment_id": "exp-952b8ab91072",
+          "planner_action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00007",
+          "planner_score": 10.15,
+          "sequence_order": 0
+        },
+        {
+          "old_frame_id": "frame-00007",
+          "new_frame_id": "frame-00003",
+          "transformation": "STRUCTURAL_TRIGGER",
+          "trigger": "STRUCTURAL_TRIGGER",
+          "saturation_evidence": {},
+          "parent_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+          "parent_population_hash": "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0",
+          "new_outcome_hash": "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+          "new_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "observation_horizon": 0,
+          "parent_observation_horizon": 5,
+          "sample_n": null,
+          "temporal_legal": true,
+          "triggering_experiment_id": "exp-952b8ab91072",
+          "planner_action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00003",
+          "planner_score": null,
+          "sequence_order": 1
+        }
+      ],
+      "frontier_persisted": true,
+      "search_accounting_persisted": true,
+      "false_completion_nodes": [],
+      "session_stop_reason": {
+        "code": "DOWNSTREAM_FAILURE",
+        "operation": "plan_after_experiment",
+        "experiment_node_id": "exp-0f6d01eb1bb9",
+        "frame_id": "frame-00003",
+        "error_type": "DuplicateExperimentError",
+        "error_message": "Duplicate experiment content_hash=e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44 already recorded at node exp-5f1e13ae9c7c",
+        "experiment_executed": true
+      }
+    }
+  },
+  "gate_G_revisit_tracking_active": {
+    "result": "PASS",
+    "evidence": {
+      "revisit_count": 0
+    }
+  },
+  "gate_H_discovery_optional": {
+    "result": "PASS",
+    "evidence": "3 conditional candidates",
+    "note": "Discovery may fail while allocation gates pass."
+  },
+  "gate_I_frontier_quality_measured": {
+    "result": "PASS",
+    "evidence": {
+      "viable_frontier_size": 32,
+      "high_value_unexplored": 14,
+      "stale_opportunities": 0,
+      "dominated_on_frontier": 0,
+      "high_value_items": [
+        {
+          "frontier_id": "frontier-00006",
+          "action_code": "REFRAME_OUTCOME",
+          "planner_score": 8.7
+        },
+        {
+          "frontier_id": "frontier-00007",
+          "action_code": "REFRAME_OUTCOME",
+          "planner_score": 8.7
+        },
+        {
+          "frontier_id": "frontier-00008",
+          "action_code": "REFRAME_OUTCOME",
+          "planner_score": 7.125
+        },
+        {
+          "frontier_id": "frontier-00009",
+          "action_code": "REFRAME_OUTCOME",
+          "planner_score": 8.175
+        },
+        {
+          "frontier_id": "frontier-00010",
+          "action_code": "REFRAME_OUTCOME",
+          "planner_score": 8.175
+        },
+        {
+          "frontier_id": "frontier-00020",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00002",
+          "planner_score": 8.2
+        },
+        {
+          "frontier_id": "frontier-00022",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00004",
+          "planner_score": 6.625
+        },
+        {
+          "frontier_id": "frontier-00023",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00005",
+          "planner_score": 7.675
+        },
+        {
+          "frontier_id": "frontier-00024",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00006",
+          "planner_score": 7.675
+        },
+        {
+          "frontier_id": "frontier-00025",
+          "action_code": "REFRAME_HORIZON_ADVANCE_frame-00008",
+          "planner_score": 3.7
+        },
+        {
+          "frontier_id": "frontier-00026",
+          "action_code": "HORIZON_ADVANCE_frame-00009",
+          "planner_score": 8.15
+        },
+        {
+          "frontier_id": "frontier-00027",
+          "action_code": "HORIZON_ADVANCE_frame-00010",
+          "planner_score": 3.2
+        },
+        {
+          "frontier_id": "frontier-00028",
+          "action_code": "REFRAME_OUTCOME",
+          "planner_score": 4.0875
+        },
+        {
+          "frontier_id": "frontier-00030",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00011",
+          "planner_score": 3.5875000000000004
+        }
+      ],
+      "status_counts": {
+        "DUPLICATE": 9,
+        "SELECTED": 1,
+        "UNEXPLORED": 32,
+        "INVALID": 8,
+        "EXECUTED": 1
+      }
+    }
+  },
+  "gate_J_unresolved_value_at_termination": {
+    "result": "PASS",
+    "evidence": 1.0
+  }
+}

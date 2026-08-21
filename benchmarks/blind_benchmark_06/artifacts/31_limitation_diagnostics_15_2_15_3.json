@@ -1,0 +1,43 @@
+{
+  "limitation_15_2_frontier_exploitation_assessment": {
+    "description": "Frontier revaluation may use current experiment assessment for exploitation components",
+    "evidence_cases": [],
+    "case_count": 0
+  },
+  "limitation_15_3_session_stop_historical_scores": {
+    "limitation": "15.3",
+    "evaluate_global_stop_uses_historical_planner_score": true,
+    "historical_best_unexplored_score": 8.7,
+    "unexplored_count": 32,
+    "session_stop_evaluated": false,
+    "stop_reason_code": "CONTINUE",
+    "note": "Session stop threshold uses frontier.best_unexplored_score() which sorts by historical planner_score \u2014 not current-state revalued ERV used at planning decisions",
+    "top_unexplored_by_historical_score": [
+      {
+        "frontier_id": "frontier-00006",
+        "historical_planner_score": 8.7,
+        "portfolio_score_at_enqueue": 8.7
+      },
+      {
+        "frontier_id": "frontier-00007",
+        "historical_planner_score": 8.7,
+        "portfolio_score_at_enqueue": 8.7
+      },
+      {
+        "frontier_id": "frontier-00020",
+        "historical_planner_score": 8.2,
+        "portfolio_score_at_enqueue": 8.2
+      },
+      {
+        "frontier_id": "frontier-00009",
+        "historical_planner_score": 8.175,
+        "portfolio_score_at_enqueue": 8.175
+      },
+      {
+        "frontier_id": "frontier-00010",
+        "historical_planner_score": 8.175,
+        "portfolio_score_at_enqueue": 8.175
+      }
+    ]
+  }
+}
