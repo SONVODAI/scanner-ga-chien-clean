@@ -346,6 +346,12 @@ class ResearchSession:
     research_operational_awareness: Optional[Dict[str, Any]] = None
     research_competence_audit: Optional[List[Dict[str, Any]]] = None
     research_information_value_audit: Optional[List[Dict[str, Any]]] = None
+    research_branch_marginal_audit: Optional[List[Dict[str, Any]]] = None
+    research_exit_decision_audit: Optional[List[Dict[str, Any]]] = None
+    research_realized_information_gain_history: Optional[List[Dict[str, Any]]] = None
+    research_realized_gain_by_branch: Optional[Dict[str, List[Dict[str, Any]]]] = None
+    research_revalued_erv_history: Optional[List[Dict[str, Any]]] = None
+    experiment_assessment_snapshots: Optional[Dict[str, Dict[str, Any]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -385,6 +391,20 @@ class ResearchSession:
             payload["research_competence_audit"] = list(self.research_competence_audit)
         if self.research_information_value_audit:
             payload["research_information_value_audit"] = list(self.research_information_value_audit)
+        if self.research_branch_marginal_audit:
+            payload["research_branch_marginal_audit"] = list(self.research_branch_marginal_audit)
+        if self.research_exit_decision_audit:
+            payload["research_exit_decision_audit"] = list(self.research_exit_decision_audit)
+        if self.research_realized_information_gain_history:
+            payload["research_realized_information_gain_history"] = list(
+                self.research_realized_information_gain_history
+            )
+        if self.research_realized_gain_by_branch:
+            payload["research_realized_gain_by_branch"] = dict(self.research_realized_gain_by_branch)
+        if self.research_revalued_erv_history:
+            payload["research_revalued_erv_history"] = list(self.research_revalued_erv_history)
+        if self.experiment_assessment_snapshots:
+            payload["experiment_assessment_snapshots"] = dict(self.experiment_assessment_snapshots)
         return payload
 
     @classmethod
@@ -429,6 +449,26 @@ class ResearchSession:
             else None,
             research_information_value_audit=list(payload["research_information_value_audit"])
             if payload.get("research_information_value_audit")
+            else None,
+            research_branch_marginal_audit=list(payload["research_branch_marginal_audit"])
+            if payload.get("research_branch_marginal_audit")
+            else None,
+            research_exit_decision_audit=list(payload["research_exit_decision_audit"])
+            if payload.get("research_exit_decision_audit")
+            else None,
+            research_realized_information_gain_history=list(
+                payload["research_realized_information_gain_history"]
+            )
+            if payload.get("research_realized_information_gain_history")
+            else None,
+            research_realized_gain_by_branch=dict(payload["research_realized_gain_by_branch"])
+            if payload.get("research_realized_gain_by_branch")
+            else None,
+            research_revalued_erv_history=list(payload["research_revalued_erv_history"])
+            if payload.get("research_revalued_erv_history")
+            else None,
+            experiment_assessment_snapshots=dict(payload["experiment_assessment_snapshots"])
+            if payload.get("experiment_assessment_snapshots")
             else None,
         )
 

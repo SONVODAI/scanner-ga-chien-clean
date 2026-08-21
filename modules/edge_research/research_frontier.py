@@ -435,11 +435,13 @@ def evaluate_global_stop(
     features_touched: int,
     eligible_feature_count: int,
     min_research_value_threshold: float = 0.5,
+    current_best_revalued_score: Optional[float] = None,
 ) -> Tuple[bool, SessionStopReason]:
     """
     Global stopping evaluation — session may stop only when justified.
 
-    Returns (should_stop_session, reason).
+    Phase 3H.8: when current_best_revalued_score is provided, use it instead of
+    historical frontier planner_score (limitation 15.3 alignment).
     """
     unexplored = frontier.unexplored_items()
     n_unexplored = len(unexplored)
@@ -464,7 +466,10 @@ def evaluate_global_stop(
             eligible_features=eligible_feature_count,
         )
 
-    best_score = frontier.best_unexplored_score()
+    if current_best_revalued_score is not None:
+        best_score = current_best_revalued_score
+    else:
+        best_score = frontier.best_unexplored_score()
     if best_score >= min_research_value_threshold:
         return False, SessionStopReason(
             code="CONTINUE",

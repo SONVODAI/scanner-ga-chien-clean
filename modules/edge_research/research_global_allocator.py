@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from modules.edge_research.research_graph import ResearchGraph
     from modules.edge_research.research_planner import PlanDecision
 
-GLOBAL_ALLOCATOR_VERSION = "research_global_allocator_v1_1"
+GLOBAL_ALLOCATOR_VERSION = "research_global_allocator_v1_2"
 
 
 class OpportunitySource(str, Enum):
@@ -111,6 +111,12 @@ class GlobalAllocationResult:
     budget_remaining: int = 0
     valuation_sequence: int = 0
     local_plan_decision: Optional["PlanDecision"] = None
+    stop_session_selected: bool = False
+    exit_value: float = 0.0
+    exit_value_components: Dict[str, float] = field(default_factory=dict)
+    branch_marginal_state: str = ""
+    current_best_revalued_score: float = 0.0
+    best_revisit_erv: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -129,6 +135,12 @@ class GlobalAllocationResult:
             "new_branch_root_id": self.new_branch_root_id,
             "budget_remaining": self.budget_remaining,
             "valuation_sequence": self.valuation_sequence,
+            "stop_session_selected": self.stop_session_selected,
+            "exit_value": self.exit_value,
+            "exit_value_components": dict(self.exit_value_components),
+            "branch_marginal_state": self.branch_marginal_state,
+            "current_best_revalued_score": self.current_best_revalued_score,
+            "best_revisit_erv": self.best_revisit_erv,
         }
 
 
@@ -603,30 +615,94 @@ def select_global_research_opportunity(
     ]
 
     selected: Optional[GlobalComparableOpportunity] = None
+    stop_session_selected = False
+    exit_value_result = 0.0
+    exit_components: Dict[str, float] = {}
+    branch_marginal_state_str = ""
+    current_best_revalued = 0.0
+
+    best_revisit_erv = max(
+        (o.expected_research_value for o in comparable if o.source == OpportunitySource.REVISIT.value),
+        default=float("-inf"),
+    )
+    if best_revisit_erv == float("-inf"):
+        best_revisit_erv = 0.0
+
     if experiment_comparable:
         experiment_comparable.sort(
             key=lambda o: (-o.expected_research_value, o.action_id, o.source)
         )
         best_experiment = experiment_comparable[0]
+        current_best_revalued = best_experiment.expected_research_value
 
-        local_is_terminal = local_decision.decision_type in (
-            PlanDecisionType.STOP_BRANCH,
-            PlanDecisionType.ABANDON,
-            PlanDecisionType.STOP_SESSION,
+        from modules.edge_research.research_branch_marginal_state import (
+            build_branch_marginal_state,
+            record_branch_marginal_state,
+        )
+        from modules.edge_research.research_exit_valuation import (
+            _independent_frontier_erv,
+            compute_research_exit_value,
+            evaluate_exit_vs_experiment,
         )
 
-        local_terminal_erv = float("-inf")
-        if local_decision.selected is not None:
-            for o in comparable:
-                if o.action_id == local_decision.selected.action_id:
-                    local_terminal_erv = o.expected_research_value
-                    break
+        marginal = build_branch_marginal_state(
+            graph=graph,
+            assessment=assessment,
+            branch_root_id=current_root,
+            experiment_node_id=experiment_node_id,
+            planning_sequence=seq,
+        )
+        record_branch_marginal_state(graph, marginal)
+        branch_marginal_state_str = marginal.marginal_state
 
-        if local_is_terminal:
-            if best_experiment.expected_research_value > local_terminal_erv:
-                selected = best_experiment
+        historical_best = graph.get_frontier().best_unexplored_score()
+        features_touched = len(
+            graph.get_search_accounting().session_ledger.explanatory_features_tested
+        )
+        eligible = len((graph.session.panel_preflight or {}).get("eligible_explanatory") or [])
+        indep_erv = _independent_frontier_erv(comparable, current_root)
+
+        exit_val = compute_research_exit_value(
+            marginal_state=marginal,
+            best_experiment_erv=best_experiment.expected_research_value,
+            best_local_erv=best_local,
+            best_frontier_erv=best_frontier,
+            best_revisit_erv=best_revisit_erv,
+            best_deferred_erv=best_deferred,
+            historical_best_frontier_score=historical_best,
+            remaining_budget=remaining,
+            experiment_budget=graph.session.experiment_budget,
+            features_touched=features_touched,
+            eligible_feature_count=eligible,
+            independent_frontier_erv=indep_erv,
+        )
+        exit_value_result = exit_val.exit_value
+        exit_components = exit_val.components
+
+        if evaluate_exit_vs_experiment(exit_val, best_experiment.expected_research_value):
+            stop_session_selected = True
+            selected = None
         else:
-            selected = best_experiment
+            local_is_terminal = local_decision.decision_type in (
+                PlanDecisionType.STOP_BRANCH,
+                PlanDecisionType.ABANDON,
+                PlanDecisionType.STOP_SESSION,
+            )
+
+            local_terminal_erv = float("-inf")
+            if local_decision.selected is not None:
+                for o in comparable:
+                    if o.action_id == local_decision.selected.action_id:
+                        local_terminal_erv = o.expected_research_value
+                        break
+
+            if local_is_terminal:
+                if best_experiment.expected_research_value > local_terminal_erv:
+                    selected = best_experiment
+            else:
+                selected = best_experiment
+    else:
+        best_experiment = None
 
     if selected and selected.source == OpportunitySource.LOCAL.value:
         context_switch = False
@@ -639,16 +715,21 @@ def select_global_research_opportunity(
         new_root = current_root
 
     best_global_alt = float("-inf")
-    if selected:
+    if stop_session_selected and experiment_comparable:
+        best_global_alt_erv = experiment_comparable[0].expected_research_value
+        opp_cost = max(0.0, exit_value_result - best_global_alt_erv)
+    elif selected:
         for o in experiment_comparable:
             if o.action_id != selected.action_id or o.source != selected.source:
                 best_global_alt = max(best_global_alt, o.expected_research_value)
-    best_global_alt_erv = best_global_alt if best_global_alt != float("-inf") else 0.0
-
-    opp_cost = max(
-        0.0,
-        best_global_alt_erv - (selected.expected_research_value if selected else 0.0),
-    )
+        best_global_alt_erv = best_global_alt if best_global_alt != float("-inf") else 0.0
+        opp_cost = max(
+            0.0,
+            best_global_alt_erv - selected.expected_research_value,
+        )
+    else:
+        best_global_alt_erv = 0.0
+        opp_cost = 0.0
 
     return GlobalAllocationResult(
         selected=selected,
@@ -671,6 +752,12 @@ def select_global_research_opportunity(
         budget_remaining=remaining,
         valuation_sequence=seq,
         local_plan_decision=local_decision,
+        stop_session_selected=stop_session_selected,
+        exit_value=exit_value_result,
+        exit_value_components=exit_components,
+        branch_marginal_state=branch_marginal_state_str,
+        current_best_revalued_score=current_best_revalued,
+        best_revisit_erv=best_revisit_erv,
     )
 
 
@@ -710,6 +797,34 @@ def apply_global_allocation_to_plan_decision(
     portfolio = graph.get_portfolio_state()
     portfolio.decision_explanations.append(explanation)
     graph.persist_portfolio_state()
+
+    if allocation.stop_session_selected:
+        from modules.edge_research.research_actions import ActionIntent
+
+        stop_cand = next(
+            (
+                c
+                for c in local_decision.all_candidates
+                if c.intent == ActionIntent.STOP_SESSION.value
+            ),
+            local_decision.selected,
+        )
+        return PlanDecision(
+            decision_type=PlanDecisionType.STOP_SESSION,
+            selected=stop_cand,
+            all_candidates=local_decision.all_candidates,
+            score_breakdown={
+                "components": allocation.exit_value_components,
+                "total": allocation.exit_value,
+            },
+            rationale_codes=("STOP_SESSION", "EXIT_VALUATION_DOMINANT"),
+            portfolio_explanation=explanation,
+            portfolio_opportunities=local_decision.portfolio_opportunities,
+            global_allocation_source="EXIT_PRESERVE_BUDGET",
+            selected_frontier_id="",
+            context_switch_required=False,
+            global_allocation=allocation.to_dict(),
+        )
 
     if selected is None:
         return PlanDecision(

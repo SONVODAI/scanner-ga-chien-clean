@@ -618,6 +618,18 @@ def plan_after_experiment(
 ) -> PlanningRecord:
     """Interpret result, generate candidates, plan next step, record on graph."""
     assessment = interpret_tool_result(graph, experiment_node_id, tool_result)
+    from modules.edge_research.research_exit_valuation import prepare_post_experiment_exit_context
+    from modules.edge_research.research_realized_information_gain import store_assessment_snapshot
+    from modules.edge_research.research_search_accounting import branch_root_id as _br_plan
+
+    _proot = _br_plan(graph, experiment_node_id)
+    prepare_post_experiment_exit_context(
+        graph,
+        experiment_node_id=experiment_node_id,
+        current_assessment=assessment,
+        branch_root_id=_proot,
+    )
+    store_assessment_snapshot(graph, experiment_node_id, assessment)
     awareness = graph.get_operational_awareness() if consult_operational_awareness else None
     if awareness is not None:
         constructible = awareness.constructible_explanatory_features()
@@ -711,6 +723,125 @@ def plan_after_experiment(
             selected_action_id=sel_id,
         )
         record_information_value_audit(graph, iv_audit)
+
+    from modules.edge_research.research_branch_marginal_state import record_revalued_erv_snapshot
+    from modules.edge_research.research_exit_valuation import (
+        ResearchExitValue,
+        build_exit_decision_audit,
+        record_exit_decision_audit,
+    )
+
+    portfolio_state = graph.get_portfolio_state()
+    sel_erv = allocation.selected.expected_research_value if allocation.selected else 0.0
+    if allocation.stop_session_selected:
+        sel_erv = allocation.exit_value
+    record_revalued_erv_snapshot(
+        graph,
+        branch_root_id=root,
+        selected_erv=sel_erv,
+        planning_sequence=portfolio_state.sequence_counter,
+    )
+
+    marginal_trail = list(getattr(graph.session, "research_branch_marginal_audit", None) or [])
+    marginal_dict = marginal_trail[-1] if marginal_trail else {}
+    from modules.edge_research.research_branch_marginal_state import ResearchBranchMarginalState
+
+    marginal_obj = ResearchBranchMarginalState(
+        version=marginal_dict.get("version", ""),
+        branch_root_id=root,
+        observation_horizon=int(marginal_dict.get("observation_horizon", 0)),
+        experiments_on_branch=int(marginal_dict.get("experiments_on_branch", 0)),
+        current_frame_id=str(marginal_dict.get("current_frame_id", "")),
+        unresolved_uncertainty_codes=tuple(marginal_dict.get("unresolved_uncertainty_codes") or ()),
+        prior_resolution_attempts=int(marginal_dict.get("prior_resolution_attempts", 0)),
+        recent_information_value_history=tuple(marginal_dict.get("recent_information_value_history") or ()),
+        realized_information_gain_history=tuple(marginal_dict.get("realized_information_gain_history") or ()),
+        redundancy_evidence=tuple(marginal_dict.get("redundancy_evidence") or ()),
+        novelty_evidence=tuple(marginal_dict.get("novelty_evidence") or ()),
+        recent_revalued_opportunity_history=tuple(marginal_dict.get("recent_revalued_opportunity_history") or ()),
+        marginal_state=str(marginal_dict.get("marginal_state", allocation.branch_marginal_state)),
+        marginal_state_reason=str(marginal_dict.get("marginal_state_reason", "")),
+        planning_sequence=int(marginal_dict.get("planning_sequence", 0)),
+    )
+    exit_val_obj = ResearchExitValue(
+        version="research_exit_valuation_v1",
+        exit_value=allocation.exit_value,
+        components=dict(allocation.exit_value_components),
+        marginal_state=allocation.branch_marginal_state,
+        marginal_state_reason=marginal_obj.marginal_state_reason,
+        best_experiment_erv=allocation.current_best_revalued_score,
+        best_local_erv=allocation.best_local_erv,
+        best_frontier_erv=allocation.best_frontier_erv,
+        best_revisit_erv=allocation.best_revisit_erv,
+        best_deferred_erv=allocation.best_deferred_erv,
+        historical_best_frontier_score=graph.get_frontier().best_unexplored_score(),
+        remaining_budget=allocation.budget_remaining,
+    )
+
+    best_exp = allocation.selected
+    if allocation.stop_session_selected and not best_exp:
+        from modules.edge_research.research_actions import ActionIntent
+
+        terminal = {
+            ActionIntent.STOP.value,
+            ActionIntent.STOP_SESSION.value,
+            ActionIntent.ABANDON.value,
+        }
+        exp_opps = [
+            o
+            for o in allocation.all_opportunities
+            if o.comparable
+            and o.action_candidate is not None
+            and o.action_candidate.intent not in terminal
+        ]
+        if exp_opps:
+            best_exp = max(exp_opps, key=lambda o: o.expected_research_value)
+    best_exp_erv = best_exp.expected_research_value if best_exp else 0.0
+    best_exp_source = best_exp.source if best_exp else ""
+    best_exp_id = best_exp.action_id if best_exp else ""
+    alt_roots = tuple(
+        sorted(
+            {
+                o.branch_root_id
+                for o in allocation.all_opportunities
+                if o.branch_root_id and o.branch_root_id != root
+            }
+        )
+    )
+    same_branch_notes: List[str] = []
+    if allocation.selected and allocation.selected.is_revisit:
+        same_branch_notes.append("REVISIT_same_branch_root")
+    if allocation.selected and allocation.selected.from_frontier:
+        if allocation.selected.branch_root_id == root:
+            same_branch_notes.append("FRONTIER_same_branch_root")
+
+    exit_audit = build_exit_decision_audit(
+        planning_sequence=portfolio_state.sequence_counter,
+        branch_root_id=root,
+        marginal_state=marginal_obj,
+        exit_val=exit_val_obj,
+        best_experiment_source=best_exp_source,
+        best_experiment_action_id=best_exp_id,
+        best_experiment_erv=best_exp_erv,
+        selected_action="STOP_SESSION" if allocation.stop_session_selected else (
+            decision.selected.action_id if decision.selected else ""
+        ),
+        stop_competed=allocation.exit_value != float("-inf"),
+        stop_won=allocation.stop_session_selected,
+        why_selected=(
+            "exit_value_exceeds_best_experiment"
+            if allocation.stop_session_selected
+            else "best_experiment_erv_selected"
+        ),
+        runner_up=best_exp_id if allocation.stop_session_selected else "",
+        runner_up_value=best_exp_erv if allocation.stop_session_selected else allocation.exit_value,
+        opportunity_cost=allocation.global_opportunity_cost,
+        would_pre_3h8_continue=not allocation.stop_session_selected,
+        selection_changed=allocation.stop_session_selected,
+        alternative_branch_roots=alt_roots,
+        same_branch_notes=tuple(same_branch_notes),
+    )
+    record_exit_decision_audit(graph, exit_audit)
 
     if consult_competence and competence is not None:
         sel_id = decision.selected.action_id if decision.selected else ""
@@ -977,12 +1108,24 @@ def apply_plan_decision(
     if decision.decision_type == PlanDecisionType.STOP_SESSION:
         reason = decision.selected.action_code if decision.selected else "STOP_SESSION"
         _resolve_branch(graph, experiment_node_id, reason)
+        ft, ec = _coverage_counts(graph)
+        ga = decision.global_allocation or {}
         _, stop_reason = evaluate_global_stop(
             remaining_budget=_remaining_budget(graph),
             frontier=graph.get_frontier(),
-            features_touched=_coverage_counts(graph)[0],
-            eligible_feature_count=_coverage_counts(graph)[1],
+            features_touched=ft,
+            eligible_feature_count=ec,
+            current_best_revalued_score=ga.get("current_best_revalued_score"),
         )
+        if ga.get("stop_session_selected"):
+            stop_reason = SessionStopReason(
+                code="INSUFFICIENT_RESEARCH_VALUE",
+                detail="Exit valuation exceeded best experiment opportunity",
+                remaining_budget=_remaining_budget(graph),
+                unexplored_frontier_count=len(graph.get_frontier().unexplored_items()),
+                features_touched=ft,
+                eligible_features=ec,
+            )
         finalize_session(graph, stop_reason)
         return ControllerStepResult(
             tool_result=None,
