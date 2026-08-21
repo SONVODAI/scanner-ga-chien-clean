@@ -153,9 +153,14 @@ class SessionStopReason:
     unexplored_frontier_count: int = 0
     features_touched: int = 0
     eligible_features: int = 0
+    terminal_status: str = ""
+    experiment_budget: int = 0
+    experiments_executed: int = 0
+    final_experiment_id: str = ""
+    unresolved_promising_deferred_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        payload: Dict[str, Any] = {
             "code": self.code,
             "detail": self.detail,
             "remaining_budget": self.remaining_budget,
@@ -163,6 +168,15 @@ class SessionStopReason:
             "features_touched": self.features_touched,
             "eligible_features": self.eligible_features,
         }
+        if self.terminal_status or self.code == "BUDGET_EXHAUSTED":
+            payload["terminal_status"] = self.terminal_status or self.code
+            payload["experiment_budget"] = self.experiment_budget
+            payload["experiments_executed"] = self.experiments_executed
+            payload["final_experiment_id"] = self.final_experiment_id
+            payload["unresolved_promising_deferred_count"] = (
+                self.unresolved_promising_deferred_count
+            )
+        return payload
 
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "SessionStopReason":
@@ -173,6 +187,13 @@ class SessionStopReason:
             unexplored_frontier_count=int(payload.get("unexplored_frontier_count", 0)),
             features_touched=int(payload.get("features_touched", 0)),
             eligible_features=int(payload.get("eligible_features", 0)),
+            terminal_status=str(payload.get("terminal_status", "")),
+            experiment_budget=int(payload.get("experiment_budget", 0)),
+            experiments_executed=int(payload.get("experiments_executed", 0)),
+            final_experiment_id=str(payload.get("final_experiment_id", "")),
+            unresolved_promising_deferred_count=int(
+                payload.get("unresolved_promising_deferred_count", 0)
+            ),
         )
 
 

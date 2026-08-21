@@ -38,6 +38,7 @@ from modules.edge_research.research_panel_preflight import (
 )
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
+    BranchPortfolioStatus,
     compute_session_portfolio_metrics,
     record_branch_revisit,
     record_dimension_experiment,
@@ -461,6 +462,130 @@ def _enqueue_frontier_from_planning(
     graph.persist_frontier()
 
 
+def _is_budget_exhausted(graph: ResearchGraph) -> bool:
+    """True when no further experiments may be scheduled under session budget."""
+    budget = graph.session.experiment_budget
+    if budget is None:
+        return False
+    return graph.session.experiments_used >= budget
+
+
+def _count_unresolved_promising_deferred(graph: ResearchGraph) -> int:
+    portfolio = graph.get_portfolio_state()
+    return sum(
+        1
+        for branch in portfolio.branches.values()
+        if branch.status == BranchPortfolioStatus.DEFERRED_PROMISING.value
+    )
+
+
+def build_budget_exhausted_stop_reason(
+    graph: ResearchGraph,
+    final_experiment_id: str,
+) -> SessionStopReason:
+    """Structured session stop when experiment budget is fully consumed."""
+    features_touched, eligible_count = _coverage_counts(graph)
+    frontier = graph.get_frontier()
+    budget = graph.session.experiment_budget or 0
+    return SessionStopReason(
+        code="BUDGET_EXHAUSTED",
+        detail="Experiment budget exhausted",
+        remaining_budget=0,
+        unexplored_frontier_count=len(frontier.unexplored_items()),
+        features_touched=features_touched,
+        eligible_features=eligible_count,
+        terminal_status="BUDGET_EXHAUSTED",
+        experiment_budget=budget,
+        experiments_executed=graph.session.experiments_used,
+        final_experiment_id=final_experiment_id,
+        unresolved_promising_deferred_count=_count_unresolved_promising_deferred(graph),
+    )
+
+
+def _apply_post_experiment_bookkeeping(
+    graph: ResearchGraph,
+    experiment_node_id: str,
+    assessment: ResearchAssessment,
+    tool_result: ToolResult,
+) -> None:
+    """Persist audit, frame, branch, and dimension state for a completed experiment."""
+    _maybe_build_candidate_summary(graph, experiment_node_id, assessment, tool_result)
+    _update_frame_from_experiment(graph, experiment_node_id, assessment, tool_result)
+
+    root = branch_root_id(graph, experiment_node_id)
+    mig = 0.5 if assessment.interesting else 0.1
+    if assessment.conditional_candidate:
+        mig = 1.0
+    unresolved = mig * 2.0 if assessment.additional_investigation_warranted else 0.0
+    update_branch_on_experiment(
+        graph,
+        branch_root_id=root,
+        assessment=assessment,
+        marginal_gain=mig,
+        unresolved_value=unresolved,
+    )
+
+    exp = graph.get_node(experiment_node_id)
+    if exp.experiment_spec:
+        inputs = exp.experiment_spec.inputs or {}
+        feat = ""
+        for key in ("feature_column", "partition_column", "primary_feature"):
+            if key in inputs:
+                feat = str(inputs[key])
+                break
+        qctx = _question_context_dict(graph, experiment_node_id)
+        out_h = ""
+        pop_h = ""
+        frame_id = ""
+        if qctx.get("outcome_spec"):
+            out_h = OutcomeSpec.from_dict(qctx["outcome_spec"]).content_hash()
+        if qctx.get("population_spec"):
+            pop_h = PopulationSpec.from_dict(qctx["population_spec"]).content_hash()
+        frame_id = str(qctx.get("frame_id") or "")
+        record_dimension_experiment(
+            graph,
+            feature=feat,
+            outcome_hash=out_h,
+            population_hash=pop_h,
+            frame_id=frame_id,
+            tool=exp.experiment_spec.tool_name,
+        )
+
+
+def _terminate_session_on_budget_exhaustion(
+    graph: ResearchGraph,
+    experiment_node_id: str,
+    tool_result: ToolResult,
+    *,
+    research_scope: Optional[Dict[str, Any]] = None,
+) -> PlanningRecord:
+    """
+    Finalize the last allowed experiment without entering planning/spawn.
+
+    Order: interpret → bookkeeping → budget stop reason → session finalize.
+    """
+    assessment = interpret_tool_result(graph, experiment_node_id, tool_result)
+    _apply_post_experiment_bookkeeping(
+        graph, experiment_node_id, assessment, tool_result
+    )
+    reason = build_budget_exhausted_stop_reason(graph, experiment_node_id)
+    finalize_session(graph, reason)
+    graph.persist_search_accounting()
+    graph.persist_portfolio_state()
+    return PlanningRecord(
+        experiment_node_id=experiment_node_id,
+        assessment=assessment,
+        decision=PlanDecision(
+            decision_type=PlanDecisionType.STOP_SESSION,
+            selected=None,
+            all_candidates=[],
+            score_breakdown={"reason": "BUDGET_EXHAUSTED"},
+            rationale_codes=("STOP_SESSION", "BUDGET_EXHAUSTED"),
+        ),
+        candidate_scores={},
+    )
+
+
 def plan_after_experiment(
     graph: ResearchGraph,
     experiment_node_id: str,
@@ -535,47 +660,9 @@ def plan_after_experiment(
         decision=decision,
         candidate_scores=serializable_scores,
     )
-    _maybe_build_candidate_summary(graph, experiment_node_id, assessment, tool_result)
-    _update_frame_from_experiment(graph, experiment_node_id, assessment, tool_result)
-
-    root = branch_root_id(graph, experiment_node_id)
-    mig = 0.5 if assessment.interesting else 0.1
-    if assessment.conditional_candidate:
-        mig = 1.0
-    unresolved = mig * 2.0 if assessment.additional_investigation_warranted else 0.0
-    update_branch_on_experiment(
-        graph,
-        branch_root_id=root,
-        assessment=assessment,
-        marginal_gain=mig,
-        unresolved_value=unresolved,
+    _apply_post_experiment_bookkeeping(
+        graph, experiment_node_id, assessment, tool_result
     )
-    exp = graph.get_node(experiment_node_id)
-    if exp.experiment_spec:
-        inputs = exp.experiment_spec.inputs or {}
-        feat = ""
-        for key in ("feature_column", "partition_column", "primary_feature"):
-            if key in inputs:
-                feat = str(inputs[key])
-                break
-        qctx = _question_context_dict(graph, experiment_node_id)
-        from modules.edge_research.research_grammar import OutcomeSpec, PopulationSpec
-        out_h = ""
-        pop_h = ""
-        frame_id = ""
-        if qctx.get("outcome_spec"):
-            out_h = OutcomeSpec.from_dict(qctx["outcome_spec"]).content_hash()
-        if qctx.get("population_spec"):
-            pop_h = PopulationSpec.from_dict(qctx["population_spec"]).content_hash()
-        frame_id = str(qctx.get("frame_id") or "")
-        record_dimension_experiment(
-            graph,
-            feature=feat,
-            outcome_hash=out_h,
-            population_hash=pop_h,
-            frame_id=frame_id,
-            tool=exp.experiment_spec.tool_name,
-        )
 
     _enqueue_frontier_from_planning(
         graph, experiment_node_id, decision, serializable_scores
@@ -1055,6 +1142,23 @@ def run_experiment_and_plan(
     record_experiment_executed(graph.get_search_accounting(), graph, experiment_node_id)
     graph.persist_search_accounting()
     _maybe_mark_frontier_executed(graph, experiment_node_id)
+
+    if _is_budget_exhausted(graph):
+        planning = _terminate_session_on_budget_exhaustion(
+            graph,
+            experiment_node_id,
+            tool_result,
+            research_scope=research_scope,
+        )
+        _maybe_persist_graph(graph, auto_persist=auto_persist, persist_dir=persist_dir)
+        return ControllerStepResult(
+            tool_result=tool_result,
+            planning=planning,
+            terminal=True,
+            session_terminal=True,
+            terminal_reason="BUDGET_EXHAUSTED",
+        )
+
     try:
         planning = plan_after_experiment(
             graph,
