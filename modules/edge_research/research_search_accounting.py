@@ -101,6 +101,7 @@ class SearchCountLedger:
     candidate_actions_considered: int = 0
     unique_outcome_specs: Set[str] = field(default_factory=set)
     unique_population_specs: Set[str] = field(default_factory=set)
+    unique_research_frames: Set[str] = field(default_factory=set)
     explanatory_features_tested: Set[str] = field(default_factory=set)
     partitions_evaluated: int = 0
     threshold_candidates_evaluated: int = 0
@@ -120,6 +121,7 @@ class SearchCountLedger:
             "candidate_actions_considered": self.candidate_actions_considered,
             "unique_outcome_specs": sorted(self.unique_outcome_specs),
             "unique_population_specs": sorted(self.unique_population_specs),
+            "unique_research_frames": sorted(self.unique_research_frames),
             "explanatory_features_tested": sorted(self.explanatory_features_tested),
             "partitions_evaluated": self.partitions_evaluated,
             "threshold_candidates_evaluated": self.threshold_candidates_evaluated,
@@ -141,6 +143,7 @@ class SearchCountLedger:
             candidate_actions_considered=int(payload.get("candidate_actions_considered", 0)),
             unique_outcome_specs=set(payload.get("unique_outcome_specs") or []),
             unique_population_specs=set(payload.get("unique_population_specs") or []),
+            unique_research_frames=set(payload.get("unique_research_frames") or []),
             explanatory_features_tested=set(payload.get("explanatory_features_tested") or []),
             partitions_evaluated=int(payload.get("partitions_evaluated", 0)),
             threshold_candidates_evaluated=int(payload.get("threshold_candidates_evaluated", 0)),
@@ -160,6 +163,7 @@ class SearchCountLedger:
         self.candidate_actions_considered += other.candidate_actions_considered
         self.unique_outcome_specs |= other.unique_outcome_specs
         self.unique_population_specs |= other.unique_population_specs
+        self.unique_research_frames |= other.unique_research_frames
         self.explanatory_features_tested |= other.explanatory_features_tested
         self.partitions_evaluated += other.partitions_evaluated
         self.threshold_candidates_evaluated += other.threshold_candidates_evaluated
@@ -778,6 +782,16 @@ def record_abandoned_branch(state: SearchAccountingState, graph: Any, node_id: s
     branch.abandoned_branches += 1
 
 
+def _frame_id_from_experiment(graph: Any, experiment_node_id: str) -> Optional[str]:
+    """Resolve research frame id from parent question context."""
+    node = graph.get_node(experiment_node_id)
+    for pid in node.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.question_context and parent.question_context.frame_id:
+            return parent.question_context.frame_id
+    return None
+
+
 def record_experiment_executed(
     state: SearchAccountingState,
     graph: Any,
@@ -800,16 +814,14 @@ def record_experiment_executed(
     session.branch_depth_max = max(session.branch_depth_max, depth)
     branch.branch_depth_max = max(branch.branch_depth_max, depth)
 
-    if is_reframe:
-        session.refinements_reframes += 1
-        branch.refinements_reframes += 1
-
     if is_falsification:
         session.falsification_experiments_executed += 1
         branch.falsification_experiments_executed += 1
 
     if spec:
         scope = spec.research_scope or {}
+        if not is_reframe and scope.get("frame_transformation"):
+            is_reframe = True
         oh, ph = _extract_specs_from_scope(scope)
         if oh:
             session.unique_outcome_specs.add(oh)
@@ -817,6 +829,15 @@ def record_experiment_executed(
         if ph:
             session.unique_population_specs.add(ph)
             branch.unique_population_specs.add(ph)
+
+        frame_id = _frame_id_from_experiment(graph, experiment_node_id)
+        if frame_id:
+            session.unique_research_frames.add(frame_id)
+            branch.unique_research_frames.add(frame_id)
+
+        if is_reframe:
+            session.refinements_reframes += 1
+            branch.refinements_reframes += 1
 
         feat = _extract_feature_from_spec(spec)
         if feat:

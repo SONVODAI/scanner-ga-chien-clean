@@ -57,6 +57,8 @@ class FrontierItem:
     invalid_reason: str = ""
     question_text: str = ""
     draft_spec: Optional[Dict[str, Any]] = None
+    frame_id: str = ""
+    transformation_type: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -80,6 +82,8 @@ class FrontierItem:
             "invalid_reason": self.invalid_reason,
             "question_text": self.question_text,
             "draft_spec": dict(self.draft_spec) if self.draft_spec else None,
+            "frame_id": self.frame_id,
+            "transformation_type": self.transformation_type,
         }
 
     @classmethod
@@ -105,6 +109,8 @@ class FrontierItem:
             invalid_reason=str(payload.get("invalid_reason", "")),
             question_text=str(payload.get("question_text", "")),
             draft_spec=dict(payload.get("draft_spec")) if payload.get("draft_spec") else None,
+            frame_id=str(payload.get("frame_id", "")),
+            transformation_type=str(payload.get("transformation_type", "")),
         )
 
     def to_action_candidate(self) -> "ResearchActionCandidate":
@@ -238,6 +244,15 @@ class ResearchFrontier:
             if cand.draft_spec is None:
                 continue
 
+            scope = cand.draft_spec.research_scope or {}
+            pending = scope.get("pending_question_context") or {}
+            if pending.get("population_spec"):
+                pop_spec = dict(pending["population_spec"])
+            if pending.get("outcome_spec"):
+                out_spec = dict(pending["outcome_spec"])
+            frame_id = str(pending.get("frame_id") or scope.get("frame_id") or "")
+            transformation = str(scope.get("frame_transformation") or "")
+
             total, comp = scores.get(cand.action_id, (0.0, {}))
             feat = _extract_feature(cand)
             fid = self._next_id()
@@ -260,6 +275,8 @@ class ResearchFrontier:
                 planner_score=float(total),
                 question_text=cand.question_text,
                 draft_spec=cand.draft_spec.to_dict(),
+                frame_id=frame_id,
+                transformation_type=transformation,
             )
             existing_action_ids.add(cand.action_id)
             added += 1

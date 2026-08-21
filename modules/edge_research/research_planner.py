@@ -47,6 +47,16 @@ WEIGHT_REDUNDANCY_PENALTY = 3.0
 EARLY_SESSION_FALSIFICATION_DAMPEN = 0.45
 LOW_COVERAGE_STOP_PENALTY = 4.0
 
+# Phase 3G.2 — frame diversity (generic, not benchmark-tuned).
+WEIGHT_NEW_OUTCOME = 3.0
+WEIGHT_NEW_POPULATION = 3.0
+WEIGHT_NEW_HORIZON = 3.5
+WEIGHT_NEW_CONTEXT = 2.5
+WEIGHT_FRAME_NOVELTY = 2.0
+WEIGHT_SATURATED_REFRAME = 4.0
+WEIGHT_SAME_FRAME_PENALTY = 2.5
+WEIGHT_SAMPLE_LOSS_PENALTY = 3.0
+
 
 class PlanDecisionType(str, Enum):
     EXPERIMENT = "EXPERIMENT"
@@ -305,6 +315,63 @@ def _stop_session_score(candidate: ResearchActionCandidate) -> float:
     return -100.0
 
 
+def _frame_diversity_bonuses(
+    candidate: ResearchActionCandidate,
+    graph: ResearchGraph,
+) -> Dict[str, float]:
+    """Frame-level diversity scoring — reframes compete with same-frame feature tests."""
+    if candidate.intent in (
+        ActionIntent.STOP.value,
+        ActionIntent.STOP_SESSION.value,
+        ActionIntent.ABANDON.value,
+    ):
+        return {}
+
+    hints = candidate.priority_hints
+    components: Dict[str, float] = {}
+
+    for key, weight in (
+        ("new_outcome_bonus", WEIGHT_NEW_OUTCOME),
+        ("new_population_bonus", WEIGHT_NEW_POPULATION),
+        ("new_information_horizon_bonus", WEIGHT_NEW_HORIZON),
+        ("new_context_bonus", WEIGHT_NEW_CONTEXT),
+        ("frame_novelty_bonus", WEIGHT_FRAME_NOVELTY),
+        ("saturated_parent_reframe_bonus", WEIGHT_SATURATED_REFRAME),
+    ):
+        val = hints.get(key, 0.0)
+        if val:
+            components[key] = float(val) if val != True else weight  # noqa: E712
+
+    sample_pen = hints.get("sample_loss_penalty", 0.0)
+    if sample_pen:
+        components["sample_loss_penalty"] = float(sample_pen)
+
+    scope = candidate.draft_spec.research_scope if candidate.draft_spec else {}
+    reg = graph.get_frame_registry()
+    active = reg.get(reg.active_frame_id) if reg.active_frame_id else None
+
+    if active and scope.get("frame_transformation"):
+        if not scope.get("outcome_reframe") and not scope.get("population_reframe"):
+            if candidate.intent == ActionIntent.SLICING.value:
+                components["repeated_same_frame_penalty"] = -WEIGHT_SAME_FRAME_PENALTY
+
+    known_outcomes = {f.outcome.content_hash() for f in reg.frames.values()}
+    known_pops = {f.population.content_hash() for f in reg.frames.values()}
+    pending = scope.get("pending_question_context") or {}
+    if pending.get("outcome_spec"):
+        from modules.edge_research.research_grammar import OutcomeSpec
+        oh = OutcomeSpec.from_dict(pending["outcome_spec"]).content_hash()
+        if oh not in known_outcomes:
+            components.setdefault("new_outcome_bonus", WEIGHT_NEW_OUTCOME)
+    if pending.get("population_spec"):
+        from modules.edge_research.research_grammar import PopulationSpec
+        ph = PopulationSpec.from_dict(pending["population_spec"]).content_hash()
+        if ph not in known_pops:
+            components.setdefault("new_population_bonus", WEIGHT_NEW_POPULATION)
+
+    return components
+
+
 def _remaining_budget(graph: ResearchGraph) -> Optional[int]:
     budget = graph.session.experiment_budget
     if budget is None:
@@ -408,6 +475,7 @@ def score_candidate(
     components["stop"] = _stop_score(assessment, candidate)
     components["abandon"] = _abandon_score(assessment, candidate)
     components.update(_coverage_bonuses(candidate, graph))
+    components.update(_frame_diversity_bonuses(candidate, graph))
     components["stop_branch_penalty"] = _stop_branch_penalty(candidate, graph)
     components["stop_session_block"] = _stop_session_score(candidate)
 

@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from modules.edge_research.research_assessment import ResearchAssessment
 from modules.edge_research.research_graph import ResearchGraph
 from modules.edge_research.research_grammar import (
+    GrammarValidationError,
     OutcomeSpec,
     PopulationSpec,
     build_search_accounting,
@@ -22,6 +23,7 @@ from modules.edge_research.research_grammar import (
     propose_outcome_reframes,
     propose_population_refinements,
     propose_population_widenings,
+    validate_outcome_spec,
 )
 from modules.edge_research.research_interpreter import (
     FALSIFY_DATE_ARTIFACT,
@@ -261,6 +263,41 @@ def _grammar_scope(
     return scope
 
 
+def _grammar_scope_for_frame(
+    population: PopulationSpec,
+    outcome: OutcomeSpec,
+    base_scope: Dict[str, Any],
+    *,
+    observation_horizon: int = 0,
+) -> Optional[Dict[str, Any]]:
+    """
+    Build research scope for a frame, respecting information-horizon legality.
+
+    Outcome-derived population filters are valid only at/after their availability horizon.
+    """
+    from modules.edge_research.research_frame import validate_population_at_horizon
+
+    try:
+        validate_outcome_spec(outcome)
+        validate_population_at_horizon(population, observation_horizon=observation_horizon)
+    except GrammarValidationError:
+        return None
+
+    scope = _base_scope(base_scope)
+    if observation_horizon <= 0:
+        try:
+            scope.update(population_spec_to_research_scope(population))
+        except GrammarValidationError:
+            return None
+    else:
+        scope["population_spec"] = population.to_dict()
+        scope["population_spec_hash"] = population.content_hash()
+    scope["outcome_spec"] = outcome.to_dict()
+    scope["outcome_spec_hash"] = outcome.content_hash()
+    scope["research_observation_horizon"] = observation_horizon
+    return scope
+
+
 def _add_grammar_candidates(
     candidates: List[ResearchActionCandidate],
     *,
@@ -299,6 +336,8 @@ def _add_grammar_candidates(
                 parent_branch_hash=parent_hash,
             )
             new_scope = _grammar_scope(population, alt_outcome, scope)
+            new_scope["outcome_reframe"] = True
+            new_scope["frame_transformation"] = "OUTCOME_REFRAME"
             new_scope["pending_question_context"] = ResearchQuestionContext(
                 population_spec=population.to_dict(),
                 outcome_spec=alt_outcome.to_dict(),
@@ -346,6 +385,8 @@ def _add_grammar_candidates(
                 parent_branch_hash=parent_hash,
             )
             new_scope = _grammar_scope(refined, outcome, scope)
+            new_scope["population_reframe"] = True
+            new_scope["frame_transformation"] = "POPULATION_REFRAME"
             new_scope["pending_question_context"] = ResearchQuestionContext(
                 population_spec=refined.to_dict(),
                 outcome_spec=outcome.to_dict(),
@@ -710,6 +751,286 @@ DEFAULT_HORIZON_LIST = ["T3", "T5", "T10"]
 HORIZONS = DEFAULT_HORIZON_LIST  # alias for grammar candidates
 
 
+def _add_frame_reframe_candidates(
+    candidates: List[ResearchActionCandidate],
+    *,
+    assessment: ResearchAssessment,
+    graph: ResearchGraph,
+    registry: ToolRegistry,
+    scope: Dict[str, Any],
+    cutoff: str,
+    experiment_node_id: str,
+    panel_columns: Optional[Sequence[str]] = None,
+) -> None:
+    """Phase 3G.2 — autonomous outcome/population/horizon reframing from frame saturation."""
+    from modules.edge_research.research_frame import (
+        FrameStatus,
+        FrameTransformationType,
+        ResearchFrame,
+        assess_frame_saturation,
+        check_sample_sufficiency,
+        propose_horizon_advancement_frames,
+        propose_population_from_observed_data,
+        propose_structural_reframes,
+        validate_frame_temporal_legality,
+    )
+
+    ctx = _question_context_from_experiment(graph, experiment_node_id)
+    if ctx is None:
+        return
+
+    population, outcome = _parse_specs_from_context(ctx)
+    reg = graph.get_frame_registry()
+    frame_id = ctx.frame_id or reg.active_frame_id
+    if not frame_id:
+        fid = reg.next_id()
+        preflight = graph.session.panel_preflight or {}
+        eligible = len(preflight.get("eligible_explanatory") or [])
+        frame = ResearchFrame.initial(fid, population, outcome, eligible_feature_count=eligible)
+        reg.register(frame)
+        graph.persist_frames()
+        frame_id = fid
+
+    frame = reg.get(frame_id)
+    if frame is None:
+        frame = ResearchFrame.initial(frame_id, population, outcome)
+        reg.register(frame)
+
+    status, sat_evidence = assess_frame_saturation(frame)
+    frame.status = status
+    saturated = status in (FrameStatus.LOW_YIELD.value, FrameStatus.EXHAUSTED.value)
+
+    def add(**kwargs: Any) -> None:
+        candidates.append(_check_candidate(graph, registry=registry, **kwargs))
+
+    depth = ctx.research_depth
+    parent_hash = population.content_hash()
+    parent_n = ctx.population_n or 100
+
+    # Structural observation → new frames (even without conditional candidate).
+    if assessment.observation_kind in ("STRUCTURAL_OBSERVATION", "DESCRIPTIVE_OBSERVATION"):
+        for child_frame in propose_structural_reframes(
+            frame,
+            observation_kind=assessment.observation_kind,
+            observation_codes=assessment.empirical_findings,
+        ):
+            new_id = reg.next_id()
+            child = child_frame.child(
+                new_id,
+                population=child_frame.population,
+                outcome=child_frame.outcome,
+                observation_horizon=child_frame.observation_horizon,
+                transformation=child_frame.transformation,
+                reason=child_frame.reason_created,
+                evidence=child_frame.triggering_evidence,
+            )
+            accounting = build_search_accounting(
+                population_spec=child.population,
+                outcome_spec=child.outcome,
+                research_depth=depth + 1,
+                parent_branch_hash=parent_hash,
+                alternatives_considered=1,
+            )
+            new_scope = _grammar_scope_for_frame(
+                child.population,
+                child.outcome,
+                scope,
+                observation_horizon=child.observation_horizon,
+            )
+            if new_scope is None:
+                continue
+            new_scope["outcome_reframe"] = child.outcome.content_hash() != frame.outcome.content_hash()
+            new_scope["population_reframe"] = child.population.content_hash() != frame.population.content_hash()
+            new_scope["frame_transformation"] = child.transformation
+            new_scope["research_observation_horizon"] = child.observation_horizon
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=child.population.to_dict(),
+                outcome_spec=child.outcome.to_dict(),
+                research_depth=depth + 1,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                frame_id=new_id,
+                observation_horizon=child.observation_horizon,
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": child.transformation,
+                    "triggering_evidence": child.triggering_evidence,
+                },
+            ).to_dict()
+            hint = 4.0 if saturated else 2.0
+            if child.transformation == FrameTransformationType.OUTCOME_REFRAME.value:
+                hint_key = "new_outcome_bonus"
+            elif child.transformation == FrameTransformationType.POPULATION_REFRAME.value:
+                hint_key = "new_population_bonus"
+            elif child.transformation == FrameTransformationType.OUTCOME_TO_POPULATION.value:
+                hint_key = "new_information_horizon_bonus"
+            else:
+                hint_key = "frame_novelty_bonus"
+            add(
+                action_code=f"REFRAME_{child.transformation}_{new_id}",
+                intent=ActionIntent.REFRAME if "OUTCOME" in child.transformation else ActionIntent.REPOPULATE,
+                template_id="FRAME_REFRAME",
+                question=f"Reframe research: {child.reason_created}",
+                tool_name="horizon_comparison",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="horizon_comparison",
+                    tool_version="v1",
+                    inputs={"horizons": list(HORIZONS)},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="FRAME_REFRAME",
+                expected_info=ExpectedInformation.HIGH if saturated else ExpectedInformation.MEDIUM,
+                rationale_codes=("REFRAME", child.transformation),
+                priority_hints={
+                    hint_key: hint,
+                    "saturated_parent_reframe_bonus": 3.0 if saturated else 0.0,
+                    "grammar_reframe": 2.0,
+                },
+            )
+
+    # Evidence-driven population from observed metrics (generic fields).
+    if assessment.additional_investigation_warranted or saturated:
+        metrics = _experiment_metrics(graph, experiment_node_id)
+        cat_values: Dict[str, Tuple[str, ...]] = {}
+        if metrics.get("best_category"):
+            feat = str(metrics.get("feature_column", "partition_group"))
+            cat_values[feat] = (str(metrics.get("best_category")),)
+        num_splits: Dict[str, float] = {}
+        if metrics.get("discovered_boundaries"):
+            feat = str(metrics.get("feature_column", ""))
+            edges = metrics.get("discovered_boundaries") or []
+            if feat and edges:
+                num_splits[feat] = float(edges[0])
+
+        for refined in propose_population_from_observed_data(
+            population,
+            categorical_values=cat_values,
+            numeric_median_splits=num_splits,
+            reason_code="EVIDENCE_DERIVED_COHORT",
+            triggering_evidence={"source_experiment": experiment_node_id},
+        ):
+            sufficient, loss = check_sample_sufficiency(resulting_n=int(parent_n * 0.4), parent_n=parent_n)
+            if not sufficient and loss > 0.7:
+                continue
+            new_depth = depth + 1
+            accounting = build_search_accounting(
+                population_spec=refined,
+                outcome_spec=outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(refined, outcome, scope)
+            new_scope["population_reframe"] = True
+            new_scope["frame_transformation"] = "POPULATION_REFRAME"
+            new_scope["sample_loss_ratio"] = loss
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=refined.to_dict(),
+                outcome_spec=outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                frame_id=frame_id,
+                observation_horizon=ctx.observation_horizon,
+            ).to_dict()
+            feat_col = "feat_alpha"
+            if panel_columns:
+                from modules.edge_research.research_panel_preflight import adaptive_features_from_columns
+                feats = adaptive_features_from_columns(panel_columns)
+                if feats:
+                    feat_col = feats[0]
+            add(
+                action_code="REPOPULATE_EVIDENCE",
+                intent=ActionIntent.REPOPULATE,
+                template_id="EVIDENCE_POPULATION_REFINE",
+                question="Does a data-derived conditional population reveal structure?",
+                tool_name="adaptive_partition_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="adaptive_partition_compare",
+                    tool_version="v1",
+                    inputs={"feature_column": feat_col, "max_bins": 3, "min_bin_n": 5},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="POPULATION_EVIDENCE",
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("REPOPULATE", "EVIDENCE_DERIVED"),
+                priority_hints={
+                    "new_population_bonus": 2.5,
+                    "grammar_repopulate": 2.0,
+                    "sample_loss_penalty": -2.0 if loss > 0.5 else 0.0,
+                },
+            )
+
+    # Horizon advancement / outcome-to-population when frame has mature early outcome.
+    if saturated or assessment.observation_kind == "STRUCTURAL_OBSERVATION":
+        for child_frame in propose_horizon_advancement_frames(frame):
+            new_id = reg.next_id()
+            if not validate_frame_temporal_legality(child_frame):
+                continue
+            child = child_frame.child(
+                new_id,
+                population=child_frame.population,
+                outcome=child_frame.outcome,
+                observation_horizon=child_frame.observation_horizon,
+                transformation=child_frame.transformation,
+                reason=child_frame.reason_created,
+                evidence=child_frame.triggering_evidence,
+            )
+            accounting = build_search_accounting(
+                population_spec=child.population,
+                outcome_spec=child.outcome,
+                research_depth=depth + 1,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope_for_frame(
+                child.population,
+                child.outcome,
+                scope,
+                observation_horizon=child.observation_horizon,
+            )
+            if new_scope is None:
+                continue
+            new_scope["frame_transformation"] = FrameTransformationType.OUTCOME_TO_POPULATION.value
+            new_scope["research_observation_horizon"] = child.observation_horizon
+            new_scope["new_information_horizon_bonus"] = True
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=child.population.to_dict(),
+                outcome_spec=child.outcome.to_dict(),
+                research_depth=depth + 1,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                frame_id=new_id,
+                observation_horizon=child.observation_horizon,
+            ).to_dict()
+            add(
+                action_code=f"HORIZON_ADVANCE_{new_id}",
+                intent=ActionIntent.REFRAME,
+                template_id="HORIZON_ADVANCEMENT",
+                question=f"Advance information horizon: {child.reason_created}",
+                tool_name="horizon_comparison",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="horizon_comparison",
+                    tool_version="v1",
+                    inputs={"horizons": list(HORIZONS)},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="HORIZON_ADVANCE",
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("REFRAME", "HORIZON_ADVANCE"),
+                priority_hints={
+                    "new_information_horizon_bonus": 3.5,
+                    "saturated_parent_reframe_bonus": 3.0 if saturated else 0.0,
+                },
+            )
+
+    graph.persist_frames()
+
+
 def generate_action_candidates(
     assessment: ResearchAssessment,
     graph: ResearchGraph,
@@ -941,6 +1262,16 @@ def generate_action_candidates(
             experiment_node_id=experiment_node_id,
         )
         _add_adaptive_candidates(
+            candidates,
+            assessment=assessment,
+            graph=graph,
+            registry=registry,
+            scope=scope,
+            cutoff=cutoff,
+            experiment_node_id=experiment_node_id,
+            panel_columns=panel_columns,
+        )
+        _add_frame_reframe_candidates(
             candidates,
             assessment=assessment,
             graph=graph,

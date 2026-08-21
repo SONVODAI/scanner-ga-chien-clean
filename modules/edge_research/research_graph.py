@@ -19,6 +19,7 @@ from modules.edge_research.research_search_accounting import (
     record_question_generated,
 )
 from modules.edge_research.research_frontier import ResearchFrontier
+from modules.edge_research.research_frame import ResearchFrame, ResearchFrameRegistry
 from modules.edge_research.research_state import (
     RESEARCH_GRAPH_SCHEMA_VERSION,
     EvidenceReference,
@@ -78,6 +79,7 @@ class ResearchGraph:
         self.experiment_index: Dict[str, str] = dict(experiment_index or {})
         self._search_accounting: Optional[SearchAccountingState] = None
         self._research_frontier: Optional[ResearchFrontier] = None
+        self._frame_registry: Optional[ResearchFrameRegistry] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -111,6 +113,18 @@ class ResearchGraph:
     def sync_frontier(self) -> None:
         if self._research_frontier is not None:
             self.session.research_frontier = self._research_frontier.to_dict()
+
+    def get_frame_registry(self) -> ResearchFrameRegistry:
+        if self._frame_registry is None:
+            raw = self.session.research_frames
+            self._frame_registry = (
+                ResearchFrameRegistry.from_dict(raw) if raw else ResearchFrameRegistry()
+            )
+        return self._frame_registry
+
+    def persist_frames(self) -> None:
+        reg = self.get_frame_registry()
+        self.session.research_frames = reg.to_dict()
 
     @classmethod
     def create_session(

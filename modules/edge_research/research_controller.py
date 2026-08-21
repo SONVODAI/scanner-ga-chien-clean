@@ -23,6 +23,11 @@ from modules.edge_research.research_frontier import (
     SessionStopReason,
     evaluate_global_stop,
 )
+from modules.edge_research.research_frame import (
+    FrameStatus,
+    ResearchFrame,
+    assess_frame_saturation,
+)
 from modules.edge_research.research_graph import ResearchGraph, ResearchGraphError
 from modules.edge_research.research_interpreter import interpret_tool_result
 from modules.edge_research.research_panel_preflight import (
@@ -74,6 +79,95 @@ class ControllerStepResult:
     session_terminal: bool = False
     branch_terminal: bool = False
     terminal_reason: str = ""
+
+
+def _update_frame_from_experiment(
+    graph: ResearchGraph,
+    experiment_node_id: str,
+    assessment: ResearchAssessment,
+    tool_result: ToolResult,
+) -> None:
+    """Accumulate frame-level stats after each experiment."""
+    exp = graph.get_node(experiment_node_id)
+    frame_id = ""
+    for pid in exp.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.question_context:
+            frame_id = parent.question_context.frame_id
+            break
+
+    reg = graph.get_frame_registry()
+    if not frame_id:
+        frame_id = reg.active_frame_id
+    frame = reg.get(frame_id)
+    if frame is None:
+        return
+
+    frame.experiments_in_frame += 1
+    if exp.experiment_spec:
+        inputs = exp.experiment_spec.inputs or {}
+        for key in ("feature_column", "partition_column", "primary_feature"):
+            if key in inputs:
+                feat = str(inputs[key])
+                if feat not in frame.features_explored:
+                    frame.features_explored = frame.features_explored + (feat,)
+
+    if assessment.conditional_candidate:
+        frame.candidate_yield += 1
+    if assessment.possible_falsification_targets and exp.experiment_spec:
+        if exp.experiment_spec.tool_name == "sensitivity_analysis":
+            frame.falsification_yield += 1
+
+    codes = {o.code for o in tool_result.structured_observations}
+    if "SHAPE_FLAT" in codes or "SHAPE_NOISY" in codes or "NO_CLEAR_DIFFERENCE" in codes:
+        frame.flat_noisy_count += 1
+
+    status, _ = assess_frame_saturation(frame)
+    frame.status = status
+    reg.frames[frame_id] = frame
+    graph.persist_frames()
+
+
+def _register_frame_transition_on_spawn(
+    graph: ResearchGraph,
+    *,
+    pending_ctx: Optional[ResearchQuestionContext],
+    parent_frame_id: str,
+) -> None:
+    """Record frame lineage when spawning a reframe question."""
+    if pending_ctx is None or not pending_ctx.frame_id:
+        return
+    if pending_ctx.frame_id == parent_frame_id:
+        return
+
+    reg = graph.get_frame_registry()
+    old = reg.get(parent_frame_id)
+    if old is None:
+        return
+
+    pop = PopulationSpec.from_dict(pending_ctx.population_spec)
+    out = OutcomeSpec.from_dict(pending_ctx.outcome_spec)
+    pc = pending_ctx.population_change or {}
+    new_frame = ResearchFrame(
+        frame_id=pending_ctx.frame_id,
+        population=pop,
+        outcome=out,
+        observation_horizon=pending_ctx.observation_horizon,
+        parent_frame_id=parent_frame_id,
+        reason_created=str(pc.get("reason_code", "REFRAME")),
+        triggering_evidence=dict(pc.get("triggering_evidence") or {}),
+        transformation=str(pc.get("reason_code", "REFRAME")),
+        frame_depth=old.frame_depth + 1,
+        eligible_feature_count=old.eligible_feature_count,
+        status=FrameStatus.UNDEREXPLORED.value,
+    )
+    reg.record_transition(
+        old,
+        new_frame,
+        trigger=pc.get("reason_code", "REFRAME"),
+        sample_n=pending_ctx.population_n,
+    )
+    graph.persist_frames()
 
 
 def record_planning_on_experiment(
@@ -290,6 +384,7 @@ def plan_after_experiment(
         candidate_scores=serializable_scores,
     )
     _maybe_build_candidate_summary(graph, experiment_node_id, assessment, tool_result)
+    _update_frame_from_experiment(graph, experiment_node_id, assessment, tool_result)
     _enqueue_frontier_from_planning(
         graph, experiment_node_id, decision, serializable_scores
     )
@@ -458,6 +553,11 @@ def apply_plan_decision(
         if decision.selected:
             reason = decision.selected.action_code
         _resolve_branch(graph, experiment_node_id, reason)
+        reg = graph.get_frame_registry()
+        frame = reg.get(reg.active_frame_id)
+        if frame:
+            frame.stop_branch_count += 1
+            graph.persist_frames()
         should_stop, _ = evaluate_and_maybe_stop_session(graph)
         if should_stop:
             return ControllerStepResult(
@@ -573,6 +673,13 @@ def apply_plan_decision(
         evidence_summary=evidence_summary,
         question_context=pending_ctx,
     )
+    parent_frame_id = ""
+    for pid in graph.get_node(experiment_node_id).parent_node_ids:
+        p = graph.get_node(pid)
+        if p.question_context:
+            parent_frame_id = p.question_context.frame_id
+            break
+    _register_frame_transition_on_spawn(graph, pending_ctx=pending_ctx, parent_frame_id=parent_frame_id)
     eid = graph.add_experiment(question_node_id=qid, spec=selected.draft_spec)
     return ControllerStepResult(
         tool_result=None,

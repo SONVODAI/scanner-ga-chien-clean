@@ -20,6 +20,7 @@ from modules.edge_research.research_controller import (
     DEFAULT_SESSION_EXPERIMENT_BUDGET,
     run_research_session,
 )
+from modules.edge_research.research_frame import ResearchFrame
 from modules.edge_research.research_graph import ResearchGraph
 from modules.edge_research.research_grammar import (
     OutcomeSpec,
@@ -117,12 +118,25 @@ def bootstrap_research_graph(config: AutonomousResearchConfig) -> tuple[Research
     research_scope["outcome_spec"] = config.outcome_spec.to_dict()
     research_scope["outcome_spec_hash"] = config.outcome_spec.content_hash()
 
+    reg = graph.get_frame_registry()
+    frame_id = reg.next_id()
+    reg.register(
+        ResearchFrame.initial(
+            frame_id,
+            config.population_spec,
+            config.outcome_spec,
+        )
+    )
+    graph.persist_frames()
+
     qctx = ResearchQuestionContext(
         population_spec=config.population_spec.to_dict(),
         outcome_spec=config.outcome_spec.to_dict(),
         research_depth=0,
         search_complexity=accounting.predicate_count,
         search_accounting=accounting.to_dict(),
+        frame_id=frame_id,
+        observation_horizon=0,
     )
 
     qid = graph.spawn_question(

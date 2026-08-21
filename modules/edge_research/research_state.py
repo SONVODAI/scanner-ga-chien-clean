@@ -113,6 +113,8 @@ class ResearchQuestionContext:
     population_n: Optional[int] = None
     search_accounting: Dict[str, Any] = field(default_factory=dict)
     population_change: Optional[Dict[str, Any]] = None
+    frame_id: str = ""
+    observation_horizon: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -123,6 +125,8 @@ class ResearchQuestionContext:
             "population_n": self.population_n,
             "search_accounting": dict(self.search_accounting),
             "population_change": dict(self.population_change) if self.population_change else None,
+            "frame_id": self.frame_id,
+            "observation_horizon": self.observation_horizon,
         }
 
     @classmethod
@@ -136,6 +140,8 @@ class ResearchQuestionContext:
             population_n=payload.get("population_n"),
             search_accounting=dict(payload.get("search_accounting") or {}),
             population_change=dict(pc) if pc else None,
+            frame_id=str(payload.get("frame_id", "")),
+            observation_horizon=int(payload.get("observation_horizon", 0)),
         )
 
 
@@ -331,6 +337,7 @@ class ResearchSession:
     research_frontier: Dict[str, Any] = field(default_factory=dict)
     session_stop_reason: Optional[Dict[str, Any]] = None
     panel_preflight: Optional[Dict[str, Any]] = None
+    research_frames: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -352,6 +359,8 @@ class ResearchSession:
             payload["session_stop_reason"] = dict(self.session_stop_reason)
         if self.panel_preflight:
             payload["panel_preflight"] = dict(self.panel_preflight)
+        if self.research_frames:
+            payload["research_frames"] = dict(self.research_frames)
         return payload
 
     @classmethod
@@ -374,6 +383,7 @@ class ResearchSession:
             if payload.get("session_stop_reason")
             else None,
             panel_preflight=dict(payload["panel_preflight"]) if payload.get("panel_preflight") else None,
+            research_frames=dict(payload.get("research_frames") or {}),
         )
 
 
