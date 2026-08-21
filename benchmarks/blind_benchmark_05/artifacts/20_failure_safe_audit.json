@@ -1,0 +1,41 @@
+{
+  "runtime_error_occurred": false,
+  "error_message": null,
+  "session_terminal_status": "BUDGET_EXHAUSTED",
+  "last_completed_experiment": "exp-d3b28539f0af",
+  "active_frame_id": "frame-00007",
+  "lineage_records_persisted": 1,
+  "lineage_survived_failure": true,
+  "lineage_records": [
+    {
+      "old_frame_id": "frame-00001",
+      "new_frame_id": "frame-00007",
+      "transformation": "OUTCOME_TO_POPULATION",
+      "trigger": "OUTCOME_TO_POPULATION",
+      "saturation_evidence": {},
+      "parent_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+      "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+      "new_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+      "new_population_hash": "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0",
+      "observation_horizon": 5,
+      "parent_observation_horizon": 0,
+      "sample_n": null,
+      "temporal_legal": true,
+      "triggering_experiment_id": "exp-6184be88c932",
+      "planner_action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00007",
+      "planner_score": 10.15,
+      "sequence_order": 0
+    }
+  ],
+  "frontier_persisted": true,
+  "search_accounting_persisted": true,
+  "false_completion_nodes": [],
+  "session_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "remaining_budget": 0,
+    "unexplored_frontier_count": 31,
+    "features_touched": 2,
+    "eligible_features": 8
+  }
+}

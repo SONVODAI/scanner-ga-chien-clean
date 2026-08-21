@@ -1,0 +1,153 @@
+{
+  "registry_version": "research_frame_v1",
+  "active_frame_id": "frame-00007",
+  "frames": {
+    "frame-00001": {
+      "frame_id": "frame-00001",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 0,
+      "context_scope": {},
+      "parent_frame_id": "",
+      "reason_created": "",
+      "triggering_evidence": {},
+      "transformation": "INITIAL",
+      "frame_depth": 0,
+      "experiments_in_frame": 1,
+      "features_explored": [],
+      "candidate_yield": 0,
+      "falsification_yield": 0,
+      "stop_branch_count": 0,
+      "flat_noisy_count": 0,
+      "complexity_burden": 9.0,
+      "information_gain_score": 0.15,
+      "status": "SUPERSEDED",
+      "eligible_feature_count": 0,
+      "content_hash": "c6a53f42bf8bf366"
+    },
+    "frame-00007": {
+      "frame_id": "frame-00007",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 5,
+      "context_scope": {},
+      "parent_frame_id": "frame-00001",
+      "reason_created": "OUTCOME_TO_POPULATION",
+      "triggering_evidence": {
+        "early_field": "t5_return",
+        "late_field": "t10_return"
+      },
+      "transformation": "OUTCOME_TO_POPULATION",
+      "frame_depth": 1,
+      "experiments_in_frame": 11,
+      "features_explored": [
+        "rs10",
+        "rs_spread"
+      ],
+      "candidate_yield": 4,
+      "falsification_yield": 0,
+      "stop_branch_count": 4,
+      "flat_noisy_count": 0,
+      "complexity_burden": 49.0,
+      "information_gain_score": 0.5360530284449998,
+      "status": "PRODUCTIVE",
+      "eligible_feature_count": 0,
+      "content_hash": "538ab2e09034972a"
+    }
+  },
+  "lineage": [
+    {
+      "old_frame_id": "frame-00001",
+      "new_frame_id": "frame-00007",
+      "transformation": "OUTCOME_TO_POPULATION",
+      "trigger": "OUTCOME_TO_POPULATION",
+      "saturation_evidence": {},
+      "parent_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+      "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+      "new_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+      "new_population_hash": "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0",
+      "observation_horizon": 5,
+      "parent_observation_horizon": 0,
+      "sample_n": null,
+      "temporal_legal": true,
+      "triggering_experiment_id": "exp-6184be88c932",
+      "planner_action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00007",
+      "planner_score": 10.15,
+      "sequence_order": 0
+    }
+  ],
+  "created_vs_executed": {
+    "research_frames_created": 22,
+    "research_frames_executed": 2,
+    "research_frames_unexplored": [
+      "frame-00001",
+      "frame-00002",
+      "frame-00003",
+      "frame-00004",
+      "frame-00005",
+      "frame-00006",
+      "frame-00008",
+      "frame-00009",
+      "frame-00010",
+      "frame-00011",
+      "frame-00012",
+      "frame-00013",
+      "frame-00014",
+      "frame-00015",
+      "frame-00016",
+      "frame-00017",
+      "frame-00018",
+      "frame-00019",
+      "frame-00020",
+      "frame-00021",
+      "frame-00022"
+    ],
+    "unique_outcome_specs_created": 2,
+    "unique_population_specs_created": 2
+  },
+  "status_counts": {
+    "SUPERSEDED": 1,
+    "PRODUCTIVE": 1
+  },
+  "frontier_transformation_types_created": {
+    "OUTCOME_REFRAME": 11,
+    "STRUCTURAL_TRIGGER": 9,
+    "HORIZON_ADVANCE": 5,
+    "OUTCOME_TO_POPULATION": 7
+  }
+}

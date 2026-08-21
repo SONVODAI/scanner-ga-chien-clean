@@ -1,0 +1,68 @@
+{
+  "branch_count": 1,
+  "deferred_promising_branches": [
+    {
+      "branch_root_id": "obs-b1e9a5d79076",
+      "status": "DEFERRED_PROMISING",
+      "experiments_on_branch": 12,
+      "unresolved_research_value": 1.0,
+      "revisit_count": 0,
+      "last_explored_sequence": 12,
+      "last_marginal_gain": 0.5,
+      "evidence_before_leave": 1.0,
+      "leave_reason": "STOP_BRANCH",
+      "falsified": false,
+      "deferred_promising": true
+    }
+  ],
+  "falsified_branches": [],
+  "revisit_branches": [],
+  "branches": [
+    {
+      "branch_root_id": "obs-b1e9a5d79076",
+      "status": "DEFERRED_PROMISING",
+      "experiments_on_branch": 12,
+      "unresolved_research_value": 1.0,
+      "revisit_count": 0,
+      "last_explored_sequence": 12,
+      "last_marginal_gain": 0.5,
+      "evidence_before_leave": 1.0,
+      "leave_reason": "STOP_BRANCH",
+      "falsified": false,
+      "deferred_promising": true
+    }
+  ],
+  "marginal_gains_sequence": [
+    0.5,
+    0.5,
+    0.1,
+    0.5,
+    1.0,
+    1.0,
+    0.1,
+    0.5,
+    1.0,
+    1.0,
+    0.1,
+    0.5
+  ],
+  "dimension_experiment_counts": {
+    "_|b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937|13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547|_": 1,
+    "_|484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244|dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0|frame-00007": 1,
+    "_|_|_|_": 3,
+    "_|08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7|13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547|_": 1,
+    "rs10|_|_|_": 2,
+    "_|90a3e561442d95e6e3e5d265315ad0c9af69541e18c093700f40bae101052cb5|13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547|_": 1,
+    "rs_spread|_|_|_": 2,
+    "_|4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095|13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547|_": 1
+  },
+  "tool_attempt_counts": {
+    "horizon_comparison": 5,
+    "sensitivity_analysis": 1,
+    "adaptive_partition_compare": 2,
+    "threshold_exploration": 2,
+    "symbol_decomposition": 1,
+    "date_decomposition": 1
+  },
+  "dominated_skipped": 0
+}
