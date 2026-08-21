@@ -1,10 +1,10 @@
 {
   "replay_version": "bb10_exit_valuation_replay_v1",
-  "replayed_at": "2026-08-21T15:57:06Z",
+  "replayed_at": "2026-08-21T16:00:28Z",
   "frozen_bb10_commit": "22b1d0e4e",
   "frozen_3h6_commit": "b28cf8ae6",
   "frozen_3h7_commit": "6125150b7",
-  "implementation_commit": "b28cf8ae6",
+  "implementation_commit": "ae3e80036",
   "transitions_replayed": 11,
   "stop_competed_count": 6,
   "stop_would_win_count": 2,
