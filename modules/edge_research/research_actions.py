@@ -496,21 +496,22 @@ def _add_adaptive_candidates(
     cutoff: str,
     experiment_node_id: str,
     panel_columns: Optional[Sequence[str]] = None,
+    operational_awareness: Optional[Any] = None,
 ) -> None:
     """Phase 3F evidence-driven adaptive slicing follow-ups."""
 
     def add(**kwargs: Any) -> None:
         candidates.append(_check_candidate(graph, registry=registry, **kwargs))
 
-    from modules.edge_research.research_panel_preflight import adaptive_features_from_columns
+    from modules.edge_research.research_operational_awareness import partition_features_for_construction
 
     metrics = _experiment_metrics(graph, experiment_node_id)
     exp_node = graph.get_node(experiment_node_id)
     parent_tool = exp_node.experiment_spec.tool_name if exp_node.experiment_spec else ""
 
     partition_feats: Tuple[str, ...] = ()
-    if panel_columns:
-        partition_feats = adaptive_features_from_columns(panel_columns)
+    if panel_columns or operational_awareness is not None:
+        partition_feats = partition_features_for_construction(panel_columns, operational_awareness)
 
     # Initial adaptive partition on eligible continuous features (exploration).
     if parent_tool not in ("adaptive_partition_compare", "threshold_exploration", "threshold_neighborhood"):
@@ -755,6 +756,7 @@ def _add_frame_reframe_candidates(
     cutoff: str,
     experiment_node_id: str,
     panel_columns: Optional[Sequence[str]] = None,
+    operational_awareness: Optional[Any] = None,
 ) -> None:
     """Phase 3G.2 — autonomous outcome/population/horizon reframing from frame saturation."""
     from modules.edge_research.research_frame import (
@@ -932,9 +934,9 @@ def _add_frame_reframe_candidates(
                 observation_horizon=ctx.observation_horizon,
             ).to_dict()
             feat_col = "feat_alpha"
-            if panel_columns:
-                from modules.edge_research.research_panel_preflight import adaptive_features_from_columns
-                feats = adaptive_features_from_columns(panel_columns)
+            if panel_columns or operational_awareness is not None:
+                from modules.edge_research.research_operational_awareness import partition_features_for_construction
+                feats = partition_features_for_construction(panel_columns, operational_awareness)
                 if feats:
                     feat_col = feats[0]
             add(
@@ -1036,6 +1038,7 @@ def generate_action_candidates(
     research_scope: Optional[Dict[str, Any]] = None,
     experiment_node_id: Optional[str] = None,
     panel_columns: Optional[Sequence[str]] = None,
+    operational_awareness: Optional[Any] = None,
 ) -> Tuple[ResearchActionCandidate, ...]:
     """
     Generate multiple scientifically legitimate next actions from assessment.
@@ -1267,6 +1270,7 @@ def generate_action_candidates(
             cutoff=cutoff,
             experiment_node_id=experiment_node_id,
             panel_columns=panel_columns,
+            operational_awareness=operational_awareness,
         )
         _add_frame_reframe_candidates(
             candidates,
@@ -1277,6 +1281,7 @@ def generate_action_candidates(
             cutoff=cutoff,
             experiment_node_id=experiment_node_id,
             panel_columns=panel_columns,
+            operational_awareness=operational_awareness,
         )
 
     # Terminal candidates — always available; planner may select immediately.

@@ -343,6 +343,7 @@ class ResearchSession:
     research_data_expansion_audit: Optional[Dict[str, Any]] = None
     research_provenance_proof: Optional[Dict[str, Any]] = None
     research_exposure_contract: Optional[Dict[str, Any]] = None
+    research_operational_awareness: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -376,6 +377,8 @@ class ResearchSession:
             payload["research_provenance_proof"] = dict(self.research_provenance_proof)
         if self.research_exposure_contract:
             payload["research_exposure_contract"] = dict(self.research_exposure_contract)
+        if self.research_operational_awareness:
+            payload["research_operational_awareness"] = dict(self.research_operational_awareness)
         return payload
 
     @classmethod
@@ -411,6 +414,9 @@ class ResearchSession:
             else None,
             research_exposure_contract=dict(payload["research_exposure_contract"])
             if payload.get("research_exposure_contract")
+            else None,
+            research_operational_awareness=dict(payload["research_operational_awareness"])
+            if payload.get("research_operational_awareness")
             else None,
         )
 

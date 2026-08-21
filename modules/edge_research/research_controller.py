@@ -44,6 +44,12 @@ from modules.edge_research.research_data_expansion_audit import ensure_session_e
 from modules.edge_research.research_provenance_proof import ensure_session_provenance_proof
 from modules.edge_research.research_exposure_governance import ensure_session_exposure_contract
 from modules.edge_research.research_exposure_governance import record_experiment_exposure_exercises
+from modules.edge_research.research_operational_awareness import (
+    filter_candidates_to_awareness_legal_set,
+    mark_awareness_considered_from_candidates,
+    mark_awareness_consulted,
+    rebuild_awareness_at_horizon,
+)
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     BranchPortfolioStatus,
@@ -602,9 +608,16 @@ def plan_after_experiment(
     *,
     research_scope: Optional[Dict[str, Any]] = None,
     panel_columns: Optional[Tuple[str, ...]] = None,
+    consult_operational_awareness: bool = True,
 ) -> PlanningRecord:
     """Interpret result, generate candidates, plan next step, record on graph."""
     assessment = interpret_tool_result(graph, experiment_node_id, tool_result)
+    awareness = graph.get_operational_awareness() if consult_operational_awareness else None
+    if awareness is not None:
+        constructible = awareness.constructible_explanatory_features()
+        awareness = mark_awareness_consulted(awareness, constructible_features=constructible)
+        graph._operational_awareness = awareness  # noqa: SLF001
+
     candidates = generate_action_candidates(
         assessment,
         graph,
@@ -612,9 +625,15 @@ def plan_after_experiment(
         research_scope=research_scope,
         experiment_node_id=experiment_node_id,
         panel_columns=panel_columns,
+        operational_awareness=awareness,
     )
     if panel_columns:
         candidates = filter_candidates_for_panel(candidates, panel_columns)
+    if awareness is not None:
+        candidates = filter_candidates_to_awareness_legal_set(candidates, awareness)
+        awareness = mark_awareness_considered_from_candidates(awareness, candidates)
+        graph._operational_awareness = awareness  # noqa: SLF001
+        graph.persist_operational_awareness()
     candidates = _enrich_candidates_with_search_hints(candidates, tool_result)
     record_candidates_considered(
         graph.get_search_accounting(), graph, experiment_node_id, len(candidates)
@@ -1161,6 +1180,11 @@ def run_experiment_and_plan(
         exposure, node.experiment_spec, experiment_node_id
     )
     graph.persist_exposure_contract()
+    reg = graph.get_capability_registry()
+    obs_horizon = int(getattr(reg, "observation_horizon", 0) or 0)
+    rebuild_awareness_at_horizon(
+        graph, panel, observation_horizon=obs_horizon, tool_registry=registry
+    )
 
     if _is_budget_exhausted(graph):
         planning = _terminate_session_on_budget_exhaustion(
@@ -1245,6 +1269,9 @@ def run_research_session(
     ensure_session_expansion_audit(graph)
     ensure_session_provenance_proof(graph)
     ensure_session_exposure_contract(graph)
+    from modules.edge_research.research_operational_awareness import ensure_session_operational_awareness
+
+    ensure_session_operational_awareness(graph, panel, registry)
 
     steps: List[ControllerStepResult] = []
     current_exp: Optional[str] = initial_experiment_id

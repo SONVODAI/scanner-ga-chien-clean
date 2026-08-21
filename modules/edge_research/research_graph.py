@@ -86,6 +86,7 @@ class ResearchGraph:
         self._expansion_audit: Optional[Any] = None
         self._provenance_proof: Optional[Any] = None
         self._exposure_contract: Optional[Any] = None
+        self._operational_awareness: Optional[Any] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -215,6 +216,21 @@ class ResearchGraph:
     def persist_exposure_contract(self) -> None:
         contract = self.get_exposure_contract()
         self.session.research_exposure_contract = contract.to_dict()
+
+    def get_operational_awareness(self) -> Any:
+        from modules.edge_research.research_operational_awareness import OperationalAwareness
+
+        if self._operational_awareness is None:
+            raw = self.session.research_operational_awareness
+            self._operational_awareness = (
+                OperationalAwareness.from_dict(raw) if raw else None
+            )
+        return self._operational_awareness
+
+    def persist_operational_awareness(self) -> None:
+        awareness = self.get_operational_awareness()
+        if awareness is not None:
+            self.session.research_operational_awareness = awareness.to_dict()
 
     @classmethod
     def create_session(
