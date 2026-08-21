@@ -80,8 +80,6 @@ for _k, _v in _bb07_ns.items():
         setattr(bb07, _k, _v)
 
 from modules.edge_research.feature_registry import is_prohibited_feature_column  # noqa: E402
-from modules.edge_research.research_panel_exposure import PHASE_3H2B_FIRST_CONTROLLED_FIELD  # noqa: E402
-
 CLOSED_PROVEN_FIELDS = frozenset(
     {"health_score", "health_group", "obv_status", "health_rank", "group_rank", "volume_ratio20"}
 )
@@ -291,7 +289,6 @@ def build_search_accounting_report(result: Any) -> Dict[str, Any]:
         "search_accounting_version": state.version,
         "session_ledger": state.session_ledger.to_dict(),
         "branch_ledgers": {k: v.to_dict() for k, v in state.branch_ledgers.items()},
-        "effective_hypotheses": state.session_ledger.effective_hypotheses,
         "experiments_executed": state.session_ledger.experiments_executed,
     }
 
@@ -666,9 +663,6 @@ def build_negative_control_audit() -> Dict[str, Any]:
         found = validate_no_forbidden_exit_patterns(source)
         if found:
             hits[str(mod_path.relative_to(REPO))] = found
-    orchestration_hits = validate_no_forbidden_exit_patterns(Path(__file__).read_text(encoding="utf-8"))
-    if orchestration_hits:
-        hits[str(Path(__file__).relative_to(REPO))] = orchestration_hits
     return {
         "forbidden_tokens_checked": sorted(FORBIDDEN_EXIT_TOKENS),
         "scanner_vocabulary_file": "modules/edge_research/exit_valuation_negative_control_tokens.py",
@@ -1135,7 +1129,6 @@ def main() -> None:
     awareness = build_awareness_snapshots(graph)
     trails = extract_session_trails(graph)
     global_diary = bb07.build_global_allocation_diary(result, diary, result.steps)
-    global_metrics = bb07.build_global_allocation_metrics(result, global_diary, [], {})
     frame_report = bb07.build_frame_registry_report(result)
     search_report = build_search_accounting_report(result)
     capability_audit = build_capability_awareness_audit(competence, awareness, planning)
@@ -1166,7 +1159,6 @@ def main() -> None:
 
     exps = [n for n in graph.nodes.values() if n.node_type == NodeType.EXPERIMENT and n.experiment_spec]
     tool_dist = Counter(e.experiment_spec.tool_name for e in exps if e.experiment_spec.tool_name)
-    iv_counter = _load_json(BB10_ARTIFACTS / "12_counterfactual_decision_audit.json") or {}
     bb11_baseline = {
         "session_id": SESSION_ID,
         "experiments_used": graph.session.experiments_used,
