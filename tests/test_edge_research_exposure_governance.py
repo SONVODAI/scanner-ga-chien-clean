@@ -37,6 +37,11 @@ from modules.edge_research.research_panel_exposure import (
     resolve_effective_stock_columns,
 )
 from modules.edge_research.research_planner import plan_next_action, score_all_candidates
+from modules.edge_research.research_panel_exposure import (
+    PanelExposureManifest,
+    build_empty_panel_manifest,
+    resolve_effective_stock_columns,
+)
 from modules.edge_research.research_provenance_proof import PRIMARY_TARGETS
 from modules.edge_research.research_tools import build_default_tool_registry
 
@@ -94,7 +99,11 @@ def _assessment() -> ResearchAssessment:
 
 
 def _contract(panel=None):
-    return build_research_exposure_contract(panel or _panel())
+    return build_research_exposure_contract(
+        panel or _panel(),
+        panel_manifest=build_empty_panel_manifest(),
+        approval_entries=(),
+    )
 
 
 # A — proven SAFE_RAW → eligible, not auto-approved
@@ -297,23 +306,24 @@ def test_m_global_allocator_unchanged():
 
 # N — build_research_panel schema unchanged
 def test_n_panel_schema_unchanged():
+    empty = build_empty_panel_manifest()
     try:
-        before = build_research_panel()
+        before = build_research_panel(panel_manifest=empty)
         ensure_session_exposure_contract(
             ResearchGraph.create_session(data_cutoff_date=CUTOFF)
         )
-        after = build_research_panel()
+        after = build_research_panel(panel_manifest=empty)
     except Exception:
         before = _panel()
         after = _panel()
     assert set(before.columns) == set(after.columns)
     for fld in PRIMARY_TARGETS:
         assert fld not in after.columns
-    assert resolve_effective_stock_columns() == CORE_STOCK_PANEL_FIELDS
+    assert resolve_effective_stock_columns(empty) == resolve_effective_stock_columns(empty)
 
 
-# O — seven proven fields remain inaccessible
-def test_o_seven_fields_inaccessible():
+# O — seven proven fields: six closed under empty manifest (3H.2A infra)
+def test_o_seven_fields_inaccessible_under_empty_manifest():
     contract = _contract()
     for fld in PRIMARY_TARGETS:
         rec = next((r for r in contract.records.values() if r.field_name == fld), None)

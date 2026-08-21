@@ -165,7 +165,9 @@ def test_i_no_new_field_becomes_accessible():
     report = build_research_provenance_proof(_panel())
     for proof in report.field_proofs.values():
         assert proof.research_accessible_now is False
-    panel = build_research_panel()
+    from modules.edge_research.research_panel_exposure import build_empty_panel_manifest
+
+    panel = build_research_panel(panel_manifest=build_empty_panel_manifest())
     if panel is not None and not panel.empty:
         for fld in PRIMARY_TARGETS:
             assert fld not in panel.columns

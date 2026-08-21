@@ -43,6 +43,7 @@ from modules.edge_research.research_capability_registry import (
 from modules.edge_research.research_data_expansion_audit import ensure_session_expansion_audit
 from modules.edge_research.research_provenance_proof import ensure_session_provenance_proof
 from modules.edge_research.research_exposure_governance import ensure_session_exposure_contract
+from modules.edge_research.research_exposure_governance import record_experiment_exposure_exercises
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     BranchPortfolioStatus,
@@ -1155,6 +1156,11 @@ def run_experiment_and_plan(
     _maybe_mark_frontier_executed(graph, experiment_node_id)
     node = graph.get_node(experiment_node_id)
     record_experiment_capability_exercise(graph, experiment_node_id, node.experiment_spec)
+    exposure = graph.get_exposure_contract()
+    record_experiment_exposure_exercises(
+        exposure, node.experiment_spec, experiment_node_id
+    )
+    graph.persist_exposure_contract()
 
     if _is_budget_exhausted(graph):
         planning = _terminate_session_on_budget_exhaustion(

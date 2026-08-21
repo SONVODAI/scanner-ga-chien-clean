@@ -1,8 +1,6 @@
 """
 Phase 3H.2A — Controlled Exposure Infrastructure.
-
-Builds provenance-gated exposure governance without opening the door:
-eligibility ≠ approval ≠ panel wiring ≠ research_accessible_now.
+Phase 3H.2B — First controlled exposure (rsi_slope) via explicit approval manifest.
 """
 
 from __future__ import annotations
@@ -31,7 +29,11 @@ from modules.edge_research.research_feature_eligibility import (
 from modules.edge_research.research_panel_exposure import (
     CORE_STOCK_PANEL_FIELDS,
     PANEL_EXPOSURE_DESIGN_VERSION,
+    PHASE_3H2B_FIRST_CONTROLLED_FIELD,
     PanelExposureManifest,
+    build_empty_panel_manifest,
+    build_phase_3h2b_panel_manifest,
+    get_active_panel_exposure_manifest,
     resolve_effective_stock_columns,
 )
 from modules.edge_research.research_provenance_proof import (
@@ -41,9 +43,11 @@ from modules.edge_research.research_provenance_proof import (
     build_research_provenance_proof,
 )
 
-EXPOSURE_GOVERNANCE_VERSION = "research_exposure_governance_v1"
+EXPOSURE_GOVERNANCE_VERSION = "research_exposure_governance_v2"
 EXPOSURE_POLICY_VERSION = "controlled_exposure_policy_v1"
 PHASE_3H1_1_FROZEN_COMMIT = "300810ff8"
+PHASE_3H2A_FROZEN_COMMIT = "88e4df5f1"
+PHASE_3H2B_APPROVAL_SOURCE = "PHASE_3H2B_EXPLICIT_MANIFEST"
 
 _ELIGIBLE_SCIENTIFIC_CLASSES: FrozenSet[str] = frozenset(
     {
@@ -98,6 +102,7 @@ class CapabilityExposureRecord:
     wired_to_panel: bool
     research_accessible_now: bool
     temporally_legal_at_horizon: bool
+    exercised_by_researcher: bool
     blockers: Tuple[str, ...]
     exposure_version: str
     provenance_fingerprint: str
@@ -130,6 +135,7 @@ class CapabilityExposureRecord:
             "wired_to_panel": self.wired_to_panel,
             "research_accessible_now": self.research_accessible_now,
             "temporally_legal_at_horizon": self.temporally_legal_at_horizon,
+            "exercised_by_researcher": self.exercised_by_researcher,
             "blockers": list(self.blockers),
             "exposure_version": self.exposure_version,
             "provenance_fingerprint": self.provenance_fingerprint,
@@ -168,6 +174,7 @@ class CapabilityExposureRecord:
             wired_to_panel=bool(payload.get("wired_to_panel", False)),
             research_accessible_now=bool(payload.get("research_accessible_now", False)),
             temporally_legal_at_horizon=bool(payload.get("temporally_legal_at_horizon", False)),
+            exercised_by_researcher=bool(payload.get("exercised_by_researcher", False)),
             blockers=tuple(payload.get("blockers") or ()),
             exposure_version=str(payload.get("exposure_version", EXPOSURE_GOVERNANCE_VERSION)),
             provenance_fingerprint=str(payload.get("provenance_fingerprint") or ""),
@@ -205,6 +212,39 @@ class ResearchExposurePolicy:
         }
 
 
+@dataclass(frozen=True)
+class ResearchExposureApprovalEntry:
+    """Explicit exposure approval bound to provenance fingerprint."""
+
+    field_name: str
+    provenance_proof_id: str
+    provenance_fingerprint: str
+    proof_version: str
+    approval_source: str
+    approved_at: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "field_name": self.field_name,
+            "provenance_proof_id": self.provenance_proof_id,
+            "provenance_fingerprint": self.provenance_fingerprint,
+            "proof_version": self.proof_version,
+            "approval_source": self.approval_source,
+            "approved_at": self.approved_at,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "ResearchExposureApprovalEntry":
+        return cls(
+            field_name=str(payload["field_name"]),
+            provenance_proof_id=str(payload["provenance_proof_id"]),
+            provenance_fingerprint=str(payload["provenance_fingerprint"]),
+            proof_version=str(payload["proof_version"]),
+            approval_source=str(payload.get("approval_source") or ""),
+            approved_at=str(payload.get("approved_at") or ""),
+        )
+
+
 @dataclass
 class ResearchExposureContract:
     """Session-persistent exposure governance contract."""
@@ -218,6 +258,7 @@ class ResearchExposureContract:
     policy: ResearchExposurePolicy = field(default_factory=ResearchExposurePolicy)
     records: Dict[str, CapabilityExposureRecord] = field(default_factory=dict)
     panel_manifest: PanelExposureManifest = field(default_factory=PanelExposureManifest)
+    approval_entries: Tuple[ResearchExposureApprovalEntry, ...] = field(default_factory=tuple)
     observation_horizon: int = 0
     audit_trail: List[Dict[str, Any]] = field(default_factory=list)
     revoked_records: List[Dict[str, Any]] = field(default_factory=list)
@@ -237,6 +278,7 @@ class ResearchExposureContract:
                 "approved_field_names": sorted(self.panel_manifest.approved_field_names),
                 "wired_field_names": sorted(self.panel_manifest.wired_field_names),
             },
+            "approval_entries": [e.to_dict() for e in self.approval_entries],
             "observation_horizon": self.observation_horizon,
             "audit_trail": list(self.audit_trail),
             "revoked_records": list(self.revoked_records),
@@ -296,6 +338,10 @@ class ResearchExposureContract:
                     str(x) for x in (manifest_raw.get("wired_field_names") or ())
                 ),
             ),
+            approval_entries=tuple(
+                ResearchExposureApprovalEntry.from_dict(e)
+                for e in (payload.get("approval_entries") or ())
+            ),
             observation_horizon=int(payload.get("observation_horizon", 0)),
             audit_trail=list(payload.get("audit_trail") or []),
             revoked_records=list(payload.get("revoked_records") or []),
@@ -327,6 +373,80 @@ def compute_provenance_fingerprint(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
     return f"pf:{digest[:24]}"
+
+
+def build_phase_3h2b_approval_entries(
+    provenance_report: ResearchProvenanceProofReport,
+    *,
+    policy_version: str = EXPOSURE_POLICY_VERSION,
+) -> Tuple[ResearchExposureApprovalEntry, ...]:
+    """Derive explicit Phase 3H.2B approval for rsi_slope from provenance proof."""
+    proof_id = f"provenance_proof:missing_panel:{PHASE_3H2B_FIRST_CONTROLLED_FIELD}"
+    proof = provenance_report.field_proofs.get(proof_id)
+    if proof is None:
+        raise ValueError(f"MISSING_PROVENANCE_PROOF:{PHASE_3H2B_FIRST_CONTROLLED_FIELD}")
+
+    fingerprint = compute_provenance_fingerprint(
+        proof_version=provenance_report.version,
+        field_id=proof.field_id,
+        classification=proof.final_scientific_classification,
+        producer_module=proof.producer_module,
+        transformation_chain=proof.transformation_chain,
+        policy_version=policy_version,
+    )
+    return (
+        ResearchExposureApprovalEntry(
+            field_name=PHASE_3H2B_FIRST_CONTROLLED_FIELD,
+            provenance_proof_id=proof.field_id,
+            provenance_fingerprint=fingerprint,
+            proof_version=provenance_report.version,
+            approval_source=PHASE_3H2B_APPROVAL_SOURCE,
+            approved_at=_utc_now(),
+        ),
+    )
+
+
+def resolve_validated_approval_fields(
+    approval_entries: Sequence[ResearchExposureApprovalEntry],
+    proofs: Dict[str, FieldProvenanceProof],
+    *,
+    policy_version: str,
+    proof_version: str,
+) -> Tuple[FrozenSet[str], Tuple[str, ...]]:
+    """Return fields with fingerprint-valid explicit approval — fail closed."""
+    approved: set[str] = set()
+    errors: List[str] = []
+    for entry in approval_entries:
+        proof = proofs.get(entry.provenance_proof_id)
+        if proof is None:
+            errors.append(f"MISSING_PROOF:{entry.field_name}")
+            continue
+        if entry.proof_version != proof_version:
+            errors.append(f"STALE_PROOF_VERSION:{entry.field_name}")
+            continue
+        expected = compute_provenance_fingerprint(
+            proof_version=proof_version,
+            field_id=proof.field_id,
+            classification=proof.final_scientific_classification,
+            producer_module=proof.producer_module,
+            transformation_chain=proof.transformation_chain,
+            policy_version=policy_version,
+        )
+        if expected != entry.provenance_fingerprint:
+            errors.append(f"FINGERPRINT_MISMATCH:{entry.field_name}")
+            continue
+        approved.add(entry.field_name)
+    return frozenset(approved), tuple(errors)
+
+
+def _approval_source_for_field(
+    field_name: str,
+    approval_entries: Sequence[ResearchExposureApprovalEntry],
+) -> str:
+    for entry in approval_entries:
+        if entry.field_name == field_name:
+            return entry.approval_source
+    return ""
 
 
 def _temporally_legal(
@@ -470,6 +590,8 @@ def _record_from_proof(
     wired_manifest: FrozenSet[str],
     observation_horizon: int,
     proof_version: str,
+    approval_entries: Sequence[ResearchExposureApprovalEntry] = (),
+    fingerprint_match: bool = True,
 ) -> CapabilityExposureRecord:
     fingerprint = compute_provenance_fingerprint(
         proof_version=proof_version,
@@ -495,8 +617,8 @@ def _record_from_proof(
         panel_columns=panel_columns,
         lifecycle_columns=lifecycle_columns,
         policy=policy,
-        prior_approved=False,
-        fingerprint_match=True,
+        prior_approved=proof.field_name in approved_manifest,
+        fingerprint_match=fingerprint_match,
     )
 
     temporal_legal = _temporally_legal(
@@ -505,6 +627,7 @@ def _record_from_proof(
         earliest_horizon=proof.earliest_availability_horizon,
     )
     blockers = tuple(dict.fromkeys(elig_blockers + appr_blockers))
+    approval_source = _approval_source_for_field(proof.field_name, approval_entries) if approved else ""
 
     history = (
         {
@@ -515,6 +638,7 @@ def _record_from_proof(
             "wired": wired,
             "accessible": accessible,
             "fingerprint": fingerprint,
+            "lifecycle_event": "EXPOSED" if accessible else "NOT_EXPOSED",
         },
     )
 
@@ -538,10 +662,11 @@ def _record_from_proof(
         eligible_for_exposure=eligible,
         eligibility_reason=elig_reason,
         approved_for_exposure=approved,
-        approval_source="" if not approved else "MANIFEST",
+        approval_source=approval_source,
         wired_to_panel=wired,
         research_accessible_now=accessible,
         temporally_legal_at_horizon=temporal_legal,
+        exercised_by_researcher=False,
         blockers=blockers,
         exposure_version=EXPOSURE_GOVERNANCE_VERSION,
         provenance_fingerprint=fingerprint,
@@ -607,6 +732,7 @@ def _record_from_expansion_negative_control(
         wired_to_panel=False,
         research_accessible_now=False,
         temporally_legal_at_horizon=temporal_legal,
+        exercised_by_researcher=False,
         blockers=blockers,
         exposure_version=EXPOSURE_GOVERNANCE_VERSION,
         provenance_fingerprint=fingerprint,
@@ -661,6 +787,7 @@ def revoke_exposure_record(
         wired_to_panel=False,
         research_accessible_now=False,
         temporally_legal_at_horizon=record.temporally_legal_at_horizon,
+        exercised_by_researcher=False,
         blockers=record.blockers + (reason,),
         exposure_version=record.exposure_version,
         provenance_fingerprint=record.provenance_fingerprint,
@@ -704,32 +831,67 @@ def build_research_exposure_contract(
     policy: Optional[ResearchExposurePolicy] = None,
     observation_horizon: int = 0,
     panel_manifest: Optional[PanelExposureManifest] = None,
+    approval_entries: Optional[Sequence[ResearchExposureApprovalEntry]] = None,
 ) -> ResearchExposureContract:
-    """Build exposure governance contract — audit only, door closed."""
+    """Build exposure governance contract with optional Phase 3H.2B approval."""
     pol = policy or ResearchExposurePolicy()
-    manifest = panel_manifest or PanelExposureManifest()
+    manifest = panel_manifest if panel_manifest is not None else get_active_panel_exposure_manifest()
 
     ok, reason = manifest.validate()
     if not ok:
         raise ValueError(f"MALFORMED_EXPOSURE_MANIFEST: {reason}")
 
-    if panel is None:
-        try:
-            panel = build_research_panel()
-        except Exception:
-            panel = pd.DataFrame()
+    lifecycle = load_lifecycle()
+    lifecycle_columns = frozenset(lifecycle.columns) if not lifecycle.empty else frozenset()
 
-    if expansion_audit is None:
-        expansion_audit = build_research_data_expansion_audit(panel)
-
-    if provenance_report is None:
-        provenance_report = build_research_provenance_proof(panel, expansion_audit)
+    if provenance_report is None or expansion_audit is None:
+        baseline_panel = panel
+        if baseline_panel is None:
+            try:
+                baseline_panel = build_research_panel(
+                    lifecycle=lifecycle,
+                    panel_manifest=build_empty_panel_manifest(),
+                )
+            except Exception:
+                baseline_panel = pd.DataFrame()
+        if expansion_audit is None:
+            expansion_audit = build_research_data_expansion_audit(baseline_panel)
+        if provenance_report is None:
+            provenance_report = build_research_provenance_proof(baseline_panel, expansion_audit)
 
     if provenance_report.version != PROVENANCE_PROOF_VERSION:
         raise ValueError("STALE_PROVENANCE_PROOF_VERSION")
 
-    lifecycle = load_lifecycle()
-    lifecycle_columns = frozenset(lifecycle.columns) if not lifecycle.empty else frozenset()
+    entries = (
+        tuple(approval_entries)
+        if approval_entries is not None
+        else build_phase_3h2b_approval_entries(provenance_report, policy_version=pol.version)
+        if manifest.approved_field_names
+        else ()
+    )
+
+    validated_approved, approval_errors = resolve_validated_approval_fields(
+        entries,
+        provenance_report.field_proofs,
+        policy_version=pol.version,
+        proof_version=provenance_report.version,
+    )
+    if approval_errors and manifest.approved_field_names:
+        raise ValueError(f"APPROVAL_VALIDATION_FAILED:{approval_errors}")
+
+    effective_approved = validated_approved & manifest.approved_field_names
+    effective_wired = validated_approved & manifest.wired_field_names
+
+    if panel is None:
+        try:
+            panel = build_research_panel(
+                lifecycle=lifecycle,
+                panel_manifest=manifest,
+                contract_wired=effective_wired,
+            )
+        except Exception:
+            panel = pd.DataFrame()
+
     panel_columns = frozenset(panel.columns) if not panel.empty else frozenset()
 
     records: Dict[str, CapabilityExposureRecord] = {}
@@ -737,16 +899,21 @@ def build_research_exposure_contract(
     for proof in provenance_report.field_proofs.values():
         exp_key = f"expansion_audit:missing_panel_registry:{proof.field_name}"
         exp_entry = expansion_audit.entries.get(exp_key)
+        fp_match = True
+        if proof.field_name in manifest.approved_field_names:
+            fp_match = proof.field_name in validated_approved
         rec = _record_from_proof(
             proof,
             expansion_entry=exp_entry,
             policy=pol,
             panel_columns=panel_columns,
             lifecycle_columns=lifecycle_columns,
-            approved_manifest=manifest.approved_field_names,
-            wired_manifest=manifest.wired_field_names,
+            approved_manifest=effective_approved,
+            wired_manifest=effective_wired,
             observation_horizon=observation_horizon,
             proof_version=provenance_report.version,
+            approval_entries=entries,
+            fingerprint_match=fp_match,
         )
         records[rec.capability_id] = rec
 
@@ -764,13 +931,25 @@ def build_research_exposure_contract(
         records[rec.capability_id] = rec
 
     effective_stock = resolve_effective_stock_columns(manifest)
-    assert effective_stock == CORE_STOCK_PANEL_FIELDS, "3H.2A panel stock columns must equal core"
+    if manifest.approved_field_names:
+        expected = CORE_STOCK_PANEL_FIELDS | (
+            effective_wired - CORE_STOCK_PANEL_FIELDS
+        )
+        if effective_stock != expected and effective_wired:
+            raise ValueError("WIRED_MANIFEST_PANEL_MISMATCH")
+
+    policy_label = (
+        "PHASE_3H2B_FIRST_CONTROLLED_EXPOSURE"
+        if manifest.approved_field_names
+        else "BUILD_DOOR_DO_NOT_OPEN"
+    )
 
     return ResearchExposureContract(
         built_at=_utc_now(),
         policy=pol,
         records=records,
         panel_manifest=manifest,
+        approval_entries=tuple(entries),
         observation_horizon=observation_horizon,
         audit_trail=[
             {
@@ -780,7 +959,7 @@ def build_research_exposure_contract(
                 "eligible_count": sum(1 for r in records.values() if r.eligible_for_exposure),
                 "approved_count": sum(1 for r in records.values() if r.approved_for_exposure),
                 "accessible_count": sum(1 for r in records.values() if r.research_accessible_now),
-                "policy": "BUILD_DOOR_DO_NOT_OPEN",
+                "policy": policy_label,
             }
         ],
     )
@@ -799,7 +978,6 @@ def enrich_capability_registry_observational(
             r
             for r in exposure_contract.records.values()
             if r.field_name == cap.name
-            or cap_id.endswith(f":{cap.name}")
         ]
         if not exposure_records:
             continue
@@ -814,8 +992,102 @@ def enrich_capability_registry_observational(
             "temporally_legal_at_horizon": rec.temporally_legal_at_horizon,
             "exposure_blockers": list(rec.blockers),
             "provenance_fingerprint": rec.provenance_fingerprint,
+            "exercised_by_researcher": rec.exercised_by_researcher,
         }
     return overlay
+
+
+def record_exposure_exercise(
+    contract: ResearchExposureContract,
+    field_name: str,
+    experiment_node_id: str,
+) -> bool:
+    """
+    Mark EXERCISED_BY_RESEARCHER only after canonical executed experiment uses field.
+    """
+    cap_id = f"exposure:{field_name}"
+    rec = contract.records.get(cap_id)
+    if rec is None or not rec.research_accessible_now:
+        return False
+    if rec.exercised_by_researcher:
+        return False
+
+    event = {
+        "event": "EXERCISED_BY_RESEARCHER",
+        "timestamp": _utc_now(),
+        "experiment_node_id": experiment_node_id,
+        "field_name": field_name,
+        "lifecycle_event": "EXECUTED",
+    }
+    updated = CapabilityExposureRecord(
+        capability_id=rec.capability_id,
+        field_name=rec.field_name,
+        source_id=rec.source_id,
+        provenance_proof_id=rec.provenance_proof_id,
+        provenance_classification=rec.provenance_classification,
+        proof_confidence=rec.proof_confidence,
+        point_in_time_reconstructable=rec.point_in_time_reconstructable,
+        future_dependency_detected=rec.future_dependency_detected,
+        outcome_dependency_detected=rec.outcome_dependency_detected,
+        retrospective_dependency_detected=rec.retrospective_dependency_detected,
+        revision_risk=rec.revision_risk,
+        earliest_availability_horizon=rec.earliest_availability_horizon,
+        scientific_safety_status=rec.scientific_safety_status,
+        exists_in_system=rec.exists_in_system,
+        provenance_audited=rec.provenance_audited,
+        scientifically_safe=rec.scientifically_safe,
+        eligible_for_exposure=rec.eligible_for_exposure,
+        eligibility_reason=rec.eligibility_reason,
+        approved_for_exposure=rec.approved_for_exposure,
+        approval_source=rec.approval_source,
+        wired_to_panel=rec.wired_to_panel,
+        research_accessible_now=rec.research_accessible_now,
+        temporally_legal_at_horizon=rec.temporally_legal_at_horizon,
+        exercised_by_researcher=True,
+        blockers=rec.blockers,
+        exposure_version=rec.exposure_version,
+        provenance_fingerprint=rec.provenance_fingerprint,
+        proof_version=rec.proof_version,
+        policy_version=rec.policy_version,
+        audit_history=rec.audit_history + (event,),
+    )
+    contract.records[cap_id] = updated
+    contract.audit_trail.append(dict(event))
+    return True
+
+
+def is_field_governance_accessible(
+    contract: ResearchExposureContract,
+    field_name: str,
+) -> bool:
+    rec = contract.records.get(f"exposure:{field_name}")
+    return rec is not None and rec.research_accessible_now
+
+
+def extract_experiment_feature_fields(spec: Any) -> Tuple[str, ...]:
+    """Canonical feature fields referenced by an experiment spec."""
+    if spec is None:
+        return ()
+    inputs = dict(getattr(spec, "inputs", None) or {})
+    fields: List[str] = []
+    for key in ("feature_column", "partition_column"):
+        val = inputs.get(key)
+        if val:
+            fields.append(str(val))
+    return tuple(fields)
+
+
+def record_experiment_exposure_exercises(
+    contract: ResearchExposureContract,
+    spec: Any,
+    experiment_node_id: str,
+) -> Tuple[str, ...]:
+    """Record exposure exercise for governance-accessible fields in spec."""
+    exercised: List[str] = []
+    for fld in extract_experiment_feature_fields(spec):
+        if record_exposure_exercise(contract, fld, experiment_node_id):
+            exercised.append(fld)
+    return tuple(exercised)
 
 
 def represent_future_approval(

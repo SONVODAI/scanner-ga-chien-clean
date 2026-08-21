@@ -1,30 +1,36 @@
 """
-Phase 3H.2A — Panel exposure wiring design (door not opened).
+Panel exposure wiring — Phase 3H.2A design, Phase 3H.2B first controlled exposure.
 
-Defines canonical core panel fields and the approved-exposure manifest
-mechanism. In 3H.2A the manifest is always empty — build_research_panel()
-output must remain unchanged.
+Governance-approved optional columns are merged with CORE_STOCK_PANEL_FIELDS
+when building the research panel. Only fields in the active wired manifest
+are extracted from lifecycle persistence.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import FrozenSet, Iterable, Optional, Sequence, Tuple
+from typing import FrozenSet, Optional, Tuple
 
-PANEL_EXPOSURE_DESIGN_VERSION = "research_panel_exposure_v1"
+PANEL_EXPOSURE_DESIGN_VERSION = "research_panel_exposure_v2"
 
-# Hard-coded core stock fields currently extracted in adapters._stock_panel_from_lifecycle.
+# Hard-coded core stock fields in adapters._stock_panel_from_lifecycle.
 CORE_STOCK_PANEL_FIELDS: FrozenSet[str] = frozenset(
     {"close", "rs5", "rs10", "rsi14", "rs_spread"}
 )
 
-# Phase 3H.2A: intentionally empty — no approved+wired optional columns.
+# Phase 3H.2A: empty manifest (door built, not opened).
 DEFAULT_APPROVED_EXPOSURE_MANIFEST: FrozenSet[str] = frozenset()
+
+# Phase 3H.2B: first and only controlled exposure field.
+PHASE_3H2B_FIRST_CONTROLLED_FIELD = "rsi_slope"
+
+# Optional columns requiring governance manifest wiring before panel inclusion.
+GOVERNED_OPTIONAL_PANEL_COLUMNS: FrozenSet[str] = frozenset({PHASE_3H2B_FIRST_CONTROLLED_FIELD})
 
 
 @dataclass(frozen=True)
 class PanelExposureManifest:
-    """Approved optional stock-level columns for panel wiring (3H.2B+)."""
+    """Approved optional stock-level columns for panel wiring."""
 
     version: str = PANEL_EXPOSURE_DESIGN_VERSION
     approved_field_names: FrozenSet[str] = DEFAULT_APPROVED_EXPOSURE_MANIFEST
@@ -43,11 +49,6 @@ class PanelExposureManifest:
         return True, ""
 
     def effective_stock_columns(self) -> FrozenSet[str]:
-        """
-        Resolve stock-level columns for panel builder.
-
-        Phase 3H.2A: returns CORE only because wired manifest is empty.
-        """
         ok, reason = self.validate()
         if not ok:
             raise ValueError(f"PanelExposureManifest invalid: {reason}")
@@ -55,11 +56,31 @@ class PanelExposureManifest:
         return CORE_STOCK_PANEL_FIELDS | wired_optional
 
 
+def build_phase_3h2b_panel_manifest() -> PanelExposureManifest:
+    """Explicit Phase 3H.2B manifest — rsi_slope only."""
+    field = PHASE_3H2B_FIRST_CONTROLLED_FIELD
+    names = frozenset({field})
+    return PanelExposureManifest(
+        version=PANEL_EXPOSURE_DESIGN_VERSION,
+        approved_field_names=names,
+        wired_field_names=names,
+    )
+
+
+def build_empty_panel_manifest() -> PanelExposureManifest:
+    """Phase 3H.2A door-closed manifest for infrastructure tests."""
+    return PanelExposureManifest()
+
+
+def get_active_panel_exposure_manifest() -> PanelExposureManifest:
+    """Active production manifest — Phase 3H.2B first controlled exposure."""
+    return build_phase_3h2b_panel_manifest()
+
+
 def resolve_effective_stock_columns(
     manifest: Optional[PanelExposureManifest] = None,
 ) -> FrozenSet[str]:
-    """Future-safe resolver — 3H.2A output equals CORE_STOCK_PANEL_FIELDS only."""
-    m = manifest or PanelExposureManifest()
+    m = manifest if manifest is not None else get_active_panel_exposure_manifest()
     return m.effective_stock_columns()
 
 
@@ -67,13 +88,11 @@ def columns_would_change_panel(
     manifest: PanelExposureManifest,
     baseline: Optional[FrozenSet[str]] = None,
 ) -> bool:
-    """True if manifest would alter stock column set vs baseline core."""
     base = baseline or CORE_STOCK_PANEL_FIELDS
     return resolve_effective_stock_columns(manifest) != base
 
 
 def parse_panel_exposure_manifest(payload: Optional[dict]) -> PanelExposureManifest:
-    """Parse manifest from session dict — fail-closed on malformed input."""
     if payload is None:
         return PanelExposureManifest()
     if not isinstance(payload, dict):
@@ -90,3 +109,22 @@ def parse_panel_exposure_manifest(payload: Optional[dict]) -> PanelExposureManif
     if not ok:
         raise ValueError(f"MALFORMED_EXPOSURE_MANIFEST: {reason}")
     return manifest
+
+
+def governed_wired_stock_columns(
+    manifest: Optional[PanelExposureManifest] = None,
+    *,
+    contract_wired: Optional[FrozenSet[str]] = None,
+) -> FrozenSet[str]:
+    """
+    Fail-closed resolver: optional columns must appear in both manifest and
+    (when provided) live exposure contract wired set.
+    """
+    m = manifest if manifest is not None else get_active_panel_exposure_manifest()
+    ok, reason = m.validate()
+    if not ok:
+        raise ValueError(f"MALFORMED_EXPOSURE_MANIFEST: {reason}")
+    optional = m.wired_field_names - CORE_STOCK_PANEL_FIELDS
+    if contract_wired is not None:
+        optional = optional & contract_wired
+    return CORE_STOCK_PANEL_FIELDS | optional
