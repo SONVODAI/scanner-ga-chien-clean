@@ -18,6 +18,7 @@ from modules.edge_research.research_search_accounting import (
     record_experiment_executed,
     record_question_generated,
 )
+from modules.edge_research.research_frontier import ResearchFrontier
 from modules.edge_research.research_state import (
     RESEARCH_GRAPH_SCHEMA_VERSION,
     EvidenceReference,
@@ -76,6 +77,7 @@ class ResearchGraph:
         self.nodes: Dict[str, ResearchNode] = dict(nodes or {})
         self.experiment_index: Dict[str, str] = dict(experiment_index or {})
         self._search_accounting: Optional[SearchAccountingState] = None
+        self._research_frontier: Optional[ResearchFrontier] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -93,6 +95,22 @@ class ResearchGraph:
         """Write in-memory search accounting back to session dict."""
         if self._search_accounting is not None:
             self.session.search_accounting = self._search_accounting.to_dict()
+
+    def get_frontier(self) -> ResearchFrontier:
+        if self._research_frontier is None:
+            raw = self.session.research_frontier
+            self._research_frontier = (
+                ResearchFrontier.from_dict(raw) if raw else ResearchFrontier()
+            )
+        return self._research_frontier
+
+    def persist_frontier(self) -> None:
+        frontier = self.get_frontier()
+        self.session.research_frontier = frontier.to_dict()
+
+    def sync_frontier(self) -> None:
+        if self._research_frontier is not None:
+            self.session.research_frontier = self._research_frontier.to_dict()
 
     @classmethod
     def create_session(

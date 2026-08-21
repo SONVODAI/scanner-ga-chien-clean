@@ -853,6 +853,7 @@ def infer_research_status(
     fragility: Sequence[str],
     falsification_pending: bool,
     abandoned: bool = False,
+    conditional_candidate: bool = True,
 ) -> str:
     if abandoned:
         return ResearchStatus.ABANDONED.value
@@ -860,8 +861,10 @@ def infer_research_status(
         return ResearchStatus.REJECTED.value
     if interesting and falsification_pending:
         return ResearchStatus.NEEDS_FALSIFICATION.value
-    if interesting:
+    if interesting and conditional_candidate:
         return ResearchStatus.CANDIDATE_DISCOVERED.value
+    if interesting:
+        return ResearchStatus.EXPLORATORY.value
     return ResearchStatus.EXPLORATORY.value
 
 
@@ -913,6 +916,7 @@ def build_candidate_research_summary(
     assessment_fragility: Sequence[str] = (),
     assessment_concentration: Sequence[str] = (),
     interesting: bool = False,
+    conditional_candidate: bool = True,
     parent_comparison: Optional[ParentComparison] = None,
     confirmation_split: Optional[ConfirmationSplitMetadata] = None,
     lineage_roles: Sequence[str] = (),
@@ -960,6 +964,7 @@ def build_candidate_research_summary(
         interesting=interesting,
         fragility=assessment_fragility,
         falsification_pending=fals_pending and interesting,
+        conditional_candidate=conditional_candidate,
     )
 
     next_test = ""

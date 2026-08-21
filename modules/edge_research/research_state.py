@@ -40,6 +40,11 @@ class SessionStatus(str, Enum):
     PAUSED = "PAUSED"
     COMPLETE = "COMPLETE"
     NO_EDGE_FOUND = "NO_EDGE_FOUND"
+    RESEARCH_COMPLETE_WITH_CANDIDATES = "RESEARCH_COMPLETE_WITH_CANDIDATES"
+    BUDGET_EXHAUSTED = "BUDGET_EXHAUSTED"
+    NO_VALID_FRONTIER = "NO_VALID_FRONTIER"
+    INCOMPLETE = "INCOMPLETE"
+    ERROR = "ERROR"
 
 
 @dataclass(frozen=True)
@@ -323,6 +328,9 @@ class ResearchSession:
     experiments_used: int = 0
     schema_version: str = RESEARCH_GRAPH_SCHEMA_VERSION
     search_accounting: Dict[str, Any] = field(default_factory=dict)
+    research_frontier: Dict[str, Any] = field(default_factory=dict)
+    session_stop_reason: Optional[Dict[str, Any]] = None
+    panel_preflight: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -338,6 +346,12 @@ class ResearchSession:
         }
         if self.search_accounting:
             payload["search_accounting"] = dict(self.search_accounting)
+        if self.research_frontier:
+            payload["research_frontier"] = dict(self.research_frontier)
+        if self.session_stop_reason:
+            payload["session_stop_reason"] = dict(self.session_stop_reason)
+        if self.panel_preflight:
+            payload["panel_preflight"] = dict(self.panel_preflight)
         return payload
 
     @classmethod
@@ -355,6 +369,11 @@ class ResearchSession:
             experiments_used=int(payload.get("experiments_used", 0)),
             schema_version=str(payload.get("schema_version", RESEARCH_GRAPH_SCHEMA_VERSION)),
             search_accounting=dict(payload.get("search_accounting") or {}),
+            research_frontier=dict(payload.get("research_frontier") or {}),
+            session_stop_reason=dict(payload["session_stop_reason"])
+            if payload.get("session_stop_reason")
+            else None,
+            panel_preflight=dict(payload["panel_preflight"]) if payload.get("panel_preflight") else None,
         )
 
 

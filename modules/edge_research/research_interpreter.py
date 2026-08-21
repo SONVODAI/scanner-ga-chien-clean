@@ -14,6 +14,11 @@ from modules.edge_research.research_assessment import (
     ResearchAssessment,
 )
 from modules.edge_research.research_graph import ResearchGraph
+from modules.edge_research.research_observation_kind import (
+    ObservationKind,
+    classify_observation,
+    is_conditional_candidate,
+)
 from modules.edge_research.research_state import NodeType
 from modules.edge_research.research_shape import (
     OBS_SHAPE_EXTREME_BIN,
@@ -204,6 +209,16 @@ def interpret_tool_result(
     if fragility and (OBS_EXTREME_WINNER_SENSITIVE in codes or OBS_SENSITIVITY_FRAGILE in codes):
         interesting = False
 
+    obs_kind = classify_observation(
+        tool_name=tool_result.tool_name,
+        observation_codes=codes,
+        metrics=dict(tool_result.metrics or {}),
+    )
+    conditional = is_conditional_candidate(obs_kind.value)
+    # Full-cohort descriptive/structural observations are not edge candidates.
+    if obs_kind in (ObservationKind.DESCRIPTIVE_OBSERVATION, ObservationKind.STRUCTURAL_OBSERVATION):
+        conditional = False
+
     warrant_gaps = interesting or strength == DescriptiveStrength.GROUP_DIFFERENCE
 
     # Derive information gaps from what has NOT been tested on branch.
@@ -271,6 +286,8 @@ def interpret_tool_result(
         actionable=False,
         branch_tools_attempted=branch_tools,
         branch_observation_codes=branch_obs,
+        observation_kind=obs_kind.value,
+        conditional_candidate=conditional,
     )
 
 

@@ -37,11 +37,23 @@ WEIGHT_ABANDON = 4.5
 WEIGHT_STRONG_EVIDENCE_EXPLORATION = 3.0
 BLOCKED_SCORE = -1000.0
 
+# Phase 3G.1 — exploration coverage (generic, not BB01-tuned).
+WEIGHT_UNEXPLORED_FEATURE = 2.5
+WEIGHT_UNEXPLORED_OUTCOME = 1.5
+WEIGHT_UNEXPLORED_POPULATION = 1.5
+WEIGHT_INDEPENDENT_BRANCH = 2.0
+WEIGHT_INFORMATION_GAIN = 2.0
+WEIGHT_REDUNDANCY_PENALTY = 3.0
+EARLY_SESSION_FALSIFICATION_DAMPEN = 0.45
+LOW_COVERAGE_STOP_PENALTY = 4.0
+
 
 class PlanDecisionType(str, Enum):
     EXPERIMENT = "EXPERIMENT"
-    STOP = "STOP"
+    STOP_BRANCH = "STOP_BRANCH"
+    STOP_SESSION = "STOP_SESSION"
     ABANDON = "ABANDON"
+    STOP = "STOP_BRANCH"  # backward-compatible alias
 
 
 @dataclass(frozen=True)
@@ -201,6 +213,98 @@ def _branch_complexity_penalty_for_candidate(
     return incremental * COMPLEXITY_PENALTY_SCALE * 1.5
 
 
+def _extract_candidate_feature(candidate: ResearchActionCandidate) -> str:
+    if candidate.draft_spec is None:
+        return ""
+    inputs = candidate.draft_spec.inputs or {}
+    for key in ("feature_column", "partition_column", "primary_feature", "trajectory_feature"):
+        if key in inputs:
+            return str(inputs[key])
+    return ""
+
+
+def _session_coverage_context(graph: ResearchGraph) -> Dict[str, Any]:
+    state = graph.get_search_accounting()
+    session = state.session_ledger
+    preflight = graph.session.panel_preflight or {}
+    eligible = preflight.get("eligible_explanatory") or []
+    features_tested = set(session.explanatory_features_tested)
+    budget = graph.session.experiment_budget
+    used = graph.session.experiments_used
+    return {
+        "features_touched": len(features_tested),
+        "eligible_feature_count": len(eligible),
+        "features_tested": features_tested,
+        "experiments_used": used,
+        "experiment_budget": budget,
+        "low_coverage": len(eligible) > 0 and len(features_tested) < len(eligible),
+        "early_session": budget is not None and used <= max(1, budget // 4),
+    }
+
+
+def _coverage_bonuses(
+    candidate: ResearchActionCandidate,
+    graph: ResearchGraph,
+) -> Dict[str, float]:
+    """Transparent coverage / information-gain terms competing with STOP/falsification."""
+    if candidate.intent in (
+        ActionIntent.STOP.value,
+        ActionIntent.STOP_SESSION.value,
+        ActionIntent.ABANDON.value,
+    ):
+        return {}
+
+    ctx = _session_coverage_context(graph)
+    components: Dict[str, float] = {}
+    feat = _extract_candidate_feature(candidate)
+    tested = ctx["features_tested"]
+
+    if feat and feat not in tested:
+        components["unexplored_feature_bonus"] = WEIGHT_UNEXPLORED_FEATURE
+    elif feat and feat in tested:
+        components["redundancy_penalty"] = -WEIGHT_REDUNDANCY_PENALTY
+
+    scope = candidate.draft_spec.research_scope if candidate.draft_spec else {}
+    if scope.get("pending_question_context"):
+        components["unexplored_population_bonus"] = WEIGHT_UNEXPLORED_POPULATION * 0.5
+    if scope.get("outcome_reframe") or candidate.intent == ActionIntent.REDESCRIBE_OUTCOME.value:
+        components["unexplored_outcome_bonus"] = WEIGHT_UNEXPLORED_OUTCOME
+
+    if candidate.intent in (
+        ActionIntent.SLICING.value,
+        ActionIntent.EXPLORATION.value,
+        ActionIntent.DECOMPOSITION.value,
+    ):
+        components["information_gain_bonus"] = WEIGHT_INFORMATION_GAIN
+
+    if ctx["low_coverage"] and ctx["early_session"]:
+        components["independent_branch_bonus"] = WEIGHT_INDEPENDENT_BRANCH
+
+    return components
+
+
+def _stop_branch_penalty(candidate: ResearchActionCandidate, graph: ResearchGraph) -> float:
+    """Global STOP should lose when substantial unexplored coverage remains."""
+    if candidate.intent != ActionIntent.STOP.value:
+        return 0.0
+    ctx = _session_coverage_context(graph)
+    frontier = graph.get_frontier()
+    if ctx["low_coverage"] and ctx["experiment_budget"] and ctx["experiments_used"] < ctx["experiment_budget"]:
+        remaining = ctx["experiment_budget"] - ctx["experiments_used"]
+        if remaining > 1 and frontier.count_by_status("UNEXPLORED") > 0:
+            return -LOW_COVERAGE_STOP_PENALTY
+        if ctx["features_touched"] == 0 and ctx["eligible_feature_count"] >= 2:
+            return -LOW_COVERAGE_STOP_PENALTY
+    return 0.0
+
+
+def _stop_session_score(candidate: ResearchActionCandidate) -> float:
+    """STOP_SESSION is controller-driven — keep score low in branch planner."""
+    if candidate.intent != ActionIntent.STOP_SESSION.value:
+        return 0.0
+    return -100.0
+
+
 def _remaining_budget(graph: ResearchGraph) -> Optional[int]:
     budget = graph.session.experiment_budget
     if budget is None:
@@ -215,7 +319,11 @@ def _gap_match(assessment: ResearchAssessment, candidate: ResearchActionCandidat
     return hints if hints else 0.0
 
 
-def _falsification_match(assessment: ResearchAssessment, candidate: ResearchActionCandidate) -> float:
+def _falsification_match(
+    assessment: ResearchAssessment,
+    candidate: ResearchActionCandidate,
+    graph: ResearchGraph,
+) -> float:
     if candidate.intent != ActionIntent.FALSIFICATION.value:
         return 0.0
     if candidate.uncertainty_addressed not in assessment.possible_falsification_targets:
@@ -224,6 +332,11 @@ def _falsification_match(assessment: ResearchAssessment, candidate: ResearchActi
     # Reduce falsification priority if that exact sensitivity test already ran.
     if candidate.tool_name in assessment.branch_tools_attempted:
         return base * 0.2
+    ctx = _session_coverage_context(graph)
+    if ctx["early_session"] and ctx["low_coverage"] and assessment.conditional_candidate:
+        return base
+    if ctx["early_session"] and ctx["low_coverage"] and not assessment.conditional_candidate:
+        return base * EARLY_SESSION_FALSIFICATION_DAMPEN
     return base
 
 
@@ -288,12 +401,15 @@ def score_candidate(
 
     components: Dict[str, float] = {}
     components["information_gap"] = _gap_match(assessment, candidate)
-    components["falsification_threat"] = _falsification_match(assessment, candidate)
+    components["falsification_threat"] = _falsification_match(assessment, candidate, graph)
     components["novelty"] = _novelty_bonus(assessment, candidate)
     components["grammar"] = _grammar_bonus(candidate)
     components["adaptive"] = _adaptive_bonus(candidate)
     components["stop"] = _stop_score(assessment, candidate)
     components["abandon"] = _abandon_score(assessment, candidate)
+    components.update(_coverage_bonuses(candidate, graph))
+    components["stop_branch_penalty"] = _stop_branch_penalty(candidate, graph)
+    components["stop_session_block"] = _stop_session_score(candidate)
 
     exp_id = experiment_node_id or assessment.source_experiment_node_id
     if exp_id:
@@ -351,11 +467,11 @@ def plan_next_action(
 
     if not scored:
         return PlanDecision(
-            decision_type=PlanDecisionType.STOP,
+            decision_type=PlanDecisionType.STOP_BRANCH,
             selected=None,
             all_candidates=tuple(candidates),
             score_breakdown={"reason": "NO_CANDIDATES"},
-            rationale_codes=("STOP", "NO_CANDIDATES"),
+            rationale_codes=("STOP_BRANCH", "NO_CANDIDATES"),
         )
 
     best_score, best, best_components = scored[0]
@@ -374,7 +490,7 @@ def plan_next_action(
         for total, cand, comp in scored:
             if cand.intent == ActionIntent.STOP.value:
                 return PlanDecision(
-                    decision_type=PlanDecisionType.STOP,
+                    decision_type=PlanDecisionType.STOP_BRANCH,
                     selected=cand,
                     all_candidates=tuple(candidates),
                     score_breakdown={"components": comp, "total": total},
@@ -383,7 +499,7 @@ def plan_next_action(
 
     if best.intent == ActionIntent.STOP.value:
         return PlanDecision(
-            decision_type=PlanDecisionType.STOP,
+            decision_type=PlanDecisionType.STOP_BRANCH,
             selected=best,
             all_candidates=tuple(candidates),
             score_breakdown={"components": best_components, "total": best_score},
@@ -402,11 +518,11 @@ def plan_next_action(
     if budget_exhausted:
         stop_cand = next((c for _, c, _ in scored if c.intent == ActionIntent.STOP.value), None)
         return PlanDecision(
-            decision_type=PlanDecisionType.STOP,
+            decision_type=PlanDecisionType.STOP_BRANCH,
             selected=stop_cand,
             all_candidates=tuple(candidates),
             score_breakdown={"reason": "BUDGET_EXHAUSTED"},
-            rationale_codes=("STOP", "BUDGET_EXHAUSTED"),
+            rationale_codes=("STOP_BRANCH", "BUDGET_EXHAUSTED"),
         )
 
     return PlanDecision(

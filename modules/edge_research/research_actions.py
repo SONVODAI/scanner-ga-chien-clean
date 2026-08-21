@@ -71,6 +71,7 @@ class ActionIntent(str, Enum):
     TEST_NEIGHBORHOOD = "TEST_NEIGHBORHOOD"
     SLICING = "SLICING"
     STOP = "STOP"
+    STOP_SESSION = "STOP_SESSION"
     ABANDON = "ABANDON"
 
 
@@ -176,7 +177,7 @@ def _check_candidate(
     blocked_reason: Optional[str] = None
     already_attempted = False
 
-    if intent in (ActionIntent.STOP, ActionIntent.ABANDON):
+    if intent in (ActionIntent.STOP, ActionIntent.ABANDON, ActionIntent.STOP_SESSION):
         action_id = _action_id(action_code, None)
         return ResearchActionCandidate(
             action_id=action_id,
@@ -463,20 +464,28 @@ def _add_adaptive_candidates(
     scope: Dict[str, Any],
     cutoff: str,
     experiment_node_id: str,
+    panel_columns: Optional[Sequence[str]] = None,
 ) -> None:
     """Phase 3F evidence-driven adaptive slicing follow-ups."""
 
     def add(**kwargs: Any) -> None:
         candidates.append(_check_candidate(graph, registry=registry, **kwargs))
 
+    from modules.edge_research.research_panel_preflight import adaptive_features_from_columns
+
     metrics = _experiment_metrics(graph, experiment_node_id)
     exp_node = graph.get_node(experiment_node_id)
     parent_tool = exp_node.experiment_spec.tool_name if exp_node.experiment_spec else ""
 
-    # Initial adaptive partition on eligible continuous feature (exploration).
+    partition_feats: Tuple[str, ...] = ()
+    if panel_columns:
+        partition_feats = adaptive_features_from_columns(panel_columns)
+
+    # Initial adaptive partition on eligible continuous features (exploration).
     if parent_tool not in ("adaptive_partition_compare", "threshold_exploration", "threshold_neighborhood"):
         if assessment.additional_investigation_warranted or assessment.interesting:
-            for feat in ("feature_x", "feature_y", "rs10", "health_score"):
+            feats = partition_feats if partition_feats else ("feature_x", "feature_y", "rs10")
+            for feat in feats:
                 add(
                     action_code=f"ADAPTIVE_PARTITION_{feat}",
                     intent=ActionIntent.SLICING,
@@ -708,6 +717,7 @@ def generate_action_candidates(
     *,
     research_scope: Optional[Dict[str, Any]] = None,
     experiment_node_id: Optional[str] = None,
+    panel_columns: Optional[Sequence[str]] = None,
 ) -> Tuple[ResearchActionCandidate, ...]:
     """
     Generate multiple scientifically legitimate next actions from assessment.
@@ -938,6 +948,7 @@ def generate_action_candidates(
             scope=scope,
             cutoff=cutoff,
             experiment_node_id=experiment_node_id,
+            panel_columns=panel_columns,
         )
 
     # Terminal candidates — always available; planner may select immediately.
@@ -977,6 +988,20 @@ def generate_action_candidates(
         expected_info=ExpectedInformation.LOW,
         rationale_codes=("ABANDON", "FRAGILITY"),
         priority_hints={"abandon_urgency": abandon_urgency},
+    )
+
+    add(
+        action_code="STOP_SESSION",
+        intent=ActionIntent.STOP_SESSION,
+        template_id="STOP_SESSION_GLOBAL",
+        question="Stop entire research session — global stopping criteria satisfied.",
+        tool_name="",
+        tool_version="",
+        spec=None,
+        uncertainty="STOP_SESSION",
+        expected_info=ExpectedInformation.LOW,
+        rationale_codes=("STOP_SESSION", "GLOBAL"),
+        priority_hints={"stop_urgency": 0.0},
     )
 
     # Deduplicate by action_id while preserving order.
@@ -1058,4 +1083,9 @@ def _apply_complexity_hints(
 
 def viable_candidates(candidates: Sequence[ResearchActionCandidate]) -> Tuple[ResearchActionCandidate, ...]:
     """Non-blocked experiment candidates plus terminal actions."""
-    return tuple(c for c in candidates if not c.blocked or c.intent in (ActionIntent.STOP.value, ActionIntent.ABANDON.value))
+    terminal = (
+        ActionIntent.STOP.value,
+        ActionIntent.STOP_SESSION.value,
+        ActionIntent.ABANDON.value,
+    )
+    return tuple(c for c in candidates if not c.blocked or c.intent in terminal)
