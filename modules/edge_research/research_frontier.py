@@ -319,6 +319,42 @@ class ResearchFrontier:
             if item.action_id == action_id and item.status == FrontierItemStatus.UNEXPLORED.value:
                 item.status = FrontierItemStatus.DUPLICATE.value
 
+    def mark_duplicate_by_content_hash(
+        self,
+        content_hash: str,
+        *,
+        executed_node_id: str = "",
+    ) -> int:
+        """Mark UNEXPLORED frontier items whose draft spec matches executed identity."""
+        from modules.edge_research.research_state import (
+            ExperimentSpec,
+            compute_experiment_content_hash,
+        )
+
+        marked = 0
+        for item in self.items.values():
+            if item.status != FrontierItemStatus.UNEXPLORED.value:
+                continue
+            if not item.draft_spec:
+                continue
+            try:
+                spec = ExperimentSpec.from_dict(item.draft_spec)
+                item_hash = compute_experiment_content_hash(spec)
+            except Exception:
+                continue
+            if item_hash == content_hash:
+                item.status = FrontierItemStatus.DUPLICATE.value
+                item.invalid_reason = (
+                    f"duplicate_experiment_already_executed:{content_hash}"
+                )
+                if executed_node_id:
+                    item.triggering_evidence = {
+                        **(item.triggering_evidence or {}),
+                        "duplicate_of_experiment_node_id": executed_node_id,
+                    }
+                marked += 1
+        return marked
+
     def mark_invalid(self, frontier_id: str, reason: str) -> None:
         if frontier_id in self.items:
             self.items[frontier_id].status = FrontierItemStatus.INVALID.value

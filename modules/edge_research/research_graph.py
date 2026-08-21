@@ -319,6 +319,11 @@ class ResearchGraph:
         self.nodes[nid] = node
         self._link_parent_child(question_node_id, nid)
         self.experiment_index[content_hash] = nid
+        from modules.edge_research.research_experiment_identity import (
+            sync_frontier_with_executed_identity,
+        )
+
+        sync_frontier_with_executed_identity(self, content_hash)
         self.session.experiments_used += 1
         return nid
 

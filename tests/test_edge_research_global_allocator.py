@@ -271,10 +271,16 @@ def test_b_strong_local_beats_frontier():
     graph.persist_frontier()
 
     assessment = _assessment()
-    strong = _candidate("STRONG_LOCAL", hints={"shape_strength": 30.0, "shape_followup": 5.0})
+    strong = _candidate(
+        "STRONG_LOCAL",
+        feature="feat_gamma",
+        hints={"shape_strength": 30.0, "shape_followup": 5.0},
+    )
 
     with _patch_opportunity_erv(lambda cand, opp: 8.0 if "STRONG" in cand.action_code else 4.0):
-        decision = _plan_with_global(graph, assessment, [strong], eid, ("feat_alpha", "feat_beta"))
+        decision = _plan_with_global(
+            graph, assessment, [strong], eid, ("feat_alpha", "feat_beta", "feat_gamma")
+        )
 
     assert decision.decision_type == PlanDecisionType.EXPERIMENT
     assert decision.global_allocation_source == OpportunitySource.LOCAL.value
@@ -300,10 +306,16 @@ def test_c_stale_historical_frontier_score_not_used_for_selection():
     graph.persist_frontier()
 
     assessment = _assessment()
-    local = _candidate("LOCAL_WINNER", hints={"shape_strength": 15.0})
+    local = _candidate(
+        "LOCAL_WINNER",
+        feature="feat_gamma",
+        hints={"shape_strength": 15.0},
+    )
 
     with _patch_opportunity_erv(lambda cand, opp: 6.0 if "LOCAL" in cand.action_code else 0.5):
-        decision = _plan_with_global(graph, assessment, [local], eid, ("feat_alpha", "feat_beta"))
+        decision = _plan_with_global(
+            graph, assessment, [local], eid, ("feat_alpha", "feat_beta", "feat_gamma")
+        )
 
     assert decision.decision_type == PlanDecisionType.EXPERIMENT
     assert item.planner_score == 99.0
@@ -528,7 +540,7 @@ def test_i_genuine_revisit_audit():
 
 def test_j_repeated_local_exploitation_allowed():
     graph = _graph()
-    _panel_preflight(graph, ["feat_alpha", "feat_beta"])
+    _panel_preflight(graph, ["feat_alpha", "feat_beta", "feat_gamma"])
     eid = _seed_lineage(graph)
     parent_id = "E-root"
     graph.get_frontier().items["f-alt"] = _frontier_item(
@@ -541,11 +553,19 @@ def test_j_repeated_local_exploitation_allowed():
     graph.persist_portfolio_state()
 
     assessment = _assessment()
-    strong = _candidate("DEEP_LOCAL", hints={"shape_strength": 25.0, "shape_followup": 4.0})
+    strong = _candidate(
+        "DEEP_LOCAL",
+        feature="feat_gamma",
+        hints={"shape_strength": 25.0, "shape_followup": 4.0},
+    )
 
     with _patch_opportunity_erv(lambda cand, opp: 10.0 if "DEEP" in cand.action_code else 3.0):
-        d1 = _plan_with_global(graph, assessment, [strong], eid, ("feat_alpha", "feat_beta"))
-        d2 = _plan_with_global(graph, assessment, [strong], eid, ("feat_alpha", "feat_beta"))
+        d1 = _plan_with_global(
+            graph, assessment, [strong], eid, ("feat_alpha", "feat_beta", "feat_gamma")
+        )
+        d2 = _plan_with_global(
+            graph, assessment, [strong], eid, ("feat_alpha", "feat_beta", "feat_gamma")
+        )
 
     assert d1.decision_type == PlanDecisionType.EXPERIMENT
     assert d2.decision_type == PlanDecisionType.EXPERIMENT

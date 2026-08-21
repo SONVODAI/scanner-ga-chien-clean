@@ -11,6 +11,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING
 
+from modules.edge_research.research_experiment_identity import (
+    EXPERIMENT_IDENTITY_VERSION,
+    apply_experiment_identity_deduplication,
+    canonical_hash_from_candidate,
+)
+
 if TYPE_CHECKING:
     from modules.edge_research.research_actions import ResearchActionCandidate
     from modules.edge_research.research_assessment import ResearchAssessment
@@ -18,7 +24,7 @@ if TYPE_CHECKING:
     from modules.edge_research.research_graph import ResearchGraph
     from modules.edge_research.research_planner import PlanDecision
 
-GLOBAL_ALLOCATOR_VERSION = "research_global_allocator_v1"
+GLOBAL_ALLOCATOR_VERSION = "research_global_allocator_v1_1"
 
 
 class OpportunitySource(str, Enum):
@@ -52,6 +58,9 @@ class GlobalComparableOpportunity:
     current_branch_root_id: str = ""
     is_revisit: bool = False
     from_frontier: bool = False
+    experiment_content_hash: str = ""
+    duplicate_of_experiment_id: str = ""
+    duplicate_representative_id: str = ""
     opportunity: Any = None  # ResearchOpportunity when available
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,6 +84,9 @@ class GlobalComparableOpportunity:
             "current_branch_root_id": self.current_branch_root_id,
             "is_revisit": self.is_revisit,
             "from_frontier": self.from_frontier,
+            "experiment_content_hash": self.experiment_content_hash,
+            "duplicate_of_experiment_id": self.duplicate_of_experiment_id,
+            "duplicate_representative_id": self.duplicate_representative_id,
             "opportunity": self.opportunity.to_dict() if self.opportunity is not None else None,
         }
 
@@ -326,6 +338,7 @@ def revalue_frontier_opportunity(
         current_branch_root_id=current_branch_root_id,
         is_revisit=is_revisit,
         from_frontier=True,
+        experiment_content_hash=canonical_hash_from_candidate(cand) or "",
         opportunity=opp,
     )
 
@@ -397,6 +410,7 @@ def collect_global_opportunities(
             revalued_sequence=seq,
             context_switch_required=False,
             current_branch_root_id=current_root,
+            experiment_content_hash=canonical_hash_from_candidate(cand) or "",
             opportunity=opp,
         )
         if g.comparable:
@@ -405,10 +419,7 @@ def collect_global_opportunities(
             excluded.append(g)
 
     frontier = graph.get_frontier()
-    seen_action_ids = {g.action_id for g in global_opps}
     for item in frontier.unexplored_items():
-        if item.action_id in seen_action_ids:
-            continue
         g = revalue_frontier_opportunity(
             graph,
             item,
@@ -419,11 +430,13 @@ def collect_global_opportunities(
         )
         if g.comparable:
             global_opps.append(g)
-            seen_action_ids.add(g.action_id)
         else:
             excluded.append(g)
 
-    return global_opps, excluded
+    comparable_pool, excluded = apply_experiment_identity_deduplication(
+        global_opps, excluded, graph
+    )
+    return comparable_pool, excluded
 
 
 def _best_erv_by_source(
@@ -512,6 +525,7 @@ def build_global_decision_explanation(
     return {
         **base_explanation,
         "allocator_version": GLOBAL_ALLOCATOR_VERSION,
+        "experiment_identity_version": EXPERIMENT_IDENTITY_VERSION,
         "selected_source": selected.source if selected else "",
         "selected_frontier_id": selected.frontier_id if selected else "",
         "selected_erv": selected_erv,
@@ -572,7 +586,8 @@ def select_global_research_opportunity(
         panel_columns=panel_columns,
     )
 
-    comparable = [o for o in global_opps if o.comparable]
+    all_audit_opportunities = tuple(global_opps) + tuple(excluded)
+    comparable = list(global_opps)
     best_local, best_frontier, best_deferred = _best_erv_by_source(comparable)
 
     terminal_intents = {
@@ -637,7 +652,7 @@ def select_global_research_opportunity(
 
     return GlobalAllocationResult(
         selected=selected,
-        all_opportunities=tuple(global_opps),
+        all_opportunities=all_audit_opportunities,
         excluded=tuple(excluded),
         best_local_erv=best_local,
         best_frontier_erv=best_frontier,
