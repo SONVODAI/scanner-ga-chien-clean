@@ -1,0 +1,14 @@
+{
+  "illegal_capability_attempts": 0,
+  "violations": [],
+  "passed": true,
+  "closed_fields_checked": [
+    "group_rank",
+    "health_group",
+    "health_rank",
+    "health_score",
+    "obv_status",
+    "volume_ratio20"
+  ],
+  "governed_exposed_field": "rsi_slope"
+}
