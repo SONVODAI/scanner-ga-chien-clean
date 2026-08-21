@@ -1,0 +1,245 @@
+{
+  "comparison_type": "research_allocation_quality_bb04_vs_bb05",
+  "no_human_edge_comparison": true,
+  "metrics_table": [
+    {
+      "metric": "experiments_executed",
+      "bb04": 12,
+      "bb05": 12,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "unique_frames_executed",
+      "bb04": 3,
+      "bb05": 5,
+      "allocation_interpretation": "More frames is not automatically better \u2014 quality of allocation matters."
+    },
+    {
+      "metric": "unique_features_touched",
+      "bb04": 1,
+      "bb05": 3,
+      "allocation_interpretation": "Breadth without value is not success."
+    },
+    {
+      "metric": "unique_outcome_specs_executed",
+      "bb04": 5,
+      "bb05": 6,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "unique_population_specs_executed",
+      "bb04": 2,
+      "bb05": 2,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "observation_horizons_executed",
+      "bb04": 2,
+      "bb05": 2,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "max_same_frame_depth",
+      "bb04": 1,
+      "bb05": 1,
+      "allocation_interpretation": "Depth on productive branch can be rational."
+    },
+    {
+      "metric": "falsifications_executed",
+      "bb04": 2,
+      "bb05": 1,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "conditional_candidates",
+      "bb04": 8,
+      "bb05": 6,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "frontier_unexplored_at_end",
+      "bb04": 41,
+      "bb05": 47,
+      "allocation_interpretation": "Large frontier with few executions is not automatically bad if allocation was reasoned."
+    },
+    {
+      "metric": "revisit_count",
+      "bb04": 0,
+      "bb05": 2,
+      "allocation_interpretation": "BB04 had no portfolio revisit tracking."
+    },
+    {
+      "metric": "successful_branch_returns",
+      "bb04": 0,
+      "bb05": 2,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "redundant_experiment_count",
+      "bb04": "not_tracked",
+      "bb05": 1,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "mean_marginal_information_gain",
+      "bb04": "not_tracked",
+      "bb05": 0.675,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "high_value_unexplored_at_end",
+      "bb04": "not_tracked",
+      "bb05": 12,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "exploration_debt_at_end",
+      "bb04": "not_tracked",
+      "bb05": 6.25,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "unresolved_research_value_at_termination",
+      "bb04": "not_tracked",
+      "bb05": 2.0,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "portfolio_decisions_with_audit",
+      "bb04": 0,
+      "bb05": 11,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "mean_opportunity_cost",
+      "bb04": "not_tracked",
+      "bb05": 0.0,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "selections_with_exploitation_component",
+      "bb04": "not_tracked",
+      "bb05": 5,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "selections_with_exploration_component",
+      "bb04": "not_tracked",
+      "bb05": 6,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "selections_with_falsification_component",
+      "bb04": "not_tracked",
+      "bb05": 2,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "selections_marked_revisit",
+      "bb04": "not_tracked",
+      "bb05": 0,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "viable_frontier_size",
+      "bb04": "not_tracked",
+      "bb05": 47,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "high_value_frontier_opportunities",
+      "bb04": "not_tracked",
+      "bb05": 12,
+      "allocation_interpretation": ""
+    },
+    {
+      "metric": "stale_frontier_opportunities",
+      "bb04": "not_tracked",
+      "bb05": 17,
+      "allocation_interpretation": ""
+    }
+  ],
+  "allocation_judgment": {
+    "primary_question": "Did BB05 allocate scarce experiments better than BB04?",
+    "breadth_alone_is_not_success": true,
+    "bb04_limitation_observed": "BB04 executed 12 experiments but touched only 1/8 eligible features; 41 frontier items remained unexplored; allocation was not portfolio-aware.",
+    "bb05_portfolio_awareness": true,
+    "bb05_has_opportunity_cost_audit": true,
+    "comparison_basis": "architectural_allocation_quality_not_human_edge",
+    "no_bb04_relationship_encoding": true
+  },
+  "bb05_frontier_quality": {
+    "viable_frontier_size": 47,
+    "high_value_unexplored": 12,
+    "stale_opportunities": 17,
+    "dominated_on_frontier": 0,
+    "high_value_items": [
+      {
+        "frontier_id": "frontier-00006",
+        "action_code": "REFRAME_OUTCOME",
+        "planner_score": 8.7
+      },
+      {
+        "frontier_id": "frontier-00007",
+        "action_code": "REFRAME_OUTCOME",
+        "planner_score": 8.7
+      },
+      {
+        "frontier_id": "frontier-00008",
+        "action_code": "REFRAME_OUTCOME",
+        "planner_score": 7.125
+      },
+      {
+        "frontier_id": "frontier-00009",
+        "action_code": "REFRAME_OUTCOME",
+        "planner_score": 8.175
+      },
+      {
+        "frontier_id": "frontier-00010",
+        "action_code": "REFRAME_OUTCOME",
+        "planner_score": 8.175
+      },
+      {
+        "frontier_id": "frontier-00021",
+        "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00003",
+        "planner_score": 8.2
+      },
+      {
+        "frontier_id": "frontier-00023",
+        "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00005",
+        "planner_score": 7.675
+      },
+      {
+        "frontier_id": "frontier-00025",
+        "action_code": "REFRAME_HORIZON_ADVANCE_frame-00008",
+        "planner_score": 3.7
+      },
+      {
+        "frontier_id": "frontier-00026",
+        "action_code": "HORIZON_ADVANCE_frame-00009",
+        "planner_score": 8.15
+      },
+      {
+        "frontier_id": "frontier-00027",
+        "action_code": "HORIZON_ADVANCE_frame-00010",
+        "planner_score": 3.2
+      },
+      {
+        "frontier_id": "frontier-00028",
+        "action_code": "REFRAME_OUTCOME",
+        "planner_score": 4.0875
+      },
+      {
+        "frontier_id": "frontier-00030",
+        "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00011",
+        "planner_score": 3.5875000000000004
+      }
+    ],
+    "status_counts": {
+      "DUPLICATE": 13,
+      "UNEXPLORED": 47,
+      "INVALID": 17,
+      "EXECUTED": 3
+    }
+  }
+}
