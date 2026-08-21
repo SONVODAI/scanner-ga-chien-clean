@@ -1,0 +1,118 @@
+{
+  "signals": [
+    {
+      "signal": "repeated_unresolved_uncertainty",
+      "represented": true,
+      "location": "ResearchAssessment.information_gaps, unresolved_uncertainties",
+      "available_before_planning": true,
+      "consumed_by_planner": "partial (information_gap weights)",
+      "consumed_by_portfolio_erv": "via marginal_information_gain reduction",
+      "consumed_by_global_allocator": "indirect via ERV",
+      "consumed_by_stop": false,
+      "audit_only": false
+    },
+    {
+      "signal": "branch_tools_attempted",
+      "represented": true,
+      "location": "ResearchAssessment.branch_tools_attempted",
+      "available_before_planning": true,
+      "consumed_by_planner": true,
+      "consumed_by_portfolio_erv": true,
+      "consumed_by_global_allocator": true,
+      "consumed_by_stop": false,
+      "audit_only": false
+    },
+    {
+      "signal": "negative_planner_scores",
+      "represented": true,
+      "location": "research_planner.score_candidate",
+      "available_before_planning": true,
+      "consumed_by_planner": true,
+      "consumed_by_portfolio_erv": true,
+      "consumed_by_global_allocator": true,
+      "consumed_by_stop": false,
+      "audit_only": false
+    },
+    {
+      "signal": "iv_redundancy_burden",
+      "represented": true,
+      "location": "research_information_value._redundancy_burden (uncertainty-tool topology)",
+      "available_before_planning": true,
+      "consumed_by_planner": false,
+      "consumed_by_portfolio_erv": false,
+      "consumed_by_global_allocator": false,
+      "consumed_by_stop": false,
+      "audit_only": false,
+      "note": "Affects planner layer only via IV bridge; not branch-level cumulative"
+    },
+    {
+      "signal": "frame_saturation_status",
+      "represented": true,
+      "location": "research_frame.assess_frame_saturation",
+      "available_before_planning": true,
+      "consumed_by_planner": "reframe bonuses only",
+      "consumed_by_portfolio_erv": false,
+      "consumed_by_global_allocator": false,
+      "consumed_by_stop": false,
+      "audit_only": "partial"
+    },
+    {
+      "signal": "portfolio_tool_attempt_counts",
+      "represented": true,
+      "location": "research_portfolio.compute_marginal_information_gain",
+      "available_before_planning": true,
+      "consumed_by_planner": false,
+      "consumed_by_portfolio_erv": true,
+      "consumed_by_global_allocator": true,
+      "consumed_by_stop": false,
+      "audit_only": false
+    },
+    {
+      "signal": "realized_information_gain",
+      "represented": false,
+      "location": "NOT in state \u2014 only in post-hoc BB10 audit",
+      "available_before_planning": false,
+      "consumed_by_planner": false,
+      "consumed_by_portfolio_erv": false,
+      "consumed_by_global_allocator": false,
+      "consumed_by_stop": false,
+      "audit_only": true
+    },
+    {
+      "signal": "branch_level_marginal_decay",
+      "represented": false,
+      "location": "No explicit branch cumulative marginal value field",
+      "available_before_planning": false,
+      "consumed_by_planner": false,
+      "consumed_by_portfolio_erv": "partial via MIG tool/dimension counts",
+      "consumed_by_global_allocator": false,
+      "consumed_by_stop": false,
+      "audit_only": false
+    },
+    {
+      "signal": "frontier_revalued_erv",
+      "represented": true,
+      "location": "research_global_allocator._build_frontier_opportunity",
+      "available_before_planning": true,
+      "consumed_by_planner": false,
+      "consumed_by_portfolio_erv": true,
+      "consumed_by_global_allocator": true,
+      "consumed_by_stop": false,
+      "audit_only": false
+    },
+    {
+      "signal": "stop_session_candidate",
+      "represented": true,
+      "location": "research_actions STOP_SESSION candidate; planner _stop_session_score=-100",
+      "available_before_planning": true,
+      "consumed_by_planner": true,
+      "consumed_by_portfolio_erv": true,
+      "consumed_by_global_allocator": true,
+      "consumed_by_stop": "evaluate_global_stop separate from candidate competition",
+      "audit_only": false
+    }
+  ],
+  "signals_represented_before_planning": 8,
+  "signals_operationally_consumed": 8,
+  "can_bot_know_saturation_before_decision": "PARTIAL \u2014 multiple local signals exist but no unified branch-exhaustion representation gates exit"
+}
