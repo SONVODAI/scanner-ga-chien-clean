@@ -20,6 +20,7 @@ from modules.edge_research.research_search_accounting import (
 )
 from modules.edge_research.research_frontier import ResearchFrontier
 from modules.edge_research.research_frame import ResearchFrame, ResearchFrameRegistry
+from modules.edge_research.research_portfolio import PortfolioSessionState
 from modules.edge_research.research_state import (
     RESEARCH_GRAPH_SCHEMA_VERSION,
     EvidenceReference,
@@ -80,6 +81,7 @@ class ResearchGraph:
         self._search_accounting: Optional[SearchAccountingState] = None
         self._research_frontier: Optional[ResearchFrontier] = None
         self._frame_registry: Optional[ResearchFrameRegistry] = None
+        self._portfolio_state: Optional[PortfolioSessionState] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -125,6 +127,22 @@ class ResearchGraph:
     def persist_frames(self) -> None:
         reg = self.get_frame_registry()
         self.session.research_frames = reg.to_dict()
+
+    def get_portfolio_state(self) -> PortfolioSessionState:
+        if self._portfolio_state is None:
+            raw = self.session.research_portfolio
+            self._portfolio_state = (
+                PortfolioSessionState.from_dict(raw) if raw else PortfolioSessionState()
+            )
+        return self._portfolio_state
+
+    def persist_portfolio_state(self) -> None:
+        state = self.get_portfolio_state()
+        self.session.research_portfolio = state.to_dict()
+
+    def sync_portfolio_state(self) -> None:
+        if self._portfolio_state is not None:
+            self.session.research_portfolio = self._portfolio_state.to_dict()
 
     @classmethod
     def create_session(

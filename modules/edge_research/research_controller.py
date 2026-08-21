@@ -37,6 +37,12 @@ from modules.edge_research.research_panel_preflight import (
     validate_action_against_panel,
 )
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
+from modules.edge_research.research_portfolio import (
+    compute_session_portfolio_metrics,
+    record_dimension_experiment,
+    update_branch_on_experiment,
+    update_branch_on_leave,
+)
 from modules.edge_research.research_grammar import OutcomeSpec, PopulationSpec
 from modules.edge_research.research_search_accounting import (
     build_candidate_research_summary,
@@ -125,6 +131,24 @@ def _update_frame_from_experiment(
 
     status, _ = assess_frame_saturation(frame)
     frame.status = status
+
+    portfolio = graph.get_portfolio_state()
+    mig = 0.5 if assessment.interesting else 0.1
+    if assessment.conditional_candidate:
+        mig = 1.0
+    codes = set(assessment.branch_observation_codes)
+    if "SHAPE_FLAT" in codes or "NO_CLEAR_DIFFERENCE" in codes:
+        mig = 0.05
+    frame.information_gain_score = frame.information_gain_score * 0.7 + mig * 0.3
+    from modules.edge_research.research_search_accounting import compute_complexity_score, branch_depth
+    branch_ledger = graph.get_search_accounting().branch_ledgers.get(
+        branch_root_id(graph, experiment_node_id),
+        graph.get_search_accounting().session_ledger,
+    )
+    frame.complexity_burden = compute_complexity_score(
+        branch_ledger, branch_depth=branch_depth(graph, experiment_node_id)
+    ).aggregate_score
+
     reg.frames[frame_id] = frame
     graph.persist_frames()
 
@@ -423,6 +447,7 @@ def _enqueue_frontier_from_planning(
     }
     selected_id = decision.selected.action_id if decision.selected else None
     root = _branch_root(graph, experiment_node_id)
+    portfolio = graph.get_portfolio_state()
     frontier.add_from_candidates(
         candidates=decision.all_candidates,
         scores=scores,
@@ -430,6 +455,7 @@ def _enqueue_frontier_from_planning(
         branch_root_id=root,
         selected_action_id=selected_id,
         question_context=_question_context_dict(graph, experiment_node_id),
+        enqueued_sequence=portfolio.sequence_counter,
     )
     graph.persist_frontier()
 
@@ -479,6 +505,46 @@ def plan_after_experiment(
     )
     _maybe_build_candidate_summary(graph, experiment_node_id, assessment, tool_result)
     _update_frame_from_experiment(graph, experiment_node_id, assessment, tool_result)
+
+    root = branch_root_id(graph, experiment_node_id)
+    mig = 0.5 if assessment.interesting else 0.1
+    if assessment.conditional_candidate:
+        mig = 1.0
+    unresolved = mig * 2.0 if assessment.additional_investigation_warranted else 0.0
+    update_branch_on_experiment(
+        graph,
+        branch_root_id=root,
+        assessment=assessment,
+        marginal_gain=mig,
+        unresolved_value=unresolved,
+    )
+    exp = graph.get_node(experiment_node_id)
+    if exp.experiment_spec:
+        inputs = exp.experiment_spec.inputs or {}
+        feat = ""
+        for key in ("feature_column", "partition_column", "primary_feature"):
+            if key in inputs:
+                feat = str(inputs[key])
+                break
+        qctx = _question_context_dict(graph, experiment_node_id)
+        from modules.edge_research.research_grammar import OutcomeSpec, PopulationSpec
+        out_h = ""
+        pop_h = ""
+        frame_id = ""
+        if qctx.get("outcome_spec"):
+            out_h = OutcomeSpec.from_dict(qctx["outcome_spec"]).content_hash()
+        if qctx.get("population_spec"):
+            pop_h = PopulationSpec.from_dict(qctx["population_spec"]).content_hash()
+        frame_id = str(qctx.get("frame_id") or "")
+        record_dimension_experiment(
+            graph,
+            feature=feat,
+            outcome_hash=out_h,
+            population_hash=pop_h,
+            frame_id=frame_id,
+            tool=exp.experiment_spec.tool_name,
+        )
+
     _enqueue_frontier_from_planning(
         graph, experiment_node_id, decision, serializable_scores
     )
@@ -626,14 +692,25 @@ def _spawn_from_frontier_item(
     return eid
 
 
+def _neutral_frontier_assessment() -> ResearchAssessment:
+    """Minimal assessment for portfolio frontier selection without experiment context."""
+    return ResearchAssessment(
+        source_experiment_node_id="",
+        tool_name="",
+        tool_status="OK",
+        additional_investigation_warranted=True,
+    )
+
+
 def _select_next_experiment_from_frontier(
     graph: ResearchGraph,
     panel_columns: Tuple[str, ...],
 ) -> Optional[str]:
     """Deterministically pick next unexplored frontier experiment."""
     frontier = graph.get_frontier()
+    assessment = _neutral_frontier_assessment()
     while True:
-        item = frontier.select_best_unexplored()
+        item = frontier.select_best_unexplored(graph=graph, assessment=assessment)
         if item is None:
             return None
         eid = _spawn_from_frontier_item(graph, item, panel_columns)
@@ -661,6 +738,14 @@ def apply_plan_decision(
         if frame:
             frame.stop_branch_count += 1
             graph.persist_frames()
+        root = branch_root_id(graph, experiment_node_id)
+        branch = graph.get_portfolio_state().get_branch(root)
+        update_branch_on_leave(
+            graph,
+            branch_root_id=root,
+            unresolved_value=branch.unresolved_research_value,
+            reason=reason,
+        )
         should_stop, _ = evaluate_and_maybe_stop_session(graph)
         if should_stop:
             return ControllerStepResult(
@@ -936,6 +1021,10 @@ def run_research_session(
 
     if graph.session.status == SessionStatus.ACTIVE:
         evaluate_and_maybe_stop_session(graph)
+
+    portfolio = graph.get_portfolio_state()
+    portfolio.metrics = compute_session_portfolio_metrics(graph).to_dict()
+    graph.persist_portfolio_state()
 
     if auto_persist and persist_dir is not None:
         write_research_graph(graph, data_dir=persist_dir)

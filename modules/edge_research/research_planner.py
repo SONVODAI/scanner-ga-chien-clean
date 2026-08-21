@@ -73,6 +73,8 @@ class PlanDecision:
     all_candidates: Tuple[ResearchActionCandidate, ...]
     score_breakdown: Dict[str, Any] = field(default_factory=dict)
     rationale_codes: Tuple[str, ...] = field(default_factory=tuple)
+    portfolio_explanation: Optional[Dict[str, Any]] = None
+    portfolio_opportunities: Tuple[Dict[str, Any], ...] = field(default_factory=tuple)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -82,6 +84,8 @@ class PlanDecision:
             "score_breakdown": dict(self.score_breakdown),
             "rationale_codes": list(self.rationale_codes),
             "candidate_count": len(self.all_candidates),
+            "portfolio_explanation": dict(self.portfolio_explanation) if self.portfolio_explanation else None,
+            "portfolio_opportunities": list(self.portfolio_opportunities),
         }
 
 
@@ -498,6 +502,42 @@ def score_candidate(
     return total, components
 
 
+def _attach_portfolio_to_decision(
+    decision: PlanDecision,
+    *,
+    graph: ResearchGraph,
+    opportunities: Sequence[Any],
+    opp_by_action: Dict[str, Any],
+    remaining: Optional[int],
+    components: Dict[str, float],
+) -> PlanDecision:
+    from modules.edge_research.research_portfolio import build_decision_explanation
+
+    portfolio_explanation = None
+    if decision.selected is not None and decision.selected.action_id in opp_by_action:
+        selected_opp = opp_by_action[decision.selected.action_id]
+        explanation = build_decision_explanation(
+            selected_opp,
+            opportunities,
+            budget_remaining=remaining if remaining is not None else 999,
+            portfolio_components=components,
+        )
+        portfolio_explanation = explanation.to_dict()
+        portfolio = graph.get_portfolio_state()
+        portfolio.decision_explanations.append(portfolio_explanation)
+        graph.persist_portfolio_state()
+
+    return PlanDecision(
+        decision_type=decision.decision_type,
+        selected=decision.selected,
+        all_candidates=decision.all_candidates,
+        score_breakdown=decision.score_breakdown,
+        rationale_codes=decision.rationale_codes,
+        portfolio_explanation=portfolio_explanation,
+        portfolio_opportunities=tuple(o.to_dict() for o in opportunities),
+    )
+
+
 def plan_next_action(
     assessment: ResearchAssessment,
     candidates: Sequence[ResearchActionCandidate],
@@ -509,8 +549,28 @@ def plan_next_action(
     Choose among candidates, STOP, or ABANDON using weighted deterministic scoring.
 
     Falsification competes with exploration — no automatic pipeline ordering.
+    Phase 3G.3 applies portfolio intelligence layer for resource allocation.
     """
+    from modules.edge_research.research_portfolio import (
+        score_opportunities_for_selection,
+    )
+    from modules.edge_research.research_search_accounting import branch_root_id
+
     remaining = _remaining_budget(graph)
+    base_scores = score_all_candidates(
+        assessment, candidates, graph, experiment_node_id=experiment_node_id
+    )
+    root = branch_root_id(graph, experiment_node_id) if experiment_node_id else ""
+    opportunities, adjusted_scores = score_opportunities_for_selection(
+        graph,
+        assessment,
+        candidates,
+        base_scores,
+        experiment_node_id=experiment_node_id,
+        branch_root_id=root,
+    )
+    opp_by_action = {o.action_id: o for o in opportunities}
+
     scored: List[Tuple[float, ResearchActionCandidate, Dict[str, float]]] = []
 
     experiment_viable = [
@@ -519,27 +579,34 @@ def plan_next_action(
         and c.intent not in (ActionIntent.STOP.value, ActionIntent.ABANDON.value)
     ]
 
-    # Budget exhaustion boosts STOP but does not remove other candidates from record.
     budget_exhausted = remaining is not None and remaining <= 0
 
     for candidate in candidates:
-        total, components = score_candidate(
-            candidate, assessment, graph, experiment_node_id=experiment_node_id
+        total, components = adjusted_scores.get(
+            candidate.action_id,
+            base_scores.get(candidate.action_id, (0.0, {})),
         )
         if budget_exhausted and candidate.intent == ActionIntent.STOP.value:
             total += WEIGHT_STOP * 2
-            components["budget_exhausted"] = WEIGHT_STOP * 2
+            components = {**components, "budget_exhausted": WEIGHT_STOP * 2}
         scored.append((total, candidate, components))
 
     scored.sort(key=lambda x: (-x[0], x[1].action_id))
 
     if not scored:
-        return PlanDecision(
-            decision_type=PlanDecisionType.STOP_BRANCH,
-            selected=None,
-            all_candidates=tuple(candidates),
-            score_breakdown={"reason": "NO_CANDIDATES"},
-            rationale_codes=("STOP_BRANCH", "NO_CANDIDATES"),
+        return _attach_portfolio_to_decision(
+            PlanDecision(
+                decision_type=PlanDecisionType.STOP_BRANCH,
+                selected=None,
+                all_candidates=tuple(candidates),
+                score_breakdown={"reason": "NO_CANDIDATES"},
+                rationale_codes=("STOP_BRANCH", "NO_CANDIDATES"),
+            ),
+            graph=graph,
+            opportunities=opportunities,
+            opp_by_action=opp_by_action,
+            remaining=remaining,
+            components={},
         )
 
     best_score, best, best_components = scored[0]
@@ -548,57 +615,114 @@ def plan_next_action(
     if not experiment_viable:
         for total, cand, comp in scored:
             if cand.intent == ActionIntent.ABANDON.value and assessment.fragility_evidence:
-                return PlanDecision(
-                    decision_type=PlanDecisionType.ABANDON,
-                    selected=cand,
-                    all_candidates=tuple(candidates),
-                    score_breakdown={"components": comp, "total": total},
-                    rationale_codes=cand.rationale_codes,
+                return _attach_portfolio_to_decision(
+                    PlanDecision(
+                        decision_type=PlanDecisionType.ABANDON,
+                        selected=cand,
+                        all_candidates=tuple(candidates),
+                        score_breakdown={"components": comp, "total": total},
+                        rationale_codes=cand.rationale_codes,
+                    ),
+                    graph=graph,
+                    opportunities=opportunities,
+                    opp_by_action=opp_by_action,
+                    remaining=remaining,
+                    components=comp,
                 )
         for total, cand, comp in scored:
             if cand.intent == ActionIntent.STOP.value:
-                return PlanDecision(
-                    decision_type=PlanDecisionType.STOP_BRANCH,
-                    selected=cand,
-                    all_candidates=tuple(candidates),
-                    score_breakdown={"components": comp, "total": total},
-                    rationale_codes=cand.rationale_codes,
+                return _attach_portfolio_to_decision(
+                    PlanDecision(
+                        decision_type=PlanDecisionType.STOP_BRANCH,
+                        selected=cand,
+                        all_candidates=tuple(candidates),
+                        score_breakdown={"components": comp, "total": total},
+                        rationale_codes=cand.rationale_codes,
+                    ),
+                    graph=graph,
+                    opportunities=opportunities,
+                    opp_by_action=opp_by_action,
+                    remaining=remaining,
+                    components=comp,
                 )
 
+    # Terminal intents only win when no viable experiment beats them on portfolio value.
+    if best.intent in (ActionIntent.STOP.value, ActionIntent.ABANDON.value) and experiment_viable:
+        best_experiment = max(
+            (
+                (adjusted_scores.get(c.action_id, base_scores.get(c.action_id, (float("-inf"), {})))[0], c)
+                for c in experiment_viable
+            ),
+            key=lambda x: (x[0], x[1].action_id),
+            default=None,
+        )
+        if best_experiment and best_experiment[0] > best_score:
+            best_score, best, best_components = (
+                best_experiment[0],
+                best_experiment[1],
+                adjusted_scores.get(
+                    best_experiment[1].action_id,
+                    base_scores.get(best_experiment[1].action_id, (0.0, {})),
+                )[1],
+            )
+
     if best.intent == ActionIntent.STOP.value:
-        return PlanDecision(
-            decision_type=PlanDecisionType.STOP_BRANCH,
-            selected=best,
-            all_candidates=tuple(candidates),
-            score_breakdown={"components": best_components, "total": best_score},
-            rationale_codes=best.rationale_codes,
+        return _attach_portfolio_to_decision(
+            PlanDecision(
+                decision_type=PlanDecisionType.STOP_BRANCH,
+                selected=best,
+                all_candidates=tuple(candidates),
+                score_breakdown={"components": best_components, "total": best_score},
+                rationale_codes=best.rationale_codes,
+            ),
+            graph=graph,
+            opportunities=opportunities,
+            opp_by_action=opp_by_action,
+            remaining=remaining,
+            components=best_components,
         )
 
     if best.intent == ActionIntent.ABANDON.value:
-        return PlanDecision(
-            decision_type=PlanDecisionType.ABANDON,
-            selected=best,
-            all_candidates=tuple(candidates),
-            score_breakdown={"components": best_components, "total": best_score},
-            rationale_codes=best.rationale_codes,
+        return _attach_portfolio_to_decision(
+            PlanDecision(
+                decision_type=PlanDecisionType.ABANDON,
+                selected=best,
+                all_candidates=tuple(candidates),
+                score_breakdown={"components": best_components, "total": best_score},
+                rationale_codes=best.rationale_codes,
+            ),
+            graph=graph,
+            opportunities=opportunities,
+            opp_by_action=opp_by_action,
+            remaining=remaining,
+            components=best_components,
         )
 
     if budget_exhausted:
         stop_cand = next((c for _, c, _ in scored if c.intent == ActionIntent.STOP.value), None)
-        return PlanDecision(
+        decision = PlanDecision(
             decision_type=PlanDecisionType.STOP_BRANCH,
             selected=stop_cand,
             all_candidates=tuple(candidates),
             score_breakdown={"reason": "BUDGET_EXHAUSTED"},
             rationale_codes=("STOP_BRANCH", "BUDGET_EXHAUSTED"),
         )
+    else:
+        decision = PlanDecision(
+            decision_type=PlanDecisionType.EXPERIMENT,
+            selected=best,
+            all_candidates=tuple(candidates),
+            score_breakdown={"components": best_components, "total": best_score},
+            rationale_codes=best.rationale_codes,
+        )
 
-    return PlanDecision(
-        decision_type=PlanDecisionType.EXPERIMENT,
-        selected=best,
-        all_candidates=tuple(candidates),
-        score_breakdown={"components": best_components, "total": best_score},
-        rationale_codes=best.rationale_codes,
+    return _attach_portfolio_to_decision(
+        decision,
+        graph=graph,
+        opportunities=opportunities,
+        opp_by_action=opp_by_action,
+        remaining=remaining,
+        components=best_components,
     )
 
 

@@ -59,6 +59,8 @@ class FrontierItem:
     draft_spec: Optional[Dict[str, Any]] = None
     frame_id: str = ""
     transformation_type: str = ""
+    enqueued_sequence: int = 0
+    portfolio_score: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -84,6 +86,8 @@ class FrontierItem:
             "draft_spec": dict(self.draft_spec) if self.draft_spec else None,
             "frame_id": self.frame_id,
             "transformation_type": self.transformation_type,
+            "enqueued_sequence": self.enqueued_sequence,
+            "portfolio_score": self.portfolio_score,
         }
 
     @classmethod
@@ -111,6 +115,8 @@ class FrontierItem:
             draft_spec=dict(payload.get("draft_spec")) if payload.get("draft_spec") else None,
             frame_id=str(payload.get("frame_id", "")),
             transformation_type=str(payload.get("transformation_type", "")),
+            enqueued_sequence=int(payload.get("enqueued_sequence", 0)),
+            portfolio_score=float(payload.get("portfolio_score", 0.0)),
         )
 
     def to_action_candidate(self) -> "ResearchActionCandidate":
@@ -221,6 +227,7 @@ class ResearchFrontier:
         branch_root_id: str,
         selected_action_id: Optional[str],
         question_context: Optional[Dict[str, Any]] = None,
+        enqueued_sequence: int = 0,
     ) -> int:
         """Enqueue non-selected experiment candidates. Returns count added."""
         existing_action_ids = {i.action_id for i in self.items.values()}
@@ -277,6 +284,8 @@ class ResearchFrontier:
                 draft_spec=cand.draft_spec.to_dict(),
                 frame_id=frame_id,
                 transformation_type=transformation,
+                enqueued_sequence=enqueued_sequence,
+                portfolio_score=float(total),
             )
             existing_action_ids.add(cand.action_id)
             added += 1
@@ -327,11 +336,20 @@ class ResearchFrontier:
         if frontier_id in self.items:
             self.items[frontier_id].status = FrontierItemStatus.EXHAUSTED.value
 
-    def select_best_unexplored(self) -> Optional[FrontierItem]:
-        """Deterministic highest-score unexplored item."""
+    def select_best_unexplored(
+        self,
+        graph: Optional[Any] = None,
+        assessment: Optional[Any] = None,
+    ) -> Optional[FrontierItem]:
+        """Deterministic highest-value unexplored item (portfolio-aware when graph provided)."""
         unexplored = self.unexplored_items()
         if not unexplored:
             return None
+        if graph is not None and assessment is not None:
+            from modules.edge_research.research_portfolio import select_best_frontier_opportunity
+            selected = select_best_frontier_opportunity(graph, self, assessment)
+            if selected is not None:
+                return selected
         unexplored.sort(key=lambda i: (-i.planner_score, i.frontier_id))
         return unexplored[0]
 

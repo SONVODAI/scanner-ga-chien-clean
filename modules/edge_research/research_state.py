@@ -338,6 +338,7 @@ class ResearchSession:
     session_stop_reason: Optional[Dict[str, Any]] = None
     panel_preflight: Optional[Dict[str, Any]] = None
     research_frames: Dict[str, Any] = field(default_factory=dict)
+    research_portfolio: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -361,6 +362,8 @@ class ResearchSession:
             payload["panel_preflight"] = dict(self.panel_preflight)
         if self.research_frames:
             payload["research_frames"] = dict(self.research_frames)
+        if self.research_portfolio:
+            payload["research_portfolio"] = dict(self.research_portfolio)
         return payload
 
     @classmethod
@@ -384,6 +387,7 @@ class ResearchSession:
             else None,
             panel_preflight=dict(payload["panel_preflight"]) if payload.get("panel_preflight") else None,
             research_frames=dict(payload.get("research_frames") or {}),
+            research_portfolio=dict(payload.get("research_portfolio") or {}),
         )
 
 
