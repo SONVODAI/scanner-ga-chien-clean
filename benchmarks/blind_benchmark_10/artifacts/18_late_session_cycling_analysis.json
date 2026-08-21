@@ -1,0 +1,133 @@
+{
+  "late_session_decisions": [
+    {
+      "transition": 8,
+      "tool_selected": "horizon_comparison",
+      "erv": -1.0782499999999995,
+      "planner_score": -4.999999999999999,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning"
+      ],
+      "classification": "REDUNDANT",
+      "saturation_signal": false
+    },
+    {
+      "transition": 9,
+      "tool_selected": "adaptive_partition_compare",
+      "erv": -2.1133124999999993,
+      "planner_score": -8.487499999999999,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning"
+      ],
+      "classification": "MECHANICAL_CYCLING",
+      "saturation_signal": false
+    },
+    {
+      "transition": 10,
+      "tool_selected": "threshold_exploration",
+      "erv": 3.799500000000002,
+      "planner_score": -3.299999999999997,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "threshold_exploration",
+        "trajectory_partition_compare"
+      ],
+      "classification": "MECHANICAL_CYCLING",
+      "saturation_signal": true
+    },
+    {
+      "transition": 11,
+      "tool_selected": "horizon_comparison",
+      "erv": -1.6114999999999993,
+      "planner_score": null,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_needs": [
+        "EXPLORE_STRUCTURE",
+        "REVISIT_UNRESOLVED_BRANCH",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "trajectory_partition_compare"
+      ],
+      "classification": "JUSTIFIED_CONTINUATION",
+      "saturation_signal": true
+    },
+    {
+      "transition": 12,
+      "tool_selected": "",
+      "erv": null,
+      "planner_score": null,
+      "uncertainties": null,
+      "inferred_needs": null,
+      "alternatives_constructible": [],
+      "classification": "JUSTIFIED_CONTINUATION",
+      "saturation_signal": false
+    }
+  ],
+  "classification_counts": {
+    "REDUNDANT": 1,
+    "MECHANICAL_CYCLING": 2,
+    "JUSTIFIED_CONTINUATION": 2
+  },
+  "mechanical_cycling_count": 2,
+  "verdict": "IMPROVED"
+}

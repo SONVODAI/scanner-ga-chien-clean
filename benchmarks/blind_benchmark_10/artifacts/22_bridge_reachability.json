@@ -1,0 +1,16 @@
+{
+  "candidates_evaluated": 167,
+  "candidates_zero_bridge_contribution": 116,
+  "candidates_positive_bridge_contribution": 51,
+  "decisions_bridge_changed_planner_winner": 2,
+  "bridge_contribution_distribution": {
+    "min": 0,
+    "max": 3.0,
+    "mean": 0.7679640718562875,
+    "positive_count": 51
+  },
+  "contribution_by_uncertainty_type": {
+    "information_gap": 42,
+    "falsification_target": 9
+  }
+}

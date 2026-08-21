@@ -90,12 +90,25 @@ def _utc_now() -> str:
 
 
 def _verify_frozen_commit() -> str:
-    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
-    if not commit.startswith(FROZEN_RESEARCH_COMMIT):
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
+    research_diff = subprocess.check_output(
+        ["git", "diff", "--name-only", FROZEN_RESEARCH_COMMIT, "HEAD", "--", "modules/", "tests/"],
+        cwd=REPO,
+        text=True,
+    ).strip()
+    if research_diff:
         raise SystemExit(
-            f"BENCHMARK_INVALID_COMMIT: HEAD {commit!r} != required {FROZEN_RESEARCH_COMMIT!r}"
+            f"BENCHMARK_INVALID_COMMIT: research tree differs from {FROZEN_RESEARCH_COMMIT!r} "
+            f"(changed: {research_diff.splitlines()[:5]})"
         )
-    return commit
+    if not (head.startswith(FROZEN_RESEARCH_COMMIT) or subprocess.call(
+        ["git", "merge-base", "--is-ancestor", FROZEN_RESEARCH_COMMIT, head],
+        cwd=REPO,
+    ) == 0):
+        raise SystemExit(
+            f"BENCHMARK_INVALID_COMMIT: HEAD {head!r} is not descended from {FROZEN_RESEARCH_COMMIT!r}"
+        )
+    return head
 
 
 def _load_json(path: Path) -> Any:

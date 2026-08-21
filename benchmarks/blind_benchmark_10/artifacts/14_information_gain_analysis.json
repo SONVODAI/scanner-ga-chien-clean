@@ -1,0 +1,156 @@
+{
+  "experiments": [
+    {
+      "experiment": "exp-1b163c2078b0",
+      "tool": "horizon_comparison",
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "LOW_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-d2e781b13246",
+      "tool": "horizon_comparison",
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "REDUNDANT"
+    },
+    {
+      "experiment": "exp-76e1a836a5bc",
+      "tool": "sensitivity_analysis",
+      "observation_codes": [
+        "EXTREME_WINNER_ROBUST"
+      ],
+      "gaps_resolved": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_resolved": [
+        "EXTREME_WINNER"
+      ],
+      "information_gain_class": "HIGH_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-310e6edee836",
+      "tool": "horizon_comparison",
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "LOW_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-7dc0eb0c8fb0",
+      "tool": "adaptive_partition_compare",
+      "observation_codes": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "MODERATE_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-e0d883184cab",
+      "tool": "threshold_exploration",
+      "observation_codes": [
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "gaps_resolved": [
+        "THRESHOLD_EXPLORATION"
+      ],
+      "falsification_resolved": [],
+      "information_gain_class": "HIGH_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-82504efb7e41",
+      "tool": "symbol_decomposition",
+      "observation_codes": [
+        "SYMBOL_BROAD"
+      ],
+      "gaps_resolved": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "falsification_resolved": [
+        "EXTREME_WINNER"
+      ],
+      "information_gain_class": "HIGH_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-38879aba5554",
+      "tool": "horizon_comparison",
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "LOW_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-03165d3a7dec",
+      "tool": "horizon_comparison",
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "REDUNDANT"
+    },
+    {
+      "experiment": "exp-37b8e05cc4bd",
+      "tool": "adaptive_partition_compare",
+      "observation_codes": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "gaps_resolved": [],
+      "falsification_resolved": [],
+      "information_gain_class": "MODERATE_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-3e90dbf9a738",
+      "tool": "threshold_exploration",
+      "observation_codes": [
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "gaps_resolved": [
+        "THRESHOLD_EXPLORATION"
+      ],
+      "falsification_resolved": [],
+      "information_gain_class": "HIGH_INFORMATION_GAIN"
+    },
+    {
+      "experiment": "exp-3f17dab233c5",
+      "tool": "horizon_comparison",
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "gaps_resolved": [
+        "NEIGHBORHOOD_STABILITY",
+        "TRAJECTORY_ROLE"
+      ],
+      "falsification_resolved": [],
+      "information_gain_class": "HIGH_INFORMATION_GAIN"
+    }
+  ],
+  "aggregate": {
+    "LOW_INFORMATION_GAIN": 3,
+    "REDUNDANT": 2,
+    "HIGH_INFORMATION_GAIN": 5,
+    "MODERATE_INFORMATION_GAIN": 2
+  },
+  "high_moderate_rate": 0.5833333333333334
+}
