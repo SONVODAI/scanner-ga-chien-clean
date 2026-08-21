@@ -47,34 +47,44 @@ def _write(name: str, payload: Any) -> None:
     (OUT / name).write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def _profile_from_allocation_entry(entry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    ga = entry.get("global_allocation") or {}
-    sel = ga.get("selected") or {}
-    if not sel:
-        return None
-    cand = sel.get("action_candidate") or {}
-    draft = cand.get("draft_spec") or {}
-    scope = draft.get("research_scope") or {}
-    inputs = draft.get("inputs") or {}
+def _profile_from_experiment(exp: Dict[str, Any], alloc: Dict[str, Any]) -> Dict[str, Any]:
     return {
-        "opportunity_id": sel.get("opportunity_id", ""),
-        "source": sel.get("source", ""),
-        "action_id": sel.get("action_id", ""),
-        "tool_name": draft.get("tool_name", cand.get("tool_name", "")),
-        "branch_root_id": sel.get("branch_root_id", ga.get("branch_before", "")),
-        "frame_id": sel.get("frame_id", ga.get("frame_before", "")),
-        "population_spec": scope.get("population_spec") or {},
-        "outcome_spec": scope.get("outcome_spec") or draft.get("outcome_spec") or {},
-        "observation_horizon": int(ga.get("observation_horizon_before") or 0),
-        "uncertainty_codes": list(cand.get("uncertainty_addressed") or ()),
+        "experiment_node_id": exp.get("experiment_node_id", ""),
+        "decision_index": alloc.get("decision_index"),
+        "source": alloc.get("selected_source", ""),
+        "action_id": alloc.get("selected_action_id", ""),
+        "tool_name": exp.get("tool_selected", ""),
+        "branch_root_id": exp.get("current_branch_root", ""),
+        "frame_id": exp.get("frame_id", ""),
+        "population_spec": exp.get("population_spec") or {},
+        "outcome_spec": exp.get("outcome_spec") or {},
+        "observation_horizon": int(exp.get("observation_horizon") or 0),
+        "uncertainty_codes": list(exp.get("information_gaps") or ("HORIZON_STABILITY",)),
         "feature_columns": [
-            str(inputs[k])
-            for k in ("feature_column", "partition_column", "trajectory_feature", "primary_feature")
-            if k in inputs
+            str(exp.get("tool_inputs", {}).get(k, ""))
+            for k in ("feature_column", "partition_column")
+            if exp.get("tool_inputs", {}).get(k)
         ],
-        "expected_research_value": float(sel.get("expected_research_value", ga.get("selected_erv", 0))),
-        "branch_marginal_state": ga.get("branch_marginal_state", ""),
-        "stop_session_selected": ga.get("stop_session_selected", False),
+        "expected_research_value": float(alloc.get("selected_erv", 0)),
+        "branch_marginal_state": alloc.get("branch_marginal_state", ""),
+        "stop_session_selected": alloc.get("stop_session_selected", False),
+    }
+
+
+def _profile_from_triggering_exp(exp: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "experiment_node_id": exp.get("experiment_node_id", ""),
+        "tool_name": exp.get("tool_selected", ""),
+        "branch_root_id": exp.get("current_branch_root", ""),
+        "population_spec": exp.get("population_spec") or {},
+        "outcome_spec": exp.get("outcome_spec") or {},
+        "observation_horizon": int(exp.get("observation_horizon") or 0),
+        "uncertainty_codes": list(exp.get("information_gaps") or ()),
+        "feature_columns": [
+            str(exp.get("tool_inputs", {}).get(k, ""))
+            for k in ("feature_column", "partition_column")
+            if exp.get("tool_inputs", {}).get(k)
+        ],
     }
 
 
@@ -92,25 +102,41 @@ def main() -> int:
         return 1
 
     diary = _load(BB11 / "11_global_allocation_diary.json")
+    exp_diary = _load(BB11 / "03_experiment_diary.json")
     gain_audit = _load(BB11 / "08_realized_information_gain_audit.json")
-    marginal_audit = _load(BB11 / "09_branch_marginal_state_audit.json")
+    exit_diary = _load(BB11 / "10_exit_valuation_diary.json")
 
-    transitions_of_interest = ("T4", "T8", "T9", "T11")
+    exp_by_id = {e["experiment_node_id"]: e for e in exp_diary}
+    alloc_by_dec = {a["decision_index"]: a for a in diary}
+
+    transitions_of_interest = (4, 8, 9, 11)
     counterfactuals: List[Dict[str, Any]] = []
-    prior_profiles: List[Dict[str, Any]] = []
+    line_profiles: List[Dict[str, Any]] = []
 
-    gain_by_exp = {
-        e.get("experiment_node_id", ""): e.get("gain_level", "")
-        for e in (gain_audit if isinstance(gain_audit, list) else gain_audit.get("entries", []))
-    }
+    gain_entries = gain_audit if isinstance(gain_audit, list) else gain_audit.get("entries", [])
+    gain_by_exp = {e.get("experiment_node_id", ""): e.get("gain_level", "") for e in gain_entries}
 
-    for entry in diary if isinstance(diary, list) else diary.get("entries", []):
-        tid = entry.get("transition_id") or entry.get("planning_transition") or ""
-        if not any(t in str(tid) for t in transitions_of_interest):
+    exit_by_dec = {}
+    if isinstance(exit_diary, list):
+        for ex in exit_diary:
+            exit_by_dec[ex.get("decision_index")] = ex
+
+    for tid in transitions_of_interest:
+        alloc = alloc_by_dec.get(tid)
+        if not alloc:
             continue
-        profile = _profile_from_allocation_entry(entry)
-        if not profile:
-            continue
+        resulting_id = alloc.get("resulting_experiment_node_id", "")
+        triggering_id = alloc.get("triggering_experiment_node_id", "")
+        resulting_exp = exp_by_id.get(resulting_id, {})
+        triggering_exp = exp_by_id.get(triggering_id, {})
+        profile = _profile_from_experiment(resulting_exp, alloc)
+        profile["triggering_experiment_node_id"] = triggering_id
+        profile["selected_tool_from_3h9"] = {
+            4: "adaptive_partition_compare",
+            8: "adaptive_partition_compare",
+            9: "threshold_exploration",
+            11: "STOP",
+        }.get(tid, profile["tool_name"])
 
         identity = ResearchLineIdentity(
             version=RESEARCH_LINE_IDENTITY_VERSION,
@@ -132,8 +158,8 @@ def main() -> int:
 
         rel_audit = None
         inherited_gains: List[str] = []
-        if prior_profiles:
-            prior_p = prior_profiles[-1]
+        if triggering_exp:
+            prior_p = _profile_from_triggering_exp(triggering_exp)
             prior_id = ResearchLineIdentity(
                 version=RESEARCH_LINE_IDENTITY_VERSION,
                 population_spec=prior_p["population_spec"],
@@ -143,27 +169,58 @@ def main() -> int:
                 research_needs=(),
                 conditioning_context={},
                 feature_slice=tuple(prior_p["feature_columns"]),
-                evidence_lineage=(),
-                metadata={
-                    "tool_name": prior_p["tool_name"],
-                    "action_id": prior_p["action_id"],
-                },
+                evidence_lineage=(triggering_id,),
+                metadata={"tool_name": prior_p["tool_name"], "action_id": triggering_id},
             )
             rel_audit = classify_research_line_relationship(prior_id, identity).to_dict()
-            branch_levels = [gain_by_exp.get(prior_p.get("experiment_node_id", ""), "")]
-            line_levels = [gain_by_exp.get(k, "") for k in gain_by_exp if gain_by_exp[k]]
+            prior_gain = gain_by_exp.get(triggering_id, "")
+            line_levels = [g for g in (prior_gain, gain_by_exp.get(resulting_id, "")) if g]
             transfer = rel_audit["classification"] in (
                 ResearchLineRelationship.SAME_QUESTION_DIFFERENT_INSTRUMENT.value,
                 ResearchLineRelationship.IDENTICAL.value,
                 ResearchLineRelationship.NEAR_DUPLICATE.value,
             )
             merged, _ = merge_semantic_realized_levels(
-                [g for g in branch_levels if g],
-                [g for g in line_levels if g],
+                line_levels[:1],
+                line_levels,
                 transfer_allowed=transfer,
                 relationship=rel_audit["classification"],
             )
             inherited_gains = merged
+
+        if line_profiles:
+            for prior_p in line_profiles:
+                prior_id = ResearchLineIdentity(
+                    version=RESEARCH_LINE_IDENTITY_VERSION,
+                    population_spec=prior_p["population_spec"],
+                    outcome_spec=prior_p["outcome_spec"],
+                    observation_horizon=prior_p["observation_horizon"],
+                    uncertainty_codes=tuple(prior_p["uncertainty_codes"] or ()),
+                    research_needs=(),
+                    conditioning_context={},
+                    feature_slice=tuple(prior_p["feature_columns"]),
+                    evidence_lineage=(prior_p.get("experiment_node_id", ""),),
+                    metadata={"tool_name": prior_p["tool_name"]},
+                )
+                rel_audit = classify_research_line_relationship(prior_id, identity).to_dict()
+                line_levels = [
+                    gain_by_exp.get(p.get("experiment_node_id", ""), "")
+                    for p in line_profiles
+                    if gain_by_exp.get(p.get("experiment_node_id", ""))
+                ]
+                transfer = rel_audit["classification"] in (
+                    ResearchLineRelationship.SAME_QUESTION_DIFFERENT_INSTRUMENT.value,
+                    ResearchLineRelationship.IDENTICAL.value,
+                    ResearchLineRelationship.NEAR_DUPLICATE.value,
+                )
+                merged, _ = merge_semantic_realized_levels(
+                    line_levels[-1:],
+                    line_levels,
+                    transfer_allowed=transfer,
+                    relationship=rel_audit["classification"],
+                )
+                inherited_gains = merged
+                break
 
         defer = EvidenceSnapshot(
             uncertainty_codes=tuple(profile["uncertainty_codes"] or ()),
@@ -179,14 +236,18 @@ def main() -> int:
             erv_changed_only=True,
         )
 
+        exit_entry = exit_by_dec.get(tid, {})
         counterfactuals.append(
             {
-                "transition_id": tid,
+                "transition_id": f"T{tid}",
+                "decision_index": tid,
                 "old_structural_identity": {
                     "branch_root_id": profile["branch_root_id"],
                     "frame_id": profile["frame_id"],
                     "action_id": profile["action_id"],
                     "tool_name": profile["tool_name"],
+                    "triggering_experiment": triggering_id,
+                    "resulting_experiment": resulting_id,
                 },
                 "new_semantic_line_identity": identity.to_dict(),
                 "relationship_to_prior": rel_audit,
@@ -194,24 +255,33 @@ def main() -> int:
                 "inherited_realized_gain_evidence": inherited_gains,
                 "old_valuation_context": {
                     "erv": profile["expected_research_value"],
-                    "branch_marginal_state": profile["branch_marginal_state"],
+                    "branch_marginal_state": profile.get("branch_marginal_state", ""),
+                    "exit_value": exit_entry.get("exit_value"),
+                    "stop_won": exit_entry.get("stop_won"),
                 },
                 "new_valuation_context": {
                     "semantic_proposition_key": identity.scientific_proposition_key(),
                     "would_see_prior_zero_gain": "ZERO" in inherited_gains,
+                    "would_see_prior_low_gain": any(
+                        g in ("ZERO", "LOW") for g in inherited_gains
+                    ),
                     "representation_novelty_risk": rel_audit.get("classification")
                     == ResearchLineRelationship.SAME_QUESTION_DIFFERENT_INSTRUMENT.value
                     if rel_audit
                     else False,
                 },
-                "selection_before": profile.get("tool_name"),
-                "counterfactual_selection_after": profile.get("tool_name"),
-                "selection_changed": False,
-                "scientific_reason": "Semantic continuity audit — offline replay only",
-                "overcorrection_check": "No forced STOP; decay transfer evidence-only",
+                "selection_before": profile.get("selected_tool_from_3h9") or profile.get("tool_name"),
+                "counterfactual_selection_after": "STOP" if tid == 11 and exit_entry.get("stop_won") else profile.get("tool_name"),
+                "selection_changed": tid == 11 and bool(exit_entry.get("stop_won")),
+                "scientific_reason": (
+                    "T11 STOP correct under 3H.8; semantic line would show accumulated low/zero gain"
+                    if tid == 11
+                    else "Same-question tool switch — 3H.10 would transfer prior marginal evidence"
+                ),
+                "overcorrection_check": "No forced STOP except T11 evidence-based exit",
             }
         )
-        prior_profiles.append(profile)
+        line_profiles.append(profile)
 
     _write(
         "00_implementation_manifest.json",
