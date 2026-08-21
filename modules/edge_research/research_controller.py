@@ -42,6 +42,7 @@ from modules.edge_research.research_capability_registry import (
 )
 from modules.edge_research.research_data_expansion_audit import ensure_session_expansion_audit
 from modules.edge_research.research_provenance_proof import ensure_session_provenance_proof
+from modules.edge_research.research_exposure_governance import ensure_session_exposure_contract
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     BranchPortfolioStatus,
@@ -1144,6 +1145,7 @@ def run_experiment_and_plan(
     ensure_session_capability_registry(graph, panel, registry)
     ensure_session_expansion_audit(graph)
     ensure_session_provenance_proof(graph)
+    ensure_session_exposure_contract(graph)
 
     tool_result = execute_research_experiment(
         graph, experiment_node_id, registry, panel
@@ -1236,6 +1238,7 @@ def run_research_session(
     ensure_session_capability_registry(graph, panel, registry)
     ensure_session_expansion_audit(graph)
     ensure_session_provenance_proof(graph)
+    ensure_session_exposure_contract(graph)
 
     steps: List[ControllerStepResult] = []
     current_exp: Optional[str] = initial_experiment_id

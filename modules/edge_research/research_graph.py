@@ -85,6 +85,7 @@ class ResearchGraph:
         self._capability_registry: Optional[Any] = None
         self._expansion_audit: Optional[Any] = None
         self._provenance_proof: Optional[Any] = None
+        self._exposure_contract: Optional[Any] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -198,6 +199,22 @@ class ResearchGraph:
     def persist_provenance_proof(self) -> None:
         report = self.get_provenance_proof()
         self.session.research_provenance_proof = report.to_dict()
+
+    def get_exposure_contract(self) -> Any:
+        from modules.edge_research.research_exposure_governance import ResearchExposureContract
+
+        if self._exposure_contract is None:
+            raw = self.session.research_exposure_contract
+            self._exposure_contract = (
+                ResearchExposureContract.from_dict(raw)
+                if raw
+                else ResearchExposureContract()
+            )
+        return self._exposure_contract
+
+    def persist_exposure_contract(self) -> None:
+        contract = self.get_exposure_contract()
+        self.session.research_exposure_contract = contract.to_dict()
 
     @classmethod
     def create_session(
