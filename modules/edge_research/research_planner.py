@@ -113,6 +113,19 @@ def _grammar_bonus(candidate: ResearchActionCandidate) -> float:
     )
 
 
+def _adaptive_bonus(candidate: ResearchActionCandidate) -> float:
+    hints = candidate.priority_hints
+    return (
+        hints.get("threshold_explore", 0.0)
+        + hints.get("shape_followup", 0.0)
+        + hints.get("neighborhood_test", 0.0)
+        + hints.get("slicing_explore", 0.0)
+        + hints.get("category_refinement", 0.0)
+        + hints.get("region_refinement", 0.0)
+        + hints.get("interaction_followup", 0.0)
+    )
+
+
 def score_candidate(
     candidate: ResearchActionCandidate,
     assessment: ResearchAssessment,
@@ -127,6 +140,7 @@ def score_candidate(
     components["falsification_threat"] = _falsification_match(assessment, candidate)
     components["novelty"] = _novelty_bonus(assessment, candidate)
     components["grammar"] = _grammar_bonus(candidate)
+    components["adaptive"] = _adaptive_bonus(candidate)
     components["stop"] = _stop_score(assessment, candidate)
     components["abandon"] = _abandon_score(assessment, candidate)
 

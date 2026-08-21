@@ -164,20 +164,29 @@ def apply_plan_decision(
         raise ResearchGraphError("EXPERIMENT decision missing draft ExperimentSpec")
 
     pending_ctx: Optional[ResearchQuestionContext] = None
-    if selected.draft_spec.research_scope.get("pending_question_context"):
-        pending_ctx = ResearchQuestionContext.from_dict(
-            selected.draft_spec.research_scope["pending_question_context"]
+    scope = selected.draft_spec.research_scope
+    if scope.get("pending_question_context"):
+        pending_ctx = ResearchQuestionContext.from_dict(scope["pending_question_context"])
+
+    evidence_summary = {
+        "uncertainty_addressed": selected.uncertainty_addressed,
+        "intent": selected.intent,
+        "planner_rationale": list(decision.rationale_codes),
+    }
+    if scope.get("pending_lineage"):
+        evidence_summary["lineage"] = dict(scope["pending_lineage"])
+        evidence_summary["triggering_experiment"] = scope["pending_lineage"].get(
+            "triggering_experiment", experiment_node_id
+        )
+        evidence_summary["triggering_observation"] = scope["pending_lineage"].get(
+            "triggering_observation", selected.action_code
         )
 
     qid = graph.spawn_child_question_from_experiment(
         experiment_node_id,
         question_text=selected.question_text,
         reason_code=selected.action_code,
-        evidence_summary={
-            "uncertainty_addressed": selected.uncertainty_addressed,
-            "intent": selected.intent,
-            "planner_rationale": list(decision.rationale_codes),
-        },
+        evidence_summary=evidence_summary,
         question_context=pending_ctx,
     )
     eid = graph.add_experiment(question_node_id=qid, spec=selected.draft_spec)
