@@ -340,6 +340,7 @@ class ResearchSession:
     research_frames: Dict[str, Any] = field(default_factory=dict)
     research_portfolio: Dict[str, Any] = field(default_factory=dict)
     research_capabilities: Optional[Dict[str, Any]] = None
+    research_data_expansion_audit: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -367,6 +368,8 @@ class ResearchSession:
             payload["research_portfolio"] = dict(self.research_portfolio)
         if self.research_capabilities:
             payload["research_capabilities"] = dict(self.research_capabilities)
+        if self.research_data_expansion_audit:
+            payload["research_data_expansion_audit"] = dict(self.research_data_expansion_audit)
         return payload
 
     @classmethod
@@ -393,6 +396,9 @@ class ResearchSession:
             research_portfolio=dict(payload.get("research_portfolio") or {}),
             research_capabilities=dict(payload["research_capabilities"])
             if payload.get("research_capabilities")
+            else None,
+            research_data_expansion_audit=dict(payload["research_data_expansion_audit"])
+            if payload.get("research_data_expansion_audit")
             else None,
         )
 

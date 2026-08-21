@@ -40,6 +40,7 @@ from modules.edge_research.research_capability_registry import (
     ensure_session_capability_registry,
     record_experiment_capability_exercise,
 )
+from modules.edge_research.research_data_expansion_audit import ensure_session_expansion_audit
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     BranchPortfolioStatus,
@@ -1140,6 +1141,7 @@ def run_experiment_and_plan(
     if not graph.session.panel_preflight:
         graph.session.panel_preflight = build_panel_preflight(panel).to_dict()
     ensure_session_capability_registry(graph, panel, registry)
+    ensure_session_expansion_audit(graph)
 
     tool_result = execute_research_experiment(
         graph, experiment_node_id, registry, panel
@@ -1230,6 +1232,7 @@ def run_research_session(
     if not graph.session.panel_preflight:
         graph.session.panel_preflight = build_panel_preflight(panel).to_dict()
     ensure_session_capability_registry(graph, panel, registry)
+    ensure_session_expansion_audit(graph)
 
     steps: List[ControllerStepResult] = []
     current_exp: Optional[str] = initial_experiment_id
