@@ -39,6 +39,7 @@ from modules.edge_research.research_panel_preflight import (
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     compute_session_portfolio_metrics,
+    record_branch_revisit,
     record_dimension_experiment,
     update_branch_on_experiment,
     update_branch_on_leave,
@@ -489,8 +490,39 @@ def plan_after_experiment(
     scores = score_all_candidates(
         assessment, candidates, graph, experiment_node_id=experiment_node_id
     )
-    decision = plan_next_action(
+    local_decision = plan_next_action(
         assessment, candidates, graph, experiment_node_id=experiment_node_id
+    )
+    from modules.edge_research.research_global_allocator import (
+        apply_global_allocation_to_plan_decision,
+        select_global_research_opportunity,
+    )
+    from modules.edge_research.research_portfolio import score_opportunities_for_selection
+    from modules.edge_research.research_search_accounting import branch_root_id as _branch_root
+
+    root = _branch_root(graph, experiment_node_id)
+    local_opps, _ = score_opportunities_for_selection(
+        graph,
+        assessment,
+        candidates,
+        scores,
+        experiment_node_id=experiment_node_id,
+        branch_root_id=root,
+    )
+    allocation = select_global_research_opportunity(
+        graph,
+        assessment,
+        candidates,
+        scores,
+        local_decision,
+        experiment_node_id=experiment_node_id,
+        panel_columns=panel_columns,
+    )
+    decision = apply_global_allocation_to_plan_decision(
+        graph,
+        local_decision,
+        allocation,
+        local_opportunities=local_opps,
     )
     serializable_scores = {
         aid: {"total": total, "components": comp}
@@ -831,6 +863,100 @@ def apply_plan_decision(
             terminal_reason=reason,
         )
 
+    if decision.decision_type == PlanDecisionType.SWITCH_OPPORTUNITY:
+        selected = decision.selected
+        if selected is None or selected.draft_spec is None:
+            raise ResearchGraphError("SWITCH_OPPORTUNITY decision missing draft ExperimentSpec")
+
+        frontier_id = decision.selected_frontier_id
+        frontier = graph.get_frontier()
+        item = frontier.items.get(frontier_id) if frontier_id else None
+
+        root = branch_root_id(graph, experiment_node_id)
+        branch = graph.get_portfolio_state().get_branch(root)
+        leave_reason = "GLOBAL_ALLOCATION_SWITCH"
+        if decision.global_allocation_source == "REVISIT":
+            leave_reason = "GLOBAL_REVISIT"
+        update_branch_on_leave(
+            graph,
+            branch_root_id=root,
+            unresolved_value=branch.unresolved_research_value,
+            reason=leave_reason,
+        )
+
+        if item is not None:
+            valid, invalid_reason = validate_action_against_panel(selected, panel_columns or ())
+            if not valid:
+                graph.get_frontier().mark_invalid(frontier_id, invalid_reason)
+                graph.persist_frontier()
+                next_eid = _select_next_experiment_from_frontier(graph, panel_columns or ())
+                if next_eid:
+                    return ControllerStepResult(
+                        tool_result=None,
+                        planning=None,
+                        spawned_experiment_id=next_eid,
+                        terminal=False,
+                        branch_terminal=True,
+                        terminal_reason=invalid_reason,
+                    )
+            frontier.mark_selected(frontier_id)
+            if decision.global_allocation_source == "REVISIT":
+                record_branch_revisit(graph, item.branch_root_id)
+
+        pending_ctx: Optional[ResearchQuestionContext] = None
+        scope = selected.draft_spec.research_scope
+        if scope.get("pending_question_context"):
+            pending_ctx = ResearchQuestionContext.from_dict(scope["pending_question_context"])
+
+        evidence_summary = {
+            "uncertainty_addressed": selected.uncertainty_addressed,
+            "intent": selected.intent,
+            "planner_rationale": list(decision.rationale_codes),
+            "from_global_allocation": True,
+            "global_allocation_source": decision.global_allocation_source,
+            "frontier_id": frontier_id,
+        }
+
+        spawn_parent = item.parent_experiment_node_id if item else experiment_node_id
+        if spawn_parent not in graph.nodes:
+            graph.get_frontier().mark_invalid(frontier_id, "missing_parent_node")
+            graph.persist_frontier()
+            return ControllerStepResult(
+                tool_result=None,
+                planning=None,
+                terminal=True,
+                branch_terminal=True,
+                terminal_reason="missing_parent_node",
+            )
+
+        parent_frame_id = _resolve_parent_frame_id(graph, spawn_parent)
+        _register_frame_transition_on_spawn(
+            graph,
+            pending_ctx=pending_ctx,
+            parent_frame_id=parent_frame_id,
+            experiment_node_id=spawn_parent,
+            planner_action_code=selected.action_code,
+            planner_score=planner_score,
+        )
+        qid = graph.spawn_child_question_from_experiment(
+            spawn_parent,
+            question_text=selected.question_text,
+            reason_code=selected.action_code,
+            evidence_summary=evidence_summary,
+            question_context=pending_ctx,
+        )
+        eid = graph.add_experiment(question_node_id=qid, spec=selected.draft_spec)
+        graph.persist_frontier()
+        return ControllerStepResult(
+            tool_result=None,
+            planning=None,
+            spawned_question_id=qid,
+            spawned_experiment_id=eid,
+            terminal=False,
+            branch_terminal=True,
+            terminal_reason=leave_reason,
+        )
+
     selected = decision.selected
     if selected is None or selected.draft_spec is None:
         raise ResearchGraphError("EXPERIMENT decision missing draft ExperimentSpec")
@@ -891,6 +1017,23 @@ def _maybe_persist_graph(
         write_research_graph(graph, data_dir=persist_dir)
 
 
+def _maybe_mark_frontier_executed(graph: ResearchGraph, experiment_node_id: str) -> None:
+    """Mark frontier item EXECUTED when its spawned experiment runs."""
+    node = graph.get_node(experiment_node_id)
+    for pid in node.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.node_type.value != "QUESTION":
+            continue
+        summary: Dict[str, Any] = {}
+        if parent.rationale is not None:
+            summary = parent.rationale.evidence_summary or {}
+        frontier_id = summary.get("frontier_id")
+        if frontier_id:
+            graph.get_frontier().mark_executed(str(frontier_id))
+            graph.persist_frontier()
+            return
+
+
 def run_experiment_and_plan(
     graph: ResearchGraph,
     experiment_node_id: str,
@@ -911,6 +1054,7 @@ def run_experiment_and_plan(
     )
     record_experiment_executed(graph.get_search_accounting(), graph, experiment_node_id)
     graph.persist_search_accounting()
+    _maybe_mark_frontier_executed(graph, experiment_node_id)
     try:
         planning = plan_after_experiment(
             graph,

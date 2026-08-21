@@ -509,6 +509,7 @@ def test_multistep_session_abandon_after_fragility():
                 PlanDecisionType.ABANDON,
                 PlanDecisionType.STOP,
                 PlanDecisionType.EXPERIMENT,
+                PlanDecisionType.SWITCH_OPPORTUNITY,
             )
 
 

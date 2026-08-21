@@ -63,6 +63,7 @@ class PlanDecisionType(str, Enum):
     STOP_BRANCH = "STOP_BRANCH"
     STOP_SESSION = "STOP_SESSION"
     ABANDON = "ABANDON"
+    SWITCH_OPPORTUNITY = "SWITCH_OPPORTUNITY"
     STOP = "STOP_BRANCH"  # backward-compatible alias
 
 
@@ -75,6 +76,10 @@ class PlanDecision:
     rationale_codes: Tuple[str, ...] = field(default_factory=tuple)
     portfolio_explanation: Optional[Dict[str, Any]] = None
     portfolio_opportunities: Tuple[Dict[str, Any], ...] = field(default_factory=tuple)
+    global_allocation_source: str = ""
+    selected_frontier_id: str = ""
+    context_switch_required: bool = False
+    global_allocation: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -86,6 +91,10 @@ class PlanDecision:
             "candidate_count": len(self.all_candidates),
             "portfolio_explanation": dict(self.portfolio_explanation) if self.portfolio_explanation else None,
             "portfolio_opportunities": list(self.portfolio_opportunities),
+            "global_allocation_source": self.global_allocation_source,
+            "selected_frontier_id": self.selected_frontier_id,
+            "context_switch_required": self.context_switch_required,
+            "global_allocation": dict(self.global_allocation) if self.global_allocation else None,
         }
 
 
