@@ -341,6 +341,7 @@ class ResearchSession:
     research_portfolio: Dict[str, Any] = field(default_factory=dict)
     research_capabilities: Optional[Dict[str, Any]] = None
     research_data_expansion_audit: Optional[Dict[str, Any]] = None
+    research_provenance_proof: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -370,6 +371,8 @@ class ResearchSession:
             payload["research_capabilities"] = dict(self.research_capabilities)
         if self.research_data_expansion_audit:
             payload["research_data_expansion_audit"] = dict(self.research_data_expansion_audit)
+        if self.research_provenance_proof:
+            payload["research_provenance_proof"] = dict(self.research_provenance_proof)
         return payload
 
     @classmethod
@@ -399,6 +402,9 @@ class ResearchSession:
             else None,
             research_data_expansion_audit=dict(payload["research_data_expansion_audit"])
             if payload.get("research_data_expansion_audit")
+            else None,
+            research_provenance_proof=dict(payload["research_provenance_proof"])
+            if payload.get("research_provenance_proof")
             else None,
         )
 

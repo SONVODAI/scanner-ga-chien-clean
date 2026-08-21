@@ -84,6 +84,7 @@ class ResearchGraph:
         self._portfolio_state: Optional[PortfolioSessionState] = None
         self._capability_registry: Optional[Any] = None
         self._expansion_audit: Optional[Any] = None
+        self._provenance_proof: Optional[Any] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -181,6 +182,22 @@ class ResearchGraph:
     def persist_expansion_audit(self) -> None:
         audit = self.get_expansion_audit()
         self.session.research_data_expansion_audit = audit.to_dict()
+
+    def get_provenance_proof(self) -> Any:
+        from modules.edge_research.research_provenance_proof import ResearchProvenanceProofReport
+
+        if self._provenance_proof is None:
+            raw = self.session.research_provenance_proof
+            self._provenance_proof = (
+                ResearchProvenanceProofReport.from_dict(raw)
+                if raw
+                else ResearchProvenanceProofReport()
+            )
+        return self._provenance_proof
+
+    def persist_provenance_proof(self) -> None:
+        report = self.get_provenance_proof()
+        self.session.research_provenance_proof = report.to_dict()
 
     @classmethod
     def create_session(
