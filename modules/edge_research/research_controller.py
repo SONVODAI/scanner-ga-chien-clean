@@ -692,6 +692,26 @@ def plan_after_experiment(
         local_opportunities=local_opps,
     )
 
+    from modules.edge_research.research_information_value import (
+        build_selection_counterfactual_audit,
+        record_information_value_audit,
+    )
+
+    iv_assessments = getattr(graph, "_pending_information_value_assessments", None) or []
+    iv_base = getattr(graph, "_pending_information_value_base_scores", None) or scores
+    iv_bridged = getattr(graph, "_pending_information_value_bridged_scores", None) or scores
+    if iv_assessments:
+        sel_id = decision.selected.action_id if decision.selected else ""
+        iv_audit = build_selection_counterfactual_audit(
+            experiment_node_id=experiment_node_id,
+            candidates=candidates,
+            base_scores=iv_base,
+            bridged_scores=iv_bridged,
+            assessments=iv_assessments,
+            selected_action_id=sel_id,
+        )
+        record_information_value_audit(graph, iv_audit)
+
     if consult_competence and competence is not None:
         sel_id = decision.selected.action_id if decision.selected else ""
         alt_id = ""
@@ -709,7 +729,7 @@ def plan_after_experiment(
 
     serializable_scores = {
         aid: {"total": total, "components": comp}
-        for aid, (total, comp) in scores.items()
+        for aid, (total, comp) in iv_bridged.items()
     }
     record_planning_on_experiment(
         graph,

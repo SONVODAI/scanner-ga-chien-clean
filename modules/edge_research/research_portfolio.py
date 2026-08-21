@@ -1062,6 +1062,7 @@ def score_opportunities_for_selection(
     *,
     experiment_node_id: Optional[str] = None,
     branch_root_id: str = "",
+    use_information_value_bridge: bool = True,
 ) -> Tuple[List[ResearchOpportunity], Dict[str, Tuple[float, Dict[str, float]]]]:
     """Score all candidates with portfolio layer; return opportunities and adjusted scores."""
     from modules.edge_research.research_search_accounting import branch_root_id as _branch_root
@@ -1069,11 +1070,30 @@ def score_opportunities_for_selection(
     root = branch_root_id or (
         _branch_root(graph, experiment_node_id) if experiment_node_id else ""
     )
+
+    bridged_scores = base_scores
+    iv_assessments: List[Any] = []
+    if use_information_value_bridge:
+        from modules.edge_research.research_information_value import apply_information_value_bridge
+
+        bridged_scores, iv_assessments = apply_information_value_bridge(
+            base_scores,
+            graph=graph,
+            assessment=assessment,
+            candidates=candidates,
+            experiment_node_id=experiment_node_id,
+            branch_root_id=root,
+        )
+        if experiment_node_id and iv_assessments:
+            graph._pending_information_value_assessments = iv_assessments  # noqa: SLF001
+            graph._pending_information_value_base_scores = base_scores  # noqa: SLF001
+            graph._pending_information_value_bridged_scores = bridged_scores  # noqa: SLF001
+
     opportunities: List[ResearchOpportunity] = []
     adjusted: Dict[str, Tuple[float, Dict[str, float]]] = {}
 
     for cand in candidates:
-        base, comp = base_scores.get(cand.action_id, (0.0, {}))
+        base, comp = bridged_scores.get(cand.action_id, (0.0, {}))
         delta, port_comp, opp = portfolio_score_adjustments(
             cand,
             assessment,

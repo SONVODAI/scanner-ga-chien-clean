@@ -345,6 +345,7 @@ class ResearchSession:
     research_exposure_contract: Optional[Dict[str, Any]] = None
     research_operational_awareness: Optional[Dict[str, Any]] = None
     research_competence_audit: Optional[List[Dict[str, Any]]] = None
+    research_information_value_audit: Optional[List[Dict[str, Any]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -382,6 +383,8 @@ class ResearchSession:
             payload["research_operational_awareness"] = dict(self.research_operational_awareness)
         if self.research_competence_audit:
             payload["research_competence_audit"] = list(self.research_competence_audit)
+        if self.research_information_value_audit:
+            payload["research_information_value_audit"] = list(self.research_information_value_audit)
         return payload
 
     @classmethod
@@ -423,6 +426,9 @@ class ResearchSession:
             else None,
             research_competence_audit=list(payload["research_competence_audit"])
             if payload.get("research_competence_audit")
+            else None,
+            research_information_value_audit=list(payload["research_information_value_audit"])
+            if payload.get("research_information_value_audit")
             else None,
         )
 
