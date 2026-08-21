@@ -36,6 +36,10 @@ from modules.edge_research.research_panel_preflight import (
     filter_candidates_for_panel,
     validate_action_against_panel,
 )
+from modules.edge_research.research_capability_registry import (
+    ensure_session_capability_registry,
+    record_experiment_capability_exercise,
+)
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     BranchPortfolioStatus,
@@ -1135,6 +1139,7 @@ def run_experiment_and_plan(
     panel_columns = tuple(panel.columns)
     if not graph.session.panel_preflight:
         graph.session.panel_preflight = build_panel_preflight(panel).to_dict()
+    ensure_session_capability_registry(graph, panel, registry)
 
     tool_result = execute_research_experiment(
         graph, experiment_node_id, registry, panel
@@ -1142,6 +1147,8 @@ def run_experiment_and_plan(
     record_experiment_executed(graph.get_search_accounting(), graph, experiment_node_id)
     graph.persist_search_accounting()
     _maybe_mark_frontier_executed(graph, experiment_node_id)
+    node = graph.get_node(experiment_node_id)
+    record_experiment_capability_exercise(graph, experiment_node_id, node.experiment_spec)
 
     if _is_budget_exhausted(graph):
         planning = _terminate_session_on_budget_exhaustion(
@@ -1222,6 +1229,7 @@ def run_research_session(
     panel_columns = tuple(panel.columns)
     if not graph.session.panel_preflight:
         graph.session.panel_preflight = build_panel_preflight(panel).to_dict()
+    ensure_session_capability_registry(graph, panel, registry)
 
     steps: List[ControllerStepResult] = []
     current_exp: Optional[str] = initial_experiment_id

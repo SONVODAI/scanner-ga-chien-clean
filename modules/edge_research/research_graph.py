@@ -82,6 +82,7 @@ class ResearchGraph:
         self._research_frontier: Optional[ResearchFrontier] = None
         self._frame_registry: Optional[ResearchFrameRegistry] = None
         self._portfolio_state: Optional[PortfolioSessionState] = None
+        self._capability_registry: Optional[Any] = None
 
     def get_search_accounting(self) -> SearchAccountingState:
         if self._search_accounting is None:
@@ -143,6 +144,26 @@ class ResearchGraph:
     def sync_portfolio_state(self) -> None:
         if self._portfolio_state is not None:
             self.session.research_portfolio = self._portfolio_state.to_dict()
+
+    def get_capability_registry(self) -> Any:
+        from modules.edge_research.research_capability_registry import ResearchCapabilityRegistry
+
+        if self._capability_registry is None:
+            raw = self.session.research_capabilities
+            self._capability_registry = (
+                ResearchCapabilityRegistry.from_dict(raw)
+                if raw
+                else ResearchCapabilityRegistry()
+            )
+        return self._capability_registry
+
+    def persist_capability_registry(self) -> None:
+        reg = self.get_capability_registry()
+        self.session.research_capabilities = reg.to_dict()
+
+    def sync_capability_registry(self) -> None:
+        if self._capability_registry is not None:
+            self.session.research_capabilities = self._capability_registry.to_dict()
 
     @classmethod
     def create_session(
