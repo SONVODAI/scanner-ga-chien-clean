@@ -322,9 +322,10 @@ class ResearchSession:
     experiment_budget: Optional[int] = None
     experiments_used: int = 0
     schema_version: str = RESEARCH_GRAPH_SCHEMA_VERSION
+    search_accounting: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        payload: Dict[str, Any] = {
             "research_session_id": self.research_session_id,
             "started_at": self.started_at,
             "data_cutoff_date": self.data_cutoff_date,
@@ -335,6 +336,9 @@ class ResearchSession:
             "experiments_used": self.experiments_used,
             "schema_version": self.schema_version,
         }
+        if self.search_accounting:
+            payload["search_accounting"] = dict(self.search_accounting)
+        return payload
 
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "ResearchSession":
@@ -350,6 +354,7 @@ class ResearchSession:
             experiment_budget=payload.get("experiment_budget"),
             experiments_used=int(payload.get("experiments_used", 0)),
             schema_version=str(payload.get("schema_version", RESEARCH_GRAPH_SCHEMA_VERSION)),
+            search_accounting=dict(payload.get("search_accounting") or {}),
         )
 
 
@@ -378,6 +383,8 @@ class ResearchNode:
     terminal_reason: str = ""
     frozen_spec_ref: Optional[Dict[str, Any]] = None
     revisit_allowed: bool = False
+    research_status: str = ""
+    candidate_summary: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -406,6 +413,8 @@ class ResearchNode:
             "terminal_reason": self.terminal_reason,
             "frozen_spec_ref": dict(self.frozen_spec_ref) if self.frozen_spec_ref else None,
             "revisit_allowed": self.revisit_allowed,
+            "research_status": self.research_status,
+            "candidate_summary": dict(self.candidate_summary) if self.candidate_summary else None,
         }
 
     @classmethod
@@ -448,6 +457,8 @@ class ResearchNode:
             terminal_reason=str(payload.get("terminal_reason", "")),
             frozen_spec_ref=dict(frozen) if frozen else None,
             revisit_allowed=bool(payload.get("revisit_allowed", False)),
+            research_status=str(payload.get("research_status", "")),
+            candidate_summary=dict(payload.get("candidate_summary")) if payload.get("candidate_summary") else None,
         )
 
 

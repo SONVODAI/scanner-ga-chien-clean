@@ -986,7 +986,74 @@ def generate_action_candidates(
         if c.action_id not in seen:
             seen.add(c.action_id)
             unique.append(c)
+
+    if experiment_node_id:
+        unique = list(_apply_complexity_hints(unique, graph, experiment_node_id))
+
     return tuple(unique)
+
+
+def _apply_complexity_hints(
+    candidates: List[ResearchActionCandidate],
+    graph: ResearchGraph,
+    experiment_node_id: str,
+) -> List[ResearchActionCandidate]:
+    """Add draft vs parent complexity for planner penalty."""
+    ctx = _question_context_from_experiment(graph, experiment_node_id)
+    if ctx is None:
+        return candidates
+    try:
+        pop, out = _parse_specs_from_context(ctx)
+        parent_complexity = float(pop.complexity() + out.complexity())
+    except Exception:
+        parent_complexity = 0.0
+
+    enriched: List[ResearchActionCandidate] = []
+    for c in candidates:
+        hints = dict(c.priority_hints)
+        hints.setdefault("parent_complexity", parent_complexity)
+        draft_complexity = parent_complexity
+        if c.draft_spec and c.draft_spec.research_scope.get("pending_question_context"):
+            pctx = ResearchQuestionContext.from_dict(
+                c.draft_spec.research_scope["pending_question_context"]
+            )
+            try:
+                dp, do = _parse_specs_from_context(pctx)
+                draft_complexity = float(dp.complexity() + do.complexity())
+            except Exception:
+                pass
+        elif c.draft_spec and c.draft_spec.research_scope.get("population_spec"):
+            try:
+                dp = PopulationSpec.from_dict(c.draft_spec.research_scope["population_spec"])
+                do_raw = c.draft_spec.research_scope.get("outcome_spec")
+                do = OutcomeSpec.from_dict(do_raw) if do_raw else out
+                draft_complexity = float(dp.complexity() + do.complexity())
+            except Exception:
+                pass
+        hints["draft_complexity"] = draft_complexity
+        if pop.kind == "refine" or pop.parent is not None:
+            hints["population_refined"] = 1.0
+        enriched.append(
+            ResearchActionCandidate(
+                action_id=c.action_id,
+                action_code=c.action_code,
+                intent=c.intent,
+                question_template_id=c.question_template_id,
+                question_text=c.question_text,
+                tool_name=c.tool_name,
+                tool_version=c.tool_version,
+                draft_spec=c.draft_spec,
+                uncertainty_addressed=c.uncertainty_addressed,
+                expected_information=c.expected_information,
+                budget_cost=c.budget_cost,
+                already_attempted=c.already_attempted,
+                blocked=c.blocked,
+                blocked_reason=c.blocked_reason,
+                rationale_codes=c.rationale_codes,
+                priority_hints=hints,
+            )
+        )
+    return enriched
 
 
 def viable_candidates(candidates: Sequence[ResearchActionCandidate]) -> Tuple[ResearchActionCandidate, ...]:

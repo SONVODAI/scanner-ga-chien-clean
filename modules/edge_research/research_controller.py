@@ -21,6 +21,14 @@ from modules.edge_research.research_assessment import ResearchAssessment
 from modules.edge_research.research_graph import ResearchGraph, ResearchGraphError
 from modules.edge_research.research_interpreter import interpret_tool_result
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
+from modules.edge_research.research_grammar import OutcomeSpec, PopulationSpec
+from modules.edge_research.research_search_accounting import (
+    build_candidate_research_summary,
+    build_parent_comparison,
+    lineage_step_roles,
+    record_candidates_considered,
+    record_experiment_executed,
+)
 from modules.edge_research.research_state import (
     NextActionCandidate,
     NodeStatus,
@@ -83,6 +91,111 @@ def record_planning_on_experiment(
     node.uncertainties = list(assessment.unresolved_uncertainties)
 
 
+def _enrich_candidates_with_search_hints(
+    candidates: Tuple[ResearchActionCandidate, ...],
+    tool_result: ToolResult,
+) -> Tuple[ResearchActionCandidate, ...]:
+    """Attach metric-derived hints for complexity/skepticism scoring."""
+    metrics = tool_result.metrics or {}
+    base_hints = {
+        "observed_success_rate": metrics.get("best_group_success_rate")
+        or metrics.get("success_rate")
+        or metrics.get("baseline_success_rate"),
+        "sample_size": tool_result.sample_size,
+        "shape_strength": (metrics.get("shape") or {}).get("strength"),
+        "threshold_strength": metrics.get("threshold_strength"),
+    }
+    enriched: List[ResearchActionCandidate] = []
+    for c in candidates:
+        merged_hints = dict(c.priority_hints)
+        for k, v in base_hints.items():
+            if v is not None:
+                merged_hints.setdefault(k, v)
+        enriched.append(
+            ResearchActionCandidate(
+                action_id=c.action_id,
+                action_code=c.action_code,
+                intent=c.intent,
+                question_template_id=c.question_template_id,
+                question_text=c.question_text,
+                tool_name=c.tool_name,
+                tool_version=c.tool_version,
+                draft_spec=c.draft_spec,
+                uncertainty_addressed=c.uncertainty_addressed,
+                expected_information=c.expected_information,
+                budget_cost=c.budget_cost,
+                already_attempted=c.already_attempted,
+                blocked=c.blocked,
+                blocked_reason=c.blocked_reason,
+                rationale_codes=c.rationale_codes,
+                priority_hints=merged_hints,
+            )
+        )
+    return tuple(enriched)
+
+
+def _maybe_build_candidate_summary(
+    graph: ResearchGraph,
+    experiment_node_id: str,
+    assessment: ResearchAssessment,
+    tool_result: ToolResult,
+) -> None:
+    """Persist research-only candidate summary on experiment node when interesting."""
+    if not assessment.interesting:
+        return
+    exp = graph.get_node(experiment_node_id)
+    ctx = None
+    for pid in exp.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.question_context is not None:
+            ctx = parent.question_context
+            break
+    if ctx is None:
+        return
+
+    pop = PopulationSpec.from_dict(ctx.population_spec)
+    out = OutcomeSpec.from_dict(ctx.outcome_spec)
+    state = graph.get_search_accounting()
+    from modules.edge_research.research_search_accounting import branch_root_id
+
+    root = branch_root_id(graph, experiment_node_id)
+    branch_ledger = state.branch_ledgers.get(root, state.session_ledger)
+
+    parent_cmp = None
+    if pop.parent is not None or pop.kind == "refine":
+        parent_pop = pop.parent if pop.parent else PopulationSpec.all_()
+        parent_cmp = build_parent_comparison(
+            parent_pop,
+            out,
+            pop,
+            out,
+            parent_effect=tool_result.metrics.get("baseline_success_rate"),
+            candidate_effect=tool_result.metrics.get("best_group_success_rate")
+            or tool_result.metrics.get("success_rate"),
+            parent_n=tool_result.metrics.get("baseline_n"),
+            candidate_n=tool_result.sample_size,
+        )
+
+    summary = build_candidate_research_summary(
+        candidate_id=experiment_node_id,
+        population_spec=pop,
+        outcome_spec=out,
+        branch_ledger=branch_ledger,
+        session_ledger=state.session_ledger,
+        metrics=dict(tool_result.metrics),
+        assessment_fragility=assessment.fragility_evidence,
+        assessment_concentration=assessment.concentration_concerns,
+        interesting=assessment.interesting,
+        parent_comparison=parent_cmp,
+        lineage_roles=lineage_step_roles(graph, experiment_node_id),
+        discovery_cutoff=graph.session.data_cutoff_date,
+    )
+    exp.candidate_summary = summary.to_dict()
+    exp.research_status = summary.current_research_status
+    state.candidate_summaries[experiment_node_id] = summary.to_dict()
+    graph.persist_search_accounting()
+
+
 def plan_after_experiment(
     graph: ResearchGraph,
     experiment_node_id: str,
@@ -100,8 +213,17 @@ def plan_after_experiment(
         research_scope=research_scope,
         experiment_node_id=experiment_node_id,
     )
-    scores = score_all_candidates(assessment, candidates, graph)
-    decision = plan_next_action(assessment, candidates, graph)
+    candidates = _enrich_candidates_with_search_hints(candidates, tool_result)
+    record_candidates_considered(
+        graph.get_search_accounting(), graph, experiment_node_id, len(candidates)
+    )
+    graph.persist_search_accounting()
+    scores = score_all_candidates(
+        assessment, candidates, graph, experiment_node_id=experiment_node_id
+    )
+    decision = plan_next_action(
+        assessment, candidates, graph, experiment_node_id=experiment_node_id
+    )
     serializable_scores = {
         aid: {"total": total, "components": comp}
         for aid, (total, comp) in scores.items()
@@ -113,6 +235,7 @@ def plan_after_experiment(
         decision=decision,
         candidate_scores=serializable_scores,
     )
+    _maybe_build_candidate_summary(graph, experiment_node_id, assessment, tool_result)
     return PlanningRecord(
         experiment_node_id=experiment_node_id,
         assessment=assessment,
@@ -223,6 +346,8 @@ def run_experiment_and_plan(
     tool_result = execute_research_experiment(
         graph, experiment_node_id, registry, panel
     )
+    record_experiment_executed(graph.get_search_accounting(), graph, experiment_node_id)
+    graph.persist_search_accounting()
     planning = plan_after_experiment(
         graph, experiment_node_id, tool_result, registry, research_scope=research_scope
     )
