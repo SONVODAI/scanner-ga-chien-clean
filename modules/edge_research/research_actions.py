@@ -251,51 +251,34 @@ def _parse_specs_from_context(ctx: ResearchQuestionContext) -> Tuple[PopulationS
     return pop, out
 
 
-def _grammar_scope(
-    population: PopulationSpec,
-    outcome: OutcomeSpec,
+def _observation_horizon_from_context(
+    ctx: ResearchQuestionContext,
     base_scope: Dict[str, Any],
-) -> Dict[str, Any]:
-    scope = _base_scope(base_scope)
-    scope.update(population_spec_to_research_scope(population))
-    scope["outcome_spec"] = outcome.to_dict()
-    scope["outcome_spec_hash"] = outcome.content_hash()
-    return scope
+) -> int:
+    """Resolve active frame observation horizon from question context or scope."""
+    if ctx.observation_horizon:
+        return ctx.observation_horizon
+    from modules.edge_research.research_feature_eligibility import get_research_observation_horizon
+
+    return get_research_observation_horizon(base_scope)
 
 
-def _grammar_scope_for_frame(
+def _grammar_scope(
     population: PopulationSpec,
     outcome: OutcomeSpec,
     base_scope: Dict[str, Any],
     *,
     observation_horizon: int = 0,
 ) -> Optional[Dict[str, Any]]:
-    """
-    Build research scope for a frame, respecting information-horizon legality.
+    """Authoritative horizon-aware scope builder for all candidate paths."""
+    from modules.edge_research.research_frame import build_grammar_scope_at_horizon
 
-    Outcome-derived population filters are valid only at/after their availability horizon.
-    """
-    from modules.edge_research.research_frame import validate_population_at_horizon
-
-    try:
-        validate_outcome_spec(outcome)
-        validate_population_at_horizon(population, observation_horizon=observation_horizon)
-    except GrammarValidationError:
-        return None
-
-    scope = _base_scope(base_scope)
-    if observation_horizon <= 0:
-        try:
-            scope.update(population_spec_to_research_scope(population))
-        except GrammarValidationError:
-            return None
-    else:
-        scope["population_spec"] = population.to_dict()
-        scope["population_spec_hash"] = population.content_hash()
-    scope["outcome_spec"] = outcome.to_dict()
-    scope["outcome_spec_hash"] = outcome.content_hash()
-    scope["research_observation_horizon"] = observation_horizon
-    return scope
+    return build_grammar_scope_at_horizon(
+        population,
+        outcome,
+        _base_scope(base_scope),
+        observation_horizon=observation_horizon,
+    )
 
 
 def _add_grammar_candidates(
@@ -316,6 +299,7 @@ def _add_grammar_candidates(
     population, outcome = _parse_specs_from_context(ctx)
     depth = ctx.research_depth
     parent_hash = population.content_hash()
+    obs_horizon = _observation_horizon_from_context(ctx, scope)
     evidence = {
         "source_experiment": experiment_node_id,
         "interesting": assessment.interesting,
@@ -335,7 +319,9 @@ def _add_grammar_candidates(
                 research_depth=new_depth,
                 parent_branch_hash=parent_hash,
             )
-            new_scope = _grammar_scope(population, alt_outcome, scope)
+            new_scope = _grammar_scope(population, alt_outcome, scope, observation_horizon=obs_horizon)
+            if new_scope is None:
+                continue
             new_scope["outcome_reframe"] = True
             new_scope["frame_transformation"] = "OUTCOME_REFRAME"
             new_scope["pending_question_context"] = ResearchQuestionContext(
@@ -384,7 +370,9 @@ def _add_grammar_candidates(
                 research_depth=new_depth,
                 parent_branch_hash=parent_hash,
             )
-            new_scope = _grammar_scope(refined, outcome, scope)
+            new_scope = _grammar_scope(refined, outcome, scope, observation_horizon=obs_horizon)
+            if new_scope is None:
+                continue
             new_scope["population_reframe"] = True
             new_scope["frame_transformation"] = "POPULATION_REFRAME"
             new_scope["pending_question_context"] = ResearchQuestionContext(
@@ -437,7 +425,9 @@ def _add_grammar_candidates(
                 research_depth=new_depth,
                 parent_branch_hash=parent_hash,
             )
-            new_scope = _grammar_scope(widened, outcome, scope)
+            new_scope = _grammar_scope(widened, outcome, scope, observation_horizon=obs_horizon)
+            if new_scope is None:
+                continue
             new_scope["pending_question_context"] = ResearchQuestionContext(
                 population_spec=widened.to_dict(),
                 outcome_spec=outcome.to_dict(),
@@ -629,32 +619,34 @@ def _add_adaptive_candidates(
         ctx = _question_context_from_experiment(graph, experiment_node_id)
         if ctx:
             pop, out = _parse_specs_from_context(ctx)
+            obs_horizon = _observation_horizon_from_context(ctx, scope)
             refined = PopulationSpec.refine(
                 pop,
                 PopulationSpec.filter_categorical(feature, [str(best_cat)]),
                 reason_code="CONDITION_ON_CATEGORY",
                 triggering_evidence={"source_experiment": experiment_node_id},
             )
-            new_scope = _grammar_scope(refined, out, scope)
-            add(
-                action_code="CONDITION_ON_CATEGORY",
-                intent=ActionIntent.REPOPULATE,
-                template_id="CATEGORY_POPULATION_REFINE",
-                question=f"Does conditioning on {feature}={best_cat} preserve the relationship?",
-                tool_name="categorical_adaptive_compare",
-                tool_version="v1",
-                spec=_make_spec(
+            new_scope = _grammar_scope(refined, out, scope, observation_horizon=obs_horizon)
+            if new_scope is not None:
+                add(
+                    action_code="CONDITION_ON_CATEGORY",
+                    intent=ActionIntent.REPOPULATE,
+                    template_id="CATEGORY_POPULATION_REFINE",
+                    question=f"Does conditioning on {feature}={best_cat} preserve the relationship?",
                     tool_name="categorical_adaptive_compare",
                     tool_version="v1",
-                    inputs={"feature_column": feature},
-                    research_scope=new_scope,
-                    cutoff=cutoff,
-                ),
-                uncertainty=GAP_CATEGORY_REFINEMENT,
-                expected_info=ExpectedInformation.MEDIUM,
-                rationale_codes=("REPOPULATE", "CATEGORY_SEPARATION"),
-                priority_hints={"category_refinement": 3.0},
-            )
+                    spec=_make_spec(
+                        tool_name="categorical_adaptive_compare",
+                        tool_version="v1",
+                        inputs={"feature_column": feature},
+                        research_scope=new_scope,
+                        cutoff=cutoff,
+                    ),
+                    uncertainty=GAP_CATEGORY_REFINEMENT,
+                    expected_info=ExpectedInformation.MEDIUM,
+                    rationale_codes=("REPOPULATE", "CATEGORY_SEPARATION"),
+                    priority_hints={"category_refinement": 3.0},
+                )
 
     # High/low region population conditioning after threshold discovery.
     if parent_tool == "threshold_exploration" and metrics.get("best_threshold"):
@@ -666,6 +658,7 @@ def _add_adaptive_candidates(
         ctx = _question_context_from_experiment(graph, experiment_node_id)
         if ctx and threshold is not None:
             pop, out = _parse_specs_from_context(ctx)
+            obs_horizon = _observation_horizon_from_context(ctx, scope)
             filt = PopulationSpec.filter_numeric(feature, op, float(threshold))
             refined = PopulationSpec.refine(
                 pop,
@@ -676,27 +669,28 @@ def _add_adaptive_candidates(
                     "threshold": threshold,
                 },
             )
-            new_scope = _grammar_scope(refined, out, scope)
-            action_code = "CONDITION_ON_HIGH_REGION" if direction == "high" else "CONDITION_ON_LOW_REGION"
-            add(
-                action_code=action_code,
-                intent=ActionIntent.REPOPULATE,
-                template_id="THRESHOLD_POPULATION_REFINE",
-                question=f"Does the outcome pattern hold within the {direction} region of {feature}?",
-                tool_name="adaptive_partition_compare",
-                tool_version="v1",
-                spec=_make_spec(
+            new_scope = _grammar_scope(refined, out, scope, observation_horizon=obs_horizon)
+            if new_scope is not None:
+                action_code = "CONDITION_ON_HIGH_REGION" if direction == "high" else "CONDITION_ON_LOW_REGION"
+                add(
+                    action_code=action_code,
+                    intent=ActionIntent.REPOPULATE,
+                    template_id="THRESHOLD_POPULATION_REFINE",
+                    question=f"Does the outcome pattern hold within the {direction} region of {feature}?",
                     tool_name="adaptive_partition_compare",
                     tool_version="v1",
-                    inputs={"feature_column": feature, "max_bins": 3, "min_bin_n": 5},
-                    research_scope=new_scope,
-                    cutoff=cutoff,
-                ),
-                uncertainty="POPULATION_REGION",
-                expected_info=ExpectedInformation.HIGH,
-                rationale_codes=("REPOPULATE", "THRESHOLD_REGION"),
-                priority_hints={"region_refinement": 3.5},
-            )
+                    spec=_make_spec(
+                        tool_name="adaptive_partition_compare",
+                        tool_version="v1",
+                        inputs={"feature_column": feature, "max_bins": 3, "min_bin_n": 5},
+                        research_scope=new_scope,
+                        cutoff=cutoff,
+                    ),
+                    uncertainty="POPULATION_REGION",
+                    expected_info=ExpectedInformation.HIGH,
+                    rationale_codes=("REPOPULATE", "THRESHOLD_REGION"),
+                    priority_hints={"region_refinement": 3.5},
+                )
 
     # Bounded interaction when shape interesting and market context untested.
     if assessment.interesting and GAP_MARKET_DEPENDENCE in assessment.information_gaps:
@@ -806,6 +800,7 @@ def _add_frame_reframe_candidates(
     depth = ctx.research_depth
     parent_hash = population.content_hash()
     parent_n = ctx.population_n or 100
+    obs_horizon = _observation_horizon_from_context(ctx, scope)
 
     # Structural observation → new frames (even without conditional candidate).
     if assessment.observation_kind in ("STRUCTURAL_OBSERVATION", "DESCRIPTIVE_OBSERVATION"):
@@ -831,7 +826,7 @@ def _add_frame_reframe_candidates(
                 parent_branch_hash=parent_hash,
                 alternatives_considered=1,
             )
-            new_scope = _grammar_scope_for_frame(
+            new_scope = _grammar_scope(
                 child.population,
                 child.outcome,
                 scope,
@@ -921,7 +916,9 @@ def _add_frame_reframe_candidates(
                 research_depth=new_depth,
                 parent_branch_hash=parent_hash,
             )
-            new_scope = _grammar_scope(refined, outcome, scope)
+            new_scope = _grammar_scope(refined, outcome, scope, observation_horizon=obs_horizon)
+            if new_scope is None:
+                continue
             new_scope["population_reframe"] = True
             new_scope["frame_transformation"] = "POPULATION_REFRAME"
             new_scope["sample_loss_ratio"] = loss
@@ -985,7 +982,7 @@ def _add_frame_reframe_candidates(
                 research_depth=depth + 1,
                 parent_branch_hash=parent_hash,
             )
-            new_scope = _grammar_scope_for_frame(
+            new_scope = _grammar_scope(
                 child.population,
                 child.outcome,
                 scope,

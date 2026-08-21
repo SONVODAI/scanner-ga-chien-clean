@@ -16,6 +16,7 @@ from modules.edge_research.research_feature_eligibility import (
     field_availability_horizon,
     get_research_observation_horizon,
 )
+from modules.edge_research.feature_registry import is_prohibited_feature_column
 from modules.edge_research.research_grammar import (
     ALLOWED_OUTCOME_FIELDS,
     GrammarValidationError,
@@ -73,8 +74,13 @@ class FrameLineageRecord:
     new_outcome_hash: str = ""
     new_population_hash: str = ""
     observation_horizon: int = 0
+    parent_observation_horizon: int = 0
     sample_n: Optional[int] = None
     temporal_legal: bool = True
+    triggering_experiment_id: str = ""
+    planner_action_code: str = ""
+    planner_score: Optional[float] = None
+    sequence_order: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -88,8 +94,13 @@ class FrameLineageRecord:
             "new_outcome_hash": self.new_outcome_hash,
             "new_population_hash": self.new_population_hash,
             "observation_horizon": self.observation_horizon,
+            "parent_observation_horizon": self.parent_observation_horizon,
             "sample_n": self.sample_n,
             "temporal_legal": self.temporal_legal,
+            "triggering_experiment_id": self.triggering_experiment_id,
+            "planner_action_code": self.planner_action_code,
+            "planner_score": self.planner_score,
+            "sequence_order": self.sequence_order,
         }
 
     @classmethod
@@ -105,8 +116,13 @@ class FrameLineageRecord:
             new_outcome_hash=str(payload.get("new_outcome_hash", "")),
             new_population_hash=str(payload.get("new_population_hash", "")),
             observation_horizon=int(payload.get("observation_horizon", 0)),
+            parent_observation_horizon=int(payload.get("parent_observation_horizon", 0)),
             sample_n=payload.get("sample_n"),
             temporal_legal=bool(payload.get("temporal_legal", True)),
+            triggering_experiment_id=str(payload.get("triggering_experiment_id", "")),
+            planner_action_code=str(payload.get("planner_action_code", "")),
+            planner_score=payload.get("planner_score"),
+            sequence_order=int(payload.get("sequence_order", 0)),
         )
 
 
@@ -292,6 +308,9 @@ class ResearchFrameRegistry:
         trigger: str,
         saturation_evidence: Optional[Dict[str, Any]] = None,
         sample_n: Optional[int] = None,
+        triggering_experiment_id: str = "",
+        planner_action_code: str = "",
+        planner_score: Optional[float] = None,
     ) -> None:
         self.lineage.append(
             FrameLineageRecord(
@@ -305,8 +324,13 @@ class ResearchFrameRegistry:
                 new_outcome_hash=new_frame.outcome.content_hash(),
                 new_population_hash=new_frame.population.content_hash(),
                 observation_horizon=new_frame.observation_horizon,
+                parent_observation_horizon=old_frame.observation_horizon,
                 sample_n=sample_n,
                 temporal_legal=validate_frame_temporal_legality(new_frame),
+                triggering_experiment_id=triggering_experiment_id,
+                planner_action_code=planner_action_code,
+                planner_score=planner_score,
+                sequence_order=len(self.lineage),
             )
         )
         old_frame.status = FrameStatus.SUPERSEDED.value
@@ -319,22 +343,116 @@ class ResearchFrameRegistry:
         return len({f.population.content_hash() for f in self.frames.values()})
 
 
+def validate_outcome_at_horizon(outcome: OutcomeSpec, *, observation_horizon: int) -> None:
+    """Target outcome must remain forward relative to the frame observation horizon."""
+    validate_outcome_spec(outcome)
+    max_outcome_h = _max_outcome_horizon_sessions(outcome)
+    if max_outcome_h <= observation_horizon:
+        raise GrammarValidationError(
+            f"Outcome not forward: latest session {max_outcome_h} "
+            f"<= observation_horizon {observation_horizon}"
+        )
+
+
+def validate_specs_at_horizon(
+    population: PopulationSpec,
+    outcome: OutcomeSpec,
+    *,
+    observation_horizon: int,
+) -> None:
+    """Authoritative horizon-aware validation for population + outcome specs."""
+    validate_outcome_at_horizon(outcome, observation_horizon=observation_horizon)
+    validate_population_at_horizon(population, observation_horizon=observation_horizon)
+
+
+def build_grammar_scope_at_horizon(
+    population: PopulationSpec,
+    outcome: OutcomeSpec,
+    base_scope: Dict[str, Any],
+    *,
+    observation_horizon: int = 0,
+) -> Optional[Dict[str, Any]]:
+    """
+    Build research scope using horizon-aware temporal legality.
+
+    Single authoritative path for frame, grammar, adaptive, and reframe candidates.
+    Returns None when specs are illegal at the given observation horizon.
+    """
+    from modules.edge_research.research_grammar import population_spec_to_research_scope
+
+    try:
+        validate_specs_at_horizon(
+            population, outcome, observation_horizon=observation_horizon
+        )
+    except GrammarValidationError:
+        return None
+
+    scope = dict(base_scope or {})
+    if observation_horizon <= 0:
+        try:
+            scope.update(population_spec_to_research_scope(population))
+        except GrammarValidationError:
+            return None
+    else:
+        scope["population_spec"] = population.to_dict()
+        scope["population_spec_hash"] = population.content_hash()
+    scope["outcome_spec"] = outcome.to_dict()
+    scope["outcome_spec_hash"] = outcome.content_hash()
+    scope["research_observation_horizon"] = observation_horizon
+    return scope
+
+
 def validate_frame_temporal_legality(frame: ResearchFrame) -> bool:
     """Ensure population filters and outcomes respect information horizon."""
-    obs = frame.observation_horizon
     try:
-        validate_outcome_spec(frame.outcome)
+        validate_specs_at_horizon(
+            frame.population,
+            frame.outcome,
+            observation_horizon=frame.observation_horizon,
+        )
     except GrammarValidationError:
-        return False
-    try:
-        validate_population_at_horizon(frame.population, observation_horizon=obs)
-    except GrammarValidationError:
-        return False
-    # Outcome must be forward relative to observation horizon.
-    max_outcome_h = _max_outcome_horizon_sessions(frame.outcome)
-    if max_outcome_h <= obs:
         return False
     return True
+
+
+def _validate_population_filter_at_horizon(
+    field: str,
+    *,
+    observation_horizon: int,
+    operator: Optional[str] = None,
+) -> None:
+    """Validate a single population filter field at the given observation horizon."""
+    from modules.edge_research.research_grammar import COMPARE_OPERATORS
+
+    if field in ALLOWED_OUTCOME_FIELDS:
+        avail = field_availability_horizon(field)
+        if avail > observation_horizon:
+            raise GrammarValidationError(
+                f"Future leakage: {field!r} available at session {avail}, "
+                f"observation_horizon={observation_horizon}"
+            )
+        return
+
+    if observation_horizon > 0:
+        avail = field_availability_horizon(field)
+        if avail > observation_horizon:
+            raise GrammarValidationError(
+                f"Future leakage: {field!r} available at session {avail}, "
+                f"observation_horizon={observation_horizon}"
+            )
+        if is_prohibited_feature_column(field):
+            raise GrammarValidationError(f"Population field {field!r} is prohibited (future leakage)")
+        if operator and operator not in COMPARE_OPERATORS and operator != "in":
+            raise GrammarValidationError(f"Operator {operator!r} not allowed")
+        return
+
+    from modules.edge_research.research_grammar import _validate_population_field
+
+    _validate_population_field(field)
+    if operator:
+        from modules.edge_research.research_grammar import _validate_operator
+
+        _validate_operator(operator)
 
 
 def validate_population_at_horizon(spec: PopulationSpec, *, observation_horizon: int) -> None:
@@ -343,16 +461,11 @@ def validate_population_at_horizon(spec: PopulationSpec, *, observation_horizon:
         return
     if spec.kind == PopulationKind.FILTER.value:
         assert spec.filter_field is not None
-        field = spec.filter_field
-        if field in ALLOWED_OUTCOME_FIELDS:
-            avail = field_availability_horizon(field)
-            if avail > observation_horizon:
-                raise GrammarValidationError(
-                    f"Future leakage: {field!r} available at session {avail}, "
-                    f"observation_horizon={observation_horizon}"
-                )
-            return
-        validate_population_spec(spec)
+        _validate_population_filter_at_horizon(
+            spec.filter_field,
+            observation_horizon=observation_horizon,
+            operator=spec.operator,
+        )
         return
     if spec.kind == PopulationKind.AND.value:
         for child in spec.children:

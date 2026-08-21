@@ -27,6 +27,7 @@ from modules.edge_research.research_frame import (
     FrameStatus,
     ResearchFrame,
     assess_frame_saturation,
+    frame_from_question_context,
 )
 from modules.edge_research.research_graph import ResearchGraph, ResearchGraphError
 from modules.edge_research.research_interpreter import interpret_tool_result
@@ -128,14 +129,70 @@ def _update_frame_from_experiment(
     graph.persist_frames()
 
 
+def _resolve_parent_frame_id(graph: ResearchGraph, experiment_node_id: str) -> str:
+    """Resolve parent frame ID from question context, falling back to active frame."""
+    reg = graph.get_frame_registry()
+    for pid in graph.get_node(experiment_node_id).parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.question_context and parent.question_context.frame_id:
+            return parent.question_context.frame_id
+    return reg.active_frame_id
+
+
+def _ensure_parent_frame_registered(
+    graph: ResearchGraph,
+    parent_frame_id: str,
+    experiment_node_id: str,
+) -> str:
+    """Ensure parent frame exists in registry; reconstruct from question context if needed."""
+    reg = graph.get_frame_registry()
+    if parent_frame_id and reg.get(parent_frame_id):
+        return parent_frame_id
+
+    for pid in graph.get_node(experiment_node_id).parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.question_context is None:
+            continue
+        ctx = parent.question_context
+        fid = parent_frame_id or ctx.frame_id or reg.active_frame_id
+        if not fid:
+            fid = reg.next_id()
+        if reg.get(fid) is None:
+            pop = PopulationSpec.from_dict(ctx.population_spec)
+            out = OutcomeSpec.from_dict(ctx.outcome_spec)
+            preflight = graph.session.panel_preflight or {}
+            eligible = len(preflight.get("eligible_explanatory") or [])
+            frame = frame_from_question_context(
+                fid,
+                pop,
+                out,
+                observation_horizon=ctx.observation_horizon,
+            )
+            frame.eligible_feature_count = eligible
+            frame.status = FrameStatus.UNDEREXPLORED.value
+            reg.register(frame, set_active=not bool(reg.active_frame_id))
+            graph.persist_frames()
+        return fid
+    return parent_frame_id
+
+
 def _register_frame_transition_on_spawn(
     graph: ResearchGraph,
     *,
     pending_ctx: Optional[ResearchQuestionContext],
     parent_frame_id: str,
+    experiment_node_id: str,
+    planner_action_code: str = "",
+    planner_score: Optional[float] = None,
 ) -> None:
-    """Record frame lineage when spawning a reframe question."""
+    """Record frame lineage when spawning a reframe question — before downstream operations."""
     if pending_ctx is None or not pending_ctx.frame_id:
+        return
+
+    parent_frame_id = _ensure_parent_frame_registered(
+        graph, parent_frame_id, experiment_node_id
+    )
+    if not parent_frame_id:
         return
     if pending_ctx.frame_id == parent_frame_id:
         return
@@ -166,8 +223,45 @@ def _register_frame_transition_on_spawn(
         new_frame,
         trigger=pc.get("reason_code", "REFRAME"),
         sample_n=pending_ctx.population_n,
+        triggering_experiment_id=experiment_node_id,
+        planner_action_code=planner_action_code,
+        planner_score=planner_score,
     )
     graph.persist_frames()
+
+
+def _record_session_failure(
+    graph: ResearchGraph,
+    *,
+    experiment_node_id: str,
+    operation: str,
+    error: Exception,
+    tool_result: Optional[ToolResult] = None,
+) -> None:
+    """Mark session ERROR/INCOMPLETE with auditable failure context; preserve committed lineage."""
+    exp = graph.get_node(experiment_node_id)
+    frame_id = ""
+    for pid in exp.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.question_context:
+            frame_id = parent.question_context.frame_id or graph.get_frame_registry().active_frame_id
+            break
+
+    graph.set_session_status(SessionStatus.ERROR)
+    graph.session.session_stop_reason = {
+        "code": "DOWNSTREAM_FAILURE",
+        "operation": operation,
+        "experiment_node_id": experiment_node_id,
+        "frame_id": frame_id,
+        "error_type": type(error).__name__,
+        "error_message": str(error),
+        "experiment_executed": tool_result is not None,
+    }
+    if tool_result is not None:
+        exp.terminal_reason = f"PLANNING_FAILED:{operation}"
+    graph.persist_frames()
+    graph.persist_frontier()
+    graph.persist_search_accounting()
 
 
 def record_planning_on_experiment(
@@ -512,6 +606,14 @@ def _spawn_from_frontier_item(
         "frontier_id": item.frontier_id,
         "from_frontier": True,
     }
+    parent_frame_id = _resolve_parent_frame_id(graph, parent_id)
+    _register_frame_transition_on_spawn(
+        graph,
+        pending_ctx=pending_ctx,
+        parent_frame_id=parent_frame_id,
+        experiment_node_id=parent_id,
+        planner_action_code=cand.action_code,
+    )
     qid = graph.spawn_child_question_from_experiment(
         parent_id,
         question_text=cand.question_text or item.question_text,
@@ -546,6 +648,7 @@ def apply_plan_decision(
     decision: PlanDecision,
     *,
     panel_columns: Optional[Tuple[str, ...]] = None,
+    planner_score: Optional[float] = None,
 ) -> ControllerStepResult:
     """Apply planner decision — STOP_BRANCH returns to frontier; STOP_SESSION ends session."""
     if decision.decision_type in (PlanDecisionType.STOP_BRANCH, PlanDecisionType.STOP):
@@ -666,6 +769,16 @@ def apply_plan_decision(
             "triggering_observation", selected.action_code
         )
 
+    parent_frame_id = _resolve_parent_frame_id(graph, experiment_node_id)
+    _register_frame_transition_on_spawn(
+        graph,
+        pending_ctx=pending_ctx,
+        parent_frame_id=parent_frame_id,
+        experiment_node_id=experiment_node_id,
+        planner_action_code=selected.action_code,
+        planner_score=planner_score,
+    )
+
     qid = graph.spawn_child_question_from_experiment(
         experiment_node_id,
         question_text=selected.question_text,
@@ -673,13 +786,6 @@ def apply_plan_decision(
         evidence_summary=evidence_summary,
         question_context=pending_ctx,
     )
-    parent_frame_id = ""
-    for pid in graph.get_node(experiment_node_id).parent_node_ids:
-        p = graph.get_node(pid)
-        if p.question_context:
-            parent_frame_id = p.question_context.frame_id
-            break
-    _register_frame_transition_on_spawn(graph, pending_ctx=pending_ctx, parent_frame_id=parent_frame_id)
     eid = graph.add_experiment(question_node_id=qid, spec=selected.draft_spec)
     return ControllerStepResult(
         tool_result=None,
@@ -720,22 +826,45 @@ def run_experiment_and_plan(
     )
     record_experiment_executed(graph.get_search_accounting(), graph, experiment_node_id)
     graph.persist_search_accounting()
-    planning = plan_after_experiment(
-        graph,
-        experiment_node_id,
-        tool_result,
-        registry,
-        research_scope=research_scope,
-        panel_columns=panel_columns,
-    )
-    step = apply_plan_decision(
-        graph,
-        experiment_node_id,
-        planning.decision,
-        panel_columns=panel_columns,
-    )
-    step.tool_result = tool_result
-    step.planning = planning
+    try:
+        planning = plan_after_experiment(
+            graph,
+            experiment_node_id,
+            tool_result,
+            registry,
+            research_scope=research_scope,
+            panel_columns=panel_columns,
+        )
+        planner_score: Optional[float] = None
+        if planning.decision.selected is not None:
+            sel_entry = planning.candidate_scores.get(planning.decision.selected.action_id, {})
+            if isinstance(sel_entry, dict):
+                planner_score = sel_entry.get("total")
+        step = apply_plan_decision(
+            graph,
+            experiment_node_id,
+            planning.decision,
+            panel_columns=panel_columns,
+            planner_score=planner_score,
+        )
+        step.tool_result = tool_result
+        step.planning = planning
+    except Exception as exc:
+        _record_session_failure(
+            graph,
+            experiment_node_id=experiment_node_id,
+            operation="plan_after_experiment",
+            error=exc,
+            tool_result=tool_result,
+        )
+        _maybe_persist_graph(graph, auto_persist=auto_persist, persist_dir=persist_dir)
+        return ControllerStepResult(
+            tool_result=tool_result,
+            planning=None,
+            terminal=True,
+            session_terminal=True,
+            terminal_reason=f"ERROR:{type(exc).__name__}",
+        )
     _maybe_persist_graph(graph, auto_persist=auto_persist, persist_dir=persist_dir)
     return step
 
