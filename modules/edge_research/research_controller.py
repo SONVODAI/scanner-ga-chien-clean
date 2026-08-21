@@ -50,6 +50,10 @@ from modules.edge_research.research_operational_awareness import (
     mark_awareness_consulted,
     rebuild_awareness_at_horizon,
 )
+from modules.edge_research.research_competence import (
+    build_research_competence_model,
+    record_competence_audit,
+)
 from modules.edge_research.research_planner import PlanDecision, PlanDecisionType, plan_next_action, score_all_candidates
 from modules.edge_research.research_portfolio import (
     BranchPortfolioStatus,
@@ -90,6 +94,7 @@ class PlanningRecord:
     assessment: ResearchAssessment
     decision: PlanDecision
     candidate_scores: Dict[str, Any] = field(default_factory=dict)
+    competence_model: Optional[Dict[str, Any]] = None
 
 
 @dataclass
@@ -609,6 +614,7 @@ def plan_after_experiment(
     research_scope: Optional[Dict[str, Any]] = None,
     panel_columns: Optional[Tuple[str, ...]] = None,
     consult_operational_awareness: bool = True,
+    consult_competence: bool = True,
 ) -> PlanningRecord:
     """Interpret result, generate candidates, plan next step, record on graph."""
     assessment = interpret_tool_result(graph, experiment_node_id, tool_result)
@@ -617,6 +623,15 @@ def plan_after_experiment(
         constructible = awareness.constructible_explanatory_features()
         awareness = mark_awareness_consulted(awareness, constructible_features=constructible)
         graph._operational_awareness = awareness  # noqa: SLF001
+
+    competence = None
+    if consult_competence:
+        competence = build_research_competence_model(
+            assessment,
+            awareness,
+            graph=graph,
+            experiment_node_id=experiment_node_id,
+        )
 
     candidates = generate_action_candidates(
         assessment,
@@ -676,6 +691,22 @@ def plan_after_experiment(
         allocation,
         local_opportunities=local_opps,
     )
+
+    if consult_competence and competence is not None:
+        sel_id = decision.selected.action_id if decision.selected else ""
+        alt_id = ""
+        if allocation.selected and allocation.selected.action_id != sel_id:
+            alt_id = allocation.selected.action_id
+        record_competence_audit(
+            graph,
+            experiment_node_id=experiment_node_id,
+            competence=competence,
+            candidates=candidates,
+            selected_action_id=sel_id,
+            allocator_agreed=(alt_id == "" or alt_id == sel_id),
+            alternative_action_id=alt_id,
+        )
+
     serializable_scores = {
         aid: {"total": total, "components": comp}
         for aid, (total, comp) in scores.items()
@@ -699,6 +730,7 @@ def plan_after_experiment(
         assessment=assessment,
         decision=decision,
         candidate_scores=serializable_scores,
+        competence_model=competence.to_dict() if competence is not None else None,
     )
 
 
