@@ -322,6 +322,23 @@ def run_production_daily_research(
         )
     ]
 
+    # Phase 3K.3 — calibration ledger update (LIVE_FORWARD only)
+    calibration_result: Dict[str, Any] = {"updated": False, "reason": "not_live_forward"}
+    if run_mode == LIVE_FORWARD and run.counts_as_forward_evidence:
+        from modules.edge_research.opr_bridge.production_calibration_updater import update_calibration_ledger
+
+        all_oids = list(set(list(run.observations_born) + list(run.observations_reassessed)))
+        calibration_result = update_calibration_ledger(
+            panel=panel,
+            as_of_trade_date=target_trade_date,
+            run_id=run_id,
+            run_mode=run_mode,
+            run_counts_as_forward_evidence=run.counts_as_forward_evidence,
+            newly_released_outcome_ids=run.forward_outcomes_released,
+            observation_ids=all_oids,
+            data_dir=data_dir,
+        )
+
     run.run_disposition = RunDisposition.SUCCESS.value
     run.run_completed_at = utc_now_iso()
     run.frozen = True
@@ -340,6 +357,7 @@ def run_production_daily_research(
         "notifications": [n.to_dict() for n in notifications],
         "assessment_result": assessment_result,
         "forward_clock": forward_clock,
+        "calibration_result": calibration_result,
         "observability": obs.to_dict(),
         "idempotent_replay": False,
         "counts_as_forward_evidence": run.counts_as_forward_evidence,

@@ -52,6 +52,15 @@ OBSERVATION_MODULES = (
     "production_notification_contract.py",
     "production_daily_run_orchestrator.py",
     "production_daily_run_entrypoint.py",
+    "production_calibration_records.py",
+    "production_forward_evidence_eligibility.py",
+    "production_pre_outcome_snapshot.py",
+    "production_calibration_cohorts.py",
+    "production_calibration_ledger_persistence.py",
+    "production_calibration_engine.py",
+    "production_calibration_updater.py",
+    "production_calibration_self_knowledge.py",
+    "production_calibration_simulation.py",
 )
 
 
