@@ -47,8 +47,11 @@ from modules.edge_research.opr_bridge.first_experiment_execution_records import 
 from modules.edge_research.opr_bridge.first_experiment_interpretation_records import (
     STOP_FIRST_EVIDENCE_INTERPRETED,
 )
+from modules.edge_research.opr_bridge.first_experiment_research_decision_records import (
+    STOP_RESEARCH_DECISION_FROZEN,
+)
 
-ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j4"
+ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j5"
 
 # Documented STOP boundaries — preserved from Phase 3I
 STOP_PROPOSITION_PERSISTED = "STOP_PROPOSITION_PERSISTED"
@@ -78,6 +81,7 @@ class ProductionOprCycleResult:
     frozen_integrity: Optional[Dict[str, Any]] = None
     first_experiment: Optional[Dict[str, Any]] = None
     first_experiment_interpretation: Optional[Dict[str, Any]] = None
+    first_experiment_research_decision: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -93,6 +97,7 @@ class ProductionOprCycleResult:
             "frozen_integrity": self.frozen_integrity,
             "first_experiment": self.first_experiment,
             "first_experiment_interpretation": self.first_experiment_interpretation,
+            "first_experiment_research_decision": self.first_experiment_research_decision,
             "error": self.error,
         }
 
@@ -155,13 +160,15 @@ def run_production_opr_cycle(
     reopening_opportunity: Optional[ResearchOpportunityState] = None,
     execute_first_experiment: bool = False,
     interpret_first_experiment: bool = False,
+    decide_first_experiment: bool = False,
 ) -> ProductionOprCycleResult:
     """
-    Production-facing OPR cycle: detect → idempotency → persist → optional first-experiment execution/interpretation.
+    Production-facing OPR cycle: detect → idempotency → persist → optional first-experiment path.
 
     When execute_first_experiment=True, runs 3J.2 selection then 3J.3 execution.
     When interpret_first_experiment=True (requires execution), runs 3J.4 evidence interpretation.
-    Does NOT generate research decisions or invoke synthesis hooks.
+    When decide_first_experiment=True (requires interpretation), runs 3J.5 research decision.
+    Does NOT generate second experiment packages or invoke synthesis hooks.
     """
     result = ProductionOprCycleResult()
     result.frozen_integrity = verify_frozen_scientific_integrity()
@@ -203,6 +210,10 @@ def run_production_opr_cycle(
             result.first_experiment_interpretation = record.first_experiment_interpretation
             if STOP_FIRST_EVIDENCE_INTERPRETED not in result.stop_boundaries:
                 result.stop_boundaries.append(STOP_FIRST_EVIDENCE_INTERPRETED)
+        if decide_first_experiment and record.first_experiment_research_decision:
+            result.first_experiment_research_decision = record.first_experiment_research_decision
+            if STOP_RESEARCH_DECISION_FROZEN not in result.stop_boundaries:
+                result.stop_boundaries.append(STOP_RESEARCH_DECISION_FROZEN)
         return result
 
     session_id = new_production_session_id(detection.proposition_id or "unknown")
@@ -299,6 +310,24 @@ def run_production_opr_cycle(
             write_opr_session(record, data_dir=data_dir)
             result.first_experiment_interpretation = ix.to_dict()
 
+            if decide_first_experiment and record.first_experiment_interpretation:
+                from modules.edge_research.opr_bridge.production_first_experiment_research_decision import (
+                    run_production_first_experiment_research_decision,
+                )
+
+                dx = run_production_first_experiment_research_decision(
+                    detection.proposition_record,
+                    session_id=session_id,
+                    package_dict=record.initial_experiment_package or {},
+                    interpretation_dict=record.first_experiment_interpretation,
+                    data_dir=data_dir,
+                )
+                if dx.decision and dx.decision.envelope:
+                    record.first_experiment_research_decision = dx.decision.envelope.to_dict()
+                stop_boundaries.append(STOP_RESEARCH_DECISION_FROZEN)
+                write_opr_session(record, data_dir=data_dir)
+                result.first_experiment_research_decision = dx.to_dict()
+
     result.outcome = "SESSION_CREATED"
     result.session_id = session_id
     result.session_record = record
@@ -337,4 +366,5 @@ def list_documented_stop_boundaries() -> List[Dict[str, str]]:
         {"code": STOP_FROZEN_LINEAGE_REPLAY, "description": "Historical events replayed from artifacts only"},
         {"code": STOP_FIRST_EXPERIMENT_EXECUTED, "description": "First experiment executed; auditable ToolResult persisted (3J.3)"},
         {"code": STOP_FIRST_EVIDENCE_INTERPRETED, "description": "First experiment evidence interpreted; EpistemicUpdate persisted (3J.4)"},
+        {"code": STOP_RESEARCH_DECISION_FROZEN, "description": "Research decision frozen; no second experiment generated (3J.5)"},
     ]

@@ -69,6 +69,7 @@ class OprProductionSessionRecord:
     frozen_interpretation_contract: Optional[Dict[str, Any]] = None
     first_experiment_interpretation: Optional[Dict[str, Any]] = None
     first_experiment_epistemic_update: Optional[Dict[str, Any]] = None
+    first_experiment_research_decision: Optional[Dict[str, Any]] = None
 
     def record_hash(self) -> str:
         return stable_hash(
@@ -103,6 +104,7 @@ class OprProductionSessionRecord:
             "frozen_interpretation_contract": self.frozen_interpretation_contract,
             "first_experiment_interpretation": self.first_experiment_interpretation,
             "first_experiment_epistemic_update": self.first_experiment_epistemic_update,
+            "first_experiment_research_decision": self.first_experiment_research_decision,
             "record_hash": self.record_hash(),
         }
 
@@ -129,6 +131,7 @@ class OprProductionSessionRecord:
             frozen_interpretation_contract=payload.get("frozen_interpretation_contract"),
             first_experiment_interpretation=payload.get("first_experiment_interpretation"),
             first_experiment_epistemic_update=payload.get("first_experiment_epistemic_update"),
+            first_experiment_research_decision=payload.get("first_experiment_research_decision"),
         )
 
 
