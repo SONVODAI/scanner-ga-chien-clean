@@ -65,6 +65,14 @@ class ReopeningEvaluationOutcome(str, Enum):
     INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
 
 
+class ResearchActivityTransition(str, Enum):
+    """Research activity transitions — not epistemic states."""
+
+    ACTIVE = "ACTIVE"
+    DORMANT = "DORMANT"
+    REOPEN_CANDIDATE = "REOPEN_CANDIDATE"
+
+
 # Generic independence threshold — not tuned from T2; structural ceiling for "materially different"
 DEFAULT_MATERIAL_OVERLAP_CEILING = 0.5
 
@@ -142,6 +150,42 @@ class ResearchDormancyRecord:
             "independence_limitations": list(self.independence_limitations),
             "reopening_conditions": [c.to_dict() for c in self.reopening_conditions],
             "forbidden_reopening_triggers": list(self.forbidden_reopening_triggers),
+            "created_at": self.created_at,
+            "record_hash": self.record_hash,
+        }
+
+
+@dataclass(frozen=True)
+class ReopeningEvaluationRecord:
+    """Authoritative append-only reopening evaluation (lifecycle-integrated)."""
+
+    evaluation_id: str
+    dormancy_id: str
+    dormancy_record_hash: str
+    proposition_id: str
+    proposition_hash: str
+    opportunity_state_hash: str
+    outcome: str
+    rationale: str
+    satisfied_conditions: Tuple[str, ...]
+    rejected_triggers: Tuple[str, ...]
+    trigger_fingerprint: str
+    created_at: str
+    record_hash: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "evaluation_id": self.evaluation_id,
+            "dormancy_id": self.dormancy_id,
+            "dormancy_record_hash": self.dormancy_record_hash,
+            "proposition_id": self.proposition_id,
+            "proposition_hash": self.proposition_hash,
+            "opportunity_state_hash": self.opportunity_state_hash,
+            "outcome": self.outcome,
+            "rationale": self.rationale,
+            "satisfied_conditions": list(self.satisfied_conditions),
+            "rejected_triggers": list(self.rejected_triggers),
+            "trigger_fingerprint": self.trigger_fingerprint,
             "created_at": self.created_at,
             "record_hash": self.record_hash,
         }

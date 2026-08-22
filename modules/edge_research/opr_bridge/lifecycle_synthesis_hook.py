@@ -30,22 +30,50 @@ AUTHORITY_EPISTEMIC_UPDATE = "EpistemicUpdateRecord"
 AUTHORITY_KNOWLEDGE_STATE = "EvidenceSynthesisRecord"
 AUTHORITY_RESEARCH_PRIORITY = "ResearchPriorityDecision"
 AUTHORITY_IMMEDIATE_DECISION = "ResearchDecisionRecord"  # transitional single-evidence
+AUTHORITY_FRONTIER = "ScientificFrontierAssessment"
+AUTHORITY_DORMANCY = "ResearchDormancyRecord"
+AUTHORITY_REOPENING = "ReopeningEvaluationRecord"
 
 
 @dataclass
 class LifecycleKnowledgeState:
-    """Append-only proposition evidence + synthesis history."""
+    """Append-only proposition evidence + synthesis + research-activity history."""
 
     proposition_id: str
     evidence_events: List[Dict[str, Any]] = field(default_factory=list)
     synthesis_history: List[Dict[str, Any]] = field(default_factory=list)
     priority_history: List[Dict[str, Any]] = field(default_factory=list)
+    frontier_history: List[Dict[str, Any]] = field(default_factory=list)
+    dormancy_history: List[Dict[str, Any]] = field(default_factory=list)
+    reopening_history: List[Dict[str, Any]] = field(default_factory=list)
+    research_activity_state: str = "ACTIVE"
     outcomes: List[SynthesisIntegrationOutcome] = field(default_factory=list)
     _cutoff_cache: Dict[str, SynthesisIntegrationOutcome] = field(default_factory=dict)
+    _dormancy_idempotency_keys: List[str] = field(default_factory=list)
+    _opportunity_hashes_seen: List[str] = field(default_factory=list)
+    _abstract_evidence_specs: Optional[List[Dict[str, Any]]] = None
 
     def cutoff_key_for_events(self, events: List[Dict[str, Any]]) -> str:
         ids = [e["epistemic_update"]["update_id"] for e in events]
         return stable_hash({"proposition_id": self.proposition_id, "epu_ids": ids})
+
+    def latest_synthesis(self) -> Optional[Dict[str, Any]]:
+        return self.synthesis_history[-1] if self.synthesis_history else None
+
+    def latest_priority(self) -> Optional[Dict[str, Any]]:
+        return self.priority_history[-1] if self.priority_history else None
+
+    def latest_frontier(self) -> Optional[Dict[str, Any]]:
+        return self.frontier_history[-1] if self.frontier_history else None
+
+    def latest_dormancy(self) -> Optional[Dict[str, Any]]:
+        return self.dormancy_history[-1] if self.dormancy_history else None
+
+    def latest_reopening(self) -> Optional[Dict[str, Any]]:
+        return self.reopening_history[-1] if self.reopening_history else None
+
+    def is_dormant(self) -> bool:
+        return self.research_activity_state == "DORMANT"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -53,6 +81,10 @@ class LifecycleKnowledgeState:
             "evidence_event_count": len(self.evidence_events),
             "synthesis_history_count": len(self.synthesis_history),
             "priority_history_count": len(self.priority_history),
+            "frontier_history_count": len(self.frontier_history),
+            "dormancy_history_count": len(self.dormancy_history),
+            "reopening_history_count": len(self.reopening_history),
+            "research_activity_state": self.research_activity_state,
             "epu_ids": [e["epistemic_update"]["update_id"] for e in self.evidence_events],
         }
 
