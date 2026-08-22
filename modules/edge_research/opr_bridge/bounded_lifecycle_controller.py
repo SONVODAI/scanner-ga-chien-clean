@@ -21,6 +21,7 @@ from modules.edge_research.opr_bridge.bounded_lifecycle_records import (
     ResearchBudget,
     STOP_LIFECYCLE_BOUNDED,
     STOP_LIFECYCLE_BUDGET_EXHAUSTED,
+    STOP_LIFECYCLE_DESIGN_SILENCE,
     STOP_LIFECYCLE_FAIL_CLOSED,
     STOP_LIFECYCLE_SCIENTIFIC_STOP,
     is_authoritative_scientific_stop,
@@ -102,6 +103,79 @@ def _log_iteration(
             "outcome": outcome,
             "detail": detail or {},
         }
+    )
+
+
+def _package_disposition(package: Optional[Dict[str, Any]]) -> str:
+    return str((package or {}).get("disposition") or "")
+
+
+def _is_execution_eligible_package(package: Optional[Dict[str, Any]]) -> bool:
+    """Execution may occur only when the persisted design disposition is SELECTED."""
+    return _package_disposition(package) == "SELECTED"
+
+
+def _design_silence_termination_reason(disposition: str) -> str:
+    return f"{STOP_LIFECYCLE_DESIGN_SILENCE}:{disposition or 'UNKNOWN_DISPOSITION'}"
+
+
+def _is_design_silence_termination(record: OprProductionSessionRecord) -> bool:
+    return STOP_LIFECYCLE_DESIGN_SILENCE in (record.stop_boundaries_reached or [])
+
+
+def _finalize_design_silence(
+    prop: Dict[str, Any],
+    panel: pd.DataFrame,
+    record: OprProductionSessionRecord,
+    history: List[ExperimentHistoryEntry],
+    entry: ExperimentHistoryEntry,
+    budget: ResearchBudget,
+    *,
+    run_id: str,
+    start_phase: str,
+    stop_boundaries: List[str],
+    iteration_log: List[Dict[str, Any]],
+    phase_in: str,
+    data_dir: Optional[Path],
+) -> BoundedLifecycleResult:
+    disposition = _package_disposition(entry.package)
+    termination_reason = _design_silence_termination_reason(disposition)
+    entry.stop_boundaries.append(STOP_LIFECYCLE_DESIGN_SILENCE)
+    _append_boundary(record, STOP_LIFECYCLE_DESIGN_SILENCE)
+    _append_boundary(record, STOP_LIFECYCLE_BOUNDED)
+    record.lifecycle_phase = LifecyclePhase.STOPPED
+    sync_legacy_fields(record, history)
+    write_opr_session(record, data_dir=data_dir)
+    _log_iteration(
+        iteration_log,
+        ordinal=entry.ordinal,
+        stage="design_silence_stop",
+        phase_in=phase_in,
+        phase_out=LifecyclePhase.STOPPED,
+        outcome="design_silence",
+        detail={"disposition": disposition, "termination_reason": termination_reason},
+    )
+    audit = _build_audit(
+        record,
+        history,
+        budget,
+        run_id=run_id,
+        start_phase=start_phase,
+        end_phase=LifecyclePhase.STOPPED,
+        termination_reason=termination_reason,
+    )
+    record.lifecycle_audit = audit.to_dict()
+    write_opr_session(record, data_dir=data_dir)
+    experiments_completed = len([e for e in history if e.execution])
+    return BoundedLifecycleResult(
+        outcome="DESIGN_SILENCE",
+        session_id=record.session_id,
+        termination_reason=termination_reason,
+        lifecycle_phase=LifecyclePhase.STOPPED,
+        experiments_completed=experiments_completed,
+        stop_boundaries=stop_boundaries + [STOP_LIFECYCLE_DESIGN_SILENCE, STOP_LIFECYCLE_BOUNDED],
+        audit=audit,
+        iteration_log=iteration_log,
     )
 
 
@@ -486,6 +560,44 @@ def run_bounded_lifecycle_loop(
         phase, ordinal, entry = resolve_lifecycle_phase(record)
 
         if phase == LifecyclePhase.STOPPED:
+            if _is_design_silence_termination(record):
+                termination_reason = next(
+                    (
+                        b
+                        for b in reversed(record.stop_boundaries_reached or [])
+                        if str(b).startswith(f"{STOP_LIFECYCLE_DESIGN_SILENCE}:")
+                    ),
+                    STOP_LIFECYCLE_DESIGN_SILENCE,
+                )
+                if termination_reason == STOP_LIFECYCLE_DESIGN_SILENCE:
+                    for entry in reversed(history):
+                        if entry.package and not entry.execution:
+                            disposition = _package_disposition(entry.package)
+                            if disposition and disposition != "SELECTED":
+                                termination_reason = _design_silence_termination_reason(disposition)
+                                break
+                audit = _build_audit(
+                    record,
+                    history,
+                    budget,
+                    run_id=run_id,
+                    start_phase=start_phase,
+                    end_phase=LifecyclePhase.STOPPED,
+                    termination_reason=termination_reason,
+                )
+                record.lifecycle_audit = audit.to_dict()
+                write_opr_session(record, data_dir=data_dir)
+                return BoundedLifecycleResult(
+                    outcome="DESIGN_SILENCE",
+                    session_id=record.session_id,
+                    termination_reason=termination_reason,
+                    lifecycle_phase=LifecyclePhase.STOPPED,
+                    experiments_completed=len([e for e in history if e.execution]),
+                    stop_boundaries=list(record.stop_boundaries_reached),
+                    audit=audit,
+                    iteration_log=iteration_log,
+                )
+
             last = max([e for e in history if e.decision], key=lambda e: e.ordinal, default=None)
             stop_reason = (last.decision or {}).get("stop_reason", "scientific_stop") if last else "scientific_stop"
             record.lifecycle_phase = LifecyclePhase.STOPPED
@@ -637,6 +749,21 @@ def run_bounded_lifecycle_loop(
 
         if phase == LifecyclePhase.EXPERIMENT_DESIGNED and ordinal >= 2:
             entry = _ensure_history_entry(history, ordinal)
+            if not _is_execution_eligible_package(entry.package):
+                return _finalize_design_silence(
+                    prop,
+                    panel,
+                    record,
+                    history,
+                    entry,
+                    budget,
+                    run_id=run_id,
+                    start_phase=start_phase,
+                    stop_boundaries=stop_boundaries,
+                    iteration_log=iteration_log,
+                    phase_in=phase,
+                    data_dir=data_dir,
+                )
             ok, err = _run_follow_on_execute(prop, panel, history, entry, record, data_dir=data_dir)
             _log_iteration(iteration_log, ordinal=ordinal, stage="execute", phase_in=phase, phase_out="EXECUTED", outcome="ok" if ok else err or "fail")
             if not ok:

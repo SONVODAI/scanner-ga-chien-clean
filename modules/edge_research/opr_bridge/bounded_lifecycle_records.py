@@ -10,12 +10,13 @@ from typing import Any, Dict, List, Optional, Tuple
 from modules.edge_research.opr_bridge.evidence_synthesis_records import new_id, stable_hash, utc_now_iso
 
 LIFECYCLE_VERSION = "bounded_autonomous_lifecycle_v1_3j10"
-CONTROLLER_VERSION = "bounded_lifecycle_controller_v1_3j12"
+CONTROLLER_VERSION = "bounded_lifecycle_controller_v1_3j14a"
 
 STOP_LIFECYCLE_BOUNDED = "STOP_LIFECYCLE_BOUNDED"
 STOP_LIFECYCLE_SCIENTIFIC_STOP = "STOP_LIFECYCLE_SCIENTIFIC_STOP"
 STOP_LIFECYCLE_BUDGET_EXHAUSTED = "STOP_LIFECYCLE_BUDGET_EXHAUSTED"
 STOP_LIFECYCLE_FAIL_CLOSED = "STOP_LIFECYCLE_FAIL_CLOSED"
+STOP_LIFECYCLE_DESIGN_SILENCE = "STOP_LIFECYCLE_DESIGN_SILENCE"
 
 # Authoritative scientific STOP reasons from research deciders (3J.5 / 3J.9).
 SCIENTIFIC_STOP_FAMILIES = frozenset(

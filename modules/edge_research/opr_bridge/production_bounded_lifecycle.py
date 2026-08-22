@@ -18,6 +18,7 @@ from modules.edge_research.opr_bridge.bounded_lifecycle_records import (
     LifecyclePhase,
     ResearchBudget,
     STOP_LIFECYCLE_BOUNDED,
+    STOP_LIFECYCLE_DESIGN_SILENCE,
 )
 from modules.edge_research.opr_bridge.bounded_lifecycle_state import (
     build_experiment_history,
@@ -108,14 +109,35 @@ def run_bounded_autonomous_research(
     if phase == LifecyclePhase.STOPPED:
         history = build_experiment_history(record)
         sync_legacy_fields(record, history)
-        lifecycle = BoundedLifecycleResult(
-            outcome="SCIENTIFIC_STOP",
-            session_id=record.session_id,
-            termination_reason=(history[-1].decision or {}).get("stop_reason", "authoritative_stop"),
-            lifecycle_phase=LifecyclePhase.STOPPED,
-            experiments_completed=len([e for e in history if e.execution]),
-            stop_boundaries=list(record.stop_boundaries_reached),
-        )
+        if STOP_LIFECYCLE_DESIGN_SILENCE in (record.stop_boundaries_reached or []):
+            termination_reason = (record.lifecycle_audit or {}).get("termination_reason")
+            if not termination_reason:
+                for entry in reversed(history):
+                    if entry.package and not entry.execution:
+                        disposition = str((entry.package or {}).get("disposition") or "")
+                        if disposition and disposition != "SELECTED":
+                            termination_reason = f"{STOP_LIFECYCLE_DESIGN_SILENCE}:{disposition}"
+                            break
+                termination_reason = termination_reason or STOP_LIFECYCLE_DESIGN_SILENCE
+            lifecycle = BoundedLifecycleResult(
+                outcome="DESIGN_SILENCE",
+                session_id=record.session_id,
+                termination_reason=termination_reason,
+                lifecycle_phase=LifecyclePhase.STOPPED,
+                experiments_completed=len([e for e in history if e.execution]),
+                stop_boundaries=list(record.stop_boundaries_reached),
+            )
+        else:
+            lifecycle = BoundedLifecycleResult(
+                outcome="SCIENTIFIC_STOP",
+                session_id=record.session_id,
+                termination_reason=(history[-1].decision or {}).get("stop_reason", "authoritative_stop")
+                if history
+                else "authoritative_stop",
+                lifecycle_phase=LifecyclePhase.STOPPED,
+                experiments_completed=len([e for e in history if e.execution]),
+                stop_boundaries=list(record.stop_boundaries_reached),
+            )
         stop_boundaries.append(STOP_LIFECYCLE_BOUNDED)
         return ProductionBoundedLifecycleResult(
             lifecycle=lifecycle,

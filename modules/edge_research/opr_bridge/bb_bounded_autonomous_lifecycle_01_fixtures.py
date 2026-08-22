@@ -74,7 +74,8 @@ def run_cf_arl_counterfactuals() -> Dict[str, Any]:
             history = build_experiment_history(r1.session_record) if r1.session_record else []
             last_dec = history[-1].decision if history else None
             cf["CF-ARL1"] = {
-                "passed": r1.lifecycle.outcome in ("SCIENTIFIC_STOP", "BUDGET_EXHAUSTED", "FAILED_CLOSED")
+                "passed": r1.lifecycle.outcome
+                in ("SCIENTIFIC_STOP", "BUDGET_EXHAUSTED", "FAILED_CLOSED", "DESIGN_SILENCE")
                 or (
                     last_dec
                     and is_authoritative_scientific_stop(last_dec)
