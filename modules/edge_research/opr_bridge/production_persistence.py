@@ -66,6 +66,9 @@ class OprProductionSessionRecord:
     lineage_artifacts: List[str] = field(default_factory=list)
     initial_experiment_package: Optional[Dict[str, Any]] = None
     first_experiment_execution: Optional[Dict[str, Any]] = None
+    frozen_interpretation_contract: Optional[Dict[str, Any]] = None
+    first_experiment_interpretation: Optional[Dict[str, Any]] = None
+    first_experiment_epistemic_update: Optional[Dict[str, Any]] = None
 
     def record_hash(self) -> str:
         return stable_hash(
@@ -97,6 +100,9 @@ class OprProductionSessionRecord:
             "lineage_artifacts": list(self.lineage_artifacts),
             "initial_experiment_package": self.initial_experiment_package,
             "first_experiment_execution": self.first_experiment_execution,
+            "frozen_interpretation_contract": self.frozen_interpretation_contract,
+            "first_experiment_interpretation": self.first_experiment_interpretation,
+            "first_experiment_epistemic_update": self.first_experiment_epistemic_update,
             "record_hash": self.record_hash(),
         }
 
@@ -120,6 +126,9 @@ class OprProductionSessionRecord:
             lineage_artifacts=list(payload.get("lineage_artifacts") or []),
             initial_experiment_package=payload.get("initial_experiment_package"),
             first_experiment_execution=payload.get("first_experiment_execution"),
+            frozen_interpretation_contract=payload.get("frozen_interpretation_contract"),
+            first_experiment_interpretation=payload.get("first_experiment_interpretation"),
+            first_experiment_epistemic_update=payload.get("first_experiment_epistemic_update"),
         )
 
 

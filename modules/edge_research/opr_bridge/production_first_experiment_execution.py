@@ -10,6 +10,10 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
+from modules.edge_research.opr_bridge.first_experiment_contract_freeze import (
+    FREEZE_POINT_PRE_EXECUTION,
+    freeze_interpretation_contract_pre_result,
+)
 from modules.edge_research.opr_bridge.first_experiment_execution_persistence import (
     envelope_from_dict,
     lookup_execution_by_identity,
@@ -33,6 +37,7 @@ class ProductionFirstExperimentResult:
     integration_version: str = INTEGRATION_VERSION
     package_dict: Optional[Dict[str, Any]] = None
     execution: Optional[FirstExperimentExecutionResult] = None
+    frozen_contract_ref: Optional[Dict[str, Any]] = None
     stop_boundaries: List[str] = field(default_factory=list)
     idempotent_replay: bool = False
 
@@ -41,6 +46,7 @@ class ProductionFirstExperimentResult:
             "integration_version": self.integration_version,
             "package": self.package_dict,
             "execution": self.execution.to_dict() if self.execution else None,
+            "frozen_contract_ref": self.frozen_contract_ref,
             "stop_boundaries": list(self.stop_boundaries),
             "idempotent_replay": self.idempotent_replay,
         }
@@ -79,6 +85,8 @@ def run_production_first_experiment_execution(
     )
     from modules.edge_research.research_state import ExperimentSpec, compute_experiment_content_hash
 
+    exp_hash = ""
+    frozen_ref = None
     if package.selected_experiment_spec:
         spec = ExperimentSpec.from_dict(package.selected_experiment_spec)
         exp_hash = compute_experiment_content_hash(spec)
@@ -91,6 +99,22 @@ def run_production_first_experiment_execution(
         cached = lookup_execution_by_identity(exec_id, data_dir=data_dir)
         if cached and existing_envelope is None:
             existing_envelope = cached
+
+        if package.selected_candidate_id:
+            core_hash = ""
+            for c in package.deduplicated_candidates:
+                if c.candidate_id == package.selected_candidate_id:
+                    core_hash = c.scientific_action_core_hash
+                    break
+            frozen_ref = freeze_interpretation_contract_pre_result(
+                prop,
+                package_id=package.package_id,
+                experiment_content_hash=exp_hash,
+                scientific_action_core_hash=core_hash,
+                freeze_point=FREEZE_POINT_PRE_EXECUTION,
+            )
+    else:
+        frozen_ref = None
 
     execution = execute_first_experiment(
         package,
@@ -109,6 +133,7 @@ def run_production_first_experiment_execution(
     return ProductionFirstExperimentResult(
         package_dict=execution.package.to_dict() if hasattr(execution.package, "to_dict") else package.to_dict(),
         execution=execution,
+        frozen_contract_ref=frozen_ref.to_dict() if frozen_ref else None,
         stop_boundaries=stop,
         idempotent_replay=idempotent,
     )

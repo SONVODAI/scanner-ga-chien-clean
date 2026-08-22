@@ -1,0 +1,8 @@
+{
+  "git_head": "f452d7a61736333b50f7358e9976bdebf7c8e2d0",
+  "phase": "3J.4",
+  "cf_int_all_passed": true,
+  "frozen_hashes_unchanged": true,
+  "real_interpretation_outcome": "INTERPRETED",
+  "stop_boundary": "STOP_FIRST_EVIDENCE_INTERPRETED"
+}
