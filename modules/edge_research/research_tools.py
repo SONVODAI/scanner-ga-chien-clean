@@ -291,6 +291,18 @@ def resolve_cohort(
         sym_set = set(str(s) for s in symbol_filter)
         cohort = cohort[cohort["symbol"].astype(str).isin(sym_set)]
 
+    pop_spec_raw = research_scope.get("population_spec")
+    if pop_spec_raw:
+        from modules.edge_research.research_grammar import apply_population_spec, parse_population_spec
+
+        try:
+            pop = parse_population_spec(pop_spec_raw)
+            cohort, pop_n = apply_population_spec(cohort, pop)
+            diag["population_spec_applied"] = True
+            diag["population_spec_n"] = pop_n
+        except Exception as exc:
+            diag["population_spec_error"] = str(exc)
+
     diag["cohort_n"] = int(len(cohort))
     return cohort.copy(), diag
 
