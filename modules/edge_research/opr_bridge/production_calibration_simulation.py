@@ -112,6 +112,23 @@ def run_live_forward_mechanics_fixture(
     repo_root: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Create LIVE_FORWARD run in isolated temp dir for ledger mechanics verification."""
+    repo_root = repo_root or Path(__file__).resolve().parents[3]
+    from modules.edge_research.opr_bridge.blind_research_examination_runner import compute_research_policy_hashes
+    from modules.edge_research.opr_bridge.production_live_forward_genesis import (
+        build_genesis_record,
+        persist_genesis,
+    )
+
+    policy = compute_research_policy_hashes(repo_root)
+    genesis = build_genesis_record(
+        first_eligible_trade_date=target_trade_date,
+        code_commit="mechanics-fixture",
+        policy_hashes=policy,
+        dataset_identities={"panel": "mechanics_fixture"},
+        deployment_identity="mechanics_fixture",
+    )
+    persist_genesis(genesis, data_dir=data_dir)
+
     result = run_production_daily_research(
         panel,
         target_trade_date=target_trade_date,

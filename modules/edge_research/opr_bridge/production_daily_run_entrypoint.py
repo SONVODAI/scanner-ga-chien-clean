@@ -15,7 +15,9 @@ from modules.edge_research.opr_bridge.production_daily_run_orchestrator import (
 )
 from modules.edge_research.opr_bridge.production_daily_run_records import (
     BACKFILL_NON_FORWARD,
+    DAY_0_SMOKE,
     LIVE_FORWARD,
+    PRE_DEPLOYMENT_DRY_RUN,
     RunDisposition,
 )
 from modules.edge_research.opr_bridge.production_scheduling_contract import build_scheduling_contract
@@ -27,9 +29,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--mode",
         default=BACKFILL_NON_FORWARD,
-        choices=[BACKFILL_NON_FORWARD, LIVE_FORWARD, "HISTORICAL_REPLAY_TEST"],
+        choices=[BACKFILL_NON_FORWARD, LIVE_FORWARD, "HISTORICAL_REPLAY_TEST", DAY_0_SMOKE, PRE_DEPLOYMENT_DRY_RUN],
     )
     parser.add_argument("--data-dir", default=None)
+    parser.add_argument("--use-lock", action="store_true", help="Acquire exclusive run lock")
     parser.add_argument("--scheduling-contract", action="store_true")
     args = parser.parse_args(argv)
 
@@ -44,9 +47,13 @@ def main(argv: list[str] | None = None) -> int:
         target_trade_date=args.trade_date,
         run_mode=args.mode,
         data_dir=data_dir,
+        use_run_lock=args.use_lock,
     )
 
     disposition = result.get("run", {}).get("run_disposition", "FAILED_CLOSED")
+    if result.get("lock_held"):
+        print(json.dumps(result.get("lock") or result.get("run"), indent=2, default=str))
+        return 10
     exit_map = {
         RunDisposition.SUCCESS.value: 0,
         RunDisposition.SKIPPED_NON_TRADING_DAY.value: 3,

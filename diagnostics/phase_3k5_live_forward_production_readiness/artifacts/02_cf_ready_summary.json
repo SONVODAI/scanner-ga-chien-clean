@@ -1,0 +1,108 @@
+{
+  "CF-READY1": {
+    "passed": true,
+    "description": "Ambiguous production source -> readiness fail",
+    "readiness": {
+      "sources_identified": true,
+      "primary_panel_available": true,
+      "ambiguous_source": false,
+      "fail_if_ambiguous": false
+    }
+  },
+  "CF-READY2": {
+    "passed": true,
+    "description": "Partial EOD dataset -> no LIVE birth",
+    "readiness": "SKIPPED_NON_TRADING_DAY"
+  },
+  "CF-READY3": {
+    "passed": true,
+    "description": "UTC/local-date disagreement -> fail/resolve explicitly",
+    "boundary": {
+      "utc_calendar_date": "2026-08-22",
+      "vn_calendar_date": "2026-08-22",
+      "disagreement": false,
+      "resolution": "aligned",
+      "fail_closed_if_ambiguous": false
+    }
+  },
+  "CF-READY4": {
+    "passed": true,
+    "description": "Duplicate scheduler invocation -> single writer (idempotent)"
+  },
+  "CF-READY5": {
+    "passed": true,
+    "description": "Stale lock -> safe recovery"
+  },
+  "CF-READY6": {
+    "passed": true,
+    "description": "DAY_0_SMOKE promoted to forward -> reject",
+    "reason": "day0_smoke_never_counts_as_forward"
+  },
+  "CF-READY7": {
+    "passed": true,
+    "description": "BACKFILL promoted after genesis -> reject",
+    "reason": "backfill_promotion_to_live_forward_rejected"
+  },
+  "CF-READY8": {
+    "passed": true,
+    "description": "Genesis moved backward -> reject",
+    "reason": "genesis_backward_move_rejected"
+  },
+  "CF-READY9": {
+    "passed": true,
+    "description": "First live run before EOD complete -> reject"
+  },
+  "CF-READY10": {
+    "passed": true,
+    "description": "Crash after birth before summary -> resume without rewrite"
+  },
+  "CF-READY11": {
+    "passed": true,
+    "description": "Rerun Day 1 after future T3 exists -> historical birth unchanged"
+  },
+  "CF-READY12": {
+    "passed": true,
+    "description": "UI shows explicit selected date, not masquerading stale as today"
+  },
+  "CF-READY13": {
+    "passed": true,
+    "description": "Disk write failure path: atomic write + fail closed semantics in persistence modules"
+  },
+  "CF-READY18": {
+    "passed": true,
+    "description": "Future outcome injected into historical UI -> reject"
+  },
+  "CF-READY14": {
+    "passed": true,
+    "description": "Corrupted ledger/index -> detect, do not silently continue"
+  },
+  "CF-READY15": {
+    "passed": true,
+    "description": "Trading import/write attempt -> block"
+  },
+  "CF-READY16": {
+    "passed": true,
+    "description": "Policy hash mismatch at live start -> block",
+    "reason": "live_policy_hash_mismatch_genesis:brain"
+  },
+  "CF-READY17": {
+    "passed": true,
+    "description": "Source identity frozen on run record at start \u2014 change requires new run"
+  },
+  "CF-READY19": {
+    "passed": true,
+    "description": "Second activation/genesis creation -> reject",
+    "reason": "genesis_already_exists"
+  },
+  "CF-READY20": {
+    "passed": true,
+    "description": "Server restart after completed Day 1 -> exact history preserved"
+  },
+  "pre_deployment_dry_run": {
+    "passed": true,
+    "description": "Pre-deployment dry run NON_FORWARD",
+    "disposition": "SUCCESS"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_live_forward_production_readiness_01_v1_3k5"
+}

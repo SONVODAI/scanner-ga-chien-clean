@@ -26,8 +26,10 @@ from modules.edge_research.opr_bridge.production_daily_run_persistence import (
 )
 from modules.edge_research.opr_bridge.production_daily_run_records import (
     BACKFILL_NON_FORWARD,
+    DAY_0_SMOKE,
     HISTORICAL_REPLAY_TEST,
     LIVE_FORWARD,
+    PRE_DEPLOYMENT_DRY_RUN,
     ProductionDailyResearchRun,
     RunDisposition,
     RunPhase,
@@ -36,6 +38,10 @@ from modules.edge_research.opr_bridge.production_daily_run_records import (
     new_run_id,
     STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
 )
+from modules.edge_research.opr_bridge.production_live_forward_genesis import (
+    validate_live_forward_prerequisites,
+)
+from modules.edge_research.opr_bridge.production_run_lock import acquire_run_lock, release_run_lock
 from modules.edge_research.opr_bridge.production_data_readiness_gate import verify_data_readiness
 from modules.edge_research.opr_bridge.production_forward_clock import build_forward_clock_ledger
 from modules.edge_research.opr_bridge.production_living_research_observation import (
@@ -110,15 +116,32 @@ def run_production_daily_research(
     repo_root: Optional[Path] = None,
     resume_run_id: Optional[str] = None,
     crash_after_phase: Optional[str] = None,
+    use_run_lock: bool = False,
 ) -> Dict[str, Any]:
     """
     Execute one complete production daily research run for target_trade_date.
 
     crash_after_phase: test hook — abort after named phase (crash recovery matrix).
+    use_run_lock: acquire exclusive file lock (production entrypoint / dry run).
     """
     repo_root = repo_root or Path(__file__).resolve().parents[3]
     policy_hashes = compute_research_policy_hashes(repo_root)
     policy_bundle = _policy_bundle(policy_hashes)
+
+    # LIVE_FORWARD genesis gate (3K.5)
+    if run_mode == LIVE_FORWARD:
+        ok, reason, _ = validate_live_forward_prerequisites(
+            target_trade_date, run_mode=run_mode, policy_hashes=policy_hashes, data_dir=data_dir
+        )
+        if not ok:
+            return {
+                "run": {"run_disposition": RunDisposition.FAILED_CLOSED.value, "failure_or_skip_reason": reason},
+                "lock_held": False,
+                "genesis_blocked": True,
+                "idempotent_replay": False,
+                "counts_as_forward_evidence": False,
+                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+            }
 
     readiness = verify_data_readiness(panel, target_trade_date)
     dataset_hash = readiness.source_dataset_hash
@@ -129,6 +152,56 @@ def run_production_daily_research(
         policy_hash_bundle=policy_bundle,
     )
     run_id = resume_run_id or new_run_id(identity)
+
+    lock_fh = None
+    if use_run_lock and not resume_run_id:
+        lock_fh, lock_result = acquire_run_lock(run_id=run_id, data_dir=data_dir)
+        if not lock_result.acquired:
+            return {
+                "run": {"run_disposition": "LOCK_HELD", "failure_or_skip_reason": lock_result.reason},
+                "lock_held": True,
+                "lock": lock_result.to_dict(),
+                "idempotent_replay": False,
+                "counts_as_forward_evidence": mode_counts_as_forward_evidence(run_mode),
+                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+            }
+
+    try:
+        return _run_production_daily_research_inner(
+            panel,
+            target_trade_date=target_trade_date,
+            run_mode=run_mode,
+            data_dir=data_dir,
+            repo_root=repo_root,
+            resume_run_id=resume_run_id,
+            crash_after_phase=crash_after_phase,
+            readiness=readiness,
+            policy_hashes=policy_hashes,
+            policy_bundle=policy_bundle,
+            identity=identity,
+            run_id=run_id,
+        )
+    finally:
+        if lock_fh is not None:
+            release_run_lock(lock_fh, data_dir=data_dir)
+
+
+def _run_production_daily_research_inner(
+    panel: pd.DataFrame,
+    *,
+    target_trade_date: str,
+    run_mode: str,
+    data_dir: Optional[Path],
+    repo_root: Path,
+    resume_run_id: Optional[str],
+    crash_after_phase: Optional[str],
+    readiness: Any,
+    policy_hashes: Dict[str, str],
+    policy_bundle: str,
+    identity: str,
+    run_id: str,
+) -> Dict[str, Any]:
+    dataset_hash = readiness.source_dataset_hash
 
     existing = lookup_run_for_date(target_trade_date, run_mode, data_dir=data_dir)
     if existing and existing.frozen and not resume_run_id:
