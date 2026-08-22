@@ -14,6 +14,10 @@ PANEL = REPO / "benchmarks/bb_prop_01/zone_b_blind_panel/expanded_panel_v3i3.csv
 FROZEN_PROP = REPO / "diagnostics/phase_3i7_minimal_lifecycle/artifacts/02_frozen_proposition.json"
 FROZEN_CONTRACT = REPO / "diagnostics/phase_3i7_minimal_lifecycle/artifacts/03_interpretation_contract.json"
 J3_DIAG = REPO / "diagnostics/phase_3j3_first_experiment_execution/artifacts/03_real_proposition_diagnostic.json"
+J2_DIAG = REPO / "diagnostics/phase_3j2_first_experiment_selection/artifacts/03_real_proposition_diagnostic.json"
+PERSISTED_EXEC = (
+    REPO / "diagnostics/phase_3j4_evidence_interpretation/artifacts/05_persisted_3j3_execution_envelope.json"
+)
 
 
 @pytest.fixture
@@ -72,6 +76,54 @@ def test_no_decide_next_action_in_interpreter():
     assert "decide_next_action(" not in src
     assert "on_epistemic_update_completed(" not in src
     assert "build_research_decision(" not in src
+
+
+def test_persisted_3j3_execution_interpretation(tmp_data_dir):
+    if not all(p.exists() for p in (FROZEN_PROP, FROZEN_CONTRACT, J3_DIAG, J2_DIAG, PERSISTED_EXEC)):
+        pytest.skip("Persisted 3J.3 artifacts unavailable")
+
+    from diagnostics.phase_3j4_evidence_interpretation.run_phase_3j4 import (
+        _package_stub_from_persisted_execution,
+    )
+    from modules.edge_research.opr_bridge.first_experiment_contract_freeze import (
+        frozen_ref_from_historical_contract_artifact,
+    )
+    from modules.edge_research.opr_bridge.first_experiment_interpretation_records import STOP_FIRST_EVIDENCE_INTERPRETED
+    from modules.edge_research.opr_bridge.production_first_experiment_interpretation import (
+        run_production_first_experiment_interpretation,
+    )
+
+    prop = json.loads(FROZEN_PROP.read_text())["full_record"]
+    j3 = json.loads(J3_DIAG.read_text())
+    execution_dict = json.loads(PERSISTED_EXEC.read_text())
+    j2_package = json.loads(J2_DIAG.read_text())["package"]
+    hist_contract = json.loads(FROZEN_CONTRACT.read_text())
+
+    assert execution_dict["execution_identity_hash"] == j3["execution_identity_hash"]
+    assert execution_dict["tool_result_hash"] == j3["tool_result_identity"]
+
+    package_dict = _package_stub_from_persisted_execution(execution_dict, j2_package)
+    frozen_ref = frozen_ref_from_historical_contract_artifact(
+        hist_contract,
+        package_id=execution_dict["package_id"],
+        experiment_content_hash=execution_dict["experiment_content_hash"],
+        scientific_action_core_hash=execution_dict["scientific_action_core_hash"],
+    )
+    assert frozen_ref.contract_hash == hist_contract["contract_hash"]
+
+    ix = run_production_first_experiment_interpretation(
+        prop,
+        session_id="j4-persisted-test",
+        package_dict=package_dict,
+        execution_dict=execution_dict,
+        frozen_contract_dict=frozen_ref.to_dict(),
+        data_dir=tmp_data_dir,
+    )
+    assert STOP_FIRST_EVIDENCE_INTERPRETED in ix.stop_boundaries
+    assert ix.interpretation.outcome == "INTERPRETED"
+    assert ix.interpretation.research_decision_generated is False
+    assert ix.interpretation.envelope.frozen_contract_ref.contract_hash == hist_contract["contract_hash"]
+    assert ix.interpretation.envelope.tool_result_hash == execution_dict["tool_result_hash"]
 
 
 def test_real_t2_diagnostic_interpretation():

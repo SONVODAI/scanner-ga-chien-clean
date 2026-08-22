@@ -1,0 +1,22 @@
+{
+  "artifact_3i7_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "artifact_3i7_frozen_at": "2026-08-22T02:24:20.667765+00:00",
+  "pre_execution_rebuilt_contract_hash": "28af8d5ec8720b0188cf913b48555445cb6c09283605fcafe17069e50a996eab",
+  "pre_execution_frozen_ref_hash": "28af8d5ec8720b0188cf913b48555445cb6c09283605fcafe17069e50a996eab",
+  "historical_frozen_ref_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "rule_content_identical": true,
+  "hash_payload_without_contract_hash_identical": true,
+  "historical_ref_integrity_ok": true,
+  "historical_ref_errors": [],
+  "pre_execution_ref_integrity_ok": true,
+  "pre_execution_ref_errors": [],
+  "hash_discrepancy_root_cause": "contract_hash is content-addressed at freeze time; rebuild produces new hash identity while rule semantics remain identical (known 3I.7/3I.8 frozen_at drift pattern)",
+  "compliance_verdict": {
+    "pre_execution_freeze_before_tool_result": true,
+    "interpretation_loads_frozen_ref_not_rebuild": true,
+    "historical_3i7_artifact_usable_via_frozen_ref_from_historical": true,
+    "rule_semantics_unchanged": true
+  },
+  "recommended_persisted_diagnostic_contract_path": "frozen_ref_from_historical_contract_artifact(03_interpretation_contract.json)",
+  "recommended_live_path": "freeze_interpretation_contract_pre_result(PRE_EXECUTION)"
+}

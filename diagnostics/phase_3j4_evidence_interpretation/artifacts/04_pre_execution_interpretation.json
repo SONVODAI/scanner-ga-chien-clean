@@ -1,9 +1,11 @@
 {
+  "diagnostic_mode": "PRE_EXECUTION_FREEZE_LIVE",
   "proposition_id": "prop-efb650d9bd5c451f",
-  "package_id": "iefp-7ec55fe26197",
-  "selected_candidate_id": "fec-b59b3a1a7700",
+  "package_id": "iefp-dcb900f2c69a",
+  "selected_candidate_id": "fec-7d66b0d7e5e2",
   "scientific_objective": "Does the effect survive excluding motivating periods?",
   "frozen_contract_hash": "28af8d5ec8720b0188cf913b48555445cb6c09283605fcafe17069e50a996eab",
+  "frozen_contract_source": "PRE_EXECUTION_rebuild",
   "tool_result_hash": "30a9f15dcc793afd7d578cb4207cfa546250b0aec4975d678c4561d755bf1c52",
   "evidence_relevance": "HIGH",
   "evidence_direction": "SUPPORTS",
@@ -22,10 +24,8 @@
   ],
   "prior_epistemic_state": "HYPOTHESIS",
   "resulting_epistemic_state": "SUPPORTED",
-  "limitations": [],
-  "tool_semantic_labels_ignored": [],
   "interpretation_outcome": "INTERPRETED",
   "research_decision_generated": false,
   "stop_boundary": "STOP_FIRST_EVIDENCE_INTERPRETED",
-  "epistemic_update_id": "epu-25a84d3d980b"
+  "epistemic_update_id": "epu-9cae1a61974c"
 }
