@@ -42,13 +42,21 @@ def synthesize_evidence(
     evidence_specs: List[Dict[str, Any]],
     *,
     prior_epistemic_state: str = "PROPOSED",
+    deterministic_replay: bool = False,
+    replay_key: Optional[str] = None,
 ) -> Tuple[EvidenceSynthesisRecord, ResearchPriorityDecision]:
     """Main synthesis entry point."""
     prop_id = proposition_spec["proposition_id"]
     prop_hash = proposition_spec.get("proposition_hash", stable_hash({"id": prop_id}))
 
     entries = build_ledger_from_specs(prop_id, prop_hash, evidence_specs)
-    return _synthesize_from_ledger(proposition_spec, entries, prior_epistemic_state=prior_epistemic_state)
+    return _synthesize_from_ledger(
+        proposition_spec,
+        entries,
+        prior_epistemic_state=prior_epistemic_state,
+        deterministic_replay=deterministic_replay,
+        replay_key=replay_key,
+    )
 
 
 def synthesize_from_ledger_entries(
@@ -56,8 +64,16 @@ def synthesize_from_ledger_entries(
     entries: List[EvidenceLedgerEntry],
     *,
     prior_epistemic_state: str = "PROPOSED",
+    deterministic_replay: bool = False,
+    replay_key: Optional[str] = None,
 ) -> Tuple[EvidenceSynthesisRecord, ResearchPriorityDecision]:
-    return _synthesize_from_ledger(proposition_spec, entries, prior_epistemic_state=prior_epistemic_state)
+    return _synthesize_from_ledger(
+        proposition_spec,
+        entries,
+        prior_epistemic_state=prior_epistemic_state,
+        deterministic_replay=deterministic_replay,
+        replay_key=replay_key,
+    )
 
 
 def _synthesize_from_ledger(
@@ -65,6 +81,8 @@ def _synthesize_from_ledger(
     entries: List[EvidenceLedgerEntry],
     *,
     prior_epistemic_state: str,
+    deterministic_replay: bool = False,
+    replay_key: Optional[str] = None,
 ) -> Tuple[EvidenceSynthesisRecord, ResearchPriorityDecision]:
     prop_id = proposition_spec["proposition_id"]
     prop_hash = proposition_spec.get("proposition_hash", entries[0].proposition_hash if entries else "")
@@ -95,8 +113,12 @@ def _synthesize_from_ledger(
         synthesized_state, saturation, contradiction_structure, unresolved, rel_map, profiles, proposition_spec
     )
 
-    synthesis_id = new_id("syn")
-    created_at = utc_now_iso()
+    synthesis_id = (
+        f"syn-{stable_hash({'replay': replay_key})[:12]}"
+        if deterministic_replay and replay_key
+        else new_id("syn")
+    )
+    created_at = "1970-01-01T00:00:00+00:00" if deterministic_replay else utc_now_iso()
 
     supporting_struct = [_entry_summary(e, rel_map, profiles) for e in supporting]
     disconfirming_struct = [_entry_summary(e, rel_map, profiles) for e in disconfirming]
@@ -152,8 +174,13 @@ def _synthesize_from_ledger(
         "chosen_priority_action": priority_action.value,
         "saturation_level": saturation.level.value,
     }
+    decision_id = (
+        f"rpd-{stable_hash({'replay': replay_key, 'syn': synthesis_hash})[:12]}"
+        if deterministic_replay and replay_key
+        else new_id("rpd")
+    )
     decision = ResearchPriorityDecision(
-        decision_id=new_id("rpd"),
+        decision_id=decision_id,
         proposition_id=prop_id,
         synthesis_id=synthesis_id,
         synthesized_epistemic_state=synthesized_state,
