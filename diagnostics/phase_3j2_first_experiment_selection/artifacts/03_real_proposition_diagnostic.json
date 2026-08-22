@@ -1,0 +1,2140 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "execution_status": "NOT_EXECUTED",
+  "disposition": "SELECTED",
+  "objectives": [
+    {
+      "objective_id": "ieo-034e0636da8a",
+      "record_version": "initial_experiment_objective_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "target_uncertainty": "directional_effect_full_universe",
+      "scientific_vulnerability": "directional_reversal",
+      "why_first": "Central falsifiable commitment must be tested before subsidiary robustness: If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+      "outcome_branches": {
+        "more_credible": "Directional contrast replicates on independent cohort without rescue",
+        "less_credible": "partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0",
+        "unresolved": "Cohort insufficient or ambiguous spread \u2014 no belief transition"
+      },
+      "forbidden_rescue_mutations": [
+        "population_narrowing",
+        "horizon_mutation",
+        "outcome_field_mutation",
+        "feature_mutation",
+        "rescue_by_regime_cherry_pick"
+      ],
+      "provenance": {
+        "falsifiable_expectation": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_",
+        "disconfirming_observation_spec": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+        "canonical_proposition_core": "{'version': 'research_proposition_core_v1', 'population_spec': {'kind': 'all', 'grammar_version': 'research_grammar_v1'}"
+      },
+      "directness_rank": 0,
+      "created_at": "2026-08-22T05:15:36.372981+00:00",
+      "objective_hash": "e72ca19160d1726ff91311bc4e40a7063c5fc0489fa744ec035a7ab02b7705d9"
+    },
+    {
+      "objective_id": "ieo-1aca6b4e5027",
+      "record_version": "initial_experiment_objective_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "target_uncertainty": "episode_robustness",
+      "scientific_vulnerability": "episode_instability",
+      "why_first": "Null competing explanation suggests episode artifact; first high-information test should use evidence independent of motivating dates",
+      "outcome_branches": {
+        "more_credible": "Effect holds on episodes excluding birth/motivating dates",
+        "less_credible": "Effect absent or reversed on independent episodes \u2014 supports artifact hypothesis",
+        "unresolved": "Holdout cohort too small or non-informative"
+      },
+      "forbidden_rescue_mutations": [
+        "population_narrowing",
+        "horizon_mutation",
+        "outcome_field_mutation",
+        "feature_mutation",
+        "rescue_by_regime_cherry_pick"
+      ],
+      "provenance": {
+        "null_competing_explanation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effe",
+        "motivating_episode_dates": "2026-08-02",
+        "disconfirming_observation_spec": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
+      },
+      "directness_rank": 1,
+      "created_at": "2026-08-22T05:15:36.373040+00:00",
+      "objective_hash": "f6e77608e9ae45209d801545e5222280b01e9529313671ad1faaee9c34fc5809"
+    }
+  ],
+  "candidates_considered": [
+    {
+      "candidate_id": "fec-ad7430076dc4",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-034e0636da8a",
+      "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+      "scientific_identity": {
+        "objective_target_uncertainty": "directional_effect_full_universe",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "full_panel_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+        "information_gain_type": "inform"
+      },
+      "primary_classification": "DIRECT_INITIAL_TEST",
+      "secondary_classifications": [],
+      "classification_rationale": "Direct test of central directional commitment on full panel",
+      "falsification_capable": false,
+      "confirmatory_only": true,
+      "birth_evidence_overlap_fraction": 0.022727272727272728,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "LOW",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.023",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 0,
+      "epistemic_alteration_potential": "MEDIUM",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to full_panel_contrast",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "full_panel_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.374637+00:00",
+      "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+    },
+    {
+      "candidate_id": "fec-a574c3fea127",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-1aca6b4e5027",
+      "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
+      "scientific_identity": {
+        "objective_target_uncertainty": "episode_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "episode_holdout_excluding_motivating",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_episode_robustness",
+        "information_gain_type": "falsify"
+      },
+      "primary_classification": "FALSIFICATION_CAPABLE",
+      "secondary_classifications": [],
+      "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+      "falsification_capable": true,
+      "confirmatory_only": false,
+      "birth_evidence_overlap_fraction": 0.0,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.000",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 1,
+      "epistemic_alteration_potential": "HIGH",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to episode_holdout_excluding_motivating",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "episode_holdout_excluding_motivating",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "in",
+          "values": [
+            "2026-06-01",
+            "2026-06-02",
+            "2026-06-03",
+            "2026-06-04",
+            "2026-06-05",
+            "2026-06-08",
+            "2026-06-09",
+            "2026-06-10",
+            "2026-06-11",
+            "2026-06-12",
+            "2026-06-15",
+            "2026-06-16",
+            "2026-06-17",
+            "2026-06-18",
+            "2026-06-19",
+            "2026-06-22",
+            "2026-06-23",
+            "2026-06-24",
+            "2026-06-25",
+            "2026-06-26",
+            "2026-06-29",
+            "2026-06-30",
+            "2026-07-23",
+            "2026-07-24",
+            "2026-07-26",
+            "2026-07-27",
+            "2026-07-28",
+            "2026-07-29",
+            "2026-07-30",
+            "2026-07-31",
+            "2026-08-01",
+            "2026-08-03",
+            "2026-08-04",
+            "2026-08-05",
+            "2026-08-06",
+            "2026-08-07",
+            "2026-08-08",
+            "2026-08-10",
+            "2026-08-11",
+            "2026-08-12",
+            "2026-08-13",
+            "2026-08-14",
+            "2026-08-17"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.379454+00:00",
+      "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+    },
+    {
+      "candidate_id": "fec-5a001f861945",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-034e0636da8a",
+      "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+      "scientific_identity": {
+        "objective_target_uncertainty": "directional_effect_full_universe",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "full_panel_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+        "information_gain_type": "inform"
+      },
+      "primary_classification": "REPRESENTATION_ONLY",
+      "secondary_classifications": [],
+      "classification_rationale": "Same scientific core \u2014 different tool envelope only",
+      "falsification_capable": false,
+      "confirmatory_only": true,
+      "birth_evidence_overlap_fraction": 0.022727272727272728,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "LOW",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.023",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 0,
+      "epistemic_alteration_potential": "LOW",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool date_decomposition binds to full_panel_contrast",
+      "experiment_spec": {
+        "tool_name": "date_decomposition",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "date_decomposition",
+        "cohort_strategy": "full_panel_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.380703+00:00",
+      "record_hash": "81b8be2659fd7594d6f9d6b9289a464e1483f3b3af933a68075446d21fe606ac"
+    },
+    {
+      "candidate_id": "fec-bc6c8268073a",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-1aca6b4e5027",
+      "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+      "scientific_identity": {
+        "objective_target_uncertainty": "episode_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "counterexample_period_search",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_episode_robustness",
+        "information_gain_type": "falsify"
+      },
+      "primary_classification": "FALSIFICATION_CAPABLE",
+      "secondary_classifications": [],
+      "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+      "falsification_capable": true,
+      "confirmatory_only": false,
+      "birth_evidence_overlap_fraction": 0.0,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.000",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 1,
+      "epistemic_alteration_potential": "HIGH",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to counterexample_period_search",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "not_in",
+            "values": [
+              "2026-08-02"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "counterexample_period_search",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "not_in",
+          "values": [
+            "2026-08-02"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.382360+00:00",
+      "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+    }
+  ],
+  "deduplicated_candidates": [
+    {
+      "candidate_id": "fec-ad7430076dc4",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-034e0636da8a",
+      "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+      "scientific_identity": {
+        "objective_target_uncertainty": "directional_effect_full_universe",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "full_panel_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+        "information_gain_type": "inform"
+      },
+      "primary_classification": "DIRECT_INITIAL_TEST",
+      "secondary_classifications": [],
+      "classification_rationale": "Direct test of central directional commitment on full panel",
+      "falsification_capable": false,
+      "confirmatory_only": true,
+      "birth_evidence_overlap_fraction": 0.022727272727272728,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "LOW",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.023",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 0,
+      "epistemic_alteration_potential": "MEDIUM",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to full_panel_contrast",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "full_panel_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.374637+00:00",
+      "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+    },
+    {
+      "candidate_id": "fec-a574c3fea127",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-1aca6b4e5027",
+      "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
+      "scientific_identity": {
+        "objective_target_uncertainty": "episode_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "episode_holdout_excluding_motivating",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_episode_robustness",
+        "information_gain_type": "falsify"
+      },
+      "primary_classification": "FALSIFICATION_CAPABLE",
+      "secondary_classifications": [],
+      "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+      "falsification_capable": true,
+      "confirmatory_only": false,
+      "birth_evidence_overlap_fraction": 0.0,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.000",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 1,
+      "epistemic_alteration_potential": "HIGH",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to episode_holdout_excluding_motivating",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "episode_holdout_excluding_motivating",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "in",
+          "values": [
+            "2026-06-01",
+            "2026-06-02",
+            "2026-06-03",
+            "2026-06-04",
+            "2026-06-05",
+            "2026-06-08",
+            "2026-06-09",
+            "2026-06-10",
+            "2026-06-11",
+            "2026-06-12",
+            "2026-06-15",
+            "2026-06-16",
+            "2026-06-17",
+            "2026-06-18",
+            "2026-06-19",
+            "2026-06-22",
+            "2026-06-23",
+            "2026-06-24",
+            "2026-06-25",
+            "2026-06-26",
+            "2026-06-29",
+            "2026-06-30",
+            "2026-07-23",
+            "2026-07-24",
+            "2026-07-26",
+            "2026-07-27",
+            "2026-07-28",
+            "2026-07-29",
+            "2026-07-30",
+            "2026-07-31",
+            "2026-08-01",
+            "2026-08-03",
+            "2026-08-04",
+            "2026-08-05",
+            "2026-08-06",
+            "2026-08-07",
+            "2026-08-08",
+            "2026-08-10",
+            "2026-08-11",
+            "2026-08-12",
+            "2026-08-13",
+            "2026-08-14",
+            "2026-08-17"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.379454+00:00",
+      "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+    },
+    {
+      "candidate_id": "fec-bc6c8268073a",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-1aca6b4e5027",
+      "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+      "scientific_identity": {
+        "objective_target_uncertainty": "episode_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "counterexample_period_search",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_episode_robustness",
+        "information_gain_type": "falsify"
+      },
+      "primary_classification": "FALSIFICATION_CAPABLE",
+      "secondary_classifications": [],
+      "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+      "falsification_capable": true,
+      "confirmatory_only": false,
+      "birth_evidence_overlap_fraction": 0.0,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.000",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 1,
+      "epistemic_alteration_potential": "HIGH",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to counterexample_period_search",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "not_in",
+            "values": [
+              "2026-08-02"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "counterexample_period_search",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "not_in",
+          "values": [
+            "2026-08-02"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.382360+00:00",
+      "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+    }
+  ],
+  "rejected": [
+    {
+      "candidate_id": "fec-ad7430076dc4",
+      "reason": "confirmatory_only_when_falsification_available",
+      "classification": "DIRECT_INITIAL_TEST"
+    }
+  ],
+  "ranking_trace": [
+    {
+      "candidate_id": "fec-bc6c8268073a",
+      "classification": "FALSIFICATION_CAPABLE",
+      "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, '7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589')",
+      "overlap": "0.000",
+      "independence": "HIGH",
+      "executability": "EXECUTABLE"
+    },
+    {
+      "candidate_id": "fec-a574c3fea127",
+      "classification": "FALSIFICATION_CAPABLE",
+      "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, 'bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880')",
+      "overlap": "0.000",
+      "independence": "HIGH",
+      "executability": "EXECUTABLE"
+    }
+  ],
+  "selected_candidate_id": "fec-bc6c8268073a",
+  "selected_experiment_spec": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "research_scope": {
+      "population_spec": {
+        "kind": "filter",
+        "field": "trade_date",
+        "operator": "not_in",
+        "values": [
+          "2026-08-02"
+        ],
+        "grammar_version": "research_grammar_v1"
+      },
+      "outcome_spec": {
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0,
+        "grammar_version": "research_grammar_v1"
+      },
+      "observation_horizon": 0
+    },
+    "data_cutoff_date": "2026-08-17"
+  },
+  "selection_reason": "Lexicographic winner: FALSIFICATION_CAPABLE (independence=HIGH, overlap=0.000)",
+  "human_choice_material": false,
+  "human_choice_reason": "Scientific lexicographic dominance \u2014 tools bound last",
+  "legacy_executability_default": {
+    "tool_name": "partition_group_compare",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "population_kind": "all"
+  },
+  "default_partition_group_compare_survives_selection": false,
+  "full_panel_candidates": [
+    {
+      "candidate_id": "fec-ad7430076dc4",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-034e0636da8a",
+      "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+      "scientific_identity": {
+        "objective_target_uncertainty": "directional_effect_full_universe",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "full_panel_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+        "information_gain_type": "inform"
+      },
+      "primary_classification": "DIRECT_INITIAL_TEST",
+      "secondary_classifications": [],
+      "classification_rationale": "Direct test of central directional commitment on full panel",
+      "falsification_capable": false,
+      "confirmatory_only": true,
+      "birth_evidence_overlap_fraction": 0.022727272727272728,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "LOW",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.023",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 0,
+      "epistemic_alteration_potential": "MEDIUM",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to full_panel_contrast",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "full_panel_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.374637+00:00",
+      "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+    },
+    {
+      "candidate_id": "fec-5a001f861945",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-034e0636da8a",
+      "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+      "scientific_identity": {
+        "objective_target_uncertainty": "directional_effect_full_universe",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "full_panel_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+        "information_gain_type": "inform"
+      },
+      "primary_classification": "REPRESENTATION_ONLY",
+      "secondary_classifications": [],
+      "classification_rationale": "Same scientific core \u2014 different tool envelope only",
+      "falsification_capable": false,
+      "confirmatory_only": true,
+      "birth_evidence_overlap_fraction": 0.022727272727272728,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "LOW",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.023",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 0,
+      "epistemic_alteration_potential": "LOW",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool date_decomposition binds to full_panel_contrast",
+      "experiment_spec": {
+        "tool_name": "date_decomposition",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "date_decomposition",
+        "cohort_strategy": "full_panel_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.380703+00:00",
+      "record_hash": "81b8be2659fd7594d6f9d6b9289a464e1483f3b3af933a68075446d21fe606ac"
+    }
+  ],
+  "falsification_candidates": [
+    {
+      "candidate_id": "fec-a574c3fea127",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-1aca6b4e5027",
+      "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
+      "scientific_identity": {
+        "objective_target_uncertainty": "episode_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "episode_holdout_excluding_motivating",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_episode_robustness",
+        "information_gain_type": "falsify"
+      },
+      "primary_classification": "FALSIFICATION_CAPABLE",
+      "secondary_classifications": [],
+      "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+      "falsification_capable": true,
+      "confirmatory_only": false,
+      "birth_evidence_overlap_fraction": 0.0,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.000",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 1,
+      "epistemic_alteration_potential": "HIGH",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to episode_holdout_excluding_motivating",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "episode_holdout_excluding_motivating",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "in",
+          "values": [
+            "2026-06-01",
+            "2026-06-02",
+            "2026-06-03",
+            "2026-06-04",
+            "2026-06-05",
+            "2026-06-08",
+            "2026-06-09",
+            "2026-06-10",
+            "2026-06-11",
+            "2026-06-12",
+            "2026-06-15",
+            "2026-06-16",
+            "2026-06-17",
+            "2026-06-18",
+            "2026-06-19",
+            "2026-06-22",
+            "2026-06-23",
+            "2026-06-24",
+            "2026-06-25",
+            "2026-06-26",
+            "2026-06-29",
+            "2026-06-30",
+            "2026-07-23",
+            "2026-07-24",
+            "2026-07-26",
+            "2026-07-27",
+            "2026-07-28",
+            "2026-07-29",
+            "2026-07-30",
+            "2026-07-31",
+            "2026-08-01",
+            "2026-08-03",
+            "2026-08-04",
+            "2026-08-05",
+            "2026-08-06",
+            "2026-08-07",
+            "2026-08-08",
+            "2026-08-10",
+            "2026-08-11",
+            "2026-08-12",
+            "2026-08-13",
+            "2026-08-14",
+            "2026-08-17"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.379454+00:00",
+      "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+    },
+    {
+      "candidate_id": "fec-bc6c8268073a",
+      "record_version": "first_experiment_candidate_v1_3j2",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "ieo-1aca6b4e5027",
+      "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+      "scientific_identity": {
+        "objective_target_uncertainty": "episode_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "counterexample_period_search",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_episode_robustness",
+        "information_gain_type": "falsify"
+      },
+      "primary_classification": "FALSIFICATION_CAPABLE",
+      "secondary_classifications": [],
+      "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+      "falsification_capable": true,
+      "confirmatory_only": false,
+      "birth_evidence_overlap_fraction": 0.0,
+      "independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.000",
+          "context_overlap=1.000"
+        ]
+      },
+      "directness_rank": 1,
+      "epistemic_alteration_potential": "HIGH",
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to counterexample_period_search",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "not_in",
+            "values": [
+              "2026-08-02"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "counterexample_period_search",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "not_in",
+          "values": [
+            "2026-08-02"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "created_at": "2026-08-22T05:15:36.382360+00:00",
+      "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+    }
+  ],
+  "package": {
+    "package_id": "iefp-fb5b18c9f320",
+    "record_version": "initial_experiment_package_v1_3j2",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "generator_version": "first_experiment_generator_v1_3j2",
+    "selector_version": "first_experiment_selector_lex_v1_3j2",
+    "objectives": [
+      {
+        "objective_id": "ieo-034e0636da8a",
+        "record_version": "initial_experiment_objective_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "target_uncertainty": "directional_effect_full_universe",
+        "scientific_vulnerability": "directional_reversal",
+        "why_first": "Central falsifiable commitment must be tested before subsidiary robustness: If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+        "outcome_branches": {
+          "more_credible": "Directional contrast replicates on independent cohort without rescue",
+          "less_credible": "partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0",
+          "unresolved": "Cohort insufficient or ambiguous spread \u2014 no belief transition"
+        },
+        "forbidden_rescue_mutations": [
+          "population_narrowing",
+          "horizon_mutation",
+          "outcome_field_mutation",
+          "feature_mutation",
+          "rescue_by_regime_cherry_pick"
+        ],
+        "provenance": {
+          "falsifiable_expectation": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_",
+          "disconfirming_observation_spec": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+          "canonical_proposition_core": "{'version': 'research_proposition_core_v1', 'population_spec': {'kind': 'all', 'grammar_version': 'research_grammar_v1'}"
+        },
+        "directness_rank": 0,
+        "created_at": "2026-08-22T05:15:36.372981+00:00",
+        "objective_hash": "e72ca19160d1726ff91311bc4e40a7063c5fc0489fa744ec035a7ab02b7705d9"
+      },
+      {
+        "objective_id": "ieo-1aca6b4e5027",
+        "record_version": "initial_experiment_objective_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "target_uncertainty": "episode_robustness",
+        "scientific_vulnerability": "episode_instability",
+        "why_first": "Null competing explanation suggests episode artifact; first high-information test should use evidence independent of motivating dates",
+        "outcome_branches": {
+          "more_credible": "Effect holds on episodes excluding birth/motivating dates",
+          "less_credible": "Effect absent or reversed on independent episodes \u2014 supports artifact hypothesis",
+          "unresolved": "Holdout cohort too small or non-informative"
+        },
+        "forbidden_rescue_mutations": [
+          "population_narrowing",
+          "horizon_mutation",
+          "outcome_field_mutation",
+          "feature_mutation",
+          "rescue_by_regime_cherry_pick"
+        ],
+        "provenance": {
+          "null_competing_explanation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effe",
+          "motivating_episode_dates": "2026-08-02",
+          "disconfirming_observation_spec": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
+        },
+        "directness_rank": 1,
+        "created_at": "2026-08-22T05:15:36.373040+00:00",
+        "objective_hash": "f6e77608e9ae45209d801545e5222280b01e9529313671ad1faaee9c34fc5809"
+      }
+    ],
+    "candidates_considered": [
+      {
+        "candidate_id": "fec-ad7430076dc4",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-034e0636da8a",
+        "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+        "scientific_identity": {
+          "objective_target_uncertainty": "directional_effect_full_universe",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "full_panel_contrast",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+          "information_gain_type": "inform"
+        },
+        "primary_classification": "DIRECT_INITIAL_TEST",
+        "secondary_classifications": [],
+        "classification_rationale": "Direct test of central directional commitment on full panel",
+        "falsification_capable": false,
+        "confirmatory_only": true,
+        "birth_evidence_overlap_fraction": 0.022727272727272728,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "LOW",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.023",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 0,
+        "epistemic_alteration_potential": "MEDIUM",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool partition_group_compare binds to full_panel_contrast",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "partition_group_compare",
+          "cohort_strategy": "full_panel_contrast",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.374637+00:00",
+        "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+      },
+      {
+        "candidate_id": "fec-a574c3fea127",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-1aca6b4e5027",
+        "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
+        "scientific_identity": {
+          "objective_target_uncertainty": "episode_robustness",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "episode_holdout_excluding_motivating",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "falsify_episode_robustness",
+          "information_gain_type": "falsify"
+        },
+        "primary_classification": "FALSIFICATION_CAPABLE",
+        "secondary_classifications": [],
+        "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+        "falsification_capable": true,
+        "confirmatory_only": false,
+        "birth_evidence_overlap_fraction": 0.0,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "HIGH",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 1,
+        "epistemic_alteration_potential": "HIGH",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool partition_group_compare binds to episode_holdout_excluding_motivating",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "filter",
+              "field": "trade_date",
+              "operator": "in",
+              "values": [
+                "2026-06-01",
+                "2026-06-02",
+                "2026-06-03",
+                "2026-06-04",
+                "2026-06-05",
+                "2026-06-08",
+                "2026-06-09",
+                "2026-06-10",
+                "2026-06-11",
+                "2026-06-12",
+                "2026-06-15",
+                "2026-06-16",
+                "2026-06-17",
+                "2026-06-18",
+                "2026-06-19",
+                "2026-06-22",
+                "2026-06-23",
+                "2026-06-24",
+                "2026-06-25",
+                "2026-06-26",
+                "2026-06-29",
+                "2026-06-30",
+                "2026-07-23",
+                "2026-07-24",
+                "2026-07-26",
+                "2026-07-27",
+                "2026-07-28",
+                "2026-07-29",
+                "2026-07-30",
+                "2026-07-31",
+                "2026-08-01",
+                "2026-08-03",
+                "2026-08-04",
+                "2026-08-05",
+                "2026-08-06",
+                "2026-08-07",
+                "2026-08-08",
+                "2026-08-10",
+                "2026-08-11",
+                "2026-08-12",
+                "2026-08-13",
+                "2026-08-14",
+                "2026-08-17"
+              ],
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "partition_group_compare",
+          "cohort_strategy": "episode_holdout_excluding_motivating",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.379454+00:00",
+        "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+      },
+      {
+        "candidate_id": "fec-5a001f861945",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-034e0636da8a",
+        "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+        "scientific_identity": {
+          "objective_target_uncertainty": "directional_effect_full_universe",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "full_panel_contrast",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+          "information_gain_type": "inform"
+        },
+        "primary_classification": "REPRESENTATION_ONLY",
+        "secondary_classifications": [],
+        "classification_rationale": "Same scientific core \u2014 different tool envelope only",
+        "falsification_capable": false,
+        "confirmatory_only": true,
+        "birth_evidence_overlap_fraction": 0.022727272727272728,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "LOW",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.023",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 0,
+        "epistemic_alteration_potential": "LOW",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool date_decomposition binds to full_panel_contrast",
+        "experiment_spec": {
+          "tool_name": "date_decomposition",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5"
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "date_decomposition",
+          "cohort_strategy": "full_panel_contrast",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.380703+00:00",
+        "record_hash": "81b8be2659fd7594d6f9d6b9289a464e1483f3b3af933a68075446d21fe606ac"
+      },
+      {
+        "candidate_id": "fec-bc6c8268073a",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-1aca6b4e5027",
+        "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+        "scientific_identity": {
+          "objective_target_uncertainty": "episode_robustness",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "counterexample_period_search",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "falsify_episode_robustness",
+          "information_gain_type": "falsify"
+        },
+        "primary_classification": "FALSIFICATION_CAPABLE",
+        "secondary_classifications": [],
+        "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+        "falsification_capable": true,
+        "confirmatory_only": false,
+        "birth_evidence_overlap_fraction": 0.0,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "HIGH",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 1,
+        "epistemic_alteration_potential": "HIGH",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool partition_group_compare binds to counterexample_period_search",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "filter",
+              "field": "trade_date",
+              "operator": "not_in",
+              "values": [
+                "2026-08-02"
+              ],
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "partition_group_compare",
+          "cohort_strategy": "counterexample_period_search",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "not_in",
+            "values": [
+              "2026-08-02"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.382360+00:00",
+        "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+      }
+    ],
+    "deduplicated_candidates": [
+      {
+        "candidate_id": "fec-ad7430076dc4",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-034e0636da8a",
+        "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
+        "scientific_identity": {
+          "objective_target_uncertainty": "directional_effect_full_universe",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "full_panel_contrast",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "inform_directional_effect_full_universe",
+          "information_gain_type": "inform"
+        },
+        "primary_classification": "DIRECT_INITIAL_TEST",
+        "secondary_classifications": [],
+        "classification_rationale": "Direct test of central directional commitment on full panel",
+        "falsification_capable": false,
+        "confirmatory_only": true,
+        "birth_evidence_overlap_fraction": 0.022727272727272728,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "LOW",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.023",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 0,
+        "epistemic_alteration_potential": "MEDIUM",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool partition_group_compare binds to full_panel_contrast",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "partition_group_compare",
+          "cohort_strategy": "full_panel_contrast",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.374637+00:00",
+        "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+      },
+      {
+        "candidate_id": "fec-a574c3fea127",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-1aca6b4e5027",
+        "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
+        "scientific_identity": {
+          "objective_target_uncertainty": "episode_robustness",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "episode_holdout_excluding_motivating",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "falsify_episode_robustness",
+          "information_gain_type": "falsify"
+        },
+        "primary_classification": "FALSIFICATION_CAPABLE",
+        "secondary_classifications": [],
+        "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+        "falsification_capable": true,
+        "confirmatory_only": false,
+        "birth_evidence_overlap_fraction": 0.0,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "HIGH",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 1,
+        "epistemic_alteration_potential": "HIGH",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool partition_group_compare binds to episode_holdout_excluding_motivating",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "filter",
+              "field": "trade_date",
+              "operator": "in",
+              "values": [
+                "2026-06-01",
+                "2026-06-02",
+                "2026-06-03",
+                "2026-06-04",
+                "2026-06-05",
+                "2026-06-08",
+                "2026-06-09",
+                "2026-06-10",
+                "2026-06-11",
+                "2026-06-12",
+                "2026-06-15",
+                "2026-06-16",
+                "2026-06-17",
+                "2026-06-18",
+                "2026-06-19",
+                "2026-06-22",
+                "2026-06-23",
+                "2026-06-24",
+                "2026-06-25",
+                "2026-06-26",
+                "2026-06-29",
+                "2026-06-30",
+                "2026-07-23",
+                "2026-07-24",
+                "2026-07-26",
+                "2026-07-27",
+                "2026-07-28",
+                "2026-07-29",
+                "2026-07-30",
+                "2026-07-31",
+                "2026-08-01",
+                "2026-08-03",
+                "2026-08-04",
+                "2026-08-05",
+                "2026-08-06",
+                "2026-08-07",
+                "2026-08-08",
+                "2026-08-10",
+                "2026-08-11",
+                "2026-08-12",
+                "2026-08-13",
+                "2026-08-14",
+                "2026-08-17"
+              ],
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "partition_group_compare",
+          "cohort_strategy": "episode_holdout_excluding_motivating",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.379454+00:00",
+        "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+      },
+      {
+        "candidate_id": "fec-bc6c8268073a",
+        "record_version": "first_experiment_candidate_v1_3j2",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "objective_id": "ieo-1aca6b4e5027",
+        "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+        "scientific_identity": {
+          "objective_target_uncertainty": "episode_robustness",
+          "proposition_commitment_challenged": "partition_contrast_rs_spread",
+          "cohort_strategy": "counterexample_period_search",
+          "contrast_relation": "partition_quintile_contrast",
+          "expected_epistemic_consequence_type": "falsify_episode_robustness",
+          "information_gain_type": "falsify"
+        },
+        "primary_classification": "FALSIFICATION_CAPABLE",
+        "secondary_classifications": [],
+        "classification_rationale": "Independent cohort can materially disconfirm proposition commitment",
+        "falsification_capable": true,
+        "confirmatory_only": false,
+        "birth_evidence_overlap_fraction": 0.0,
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "HIGH",
+          "population_independence": "HIGH",
+          "context_independence": "MEDIUM",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=0.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "directness_rank": 1,
+        "epistemic_alteration_potential": "HIGH",
+        "rescue_risk_status": "pass",
+        "executability_status": "EXECUTABLE",
+        "executability_detail": "Tool partition_group_compare binds to counterexample_period_search",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "filter",
+              "field": "trade_date",
+              "operator": "not_in",
+              "values": [
+                "2026-08-02"
+              ],
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "representation_envelope": {
+          "tool": "partition_group_compare",
+          "cohort_strategy": "counterexample_period_search",
+          "feature": "rs_spread",
+          "outcome": "t5_return",
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "not_in",
+            "values": [
+              "2026-08-02"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "syntax": "grammar_v1"
+        },
+        "created_at": "2026-08-22T05:15:36.382360+00:00",
+        "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+      }
+    ],
+    "rejected": [
+      {
+        "candidate_id": "fec-ad7430076dc4",
+        "reason": "confirmatory_only_when_falsification_available",
+        "classification": "DIRECT_INITIAL_TEST"
+      }
+    ],
+    "ranking_trace": [
+      {
+        "candidate_id": "fec-bc6c8268073a",
+        "classification": "FALSIFICATION_CAPABLE",
+        "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, '7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589')",
+        "overlap": "0.000",
+        "independence": "HIGH",
+        "executability": "EXECUTABLE"
+      },
+      {
+        "candidate_id": "fec-a574c3fea127",
+        "classification": "FALSIFICATION_CAPABLE",
+        "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, 'bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880')",
+        "overlap": "0.000",
+        "independence": "HIGH",
+        "executability": "EXECUTABLE"
+      }
+    ],
+    "disposition": "SELECTED",
+    "selected_candidate_id": "fec-bc6c8268073a",
+    "selected_experiment_spec": {
+      "tool_name": "partition_group_compare",
+      "tool_version": "v1",
+      "inputs": {
+        "partition_column": "rs_spread",
+        "n_groups": 5
+      },
+      "research_scope": {
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "not_in",
+          "values": [
+            "2026-08-02"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0
+      },
+      "data_cutoff_date": "2026-08-17"
+    },
+    "selection_reason": "Lexicographic winner: FALSIFICATION_CAPABLE (independence=HIGH, overlap=0.000)",
+    "human_choice_material": false,
+    "human_choice_reason": "Scientific lexicographic dominance \u2014 tools bound last",
+    "execution_status": "NOT_EXECUTED",
+    "created_at": "2026-08-22T05:15:36.382479+00:00",
+    "package_hash": "3e8adb6215b77f9c89da21110afe28cd55d7ba004113933c9a8355157cb14982"
+  }
+}
