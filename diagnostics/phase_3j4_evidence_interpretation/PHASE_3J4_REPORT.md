@@ -3,6 +3,8 @@
 ## Status: PASS
 
 **Branch:** `cursor/phase-3j4-evidence-interpretation-aad2`  
+**Commit:** `e98329e22`  
+**PR:** #61  
 **Base:** Phase 3J.3 at `f452d7a61`  
 **Hard STOP:** `STOP_FIRST_EVIDENCE_INTERPRETED` — no research decision, no synthesis hook
 
