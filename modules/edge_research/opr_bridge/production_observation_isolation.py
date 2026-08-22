@@ -61,6 +61,9 @@ OBSERVATION_MODULES = (
     "production_calibration_updater.py",
     "production_calibration_self_knowledge.py",
     "production_calibration_simulation.py",
+    "production_living_research_ui_records.py",
+    "production_living_research_ui_read_model.py",
+    "production_living_research_ui.py",
 )
 
 
