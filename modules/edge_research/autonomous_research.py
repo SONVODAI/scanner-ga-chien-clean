@@ -40,6 +40,7 @@ from modules.edge_research.research_tools import ToolRegistry, apply_research_cu
 from modules.edge_research.storage import read_research_graph, write_research_graph
 
 AUTONOMOUS_RESEARCH_ENV_FLAG = "EDGE_RESEARCH_AUTONOMOUS"
+OPR_LIFECYCLE_ENV_FLAG = "EDGE_RESEARCH_OPR_LIFECYCLE"
 
 
 def autonomous_research_enabled(explicit: Optional[bool] = None) -> bool:
@@ -47,6 +48,13 @@ def autonomous_research_enabled(explicit: Optional[bool] = None) -> bool:
     if explicit is not None:
         return explicit
     return os.environ.get(AUTONOMOUS_RESEARCH_ENV_FLAG, "0") in ("1", "true", "TRUE", "yes")
+
+
+def opr_lifecycle_enabled(explicit: Optional[bool] = None) -> bool:
+    """Feature flag — production OPR lifecycle integration (Phase 3J.0)."""
+    if explicit is not None:
+        return explicit
+    return os.environ.get(OPR_LIFECYCLE_ENV_FLAG, "0") in ("1", "true", "TRUE", "yes")
 
 
 @dataclass
@@ -230,3 +238,107 @@ def load_autonomous_research_session(
 ) -> ResearchGraph:
     """Reload a persisted autonomous research session."""
     return read_research_graph(session_id, data_dir=data_dir)
+
+
+@dataclass
+class OprProductionResearchResult:
+    """Result of production OPR lifecycle cycle (Phase 3J.0)."""
+
+    cycle_result: Any
+    graph: Optional[ResearchGraph] = None
+    session_path: Optional[Path] = None
+    opr_session_path: Optional[Path] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "cycle": self.cycle_result.to_dict() if self.cycle_result else None,
+            "graph_session_id": self.graph.session.research_session_id if self.graph else None,
+            "session_path": str(self.session_path) if self.session_path else None,
+            "opr_session_path": str(self.opr_session_path) if self.opr_session_path else None,
+        }
+
+
+def bootstrap_opr_research_graph(
+    proposition_record: Dict[str, Any],
+    *,
+    data_cutoff_date: str,
+    session_id: Optional[str] = None,
+) -> ResearchGraph:
+    """
+    Create minimal graph shell for OPR-authoritative session.
+
+    Does NOT seed template/GAP question — proposition comes from OPR pipeline.
+    """
+    from modules.edge_research.opr_bridge.production_authority import mark_session_opr_authority
+
+    graph = ResearchGraph.create_session(
+        data_cutoff_date=data_cutoff_date,
+        guardrails_config_version=GUARDRAILS_CONFIG_VERSION,
+        experiment_budget=0,
+        session_id=session_id,
+    )
+    mark_session_opr_authority(graph)
+    oid = graph.add_root_observation(
+        description=proposition_record.get("motivating_observation", "OPR proposition"),
+        trigger_kind="OPR_DISPERSION_EVIDENCE",
+    )
+    graph.session.root_node_ids = [oid]
+    acct = dict(graph.session.search_accounting or {})
+    acct["opr_proposition_id"] = proposition_record.get("proposition_id")
+    acct["opr_proposition_hash"] = proposition_record.get("proposition_hash")
+    graph.session.search_accounting = acct
+    return graph
+
+
+def run_opr_production_research_cycle(
+    panel: pd.DataFrame,
+    *,
+    data_cutoff_date: str,
+    data_dir: Optional[Path] = None,
+    enabled: Optional[bool] = None,
+    replay_frozen_lineage: bool = False,
+) -> OprProductionResearchResult:
+    """
+    Production OPR entry: autonomous opportunity detection + persistence.
+
+    Does NOT run legacy template/GAP planner or execute new experiments.
+    """
+    from modules.edge_research.opr_bridge.production_orchestrator import run_production_opr_cycle
+    from modules.edge_research.opr_bridge.production_persistence import opr_session_path
+    from modules.edge_research.storage import resolve_data_dir
+
+    if not opr_lifecycle_enabled(enabled):
+        raise RuntimeError(
+            f"OPR lifecycle integration disabled. Set {OPR_LIFECYCLE_ENV_FLAG}=1 to enable."
+        )
+
+    work_panel = panel.copy()
+    cutoff_panel, _ = apply_research_cutoff(work_panel, data_cutoff_date, horizons=["T3", "T5", "T10"])
+
+    cycle = run_production_opr_cycle(
+        cutoff_panel,
+        data_cutoff_date=data_cutoff_date,
+        data_dir=data_dir or resolve_data_dir(None),
+        replay_frozen_lineage=replay_frozen_lineage,
+    )
+
+    graph: Optional[ResearchGraph] = None
+    session_path: Optional[Path] = None
+    opr_path: Optional[Path] = None
+
+    if cycle.session_id and cycle.detection and cycle.detection.proposition_record:
+        graph = bootstrap_opr_research_graph(
+            cycle.detection.proposition_record,
+            data_cutoff_date=data_cutoff_date,
+            session_id=cycle.session_id,
+        )
+        if data_dir is not None:
+            session_path = write_research_graph(graph, data_dir=data_dir)
+            opr_path = opr_session_path(cycle.session_id, data_dir=data_dir)
+
+    return OprProductionResearchResult(
+        cycle_result=cycle,
+        graph=graph,
+        session_path=session_path,
+        opr_session_path=opr_path,
+    )

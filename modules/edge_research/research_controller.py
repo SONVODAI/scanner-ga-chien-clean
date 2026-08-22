@@ -617,6 +617,9 @@ def plan_after_experiment(
     consult_competence: bool = True,
 ) -> PlanningRecord:
     """Interpret result, generate candidates, plan next step, record on graph."""
+    from modules.edge_research.opr_bridge.production_authority import assert_legacy_planner_blocked
+
+    assert_legacy_planner_blocked(graph)
     assessment = interpret_tool_result(graph, experiment_node_id, tool_result)
     from modules.edge_research.research_exit_valuation import prepare_post_experiment_exit_context
     from modules.edge_research.research_realized_information_gain import store_assessment_snapshot
