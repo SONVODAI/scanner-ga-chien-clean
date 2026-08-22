@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from modules.edge_research.opr_bridge.evidence_synthesis_records import new_id, stable_hash, utc_now_iso
 
 LIFECYCLE_VERSION = "bounded_autonomous_lifecycle_v1_3j10"
-CONTROLLER_VERSION = "bounded_lifecycle_controller_v1_3j10"
+CONTROLLER_VERSION = "bounded_lifecycle_controller_v1_3j12"
 
 STOP_LIFECYCLE_BOUNDED = "STOP_LIFECYCLE_BOUNDED"
 STOP_LIFECYCLE_SCIENTIFIC_STOP = "STOP_LIFECYCLE_SCIENTIFIC_STOP"

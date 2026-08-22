@@ -1,0 +1,865 @@
+{
+  "sample_cases": [
+    {
+      "anonymous_id": "CASE-0101",
+      "frozen": {
+        "anonymous_case_id": "CASE-0101",
+        "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-c4e",
+        "proposition_id": "prop-9ef0ad5446c79fb8",
+        "proposition_summary": {
+          "proposition_id": "prop-9ef0ad5446c79fb8",
+          "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+          "observation_horizon": 0,
+          "outcome_field": "t5_return"
+        },
+        "lifecycle_outcome": "SCIENTIFIC_STOP",
+        "termination_reason": "STOP_LOW_INCREMENTAL",
+        "lifecycle_phase": "STOPPED",
+        "experiments_completed": 2,
+        "journey_rows": [
+          {
+            "ordinal": 1,
+            "epistemic_state_entering": "HYPOTHESIS",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "iefp-c934dcf8e7e3",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "iefx-81b71794656c",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "ACTION",
+            "chosen_action": "SEEK_FALSIFICATION",
+            "stop_reason": null,
+            "frozen_contract_id": null
+          },
+          {
+            "ordinal": 2,
+            "epistemic_state_entering": "SUPPORTED",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "sefp-39a2afe997db",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "sefx-6b1db5a060d7",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "STOP",
+            "chosen_action": "HOLD_UNRESOLVED",
+            "stop_reason": "STOP_LOW_INCREMENTAL",
+            "frozen_contract_id": null
+          }
+        ],
+        "audit": {
+          "lifecycle_run_id": "blc-56082a74a91a",
+          "proposition_id": "prop-9ef0ad5446c79fb8",
+          "proposition_hash": "c812572458a84811564fb428519dbcc920061b07b42c3f6818ff4839454593a3",
+          "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-c4e",
+          "start_phase": "PROPOSITION_PERSISTED",
+          "end_phase": "STOPPED",
+          "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
+          "budget_initial": {
+            "max_experiment_iterations": 4,
+            "max_search_complexity": 15.0,
+            "max_search_cardinality": 20,
+            "max_execution_failures": 1,
+            "max_redundancy_burden": 0.95
+          },
+          "budget_used": {
+            "experiments_completed": 2,
+            "max_iterations": 4
+          },
+          "experiment_count": 2,
+          "experiment_identities": [
+            "iefp-c934dcf8e7e3",
+            "sefp-39a2afe997db"
+          ],
+          "tool_result_identities": [
+            "iefx-81b71794656c",
+            "sefx-6b1db5a060d7"
+          ],
+          "interpretation_identities": [
+            "iefi-12a88be605e1",
+            "iefi2-30317d011569"
+          ],
+          "decision_identities": [
+            "iefd-59abffea7958",
+            "iefd2-4efb3f9687af"
+          ],
+          "cumulative_null_ledger": [
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "directional_reversal",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+            },
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "episode_artifact",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+            }
+          ],
+          "dependence_summary": {
+            "row_overlap_fraction": 0.9666666666666667,
+            "null_target_overlap": 0.0,
+            "scientific_question_overlap": 0.0,
+            "sample_dependence_level": "HIGH",
+            "question_novelty": "HIGH",
+            "evidence_relationship": "PARTIAL_REPLICATION",
+            "counted_as_independent_replication": false,
+            "independence_rationale": [
+              "cohort_overlap_ratio=0.967"
+            ]
+          },
+          "failures": [],
+          "warnings": [],
+          "controller_version": "bounded_lifecycle_controller_v1_3j12",
+          "created_at": "2026-08-22T07:38:31.561338+00:00",
+          "audit_hash": "3230560246d8c6f75b124a88331311034f890f822a8c8906d8790d01a99548f9"
+        },
+        "budget_initial": {
+          "max_experiment_iterations": 4,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 4
+        },
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "directional_reversal",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+          },
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {
+          "row_overlap_fraction": 0.9666666666666667,
+          "null_target_overlap": 0.0,
+          "scientific_question_overlap": 0.0,
+          "sample_dependence_level": "HIGH",
+          "question_novelty": "HIGH",
+          "evidence_relationship": "PARTIAL_REPLICATION",
+          "counted_as_independent_replication": false,
+          "independence_rationale": [
+            "cohort_overlap_ratio=0.967"
+          ]
+        },
+        "final_epistemic_state": "SUPPORTED",
+        "final_decision_kind": "STOP",
+        "final_chosen_action": "HOLD_UNRESOLVED",
+        "final_stop_reason": "STOP_LOW_INCREMENTAL",
+        "bootstrap_outcome": "SESSION_CREATED",
+        "errors": [],
+        "frozen_at": "2026-08-22T07:38:29.696417+00:00",
+        "lifecycle_frozen_hash": "569b23c28bbd390c30ef85e4dd9f9d860f6865040488ccb4d52f1f3cad426fde",
+        "runner_version": "blind_research_examination_runner_v1_3j11"
+      },
+      "reveal": {
+        "anonymous_case_id": "CASE-0101",
+        "seed": 101,
+        "blind_class": "BLIND-A",
+        "ground_truth": {
+          "case_id": "BBE-BLINDA-0101",
+          "blind_class": "BLIND-A",
+          "seed": 101,
+          "mechanism": "quintile_monotonic_positive_across_multiple_dates",
+          "true_direction": "positive",
+          "stability_structure": "distributed_across_4_episodes",
+          "artifact_or_confound": "none",
+          "expected_scientific_risk": "low_if_evidence_sufficient",
+          "expected_behavior_notes": "May support if experiments encounter distributed structure.",
+          "panel_fingerprint": "271e5ec7aa5eab0ef912f5e55b30a1de567a4a80ca8aad614b32afc197a13dff",
+          "generation_config": {
+            "effect_dates": [
+              "2026-01-10",
+              "2026-01-15",
+              "2026-01-20",
+              "2026-01-30"
+            ],
+            "focal_date": "2026-01-30"
+          },
+          "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+        },
+        "lifecycle_frozen_hash": "569b23c28bbd390c30ef85e4dd9f9d860f6865040488ccb4d52f1f3cad426fde",
+        "reveal_after_hash": "569b23c28bbd390c30ef85e4dd9f9d860f6865040488ccb4d52f1f3cad426fde",
+        "reveal_order_valid": true,
+        "calibration_category": "SUPPORTED",
+        "outcome_score": 0.85,
+        "process_integrity_score": 1.0,
+        "false_positive_risk": "LOW",
+        "notable_findings": [
+          "scientific_stop:STOP_LOW_INCREMENTAL",
+          "appropriate_uncertainty_stop"
+        ],
+        "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+      }
+    },
+    {
+      "anonymous_id": "CASE-0102",
+      "frozen": {
+        "anonymous_case_id": "CASE-0102",
+        "session_id": "opr-prod-prop-392f25bf8af8e039-sess-ffb",
+        "proposition_id": "prop-392f25bf8af8e039",
+        "proposition_summary": {
+          "proposition_id": "prop-392f25bf8af8e039",
+          "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+          "observation_horizon": 0,
+          "outcome_field": "t5_return"
+        },
+        "lifecycle_outcome": "SCIENTIFIC_STOP",
+        "termination_reason": "STOP_LOW_INCREMENTAL",
+        "lifecycle_phase": "STOPPED",
+        "experiments_completed": 2,
+        "journey_rows": [
+          {
+            "ordinal": 1,
+            "epistemic_state_entering": "HYPOTHESIS",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "iefp-8360b14626d5",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "iefx-760ab324839d",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "ACTION",
+            "chosen_action": "SEEK_FALSIFICATION",
+            "stop_reason": null,
+            "frozen_contract_id": null
+          },
+          {
+            "ordinal": 2,
+            "epistemic_state_entering": "SUPPORTED",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "sefp-181e9f46914e",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "sefx-3b1c4e83d848",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "STOP",
+            "chosen_action": "HOLD_UNRESOLVED",
+            "stop_reason": "STOP_LOW_INCREMENTAL",
+            "frozen_contract_id": null
+          }
+        ],
+        "audit": {
+          "lifecycle_run_id": "blc-c8dae0a10226",
+          "proposition_id": "prop-392f25bf8af8e039",
+          "proposition_hash": "8c27c4d4cc871ae5716a1396b19e5538c081012c3b48c545e853611c1d81637e",
+          "session_id": "opr-prod-prop-392f25bf8af8e039-sess-ffb",
+          "start_phase": "PROPOSITION_PERSISTED",
+          "end_phase": "STOPPED",
+          "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
+          "budget_initial": {
+            "max_experiment_iterations": 4,
+            "max_search_complexity": 15.0,
+            "max_search_cardinality": 20,
+            "max_execution_failures": 1,
+            "max_redundancy_burden": 0.95
+          },
+          "budget_used": {
+            "experiments_completed": 2,
+            "max_iterations": 4
+          },
+          "experiment_count": 2,
+          "experiment_identities": [
+            "iefp-8360b14626d5",
+            "sefp-181e9f46914e"
+          ],
+          "tool_result_identities": [
+            "iefx-760ab324839d",
+            "sefx-3b1c4e83d848"
+          ],
+          "interpretation_identities": [
+            "iefi-a80e0b11a902",
+            "iefi2-cfcc7acf6c40"
+          ],
+          "decision_identities": [
+            "iefd-606ddbfb8455",
+            "iefd2-6b28ddbab7be"
+          ],
+          "cumulative_null_ledger": [
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "directional_reversal",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+            },
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "episode_artifact",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+            }
+          ],
+          "dependence_summary": {
+            "row_overlap_fraction": 0.9666666666666667,
+            "null_target_overlap": 0.0,
+            "scientific_question_overlap": 0.0,
+            "sample_dependence_level": "HIGH",
+            "question_novelty": "HIGH",
+            "evidence_relationship": "PARTIAL_REPLICATION",
+            "counted_as_independent_replication": false,
+            "independence_rationale": [
+              "cohort_overlap_ratio=0.967"
+            ]
+          },
+          "failures": [],
+          "warnings": [],
+          "controller_version": "bounded_lifecycle_controller_v1_3j12",
+          "created_at": "2026-08-22T07:38:33.472852+00:00",
+          "audit_hash": "42651bf81e71fa540ffe2e9a3cfaa3c42fe0b66b5fb5b22703f9024b7081f5a1"
+        },
+        "budget_initial": {
+          "max_experiment_iterations": 4,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 4
+        },
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "directional_reversal",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+          },
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {
+          "row_overlap_fraction": 0.9666666666666667,
+          "null_target_overlap": 0.0,
+          "scientific_question_overlap": 0.0,
+          "sample_dependence_level": "HIGH",
+          "question_novelty": "HIGH",
+          "evidence_relationship": "PARTIAL_REPLICATION",
+          "counted_as_independent_replication": false,
+          "independence_rationale": [
+            "cohort_overlap_ratio=0.967"
+          ]
+        },
+        "final_epistemic_state": "SUPPORTED",
+        "final_decision_kind": "STOP",
+        "final_chosen_action": "HOLD_UNRESOLVED",
+        "final_stop_reason": "STOP_LOW_INCREMENTAL",
+        "bootstrap_outcome": "SESSION_CREATED",
+        "errors": [],
+        "frozen_at": "2026-08-22T07:38:31.607937+00:00",
+        "lifecycle_frozen_hash": "8713dff4af9c4587c973f2c66324b50c0cced8ca6865845d215709f9b5238bed",
+        "runner_version": "blind_research_examination_runner_v1_3j11"
+      },
+      "reveal": {
+        "anonymous_case_id": "CASE-0102",
+        "seed": 102,
+        "blind_class": "BLIND-A",
+        "ground_truth": {
+          "case_id": "BBE-BLINDA-0102",
+          "blind_class": "BLIND-A",
+          "seed": 102,
+          "mechanism": "quintile_monotonic_positive_across_multiple_dates",
+          "true_direction": "positive",
+          "stability_structure": "distributed_across_4_episodes",
+          "artifact_or_confound": "none",
+          "expected_scientific_risk": "low_if_evidence_sufficient",
+          "expected_behavior_notes": "May support if experiments encounter distributed structure.",
+          "panel_fingerprint": "9e5afb538478d7908cffdf97fe09ab6608a81426269c8b3f0e9c8d5454b9e8e4",
+          "generation_config": {
+            "effect_dates": [
+              "2026-01-10",
+              "2026-01-15",
+              "2026-01-20",
+              "2026-01-30"
+            ],
+            "focal_date": "2026-01-30"
+          },
+          "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+        },
+        "lifecycle_frozen_hash": "8713dff4af9c4587c973f2c66324b50c0cced8ca6865845d215709f9b5238bed",
+        "reveal_after_hash": "8713dff4af9c4587c973f2c66324b50c0cced8ca6865845d215709f9b5238bed",
+        "reveal_order_valid": true,
+        "calibration_category": "SUPPORTED",
+        "outcome_score": 0.85,
+        "process_integrity_score": 1.0,
+        "false_positive_risk": "LOW",
+        "notable_findings": [
+          "scientific_stop:STOP_LOW_INCREMENTAL",
+          "appropriate_uncertainty_stop"
+        ],
+        "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+      }
+    },
+    {
+      "anonymous_id": "CASE-0201",
+      "frozen": {
+        "anonymous_case_id": "CASE-0201",
+        "session_id": "opr-prod-prop-65e0692da41571e4-sess-318",
+        "proposition_id": "prop-65e0692da41571e4",
+        "proposition_summary": {
+          "proposition_id": "prop-65e0692da41571e4",
+          "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+          "observation_horizon": 0,
+          "outcome_field": "t5_return"
+        },
+        "lifecycle_outcome": "SCIENTIFIC_STOP",
+        "termination_reason": "STOP_LOW_INCREMENTAL",
+        "lifecycle_phase": "STOPPED",
+        "experiments_completed": 2,
+        "journey_rows": [
+          {
+            "ordinal": 1,
+            "epistemic_state_entering": "HYPOTHESIS",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "iefp-e3eb6c0d8724",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "iefx-66afef4772be",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "ACTION",
+            "chosen_action": "SEEK_FALSIFICATION",
+            "stop_reason": null,
+            "frozen_contract_id": null
+          },
+          {
+            "ordinal": 2,
+            "epistemic_state_entering": "SUPPORTED",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "sefp-059a7e2bb5a7",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "sefx-0a668f3cd7c6",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "STOP",
+            "chosen_action": "HOLD_UNRESOLVED",
+            "stop_reason": "STOP_LOW_INCREMENTAL",
+            "frozen_contract_id": null
+          }
+        ],
+        "audit": {
+          "lifecycle_run_id": "blc-6ca986701b28",
+          "proposition_id": "prop-65e0692da41571e4",
+          "proposition_hash": "7e56f2e3205d2482a4bea9b891646dd58656f5888c7f6984726362a12e21aeb3",
+          "session_id": "opr-prod-prop-65e0692da41571e4-sess-318",
+          "start_phase": "PROPOSITION_PERSISTED",
+          "end_phase": "STOPPED",
+          "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
+          "budget_initial": {
+            "max_experiment_iterations": 4,
+            "max_search_complexity": 15.0,
+            "max_search_cardinality": 20,
+            "max_execution_failures": 1,
+            "max_redundancy_burden": 0.95
+          },
+          "budget_used": {
+            "experiments_completed": 2,
+            "max_iterations": 4
+          },
+          "experiment_count": 2,
+          "experiment_identities": [
+            "iefp-e3eb6c0d8724",
+            "sefp-059a7e2bb5a7"
+          ],
+          "tool_result_identities": [
+            "iefx-66afef4772be",
+            "sefx-0a668f3cd7c6"
+          ],
+          "interpretation_identities": [
+            "iefi-e9edf50c89ad",
+            "iefi2-1ba94ce2ef5e"
+          ],
+          "decision_identities": [
+            "iefd-696f822d97b6",
+            "iefd2-fd3def49e81b"
+          ],
+          "cumulative_null_ledger": [
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "directional_reversal",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+            },
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "episode_artifact",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+            }
+          ],
+          "dependence_summary": {
+            "row_overlap_fraction": 0.9666666666666667,
+            "null_target_overlap": 0.0,
+            "scientific_question_overlap": 0.0,
+            "sample_dependence_level": "HIGH",
+            "question_novelty": "HIGH",
+            "evidence_relationship": "PARTIAL_REPLICATION",
+            "counted_as_independent_replication": false,
+            "independence_rationale": [
+              "cohort_overlap_ratio=0.967"
+            ]
+          },
+          "failures": [],
+          "warnings": [],
+          "controller_version": "bounded_lifecycle_controller_v1_3j12",
+          "created_at": "2026-08-22T07:38:35.395592+00:00",
+          "audit_hash": "3c3414cb9d2ab4f6553cad8fe4581d03c274fa37bfa6983cf9f3b2c4503a90db"
+        },
+        "budget_initial": {
+          "max_experiment_iterations": 4,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 4
+        },
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "directional_reversal",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+          },
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {
+          "row_overlap_fraction": 0.9666666666666667,
+          "null_target_overlap": 0.0,
+          "scientific_question_overlap": 0.0,
+          "sample_dependence_level": "HIGH",
+          "question_novelty": "HIGH",
+          "evidence_relationship": "PARTIAL_REPLICATION",
+          "counted_as_independent_replication": false,
+          "independence_rationale": [
+            "cohort_overlap_ratio=0.967"
+          ]
+        },
+        "final_epistemic_state": "SUPPORTED",
+        "final_decision_kind": "STOP",
+        "final_chosen_action": "HOLD_UNRESOLVED",
+        "final_stop_reason": "STOP_LOW_INCREMENTAL",
+        "bootstrap_outcome": "SESSION_CREATED",
+        "errors": [],
+        "frozen_at": "2026-08-22T07:38:33.515688+00:00",
+        "lifecycle_frozen_hash": "e56c1d88d3033bab0fd87b00d687ace3584fb885a7cdb78025251e4a2636d3f4",
+        "runner_version": "blind_research_examination_runner_v1_3j11"
+      },
+      "reveal": {
+        "anonymous_case_id": "CASE-0201",
+        "seed": 201,
+        "blind_class": "BLIND-B",
+        "ground_truth": {
+          "case_id": "BBE-BLINDB-0201",
+          "blind_class": "BLIND-B",
+          "seed": 201,
+          "mechanism": "single_episode_quintile_artifact",
+          "true_direction": "positive_focal_only",
+          "stability_structure": "unstable_outside_focal_episode",
+          "artifact_or_confound": "episode_specific_spurious_correlation",
+          "expected_scientific_risk": "artifact_overgeneralization",
+          "expected_behavior_notes": "Should not escalate focal artifact to general belief.",
+          "panel_fingerprint": "2b7603aca5cb51ab7f1568766d73237aa4e059e89131e4089762473de9e70977",
+          "generation_config": {
+            "focal_date": "2026-01-30"
+          },
+          "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+        },
+        "lifecycle_frozen_hash": "e56c1d88d3033bab0fd87b00d687ace3584fb885a7cdb78025251e4a2636d3f4",
+        "reveal_after_hash": "e56c1d88d3033bab0fd87b00d687ace3584fb885a7cdb78025251e4a2636d3f4",
+        "reveal_order_valid": true,
+        "calibration_category": "SUPPORTED",
+        "outcome_score": 0.35,
+        "process_integrity_score": 0.5,
+        "false_positive_risk": "ELEVATED",
+        "notable_findings": [
+          "risky_calibration:final_state=SUPPORTED",
+          "possible_artifact_or_confound_overgeneralization",
+          "scientific_stop:STOP_LOW_INCREMENTAL",
+          "appropriate_uncertainty_stop"
+        ],
+        "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+      }
+    },
+    {
+      "anonymous_id": "CASE-0202",
+      "frozen": {
+        "anonymous_case_id": "CASE-0202",
+        "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-09c",
+        "proposition_id": "prop-830d97c7f53dc12c",
+        "proposition_summary": {
+          "proposition_id": "prop-830d97c7f53dc12c",
+          "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+          "observation_horizon": 0,
+          "outcome_field": "t5_return"
+        },
+        "lifecycle_outcome": "SCIENTIFIC_STOP",
+        "termination_reason": "STOP_LOW_INCREMENTAL",
+        "lifecycle_phase": "STOPPED",
+        "experiments_completed": 2,
+        "journey_rows": [
+          {
+            "ordinal": 1,
+            "epistemic_state_entering": "HYPOTHESIS",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "iefp-dd857a40a5d6",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "iefx-7d3b45867c08",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "ACTION",
+            "chosen_action": "SEEK_FALSIFICATION",
+            "stop_reason": null,
+            "frozen_contract_id": null
+          },
+          {
+            "ordinal": 2,
+            "epistemic_state_entering": "SUPPORTED",
+            "decision_entering": null,
+            "targeted_null": null,
+            "experiment_identity": "sefp-f0082eb4abfc",
+            "population": null,
+            "tool": null,
+            "dependence_novelty": null,
+            "tool_result_identity": "sefx-f5f1cda4e29a",
+            "evidence_direction": null,
+            "evidence_strength": null,
+            "incremental_contribution": null,
+            "epistemic_state_leaving": "SUPPORTED",
+            "decision_leaving": "STOP",
+            "chosen_action": "HOLD_UNRESOLVED",
+            "stop_reason": "STOP_LOW_INCREMENTAL",
+            "frozen_contract_id": null
+          }
+        ],
+        "audit": {
+          "lifecycle_run_id": "blc-415cf3596fcb",
+          "proposition_id": "prop-830d97c7f53dc12c",
+          "proposition_hash": "ecb8925556f4061c24975c87c933241161a96108e6d340e15f03de052d5f6599",
+          "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-09c",
+          "start_phase": "PROPOSITION_PERSISTED",
+          "end_phase": "STOPPED",
+          "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
+          "budget_initial": {
+            "max_experiment_iterations": 4,
+            "max_search_complexity": 15.0,
+            "max_search_cardinality": 20,
+            "max_execution_failures": 1,
+            "max_redundancy_burden": 0.95
+          },
+          "budget_used": {
+            "experiments_completed": 2,
+            "max_iterations": 4
+          },
+          "experiment_count": 2,
+          "experiment_identities": [
+            "iefp-dd857a40a5d6",
+            "sefp-f0082eb4abfc"
+          ],
+          "tool_result_identities": [
+            "iefx-7d3b45867c08",
+            "sefx-f5f1cda4e29a"
+          ],
+          "interpretation_identities": [
+            "iefi-d524e66e2dc8",
+            "iefi2-68b4068b573a"
+          ],
+          "decision_identities": [
+            "iefd-2965db519739",
+            "iefd2-dd8cbe0b5bae"
+          ],
+          "cumulative_null_ledger": [
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "directional_reversal",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+            },
+            {
+              "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+              "null_key": "episode_artifact",
+              "state_before": "STILL_PLAUSIBLE",
+              "state_after": "WEAKENED",
+              "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+            }
+          ],
+          "dependence_summary": {
+            "row_overlap_fraction": 0.9666666666666667,
+            "null_target_overlap": 0.0,
+            "scientific_question_overlap": 0.0,
+            "sample_dependence_level": "HIGH",
+            "question_novelty": "HIGH",
+            "evidence_relationship": "PARTIAL_REPLICATION",
+            "counted_as_independent_replication": false,
+            "independence_rationale": [
+              "cohort_overlap_ratio=0.967"
+            ]
+          },
+          "failures": [],
+          "warnings": [],
+          "controller_version": "bounded_lifecycle_controller_v1_3j12",
+          "created_at": "2026-08-22T07:38:37.303639+00:00",
+          "audit_hash": "7f45a43a93ea8d9b7990a896c79d6acd33e50ab2c8258b19c94a191664b3a69b"
+        },
+        "budget_initial": {
+          "max_experiment_iterations": 4,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 4
+        },
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "directional_reversal",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+          },
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {
+          "row_overlap_fraction": 0.9666666666666667,
+          "null_target_overlap": 0.0,
+          "scientific_question_overlap": 0.0,
+          "sample_dependence_level": "HIGH",
+          "question_novelty": "HIGH",
+          "evidence_relationship": "PARTIAL_REPLICATION",
+          "counted_as_independent_replication": false,
+          "independence_rationale": [
+            "cohort_overlap_ratio=0.967"
+          ]
+        },
+        "final_epistemic_state": "SUPPORTED",
+        "final_decision_kind": "STOP",
+        "final_chosen_action": "HOLD_UNRESOLVED",
+        "final_stop_reason": "STOP_LOW_INCREMENTAL",
+        "bootstrap_outcome": "SESSION_CREATED",
+        "errors": [],
+        "frozen_at": "2026-08-22T07:38:35.438133+00:00",
+        "lifecycle_frozen_hash": "ef162a91a68dbc8d3adb910af9d8c68b7a1b8e452a06d53200bbbdf0db08330e",
+        "runner_version": "blind_research_examination_runner_v1_3j11"
+      },
+      "reveal": {
+        "anonymous_case_id": "CASE-0202",
+        "seed": 202,
+        "blind_class": "BLIND-B",
+        "ground_truth": {
+          "case_id": "BBE-BLINDB-0202",
+          "blind_class": "BLIND-B",
+          "seed": 202,
+          "mechanism": "single_episode_quintile_artifact",
+          "true_direction": "positive_focal_only",
+          "stability_structure": "unstable_outside_focal_episode",
+          "artifact_or_confound": "episode_specific_spurious_correlation",
+          "expected_scientific_risk": "artifact_overgeneralization",
+          "expected_behavior_notes": "Should not escalate focal artifact to general belief.",
+          "panel_fingerprint": "89905fe36bf6bad56ee6e5da9ef9fa6ceeadc0840df76ce31cd9c4a058afffb4",
+          "generation_config": {
+            "focal_date": "2026-01-30"
+          },
+          "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+        },
+        "lifecycle_frozen_hash": "ef162a91a68dbc8d3adb910af9d8c68b7a1b8e452a06d53200bbbdf0db08330e",
+        "reveal_after_hash": "ef162a91a68dbc8d3adb910af9d8c68b7a1b8e452a06d53200bbbdf0db08330e",
+        "reveal_order_valid": true,
+        "calibration_category": "SUPPORTED",
+        "outcome_score": 0.35,
+        "process_integrity_score": 0.5,
+        "false_positive_risk": "ELEVATED",
+        "notable_findings": [
+          "risky_calibration:final_state=SUPPORTED",
+          "possible_artifact_or_confound_overgeneralization",
+          "scientific_stop:STOP_LOW_INCREMENTAL",
+          "appropriate_uncertainty_stop"
+        ],
+        "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+      }
+    }
+  ],
+  "aggregate": {
+    "case_count": 4,
+    "avg_outcome_score": 0.6,
+    "avg_process_integrity_score": 0.75,
+    "critical_false_positive_count": 0,
+    "all_reveal_order_valid": true,
+    "scientific_behavior_pass": true
+  },
+  "budget": 4
+}

@@ -94,18 +94,66 @@ def run_second_experiment_design_pipeline(
     executability: Optional[ExecutabilityContext] = None,
     include_wrong_null_audit: bool = False,
     existing_package: Optional[SecondExperimentPackage] = None,
+    experiment_ordinal: int = 2,
 ) -> SecondExperimentDesignResult:
     """
     Transform frozen ResearchDecisionRecord into SecondExperimentPackage(NOT_EXECUTED).
     """
-    eligibility = validate_second_experiment_design_eligibility(
-        prop=prop,
-        first_package=first_package,
-        first_execution=first_execution,
-        interpretation_envelope=interpretation_envelope,
-        decision_envelope=decision_envelope,
-        existing_package=existing_package,
-    )
+    if experiment_ordinal >= 3:
+        from modules.edge_research.opr_bridge.follow_on_experiment_design_gate import (
+            validate_follow_on_design_eligibility,
+        )
+        from modules.edge_research.opr_bridge.follow_on_research_decision_adapter import (
+            normalize_prior_decision,
+        )
+
+        norm = normalize_prior_decision(
+            {
+                "decision_envelope_id": decision_envelope.decision_envelope_id,
+                "envelope_hash": decision_envelope.envelope_hash,
+                "decision_ordinal": experiment_ordinal - 1,
+                "research_state_identity": decision_envelope.research_state_identity,
+                "research_decision": decision_envelope.research_decision,
+                "decision_kind": decision_envelope.decision_kind,
+                "stop_reason": decision_envelope.stop_reason,
+                "proposition_id": decision_envelope.proposition_id,
+                "proposition_hash": decision_envelope.proposition_hash,
+                "session_id": decision_envelope.session_id,
+                "interpretation_id": decision_envelope.interpretation_id,
+                "interpretation_identity_hash": decision_envelope.interpretation_identity_hash,
+                "epistemic_update_id": decision_envelope.epistemic_update_id,
+                "epistemic_update_hash": decision_envelope.epistemic_update_hash,
+                "first_decision_envelope_id": decision_envelope.decision_envelope_id,
+                "first_decision_hash": decision_envelope.envelope_hash,
+                "first_interpretation_id": interpretation_envelope.interpretation_id,
+                "cumulative_null_ledger": [],
+                "search_accounting": decision_envelope.search_accounting.to_dict(),
+            }
+        )
+        eligibility = validate_follow_on_design_eligibility(
+            prop=prop,
+            first_package=first_package,
+            first_execution=first_execution,
+            interpretation_envelope=interpretation_envelope,
+            prior_decision=norm,
+            existing_package=existing_package,
+            experiment_ordinal=experiment_ordinal,
+        )
+        elig_compat = type("E", (), {
+            "eligible": eligibility.eligible,
+            "idempotent_replay": eligibility.idempotent_replay,
+            "reasons": eligibility.reasons,
+        })()
+        eligibility = elig_compat
+    else:
+        eligibility = validate_second_experiment_design_eligibility(
+            prop=prop,
+            first_package=first_package,
+            first_execution=first_execution,
+            interpretation_envelope=interpretation_envelope,
+            decision_envelope=decision_envelope,
+            existing_package=existing_package,
+        )
 
     if eligibility.idempotent_replay and existing_package is not None:
         return SecondExperimentDesignResult(
@@ -137,6 +185,7 @@ def run_second_experiment_design_pipeline(
                 raw_candidates=tuple(),
                 deduped=tuple(),
                 selection_reason="Research decision is STOP — no second experiment design",
+                experiment_ordinal=experiment_ordinal,
             ),
             stop_boundary=STOP_SECOND_EXPERIMENT_DESIGNED,
         )
@@ -165,6 +214,7 @@ def run_second_experiment_design_pipeline(
                 raw_candidates=tuple(),
                 deduped=tuple(),
                 selection_reason="Could not derive objective from frozen decision",
+                experiment_ordinal=experiment_ordinal,
             ),
             stop_boundary=STOP_SECOND_EXPERIMENT_DESIGNED,
         )
@@ -193,6 +243,7 @@ def run_second_experiment_design_pipeline(
         raw_candidates=tuple(raw_candidates),
         deduped=tuple(deduped),
         selection=selection,
+        experiment_ordinal=experiment_ordinal,
     )
 
     return SecondExperimentDesignResult(
@@ -213,6 +264,7 @@ def _build_package(
     raw_candidates,
     deduped,
     selection,
+    experiment_ordinal: int = 2,
 ) -> SecondExperimentPackage:
     ts = utc_now_iso()
     pkg_id = new_id("sefp")
@@ -225,12 +277,13 @@ def _build_package(
         "research_decision_hash": rd.get("record_hash"),
         "disposition": selection.disposition,
         "selected_candidate_id": selection.selected.candidate_id if selection.selected else None,
+        "experiment_ordinal": experiment_ordinal,
     }
 
     return SecondExperimentPackage(
         package_id=pkg_id,
         record_version=PACKAGE_RECORD_VERSION,
-        experiment_ordinal=2,
+        experiment_ordinal=experiment_ordinal,
         proposition_id=prop["proposition_id"],
         proposition_hash=decision_envelope.proposition_hash,
         epistemic_update_id=str(epu.get("update_id", "")),
@@ -307,6 +360,7 @@ def _build_silence_package(
     raw_candidates,
     deduped,
     selection_reason: str,
+    experiment_ordinal: int = 2,
 ) -> SecondExperimentPackage:
     from modules.edge_research.opr_bridge.second_experiment_records import SecondExperimentDisposition
 
@@ -327,7 +381,7 @@ def _build_silence_package(
     return SecondExperimentPackage(
         package_id=pkg_id,
         record_version=PACKAGE_RECORD_VERSION,
-        experiment_ordinal=2,
+        experiment_ordinal=experiment_ordinal,
         proposition_id=prop["proposition_id"],
         proposition_hash=decision_envelope.proposition_hash,
         epistemic_update_id=str(epu.get("update_id", "")),

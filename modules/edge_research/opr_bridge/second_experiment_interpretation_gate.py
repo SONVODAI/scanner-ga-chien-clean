@@ -52,6 +52,7 @@ def validate_second_interpretation_eligibility(
     frozen_contract_ref: FrozenInterpretationContractRef,
     existing_interpretation: Optional[SecondExperimentInterpretationEnvelope] = None,
     alternate_contract_hash: Optional[str] = None,
+    expected_ordinal: int = 2,
 ) -> SecondInterpretationEligibilityResult:
     reasons: list[str] = []
     checks: Dict[str, bool] = {}
@@ -64,7 +65,7 @@ def validate_second_interpretation_eligibility(
     if not checks["execution_envelope_present"]:
         return SecondInterpretationEligibilityResult(False, False, ("no_execution_envelope",), checks)
 
-    checks["experiment_ordinal_two"] = execution_envelope.experiment_ordinal == 2
+    checks["experiment_ordinal_two"] = execution_envelope.experiment_ordinal == expected_ordinal
     checks["tool_result_present"] = bool(execution_envelope.tool_result)
     checks["tool_result_hash_present"] = bool(execution_envelope.tool_result_hash)
     checks["novelty_decomposition_present"] = bool(execution_envelope.novelty_decomposition)

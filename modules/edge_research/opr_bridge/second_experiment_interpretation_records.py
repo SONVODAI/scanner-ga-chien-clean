@@ -123,6 +123,7 @@ def build_second_interpretation_envelope(
     prior_epistemic_state: str,
     resulting_epistemic_state: str,
     interpretation_identity_hash: str,
+    experiment_ordinal: int = 2,
 ) -> SecondExperimentInterpretationEnvelope:
     ts = utc_now_iso()
     iid = new_id("iefi2")
@@ -136,7 +137,7 @@ def build_second_interpretation_envelope(
     return SecondExperimentInterpretationEnvelope(
         interpretation_id=iid,
         record_version=ENVELOPE_VERSION,
-        experiment_ordinal=2,
+        experiment_ordinal=experiment_ordinal,
         execution_id=execution_id,
         execution_identity_hash=execution_identity_hash,
         tool_result_hash=tool_result_hash,

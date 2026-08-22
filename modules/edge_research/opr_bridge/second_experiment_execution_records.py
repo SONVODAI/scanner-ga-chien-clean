@@ -117,12 +117,13 @@ def build_second_execution_envelope(
     execution_outcome: str,
     warnings: Tuple[str, ...] = (),
     errors: Tuple[str, ...] = (),
+    experiment_ordinal: int = 2,
 ) -> SecondExperimentExecutionEnvelope:
     ts = utc_now_iso()
     eid = new_id("sefx")
     body = {
         "execution_id": eid,
-        "experiment_ordinal": 2,
+        "experiment_ordinal": experiment_ordinal,
         "package_id": package_id,
         "package_hash": package_hash,
         "execution_identity_hash": execution_identity_hash,
@@ -131,7 +132,7 @@ def build_second_execution_envelope(
     return SecondExperimentExecutionEnvelope(
         execution_id=eid,
         record_version=ENVELOPE_VERSION,
-        experiment_ordinal=2,
+        experiment_ordinal=experiment_ordinal,
         package_id=package_id,
         package_hash=package_hash,
         research_decision_id=research_decision_id,

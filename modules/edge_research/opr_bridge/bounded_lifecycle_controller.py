@@ -191,7 +191,7 @@ def _run_ordinal1_decide(
     return True, None
 
 
-ARCHITECTURAL_MAX_FOLLOW_ON_ORDINAL = 2
+ARCHITECTURAL_MAX_FOLLOW_ON_ORDINAL = None  # 3J.12: generic N support; ordinal 2 frozen via production_second_*
 
 
 def _run_follow_on_design(
@@ -203,8 +203,24 @@ def _run_follow_on_design(
     *,
     data_dir: Optional[Path],
 ) -> Tuple[bool, Optional[str]]:
-    if entry.ordinal > ARCHITECTURAL_MAX_FOLLOW_ON_ORDINAL:
-        return False, "architectural_break:follow_on_design_limited_to_ordinal_2"
+    if entry.ordinal >= 3:
+        from modules.edge_research.opr_bridge.follow_on_experiment_core import run_follow_on_design
+
+        sx = run_follow_on_design(
+            prop,
+            panel,
+            experiment_ordinal=entry.ordinal,
+            history=history,
+            session_id=record.session_id,
+            data_dir=data_dir,
+        )
+        if not sx.package:
+            return False, f"experiment_{entry.ordinal}_design_failed"
+        entry.package = sx.package.to_dict()
+        boundary = stop_boundary_for_stage(entry.ordinal, "designed")
+        entry.stop_boundaries.append(boundary)
+        _append_boundary(record, boundary)
+        return True, None
 
     from modules.edge_research.opr_bridge.production_second_experiment_design import (
         run_production_second_experiment_design,
@@ -242,8 +258,25 @@ def _run_follow_on_execute(
     *,
     data_dir: Optional[Path],
 ) -> Tuple[bool, Optional[str]]:
-    if entry.ordinal > ARCHITECTURAL_MAX_FOLLOW_ON_ORDINAL:
-        return False, "architectural_break:follow_on_execute_limited_to_ordinal_2"
+    if entry.ordinal >= 3:
+        from modules.edge_research.opr_bridge.follow_on_experiment_core import run_follow_on_execute
+
+        ex = run_follow_on_execute(
+            prop,
+            panel,
+            experiment_ordinal=entry.ordinal,
+            history=history,
+            package_dict=entry.package or {},
+            session_id=record.session_id,
+            data_dir=data_dir,
+        )
+        if not ex.envelope:
+            return False, f"experiment_{entry.ordinal}_execution_failed"
+        entry.execution = ex.envelope.to_dict()
+        boundary = stop_boundary_for_stage(entry.ordinal, "executed")
+        entry.stop_boundaries.append(boundary)
+        _append_boundary(record, boundary)
+        return True, None
 
     from modules.edge_research.opr_bridge.production_second_experiment_execution import (
         run_production_second_experiment_execution,
@@ -278,8 +311,26 @@ def _run_follow_on_interpret(
     *,
     data_dir: Optional[Path],
 ) -> Tuple[bool, Optional[str]]:
-    if entry.ordinal > ARCHITECTURAL_MAX_FOLLOW_ON_ORDINAL:
-        return False, "architectural_break:follow_on_interpret_limited_to_ordinal_2"
+    if entry.ordinal >= 3:
+        from modules.edge_research.opr_bridge.follow_on_experiment_core import run_follow_on_interpret
+
+        ix = run_follow_on_interpret(
+            prop,
+            experiment_ordinal=entry.ordinal,
+            history=history,
+            package_dict=entry.package or {},
+            execution_dict=entry.execution or {},
+            session_id=record.session_id,
+            data_dir=data_dir,
+        )
+        if not ix.envelope:
+            return False, f"experiment_{entry.ordinal}_interpretation_failed"
+        entry.interpretation = ix.envelope.to_dict()
+        entry.epistemic_update = ix.envelope.epistemic_update
+        boundary = stop_boundary_for_stage(entry.ordinal, "interpreted")
+        entry.stop_boundaries.append(boundary)
+        _append_boundary(record, boundary)
+        return True, None
 
     from modules.edge_research.opr_bridge.production_second_experiment_interpretation import (
         run_production_second_experiment_interpretation,
@@ -315,8 +366,24 @@ def _run_follow_on_decide(
     *,
     data_dir: Optional[Path],
 ) -> Tuple[bool, Optional[str]]:
-    if entry.ordinal > ARCHITECTURAL_MAX_FOLLOW_ON_ORDINAL:
-        return False, "architectural_break:follow_on_decide_limited_to_ordinal_2"
+    if entry.ordinal >= 3:
+        from modules.edge_research.opr_bridge.follow_on_experiment_core import run_follow_on_decide
+
+        dx = run_follow_on_decide(
+            prop,
+            experiment_ordinal=entry.ordinal,
+            history=history,
+            interpretation_dict=entry.interpretation or {},
+            session_id=record.session_id,
+            data_dir=data_dir,
+        )
+        if not dx.envelope:
+            return False, f"experiment_{entry.ordinal}_decision_failed"
+        entry.decision = dx.envelope.to_dict()
+        boundary = stop_boundary_for_stage(entry.ordinal, "decided")
+        entry.stop_boundaries.append(boundary)
+        _append_boundary(record, boundary)
+        return True, None
 
     from modules.edge_research.opr_bridge.production_second_experiment_research_decision import (
         run_production_second_experiment_research_decision,

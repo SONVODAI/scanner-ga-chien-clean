@@ -147,6 +147,7 @@ def build_second_decision_envelope(
     incremental_evidence_summary: Dict[str, Any],
     confirmation_bias_guard_applied: bool,
     mechanical_sequencing_blocked: bool,
+    decision_ordinal: int = 2,
 ) -> SecondExperimentResearchDecisionEnvelope:
     ts = utc_now_iso()
     deid = new_id("iefd2")
@@ -157,12 +158,12 @@ def build_second_decision_envelope(
         "first_decision_hash": first_decision_hash,
         "research_decision_hash": research_decision.get("record_hash"),
         "decider_version": DECIDER_VERSION,
-        "decision_ordinal": 2,
+        "decision_ordinal": decision_ordinal,
     }
     return SecondExperimentResearchDecisionEnvelope(
         decision_envelope_id=deid,
         record_version=ENVELOPE_VERSION,
-        decision_ordinal=2,
+        decision_ordinal=decision_ordinal,
         interpretation_id=interpretation_id,
         interpretation_identity_hash=interpretation_identity_hash,
         epistemic_update_id=epistemic_update_id,

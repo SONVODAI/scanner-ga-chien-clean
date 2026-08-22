@@ -108,6 +108,7 @@ def validate_second_execution_eligibility(
     row_overlap_fraction: Optional[float] = None,
     requested_tool_override: Optional[str] = None,
     binding_mutation: Optional[Dict[str, Any]] = None,
+    expected_ordinal: int = 2,
 ) -> Tuple[ExecutionEligibilityResult, Optional[NoveltyDecomposition]]:
     reasons: List[str] = []
     checks: Dict[str, bool] = {}
@@ -116,14 +117,14 @@ def validate_second_execution_eligibility(
     if not checks["package_exists"]:
         return ExecutionEligibilityResult(ExecutionEligibility.INELIGIBLE.value, ("package_missing",), checks), None
 
-    checks["experiment_ordinal_two"] = package.experiment_ordinal == 2
+    checks["experiment_ordinal_two"] = package.experiment_ordinal == expected_ordinal
     checks["disposition_selected"] = package.disposition == SecondExperimentDisposition.SELECTED.value
     checks["execution_status_not_executed"] = package.execution_status == "NOT_EXECUTED"
     checks["selected_spec_present"] = bool(package.selected_experiment_spec)
     checks["selected_candidate_present"] = bool(package.selected_candidate_id)
 
-    if package.experiment_ordinal != 2:
-        reasons.append("experiment_ordinal_not_2")
+    if package.experiment_ordinal != expected_ordinal:
+        reasons.append(f"experiment_ordinal_not_{expected_ordinal}")
     if package.disposition != SecondExperimentDisposition.SELECTED.value:
         reasons.append(f"disposition_not_selected:{package.disposition}")
     if package.execution_status != "NOT_EXECUTED" and existing_envelope is None:

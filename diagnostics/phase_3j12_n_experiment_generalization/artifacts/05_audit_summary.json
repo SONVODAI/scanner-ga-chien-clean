@@ -1,0 +1,10 @@
+{
+  "head": "870040e2d248166655fc8bb55e12cd04228952a7",
+  "phase": "3J.12",
+  "stop_boundary": "STOP_N_EXPERIMENT_GENERALIZATION",
+  "cf_nx_pass": true,
+  "ordinal_3_diagnostic_pass": true,
+  "blind_longer_budget_critical_fp": 0,
+  "regressions_pass": true,
+  "phase_pass": true
+}

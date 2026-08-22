@@ -94,6 +94,7 @@ def execute_second_experiment(
     binding_mutation: Optional[Dict[str, Any]] = None,
     row_overlap_fraction: Optional[float] = None,
     novelty_decomposition: Optional[NoveltyDecomposition] = None,
+    expected_ordinal: int = 2,
 ) -> SecondExperimentExecutionResult:
     """Execute exactly the frozen second experiment — fail closed on ineligibility."""
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
@@ -112,6 +113,7 @@ def execute_second_experiment(
         row_overlap_fraction=row_overlap_fraction,
         requested_tool_override=requested_tool_override,
         binding_mutation=binding_mutation,
+        expected_ordinal=expected_ordinal,
     )
 
     if eligibility.eligibility == ExecutionEligibility.IDEMPOTENT_REPLAY.value and existing_envelope:
@@ -254,6 +256,7 @@ def execute_second_experiment(
         execution_outcome=exec_outcome,
         warnings=tuple(tool_result.limitations or ()),
         errors=() if exec_outcome == ExecutionOutcome.SUCCESS.value else (f"tool_status:{tr_dict.get('status')}",),
+        experiment_ordinal=package.experiment_ordinal,
     )
 
     if _envelope_contains_interpretation(envelope):
