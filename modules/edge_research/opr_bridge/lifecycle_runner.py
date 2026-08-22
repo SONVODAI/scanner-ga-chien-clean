@@ -20,6 +20,11 @@ from modules.edge_research.opr_bridge.lifecycle_execution import (
     tool_result_hash,
 )
 from modules.edge_research.opr_bridge.lifecycle_records import LIFECYCLE_VERSION, stable_hash
+from modules.edge_research.opr_bridge.lifecycle_synthesis_hook import (
+    LifecycleKnowledgeState,
+    attach_synthesis_to_lifecycle_result,
+    on_epistemic_update_completed,
+)
 from modules.edge_research.opr_bridge.proposition_experiment_interpreter import (
     apply_epistemic_transition,
     build_epistemic_update,
@@ -125,6 +130,9 @@ def run_minimal_lifecycle(
     prebuilt_quintile_metrics=None,
     interpretation_contract=None,
     interpretation_contract_ref: Optional[Dict[str, Any]] = None,
+    knowledge_state: Optional[LifecycleKnowledgeState] = None,
+    skip_automatic_synthesis: bool = False,
+    deterministic_synthesis_replay: bool = False,
 ) -> Dict[str, Any]:
     """
     Full minimal lifecycle: contract → execute → interpret → update → decide → lineage.
@@ -202,6 +210,7 @@ def run_minimal_lifecycle(
         "experiment_spec": exec_result.experiment_spec.to_dict() if hasattr(exec_result.experiment_spec, "to_dict") else {
             "tool_name": spec.tool_name,
             "inputs": dict(spec.inputs),
+            "research_scope": dict(spec.research_scope or {}),
             "data_cutoff_date": spec.data_cutoff_date,
         },
         "tool_result_hash": tr_hash,
@@ -221,7 +230,7 @@ def run_minimal_lifecycle(
         ),
     }
 
-    return {
+    result = {
         "contract": contract.to_dict(),
         "tool_result": tool_result.to_dict(),
         "quintile_metrics": qm.to_dict(),
@@ -231,6 +240,24 @@ def run_minimal_lifecycle(
         "lineage": lineage,
         "proposition_hash": prop_hash,
     }
+
+    if not skip_automatic_synthesis:
+        exp_spec_dict = lineage["experiment_spec"]
+        ks = knowledge_state or LifecycleKnowledgeState(prop_dict["proposition_id"])
+        ks, synthesis_outcome = on_epistemic_update_completed(
+            prop_dict,
+            update.to_dict(),
+            exp_spec_dict,
+            experiment_ref,
+            tr_hash,
+            interpretation=interpretation.to_dict(),
+            knowledge_state=ks,
+            deterministic_replay=deterministic_synthesis_replay,
+        )
+        attach_synthesis_to_lifecycle_result(result, synthesis_outcome, ks)
+        result["knowledge_state_obj"] = ks
+
+    return result
 
 
 def extract_frozen_proposition_from_3i5(replay_path: Path) -> Dict[str, Any]:

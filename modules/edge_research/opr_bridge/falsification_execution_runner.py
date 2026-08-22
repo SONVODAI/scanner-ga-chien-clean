@@ -22,6 +22,12 @@ from modules.edge_research.opr_bridge.interpretation_contract import (
 from modules.edge_research.opr_bridge.lifecycle_execution import extract_quintile_metrics, tool_result_hash
 from modules.edge_research.opr_bridge.lifecycle_records import LIFECYCLE_VERSION, stable_hash, utc_now_iso, new_id
 from modules.edge_research.opr_bridge.lifecycle_runner import execute_frozen_experiment
+from modules.edge_research.opr_bridge.lifecycle_synthesis_hook import (
+    LifecycleKnowledgeState,
+    attach_synthesis_to_lifecycle_result,
+    bootstrap_knowledge_state_from_lineage,
+    on_epistemic_update_completed,
+)
 from modules.edge_research.opr_bridge.proposition_experiment_interpreter import (
     apply_epistemic_transition,
     build_epistemic_update,
@@ -202,10 +208,47 @@ def run_one_shot_falsification_execution(
     lineage: Dict[str, Any],
     interpretation_contract_dict: Dict[str, Any],
     panel: pd.DataFrame,
+    knowledge_state: Optional[LifecycleKnowledgeState] = None,
+    prior_lifecycle_lineage: Optional[Dict[str, Any]] = None,
+    skip_automatic_synthesis: bool = False,
+    deterministic_synthesis_replay: bool = False,
 ) -> Dict[str, Any]:
     """
     Execute frozen package once, interpret, append epistemic update.
     """
+    ks: Optional[LifecycleKnowledgeState] = knowledge_state
+    if ks is None and prior_lifecycle_lineage is not None:
+        ks = bootstrap_knowledge_state_from_lineage(
+            proposition,
+            prior_lifecycle_lineage,
+            deterministic_replay=deterministic_synthesis_replay,
+        )
+
+    def _attach_synthesis(result: Dict[str, Any], epu: Dict[str, Any], interp: Dict[str, Any]) -> Dict[str, Any]:
+        if skip_automatic_synthesis:
+            return result
+        nonlocal ks
+        spec_dict = package["selected_experiment_spec"]
+        exp_ref = epu.get("experiment_ref", f"falsification_{package['selected_candidate_id']}")
+        tr_h = epu.get("tool_result_hash") or result.get("raw_tool_result", {}).get("result_hash", "")
+        meta = epu.get("falsification_refs")
+        ks_local = ks or LifecycleKnowledgeState(proposition["proposition_id"])
+        ks_local, outcome = on_epistemic_update_completed(
+            proposition,
+            epu,
+            spec_dict,
+            exp_ref,
+            tr_h,
+            interpretation=interp,
+            lineage_metadata=meta,
+            knowledge_state=ks_local,
+            deterministic_replay=deterministic_synthesis_replay,
+        )
+        ks = ks_local
+        attach_synthesis_to_lifecycle_result(result, outcome, ks_local)
+        result["knowledge_state_obj"] = ks_local
+        return result
+
     integrity = verify_package_integrity(
         package,
         candidate_record=candidate_record,
@@ -300,7 +343,8 @@ def run_one_shot_falsification_execution(
                 prior_state=prior_state,
                 resulting_state=prior_state,
             )
-            return {
+            return _attach_synthesis(
+                {
                 "verdict": "AUTONOMOUS_FALSIFICATION_PARTIAL",
                 "lifecycle_verdict_detail": "STATE_TRANSITION_NOT_PREREGISTERED",
                 "integrity": integrity,
@@ -315,7 +359,10 @@ def run_one_shot_falsification_execution(
                 "research_decision": None,
                 "package_hash_after": package_hash_before,
                 "proposition_hash_after": prop_hash_before,
-            }
+            },
+                update.to_dict(),
+                interpretation.to_dict(),
+            )
 
         resulting_state, transition_key = apply_epistemic_transition(
             contract, interpretation, prior_state
@@ -410,7 +457,8 @@ def run_one_shot_falsification_execution(
         ),
     }
 
-    return {
+    return _attach_synthesis(
+        {
         "verdict": verdict,
         "integrity": integrity,
         "independence_audit": independence,
@@ -441,7 +489,10 @@ def run_one_shot_falsification_execution(
         "proposition_hash_after": prop_hash_after,
         "scientific_proposition_outcome": _scientific_outcome(interpretation.evidence_class.value, resulting_state),
         "researcher_capability_outcome": _capability_outcome(verdict, integrity, proposition_audit, package_audit),
-    }
+    },
+        extended_update,
+        interpretation.to_dict(),
+    )
 
 
 def _scientific_outcome(evidence_class: str, resulting_state: str) -> str:
