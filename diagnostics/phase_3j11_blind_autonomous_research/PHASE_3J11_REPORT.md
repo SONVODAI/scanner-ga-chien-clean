@@ -8,7 +8,8 @@
 | Base | `cursor/phase-3j10-bounded-autonomous-research-lifecycle-aad2` (3J.10 PASS) |
 | Prior STOP | `STOP_LIFECYCLE_BOUNDED` |
 | New STOP | `STOP_BLIND_EXAMINATION_COMPLETE` |
-| PR | (opened after push) |
+| Commit | `2d7401038` |
+| PR | [#69](https://github.com/SONVODAI/scanner-ga-chien-clean/pull/69) |
 
 ## Purpose
 
