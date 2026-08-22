@@ -724,10 +724,22 @@ def build_opportunity_from_candidate(
         defer_snapshot=defer_snap,
     )
     record_novelty_gating_audit(graph, gating_audit)
+
+    from modules.edge_research.research_novelty_rank_reconciliation import (
+        reconcile_planner_novelty_in_base_score,
+        record_rank_reconciliation_audit,
+    )
+
+    reconciled_base, rank_audit = reconcile_planner_novelty_in_base_score(
+        base_score,
+        novelty,
+        gating_audit,
+    )
+    record_rank_reconciliation_audit(graph, rank_audit)
     redundancy_penalty = redundancy * WEIGHT_REDUNDANCY_DIMINISH / 3.0
 
     expected = (
-        base_score
+        reconciled_base
         + exploration_component
         + exploitation_component
         + mig
