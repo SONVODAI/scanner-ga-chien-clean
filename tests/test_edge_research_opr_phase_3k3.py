@@ -85,7 +85,7 @@ def test_live_forward_mechanics_fixture():
     with tempfile.TemporaryDirectory() as tmp:
         result = run_live_forward_mechanics_fixture(
             panel,
-            target_trade_date=dates[0],
+            target_trade_date=dates[-1],
             data_dir=Path(tmp),
             repo_root=REPO,
         )

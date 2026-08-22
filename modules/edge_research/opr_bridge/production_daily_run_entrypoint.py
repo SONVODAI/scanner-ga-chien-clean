@@ -1,5 +1,5 @@
 """
-Phase 3K.2 — CLI entrypoint for future scheduled daily runs (NOT activated).
+Phase 3K.2 / 3K.5A — CLI entrypoint for future scheduled daily runs (NOT activated).
 """
 
 from __future__ import annotations
@@ -21,11 +21,21 @@ from modules.edge_research.opr_bridge.production_daily_run_records import (
     RunDisposition,
 )
 from modules.edge_research.opr_bridge.production_scheduling_contract import build_scheduling_contract
+from modules.edge_research.opr_bridge.production_timezone_policy import resolve_target_trade_date
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Production daily research run (3K.2)")
-    parser.add_argument("--trade-date", required=True, help="Target trade date YYYY-MM-DD")
+    parser = argparse.ArgumentParser(description="Production daily research run (3K.2/3K.5A)")
+    parser.add_argument(
+        "--trade-date",
+        default=None,
+        help="Target VN trading session date YYYY-MM-DD (default: derive from VN calendar)",
+    )
+    parser.add_argument(
+        "--derive-vn-date",
+        action="store_true",
+        help="Explicitly derive target from Asia/Ho_Chi_Minh (default when --trade-date omitted)",
+    )
     parser.add_argument(
         "--mode",
         default=BACKFILL_NON_FORWARD,
@@ -40,11 +50,12 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(build_scheduling_contract(), indent=2))
         return 0
 
+    trade_date = resolve_target_trade_date(args.trade_date)
     panel = build_research_panel()
     data_dir = Path(args.data_dir) if args.data_dir else None
     result = run_production_daily_research(
         panel,
-        target_trade_date=args.trade_date,
+        target_trade_date=trade_date,
         run_mode=args.mode,
         data_dir=data_dir,
         use_run_lock=args.use_lock,

@@ -107,7 +107,7 @@ def discover_production_data_sources(repo_root: Optional[Path] = None) -> Dict[s
             required_cols=["date", "market_real"],
         ),
     }
-    sources["t0_observation_freeze"]["wired_to_readiness_gate"] = False
+    sources["t0_observation_freeze"]["wired_to_readiness_gate"] = True
 
     panel = build_research_panel()
     panel_info: Dict[str, Any] = {
@@ -134,10 +134,12 @@ def discover_production_data_sources(repo_root: Optional[Path] = None) -> Dict[s
         "sources": sources,
         "panel": panel_info,
         "eod_session_complete_signal": {
-            "documented": "source_max_trade_date >= target AND rows exist for target",
-            "t0_freeze_wired": False,
+            "documented": "t0_observation_freeze rows + market AFTER_CLOSE + panel alignment",
+            "t0_freeze_wired": True,
+            "authoritative_eod_contract": "production_eod_completeness.verify_eod_completeness",
+            "vn_trading_calendar": "config/vn_trading_calendar.json",
             "post_eod_18h_vn_enforced": False,
-            "note": "EOD completeness is row-presence based; 18:00 VN freeze not wired to readiness gate",
+            "post_eod_enforced_via": "t0_observation_freeze + market_AFTER_CLOSE (not clock-only)",
         },
         "readiness": {
             "sources_identified": not ambiguous,

@@ -42,6 +42,9 @@ from modules.edge_research.opr_bridge.production_living_research_ui_read_model i
 from modules.edge_research.opr_bridge.production_observation_isolation import run_trading_isolation_audit
 from modules.edge_research.opr_bridge.production_pre_deployment_dry_run import run_pre_deployment_dry_run
 from modules.edge_research.opr_bridge.production_run_lock import acquire_run_lock, is_lock_stale, release_run_lock
+from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+    evaluate_calendar_session_eligibility,
+)
 from modules.edge_research.opr_bridge.production_timezone_audit import audit_utc_vs_vn_boundary
 
 BENCHMARK_VERSION = "bb_live_forward_production_readiness_01_v1_3k5"
@@ -52,7 +55,7 @@ def run_cf_ready_counterfactuals(repo_root: Optional[Path] = None) -> Dict[str, 
     cf: Dict[str, Any] = {}
     panel = _anomaly_panel(seed=42)
     dates = sorted(panel["trade_date"].astype(str).unique())
-    target = dates[10]
+    target = next(d for d in dates if evaluate_calendar_session_eligibility(d).eligible)
 
     # CF-READY1 — ambiguous production source -> readiness fail
     discovery = discover_production_data_sources(repo)
@@ -136,7 +139,9 @@ def run_cf_ready_counterfactuals(repo_root: Optional[Path] = None) -> Dict[str, 
         }
 
         # CF-READY8 — genesis moved backward -> reject
-        ok8, reason8 = reject_genesis_backward_move(genesis, dates[5])
+        prior_dates = [d for d in dates if d < target]
+        backward_date = prior_dates[0] if prior_dates else "2000-01-01"
+        ok8, reason8 = reject_genesis_backward_move(genesis, backward_date)
         cf["CF-READY8"] = {
             "passed": not ok8,
             "description": "Genesis moved backward -> reject",

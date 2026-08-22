@@ -135,7 +135,7 @@ def discover_runtime_environment(repo_root: Path) -> Dict[str, Any]:
         "deploy_systemd_units": systemd_units,
         "production_working_directory_documented": "/opt/mrbot-camera",
         "venv_documented": "/opt/mrbot-camera-venv",
-        "daily_research_timer_in_repo": False,
+        "daily_research_timer_in_repo": "mrbot-daily-research.timer" in systemd_units,
         "intraday_collect_timer_in_repo": "mrbot-intraday-collect.timer" in systemd_units,
         "edge_artifacts_service_in_repo": "mrbot-edge-artifacts.service" in systemd_units,
     }
@@ -172,7 +172,9 @@ def build_readiness_matrix(
         "Production data readiness": (
             "PASS" if data_discovery["readiness"]["primary_panel_available"] else "FAIL"
         ),
-        "EOD completeness": eod_audit.get("verdict", "PASS_WITH_PREREQUISITE"),
+        "EOD completeness": (
+            "PASS" if eod_audit.get("verdict") == "PASS" else eod_audit.get("verdict", "PASS_WITH_PREREQUISITE")
+        ),
         "Timezone correctness": (
             "PASS_WITH_PREREQUISITE"
             if timezone_audit.get("findings")

@@ -34,6 +34,9 @@ from modules.edge_research.opr_bridge.production_living_research_ui_read_model i
 )
 from modules.edge_research.opr_bridge.production_observation_isolation import run_trading_isolation_audit
 from modules.edge_research.opr_bridge.production_research_observation import run_production_research_observation
+from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+    evaluate_calendar_session_eligibility,
+)
 
 BENCHMARK_VERSION = "bb_living_research_ui_01_v1_3k4"
 
@@ -105,10 +108,11 @@ def run_ui_read_model_fixtures(repo_root: Optional[Path] = None) -> Dict[str, An
             data_dir2 = Path(tmp2)
             silent = _silent_panel(seed=99)
             sdates = sorted(silent["trade_date"].astype(str).unique())
+            sel = next(d for d in sdates if evaluate_calendar_session_eligibility(d).eligible)
             run_production_daily_research(
-                silent, target_trade_date=sdates[10], run_mode=BACKFILL_NON_FORWARD, data_dir=data_dir2
+                silent, target_trade_date=sel, run_mode=BACKFILL_NON_FORWARD, data_dir=data_dir2
             )
-            rm_e = build_living_research_ui_read_model(trade_date=sdates[10], data_dir=data_dir2)
+            rm_e = build_living_research_ui_read_model(trade_date=sel, data_dir=data_dir2)
             snap_e = render_living_research_ui_text_snapshot(rm_e, data_dir=data_dir2)
             has_voice = bool(rm_e.get("voice", {}).get("narrative_vi"))
             not_dead = "NO EDGE" not in snap_e.upper()

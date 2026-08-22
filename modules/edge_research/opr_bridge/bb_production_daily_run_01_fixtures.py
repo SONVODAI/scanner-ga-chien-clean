@@ -137,11 +137,19 @@ def run_cf_run_counterfactuals(repo_root: Optional[Path] = None) -> Dict[str, An
         }
 
         # CF-RUN9 — prior active observation + no new discovery -> reassessed
+        from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+            evaluate_calendar_session_eligibility,
+        )
+        eligible_dates = [
+            d for d in sorted(panel["trade_date"].astype(str).unique())
+            if evaluate_calendar_session_eligibility(d).eligible
+        ]
+        d_prior, d_next = eligible_dates[10], eligible_dates[11]
         run_production_daily_research(
-            panel, target_trade_date="2026-01-17", run_mode=BACKFILL_NON_FORWARD, data_dir=data_dir
+            panel, target_trade_date=d_prior, run_mode=BACKFILL_NON_FORWARD, data_dir=data_dir
         )
         r9 = run_production_daily_research(
-            panel, target_trade_date="2026-01-18", run_mode=BACKFILL_NON_FORWARD, data_dir=data_dir
+            panel, target_trade_date=d_next, run_mode=BACKFILL_NON_FORWARD, data_dir=data_dir
         )
         reassessed = r9.get("run", {}).get("observations_reassessed", [])
         cf["CF-RUN9"] = {

@@ -1,29 +1,32 @@
 """
-Phase 3K.2 — Trading session eligibility for production daily runs.
+Phase 3K.2 / 3K.5A — Trading session eligibility for production daily runs.
 
-Uses panel-derived trading sessions as authoritative; weekend guard only.
-No exchange holiday calendar invented here.
+Uses VN trading calendar + panel-derived sessions. Fail closed on calendar unknown.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
-from modules.intraday_memory.scheduler import is_vn_weekend
+from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+    evaluate_calendar_session_eligibility,
+)
 
 
 @dataclass(frozen=True)
 class TradingSessionEligibility:
     target_trade_date: str
     eligible: bool
-    disposition: str  # ELIGIBLE | SKIPPED_NON_TRADING_DAY | WAITING_FOR_DATA
+    disposition: str  # ELIGIBLE | SKIPPED_NON_TRADING_DAY | WAITING_FOR_DATA | CALENDAR_UNKNOWN
     reason: str
     is_weekend: bool
     in_panel_sessions: bool
+    calendar_eligible: bool
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -33,6 +36,7 @@ class TradingSessionEligibility:
             "reason": self.reason,
             "is_weekend": self.is_weekend,
             "in_panel_sessions": self.in_panel_sessions,
+            "calendar_eligible": self.calendar_eligible,
         }
 
 
@@ -50,53 +54,70 @@ def is_trading_session_in_panel(panel: pd.DataFrame, target_trade_date: str) -> 
 def evaluate_trading_session_eligibility(
     panel: pd.DataFrame,
     target_trade_date: str,
+    *,
+    calendar_path: Optional[Path] = None,
 ) -> TradingSessionEligibility:
     """
     Determine whether target_trade_date is an eligible trading session for a daily run.
-    """
+  """
     td = str(target_trade_date)
+    cal = evaluate_calendar_session_eligibility(td, calendar_path=calendar_path)
+
+    if cal.disposition == "CALENDAR_UNKNOWN":
+        return TradingSessionEligibility(
+            target_trade_date=td,
+            eligible=False,
+            disposition="CALENDAR_UNKNOWN",
+            reason=cal.reason,
+            is_weekend=False,
+            in_panel_sessions=False,
+            calendar_eligible=False,
+        )
+
+    if not cal.eligible:
+        return TradingSessionEligibility(
+            target_trade_date=td,
+            eligible=False,
+            disposition=cal.disposition,
+            reason=cal.reason,
+            is_weekend=cal.is_weekend,
+            in_panel_sessions=False,
+            calendar_eligible=False,
+        )
+
     try:
-        d = pd.Timestamp(td).date()
+        pd.Timestamp(td).date()
     except Exception:
         return TradingSessionEligibility(
             target_trade_date=td,
             eligible=False,
             disposition="WAITING_FOR_DATA",
             reason="invalid_trade_date_format",
-            is_weekend=False,
+            is_weekend=cal.is_weekend,
             in_panel_sessions=False,
+            calendar_eligible=True,
         )
 
-    weekend = is_vn_weekend(d)
     in_panel = is_trading_session_in_panel(panel, td)
-
-    if weekend and not in_panel:
-        return TradingSessionEligibility(
-            target_trade_date=td,
-            eligible=False,
-            disposition="SKIPPED_NON_TRADING_DAY",
-            reason="weekend_non_session",
-            is_weekend=True,
-            in_panel_sessions=False,
-        )
-
     if not in_panel:
         return TradingSessionEligibility(
             target_trade_date=td,
             eligible=False,
             disposition="WAITING_FOR_DATA",
             reason="target_date_not_in_panel_sessions",
-            is_weekend=weekend,
+            is_weekend=cal.is_weekend,
             in_panel_sessions=False,
+            calendar_eligible=True,
         )
 
     return TradingSessionEligibility(
         target_trade_date=td,
         eligible=True,
         disposition="ELIGIBLE",
-        reason="panel_session_confirmed",
-        is_weekend=weekend,
+        reason="calendar_and_panel_session_confirmed",
+        is_weekend=cal.is_weekend,
         in_panel_sessions=True,
+        calendar_eligible=True,
     )
 
 

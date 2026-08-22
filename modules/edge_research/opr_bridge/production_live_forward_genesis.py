@@ -13,6 +13,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from modules.edge_research.opr_bridge.evidence_synthesis_records import stable_hash, utc_now_iso
+from modules.edge_research.opr_bridge.production_timezone_policy import (
+    TRADING_SESSION_TIMEZONE,
+    validate_genesis_first_eligible_date,
+)
 from modules.edge_research.opr_bridge.production_daily_run_records import (
     BACKFILL_NON_FORWARD,
     DAY_0_SMOKE,
@@ -91,9 +95,12 @@ def build_genesis_record(
     policy_hashes: Dict[str, str],
     dataset_identities: Dict[str, str],
     deployment_identity: str,
-    timezone: str = "Asia/Ho_Chi_Minh",
+    timezone: str = TRADING_SESSION_TIMEZONE,
 ) -> LiveForwardGenesisRecord:
     """Build genesis record for deployment runbook — caller must explicitly persist."""
+    ok, reason = validate_genesis_first_eligible_date(first_eligible_trade_date)
+    if not ok:
+        raise ValueError(f"invalid_genesis_first_eligible_date:{reason}")
     genesis_id = f"lfwd-gen-{stable_hash({'commit': code_commit, 'date': first_eligible_trade_date})[:16]}"
     payload = {
         "genesis_id": genesis_id,
@@ -104,6 +111,8 @@ def build_genesis_record(
         "dataset_identities": dataset_identities,
         "runtime_mode": LIVE_FORWARD,
         "timezone": timezone,
+        "trading_session_timezone": TRADING_SESSION_TIMEZONE,
+        "first_eligible_semantics": "vn_trading_session_date",
         "authority_flags": {
             "research_only": True,
             "trading_authority": False,
@@ -115,7 +124,12 @@ def build_genesis_record(
         "record_version": GENESIS_VERSION,
     }
     ghash = compute_genesis_hash(payload)
-    return LiveForwardGenesisRecord(genesis_hash=ghash, **payload)
+    record_payload = {
+        k: v
+        for k, v in payload.items()
+        if k not in ("trading_session_timezone", "first_eligible_semantics")
+    }
+    return LiveForwardGenesisRecord(genesis_hash=ghash, **record_payload)
 
 
 def persist_genesis(

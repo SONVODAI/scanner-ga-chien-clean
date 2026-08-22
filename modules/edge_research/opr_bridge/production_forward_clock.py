@@ -22,6 +22,9 @@ from modules.edge_research.opr_bridge.production_observation_records import (
     ResearchObservationBirthRecord,
 )
 from modules.edge_research.opr_bridge.production_daily_run_records import ForwardClockEntry
+from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+    compute_horizon_eligible_date_vn,
+)
 
 
 HORIZON_OFFSETS = {"T3": 3, "T5": 5, "T10": 10}
@@ -29,18 +32,12 @@ HORIZON_OFFSETS = {"T3": 3, "T5": 5, "T10": 10}
 
 def compute_horizon_eligible_date(birth_trade_date: str, horizon: str, trading_sessions: List[str]) -> str:
     """
-    Compute eligibility date using trading-session offsets, not calendar days.
-    Falls back to BDay if birth date not in session list.
+    Compute eligibility date using VN trading calendar session offsets.
+    Panel sessions retained as compatibility fallback only.
     """
-    if birth_trade_date in trading_sessions:
-        idx = trading_sessions.index(birth_trade_date)
-        target_idx = idx + HORIZON_OFFSETS.get(horizon, 0)
-        if target_idx < len(trading_sessions):
-            return trading_sessions[target_idx]
-    import pandas as pd
-    base = pd.Timestamp(birth_trade_date)
-    offset = HORIZON_OFFSETS.get(horizon, 0)
-    return (base + pd.tseries.offsets.BDay(offset)).strftime("%Y-%m-%d")
+    return compute_horizon_eligible_date_vn(
+        birth_trade_date, horizon, panel_sessions=trading_sessions
+    )
 
 
 def build_forward_clock_entry(

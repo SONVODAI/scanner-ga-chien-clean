@@ -1,5 +1,6 @@
 """
 Phase 3K.5 — DAY_0_SMOKE mode (production plumbing verification, never forward evidence).
+Phase 3K.5A — hardened calendar / timezone / EOD / backup-readiness path.
 """
 
 from __future__ import annotations
@@ -17,11 +18,15 @@ from modules.edge_research.opr_bridge.production_data_readiness_gate import veri
 from modules.edge_research.opr_bridge.production_living_research_ui_read_model import build_living_research_ui_read_model
 from modules.edge_research.opr_bridge.production_observation_cutoff import truncate_panel_at_cutoff
 from modules.edge_research.opr_bridge.production_observation_persistence import load_observation_index
+from modules.edge_research.adapters import EARNING_LEARNING_DIR
+from modules.edge_research.opr_bridge.production_backup import load_latest_backup_metadata
+from modules.edge_research.opr_bridge.production_operational_health import build_operational_health_artifact
+from modules.edge_research.opr_bridge.production_timezone_policy import derive_vn_trade_date
 from modules.edge_research.opr_bridge.production_run_lock import acquire_run_lock, release_run_lock
 from modules.edge_research.storage import resolve_data_dir
 
 DAY0_SMOKE_SUBDIR = "day0_smoke_namespace"
-DAY0_SMOKE_VERSION = "day0_smoke_v1_3k5"
+DAY0_SMOKE_VERSION = "day0_smoke_v2_3k5a"
 
 
 def day0_smoke_data_dir(base_data_dir: Optional[Path] = None) -> Path:
@@ -42,7 +47,13 @@ def run_day0_smoke(
     Never counts as LIVE_FORWARD. Never contaminates calibration ledger.
     """
     isolated = day0_smoke_data_dir(base_data_dir)
-    readiness = verify_data_readiness(panel, target_trade_date)
+    readiness = verify_data_readiness(
+        panel,
+        target_trade_date,
+        require_authoritative_eod=True,
+        require_calendar=True,
+        eod_data_root=EARNING_LEARNING_DIR,
+    )
     truncated, cutoff_diag = truncate_panel_at_cutoff(panel, target_trade_date) if not panel.empty else (panel, {})
 
     lock_fh = None
@@ -67,13 +78,18 @@ def run_day0_smoke(
     main_ledger = list_ledger_entries(data_dir=base_data_dir, forward_only=True)
     smoke_ledger = list_ledger_entries(data_dir=isolated, forward_only=True)
     ui_model = build_living_research_ui_read_model(trade_date=target_trade_date, data_dir=isolated)
+    health = build_operational_health_artifact(data_dir=isolated, panel=panel, target_trade_date=target_trade_date)
+    backup_meta = load_latest_backup_metadata(data_dir=isolated)
 
     return {
         "test_kind": "DAY_0_SMOKE",
         "version": DAY0_SMOKE_VERSION,
         "target_trade_date": target_trade_date,
+        "vn_trading_session_date": derive_vn_trade_date(),
         "isolated_namespace": str(isolated),
         "readiness": readiness.to_dict(),
+        "operational_health": health,
+        "backup_readiness": backup_meta,
         "cutoff_diag": cutoff_diag,
         "lock": lock_result.to_dict() if lock_result else None,
         "run": run_result,

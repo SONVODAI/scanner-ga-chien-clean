@@ -73,6 +73,11 @@ OBSERVATION_MODULES = (
     "production_operational_health.py",
     "production_pre_deployment_dry_run.py",
     "production_readiness_audit.py",
+    "production_eod_completeness.py",
+    "production_vn_trading_calendar.py",
+    "production_timezone_policy.py",
+    "production_backup.py",
+    "production_prerequisite_closure_audit.py",
 )
 
 
@@ -100,7 +105,14 @@ def audit_observation_imports(repo_root: Path) -> List[Tuple[str, str]]:
 def audit_observation_write_paths(repo_root: Path) -> List[Tuple[str, str]]:
     root = repo_root / "modules/edge_research/opr_bridge"
     hits: List[Tuple[str, str]] = []
-    skip = {"production_observation_isolation.py", "production_data_discovery.py", "production_readiness_audit.py"}
+    skip = {
+        "production_observation_isolation.py",
+        "production_data_discovery.py",
+        "production_readiness_audit.py",
+        "production_eod_completeness.py",
+        "production_backup.py",
+        "production_prerequisite_closure_audit.py",
+    }
     for name in OBSERVATION_MODULES:
         if name in skip:
             continue

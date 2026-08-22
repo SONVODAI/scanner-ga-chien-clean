@@ -143,7 +143,12 @@ def run_production_daily_research(
                 "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
             }
 
-    readiness = verify_data_readiness(panel, target_trade_date)
+    readiness = verify_data_readiness(
+        panel,
+        target_trade_date,
+        require_authoritative_eod=run_mode in (LIVE_FORWARD,),
+        require_calendar=run_mode in (LIVE_FORWARD, DAY_0_SMOKE, PRE_DEPLOYMENT_DRY_RUN),
+    )
     dataset_hash = readiness.source_dataset_hash
     identity = compute_run_identity(
         target_trade_date=target_trade_date,

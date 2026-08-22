@@ -61,5 +61,9 @@ def build_scheduling_contract() -> Dict[str, Any]:
         "activated": False,
         "cron_installed": False,
         "systemd_timer_installed": False,
+        "systemd_artifacts_prepared": True,
+        "systemd_service_unit": "mrbot-daily-research.service",
+        "systemd_timer_unit": "mrbot-daily-research.timer",
+        "systemd_install_script": "deploy/systemd/install-daily-research.sh",
         "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
     }

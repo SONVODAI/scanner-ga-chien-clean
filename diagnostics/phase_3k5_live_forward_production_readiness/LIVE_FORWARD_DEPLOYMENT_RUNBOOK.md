@@ -9,11 +9,13 @@
 ## Prerequisites
 
 - [ ] Phase 3K.5 audit `phase_pass: true`
+- [ ] Phase 3K.5A prerequisite closure `phase_pass: true` (`STOP_PRODUCTION_PREREQUISITES_CLOSED`)
 - [ ] Approved commit SHA recorded
 - [ ] Production host access (SSH)
-- [ ] `data/earning_learning/` EOD data verified complete for target session (>= 18:00 Asia/Ho_Chi_Minh)
+- [ ] Authoritative EOD complete for target session (`t0_observation_freeze.csv` rows + `market_t0_snapshot` AFTER_CLOSE)
+- [ ] VN trading calendar loaded (`config/vn_trading_calendar.json`)
 - [ ] Disk space sufficient for `data/edge_research/production_observations/`
-- [ ] Backup destination configured
+- [ ] Backup destination configured (manual backup before genesis — see Step 5b)
 
 ---
 
@@ -138,25 +140,22 @@ Record genesis_id, genesis_hash, first_eligible_trade_date.
 
 ---
 
-## Step 7 — Enable Daily Scheduler (Manual)
+## Step 7 — Install Scheduler Artifacts (Do NOT Enable Until Ready)
 
-**Not automated in repo.** Example systemd timer (operator adapts):
+Repository artifacts (3K.5A):
 
-```
-# /etc/systemd/system/mrbot-daily-research.timer
-[Timer]
-OnCalendar=Mon-Fri *-*-* 18:30:00 Asia/Ho_Chi_Minh
-Persistent=true
-
-# /etc/systemd/system/mrbot-daily-research.service
-[Service]
-Type=oneshot
-WorkingDirectory=/path/to/repo
-ExecStart=/usr/bin/python3 -m modules.edge_research.opr_bridge.production_daily_run_entrypoint \
-  --trade-date $(date +%Y-%m-%d) --mode LIVE_FORWARD --use-lock
+```bash
+sudo bash deploy/systemd/install-daily-research.sh
+sudo cp deploy/systemd/mrbot-daily-research.env.example /etc/mrbot/daily-research.env
+# Edit /etc/mrbot/daily-research.env for production paths
+sudo systemctl daemon-reload
+# DO NOT enable timer yet:
+# sudo systemctl enable --now mrbot-daily-research.timer
 ```
 
-Verify: `activated` remains documented; enable only after genesis.
+Timer uses `Asia/Ho_Chi_Minh`, post-EOD window, `--derive-vn-date --mode LIVE_FORWARD --use-lock`.
+
+Verify: `activated` remains `false` in scheduling contract until operator explicitly enables.
 
 ---
 
