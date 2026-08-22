@@ -62,8 +62,11 @@ from modules.edge_research.opr_bridge.second_experiment_interpretation_records i
 from modules.edge_research.opr_bridge.second_experiment_research_decision_records import (
     STOP_SECOND_RESEARCH_DECISION_FROZEN,
 )
+from modules.edge_research.opr_bridge.bounded_lifecycle_records import (
+    STOP_LIFECYCLE_BOUNDED,
+)
 
-ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j9"
+ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j10"
 
 # Documented STOP boundaries — preserved from Phase 3I
 STOP_PROPOSITION_PERSISTED = "STOP_PROPOSITION_PERSISTED"
@@ -98,6 +101,7 @@ class ProductionOprCycleResult:
     second_experiment_execution: Optional[Dict[str, Any]] = None
     second_experiment_interpretation: Optional[Dict[str, Any]] = None
     second_experiment_research_decision: Optional[Dict[str, Any]] = None
+    bounded_lifecycle: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -118,6 +122,7 @@ class ProductionOprCycleResult:
             "second_experiment_execution": self.second_experiment_execution,
             "second_experiment_interpretation": self.second_experiment_interpretation,
             "second_experiment_research_decision": self.second_experiment_research_decision,
+            "bounded_lifecycle": self.bounded_lifecycle,
             "error": self.error,
         }
 
@@ -185,18 +190,14 @@ def run_production_opr_cycle(
     execute_second_experiment: bool = False,
     interpret_second_experiment: bool = False,
     decide_second_experiment: bool = False,
+    run_bounded_autonomous: bool = False,
+    bounded_research_budget: Optional[Dict[str, Any]] = None,
 ) -> ProductionOprCycleResult:
     """
     Production-facing OPR cycle: detect → idempotency → persist → optional first-experiment path.
 
-    When execute_first_experiment=True, runs 3J.2 selection then 3J.3 execution.
-    When interpret_first_experiment=True (requires execution), runs 3J.4 evidence interpretation.
-    When decide_first_experiment=True (requires interpretation), runs 3J.5 research decision.
-    When design_second_experiment=True (requires decision), runs 3J.6 second-experiment design.
-    When execute_second_experiment=True (requires design), runs 3J.7 second-experiment execution.
-    When interpret_second_experiment=True (requires execution), runs 3J.8 cumulative interpretation.
-    When decide_second_experiment=True (requires interpretation), runs 3J.9 cumulative research decision.
-    Does NOT generate or execute Experiment #3.
+    When run_bounded_autonomous=True (opt-in), delegates to bounded lifecycle controller.
+    Manual stage flags remain for backward-compatible stepwise invocation.
     """
     result = ProductionOprCycleResult()
     result.frozen_integrity = verify_frozen_scientific_integrity()
@@ -258,6 +259,10 @@ def run_production_opr_cycle(
             result.second_experiment_research_decision = record.second_experiment_research_decision
             if STOP_SECOND_RESEARCH_DECISION_FROZEN not in result.stop_boundaries:
                 result.stop_boundaries.append(STOP_SECOND_RESEARCH_DECISION_FROZEN)
+        if run_bounded_autonomous and record.bounded_lifecycle_enabled and record.lifecycle_audit:
+            result.bounded_lifecycle = record.lifecycle_audit
+            if STOP_LIFECYCLE_BOUNDED not in result.stop_boundaries:
+                result.stop_boundaries.append(STOP_LIFECYCLE_BOUNDED)
         return result
 
     session_id = new_production_session_id(detection.proposition_id or "unknown")
@@ -463,6 +468,28 @@ def run_production_opr_cycle(
                                 stop_boundaries.append(STOP_SECOND_RESEARCH_DECISION_FROZEN)
                                 write_opr_session(record, data_dir=data_dir)
                                 result.second_experiment_research_decision = dx2.to_dict()
+
+    if run_bounded_autonomous and detection.proposition_record and record:
+        from modules.edge_research.opr_bridge.bounded_lifecycle_records import ResearchBudget
+        from modules.edge_research.opr_bridge.production_bounded_lifecycle import (
+            run_bounded_autonomous_research,
+        )
+
+        budget = ResearchBudget.from_dict(bounded_research_budget or {})
+        bl = run_bounded_autonomous_research(
+            detection.proposition_record,
+            panel,
+            session_id=record.session_id,
+            data_cutoff_date=data_cutoff_date,
+            data_dir=data_dir,
+            budget=budget,
+        )
+        if bl.session_record:
+            record = bl.session_record
+        result.bounded_lifecycle = bl.to_dict()
+        stop_boundaries.extend(bl.stop_boundaries)
+        if STOP_LIFECYCLE_BOUNDED not in stop_boundaries:
+            stop_boundaries.append(STOP_LIFECYCLE_BOUNDED)
 
     result.outcome = "SESSION_CREATED"
     result.session_id = session_id

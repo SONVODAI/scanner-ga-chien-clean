@@ -76,6 +76,13 @@ class OprProductionSessionRecord:
     second_experiment_interpretation: Optional[Dict[str, Any]] = None
     second_experiment_epistemic_update: Optional[Dict[str, Any]] = None
     second_experiment_research_decision: Optional[Dict[str, Any]] = None
+    bounded_lifecycle_enabled: bool = False
+    lifecycle_run_id: Optional[str] = None
+    lifecycle_phase: str = "PROPOSITION_PERSISTED"
+    research_budget: Optional[Dict[str, Any]] = None
+    experiment_history: Optional[List[Dict[str, Any]]] = None
+    experiments_completed: int = 0
+    lifecycle_audit: Optional[Dict[str, Any]] = None
 
     def record_hash(self) -> str:
         return stable_hash(
@@ -117,6 +124,13 @@ class OprProductionSessionRecord:
             "second_experiment_interpretation": self.second_experiment_interpretation,
             "second_experiment_epistemic_update": self.second_experiment_epistemic_update,
             "second_experiment_research_decision": self.second_experiment_research_decision,
+            "bounded_lifecycle_enabled": self.bounded_lifecycle_enabled,
+            "lifecycle_run_id": self.lifecycle_run_id,
+            "lifecycle_phase": self.lifecycle_phase,
+            "research_budget": self.research_budget,
+            "experiment_history": self.experiment_history,
+            "experiments_completed": self.experiments_completed,
+            "lifecycle_audit": self.lifecycle_audit,
             "record_hash": self.record_hash(),
         }
 
@@ -150,6 +164,13 @@ class OprProductionSessionRecord:
             second_experiment_interpretation=payload.get("second_experiment_interpretation"),
             second_experiment_epistemic_update=payload.get("second_experiment_epistemic_update"),
             second_experiment_research_decision=payload.get("second_experiment_research_decision"),
+            bounded_lifecycle_enabled=bool(payload.get("bounded_lifecycle_enabled", False)),
+            lifecycle_run_id=payload.get("lifecycle_run_id"),
+            lifecycle_phase=payload.get("lifecycle_phase", "PROPOSITION_PERSISTED"),
+            research_budget=payload.get("research_budget"),
+            experiment_history=payload.get("experiment_history"),
+            experiments_completed=int(payload.get("experiments_completed", 0)),
+            lifecycle_audit=payload.get("lifecycle_audit"),
         )
 
 
