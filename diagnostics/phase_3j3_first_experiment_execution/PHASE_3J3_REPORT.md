@@ -3,6 +3,8 @@
 ## Status: PASS
 
 **Branch:** `cursor/phase-3j3-first-experiment-execution-aad2`  
+**Commit:** `dfe6e335e`  
+**PR:** #60  
 **Base:** Phase 3J.2 frozen at `0b00fa7c3`  
 **Hard STOP:** `STOP_FIRST_EXPERIMENT_EXECUTED` — no ToolResult interpretation, no next experiment
 
@@ -228,4 +230,6 @@ Phase 3J.3 **ends** at `STOP_FIRST_EXPERIMENT_EXECUTED`.
 
 ## Commits / PR
 
-See branch `cursor/phase-3j3-first-experiment-execution-aad2` for implementation commits and PR link.
+- Branch: `cursor/phase-3j3-first-experiment-execution-aad2`
+- Commit: `dfe6e335e`
+- PR: https://github.com/SONVODAI/scanner-ga-chien-clean/pull/60
