@@ -5,6 +5,8 @@
 | Field | Value |
 |-------|-------|
 | Branch | `cursor/phase-3j8-multi-evidence-interpretation-aad2` |
+| Commit | `cec299ae1` |
+| PR | #66 |
 | Base | `cursor/phase-3j7-second-experiment-execution-aad2` @ `5fa5e5bdd` |
 | Hard STOP | `STOP_SECOND_EVIDENCE_INTERPRETED` |
 | Prior STOP | `STOP_SECOND_EXPERIMENT_EXECUTED` |
