@@ -12,6 +12,7 @@ from typing import Any, Dict, Optional, Tuple
 
 from modules.edge_research.opr_bridge.first_experiment_research_decision_records import (
     FirstExperimentResearchDecisionEnvelope,
+    CandidateActionEvaluation,
     SearchAccountingContext,
 )
 
@@ -38,6 +39,7 @@ class NormalizedPriorDecision:
     cumulative_null_ledger: Tuple[Dict[str, Any], ...]
     search_accounting: SearchAccountingContext
     prior_decision_hash: str
+    candidate_evaluations: Tuple[CandidateActionEvaluation, ...] = ()
 
     @property
     def is_action(self) -> bool:
@@ -51,6 +53,25 @@ def _search_from_dict(sa: Dict[str, Any]) -> SearchAccountingContext:
         search_cardinality=int(sa.get("search_cardinality", 1)),
         evidence_burden_assessment=str(sa.get("evidence_burden_assessment", "MODERATE")),
         budget_exhausted=bool(sa.get("budget_exhausted", False)),
+    )
+
+
+def _evaluations_from_dict(decision_dict: Dict[str, Any]) -> Tuple[CandidateActionEvaluation, ...]:
+    return tuple(
+        CandidateActionEvaluation(
+            action_family=e["action_family"],
+            mapped_action_code=e["mapped_action_code"],
+            scientific_objective=e["scientific_objective"],
+            target_uncertainty=e["target_uncertainty"],
+            target_null_key=e.get("target_null_key"),
+            expected_information_contribution=e["expected_information_contribution"],
+            independence_requirement=e["independence_requirement"],
+            admissible=bool(e["admissible"]),
+            rejection_reasons=tuple(e.get("rejection_reasons") or ()),
+            redundancy_score=float(e.get("redundancy_score", 0.0)),
+            information_gain_rank=int(e.get("information_gain_rank", 0)),
+        )
+        for e in decision_dict.get("candidate_evaluations") or []
     )
 
 
@@ -94,6 +115,7 @@ def normalize_prior_decision(decision_dict: Dict[str, Any]) -> NormalizedPriorDe
         cumulative_null_ledger=tuple(decision_dict.get("cumulative_null_ledger") or ()),
         search_accounting=_search_from_dict(sa),
         prior_decision_hash=str(prior_hash),
+        candidate_evaluations=_evaluations_from_dict(decision_dict),
     )
 
 
@@ -113,7 +135,7 @@ def as_first_decision_envelope_view(norm: NormalizedPriorDecision) -> FirstExper
         research_decision=dict(norm.research_decision),
         decision_kind=norm.decision_kind,
         stop_reason=norm.stop_reason,
-        candidate_evaluations=(),
+        candidate_evaluations=norm.candidate_evaluations,
         search_accounting=norm.search_accounting,
         surviving_nulls=tuple(
             n.get("null_key", "") for n in norm.cumulative_null_ledger if n.get("null_key")

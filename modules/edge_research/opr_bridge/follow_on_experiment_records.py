@@ -9,6 +9,14 @@ from typing import Any, Dict, Optional
 from modules.edge_research.opr_bridge.evidence_synthesis_records import stable_hash
 
 GENERALIZATION_VERSION = "follow_on_experiment_records_v1_3j12"
+HISTORY_AWARE_GENERATOR_VERSION = "follow_on_experiment_generator_v1_3j13"
+HISTORY_AWARE_SELECTOR_VERSION = "follow_on_experiment_selector_lex_v1_3j13"
+STOP_HISTORY_AWARE_FOLLOW_ON_GENERATION = "STOP_HISTORY_AWARE_FOLLOW_ON_GENERATION"
+
+# Generic follow-on dispositions (ordinal >= 3). Legacy second-experiment names frozen at ordinal 2.
+NO_FAITHFUL_EXPERIMENT = "NO_FAITHFUL_EXPERIMENT"
+AMBIGUOUS_EXPERIMENT = "AMBIGUOUS_EXPERIMENT"
+FOLLOW_ON_SELECTED = "SELECTED"
 
 
 def compute_follow_on_decision_identity_hash(

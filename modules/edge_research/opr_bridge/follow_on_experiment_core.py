@@ -160,6 +160,7 @@ def run_follow_on_design(
         executability=ExecutabilityContext.real_partition_default(data_cutoff=cutoff),
         existing_package=None,
         experiment_ordinal=experiment_ordinal,
+        history=history,
     )
     if result.package:
         persist_second_experiment_package(result.package, data_dir=data_dir)

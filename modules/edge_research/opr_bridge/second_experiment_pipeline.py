@@ -9,9 +9,11 @@ Does NOT execute Experiment #2 or rerun decide_next_action().
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
+
+from modules.edge_research.opr_bridge.bounded_lifecycle_records import ExperimentHistoryEntry
 
 from modules.edge_research.opr_bridge.cohort_overlap_estimator import PanelMetadataIndex
 from modules.edge_research.opr_bridge.evidence_synthesis_records import new_id, stable_hash, utc_now_iso
@@ -52,7 +54,7 @@ from modules.edge_research.opr_bridge.second_experiment_records import (
 )
 from modules.edge_research.opr_bridge.second_experiment_selector import select_second_experiment
 
-PIPELINE_VERSION = "second_experiment_pipeline_v1_3j6"
+PIPELINE_VERSION = "second_experiment_pipeline_v1_3j13"
 
 
 def _cohort_strategy_from_package(package: InitialExperimentPackage) -> str:
@@ -95,6 +97,7 @@ def run_second_experiment_design_pipeline(
     include_wrong_null_audit: bool = False,
     existing_package: Optional[SecondExperimentPackage] = None,
     experiment_ordinal: int = 2,
+    history: Optional[List[ExperimentHistoryEntry]] = None,
 ) -> SecondExperimentDesignResult:
     """
     Transform frozen ResearchDecisionRecord into SecondExperimentPackage(NOT_EXECUTED).
@@ -219,19 +222,78 @@ def run_second_experiment_design_pipeline(
             stop_boundary=STOP_SECOND_EXPERIMENT_DESIGNED,
         )
 
-    raw_candidates = generate_second_experiment_candidates(
-        prop,
-        objective,
-        first_package=first_package,
-        first_execution=first_execution,
-        first_fp=first_fp,
-        panel=panel_index,
-        executability=executability,
-        panel_df=panel,
-        include_wrong_null_audit=include_wrong_null_audit,
-    )
-    deduped = deduplicate_second_experiment_candidates(raw_candidates)
-    selection = select_second_experiment(deduped)
+    if experiment_ordinal >= 3 and history:
+        from modules.edge_research.opr_bridge.follow_on_experiment_candidates import (
+            GENERATOR_VERSION as FOLLOW_ON_GENERATOR_VERSION,
+            deduplicate_follow_on_experiment_candidates,
+            generate_follow_on_experiment_candidates,
+        )
+        from modules.edge_research.opr_bridge.follow_on_experiment_history_context import (
+            build_follow_on_history_context,
+        )
+        from modules.edge_research.opr_bridge.follow_on_experiment_selector import (
+            SELECTOR_VERSION as FOLLOW_ON_SELECTOR_VERSION,
+            select_follow_on_experiment,
+        )
+
+        prior_decision_dict = {
+            "decision_envelope_id": decision_envelope.decision_envelope_id,
+            "envelope_hash": decision_envelope.envelope_hash,
+            "decision_ordinal": experiment_ordinal - 1,
+            "research_state_identity": decision_envelope.research_state_identity,
+            "research_decision": decision_envelope.research_decision,
+            "decision_kind": decision_envelope.decision_kind,
+            "stop_reason": decision_envelope.stop_reason,
+            "proposition_id": decision_envelope.proposition_id,
+            "proposition_hash": decision_envelope.proposition_hash,
+            "session_id": decision_envelope.session_id,
+            "interpretation_id": decision_envelope.interpretation_id,
+            "interpretation_identity_hash": decision_envelope.interpretation_identity_hash,
+            "epistemic_update_id": decision_envelope.epistemic_update_id,
+            "epistemic_update_hash": decision_envelope.epistemic_update_hash,
+            "first_decision_envelope_id": decision_envelope.decision_envelope_id,
+            "first_decision_hash": decision_envelope.envelope_hash,
+            "first_interpretation_id": decision_envelope.interpretation_id,
+            "cumulative_null_ledger": list(getattr(decision_envelope, "cumulative_null_ledger", ()) or ()),
+            "search_accounting": decision_envelope.search_accounting.to_dict(),
+        }
+        history_ctx = build_follow_on_history_context(
+            prop=prop,
+            history=history,
+            experiment_ordinal=experiment_ordinal,
+            panel=panel_index,
+            prior_decision_dict=prior_decision_dict,
+        )
+        raw_candidates = generate_follow_on_experiment_candidates(
+            prop,
+            objective,
+            history_ctx=history_ctx,
+            first_package=first_package,
+            panel=panel_index,
+            executability=executability,
+            panel_df=panel,
+            include_wrong_null_audit=include_wrong_null_audit,
+        )
+        deduped = deduplicate_follow_on_experiment_candidates(raw_candidates)
+        selection = select_follow_on_experiment(deduped, selected_action=objective.selected_action)
+        generator_version = FOLLOW_ON_GENERATOR_VERSION
+        selector_version = FOLLOW_ON_SELECTOR_VERSION
+    else:
+        raw_candidates = generate_second_experiment_candidates(
+            prop,
+            objective,
+            first_package=first_package,
+            first_execution=first_execution,
+            first_fp=first_fp,
+            panel=panel_index,
+            executability=executability,
+            panel_df=panel,
+            include_wrong_null_audit=include_wrong_null_audit,
+        )
+        deduped = deduplicate_second_experiment_candidates(raw_candidates)
+        selection = select_second_experiment(deduped)
+        generator_version = GENERATOR_VERSION
+        selector_version = SELECTOR_VERSION
 
     package = _build_package(
         prop,
@@ -244,6 +306,8 @@ def run_second_experiment_design_pipeline(
         deduped=tuple(deduped),
         selection=selection,
         experiment_ordinal=experiment_ordinal,
+        generator_version=generator_version,
+        selector_version=selector_version,
     )
 
     return SecondExperimentDesignResult(
@@ -265,6 +329,8 @@ def _build_package(
     deduped,
     selection,
     experiment_ordinal: int = 2,
+    generator_version: str = GENERATOR_VERSION,
+    selector_version: str = SELECTOR_VERSION,
 ) -> SecondExperimentPackage:
     ts = utc_now_iso()
     pkg_id = new_id("sefp")
@@ -295,8 +361,8 @@ def _build_package(
         first_package_hash=first_package.package_hash,
         first_execution_id=first_execution.execution_id,
         first_execution_identity_hash=first_execution.execution_identity_hash,
-        generator_version=GENERATOR_VERSION,
-        selector_version=SELECTOR_VERSION,
+        generator_version=generator_version,
+        selector_version=selector_version,
         design_version=DESIGN_VERSION,
         objective=objective,
         candidates_considered=raw_candidates,
