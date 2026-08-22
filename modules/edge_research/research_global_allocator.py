@@ -459,6 +459,7 @@ def revalue_frontier_opportunity(
         experiment_node_id=parent_id,
         branch_root_id=item.branch_root_id,
         from_frontier=True,
+        defer_evidence_snapshot=item.defer_evidence_snapshot,
     )
     opp.from_frontier = True
     opp.is_revisit = is_revisit

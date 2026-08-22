@@ -355,6 +355,7 @@ class ResearchSession:
     research_line_registry: Optional[Dict[str, Any]] = None
     research_line_marginal_audit: Optional[List[Dict[str, Any]]] = None
     research_line_opportunity_audit: Optional[List[Dict[str, Any]]] = None
+    research_novelty_gating_audit: Optional[List[Dict[str, Any]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         payload: Dict[str, Any] = {
@@ -414,6 +415,8 @@ class ResearchSession:
             payload["research_line_marginal_audit"] = list(self.research_line_marginal_audit)
         if self.research_line_opportunity_audit:
             payload["research_line_opportunity_audit"] = list(self.research_line_opportunity_audit)
+        if self.research_novelty_gating_audit:
+            payload["research_novelty_gating_audit"] = list(self.research_novelty_gating_audit)
         return payload
 
     @classmethod
@@ -487,6 +490,9 @@ class ResearchSession:
             else None,
             research_line_opportunity_audit=list(payload["research_line_opportunity_audit"])
             if payload.get("research_line_opportunity_audit")
+            else None,
+            research_novelty_gating_audit=list(payload["research_novelty_gating_audit"])
+            if payload.get("research_novelty_gating_audit")
             else None,
         )
 

@@ -93,6 +93,7 @@ class ResearchOpportunity:
     dominated_by: str = ""
     is_revisit: bool = False
     from_frontier: bool = False
+    gated_novelty_component: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -128,6 +129,7 @@ class ResearchOpportunity:
             "dominated_by": self.dominated_by,
             "is_revisit": self.is_revisit,
             "from_frontier": self.from_frontier,
+            "gated_novelty_component": self.gated_novelty_component,
         }
 
     @classmethod
@@ -165,6 +167,7 @@ class ResearchOpportunity:
             dominated_by=str(payload.get("dominated_by", "")),
             is_revisit=bool(payload.get("is_revisit", False)),
             from_frontier=bool(payload.get("from_frontier", False)),
+            gated_novelty_component=float(payload.get("gated_novelty_component", 0.0)),
         )
 
 
@@ -638,6 +641,7 @@ def build_opportunity_from_candidate(
     experiment_node_id: Optional[str] = None,
     branch_root_id: str = "",
     from_frontier: bool = False,
+    defer_evidence_snapshot: Optional[Dict[str, Any]] = None,
 ) -> ResearchOpportunity:
     """Construct auditable opportunity from planner candidate."""
     from modules.edge_research.research_search_accounting import branch_depth as accounting_branch_depth
@@ -699,6 +703,27 @@ def build_opportunity_from_candidate(
     exploitation_component = exploit
     falsification_component = fals_val * (WEIGHT_FALSIFICATION_PORTFOLIO / 4.0)
     novelty_component = novelty * (WEIGHT_NOVELTY_PORTFOLIO / 2.0)
+
+    from modules.edge_research.research_line_freshness import EvidenceSnapshot
+    from modules.edge_research.research_novelty_valuation_bridge import (
+        apply_novelty_valuation_bridge,
+        record_novelty_gating_audit,
+    )
+
+    defer_snap = (
+        EvidenceSnapshot.from_dict(defer_evidence_snapshot)
+        if defer_evidence_snapshot
+        else None
+    )
+    novelty_component, gating_audit = apply_novelty_valuation_bridge(
+        graph,
+        candidate,
+        assessment,
+        raw_novelty_component=novelty_component,
+        branch_root_id=branch_root_id,
+        defer_snapshot=defer_snap,
+    )
+    record_novelty_gating_audit(graph, gating_audit)
     redundancy_penalty = redundancy * WEIGHT_REDUNDANCY_DIMINISH / 3.0
 
     expected = (
@@ -749,6 +774,7 @@ def build_opportunity_from_candidate(
         expected_research_value=expected,
         is_revisit=is_revisit,
         from_frontier=from_frontier,
+        gated_novelty_component=novelty_component,
     )
 
 
@@ -820,7 +846,7 @@ def portfolio_score_adjustments(
         "exploitation_value_bonus": opp.exploitation_value,
         "marginal_information_gain": opp.marginal_information_gain,
         "portfolio_falsification": opp.falsification_value * (WEIGHT_FALSIFICATION_PORTFOLIO / 4.0),
-        "portfolio_novelty": opp.novelty * (WEIGHT_NOVELTY_PORTFOLIO / 2.0),
+        "portfolio_novelty": opp.gated_novelty_component,
         "portfolio_redundancy_penalty": -opp.redundancy * WEIGHT_REDUNDANCY_DIMINISH / 3.0,
         "portfolio_sample_burden": -opp.sample_loss_burden,
         "portfolio_revisit_bonus": compute_revisit_bonus(graph, branch_root_id)[0],
