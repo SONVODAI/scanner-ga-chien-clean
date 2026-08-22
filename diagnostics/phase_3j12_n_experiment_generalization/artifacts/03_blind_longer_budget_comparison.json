@@ -4,7 +4,7 @@
       "anonymous_id": "CASE-0101",
       "frozen": {
         "anonymous_case_id": "CASE-0101",
-        "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-c4e",
+        "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-9fa",
         "proposition_id": "prop-9ef0ad5446c79fb8",
         "proposition_summary": {
           "proposition_id": "prop-9ef0ad5446c79fb8",
@@ -22,11 +22,11 @@
             "epistemic_state_entering": "HYPOTHESIS",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "iefp-c934dcf8e7e3",
+            "experiment_identity": "iefp-dcec80112826",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "iefx-81b71794656c",
+            "tool_result_identity": "iefx-aeeaaf832868",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -41,11 +41,11 @@
             "epistemic_state_entering": "SUPPORTED",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "sefp-39a2afe997db",
+            "experiment_identity": "sefp-bfec0c7f9f1f",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "sefx-6b1db5a060d7",
+            "tool_result_identity": "sefx-5c603e83c509",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -57,10 +57,10 @@
           }
         ],
         "audit": {
-          "lifecycle_run_id": "blc-56082a74a91a",
+          "lifecycle_run_id": "blc-26567403291b",
           "proposition_id": "prop-9ef0ad5446c79fb8",
           "proposition_hash": "c812572458a84811564fb428519dbcc920061b07b42c3f6818ff4839454593a3",
-          "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-c4e",
+          "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-9fa",
           "start_phase": "PROPOSITION_PERSISTED",
           "end_phase": "STOPPED",
           "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
@@ -77,20 +77,20 @@
           },
           "experiment_count": 2,
           "experiment_identities": [
-            "iefp-c934dcf8e7e3",
-            "sefp-39a2afe997db"
+            "iefp-dcec80112826",
+            "sefp-bfec0c7f9f1f"
           ],
           "tool_result_identities": [
-            "iefx-81b71794656c",
-            "sefx-6b1db5a060d7"
+            "iefx-aeeaaf832868",
+            "sefx-5c603e83c509"
           ],
           "interpretation_identities": [
-            "iefi-12a88be605e1",
-            "iefi2-30317d011569"
+            "iefi-a461f97a4ab7",
+            "iefi2-14100fe44953"
           ],
           "decision_identities": [
-            "iefd-59abffea7958",
-            "iefd2-4efb3f9687af"
+            "iefd-d416d3023978",
+            "iefd2-6f9953bce11e"
           ],
           "cumulative_null_ledger": [
             {
@@ -123,8 +123,8 @@
           "failures": [],
           "warnings": [],
           "controller_version": "bounded_lifecycle_controller_v1_3j12",
-          "created_at": "2026-08-22T07:38:31.561338+00:00",
-          "audit_hash": "3230560246d8c6f75b124a88331311034f890f822a8c8906d8790d01a99548f9"
+          "created_at": "2026-08-22T07:40:14.812614+00:00",
+          "audit_hash": "4cc0c881ae5a2b37028ad722dad0ba8347d50e2dba227db22fed2c59b9ffe25d"
         },
         "budget_initial": {
           "max_experiment_iterations": 4,
@@ -171,8 +171,8 @@
         "final_stop_reason": "STOP_LOW_INCREMENTAL",
         "bootstrap_outcome": "SESSION_CREATED",
         "errors": [],
-        "frozen_at": "2026-08-22T07:38:29.696417+00:00",
-        "lifecycle_frozen_hash": "569b23c28bbd390c30ef85e4dd9f9d860f6865040488ccb4d52f1f3cad426fde",
+        "frozen_at": "2026-08-22T07:40:12.958306+00:00",
+        "lifecycle_frozen_hash": "a96407bcfbed1cd5db7416422affaa12118ba53ed4ff62adfa75c67df302cfd3",
         "runner_version": "blind_research_examination_runner_v1_3j11"
       },
       "reveal": {
@@ -201,8 +201,8 @@
           },
           "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
         },
-        "lifecycle_frozen_hash": "569b23c28bbd390c30ef85e4dd9f9d860f6865040488ccb4d52f1f3cad426fde",
-        "reveal_after_hash": "569b23c28bbd390c30ef85e4dd9f9d860f6865040488ccb4d52f1f3cad426fde",
+        "lifecycle_frozen_hash": "a96407bcfbed1cd5db7416422affaa12118ba53ed4ff62adfa75c67df302cfd3",
+        "reveal_after_hash": "a96407bcfbed1cd5db7416422affaa12118ba53ed4ff62adfa75c67df302cfd3",
         "reveal_order_valid": true,
         "calibration_category": "SUPPORTED",
         "outcome_score": 0.85,
@@ -219,7 +219,7 @@
       "anonymous_id": "CASE-0102",
       "frozen": {
         "anonymous_case_id": "CASE-0102",
-        "session_id": "opr-prod-prop-392f25bf8af8e039-sess-ffb",
+        "session_id": "opr-prod-prop-392f25bf8af8e039-sess-e0f",
         "proposition_id": "prop-392f25bf8af8e039",
         "proposition_summary": {
           "proposition_id": "prop-392f25bf8af8e039",
@@ -237,11 +237,11 @@
             "epistemic_state_entering": "HYPOTHESIS",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "iefp-8360b14626d5",
+            "experiment_identity": "iefp-18aed1858c4b",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "iefx-760ab324839d",
+            "tool_result_identity": "iefx-982aecd4dbec",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -256,11 +256,11 @@
             "epistemic_state_entering": "SUPPORTED",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "sefp-181e9f46914e",
+            "experiment_identity": "sefp-8b2ced663065",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "sefx-3b1c4e83d848",
+            "tool_result_identity": "sefx-162e54ac5c5d",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -272,10 +272,10 @@
           }
         ],
         "audit": {
-          "lifecycle_run_id": "blc-c8dae0a10226",
+          "lifecycle_run_id": "blc-6265ba30bd18",
           "proposition_id": "prop-392f25bf8af8e039",
           "proposition_hash": "8c27c4d4cc871ae5716a1396b19e5538c081012c3b48c545e853611c1d81637e",
-          "session_id": "opr-prod-prop-392f25bf8af8e039-sess-ffb",
+          "session_id": "opr-prod-prop-392f25bf8af8e039-sess-e0f",
           "start_phase": "PROPOSITION_PERSISTED",
           "end_phase": "STOPPED",
           "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
@@ -292,20 +292,20 @@
           },
           "experiment_count": 2,
           "experiment_identities": [
-            "iefp-8360b14626d5",
-            "sefp-181e9f46914e"
+            "iefp-18aed1858c4b",
+            "sefp-8b2ced663065"
           ],
           "tool_result_identities": [
-            "iefx-760ab324839d",
-            "sefx-3b1c4e83d848"
+            "iefx-982aecd4dbec",
+            "sefx-162e54ac5c5d"
           ],
           "interpretation_identities": [
-            "iefi-a80e0b11a902",
-            "iefi2-cfcc7acf6c40"
+            "iefi-f0f35fa1b08a",
+            "iefi2-a9e707525e5c"
           ],
           "decision_identities": [
-            "iefd-606ddbfb8455",
-            "iefd2-6b28ddbab7be"
+            "iefd-8c576184c824",
+            "iefd2-6856d51c0d63"
           ],
           "cumulative_null_ledger": [
             {
@@ -338,8 +338,8 @@
           "failures": [],
           "warnings": [],
           "controller_version": "bounded_lifecycle_controller_v1_3j12",
-          "created_at": "2026-08-22T07:38:33.472852+00:00",
-          "audit_hash": "42651bf81e71fa540ffe2e9a3cfaa3c42fe0b66b5fb5b22703f9024b7081f5a1"
+          "created_at": "2026-08-22T07:40:16.705524+00:00",
+          "audit_hash": "328373fdcc50efaf8d18db97d2a09aef0ea1ba2ae3ec4ac8d33f543fb453ab2c"
         },
         "budget_initial": {
           "max_experiment_iterations": 4,
@@ -386,8 +386,8 @@
         "final_stop_reason": "STOP_LOW_INCREMENTAL",
         "bootstrap_outcome": "SESSION_CREATED",
         "errors": [],
-        "frozen_at": "2026-08-22T07:38:31.607937+00:00",
-        "lifecycle_frozen_hash": "8713dff4af9c4587c973f2c66324b50c0cced8ca6865845d215709f9b5238bed",
+        "frozen_at": "2026-08-22T07:40:14.858917+00:00",
+        "lifecycle_frozen_hash": "645409a005a37b471c420a40dff093ac1fa71501f67400226b0179274fc692da",
         "runner_version": "blind_research_examination_runner_v1_3j11"
       },
       "reveal": {
@@ -416,8 +416,8 @@
           },
           "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
         },
-        "lifecycle_frozen_hash": "8713dff4af9c4587c973f2c66324b50c0cced8ca6865845d215709f9b5238bed",
-        "reveal_after_hash": "8713dff4af9c4587c973f2c66324b50c0cced8ca6865845d215709f9b5238bed",
+        "lifecycle_frozen_hash": "645409a005a37b471c420a40dff093ac1fa71501f67400226b0179274fc692da",
+        "reveal_after_hash": "645409a005a37b471c420a40dff093ac1fa71501f67400226b0179274fc692da",
         "reveal_order_valid": true,
         "calibration_category": "SUPPORTED",
         "outcome_score": 0.85,
@@ -434,7 +434,7 @@
       "anonymous_id": "CASE-0201",
       "frozen": {
         "anonymous_case_id": "CASE-0201",
-        "session_id": "opr-prod-prop-65e0692da41571e4-sess-318",
+        "session_id": "opr-prod-prop-65e0692da41571e4-sess-468",
         "proposition_id": "prop-65e0692da41571e4",
         "proposition_summary": {
           "proposition_id": "prop-65e0692da41571e4",
@@ -452,11 +452,11 @@
             "epistemic_state_entering": "HYPOTHESIS",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "iefp-e3eb6c0d8724",
+            "experiment_identity": "iefp-ac7ffcc11424",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "iefx-66afef4772be",
+            "tool_result_identity": "iefx-cceefe18b820",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -471,11 +471,11 @@
             "epistemic_state_entering": "SUPPORTED",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "sefp-059a7e2bb5a7",
+            "experiment_identity": "sefp-410946b04061",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "sefx-0a668f3cd7c6",
+            "tool_result_identity": "sefx-2462c1f46ac0",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -487,10 +487,10 @@
           }
         ],
         "audit": {
-          "lifecycle_run_id": "blc-6ca986701b28",
+          "lifecycle_run_id": "blc-6efbf0148eca",
           "proposition_id": "prop-65e0692da41571e4",
           "proposition_hash": "7e56f2e3205d2482a4bea9b891646dd58656f5888c7f6984726362a12e21aeb3",
-          "session_id": "opr-prod-prop-65e0692da41571e4-sess-318",
+          "session_id": "opr-prod-prop-65e0692da41571e4-sess-468",
           "start_phase": "PROPOSITION_PERSISTED",
           "end_phase": "STOPPED",
           "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
@@ -507,20 +507,20 @@
           },
           "experiment_count": 2,
           "experiment_identities": [
-            "iefp-e3eb6c0d8724",
-            "sefp-059a7e2bb5a7"
+            "iefp-ac7ffcc11424",
+            "sefp-410946b04061"
           ],
           "tool_result_identities": [
-            "iefx-66afef4772be",
-            "sefx-0a668f3cd7c6"
+            "iefx-cceefe18b820",
+            "sefx-2462c1f46ac0"
           ],
           "interpretation_identities": [
-            "iefi-e9edf50c89ad",
-            "iefi2-1ba94ce2ef5e"
+            "iefi-6166045daac0",
+            "iefi2-d870193fda16"
           ],
           "decision_identities": [
-            "iefd-696f822d97b6",
-            "iefd2-fd3def49e81b"
+            "iefd-07b862384def",
+            "iefd2-2abf01733b73"
           ],
           "cumulative_null_ledger": [
             {
@@ -553,8 +553,8 @@
           "failures": [],
           "warnings": [],
           "controller_version": "bounded_lifecycle_controller_v1_3j12",
-          "created_at": "2026-08-22T07:38:35.395592+00:00",
-          "audit_hash": "3c3414cb9d2ab4f6553cad8fe4581d03c274fa37bfa6983cf9f3b2c4503a90db"
+          "created_at": "2026-08-22T07:40:18.629524+00:00",
+          "audit_hash": "65f8529e0f1300598dbd5d28c0db9c08cd8d5f0665f2611db7ad0362c46ffc48"
         },
         "budget_initial": {
           "max_experiment_iterations": 4,
@@ -601,8 +601,8 @@
         "final_stop_reason": "STOP_LOW_INCREMENTAL",
         "bootstrap_outcome": "SESSION_CREATED",
         "errors": [],
-        "frozen_at": "2026-08-22T07:38:33.515688+00:00",
-        "lifecycle_frozen_hash": "e56c1d88d3033bab0fd87b00d687ace3584fb885a7cdb78025251e4a2636d3f4",
+        "frozen_at": "2026-08-22T07:40:16.748738+00:00",
+        "lifecycle_frozen_hash": "825221b14ea12c5c41b4ce24ecc08cb5ad4199e212c37bd67bfa4b92ea2057b8",
         "runner_version": "blind_research_examination_runner_v1_3j11"
       },
       "reveal": {
@@ -625,8 +625,8 @@
           },
           "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
         },
-        "lifecycle_frozen_hash": "e56c1d88d3033bab0fd87b00d687ace3584fb885a7cdb78025251e4a2636d3f4",
-        "reveal_after_hash": "e56c1d88d3033bab0fd87b00d687ace3584fb885a7cdb78025251e4a2636d3f4",
+        "lifecycle_frozen_hash": "825221b14ea12c5c41b4ce24ecc08cb5ad4199e212c37bd67bfa4b92ea2057b8",
+        "reveal_after_hash": "825221b14ea12c5c41b4ce24ecc08cb5ad4199e212c37bd67bfa4b92ea2057b8",
         "reveal_order_valid": true,
         "calibration_category": "SUPPORTED",
         "outcome_score": 0.35,
@@ -645,7 +645,7 @@
       "anonymous_id": "CASE-0202",
       "frozen": {
         "anonymous_case_id": "CASE-0202",
-        "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-09c",
+        "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-038",
         "proposition_id": "prop-830d97c7f53dc12c",
         "proposition_summary": {
           "proposition_id": "prop-830d97c7f53dc12c",
@@ -663,11 +663,11 @@
             "epistemic_state_entering": "HYPOTHESIS",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "iefp-dd857a40a5d6",
+            "experiment_identity": "iefp-0f8bd01185de",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "iefx-7d3b45867c08",
+            "tool_result_identity": "iefx-636ca6e33aca",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -682,11 +682,11 @@
             "epistemic_state_entering": "SUPPORTED",
             "decision_entering": null,
             "targeted_null": null,
-            "experiment_identity": "sefp-f0082eb4abfc",
+            "experiment_identity": "sefp-a4c95fe19432",
             "population": null,
             "tool": null,
             "dependence_novelty": null,
-            "tool_result_identity": "sefx-f5f1cda4e29a",
+            "tool_result_identity": "sefx-ab01461ccc5e",
             "evidence_direction": null,
             "evidence_strength": null,
             "incremental_contribution": null,
@@ -698,10 +698,10 @@
           }
         ],
         "audit": {
-          "lifecycle_run_id": "blc-415cf3596fcb",
+          "lifecycle_run_id": "blc-f008122d2284",
           "proposition_id": "prop-830d97c7f53dc12c",
           "proposition_hash": "ecb8925556f4061c24975c87c933241161a96108e6d340e15f03de052d5f6599",
-          "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-09c",
+          "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-038",
           "start_phase": "PROPOSITION_PERSISTED",
           "end_phase": "STOPPED",
           "termination_reason": "STOP_LIFECYCLE_SCIENTIFIC_STOP",
@@ -718,20 +718,20 @@
           },
           "experiment_count": 2,
           "experiment_identities": [
-            "iefp-dd857a40a5d6",
-            "sefp-f0082eb4abfc"
+            "iefp-0f8bd01185de",
+            "sefp-a4c95fe19432"
           ],
           "tool_result_identities": [
-            "iefx-7d3b45867c08",
-            "sefx-f5f1cda4e29a"
+            "iefx-636ca6e33aca",
+            "sefx-ab01461ccc5e"
           ],
           "interpretation_identities": [
-            "iefi-d524e66e2dc8",
-            "iefi2-68b4068b573a"
+            "iefi-53750f6e8956",
+            "iefi2-33acadf3c829"
           ],
           "decision_identities": [
-            "iefd-2965db519739",
-            "iefd2-dd8cbe0b5bae"
+            "iefd-583e47c969e5",
+            "iefd2-d47ccfcb1fb9"
           ],
           "cumulative_null_ledger": [
             {
@@ -764,8 +764,8 @@
           "failures": [],
           "warnings": [],
           "controller_version": "bounded_lifecycle_controller_v1_3j12",
-          "created_at": "2026-08-22T07:38:37.303639+00:00",
-          "audit_hash": "7f45a43a93ea8d9b7990a896c79d6acd33e50ab2c8258b19c94a191664b3a69b"
+          "created_at": "2026-08-22T07:40:20.516832+00:00",
+          "audit_hash": "7141444a4244497734cd7ce57ff4530d65c5e791f72f946d1ebd09bbc48dd584"
         },
         "budget_initial": {
           "max_experiment_iterations": 4,
@@ -812,8 +812,8 @@
         "final_stop_reason": "STOP_LOW_INCREMENTAL",
         "bootstrap_outcome": "SESSION_CREATED",
         "errors": [],
-        "frozen_at": "2026-08-22T07:38:35.438133+00:00",
-        "lifecycle_frozen_hash": "ef162a91a68dbc8d3adb910af9d8c68b7a1b8e452a06d53200bbbdf0db08330e",
+        "frozen_at": "2026-08-22T07:40:18.672365+00:00",
+        "lifecycle_frozen_hash": "8721624f1109369f969d59877106da31a6b603deca7802da79a9dc38cbedfed4",
         "runner_version": "blind_research_examination_runner_v1_3j11"
       },
       "reveal": {
@@ -836,8 +836,8 @@
           },
           "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
         },
-        "lifecycle_frozen_hash": "ef162a91a68dbc8d3adb910af9d8c68b7a1b8e452a06d53200bbbdf0db08330e",
-        "reveal_after_hash": "ef162a91a68dbc8d3adb910af9d8c68b7a1b8e452a06d53200bbbdf0db08330e",
+        "lifecycle_frozen_hash": "8721624f1109369f969d59877106da31a6b603deca7802da79a9dc38cbedfed4",
+        "reveal_after_hash": "8721624f1109369f969d59877106da31a6b603deca7802da79a9dc38cbedfed4",
         "reveal_order_valid": true,
         "calibration_category": "SUPPORTED",
         "outcome_score": 0.35,
