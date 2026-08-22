@@ -5,6 +5,8 @@
 | Field | Value |
 |-------|-------|
 | Branch | `cursor/phase-3j7-second-experiment-execution-aad2` |
+| Commit | `2f28b5e2d` |
+| PR | #65 |
 | Base | `cursor/phase-3j6a-scientific-novelty-audit-aad2` @ `838788901` |
 | Hard STOP | `STOP_SECOND_EXPERIMENT_EXECUTED` |
 | Prior STOP | `STOP_SECOND_EXPERIMENT_DESIGNED` |
