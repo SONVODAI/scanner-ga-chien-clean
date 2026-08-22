@@ -59,8 +59,11 @@ from modules.edge_research.opr_bridge.second_experiment_execution_records import
 from modules.edge_research.opr_bridge.second_experiment_interpretation_records import (
     STOP_SECOND_EVIDENCE_INTERPRETED,
 )
+from modules.edge_research.opr_bridge.second_experiment_research_decision_records import (
+    STOP_SECOND_RESEARCH_DECISION_FROZEN,
+)
 
-ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j8"
+ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j9"
 
 # Documented STOP boundaries — preserved from Phase 3I
 STOP_PROPOSITION_PERSISTED = "STOP_PROPOSITION_PERSISTED"
@@ -94,6 +97,7 @@ class ProductionOprCycleResult:
     second_experiment_design: Optional[Dict[str, Any]] = None
     second_experiment_execution: Optional[Dict[str, Any]] = None
     second_experiment_interpretation: Optional[Dict[str, Any]] = None
+    second_experiment_research_decision: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -113,6 +117,7 @@ class ProductionOprCycleResult:
             "second_experiment_design": self.second_experiment_design,
             "second_experiment_execution": self.second_experiment_execution,
             "second_experiment_interpretation": self.second_experiment_interpretation,
+            "second_experiment_research_decision": self.second_experiment_research_decision,
             "error": self.error,
         }
 
@@ -179,6 +184,7 @@ def run_production_opr_cycle(
     design_second_experiment: bool = False,
     execute_second_experiment: bool = False,
     interpret_second_experiment: bool = False,
+    decide_second_experiment: bool = False,
 ) -> ProductionOprCycleResult:
     """
     Production-facing OPR cycle: detect → idempotency → persist → optional first-experiment path.
@@ -189,7 +195,8 @@ def run_production_opr_cycle(
     When design_second_experiment=True (requires decision), runs 3J.6 second-experiment design.
     When execute_second_experiment=True (requires design), runs 3J.7 second-experiment execution.
     When interpret_second_experiment=True (requires execution), runs 3J.8 cumulative interpretation.
-    Does NOT create Research Decision #2 or invoke synthesis hooks.
+    When decide_second_experiment=True (requires interpretation), runs 3J.9 cumulative research decision.
+    Does NOT generate or execute Experiment #3.
     """
     result = ProductionOprCycleResult()
     result.frozen_integrity = verify_frozen_scientific_integrity()
@@ -247,6 +254,10 @@ def run_production_opr_cycle(
             result.second_experiment_interpretation = record.second_experiment_interpretation
             if STOP_SECOND_EVIDENCE_INTERPRETED not in result.stop_boundaries:
                 result.stop_boundaries.append(STOP_SECOND_EVIDENCE_INTERPRETED)
+        if decide_second_experiment and record.second_experiment_research_decision:
+            result.second_experiment_research_decision = record.second_experiment_research_decision
+            if STOP_SECOND_RESEARCH_DECISION_FROZEN not in result.stop_boundaries:
+                result.stop_boundaries.append(STOP_SECOND_RESEARCH_DECISION_FROZEN)
         return result
 
     session_id = new_production_session_id(detection.proposition_id or "unknown")
@@ -429,6 +440,29 @@ def run_production_opr_cycle(
                             stop_boundaries.append(STOP_SECOND_EVIDENCE_INTERPRETED)
                             write_opr_session(record, data_dir=data_dir)
                             result.second_experiment_interpretation = ix2.to_dict()
+
+                            if (
+                                decide_second_experiment
+                                and record.second_experiment_interpretation
+                                and record.first_experiment_research_decision
+                            ):
+                                from modules.edge_research.opr_bridge.production_second_experiment_research_decision import (
+                                    run_production_second_experiment_research_decision,
+                                )
+
+                                dx2 = run_production_second_experiment_research_decision(
+                                    detection.proposition_record,
+                                    session_id=session_id,
+                                    second_interpretation_dict=record.second_experiment_interpretation,
+                                    first_decision_dict=record.first_experiment_research_decision,
+                                    first_interpretation_dict=record.first_experiment_interpretation,
+                                    data_dir=data_dir,
+                                )
+                                if dx2.decision and dx2.decision.envelope:
+                                    record.second_experiment_research_decision = dx2.decision.envelope.to_dict()
+                                stop_boundaries.append(STOP_SECOND_RESEARCH_DECISION_FROZEN)
+                                write_opr_session(record, data_dir=data_dir)
+                                result.second_experiment_research_decision = dx2.to_dict()
 
     result.outcome = "SESSION_CREATED"
     result.session_id = session_id
