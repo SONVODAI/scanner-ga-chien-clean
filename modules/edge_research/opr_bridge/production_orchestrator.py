@@ -56,8 +56,11 @@ from modules.edge_research.opr_bridge.second_experiment_records import (
 from modules.edge_research.opr_bridge.second_experiment_execution_records import (
     STOP_SECOND_EXPERIMENT_EXECUTED,
 )
+from modules.edge_research.opr_bridge.second_experiment_interpretation_records import (
+    STOP_SECOND_EVIDENCE_INTERPRETED,
+)
 
-ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j7"
+ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j8"
 
 # Documented STOP boundaries — preserved from Phase 3I
 STOP_PROPOSITION_PERSISTED = "STOP_PROPOSITION_PERSISTED"
@@ -90,6 +93,7 @@ class ProductionOprCycleResult:
     first_experiment_research_decision: Optional[Dict[str, Any]] = None
     second_experiment_design: Optional[Dict[str, Any]] = None
     second_experiment_execution: Optional[Dict[str, Any]] = None
+    second_experiment_interpretation: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -108,6 +112,7 @@ class ProductionOprCycleResult:
             "first_experiment_research_decision": self.first_experiment_research_decision,
             "second_experiment_design": self.second_experiment_design,
             "second_experiment_execution": self.second_experiment_execution,
+            "second_experiment_interpretation": self.second_experiment_interpretation,
             "error": self.error,
         }
 
@@ -173,6 +178,7 @@ def run_production_opr_cycle(
     decide_first_experiment: bool = False,
     design_second_experiment: bool = False,
     execute_second_experiment: bool = False,
+    interpret_second_experiment: bool = False,
 ) -> ProductionOprCycleResult:
     """
     Production-facing OPR cycle: detect → idempotency → persist → optional first-experiment path.
@@ -182,7 +188,8 @@ def run_production_opr_cycle(
     When decide_first_experiment=True (requires interpretation), runs 3J.5 research decision.
     When design_second_experiment=True (requires decision), runs 3J.6 second-experiment design.
     When execute_second_experiment=True (requires design), runs 3J.7 second-experiment execution.
-    Does NOT interpret ToolResult #2 or invoke synthesis hooks.
+    When interpret_second_experiment=True (requires execution), runs 3J.8 cumulative interpretation.
+    Does NOT create Research Decision #2 or invoke synthesis hooks.
     """
     result = ProductionOprCycleResult()
     result.frozen_integrity = verify_frozen_scientific_integrity()
@@ -236,6 +243,10 @@ def run_production_opr_cycle(
             result.second_experiment_execution = record.second_experiment_execution
             if STOP_SECOND_EXPERIMENT_EXECUTED not in result.stop_boundaries:
                 result.stop_boundaries.append(STOP_SECOND_EXPERIMENT_EXECUTED)
+        if interpret_second_experiment and record.second_experiment_interpretation:
+            result.second_experiment_interpretation = record.second_experiment_interpretation
+            if STOP_SECOND_EVIDENCE_INTERPRETED not in result.stop_boundaries:
+                result.stop_boundaries.append(STOP_SECOND_EVIDENCE_INTERPRETED)
         return result
 
     session_id = new_production_session_id(detection.proposition_id or "unknown")
@@ -391,6 +402,34 @@ def run_production_opr_cycle(
                         write_opr_session(record, data_dir=data_dir)
                         result.second_experiment_execution = ex2.to_dict()
 
+                        if (
+                            interpret_second_experiment
+                            and record.second_experiment_execution
+                            and record.first_experiment_interpretation
+                            and record.second_experiment_package
+                        ):
+                            from modules.edge_research.opr_bridge.production_second_experiment_interpretation import (
+                                run_production_second_experiment_interpretation,
+                            )
+
+                            ix2 = run_production_second_experiment_interpretation(
+                                detection.proposition_record,
+                                session_id=session_id,
+                                package_dict=record.second_experiment_package,
+                                execution_dict=record.second_experiment_execution,
+                                first_interpretation_dict=record.first_experiment_interpretation,
+                                frozen_contract_dict=record.frozen_second_interpretation_contract,
+                                data_dir=data_dir,
+                            )
+                            if ix2.interpretation and ix2.interpretation.envelope:
+                                record.second_experiment_interpretation = ix2.interpretation.envelope.to_dict()
+                                record.second_experiment_epistemic_update = ix2.interpretation.envelope.epistemic_update
+                            if ix2.frozen_contract_ref and not record.frozen_second_interpretation_contract:
+                                record.frozen_second_interpretation_contract = ix2.frozen_contract_ref
+                            stop_boundaries.append(STOP_SECOND_EVIDENCE_INTERPRETED)
+                            write_opr_session(record, data_dir=data_dir)
+                            result.second_experiment_interpretation = ix2.to_dict()
+
     result.outcome = "SESSION_CREATED"
     result.session_id = session_id
     result.session_record = record
@@ -432,4 +471,5 @@ def list_documented_stop_boundaries() -> List[Dict[str, str]]:
         {"code": STOP_RESEARCH_DECISION_FROZEN, "description": "Research decision frozen; no second experiment generated (3J.5)"},
         {"code": STOP_SECOND_EXPERIMENT_DESIGNED, "description": "Second experiment designed and frozen; NOT_EXECUTED (3J.6)"},
         {"code": STOP_SECOND_EXPERIMENT_EXECUTED, "description": "Second experiment executed; auditable ToolResult #2 persisted (3J.7)"},
+        {"code": STOP_SECOND_EVIDENCE_INTERPRETED, "description": "Second experiment evidence interpreted; EpistemicUpdate #2 persisted (3J.8)"},
     ]
