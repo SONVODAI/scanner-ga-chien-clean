@@ -32,6 +32,15 @@ OBSERVATION_MODULES = (
     "production_observation_persistence.py",
     "production_observation_narrative.py",
     "production_observation_isolation.py",
+    "production_living_observation_records.py",
+    "production_living_observation_persistence.py",
+    "production_market_delta.py",
+    "production_forward_outcome_evaluator.py",
+    "production_observation_lifecycle.py",
+    "production_daily_assessment.py",
+    "production_daily_voice.py",
+    "production_living_read_model.py",
+    "production_living_research_observation.py",
 )
 
 
