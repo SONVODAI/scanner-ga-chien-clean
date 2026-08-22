@@ -10,7 +10,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from modules.edge_research.opr_bridge.scientific_action_context import ActionGenerationContext
+from modules.edge_research.opr_bridge.cohort_binding_records import CohortSelectionDisposition
+from modules.edge_research.opr_bridge.evidence_derived_cohort_binder import (
+    EvidenceDerivedCohortBinder,
+    panel_from_context,
+)
 from modules.edge_research.opr_bridge.scientific_action_core import _commitment_label, _contrast_relation
 from modules.edge_research.opr_bridge.scientific_action_records import (
     EpistemicConsequenceContract,
@@ -75,25 +79,20 @@ def _default_consequences(axis: str, *, falsify: bool) -> EpistemicConsequenceCo
     )
 
 
-def _independence_estimate(strategy: str) -> Dict[str, str]:
+def _independence_from_cohort(cohort_record: Optional[Any], strategy: str) -> Dict[str, str]:
+    """Evidence-computed independence when cohort binding available; else conservative fallback."""
+    if cohort_record is not None:
+        return cohort_record.independence_profile.to_dict()
+    # Non-cohort strategies retain structural defaults (not market-state hardcodes)
     mapping = {
         "episode_holdout_excluding_motivating": {
             "sample_independence": "MEDIUM",
             "temporal_independence": "MEDIUM",
             "episode_independence": "HIGH",
         },
-        "regime_separated_contrast": {
-            "sample_independence": "MEDIUM",
-            "temporal_independence": "HIGH",
-            "episode_independence": "MEDIUM",
-        },
         "rolling_stability_contrast": {
             "sample_independence": "MEDIUM",
             "temporal_independence": "HIGH",
-        },
-        "population_subgroup_contrast": {
-            "population_independence": "HIGH",
-            "sample_independence": "HIGH",
         },
         "counterexample_period_search": {
             "temporal_independence": "HIGH",
@@ -107,14 +106,13 @@ def _independence_estimate(strategy: str) -> Dict[str, str]:
             "methodological_independence": "HIGH",
             "sample_independence": "HIGH",
         },
-        "concentration_decomposition": {
-            "sample_independence": "MEDIUM",
-        },
-        "measurement_robustness_check": {
-            "measurement_independence": "HIGH",
-        },
+        "concentration_decomposition": {"sample_independence": "MEDIUM"},
+        "measurement_robustness_check": {"measurement_independence": "HIGH"},
     }
     return mapping.get(strategy, {"sample_independence": "MEDIUM"})
+
+
+_COHORT_BINDER = EvidenceDerivedCohortBinder()
 
 
 def _classify_redundancy(
@@ -148,6 +146,8 @@ def _finalize_candidate(
     rescue_risk: str = RescueRiskClass.PASS.value,
     tool_override: Optional[str] = None,
     alt_envelope: Optional[Dict[str, Any]] = None,
+    population_spec_override: Optional[Dict[str, Any]] = None,
+    cohort_binding_record: Optional[Any] = None,
 ) -> ScientificActionCandidateRecord:
     axis = objective.target_uncertainty
     redundancy = _classify_redundancy(core, ctx, axis)
@@ -161,6 +161,7 @@ def _finalize_candidate(
         rescue_risk=rescue_risk,
         tool_override=tool_override,
         alt_envelope=alt_envelope,
+        population_spec_override=population_spec_override,
     )
 
     if redundancy == RedundancyClass.REDUNDANT.value and exec_class == ExecutabilityClass.SCIENTIFICALLY_VALID_EXECUTABLE.value:
@@ -170,13 +171,17 @@ def _finalize_candidate(
     if rescue_risk != RescueRiskClass.PASS.value:
         exec_class = ExecutabilityClass.RESCUE_RISK.value
 
+    if cohort_binding_record is not None and cohort_binding_record.rescue_risk_status != RescueRiskClass.PASS.value:
+        exec_class = ExecutabilityClass.RESCUE_RISK.value
+        exec_detail = f"Cohort rescue risk: {cohort_binding_record.rescue_risk_status}"
+
     return build_candidate_record(
         objective=objective,
         action_scientific_semantics=semantics,
         proposition_commitment_challenged=commitment,
         evidence_cohort_semantics=cohort_semantics,
         expected_new_uncertainty_coverage=axis,
-        expected_independence_profile=_independence_estimate(core.cohort_strategy),
+        expected_independence_profile=_independence_from_cohort(cohort_binding_record, core.cohort_strategy),
         epistemic_consequences=consequences,
         falsification_capability=falsify,
         contradiction_resolution_capability=objective.contradiction_resolution_relevant,
@@ -195,6 +200,123 @@ def _finalize_candidate(
         },
         created_at=ctx.synthesis.created_at,
     )
+
+
+_COHORT_BOUND_STRATEGIES = frozenset({"population_subgroup_contrast", "regime_separated_contrast"})
+
+
+def _propose_cohort_bound_action(
+    *,
+    objective: ScientificObjectiveRecord,
+    ctx: ActionGenerationContext,
+    strategy: str,
+    cohort_sem: str,
+    rationale: str,
+    operator_id: str,
+    panel_fixture: Optional[Dict[str, Any]] = None,
+) -> List[ScientificActionCandidateRecord]:
+    """Use EvidenceDerivedCohortBinder for strategies requiring cohort selection."""
+    panel = panel_from_context(ctx, fixture=panel_fixture)
+    if strategy == "population_subgroup_contrast":
+        binding = _COHORT_BINDER.bind_population_axis(ctx, objective, panel)
+    else:
+        binding = _COHORT_BINDER.bind_temporal_axis(ctx, objective, panel)
+
+    if binding.disposition == CohortSelectionDisposition.NO_DEFENSIBLE_COHORT:
+        if binding.candidates:
+            fallback = binding.candidates[0]
+            return _emit_cohort_candidate(
+                objective=objective,
+                ctx=ctx,
+                strategy=strategy,
+                cohort_sem=cohort_sem,
+                rationale=rationale,
+                operator_id=operator_id,
+                selected=fallback,
+                low_information=True,
+            )
+        return []
+
+    if binding.disposition == CohortSelectionDisposition.AMBIGUOUS_COHORT_SELECTION:
+        return []
+
+    selected = binding.selected
+    if selected is None:
+        return []
+
+    return _emit_cohort_candidate(
+        objective=objective,
+        ctx=ctx,
+        strategy=strategy,
+        cohort_sem=cohort_sem,
+        rationale=rationale,
+        operator_id=operator_id,
+        selected=selected,
+        low_information=False,
+    )
+
+
+def _emit_cohort_candidate(
+    *,
+    objective: ScientificObjectiveRecord,
+    ctx: ActionGenerationContext,
+    strategy: str,
+    cohort_sem: str,
+    rationale: str,
+    operator_id: str,
+    selected: Any,
+    low_information: bool,
+) -> List[ScientificActionCandidateRecord]:
+    contrast = _contrast_relation(ctx)
+    core = ScientificActionCore(
+        objective_target_uncertainty=objective.target_uncertainty,
+        proposition_commitment_challenged=_commitment_label(ctx),
+        cohort_strategy=strategy,
+        contrast_relation=contrast,
+        expected_epistemic_consequence_type=f"falsify_{objective.target_uncertainty}",
+        information_gain_type="falsify",
+    )
+    rescue = selected.rescue_risk_status
+    if low_information:
+        rescue = RescueRiskClass.PASS.value
+    cand = _finalize_candidate(
+        objective=objective,
+        ctx=ctx,
+        core=core,
+        semantics=f"Falsify {objective.target_uncertainty}: {rationale} [{selected.cohort_semantic_definition}]",
+        cohort_semantics=f"{cohort_sem} — {selected.cohort_semantic_definition}",
+        operator_id=operator_id,
+        population_spec_override=selected.population_spec,
+        cohort_binding_record=selected,
+        rescue_risk=rescue,
+    )
+    if low_information:
+        from modules.edge_research.opr_bridge.scientific_action_records import ExecutabilityClass, RedundancyClass, build_candidate_record
+
+        return [
+            build_candidate_record(
+                objective=objective,
+                action_scientific_semantics=cand.action_scientific_semantics,
+                proposition_commitment_challenged=cand.proposition_commitment_challenged,
+                evidence_cohort_semantics=cand.evidence_cohort_semantics,
+                expected_new_uncertainty_coverage=cand.expected_new_uncertainty_coverage,
+                expected_independence_profile=cand.expected_independence_profile,
+                epistemic_consequences=cand.epistemic_consequences,
+                falsification_capability=cand.falsification_capability,
+                contradiction_resolution_capability=cand.contradiction_resolution_capability,
+                redundancy_classification=RedundancyClass.REDUNDANT.value,
+                rescue_risk_classification=cand.rescue_risk_classification,
+                executability_classification=ExecutabilityClass.EXECUTABLE_BUT_LOW_INFORMATION.value,
+                executability_detail="No defensible cohort — best-effort binding for audit",
+                scientific_action_core=cand.scientific_action_core,
+                representation_envelope=cand.representation_envelope,
+                experiment_spec=cand.experiment_spec,
+                operator_id=operator_id,
+                provenance=cand.provenance,
+                created_at=cand.created_at,
+            )
+        ]
+    return [cand]
 
 
 def _cohort_strategies_for_axis(
@@ -348,6 +470,18 @@ class FalsificationOperator(ScientificActionOperator):
         contrast = _contrast_relation(ctx)
         candidates: List[ScientificActionCandidateRecord] = []
         for strategy, cohort_sem, rationale in _cohort_strategies_for_axis(axis, ctx):
+            if strategy in _COHORT_BOUND_STRATEGIES:
+                candidates.extend(
+                    _propose_cohort_bound_action(
+                        objective=objective,
+                        ctx=ctx,
+                        strategy=strategy,
+                        cohort_sem=cohort_sem,
+                        rationale=rationale,
+                        operator_id=self.operator_id,
+                    )
+                )
+                continue
             core = ScientificActionCore(
                 objective_target_uncertainty=axis,
                 proposition_commitment_challenged=_commitment_label(ctx),

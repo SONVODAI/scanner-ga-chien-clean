@@ -22,6 +22,7 @@ def bind_experiment_spec(
     rescue_risk: str,
     tool_override: Optional[str] = None,
     alt_envelope: Optional[Dict[str, Any]] = None,
+    population_spec_override: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Optional[Dict[str, Any]], Dict[str, Any], str, str]:
     """Bind representation envelope and ExperimentSpec after scientific action defined."""
     if rescue_risk != RescueRiskClass.PASS.value:
@@ -29,7 +30,9 @@ def bind_experiment_spec(
         return None, envelope, ExecutabilityClass.RESCUE_RISK.value, f"Rescue risk: {rescue_risk}"
 
     tool = tool_override or _select_tool(core, ctx)
-    envelope = alt_envelope or _build_envelope(core, ctx, tool)
+    envelope = alt_envelope or _build_envelope(
+        core, ctx, tool, population_spec_override=population_spec_override
+    )
     spec = _build_spec(core, ctx, tool, envelope)
 
     exec_class, detail = assess_executability(ctx, core, tool, spec, envelope)
@@ -87,7 +90,15 @@ def _base_scope(ctx: ActionGenerationContext) -> Dict[str, Any]:
     }
 
 
-def _population_for_strategy(core: ScientificActionCore, ctx: ActionGenerationContext) -> Dict[str, Any]:
+def _population_for_strategy(
+    core: ScientificActionCore,
+    ctx: ActionGenerationContext,
+    *,
+    population_spec_override: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Population spec — evidence-derived override required for cohort strategies."""
+    if population_spec_override is not None:
+        return dict(population_spec_override)
     strategy = core.cohort_strategy
     if strategy == "episode_holdout_excluding_motivating":
         return {
@@ -97,22 +108,11 @@ def _population_for_strategy(core: ScientificActionCore, ctx: ActionGenerationCo
             "values": list(ctx.motivating_dates),
             "grammar_version": GRAMMAR_VERSION,
         }
-    if strategy == "regime_separated_contrast":
-        return {
-            "kind": "filter",
-            "field": "research_market_state",
-            "operator": "in",
-            "values": ["STRESS"],
-            "grammar_version": GRAMMAR_VERSION,
-        }
-    if strategy == "population_subgroup_contrast":
-        return {
-            "kind": "filter",
-            "field": "research_market_state",
-            "operator": "in",
-            "values": ["NORMAL"],
-            "grammar_version": GRAMMAR_VERSION,
-        }
+    if strategy in ("regime_separated_contrast", "population_subgroup_contrast"):
+        raise ValueError(
+            f"Cohort strategy {strategy!r} requires evidence-derived population_spec; "
+            "hardcoded market-state binding removed in 3I.17b"
+        )
     if strategy == "counterexample_period_search":
         return {
             "kind": "filter",
@@ -134,13 +134,21 @@ def _population_for_strategy(core: ScientificActionCore, ctx: ActionGenerationCo
     return {"kind": "all", "grammar_version": GRAMMAR_VERSION}
 
 
-def _build_envelope(core: ScientificActionCore, ctx: ActionGenerationContext, tool: str) -> Dict[str, Any]:
+def _build_envelope(
+    core: ScientificActionCore,
+    ctx: ActionGenerationContext,
+    tool: str,
+    *,
+    population_spec_override: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     return {
         "tool": tool,
         "cohort_strategy": core.cohort_strategy,
         "feature": _feature_field(ctx),
         "outcome": _outcome_field(ctx),
-        "population_spec": _population_for_strategy(core, ctx),
+        "population_spec": _population_for_strategy(
+            core, ctx, population_spec_override=population_spec_override
+        ),
         "syntax": "grammar_v1",
     }
 

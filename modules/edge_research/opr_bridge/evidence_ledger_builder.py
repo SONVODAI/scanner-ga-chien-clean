@@ -248,6 +248,11 @@ def build_evidence_spec_from_lifecycle_event(
         "provenance_refs": provenance,
         "proposition_id": proposition["proposition_id"],
         "proposition_hash": prop_hash,
+        "experiment_spec": {
+            "research_scope": scope,
+            "data_cutoff_date": experiment_spec.get("data_cutoff_date", ""),
+            "tool_name": experiment_spec.get("tool_name", "unknown"),
+        },
     }
 
 
