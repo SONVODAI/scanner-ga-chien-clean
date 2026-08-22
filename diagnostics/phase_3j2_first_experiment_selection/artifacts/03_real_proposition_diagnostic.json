@@ -5,7 +5,7 @@
   "disposition": "SELECTED",
   "objectives": [
     {
-      "objective_id": "ieo-034e0636da8a",
+      "objective_id": "ieo-788a7c81a3c2",
       "record_version": "initial_experiment_objective_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
@@ -30,11 +30,11 @@
         "canonical_proposition_core": "{'version': 'research_proposition_core_v1', 'population_spec': {'kind': 'all', 'grammar_version': 'research_grammar_v1'}"
       },
       "directness_rank": 0,
-      "created_at": "2026-08-22T05:15:36.372981+00:00",
-      "objective_hash": "e72ca19160d1726ff91311bc4e40a7063c5fc0489fa744ec035a7ab02b7705d9"
+      "created_at": "2026-08-22T05:19:50.306475+00:00",
+      "objective_hash": "faadb97d8e2bdbf369639891905e40a743cdd24af2ad2aa27b50b12b6800c4b5"
     },
     {
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "record_version": "initial_experiment_objective_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
@@ -59,17 +59,17 @@
         "disconfirming_observation_spec": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
       },
       "directness_rank": 1,
-      "created_at": "2026-08-22T05:15:36.373040+00:00",
-      "objective_hash": "f6e77608e9ae45209d801545e5222280b01e9529313671ad1faaee9c34fc5809"
+      "created_at": "2026-08-22T05:19:50.306523+00:00",
+      "objective_hash": "37483b8908783ea60ff893b7cc234482012f12a3d246be2bfdaf8c258d6d4842"
     }
   ],
   "candidates_considered": [
     {
-      "candidate_id": "fec-ad7430076dc4",
+      "candidate_id": "fec-26b1902c0313",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-034e0636da8a",
+      "objective_id": "ieo-788a7c81a3c2",
       "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
       "scientific_identity": {
         "objective_target_uncertainty": "directional_effect_full_universe",
@@ -136,15 +136,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.374637+00:00",
-      "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+      "created_at": "2026-08-22T05:19:50.308139+00:00",
+      "record_hash": "2eb771b82061091b3589f11de8843d1003a8a75e0cbe3fe2a1c1540f308f84fc"
     },
     {
-      "candidate_id": "fec-a574c3fea127",
+      "candidate_id": "fec-d28fcb383b91",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
       "scientific_identity": {
         "objective_target_uncertainty": "episode_robustness",
@@ -305,15 +305,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.379454+00:00",
-      "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+      "created_at": "2026-08-22T05:19:50.311960+00:00",
+      "record_hash": "360b8e88e77d04b23628d0f32820522c2dcf9a27e033bfdb7719b70d44c76246"
     },
     {
-      "candidate_id": "fec-5a001f861945",
+      "candidate_id": "fec-a92b42ea38a9",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-034e0636da8a",
+      "objective_id": "ieo-788a7c81a3c2",
       "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
       "scientific_identity": {
         "objective_target_uncertainty": "directional_effect_full_universe",
@@ -379,15 +379,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.380703+00:00",
-      "record_hash": "81b8be2659fd7594d6f9d6b9289a464e1483f3b3af933a68075446d21fe606ac"
+      "created_at": "2026-08-22T05:19:50.313189+00:00",
+      "record_hash": "f105f360daef8b942b083e0d97a186a67c4d9790f5311a6b9c133f88ae2ceca9"
     },
     {
-      "candidate_id": "fec-bc6c8268073a",
+      "candidate_id": "fec-f1467a5e42ef",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
       "scientific_identity": {
         "objective_target_uncertainty": "episode_robustness",
@@ -464,17 +464,17 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.382360+00:00",
-      "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+      "created_at": "2026-08-22T05:19:50.314836+00:00",
+      "record_hash": "4c8b9d9e01a01d374a1494bfb08d71b48f1d431fc78e82bf0ed2227c206e3f09"
     }
   ],
   "deduplicated_candidates": [
     {
-      "candidate_id": "fec-ad7430076dc4",
+      "candidate_id": "fec-26b1902c0313",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-034e0636da8a",
+      "objective_id": "ieo-788a7c81a3c2",
       "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
       "scientific_identity": {
         "objective_target_uncertainty": "directional_effect_full_universe",
@@ -541,15 +541,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.374637+00:00",
-      "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+      "created_at": "2026-08-22T05:19:50.308139+00:00",
+      "record_hash": "2eb771b82061091b3589f11de8843d1003a8a75e0cbe3fe2a1c1540f308f84fc"
     },
     {
-      "candidate_id": "fec-a574c3fea127",
+      "candidate_id": "fec-d28fcb383b91",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
       "scientific_identity": {
         "objective_target_uncertainty": "episode_robustness",
@@ -710,15 +710,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.379454+00:00",
-      "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+      "created_at": "2026-08-22T05:19:50.311960+00:00",
+      "record_hash": "360b8e88e77d04b23628d0f32820522c2dcf9a27e033bfdb7719b70d44c76246"
     },
     {
-      "candidate_id": "fec-bc6c8268073a",
+      "candidate_id": "fec-f1467a5e42ef",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
       "scientific_identity": {
         "objective_target_uncertainty": "episode_robustness",
@@ -795,20 +795,20 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.382360+00:00",
-      "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+      "created_at": "2026-08-22T05:19:50.314836+00:00",
+      "record_hash": "4c8b9d9e01a01d374a1494bfb08d71b48f1d431fc78e82bf0ed2227c206e3f09"
     }
   ],
   "rejected": [
     {
-      "candidate_id": "fec-ad7430076dc4",
+      "candidate_id": "fec-26b1902c0313",
       "reason": "confirmatory_only_when_falsification_available",
       "classification": "DIRECT_INITIAL_TEST"
     }
   ],
   "ranking_trace": [
     {
-      "candidate_id": "fec-bc6c8268073a",
+      "candidate_id": "fec-f1467a5e42ef",
       "classification": "FALSIFICATION_CAPABLE",
       "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, '7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589')",
       "overlap": "0.000",
@@ -816,7 +816,7 @@
       "executability": "EXECUTABLE"
     },
     {
-      "candidate_id": "fec-a574c3fea127",
+      "candidate_id": "fec-d28fcb383b91",
       "classification": "FALSIFICATION_CAPABLE",
       "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, 'bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880')",
       "overlap": "0.000",
@@ -824,7 +824,7 @@
       "executability": "EXECUTABLE"
     }
   ],
-  "selected_candidate_id": "fec-bc6c8268073a",
+  "selected_candidate_id": "fec-f1467a5e42ef",
   "selected_experiment_spec": {
     "tool_name": "partition_group_compare",
     "tool_version": "v1",
@@ -867,11 +867,11 @@
   "default_partition_group_compare_survives_selection": false,
   "full_panel_candidates": [
     {
-      "candidate_id": "fec-ad7430076dc4",
+      "candidate_id": "fec-26b1902c0313",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-034e0636da8a",
+      "objective_id": "ieo-788a7c81a3c2",
       "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
       "scientific_identity": {
         "objective_target_uncertainty": "directional_effect_full_universe",
@@ -938,15 +938,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.374637+00:00",
-      "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+      "created_at": "2026-08-22T05:19:50.308139+00:00",
+      "record_hash": "2eb771b82061091b3589f11de8843d1003a8a75e0cbe3fe2a1c1540f308f84fc"
     },
     {
-      "candidate_id": "fec-5a001f861945",
+      "candidate_id": "fec-a92b42ea38a9",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-034e0636da8a",
+      "objective_id": "ieo-788a7c81a3c2",
       "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
       "scientific_identity": {
         "objective_target_uncertainty": "directional_effect_full_universe",
@@ -1012,17 +1012,17 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.380703+00:00",
-      "record_hash": "81b8be2659fd7594d6f9d6b9289a464e1483f3b3af933a68075446d21fe606ac"
+      "created_at": "2026-08-22T05:19:50.313189+00:00",
+      "record_hash": "f105f360daef8b942b083e0d97a186a67c4d9790f5311a6b9c133f88ae2ceca9"
     }
   ],
   "falsification_candidates": [
     {
-      "candidate_id": "fec-a574c3fea127",
+      "candidate_id": "fec-d28fcb383b91",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
       "scientific_identity": {
         "objective_target_uncertainty": "episode_robustness",
@@ -1183,15 +1183,15 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.379454+00:00",
-      "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+      "created_at": "2026-08-22T05:19:50.311960+00:00",
+      "record_hash": "360b8e88e77d04b23628d0f32820522c2dcf9a27e033bfdb7719b70d44c76246"
     },
     {
-      "candidate_id": "fec-bc6c8268073a",
+      "candidate_id": "fec-f1467a5e42ef",
       "record_version": "first_experiment_candidate_v1_3j2",
       "proposition_id": "prop-efb650d9bd5c451f",
       "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-      "objective_id": "ieo-1aca6b4e5027",
+      "objective_id": "ieo-813765d8470e",
       "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
       "scientific_identity": {
         "objective_target_uncertainty": "episode_robustness",
@@ -1268,12 +1268,12 @@
         },
         "syntax": "grammar_v1"
       },
-      "created_at": "2026-08-22T05:15:36.382360+00:00",
-      "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+      "created_at": "2026-08-22T05:19:50.314836+00:00",
+      "record_hash": "4c8b9d9e01a01d374a1494bfb08d71b48f1d431fc78e82bf0ed2227c206e3f09"
     }
   ],
   "package": {
-    "package_id": "iefp-fb5b18c9f320",
+    "package_id": "iefp-aa6990eb4afa",
     "record_version": "initial_experiment_package_v1_3j2",
     "proposition_id": "prop-efb650d9bd5c451f",
     "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
@@ -1281,7 +1281,7 @@
     "selector_version": "first_experiment_selector_lex_v1_3j2",
     "objectives": [
       {
-        "objective_id": "ieo-034e0636da8a",
+        "objective_id": "ieo-788a7c81a3c2",
         "record_version": "initial_experiment_objective_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
@@ -1306,11 +1306,11 @@
           "canonical_proposition_core": "{'version': 'research_proposition_core_v1', 'population_spec': {'kind': 'all', 'grammar_version': 'research_grammar_v1'}"
         },
         "directness_rank": 0,
-        "created_at": "2026-08-22T05:15:36.372981+00:00",
-        "objective_hash": "e72ca19160d1726ff91311bc4e40a7063c5fc0489fa744ec035a7ab02b7705d9"
+        "created_at": "2026-08-22T05:19:50.306475+00:00",
+        "objective_hash": "faadb97d8e2bdbf369639891905e40a743cdd24af2ad2aa27b50b12b6800c4b5"
       },
       {
-        "objective_id": "ieo-1aca6b4e5027",
+        "objective_id": "ieo-813765d8470e",
         "record_version": "initial_experiment_objective_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
@@ -1335,17 +1335,17 @@
           "disconfirming_observation_spec": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
         },
         "directness_rank": 1,
-        "created_at": "2026-08-22T05:15:36.373040+00:00",
-        "objective_hash": "f6e77608e9ae45209d801545e5222280b01e9529313671ad1faaee9c34fc5809"
+        "created_at": "2026-08-22T05:19:50.306523+00:00",
+        "objective_hash": "37483b8908783ea60ff893b7cc234482012f12a3d246be2bfdaf8c258d6d4842"
       }
     ],
     "candidates_considered": [
       {
-        "candidate_id": "fec-ad7430076dc4",
+        "candidate_id": "fec-26b1902c0313",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-034e0636da8a",
+        "objective_id": "ieo-788a7c81a3c2",
         "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
         "scientific_identity": {
           "objective_target_uncertainty": "directional_effect_full_universe",
@@ -1412,15 +1412,15 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.374637+00:00",
-        "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+        "created_at": "2026-08-22T05:19:50.308139+00:00",
+        "record_hash": "2eb771b82061091b3589f11de8843d1003a8a75e0cbe3fe2a1c1540f308f84fc"
       },
       {
-        "candidate_id": "fec-a574c3fea127",
+        "candidate_id": "fec-d28fcb383b91",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-1aca6b4e5027",
+        "objective_id": "ieo-813765d8470e",
         "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
         "scientific_identity": {
           "objective_target_uncertainty": "episode_robustness",
@@ -1581,15 +1581,15 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.379454+00:00",
-        "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+        "created_at": "2026-08-22T05:19:50.311960+00:00",
+        "record_hash": "360b8e88e77d04b23628d0f32820522c2dcf9a27e033bfdb7719b70d44c76246"
       },
       {
-        "candidate_id": "fec-5a001f861945",
+        "candidate_id": "fec-a92b42ea38a9",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-034e0636da8a",
+        "objective_id": "ieo-788a7c81a3c2",
         "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
         "scientific_identity": {
           "objective_target_uncertainty": "directional_effect_full_universe",
@@ -1655,15 +1655,15 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.380703+00:00",
-        "record_hash": "81b8be2659fd7594d6f9d6b9289a464e1483f3b3af933a68075446d21fe606ac"
+        "created_at": "2026-08-22T05:19:50.313189+00:00",
+        "record_hash": "f105f360daef8b942b083e0d97a186a67c4d9790f5311a6b9c133f88ae2ceca9"
       },
       {
-        "candidate_id": "fec-bc6c8268073a",
+        "candidate_id": "fec-f1467a5e42ef",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-1aca6b4e5027",
+        "objective_id": "ieo-813765d8470e",
         "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
         "scientific_identity": {
           "objective_target_uncertainty": "episode_robustness",
@@ -1740,17 +1740,17 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.382360+00:00",
-        "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+        "created_at": "2026-08-22T05:19:50.314836+00:00",
+        "record_hash": "4c8b9d9e01a01d374a1494bfb08d71b48f1d431fc78e82bf0ed2227c206e3f09"
       }
     ],
     "deduplicated_candidates": [
       {
-        "candidate_id": "fec-ad7430076dc4",
+        "candidate_id": "fec-26b1902c0313",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-034e0636da8a",
+        "objective_id": "ieo-788a7c81a3c2",
         "scientific_action_core_hash": "dffeaa86c8b6268a4ff4920ef245c6a1881fd33996584690c63f90f619b99b59",
         "scientific_identity": {
           "objective_target_uncertainty": "directional_effect_full_universe",
@@ -1817,15 +1817,15 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.374637+00:00",
-        "record_hash": "eeda92a8d7abeb1624deec2f02a3b0e30b0c0a916992eb9f36334d81de4c5889"
+        "created_at": "2026-08-22T05:19:50.308139+00:00",
+        "record_hash": "2eb771b82061091b3589f11de8843d1003a8a75e0cbe3fe2a1c1540f308f84fc"
       },
       {
-        "candidate_id": "fec-a574c3fea127",
+        "candidate_id": "fec-d28fcb383b91",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-1aca6b4e5027",
+        "objective_id": "ieo-813765d8470e",
         "scientific_action_core_hash": "bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880",
         "scientific_identity": {
           "objective_target_uncertainty": "episode_robustness",
@@ -1986,15 +1986,15 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.379454+00:00",
-        "record_hash": "12c9facba2bec259d23fe93d040e6c2014b931ccf2071991f6bd09cf953c3c5b"
+        "created_at": "2026-08-22T05:19:50.311960+00:00",
+        "record_hash": "360b8e88e77d04b23628d0f32820522c2dcf9a27e033bfdb7719b70d44c76246"
       },
       {
-        "candidate_id": "fec-bc6c8268073a",
+        "candidate_id": "fec-f1467a5e42ef",
         "record_version": "first_experiment_candidate_v1_3j2",
         "proposition_id": "prop-efb650d9bd5c451f",
         "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
-        "objective_id": "ieo-1aca6b4e5027",
+        "objective_id": "ieo-813765d8470e",
         "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
         "scientific_identity": {
           "objective_target_uncertainty": "episode_robustness",
@@ -2071,20 +2071,20 @@
           },
           "syntax": "grammar_v1"
         },
-        "created_at": "2026-08-22T05:15:36.382360+00:00",
-        "record_hash": "898501414870d95a13bdec061f47933cd3218d00159776eba57583b31e214a8d"
+        "created_at": "2026-08-22T05:19:50.314836+00:00",
+        "record_hash": "4c8b9d9e01a01d374a1494bfb08d71b48f1d431fc78e82bf0ed2227c206e3f09"
       }
     ],
     "rejected": [
       {
-        "candidate_id": "fec-ad7430076dc4",
+        "candidate_id": "fec-26b1902c0313",
         "reason": "confirmatory_only_when_falsification_available",
         "classification": "DIRECT_INITIAL_TEST"
       }
     ],
     "ranking_trace": [
       {
-        "candidate_id": "fec-bc6c8268073a",
+        "candidate_id": "fec-f1467a5e42ef",
         "classification": "FALSIFICATION_CAPABLE",
         "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, '7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589')",
         "overlap": "0.000",
@@ -2092,7 +2092,7 @@
         "executability": "EXECUTABLE"
       },
       {
-        "candidate_id": "fec-a574c3fea127",
+        "candidate_id": "fec-d28fcb383b91",
         "classification": "FALSIFICATION_CAPABLE",
         "rank_key": "(0, 0, 0, 0.0, 1, 0, 0, 'bf32f35195633b959007642464e1d3e28608c9c292ef5cfb20440826abc1f880')",
         "overlap": "0.000",
@@ -2101,7 +2101,7 @@
       }
     ],
     "disposition": "SELECTED",
-    "selected_candidate_id": "fec-bc6c8268073a",
+    "selected_candidate_id": "fec-f1467a5e42ef",
     "selected_experiment_spec": {
       "tool_name": "partition_group_compare",
       "tool_version": "v1",
@@ -2134,7 +2134,7 @@
     "human_choice_material": false,
     "human_choice_reason": "Scientific lexicographic dominance \u2014 tools bound last",
     "execution_status": "NOT_EXECUTED",
-    "created_at": "2026-08-22T05:15:36.382479+00:00",
-    "package_hash": "3e8adb6215b77f9c89da21110afe28cd55d7ba004113933c9a8355157cb14982"
+    "created_at": "2026-08-22T05:19:50.314937+00:00",
+    "package_hash": "41d5177a36ea58a0a69dc4eb393a1a49ffa2ad105a7415a5d7a7ad4136c368bc"
   }
 }
