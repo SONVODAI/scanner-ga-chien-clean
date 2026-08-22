@@ -41,6 +41,17 @@ OBSERVATION_MODULES = (
     "production_daily_voice.py",
     "production_living_read_model.py",
     "production_living_research_observation.py",
+    "production_daily_run_records.py",
+    "production_trading_session_eligibility.py",
+    "production_data_readiness_gate.py",
+    "production_forward_clock.py",
+    "production_daily_run_persistence.py",
+    "production_daily_run_observability.py",
+    "production_daily_manifest.py",
+    "production_scheduling_contract.py",
+    "production_notification_contract.py",
+    "production_daily_run_orchestrator.py",
+    "production_daily_run_entrypoint.py",
 )
 
 
