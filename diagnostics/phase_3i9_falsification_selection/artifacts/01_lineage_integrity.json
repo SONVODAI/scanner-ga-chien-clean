@@ -1,0 +1,9 @@
+{
+  "proposition_hash_match": true,
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "decision_action": "SEEK_FALSIFICATION",
+  "resulting_state": "SUPPORTED",
+  "decision_cites_update": true,
+  "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+  "passed": true
+}

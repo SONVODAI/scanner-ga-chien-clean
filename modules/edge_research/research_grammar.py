@@ -32,6 +32,7 @@ ALLOWED_OUTCOME_FIELDS: FrozenSet[str] = frozenset(RETURN_COLUMNS.values())
 ALLOWED_POPULATION_CATEGORICAL: FrozenSet[str] = frozenset(
     {
         "symbol",
+        "trade_date",
         "research_market_state",
         "research_market_transition",
         "health_group",

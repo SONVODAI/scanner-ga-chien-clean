@@ -20,6 +20,11 @@ SPREAD_SUPPORT_FLOOR = 0.5
 SPREAD_DISCONFIRM_CEILING = 0.0
 
 
+def contract_hash_payload(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Hash-relevant contract fields — excludes frozen_at for stable provenance."""
+    return {k: v for k, v in body.items() if k != "frozen_at"}
+
+
 def proposition_content_hash(prop: Dict[str, Any]) -> str:
     """Hash immutable scientific content at lifecycle start."""
     payload = {
@@ -109,7 +114,7 @@ def build_interpretation_contract(prop: Dict[str, Any]) -> InterpretationContrac
         "frozen_at": frozen_at,
         "lifecycle_version": LIFECYCLE_VERSION,
     }
-    contract_hash = stable_hash(body)
+    contract_hash = stable_hash(contract_hash_payload(body))
 
     return InterpretationContract(
         contract_version=CONTRACT_VERSION,
@@ -134,3 +139,60 @@ def build_interpretation_contract(prop: Dict[str, Any]) -> InterpretationContrac
         frozen_at=frozen_at,
         contract_hash=contract_hash,
     )
+
+
+def interpretation_contract_from_dict(payload: Dict[str, Any]) -> InterpretationContract:
+    """
+    Load a frozen InterpretationContract artifact without regenerating hash or frozen_at.
+
+    Preserves pre-freeze contract_hash from artifact (forward provenance correction).
+    """
+    return InterpretationContract(
+        contract_version=str(payload["contract_version"]),
+        proposition_id=str(payload["proposition_id"]),
+        proposition_hash=str(payload["proposition_hash"]),
+        contrast_direction=str(payload["contrast_direction"]),
+        partition_column=str(payload["partition_column"]),
+        outcome_field=str(payload["outcome_field"]),
+        min_sample=int(payload["min_sample"]),
+        spread_support_floor=float(payload["spread_support_floor"]),
+        spread_disconfirm_ceiling=float(payload["spread_disconfirm_ceiling"]),
+        expected_direction_rule=str(payload["expected_direction_rule"]),
+        supporting_rule=str(payload["supporting_rule"]),
+        disconfirming_rule=str(payload["disconfirming_rule"]),
+        falsify_strong_rule=str(payload["falsify_strong_rule"]),
+        non_informative_rule=str(payload["non_informative_rule"]),
+        contradictory_rule=str(payload["contradictory_rule"]),
+        invalid_rule=str(payload["invalid_rule"]),
+        transition_mapping=dict(payload["transition_mapping"]),
+        decision_mapping=dict(payload["decision_mapping"]),
+        abandon_requires=str(payload["abandon_requires"]),
+        frozen_at=str(payload["frozen_at"]),
+        contract_hash=str(payload["contract_hash"]),
+    )
+
+
+def contract_rule_content(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Rule fields for regression — excludes frozen_at and contract_hash."""
+    keys = (
+        "contract_version",
+        "proposition_id",
+        "proposition_hash",
+        "contrast_direction",
+        "partition_column",
+        "outcome_field",
+        "min_sample",
+        "spread_support_floor",
+        "spread_disconfirm_ceiling",
+        "expected_direction_rule",
+        "supporting_rule",
+        "disconfirming_rule",
+        "falsify_strong_rule",
+        "non_informative_rule",
+        "contradictory_rule",
+        "invalid_rule",
+        "transition_mapping",
+        "decision_mapping",
+        "abandon_requires",
+    )
+    return {k: body[k] for k in keys if k in body}

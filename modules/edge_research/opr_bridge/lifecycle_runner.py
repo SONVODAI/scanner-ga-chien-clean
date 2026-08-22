@@ -123,14 +123,28 @@ def run_minimal_lifecycle(
     experiment_ref: str = "lifecycle_exp_001",
     prebuilt_tool_result=None,
     prebuilt_quintile_metrics=None,
+    interpretation_contract=None,
+    interpretation_contract_ref: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Full minimal lifecycle: contract → execute → interpret → update → decide → lineage.
 
     If prebuilt_tool_result provided (synthetic tests), skips panel execution.
+    If interpretation_contract provided, uses frozen contract (provenance-safe).
     """
+    from modules.edge_research.opr_bridge.interpretation_contract import (
+        InterpretationContract,
+    )
+
     prop_hash = proposition_content_hash(prop_dict)
-    contract = build_interpretation_contract(prop_dict)
+    if interpretation_contract is not None:
+        contract = interpretation_contract
+    else:
+        contract = build_interpretation_contract(prop_dict)
+    contract_ref = interpretation_contract_ref or {
+        "source": "runtime_build",
+        "contract_hash": contract.contract_hash,
+    }
     prior_state = prop_dict.get("epistemic_status", "HYPOTHESIS")
     cutoff = prop_dict["observation_provenance"]["evidence_anchor"]["data_cutoff_date"]
 
@@ -192,6 +206,7 @@ def run_minimal_lifecycle(
         },
         "tool_result_hash": tr_hash,
         "interpretation_contract_hash": contract.contract_hash,
+        "interpretation_contract_ref": contract_ref,
         "interpretation": interpretation.to_dict(),
         "epistemic_update": update.to_dict(),
         "research_decision": decision.to_dict(),
