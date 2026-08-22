@@ -12,7 +12,16 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-RESEARCH_LINE_IDENTITY_VERSION = "research_line_identity_v1"
+from modules.edge_research.research_proposition_core import (
+    RESEARCH_PROPOSITION_CORE_VERSION,
+    RepresentationEnvelope,
+    build_canonical_proposition_core,
+    build_core_from_scope,
+    enrich_scope_from_branch_context,
+    uncertainty_family as _uncertainty_family_core,
+)
+
+RESEARCH_LINE_IDENTITY_VERSION = "research_line_identity_v2"
 
 
 def _utc_now() -> str:
@@ -20,30 +29,7 @@ def _utc_now() -> str:
 
 
 def _uncertainty_family(codes: Tuple[str, ...]) -> str:
-    if not codes:
-        return "HORIZON_HETEROGENEITY_CORE"
-    families: List[str] = []
-    for c in codes:
-        if "HORIZON" in c:
-            families.append("HORIZON")
-        elif c in (
-            "EPISODE_REPLICATION",
-            "TIME_DISTRIBUTION",
-            "SYMBOL_DISTRIBUTION",
-            "MARKET_DEPENDENCE",
-        ):
-            families.append("DISTRIBUTION_ROBUSTNESS")
-        elif "EXTREME" in c or "FALSIF" in c:
-            families.append("FALSIFICATION")
-        else:
-            families.append(c)
-    return "|".join(sorted(set(families)))
-
-
-def _canonical_spec_hash(pop: Dict[str, Any], out: Dict[str, Any], horizon: int) -> str:
-    payload = {"pop": pop or {}, "out": out or {}, "h": horizon}
-    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:16]
-
+    return _uncertainty_family_core(codes)
 
 @dataclass(frozen=True)
 class ResearchLineIdentity:
@@ -64,15 +50,34 @@ class ResearchLineIdentity:
     feature_slice: Tuple[str, ...]
     evidence_lineage: Tuple[str, ...]
     parent_proposition_key: str = ""
+    canonical_core: Dict[str, Any] = field(default_factory=dict)
+    representation: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
     built_at: str = field(default_factory=_utc_now)
 
     def scientific_proposition_key(self) -> str:
-        """Stable key from scientific dimensions only."""
-        family = _uncertainty_family(self.uncertainty_codes)
-        base = _canonical_spec_hash(
-            self.population_spec, self.outcome_spec, self.observation_horizon
+        """Stable key from canonical scientific question (excludes instrument representation)."""
+        if self.canonical_core and self.canonical_core.get("scientific_question_key"):
+            return str(self.canonical_core["scientific_question_key"])
+        core = build_canonical_proposition_core(
+            population_spec=self.population_spec,
+            outcome_spec=self.outcome_spec,
+            observation_horizon=self.observation_horizon,
+            uncertainty_codes=self.uncertainty_codes,
+            research_needs=self.research_needs,
+            conditioning_context=self.conditioning_context,
         )
+        return core.scientific_question_key()
+
+    def legacy_proposition_key(self) -> str:
+        """Pre-3H.12 key including feature slice — for over-collapse audit only."""
+        family = _uncertainty_family(self.uncertainty_codes)
+        base = hashlib.sha256(
+            json.dumps(
+                {"pop": self.population_spec or {}, "out": self.outcome_spec or {}, "h": self.observation_horizon},
+                sort_keys=True,
+            ).encode()
+        ).hexdigest()[:16]
         slice_part = hashlib.sha256(
             json.dumps(list(self.feature_slice), sort_keys=True).encode()
         ).hexdigest()[:8]
@@ -91,6 +96,9 @@ class ResearchLineIdentity:
             "evidence_lineage": list(self.evidence_lineage),
             "parent_proposition_key": self.parent_proposition_key,
             "scientific_proposition_key": self.scientific_proposition_key(),
+            "legacy_proposition_key": self.legacy_proposition_key(),
+            "canonical_core": dict(self.canonical_core),
+            "representation": dict(self.representation),
             "metadata": dict(self.metadata),
             "built_at": self.built_at,
         }
@@ -108,6 +116,8 @@ class ResearchLineIdentity:
             feature_slice=tuple(payload.get("feature_slice") or ()),
             evidence_lineage=tuple(payload.get("evidence_lineage") or ()),
             parent_proposition_key=str(payload.get("parent_proposition_key", "")),
+            canonical_core=dict(payload.get("canonical_core") or {}),
+            representation=dict(payload.get("representation") or {}),
             metadata=dict(payload.get("metadata") or {}),
             built_at=str(payload.get("built_at", _utc_now())),
         )
@@ -134,6 +144,72 @@ def _scope_specs(scope: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any],
     return pop, out, horizon, conditioning
 
 
+def _build_identity(
+    *,
+    pop: Dict[str, Any],
+    out: Dict[str, Any],
+    horizon: int,
+    conditioning: Dict[str, Any],
+    uncertainty_codes: Tuple[str, ...],
+    research_needs: Tuple[str, ...],
+    feature_slice: Tuple[str, ...],
+    evidence_lineage: Tuple[str, ...],
+    metadata: Dict[str, Any],
+    graph: Any = None,
+    branch_root_id: str = "",
+    scope_for_rep: Optional[Dict[str, Any]] = None,
+) -> ResearchLineIdentity:
+    enrich_src: Tuple[str, ...] = ()
+    if graph and branch_root_id:
+        pop, out, horizon, conditioning, enrich_src = enrich_scope_from_branch_context(
+            graph,
+            branch_root_id=branch_root_id,
+            pop=pop,
+            out=out,
+            horizon=horizon,
+            conditioning=conditioning,
+        )
+        if enrich_src:
+            from modules.edge_research.research_line_identity import derive_identity_from_graph_experiment
+
+            branch_ident = derive_identity_from_graph_experiment(graph, branch_root_id)
+            if branch_ident and branch_ident.uncertainty_codes:
+                uncertainty_codes = branch_ident.uncertainty_codes
+    core = build_canonical_proposition_core(
+        population_spec=pop,
+        outcome_spec=out,
+        observation_horizon=horizon,
+        uncertainty_codes=uncertainty_codes,
+        research_needs=research_needs,
+        conditioning_context=conditioning,
+        enrichment_sources=enrich_src,
+    )
+    rep_scope = dict(scope_for_rep or {})
+    if metadata.get("tool_name"):
+        rep_scope.setdefault("tool_name", metadata["tool_name"])
+    rep = RepresentationEnvelope(
+        tool_name=str(metadata.get("tool_name") or rep_scope.get("tool_name") or ""),
+        action_id=str(metadata.get("action_id") or ""),
+        frame_id=str(metadata.get("frame_id") or ""),
+        action_code=str(metadata.get("action_code") or ""),
+        instrument_features=feature_slice,
+    )
+    return ResearchLineIdentity(
+        version=RESEARCH_LINE_IDENTITY_VERSION,
+        population_spec=pop,
+        outcome_spec=out,
+        observation_horizon=horizon,
+        uncertainty_codes=uncertainty_codes,
+        research_needs=research_needs,
+        conditioning_context=conditioning,
+        feature_slice=feature_slice,
+        evidence_lineage=evidence_lineage,
+        canonical_core=core.to_dict(),
+        representation=rep.to_dict(),
+        metadata=metadata,
+    )
+
+
 def derive_identity_from_experiment_spec(
     *,
     experiment_spec: Any,
@@ -147,17 +223,17 @@ def derive_identity_from_experiment_spec(
     pop, out, horizon, conditioning = _scope_specs(scope)
     meta = dict(metadata or {})
     meta["tool_name"] = getattr(experiment_spec, "tool_name", "")
-    return ResearchLineIdentity(
-        version=RESEARCH_LINE_IDENTITY_VERSION,
-        population_spec=pop,
-        outcome_spec=out,
-        observation_horizon=horizon,
+    return _build_identity(
+        pop=pop,
+        out=out,
+        horizon=horizon,
+        conditioning=conditioning,
         uncertainty_codes=uncertainty_codes,
         research_needs=research_needs,
-        conditioning_context=conditioning,
         feature_slice=_feature_slice_from_inputs(inputs),
         evidence_lineage=evidence_lineage,
         metadata=meta,
+        scope_for_rep={"tool_name": meta.get("tool_name", ""), "inputs": inputs},
     )
 
 
@@ -167,6 +243,8 @@ def derive_identity_from_candidate(
     uncertainty_codes: Tuple[str, ...] = (),
     research_needs: Tuple[str, ...] = (),
     evidence_lineage: Tuple[str, ...] = (),
+    graph: Any = None,
+    branch_root_id: str = "",
 ) -> Optional[ResearchLineIdentity]:
     draft = getattr(candidate, "draft_spec", None)
     if draft is None:
@@ -184,22 +262,25 @@ def derive_identity_from_candidate(
         "tool_name": getattr(candidate, "tool_name", "") or getattr(draft, "tool_name", ""),
         "action_id": getattr(candidate, "action_id", ""),
         "frame_id": getattr(candidate, "frame_id", ""),
+        "action_code": getattr(candidate, "action_code", ""),
     }
-    return ResearchLineIdentity(
-        version=RESEARCH_LINE_IDENTITY_VERSION,
-        population_spec=pop,
-        outcome_spec=out,
-        observation_horizon=horizon,
+    return _build_identity(
+        pop=pop,
+        out=out,
+        horizon=horizon,
+        conditioning=conditioning,
         uncertainty_codes=unc,
         research_needs=needs,
-        conditioning_context=conditioning,
         feature_slice=_feature_slice_from_inputs(inputs),
         evidence_lineage=evidence_lineage,
         metadata=meta,
+        graph=graph,
+        branch_root_id=branch_root_id,
+        scope_for_rep={"tool_name": meta.get("tool_name", ""), "inputs": inputs, **scope},
     )
 
 
-def derive_identity_from_frontier_item(item: Any) -> ResearchLineIdentity:
+def derive_identity_from_frontier_item(item: Any, *, graph: Any = None) -> ResearchLineIdentity:
     draft = getattr(item, "draft_spec", None) or {}
     inputs = draft.get("inputs") or {}
     scope = draft.get("research_scope") or {}
@@ -217,17 +298,20 @@ def derive_identity_from_frontier_item(item: Any) -> ResearchLineIdentity:
         "frontier_id": getattr(item, "frontier_id", ""),
         "branch_root_id": getattr(item, "branch_root_id", ""),
     }
-    return ResearchLineIdentity(
-        version=RESEARCH_LINE_IDENTITY_VERSION,
-        population_spec=pop,
-        outcome_spec=out,
-        observation_horizon=horizon,
+    branch_root = getattr(item, "branch_root_id", "") or meta.get("branch_root_id", "")
+    return _build_identity(
+        pop=pop,
+        out=out,
+        horizon=horizon,
+        conditioning=conditioning,
         uncertainty_codes=(),
         research_needs=(),
-        conditioning_context=conditioning,
         feature_slice=_feature_slice_from_inputs(inputs),
         evidence_lineage=(),
         metadata=meta,
+        graph=graph,
+        branch_root_id=branch_root,
+        scope_for_rep=draft if isinstance(draft, dict) else {},
     )
 
 

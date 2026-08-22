@@ -157,7 +157,9 @@ def build_semantic_context_for_candidate(
     planning_sequence: int = 0,
 ) -> Tuple[Optional[SemanticMarginalEvidence], str]:
     """Build semantic marginal evidence + freshness for one candidate."""
-    identity = derive_identity_from_candidate(candidate)
+    identity = derive_identity_from_candidate(
+        candidate, graph=graph, branch_root_id=branch_root_id
+    )
     if identity is None:
         return None, ""
 

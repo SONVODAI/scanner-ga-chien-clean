@@ -12,8 +12,16 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 from modules.edge_research.research_line_identity import ResearchLineIdentity
+from modules.edge_research.research_proposition_core import (
+    CanonicalPropositionCore,
+    RepresentationEnvelope,
+    build_canonical_proposition_core,
+    cores_materially_different,
+    cores_same_question,
+    instrument_features_materially_different,
+)
 
-RESEARCH_LINE_RELATIONSHIP_VERSION = "research_line_relationship_v1"
+RESEARCH_LINE_RELATIONSHIP_VERSION = "research_line_relationship_v2"
 
 
 class ResearchLineRelationship(str, Enum):
@@ -51,6 +59,49 @@ class ResearchLineRelationshipAudit:
             "audit_questions": dict(self.audit_questions),
             "built_at": self.built_at,
         }
+
+
+def _core_from_identity(identity: ResearchLineIdentity) -> CanonicalPropositionCore:
+    cached = identity.canonical_core or {}
+    if cached.get("scientific_question_key"):
+        return CanonicalPropositionCore(
+            version=str(cached.get("version", "research_proposition_core_v1")),
+            population_spec=dict(cached.get("population_spec") or identity.population_spec),
+            outcome_spec=dict(cached.get("outcome_spec") or identity.outcome_spec),
+            observation_horizon=int(cached.get("observation_horizon", identity.observation_horizon)),
+            uncertainty_family=str(cached.get("uncertainty_family", "")),
+            conditioning_context=dict(cached.get("conditioning_context") or identity.conditioning_context),
+            research_needs=tuple(cached.get("research_needs") or identity.research_needs),
+            completeness=str(cached.get("completeness", "COMPLETE")),
+            enrichment_sources=tuple(cached.get("enrichment_sources") or ()),
+        )
+    return build_canonical_proposition_core(
+        population_spec=identity.population_spec,
+        outcome_spec=identity.outcome_spec,
+        observation_horizon=identity.observation_horizon,
+        uncertainty_codes=identity.uncertainty_codes,
+        research_needs=identity.research_needs,
+        conditioning_context=identity.conditioning_context,
+    )
+
+
+def _rep_from_identity(identity: ResearchLineIdentity) -> RepresentationEnvelope:
+    cached = identity.representation or {}
+    if cached:
+        return RepresentationEnvelope(
+            tool_name=str(cached.get("tool_name") or (identity.metadata or {}).get("tool_name", "")),
+            action_id=str(cached.get("action_id") or (identity.metadata or {}).get("action_id", "")),
+            frame_id=str(cached.get("frame_id") or (identity.metadata or {}).get("frame_id", "")),
+            action_code=str(cached.get("action_code") or (identity.metadata or {}).get("action_code", "")),
+            instrument_features=tuple(cached.get("instrument_features") or identity.feature_slice),
+            execution_mechanism=str(cached.get("execution_mechanism") or ""),
+        )
+    return RepresentationEnvelope(
+        tool_name=str((identity.metadata or {}).get("tool_name", "")),
+        action_id=str((identity.metadata or {}).get("action_id", "")),
+        frame_id=str((identity.metadata or {}).get("frame_id", "")),
+        instrument_features=identity.feature_slice,
+    )
 
 
 def _same_population(a: ResearchLineIdentity, b: ResearchLineIdentity) -> bool:
@@ -104,21 +155,30 @@ def classify_research_line_relationship(
     Component-explainable relationship — no opaque embedding scores.
     Fail-closed: insufficient evidence when components cannot justify sameness.
     """
+    prior_core = _core_from_identity(prior)
+    cand_core = _core_from_identity(candidate)
+    prior_rep = _rep_from_identity(prior)
+    cand_rep = _rep_from_identity(candidate)
+
+    same_core = cores_same_question(prior_core, cand_core)
     same_pop = _same_population(prior, candidate)
     same_out = _same_outcome(prior, candidate)
     same_horizon = _same_horizon(prior, candidate)
     same_unc = _same_uncertainty(prior, candidate)
     same_need = _same_research_need(prior, candidate)
     same_cond = _same_conditioning(prior, candidate)
-    same_prop = _same_proposition(prior, candidate)
+    same_prop = same_core or _same_proposition(prior, candidate)
     same_slice = _same_slice(prior, candidate)
     same_tool = _same_tool_metadata(prior, candidate)
+    material_inst_diff = instrument_features_materially_different(prior_rep, cand_rep)
+    material_core_diff = cores_materially_different(prior_core, cand_core)
 
     prior_action = (prior.metadata or {}).get("action_id", "")
     cand_action = (candidate.metadata or {}).get("action_id", "")
     same_action = bool(prior_action) and prior_action == cand_action
 
     component: Dict[str, Any] = {
+        "same_canonical_core": same_core,
         "same_population": same_pop,
         "same_outcome": same_out,
         "same_horizon": same_horizon,
@@ -129,10 +189,15 @@ def classify_research_line_relationship(
         "same_feature_slice": same_slice,
         "same_tool_metadata": same_tool,
         "same_action_id": same_action,
+        "material_instrument_difference": material_inst_diff,
+        "material_core_difference": material_core_diff,
+        "prior_question_key": prior_core.scientific_question_key(),
+        "candidate_question_key": cand_core.scientific_question_key(),
         "new_evidence_available": new_evidence_available,
     }
 
     audit_questions: Dict[str, Any] = {
+        "same_canonical_core": same_core,
         "same_population": same_pop,
         "same_outcome": same_out,
         "same_horizon": same_horizon,
@@ -143,13 +208,13 @@ def classify_research_line_relationship(
         "same_proposition": same_prop,
         "new_evidence_available": new_evidence_available,
         "could_resolve_prior_gap": new_evidence_available and same_unc,
+        "core_completeness_prior": prior_core.completeness,
+        "core_completeness_candidate": cand_core.completeness,
     }
 
     classification = ResearchLineRelationship.INSUFFICIENT_EVIDENCE.value
 
-    has_prior_specs = bool(prior.population_spec or prior.outcome_spec)
-    has_candidate_specs = bool(candidate.population_spec or candidate.outcome_spec)
-    if not has_prior_specs or not has_candidate_specs:
+    if not prior_core.has_minimal_semantics() or not cand_core.has_minimal_semantics():
         return ResearchLineRelationshipAudit(
             version=RESEARCH_LINE_RELATIONSHIP_VERSION,
             classification=classification,
@@ -160,26 +225,27 @@ def classify_research_line_relationship(
             audit_questions=audit_questions,
         )
 
-    if same_action and same_prop:
+    if same_action and same_core:
         classification = ResearchLineRelationship.IDENTICAL.value
-    elif same_prop and same_tool:
+    elif same_core and same_tool and same_action:
         classification = ResearchLineRelationship.NEAR_DUPLICATE.value
-    elif same_out and same_pop and same_horizon and not same_tool:
-        if same_unc or not candidate.uncertainty_codes:
-            classification = ResearchLineRelationship.SAME_QUESTION_DIFFERENT_INSTRUMENT.value
-    elif same_unc and prior.feature_slice and candidate.feature_slice and not same_slice:
-        if same_out and same_pop:
-            classification = ResearchLineRelationship.SAME_UNCERTAINTY_DIFFERENT_SLICE.value
-    elif same_prop and new_evidence_available:
+    elif same_core and new_evidence_available:
         classification = ResearchLineRelationship.SAME_LINE_NEW_EVIDENCE.value
-    elif same_prop and not same_tool:
+    elif same_core and material_inst_diff and same_unc:
+        classification = ResearchLineRelationship.SAME_UNCERTAINTY_DIFFERENT_SLICE.value
+    elif same_core and not same_tool:
+        classification = ResearchLineRelationship.SAME_QUESTION_DIFFERENT_INSTRUMENT.value
+    elif same_core and same_tool and not same_action:
         classification = ResearchLineRelationship.NEAR_DUPLICATE.value
-    elif not same_out and not same_pop and not same_unc:
-        if prior.population_spec or prior.outcome_spec:
-            classification = ResearchLineRelationship.GENUINELY_INDEPENDENT.value
-    elif same_unc and (same_out or same_pop):
+    elif same_unc and material_inst_diff and same_out and same_pop and not same_core:
+        classification = ResearchLineRelationship.SAME_UNCERTAINTY_DIFFERENT_SLICE.value
+    elif material_core_diff and not same_unc:
+        classification = ResearchLineRelationship.GENUINELY_INDEPENDENT.value
+    elif not same_core and not same_unc and (same_out or same_pop):
+        classification = ResearchLineRelationship.GENUINELY_INDEPENDENT.value
+    elif same_unc and (same_out or same_pop) and not same_core:
         classification = ResearchLineRelationship.RELATED_BUT_DISTINCT.value
-    elif same_out != same_pop and (same_out or same_pop):
+    elif material_core_diff:
         classification = ResearchLineRelationship.RELATED_BUT_DISTINCT.value
 
     return ResearchLineRelationshipAudit(
