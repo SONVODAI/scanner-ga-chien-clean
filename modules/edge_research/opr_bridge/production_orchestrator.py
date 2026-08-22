@@ -41,8 +41,11 @@ from modules.edge_research.opr_bridge.production_trigger import (
     new_production_session_id,
 )
 from modules.edge_research.opr_bridge.real_ledger_adapter import load_real_lifecycle_events
+from modules.edge_research.opr_bridge.first_experiment_execution_records import (
+    STOP_FIRST_EXPERIMENT_EXECUTED,
+)
 
-ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j0"
+ORCHESTRATOR_VERSION = "production_opr_orchestrator_v1_3j3"
 
 # Documented STOP boundaries — preserved from Phase 3I
 STOP_PROPOSITION_PERSISTED = "STOP_PROPOSITION_PERSISTED"
@@ -70,6 +73,7 @@ class ProductionOprCycleResult:
     authoritative_state: Optional[Dict[str, Any]] = None
     stop_boundaries: List[str] = field(default_factory=list)
     frozen_integrity: Optional[Dict[str, Any]] = None
+    first_experiment: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -83,6 +87,7 @@ class ProductionOprCycleResult:
             "authoritative_state": self.authoritative_state,
             "stop_boundaries": list(self.stop_boundaries),
             "frozen_integrity": self.frozen_integrity,
+            "first_experiment": self.first_experiment,
             "error": self.error,
         }
 
@@ -143,11 +148,13 @@ def run_production_opr_cycle(
     data_dir: Optional[Path] = None,
     replay_frozen_lineage: bool = False,
     reopening_opportunity: Optional[ResearchOpportunityState] = None,
+    execute_first_experiment: bool = False,
 ) -> ProductionOprCycleResult:
     """
-    Production-facing OPR cycle: detect → idempotency → persist → optional frozen replay.
+    Production-facing OPR cycle: detect → idempotency → persist → optional first-experiment execution.
 
-    Does NOT execute new market experiments.
+    When execute_first_experiment=True, runs 3J.2 selection then 3J.3 execution and stops at
+    STOP_FIRST_EXPERIMENT_EXECUTED. Does NOT interpret ToolResult or generate next experiments.
     """
     result = ProductionOprCycleResult()
     result.frozen_integrity = verify_frozen_scientific_integrity()
@@ -177,6 +184,14 @@ def run_production_opr_cycle(
 
         result.authoritative_state = _recon_persisted(record)
         result.stop_boundaries = list(record.stop_boundaries_reached)
+        if execute_first_experiment and record.first_experiment_execution:
+            result.first_experiment = {
+                "package": record.initial_experiment_package,
+                "execution": record.first_experiment_execution,
+                "idempotent_replay": True,
+            }
+            if STOP_FIRST_EXPERIMENT_EXECUTED not in result.stop_boundaries:
+                result.stop_boundaries.append(STOP_FIRST_EXPERIMENT_EXECUTED)
         return result
 
     session_id = new_production_session_id(detection.proposition_id or "unknown")
@@ -232,6 +247,25 @@ def run_production_opr_cycle(
     write_opr_session(record, data_dir=data_dir)
     register_opportunity(detection.opportunity_identity, session_id, data_dir=data_dir)
 
+    if execute_first_experiment and detection.proposition_record:
+        from modules.edge_research.opr_bridge.production_first_experiment_execution import (
+            run_production_first_experiment_execution,
+        )
+
+        fx = run_production_first_experiment_execution(
+            detection.proposition_record,
+            panel,
+            session_id=session_id,
+            data_cutoff_date=data_cutoff_date,
+            data_dir=data_dir,
+        )
+        record.initial_experiment_package = fx.package_dict
+        if fx.execution and fx.execution.envelope:
+            record.first_experiment_execution = fx.execution.envelope.to_dict()
+        stop_boundaries.append(STOP_FIRST_EXPERIMENT_EXECUTED)
+        write_opr_session(record, data_dir=data_dir)
+        result.first_experiment = fx.to_dict()
+
     result.outcome = "SESSION_CREATED"
     result.session_id = session_id
     result.session_record = record
@@ -268,4 +302,5 @@ def list_documented_stop_boundaries() -> List[Dict[str, str]]:
         {"code": STOP_REOPEN_CANDIDATE_ONLY, "description": "Reopening records REOPEN_CANDIDATE only (3I.19/20)"},
         {"code": STOP_PACKAGE_NOT_EXECUTED, "description": "Action package boundary preserved (3I.16/17)"},
         {"code": STOP_FROZEN_LINEAGE_REPLAY, "description": "Historical events replayed from artifacts only"},
+        {"code": STOP_FIRST_EXPERIMENT_EXECUTED, "description": "First experiment executed; auditable ToolResult persisted (3J.3)"},
     ]

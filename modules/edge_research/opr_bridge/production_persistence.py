@@ -64,6 +64,8 @@ class OprProductionSessionRecord:
     knowledge_state: Dict[str, Any] = field(default_factory=dict)
     stop_boundaries_reached: List[str] = field(default_factory=list)
     lineage_artifacts: List[str] = field(default_factory=list)
+    initial_experiment_package: Optional[Dict[str, Any]] = None
+    first_experiment_execution: Optional[Dict[str, Any]] = None
 
     def record_hash(self) -> str:
         return stable_hash(
@@ -93,6 +95,8 @@ class OprProductionSessionRecord:
             "knowledge_state": self.knowledge_state,
             "stop_boundaries_reached": list(self.stop_boundaries_reached),
             "lineage_artifacts": list(self.lineage_artifacts),
+            "initial_experiment_package": self.initial_experiment_package,
+            "first_experiment_execution": self.first_experiment_execution,
             "record_hash": self.record_hash(),
         }
 
@@ -114,6 +118,8 @@ class OprProductionSessionRecord:
             knowledge_state=dict(payload.get("knowledge_state") or {}),
             stop_boundaries_reached=list(payload.get("stop_boundaries_reached") or []),
             lineage_artifacts=list(payload.get("lineage_artifacts") or []),
+            initial_experiment_package=payload.get("initial_experiment_package"),
+            first_experiment_execution=payload.get("first_experiment_execution"),
         )
 
 
