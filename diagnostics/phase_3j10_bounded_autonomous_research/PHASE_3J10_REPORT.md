@@ -8,7 +8,8 @@
 | Base | `cursor/phase-3j9-cumulative-research-decision-aad2` (3J.9 PASS) |
 | Prior STOP | `STOP_SECOND_RESEARCH_DECISION_FROZEN` |
 | New STOP | `STOP_LIFECYCLE_BOUNDED` |
-| PR | (opened after push) |
+| Commit | `1252c7008` |
+| PR | [#68](https://github.com/SONVODAI/scanner-ga-chien-clean/pull/68) |
 
 ## Architecture reused / added
 
