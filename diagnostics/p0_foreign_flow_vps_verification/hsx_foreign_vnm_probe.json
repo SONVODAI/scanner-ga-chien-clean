@@ -1,0 +1,45 @@
+{
+  "probed_at": "2026-08-24T15:28:25.277318+00:00",
+  "endpoint": "https://api.hsx.vn/mk/api/v1/market/securities/foreign/VNM?pageSize=5",
+  "http_status": 200,
+  "symbol": "VNM",
+  "units_interpretation": "VND",
+  "rows": [
+    {
+      "report_date": "2026-08-24",
+      "mainBuyerForeignValue": 53104069800.0,
+      "mainSellerForeignValue": 22934880000.0,
+      "mainBuyerForeignVolume": 833787.0,
+      "mainSellerForeignVolume": 359800.0
+    },
+    {
+      "report_date": "2026-08-21",
+      "mainBuyerForeignValue": 65597981200.0,
+      "mainSellerForeignValue": 62105954600.0,
+      "mainBuyerForeignVolume": 1027463.0,
+      "mainSellerForeignVolume": 973717.0
+    },
+    {
+      "report_date": "2026-08-20",
+      "mainBuyerForeignValue": 123287305200.0,
+      "mainSellerForeignValue": 82033330000.0,
+      "mainBuyerForeignVolume": 1929832.0,
+      "mainSellerForeignVolume": 1285300.0
+    },
+    {
+      "report_date": "2026-08-19",
+      "mainBuyerForeignValue": 113276289600.0,
+      "mainSellerForeignValue": 52206528600.0,
+      "mainBuyerForeignVolume": 1811684.0,
+      "mainSellerForeignVolume": 833666.0
+    },
+    {
+      "report_date": "2026-08-18",
+      "mainBuyerForeignValue": 59029594500.0,
+      "mainSellerForeignValue": 29234210300.0,
+      "mainBuyerForeignVolume": 949592.0,
+      "mainSellerForeignVolume": 470392.0
+    }
+  ],
+  "note": "Audit evidence only; not a production collector output."
+}
