@@ -283,6 +283,7 @@ def build_p0_record(
         "schema_version": P0_SCHEMA_VERSION,
         "completeness_status": completeness,
         "foreign_scope": P0_FOREIGN_SCOPE_DEFAULT,
+        "foreign_flow_scope": P0_FOREIGN_SCOPE_DEFAULT,  # explicit preferred provenance key
         "universe_turnover_scope": P0_UNIVERSE_TURNOVER_SCOPE,
         "vnindex_volume_scope": P0_VNINDEX_VOLUME_SCOPE,
         "expected_universe_size": EXPECTED_UNIVERSE_SIZE,
