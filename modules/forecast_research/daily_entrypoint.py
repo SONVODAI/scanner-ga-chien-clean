@@ -140,6 +140,7 @@ def maybe_freeze_after_market_daily(
             maturity = mature_all_outcomes(data_dir=data_dir)
         mdrr: Dict[str, Any] = {"skipped": True}
         hist: Dict[str, Any] = {"skipped": True}
+        p0: Dict[str, Any] = {"skipped": True}
         try:
             from modules.forecast_research.mdrr import maybe_write_mdrr_after_market_daily
 
@@ -160,6 +161,12 @@ def maybe_freeze_after_market_daily(
                 hist = {"ok": False, "written": False, "reason": "no_evidence"}
         except Exception as exc:  # noqa: BLE001
             hist = {"ok": False, "reason": f"hist_hook_error:{exc}"}
+        try:
+            from modules.forecast_research.p0_daily import maybe_collect_p0_after_market_daily
+
+            p0 = maybe_collect_p0_after_market_daily(trade_date, data_dir=data_dir)
+        except Exception as exc:  # noqa: BLE001
+            p0 = {"ok": False, "reason": f"p0_hook_error:{exc}"}
         return {
             "ok": bool(freeze.get("ok")),
             "written": bool(freeze.get("written")),
@@ -168,6 +175,7 @@ def maybe_freeze_after_market_daily(
             "maturity": maturity,
             "mdrr": mdrr,
             "historical_core": hist,
+            "p0_market_memory": p0,
         }
     except Exception as exc:  # noqa: BLE001 — observer must not break capture
         return {"ok": False, "written": False, "reason": f"hook_error:{exc}"}
@@ -181,7 +189,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--matrix-only", action="store_true")
     parser.add_argument("--recover-historical", action="store_true", help="Run historical market core recovery")
     parser.add_argument("--mdrr-backfill", action="store_true", help="Backfill MDRR from EMS dates")
-    parser.add_argument("--all-research-memory", action="store_true", help="T0 freeze + mature + MDRR + historical")
+    parser.add_argument("--p0-collect", action="store_true", help="Collect P0 forward market memory")
+    parser.add_argument("--all-research-memory", action="store_true", help="T0 freeze + mature + MDRR + historical + P0")
     args = parser.parse_args(argv)
 
     data_dir = Path(args.data_dir) if args.data_dir else None
@@ -209,6 +218,16 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(json.dumps(payload, indent=2, default=str)[:12000])
         return 0
 
+    if args.p0_collect and not args.all_research_memory:
+        from modules.forecast_research.p0_daily import collect_p0_for_date, run_p0_backfill
+
+        if args.trade_date:
+            payload = collect_p0_for_date(args.trade_date, data_dir=data_dir)
+        else:
+            payload = run_p0_backfill(data_dir=data_dir)
+        print(json.dumps(payload, indent=2, default=str)[:12000])
+        return 0 if payload.get("ok", True) else 1
+
     result = run_daily_pipeline(
         trade_date=args.trade_date,
         data_dir=data_dir,
@@ -217,10 +236,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.all_research_memory:
         from modules.forecast_research.historical_recovery import recover_all_historical
         from modules.forecast_research.mdrr import run_mdrr_backfill, write_forward_only_registry
+        from modules.forecast_research.p0_daily import run_p0_backfill
 
         result["historical"] = recover_all_historical(data_dir=data_dir)
         result["mdrr"] = run_mdrr_backfill(data_dir=data_dir)
         write_forward_only_registry(data_dir)
+        result["p0"] = run_p0_backfill(data_dir=data_dir)
     print(json.dumps(result, indent=2, default=str))
     return 0 if result.get("freeze", {}).get("ok", True) else 1
 
