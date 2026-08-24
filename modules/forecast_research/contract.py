@@ -75,6 +75,23 @@ MDRR_FILE = "mdrr_daily.csv"
 MDRR_STATUS_FILE = "mdrr_pipeline_status.json"
 FORWARD_ONLY_REGISTRY_FILE = "forward_only_feature_registry.json"
 
+# --- P0 Forward Market Memory ---
+P0_SCHEMA_VERSION = "p0_market_memory_v1"
+P0_DAILY_FILE = "p0_market_daily.csv"
+P0_STATUS_FILE = "p0_market_pipeline_status.json"
+P0_COMPLETENESS_COMPLETE = "COMPLETE"
+P0_COMPLETENESS_PARTIAL = "PARTIAL"
+P0_COMPLETENESS_WAITING = "WAITING"
+P0_COMPLETENESS_SOURCE_ERROR = "SOURCE_ERROR"
+
+# Foreign scope when using SSI exchange heatmap aggregation.
+P0_FOREIGN_SCOPE_DEFAULT = "HOSE"
+# Universe turnover = sum(price * volume) over EMS board (research 142), not official exchange total.
+P0_UNIVERSE_TURNOVER_SCOPE = "EMS_RESEARCH_UNIVERSE_142"
+# VNINDEX volume from index OHLCV provider (not VND market turnover).
+P0_VNINDEX_VOLUME_SCOPE = "VNINDEX_INDEX_VOLUME"
+
+
 # Outcome columns that must never enter T0 / historical core / MDRR feature bodies.
 FORBIDDEN_OUTCOME_COLUMNS = (
     "t1_return",
