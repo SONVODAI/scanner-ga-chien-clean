@@ -33,13 +33,22 @@ def build_scheduling_contract() -> Dict[str, Any]:
         "concurrency": {
             "lock_file": "data/edge_research/production_observations/daily_run.lock",
             "behavior": "exclusive_non_blocking",
-            "duplicate_same_day": "idempotent_replay",
+            # SUCCESS / SKIPPED_NON_TRADING_DAY: idempotent replay.
+            # WAITING_FOR_DATA: retry on later timer cycles when source/EOD advances;
+            # unchanged waiting readiness remains idempotent; prior waiting records stay immutable.
+            "duplicate_same_day": "idempotent_replay_terminal_or_unchanged_waiting",
+            "waiting_for_data_policy": "retry_when_source_or_eod_advances",
         },
         "retry": {
             "safe_retry": True,
             "resume_from_phase_markers": True,
             "max_retries": 3,
             "backoff_seconds": [60, 300, 900],
+            "same_day_timer_attempts": [
+                "18:35 Asia/Ho_Chi_Minh — may WAITING_FOR_DATA if EOD incomplete",
+                "20:05 Asia/Ho_Chi_Minh — retry; must not freeze on prior WAITING",
+                "22:35 Asia/Ho_Chi_Minh — final same-day retry",
+            ],
         },
         "data_readiness": {
             "require_panel_through_target_date": True,

@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple  # Any used for readiness duck-typing
 
 from modules.edge_research.opr_bridge.evidence_synthesis_records import stable_hash, utc_now_iso
 from modules.edge_research.opr_bridge.production_daily_run_records import (
@@ -98,12 +98,109 @@ def lookup_run_for_date(
     *,
     data_dir: Optional[Path] = None,
 ) -> Optional[ProductionDailyResearchRun]:
+    """
+    Resolve the authoritative run for a trade date + mode.
+
+    Preference order (same-day multi-attempt safe):
+      1) SUCCESS
+      2) SKIPPED_NON_TRADING_DAY
+      3) latest WAITING_FOR_DATA (by run_started_at)
+
+    WAITING_FOR_DATA is an immutable attempt record, not a permanent same-day lock.
+    """
     index = load_run_index(data_dir)
+    matches: List[ProductionDailyResearchRun] = []
     for meta in index.get("runs", {}).values():
-        if meta.get("target_trade_date") == target_trade_date and meta.get("run_mode") == run_mode:
-            if meta.get("run_disposition") in ("SUCCESS", "SKIPPED_NON_TRADING_DAY", "WAITING_FOR_DATA"):
-                return lookup_run(meta["run_id"], data_dir)
-    return None
+        if meta.get("target_trade_date") != target_trade_date or meta.get("run_mode") != run_mode:
+            continue
+        if meta.get("run_disposition") not in ("SUCCESS", "SKIPPED_NON_TRADING_DAY", "WAITING_FOR_DATA"):
+            continue
+        run = lookup_run(meta["run_id"], data_dir)
+        if run is not None:
+            matches.append(run)
+    if not matches:
+        return None
+    for disp in ("SUCCESS", "SKIPPED_NON_TRADING_DAY"):
+        terminal = [r for r in matches if r.run_disposition == disp]
+        if terminal:
+            return max(terminal, key=lambda r: r.run_started_at or "")
+    waiting = [r for r in matches if r.run_disposition == "WAITING_FOR_DATA"]
+    if not waiting:
+        return None
+    return max(waiting, key=lambda r: r.run_started_at or "")
+
+
+def waiting_readiness_unchanged(
+    existing: ProductionDailyResearchRun,
+    readiness: Any,
+) -> bool:
+    """True when a prior WAITING attempt still describes the current readiness state."""
+    if existing.run_disposition != "WAITING_FOR_DATA":
+        return False
+    if getattr(readiness, "ready", False):
+        return False
+    return (
+        existing.source_dataset_hash == getattr(readiness, "source_dataset_hash", None)
+        and existing.source_max_trade_date == getattr(readiness, "source_max_trade_date", None)
+        and (existing.failure_or_skip_reason or "") == (getattr(readiness, "reason", None) or "")
+    )
+
+
+def resolve_idempotent_daily_run(
+    target_trade_date: str,
+    run_mode: str,
+    *,
+    readiness: Any,
+    data_dir: Optional[Path] = None,
+) -> Tuple[Optional[ProductionDailyResearchRun], Optional[str]]:
+    """
+    Decide whether a new invocation should replay an existing frozen attempt.
+
+    Returns (run, reason) where reason is:
+      - "terminal_success_or_skip" for SUCCESS / SKIPPED_NON_TRADING_DAY
+      - "waiting_unchanged" for WAITING_FOR_DATA with no source/EOD advance
+      - (None, None) when a new attempt is allowed (including retry after WAITING)
+    """
+    index = load_run_index(data_dir)
+    matches: List[ProductionDailyResearchRun] = []
+    for meta in index.get("runs", {}).values():
+        if meta.get("target_trade_date") != target_trade_date or meta.get("run_mode") != run_mode:
+            continue
+        run = lookup_run(meta["run_id"], data_dir)
+        if run is None or not run.frozen:
+            continue
+        matches.append(run)
+
+    for disp in ("SUCCESS", "SKIPPED_NON_TRADING_DAY"):
+        terminal = [r for r in matches if r.run_disposition == disp]
+        if terminal:
+            return max(terminal, key=lambda r: r.run_started_at or ""), "terminal_success_or_skip"
+
+    waiting = [r for r in matches if r.run_disposition == "WAITING_FOR_DATA"]
+    for prior in sorted(waiting, key=lambda r: r.run_started_at or "", reverse=True):
+        if waiting_readiness_unchanged(prior, readiness):
+            return prior, "waiting_unchanged"
+    return None, None
+
+
+def allocate_daily_run_id(identity_hash: str, *, data_dir: Optional[Path] = None) -> str:
+    """
+    Allocate a durable run_id for identity_hash without colliding with a frozen prior attempt.
+
+    Primary id remains pdrun-{identity[:16]}. Retries after an immutable WAITING attempt
+    with the same identity (e.g. EOD becomes ready without panel-hash change) use -aN.
+    """
+    from modules.edge_research.opr_bridge.production_daily_run_records import new_run_id
+
+    primary = new_run_id(identity_hash)
+    if not run_exists(primary, data_dir):
+        return primary
+    n = 2
+    while True:
+        candidate = f"{primary}-a{n}"
+        if not run_exists(candidate, data_dir):
+            return candidate
+        n += 1
 
 
 def lookup_prior_successful_run(
