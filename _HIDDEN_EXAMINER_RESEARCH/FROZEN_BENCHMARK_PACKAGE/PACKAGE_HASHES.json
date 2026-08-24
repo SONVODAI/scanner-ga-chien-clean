@@ -1,0 +1,77 @@
+{
+  "timestamp_utc": "2026-08-24T09:52:23Z",
+  "files": {
+    "DO_NOT_CONSUME_BY_MRBOT": {
+      "sha256": "0231bec02d66060c7f11a3f14e0fac8cff599a2efb14c3a9d74e24d813cc17e8",
+      "bytes": 767
+    },
+    "README.md": {
+      "sha256": "c270d1e1272df00d6e379522f15f7d923c348976c102bc81e06690cdcf4cb1c8",
+      "bytes": 721
+    },
+    "REPORT.md": {
+      "sha256": "a5f4fb5f75719cfdee7c3c17dab2debeab21770db8fe56f2820f91f1baee9a82",
+      "bytes": 20732
+    },
+    "anti_edge.json": {
+      "sha256": "63bccea260f32ba063fb6bdf1843f8dcc8362c94a38c6250c1c62fb76611ef98",
+      "bytes": 2153
+    },
+    "descriptive_example_rebounds.json": {
+      "sha256": "2496e2d34874ce3e1ffefa7743e230769e50af6c8f8eaf9b5fc31ae9420738f2",
+      "bytes": 3232
+    },
+    "discovered_candidates.json": {
+      "sha256": "0208ce4eb0da2f9a58eb2c961933496400ee920649e0ba164c567d89627745af",
+      "bytes": 119316
+    },
+    "early_vs_late.json": {
+      "sha256": "5ab5fe69f8fccb377d14370175cf6e6ff4334f8cc3a838ed7508e90a735d02dd",
+      "bytes": 1561
+    },
+    "expected_qualitative_discovery.json": {
+      "sha256": "8ce60225aac7224cea0442da37af979a655f393636df9741561a8ecc547c99fa",
+      "bytes": 2640
+    },
+    "failure_cases.json": {
+      "sha256": "ce3d0c8ab0005eea4685eb8b98e8deb87dca1d4f37fb94012903a1ed869865cc",
+      "bytes": 50672
+    },
+    "isolation_verification.json": {
+      "sha256": "e8c3381e550d0accc499554681b0d9a2aa26263910f24efa54eea421479e9762",
+      "bytes": 3611
+    },
+    "local_min_diagnostic.json": {
+      "sha256": "77f8078f408e702793d07364c9ca2c331ac760fab299c24805f511b312726832",
+      "bytes": 507
+    },
+    "package_manifest.json": {
+      "sha256": "dac5b09c7e895b6739bfd88adf31c026fdfb44cdcd7233c59416d9b9373d585f",
+      "bytes": 5278
+    },
+    "panel_meta.json": {
+      "sha256": "5b93baa15b791356c3c96487c7f7441a408135c63100f6494e47d56b9cb53a55",
+      "bytes": 1178
+    },
+    "population_definitions.json": {
+      "sha256": "2934fdb349842de78769f66433af03d9bbaba4b0f35697e3b049c5733dfe872f",
+      "bytes": 11158
+    },
+    "research_ledger.json": {
+      "sha256": "1de3b25aa780cdef7ff6007e710504678d2608f6c83698c14e60db265b755050",
+      "bytes": 43772
+    },
+    "tertile_screen_primary_pop.json": {
+      "sha256": "ba9edc93d8139c6ac8df02727b163f0271c6bf2f496907ed9ecf6059977d0690",
+      "bytes": 50412
+    },
+    "transition_screen.csv": {
+      "sha256": "6efcc7af8224ed2fdd9929e3ba68d3045ac23bd10d19edbec33341d19f055722",
+      "bytes": 11166
+    },
+    "universe.json": {
+      "sha256": "471c16f461a185736e43a3f9103385e6ea39c632de276bd81f8f2a3ed6bffacf",
+      "bytes": 1596
+    }
+  }
+}

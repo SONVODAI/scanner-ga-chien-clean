@@ -1,0 +1,110 @@
+[
+  {
+    "symbol": "FRT",
+    "panel_min_date": "2026-07-27",
+    "panel_min_price": 105500.0,
+    "panel_max_after": 148000.0,
+    "peak_rebound_pct": 40.28436018957346,
+    "t10_from_min": 38.862559241706165,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "GIL",
+    "panel_min_date": "2026-07-27",
+    "panel_min_price": 6570.0,
+    "panel_max_after": 8690.0,
+    "peak_rebound_pct": 32.26788432267884,
+    "t10_from_min": 29.071537290715366,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "DGW",
+    "panel_min_date": "2026-07-27",
+    "panel_min_price": 33300.0,
+    "panel_max_after": 43150.0,
+    "peak_rebound_pct": 29.579579579579573,
+    "t10_from_min": 24.32432432432432,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "GEX",
+    "panel_min_date": "2026-07-28",
+    "panel_min_price": 20500.0,
+    "panel_max_after": 26350.0,
+    "peak_rebound_pct": 28.53658536585366,
+    "t10_from_min": 28.53658536585366,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "GVR",
+    "panel_min_date": "2026-07-24",
+    "panel_min_price": 26200.0,
+    "panel_max_after": 32650.0,
+    "peak_rebound_pct": 24.61832061068703,
+    "t10_from_min": 21.37404580152671,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "GAS",
+    "panel_min_date": "2026-07-27",
+    "panel_min_price": 67100.0,
+    "panel_max_after": 83700.0,
+    "peak_rebound_pct": 24.7391952309985,
+    "t10_from_min": 17.883755588673612,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "VRE",
+    "panel_min_date": "2026-07-27",
+    "panel_min_price": 21350.0,
+    "panel_max_after": 26600.0,
+    "peak_rebound_pct": 24.590163934426236,
+    "t10_from_min": 18.501170960187352,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "PVT",
+    "panel_min_date": "2026-07-27",
+    "panel_min_price": 16550.0,
+    "panel_max_after": 20450.0,
+    "peak_rebound_pct": 23.564954682779458,
+    "t10_from_min": 19.335347432024165,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "PNJ",
+    "panel_min_date": "2026-07-30",
+    "panel_min_price": 30450.0,
+    "panel_max_after": 39900.0,
+    "peak_rebound_pct": 31.034482758620683,
+    "t10_from_min": 15.927750410509024,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "VTP",
+    "panel_min_date": "2026-07-28",
+    "panel_min_price": 44050.0,
+    "panel_max_after": 56800.0,
+    "peak_rebound_pct": 28.944381384790006,
+    "t10_from_min": 22.814982973893304,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "DGC",
+    "panel_min_date": "2026-07-23",
+    "panel_min_price": 36050.0,
+    "panel_max_after": 44150.0,
+    "peak_rebound_pct": 22.46879334257974,
+    "t10_from_min": 22.19140083217752,
+    "WARNING": "uses full-sample min; descriptive only"
+  },
+  {
+    "symbol": "VIX",
+    "panel_min_date": "2026-07-28",
+    "panel_min_price": 12150.0,
+    "panel_max_after": 14400.0,
+    "peak_rebound_pct": 18.518518518518512,
+    "t10_from_min": 18.518518518518512,
+    "WARNING": "uses full-sample min; descriptive only"
+  }
+]
