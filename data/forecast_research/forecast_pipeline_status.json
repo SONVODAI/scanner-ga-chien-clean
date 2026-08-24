@@ -1,0 +1,387 @@
+{
+  "contract_version": "forecast_data_contract_v1",
+  "data_dir": "data/forecast_research",
+  "freeze": {
+    "ok": true,
+    "n_dates": 17,
+    "written": 0,
+    "results": [
+      {
+        "ok": true,
+        "trade_date": "2026-07-31",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "5ed3c4802ea92e3410d9ace25e9a90bc0d1cf84e48342352569daae5e0c290cd",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-03",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "75085ca83796675c9a2798bb54892180113f18e5c848415ae4f4b758eb9b922b",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-04",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "94dfc8d28391f18f1f011f5fc95b704463285000abec5d793aa2247a9bc11325",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-05",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "612f2fb08c4d43dd4a8fbda01189996bcb1bf6e2dc50d9bfad66f7fc1ee97a96",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-06",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "7facc4d80c3fc478c3dc9add1c3db27ff4087bd897aac5a8861a028aab810ee1",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-07",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "c874c967327ddfb5c2116827756d7697178a5645c624e7c6e3bbc529472da41a",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-10",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "ddad1dd421321764f291554629b30921be89bdda44f425711e0dc24b268ec807",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-11",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "2865ba0670dc0f50a9d3fc2cec3d2c1765b3aa50ffbfef907c31c25c9bc9f060",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-12",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "PARTIAL",
+        "universe_count": "142",
+        "feature_hash": "fd66b7b91cbcbd1ae8c71de1891f5fb26fde7af22b4d10410caf845c3e6301cb",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-13",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "0b38d4a44151182c2f9e939b6c47fa6eefdd99fe0a429f2da621ef4557eb4c12",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-14",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "64297c20855aea2ff388a530b8a4df8df528e99e430ac175b80b183c490a1f31",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-17",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "57d65605112c0d3b8e53f1c80d32aa8d1fa593e7f2fece0af702069929374136",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-18",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "aeef3d8c7cf5a082a14dbb3516b72c32f45d8d38917baad077541f3b8856ac09",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-19",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "abc1d97418db3fd8c74efb4ea2d8a96c82562a9e48eb880a7aa8ae66537fe129",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-20",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "d2b2c4f966ca174773e92b2709b97bd4d45b11e8254225c975a9ae78e48c1096",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-21",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "fc7e17d99585c12e564929e2adf33d412049111114ada6b80eed9a6c13ad646e",
+        "expected_universe_size": 142
+      },
+      {
+        "ok": true,
+        "trade_date": "2026-08-24",
+        "written": false,
+        "reason": "ALREADY_FROZEN",
+        "completeness_status": "COMPLETE",
+        "universe_count": "142",
+        "feature_hash": "4a26f755b63d2791cbfe267a2bc9d4594c581ac47939ff55c8fe0a36db634082",
+        "expected_universe_size": 142
+      }
+    ]
+  },
+  "maturity": {
+    "ok": true,
+    "written": 0,
+    "skipped": 51,
+    "details": [
+      {
+        "trade_date": "2026-07-31",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-07-31",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-07-31",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-03",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-03",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-03",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-04",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-04",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-04",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-05",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-05",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-05",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-06",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-06",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-06",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-07",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-07",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-07",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-10",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-10",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-10",
+        "horizon": 10,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-11",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-11",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-12",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-12",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-13",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-13",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-14",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-14",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-17",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-17",
+        "horizon": 5,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-18",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      },
+      {
+        "trade_date": "2026-08-19",
+        "horizon": 3,
+        "written": false,
+        "reason": "ALREADY_PRESENT"
+      }
+    ]
+  },
+  "feature_matrix_path": null
+}
