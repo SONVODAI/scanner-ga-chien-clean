@@ -185,7 +185,42 @@ def test_vci_forward_only_ok(tmp_path: Path):
     assert out.values["universe_foreign_net_value"] == pytest.approx(60.0)
 
 
-def test_cascade_hsx_then_vci(tmp_path: Path):
+def test_cascade_prefers_complete_vci_over_partial_hsx(tmp_path: Path):
+    ems = tmp_path / "ems.csv"
+    _write_ems(ems, "2026-08-24", ["AAA", "BBB"])
+
+    # HSX only returns AAA → PARTIAL
+    def get_json(url: str) -> Dict[str, Any]:
+        sym = url.rstrip("/").split("/")[-1].split("?")[0]
+        if sym == "AAA":
+            return _hsx_payload([_sym_row("2026-08-24", 100.0, 40.0)])
+        return _hsx_payload([])
+
+    def board(symbols: List[str]) -> pd.DataFrame:
+        return pd.DataFrame(
+            [
+                {
+                    "listing_symbol": s,
+                    "listing_trading_date": "2026-08-24",
+                    "match_foreign_buy_value": 50.0,
+                    "match_foreign_sell_value": 10.0,
+                }
+                for s in symbols
+            ]
+        )
+
+    cascade = UniverseForeignFlowCascade(
+        hsx=HsXUniverseForeignProvider(ems_path=ems, get_json=get_json, sleep_s=0.0),
+        vci=VciUniverseForeignProvider(ems_path=ems, price_board_fn=board, session_today="2026-08-24"),
+        enable_cross_check=False,
+    )
+    out = cascade.fetch("2026-08-24")
+    assert out.meta.get("source_hierarchy") == "VCI_FALLBACK"
+    assert out.meta.get("completeness") == P0_COMPLETENESS_COMPLETE
+    assert out.values["universe_foreign_net_value"] == pytest.approx(80.0)
+
+
+def test_cascade_hsx_down_uses_vci(tmp_path: Path):
     ems = tmp_path / "ems.csv"
     _write_ems(ems, "2026-08-24", ["AAA"])
 
