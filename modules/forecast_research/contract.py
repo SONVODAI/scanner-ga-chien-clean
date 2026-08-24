@@ -51,3 +51,45 @@ T0_FILE = "forecast_t0_daily.csv"
 OUTCOMES_FILE = "forecast_outcomes.csv"
 STATUS_FILE = "forecast_pipeline_status.json"
 MATRIX_FILE = "feature_availability_matrix.json"
+
+# --- Historical Market Core (separate from Forecast T0 contract) ---
+HISTORICAL_CORE_SCHEMA_VERSION = "historical_market_core_v1"
+HISTORICAL_CORE_FILE = "historical_market_core.csv"
+HISTORICAL_CORE_STATUS_FILE = "historical_recovery_status.json"
+
+# Quality tiers for historical recovery (explicit; never silently upgrade).
+QUALITY_PIT_SAFE_COMPLETE = "PIT_SAFE_COMPLETE"
+QUALITY_PIT_SAFE_PARTIAL = "PIT_SAFE_PARTIAL"
+QUALITY_PIT_RECONSTRUCTABLE = "PIT_RECONSTRUCTABLE"
+QUALITY_NOT_PROVABLY_PIT_SAFE = "NOT_PROVABLY_PIT_SAFE"
+QUALITY_LEAKAGE_RISK_SOURCE = "LEAKAGE_RISK_SOURCE"
+
+# Root pattern_history FC selection when multiple intraday values exist.
+# Prefer last scan with clock time >= 15:00 VN (market close reference).
+# This is reconstructable, never silently promoted to PIT_SAFE.
+ROOT_PH_FC_RULE = "last_post_close_scan_ge_15_00"
+
+# --- Minimum Daily Research Record V1 ---
+MDRR_SCHEMA_VERSION = "minimum_daily_research_record_v1"
+MDRR_FILE = "mdrr_daily.csv"
+MDRR_STATUS_FILE = "mdrr_pipeline_status.json"
+FORWARD_ONLY_REGISTRY_FILE = "forward_only_feature_registry.json"
+
+# Outcome columns that must never enter T0 / historical core / MDRR feature bodies.
+FORBIDDEN_OUTCOME_COLUMNS = (
+    "t1_return",
+    "t3_return",
+    "t5_return",
+    "t10_return",
+    "t1_win",
+    "t3_win",
+    "t5_win",
+    "t10_win",
+    "xs_mean_return",
+    "mfe",
+    "mae",
+    "label_up",
+    "label_strong_up",
+    "label_down",
+    "vni_return",
+)

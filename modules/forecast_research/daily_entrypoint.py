@@ -131,18 +131,43 @@ def maybe_freeze_after_market_daily(
     Fail-safe hook for market_t0_capture after canonical daily T0 write.
     Never raises into Market First / trading path.
     Idempotent: ALREADY_FROZEN still counts as ok; maturity is append-only.
+    Also writes MDRR + refreshes historical core for the date (fail-safe).
     """
     try:
         freeze = freeze_trade_date(trade_date, data_dir=data_dir)
         maturity: Dict[str, Any] = {"skipped": True}
         if mature:
             maturity = mature_all_outcomes(data_dir=data_dir)
+        mdrr: Dict[str, Any] = {"skipped": True}
+        hist: Dict[str, Any] = {"skipped": True}
+        try:
+            from modules.forecast_research.mdrr import maybe_write_mdrr_after_market_daily
+
+            mdrr = maybe_write_mdrr_after_market_daily(trade_date, data_dir=data_dir)
+        except Exception as exc:  # noqa: BLE001
+            mdrr = {"ok": False, "reason": f"mdrr_hook_error:{exc}"}
+        try:
+            from modules.forecast_research.historical_recovery import (
+                build_historical_record_for_date,
+                persist_historical_record,
+            )
+
+            rec = build_historical_record_for_date(trade_date)
+            if rec is not None:
+                ok, reason = persist_historical_record(rec, data_dir=data_dir)
+                hist = {"ok": True, "written": ok, "reason": reason, "quality_tier": rec.get("quality_tier")}
+            else:
+                hist = {"ok": False, "written": False, "reason": "no_evidence"}
+        except Exception as exc:  # noqa: BLE001
+            hist = {"ok": False, "reason": f"hist_hook_error:{exc}"}
         return {
             "ok": bool(freeze.get("ok")),
             "written": bool(freeze.get("written")),
             "reason": freeze.get("reason"),
             "completeness_status": freeze.get("completeness_status"),
             "maturity": maturity,
+            "mdrr": mdrr,
+            "historical_core": hist,
         }
     except Exception as exc:  # noqa: BLE001 — observer must not break capture
         return {"ok": False, "written": False, "reason": f"hook_error:{exc}"}
@@ -154,6 +179,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--data-dir", default=None, help="Override data/forecast_research")
     parser.add_argument("--no-mature", action="store_true")
     parser.add_argument("--matrix-only", action="store_true")
+    parser.add_argument("--recover-historical", action="store_true", help="Run historical market core recovery")
+    parser.add_argument("--mdrr-backfill", action="store_true", help="Backfill MDRR from EMS dates")
+    parser.add_argument("--all-research-memory", action="store_true", help="T0 freeze + mature + MDRR + historical")
     args = parser.parse_args(argv)
 
     data_dir = Path(args.data_dir) if args.data_dir else None
@@ -164,11 +192,35 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(json.dumps({"matrix": str(path), **build_feature_availability_matrix()}, indent=2, default=str)[:2000])
         return 0
 
+    payload: Dict[str, Any] = {}
+
+    if args.recover_historical and not args.all_research_memory:
+        from modules.forecast_research.historical_recovery import recover_all_historical
+
+        payload = recover_all_historical(data_dir=data_dir)
+        print(json.dumps(payload, indent=2, default=str)[:12000])
+        return 0 if payload.get("ok") else 1
+
+    if args.mdrr_backfill and not args.all_research_memory:
+        from modules.forecast_research.mdrr import run_mdrr_backfill, write_forward_only_registry
+
+        payload = run_mdrr_backfill(data_dir=data_dir)
+        write_forward_only_registry(data_dir)
+        print(json.dumps(payload, indent=2, default=str)[:12000])
+        return 0
+
     result = run_daily_pipeline(
         trade_date=args.trade_date,
         data_dir=data_dir,
         mature=not args.no_mature,
     )
+    if args.all_research_memory:
+        from modules.forecast_research.historical_recovery import recover_all_historical
+        from modules.forecast_research.mdrr import run_mdrr_backfill, write_forward_only_registry
+
+        result["historical"] = recover_all_historical(data_dir=data_dir)
+        result["mdrr"] = run_mdrr_backfill(data_dir=data_dir)
+        write_forward_only_registry(data_dir)
     print(json.dumps(result, indent=2, default=str))
     return 0 if result.get("freeze", {}).get("ok", True) else 1
 

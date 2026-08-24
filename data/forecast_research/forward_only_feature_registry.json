@@ -1,0 +1,78 @@
+{
+  "registry_version": "forward_only_feature_registry_v1",
+  "mdrr_schema_version": "minimum_daily_research_record_v1",
+  "fields": [
+    {
+      "feature": "foreign_net_flow",
+      "first_reliable_collection_date": null,
+      "source": "NOT_YET_COLLECTED",
+      "pit_status": "FORWARD_ONLY",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "DO_NOT_INVENT",
+      "notes": "P0 \u2014 begin prospective collection; never backfill without evidence"
+    },
+    {
+      "feature": "foreign_buy",
+      "first_reliable_collection_date": null,
+      "source": "NOT_YET_COLLECTED",
+      "pit_status": "FORWARD_ONLY",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "DO_NOT_INVENT",
+      "notes": "P0"
+    },
+    {
+      "feature": "foreign_sell",
+      "first_reliable_collection_date": null,
+      "source": "NOT_YET_COLLECTED",
+      "pit_status": "FORWARD_ONLY",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "DO_NOT_INVENT",
+      "notes": "P0"
+    },
+    {
+      "feature": "market_turnover",
+      "first_reliable_collection_date": null,
+      "source": "NOT_YET_COLLECTED",
+      "pit_status": "FORWARD_ONLY",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "DO_NOT_INVENT; VNINDEX volume in MDT0 is not a substitute",
+      "notes": "P0 total market traded value"
+    },
+    {
+      "feature": "market_adv",
+      "first_reliable_collection_date": null,
+      "source": "NOT_YET_COLLECTED",
+      "pit_status": "FORWARD_ONLY",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "DERIVE_LATER_FROM_RAW_TURNOVER_SERIES_ONLY",
+      "notes": "P0"
+    },
+    {
+      "feature": "vnindex_rsi",
+      "first_reliable_collection_date": null,
+      "source": "market_daily_t0 reserved columns (currently empty)",
+      "pit_status": "FORWARD_ONLY_UNTIL_FILLED_AT_FREEZE",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "FILL_PROSPECTIVELY_OR_DERIVE_FROM_IMMUTABLE_INDEX_OHLCV_IF_SUFFICIENT",
+      "notes": "P1"
+    },
+    {
+      "feature": "vnindex_macd",
+      "first_reliable_collection_date": null,
+      "source": "market_daily_t0 reserved columns (currently empty)",
+      "pit_status": "FORWARD_ONLY_UNTIL_FILLED_AT_FREEZE",
+      "historical_backfill_availability": false,
+      "reconstruction_policy": "SAME_AS_vnindex_rsi",
+      "notes": "P1"
+    },
+    {
+      "feature": "sector_participation_json",
+      "first_reliable_collection_date": null,
+      "source": "optional; sector on freeze/EL, not EMS",
+      "pit_status": "FORWARD_ONLY_OR_DERIVE_FROM_FREEZE_SECTOR",
+      "historical_backfill_availability": "partial via t0_observation_freeze sector",
+      "reconstruction_policy": "MAY_DERIVE_FROM_PIT_FREEZE_WHEN_SECTOR_PRESENT",
+      "notes": "P1"
+    }
+  ]
+}
