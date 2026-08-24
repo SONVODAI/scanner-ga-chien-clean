@@ -152,6 +152,13 @@ class EdgeResearchEngine:
             }
             observed_episodes = challenger.get("episodes_segmented", 0)
 
+        # Preserve autonomous heartbeat / research voice fields already on disk
+        preserved_extra = {
+            k: stored[k]
+            for k in ("last_autonomous_heartbeat_at",)
+            if k in stored
+        }
+
         status = FoundationStatus(
             engine_version=ENGINE_VERSION,
             phase=phase,
@@ -170,7 +177,9 @@ class EdgeResearchEngine:
             discovery_summary=discovery_summary,
             challenger_summary=challenger_summary,
         )
-        write_status(status.to_dict(), data_dir=self.data_dir)
+        payload = status.to_dict()
+        payload.update(preserved_extra)
+        write_status(payload, data_dir=self.data_dir)
         return status
 
     def build_panel(

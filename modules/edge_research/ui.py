@@ -348,6 +348,62 @@ def _render_research_run_status(st: Any, session_state: Mapping[str, Any]) -> No
         st.error(message)
 
 
+def _run_autonomous_heartbeat_safely(
+    *,
+    current_market_state: Optional[str],
+    current_market_transition: Optional[str],
+    research_coverage_end: Optional[str],
+    execution_in_progress: bool,
+) -> Optional[Dict[str, Any]]:
+    """
+    Cheap autonomous observe→decide→persist heartbeat.
+
+    Skipped while a manual discovery/challenger run is in progress to avoid conflict.
+    Idempotent on identical data identity (Streamlit reruns safe).
+    """
+    if execution_in_progress:
+        return None
+    try:
+        from modules.edge_research.autonomous_heartbeat import (
+            get_autonomous_status_snapshot,
+            run_autonomous_research_heartbeat,
+        )
+
+        decision = run_autonomous_research_heartbeat(
+            research_market_state=current_market_state or "UNKNOWN",
+            research_market_transition=current_market_transition or "UNKNOWN",
+            research_coverage_end=research_coverage_end,
+        )
+        snap = get_autonomous_status_snapshot()
+        return {"decision": decision.to_dict(), "snapshot": snap}
+    except Exception as exc:  # noqa: BLE001 — panel must remain display-safe
+        return {"error": str(exc)}
+
+
+def _render_autonomous_heartbeat_status(st: Any, heartbeat: Optional[Dict[str, Any]]) -> None:
+    if not heartbeat:
+        return
+    if heartbeat.get("error"):
+        st.caption(f"Autonomous research heartbeat skipped: {heartbeat['error']}")
+        return
+    snap = heartbeat.get("snapshot") or {}
+    decision = heartbeat.get("decision") or {}
+    code = snap.get("last_autonomous_decision") or decision.get("decision_code") or "—"
+    reason = snap.get("last_autonomous_reason") or decision.get("reason") or ""
+    cutoff = snap.get("last_observation_cutoff") or decision.get("data_cutoff") or "—"
+    waiting = "yes" if snap.get("waiting_for_outcomes") else "no"
+    ran = "yes" if snap.get("research_ran") else "no"
+    replay = " (idempotent replay)" if decision.get("idempotent_replay") else ""
+    active = snap.get("active_experiment_id") or "—"
+    nxt = snap.get("next_eligible_trigger") or "—"
+    st.markdown(
+        f"**Autonomous research heartbeat:** `{code}`{replay}  \n"
+        f"Data cutoff: `{cutoff}` · Research ran: `{ran}` · Waiting outcomes: `{waiting}`  \n"
+        f"Active experiment: `{active}` · Next trigger: `{nxt}`  \n"
+        f"Reason: {reason}"
+    )
+
+
 def render_edge_research_panel(
     current_market_state: Optional[str] = None,
     current_market_transition: Optional[str] = None,
@@ -380,7 +436,22 @@ def render_edge_research_panel(
             execution_in_progress=execution_in_progress,
         )
 
+        # Autonomous observe→decide→persist (cheap; not expensive discovery)
+        heartbeat = _run_autonomous_heartbeat_safely(
+            current_market_state=current_market_state,
+            current_market_transition=current_market_transition,
+            research_coverage_end=status.coverage_end,
+            execution_in_progress=execution_in_progress,
+        )
+        # Refresh status voice after heartbeat persistence
+        if heartbeat and not heartbeat.get("error"):
+            status = engine.get_foundation_status(
+                current_market_state=current_market_state,
+                current_market_transition=current_market_transition,
+            )
+
         _render_research_run_status(st, st.session_state)
+        _render_autonomous_heartbeat_status(st, heartbeat)
 
         engine_label = (
             "CHALLENGER / RESEARCH ONLY"
@@ -429,6 +500,11 @@ def render_edge_research_panel(
             )
 
         st.markdown(f"**Last research event:** {status.last_research_event}")
+        st.caption(
+            "Manual discovery/challenger buttons are optional diagnostic controls. "
+            "Autonomous heartbeat observes each new-data cycle and records a deliberate "
+            "decision (including NO_RESEARCH). Expensive discovery is not auto-run."
+        )
 
         if top_candidates:
             with st.expander("TOP EDGE CANDIDATES — DISCOVERY ONLY", expanded=False):
