@@ -66,6 +66,29 @@ from modules.edge_research.opr_bridge.production_trading_session_eligibility imp
     extract_panel_trading_sessions,
 )
 from modules.edge_research.opr_bridge.evidence_synthesis_records import utc_now_iso
+from modules.forecast_research.production_daily_integration import (
+    attach_forecast_memory_to_daily_run_result,
+)
+
+
+def _finish_daily_run(
+    result: Dict[str, Any],
+    *,
+    target_trade_date: str,
+    repo_root: Path,
+    edge_data_dir: Optional[Path],
+) -> Dict[str, Any]:
+    """Append isolated Forecast Memory stage; never mutates Edge run disposition."""
+    if result.get("genesis_blocked"):
+        out = dict(result)
+        out["forecast_memory"] = {"skipped": True, "reason": "edge_genesis_blocked"}
+        return out
+    return attach_forecast_memory_to_daily_run_result(
+        result,
+        target_trade_date=target_trade_date,
+        repo_root=repo_root,
+        edge_data_dir=edge_data_dir,
+    )
 
 
 def _policy_bundle(policy_hashes: Dict[str, str]) -> str:
@@ -136,14 +159,19 @@ def run_production_daily_research(
             target_trade_date, run_mode=run_mode, policy_hashes=policy_hashes, data_dir=data_dir
         )
         if not ok:
-            return {
-                "run": {"run_disposition": RunDisposition.FAILED_CLOSED.value, "failure_or_skip_reason": reason},
-                "lock_held": False,
-                "genesis_blocked": True,
-                "idempotent_replay": False,
-                "counts_as_forward_evidence": False,
-                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
-            }
+            return _finish_daily_run(
+                {
+                    "run": {"run_disposition": RunDisposition.FAILED_CLOSED.value, "failure_or_skip_reason": reason},
+                    "lock_held": False,
+                    "genesis_blocked": True,
+                    "idempotent_replay": False,
+                    "counts_as_forward_evidence": False,
+                    "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+                },
+                target_trade_date=target_trade_date,
+                repo_root=repo_root,
+                edge_data_dir=data_dir,
+            )
 
     readiness = verify_data_readiness(
         panel,
@@ -169,12 +197,17 @@ def run_production_daily_research(
             data_dir=data_dir,
         )
         if existing is not None and replay_kind is not None:
-            return {
-                "run": existing.to_dict(),
-                "idempotent_replay": True,
-                "idempotent_reason": replay_kind,
-                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
-            }
+            return _finish_daily_run(
+                {
+                    "run": existing.to_dict(),
+                    "idempotent_replay": True,
+                    "idempotent_reason": replay_kind,
+                    "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+                },
+                target_trade_date=target_trade_date,
+                repo_root=repo_root,
+                edge_data_dir=data_dir,
+            )
 
     run_id = resume_run_id or allocate_daily_run_id(identity, data_dir=data_dir)
 
@@ -182,17 +215,22 @@ def run_production_daily_research(
     if use_run_lock and not resume_run_id:
         lock_fh, lock_result = acquire_run_lock(run_id=run_id, data_dir=data_dir)
         if not lock_result.acquired:
-            return {
-                "run": {"run_disposition": "LOCK_HELD", "failure_or_skip_reason": lock_result.reason},
-                "lock_held": True,
-                "lock": lock_result.to_dict(),
-                "idempotent_replay": False,
-                "counts_as_forward_evidence": mode_counts_as_forward_evidence(run_mode),
-                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
-            }
+            return _finish_daily_run(
+                {
+                    "run": {"run_disposition": "LOCK_HELD", "failure_or_skip_reason": lock_result.reason},
+                    "lock_held": True,
+                    "lock": lock_result.to_dict(),
+                    "idempotent_replay": False,
+                    "counts_as_forward_evidence": mode_counts_as_forward_evidence(run_mode),
+                    "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+                },
+                target_trade_date=target_trade_date,
+                repo_root=repo_root,
+                edge_data_dir=data_dir,
+            )
 
     try:
-        return _run_production_daily_research_inner(
+        result = _run_production_daily_research_inner(
             panel,
             target_trade_date=target_trade_date,
             run_mode=run_mode,
@@ -205,6 +243,12 @@ def run_production_daily_research(
             policy_bundle=policy_bundle,
             identity=identity,
             run_id=run_id,
+        )
+        return _finish_daily_run(
+            result,
+            target_trade_date=target_trade_date,
+            repo_root=repo_root,
+            edge_data_dir=data_dir,
         )
     finally:
         if lock_fh is not None:
