@@ -15,6 +15,7 @@ from modules.edge_research.opr_bridge.blind_research_examination_runner import c
 from modules.edge_research.opr_bridge.production_daily_manifest import build_daily_manifest
 from modules.edge_research.opr_bridge.production_daily_run_observability import DailyRunObservability
 from modules.edge_research.opr_bridge.production_daily_run_persistence import (
+    allocate_daily_run_id,
     load_phase_marker,
     lookup_prior_successful_run,
     lookup_run,
@@ -23,6 +24,7 @@ from modules.edge_research.opr_bridge.production_daily_run_persistence import (
     persist_phase_marker,
     persist_run,
     phase_completed,
+    resolve_idempotent_daily_run,
 )
 from modules.edge_research.opr_bridge.production_daily_run_records import (
     BACKFILL_NON_FORWARD,
@@ -156,7 +158,25 @@ def run_production_daily_research(
         source_dataset_hash=dataset_hash,
         policy_hash_bundle=policy_bundle,
     )
-    run_id = resume_run_id or new_run_id(identity)
+
+    # Same-day retry contract: SUCCESS/SKIP are terminal; WAITING_FOR_DATA retries when
+    # source coverage / EOD readiness advances. Prior WAITING records stay immutable.
+    if not resume_run_id:
+        existing, replay_kind = resolve_idempotent_daily_run(
+            target_trade_date,
+            run_mode,
+            readiness=readiness,
+            data_dir=data_dir,
+        )
+        if existing is not None and replay_kind is not None:
+            return {
+                "run": existing.to_dict(),
+                "idempotent_replay": True,
+                "idempotent_reason": replay_kind,
+                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+            }
+
+    run_id = resume_run_id or allocate_daily_run_id(identity, data_dir=data_dir)
 
     lock_fh = None
     if use_run_lock and not resume_run_id:
@@ -208,13 +228,22 @@ def _run_production_daily_research_inner(
 ) -> Dict[str, Any]:
     dataset_hash = readiness.source_dataset_hash
 
-    existing = lookup_run_for_date(target_trade_date, run_mode, data_dir=data_dir)
-    if existing and existing.frozen and not resume_run_id:
-        return {
-            "run": existing.to_dict(),
-            "idempotent_replay": True,
-            "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
-        }
+    # Defense in depth: outer gate already handled idempotent replay; keep a narrow
+    # terminal check here for resume-safe paths without re-blocking WAITING retries.
+    if not resume_run_id:
+        existing, replay_kind = resolve_idempotent_daily_run(
+            target_trade_date,
+            run_mode,
+            readiness=readiness,
+            data_dir=data_dir,
+        )
+        if existing is not None and replay_kind is not None:
+            return {
+                "run": existing.to_dict(),
+                "idempotent_replay": True,
+                "idempotent_reason": replay_kind,
+                "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
+            }
 
     if resume_run_id:
         run = lookup_run(resume_run_id, data_dir=data_dir)
@@ -247,7 +276,9 @@ def _run_production_daily_research_inner(
             phase_history=(),
             run_identity_hash=identity,
         )
-        persist_run(run, data_dir=data_dir, allow_overwrite=True)
+        if lookup_run(run_id, data_dir=data_dir) is not None:
+            raise ValueError(f"run_id_collision_refusing_overwrite:{run_id}")
+        persist_run(run, data_dir=data_dir, allow_overwrite=False)
 
     obs = DailyRunObservability(run_id, target_trade_date)
     obs.start()
