@@ -142,17 +142,20 @@ Inside the primary decline population, the session is a *sync-bottom day*: ≥35
 |---|---|
 | N | 454 obs / 127 stocks / **4 dates** / **1 episode** |
 | Dates | 2026-07-23, 07-24, 07-27, 07-28 |
-| T3 / T5 / T10 median | +1.57 / **+3.90** / **+6.00** |
-| T5 / T10 win rate | 76.0% / 86.1% |
-| Baseline A (all declined) T5/T10 | +2.70 / +4.26 |
-| Baseline C (declined, *not* sync-bottom days) incremental T5/T10 | **+2.26 / +4.11 pp** |
+| T3 / T5 / T10 / T15 / T20 median | +1.57 / **+3.90** / **+6.00** / +3.84 / +3.37 |
+| T5 mean / win / p10 | +4.17 / 76.0% / −1.78 |
+| T5 MFE / MAE median | +4.43 / −0.35 |
+| Baseline A (all declined, any date) T5 | +2.70 |
+| Baseline B (all stocks on the 4 signal dates) T5 | +3.17 ; incremental **+0.74 pp** |
+| Baseline C (declined, *not* those dates) T5/T10 incremental | **+2.26 / +4.11 pp** |
+| Baseline D (declined *on those same dates*) | **identical to T21 by construction** (the rule is a date filter) |
 | Excess vs same-date universe T5 | **+0.28 pp** |
 | July 27–31 share | 51% (all four dates sit in E1) |
 | Holdout | **N = 0** (no sync-bottom day after 07-28) |
 | Failure rate T5 / T10 | 24.0% / 13.9% |
 | Complexity | 1 threshold on a cross-sectional count |
 
-**Interpretation:** this mostly selects **the market-bottom dates**, not a stock-specific recovery mechanic. Once you compare to all names on those same dates (Baseline B / excess), the extra return collapses to ~0.3 pp. The right reading is: *being in a meaningful decline on a synchronized-low day participated in the V-bottom*. That is regime identification, not a tradable stock-picker.
+**Interpretation:** this mostly selects **the market-bottom dates**, not a stock-specific recovery mechanic. Baseline D is tautological. Once you compare to all names on those same dates (Baseline B / excess), the extra return collapses to ~0.3–0.7 pp. The right reading is: *being in a meaningful decline on a synchronized-low day participated in the V-bottom*. That is regime identification, not a tradable stock-picker.
 
 **Anti-edge / invalidation:** a 20d low in **mid-August** without synchronization (E3: NTL, HUT, etc.) produced the worst T5s in the failure file. Isolated new lows ≠ crash lows.
 
@@ -160,7 +163,7 @@ Inside the primary decline population, the session is a *sync-bottom day*: ≥35
 
 ### Candidate 2 — Sync-bottom day AND RSI rising  
 **ID T22** · complexity: 3  
-**Verdict: REGIME-CONDITIONAL CANDIDATE**
+**Verdict: INTERESTING OBSERVATION** (downgraded from a regime-conditional *stock* overlay after Baseline D)
 
 **Exact state:** T21 AND `rsi14 > rsi14_lag1 + 0.5`.
 
@@ -168,15 +171,18 @@ Inside the primary decline population, the session is a *sync-bottom day*: ≥35
 |---|---|
 | N | 131 / 96 stocks / **3 dates** / **1 episode** |
 | Dates | 2026-07-24, 07-27, 07-28 |
-| T3 / T5 / T10 median | +2.08 / **+5.08** / **+6.27** |
-| T5 / T10 win rate | 83.2% / 92.4% |
-| Incremental vs C (T5 / T10) | **+2.48 / +2.33 pp** |
-| Excess vs same-date universe T5 | **+0.70 pp** (best residual among named states) |
+| T3 / T5 / T10 / T15 / T20 median | +2.08 / **+5.08** / **+6.27** / +3.79 / +3.82 |
+| T5 mean / win / p10 | +5.28 / 83.2% / −1.39 |
+| T5 MFE / MAE median | +5.66 / **+0.60** (median path never went negative after entry *in this episode*) |
+| Incremental vs C (other dates) T5/T10 | **+2.48 / +2.33 pp** — this is mostly **date selection** |
+| Incremental vs B (all names, same dates) T5 | +0.87 pp |
+| Incremental vs D (declined names, **same dates**) T5/T10 | **+0.05 / −0.76 pp** |
+| Excess vs same-date universe T5 | +0.70 pp |
 | Holdout | **N = 0** |
 | T5 failure rate | 16.8% |
-| T10 p10 | **+0.93%** (left tail unusually contained *in this episode*) |
+| T10 p10 | **+0.93%** |
 
-This is the strongest *stock-level* overlay on the market event: on the crash-low days, names whose RSI had already ticked up one session did better than other declined names. It is still a **single-episode** object. Three dates in one bounce cannot be promoted.
+The fair stock-selection test is Baseline D: other names that were also in a meaningful decline **on the same three dates**. T22 does not beat them. The large vs-C gap is “these dates vs other dates,” which T21 already captures. T22 is not a distinct recovery-transition edge.
 
 **Failures:** PDR, SZC, CII, HHS on 2026-07-24 (still going down into 07-27). The overlay does not prevent buying one session too early inside the crash. T10 often repaired those T5 failures — again, because the V-bottom continued.
 
@@ -191,8 +197,11 @@ This is the strongest *stock-level* overlay on the market event: on the crash-lo
 | | |
 |---|---|
 | N | 289 / 118 stocks / 17 dates / 4 episode labels |
-| T3 / T5 / T10 median | +2.37 / **+4.31** / **+5.95** |
+| T3 / T5 / T10 / T15 / T20 median | +2.37 / **+4.31** / **+5.95** / +4.05 / +4.23 |
+| T5 mean / win / p10 | +4.64 / 80.1% / −1.44 |
+| T5 MFE / MAE median | +4.71 / +0.18 |
 | Incremental vs C T5/T10 | **+1.88 / +2.10 pp** |
+| Incremental vs D (same dates, same decline) T5 | **+1.19 pp** (the only named transition with a non-trivial same-date same-state residual — still E1-dominated) |
 | Excess vs same-date universe T5 | +0.40 pp |
 | July share | **72%** |
 | Discovery T5 | +4.41 (n=268) |
@@ -212,7 +221,7 @@ Related simpler state **T08 `rs_spread > 0`** (RS5 > RS10): N=752, all 22 dates,
 
 **Exact state:** `near_bottom_20_pct <= 1` inside the primary decline pop.
 
-T5 median +3.42, T10 +6.04, incC T5 +1.15 / T10 **+3.21**. Excess T5 +0.31. Holdout T5 −1.53.
+T3/T5/T10/T15/T20 median +1.47 / +3.42 / +6.04 / +4.48 / +3.83. T5 MFE/MAE +3.61 / −0.38. incC T5 +1.15 / T10 **+3.21**. incD T5 +0.72. Excess T5 +0.31. Holdout T5 −1.53.
 
 This is the “buy the low” level. In a V-bottom it looks excellent at T10; in E3 it does not. It is **not** a recovered-structure transition.
 
@@ -232,7 +241,25 @@ These were the hypotheses a human technician would usually write down first. The
 | T24 / T25 | 2 / 3 consecutive up closes | 68 / 17 | −1.23 / −1.32 | −1.57 / −2.98 | NO EDGE |
 | T26 | drawdown “healing” | 206 | −1.11 | −1.73 | NO EDGE |
 
+T11 also: T15 median 0.0, T20 −1.35, T5 MFE/MAE +2.54 / −0.68, incD T5 −0.11. Waiting did not improve MAE vs sitting on the low.
+
 **Mechanism:** by the time a declined name reclaims EMA9 or prints consecutive up days, a large piece of the bounce is already in the entry price. Remaining forward T10 is then *worse* than names still sitting on the low. In this sample, **later confirmation was later, not safer, for magnitude.**
+
+### Required outcome grid (strongest + confirmation contrast)
+
+Baseline A = all primary-pop declined names. B = all stocks on the candidate’s signal dates. C = primary pop without the state. D = primary pop on the candidate’s signal dates (fair same-state, same-date control). Returns in median %.
+
+| ID | N / stocks / dates / eps | T3 | T5 | T10 | T15 | T20 | T5 wr | T5 p10 | MFE5 | MAE5 | vs A | vs B | vs C | vs D |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| T21 | 454 / 127 / 4 / 1 | +1.57 | +3.90 | +6.00 | +3.84 | +3.37 | 76% | −1.78 | +4.43 | −0.35 | +1.20 | +0.74 | +2.26 | 0.00 |
+| T22 | 131 / 96 / 3 / 1 | +2.08 | +5.08 | +6.27 | +3.79 | +3.82 | 83% | −1.39 | +5.66 | +0.60 | +2.38 | +0.87 | +2.48 | **+0.05** |
+| T10 | 289 / 118 / 17 / 4 | +2.37 | +4.31 | +5.95 | +4.05 | +4.23 | 80% | −1.44 | +4.71 | +0.18 | +1.60 | +3.20 | +1.88 | +1.19 |
+| T08 | 752 / 129 / 22 / 4 | +1.63 | +2.90 | +4.42 | +3.45 | +3.45 | 76% | −1.67 | +3.58 | −0.30 | +0.20 | +2.03 | +1.46 | +0.20 |
+| T18/39 | 391 / 115 / 22 / 4 | +1.47 | +3.42 | +6.04 | +4.48 | +3.83 | 75% | −1.77 | +3.61 | −0.38 | +0.72 | +2.56 | +1.15 | +0.72 |
+| T11 | 30 / 25 / 8 / 3 | +0.78 | +1.67 | +1.22 | 0.00 | −1.35 | 83% | −0.32 | +2.54 | −0.68 | −1.04 | +0.32 | **−1.36** | −0.11 |
+| T40 | 25 / 19 / 9 / 3 | +1.41 | +1.67 | +1.38 | +0.45 | −0.90 | 88% | +0.06 | +3.05 | −0.58 | −1.04 | +1.07 | **−1.34** | +0.09 |
+
+T20 N is thin (only the earliest signal dates have a 20-session window). Do not over-read T20.
 
 ---
 
@@ -317,9 +344,9 @@ The user-cited rebound examples (FRT, GIL, DGW, …) are real *outcomes* of that
 
 | Candidate | Verdict |
 |---|---|
-| T21 sync-bottom day | **INTERESTING OBSERVATION** (date/regime identification; excess ≈ 0) |
-| T22 sync-bottom + RSI rising | **REGIME-CONDITIONAL CANDIDATE** |
-| T10 RS10 weak + RS5 rising | **INTERESTING OBSERVATION** (fails holdout / E3) |
+| T21 sync-bottom day | **INTERESTING OBSERVATION** (date/regime identification; Baseline D tautological; excess ≈ 0.3 pp) |
+| T22 sync-bottom + RSI rising | **INTERESTING OBSERVATION** (vs C looks large; **vs D ≈ 0** — not a stock overlay) |
+| T10 RS10 weak + RS5 rising | **INTERESTING OBSERVATION** (best same-date same-state residual; fails holdout / E3) |
 | T08 RS-spread positive | **INTERESTING OBSERVATION** (weak holdout excess only) |
 | T18/T39 at 20d low | **INTERESTING OBSERVATION** (V-bottom magnitude, not a transition) |
 | T11/T40/T01/T34 EMA/slope confirmation | **NO EDGE** (late; negative incremental) |
@@ -333,9 +360,9 @@ The user-cited rebound examples (FRT, GIL, DGW, …) are real *outcomes* of that
 2. Notice that **almost all full-universe history is one July-2026 V-bottom**.
 3. Discover that **oversold depth is monotonic** for subsequent T5/T10 in that episode.
 4. Discover that **market-wide synchronization of 20-day lows** is the dominant state, and that stock-level MA-reclaim / slope-cross “confirmation” is **late and incrementally negative** inside still-declined names.
-5. Measure **same-date excess** and conclude most of the bounce is **market beta**.
+5. Measure **same-date excess and Baseline D** (same decline, same dates). Apparent vs-C edges that vanish vs D are date filters, not stock transitions.
 6. Find the **invalidation**: new lows **without** synchronization (mid-August) fail.
-7. Conclude **regime-conditional observation, not a robust edge**, and refuse to promote it.
+7. Conclude **no robust or research edge**: one V-bottom episode, same-date same-decline controls erase most of the apparent stock transition, and confirmation rules are late.
 
 If Mr.BOT later “discovers” an EMA9 golden-cross buy rule fitted to FRT/GIL, that is a **capability miss** (survivorship + confirmation bias). If it reports “one episode, sync-bottom, confirmation is late, excess is small,” that is a **capability hit**.
 
@@ -350,7 +377,7 @@ If Mr.BOT later “discovers” an EMA9 golden-cross buy rule fitted to FRT/GIL,
 | Named transition / sequence / anti / timing / labeled states | 45 |
 | Alternate-population sensitivities (45 × 4) | 180 |
 | Approximate search cardinality | **~250** |
-| Candidates promoted to REGIME-CONDITIONAL | 1 (T22) |
+| Candidates promoted to REGIME-CONDITIONAL | **0** after Baseline D (T21 is a date filter; T22 vs D ≈ 0) |
 | Candidates promoted to RESEARCH/ROBUST EDGE | **0** |
 
 ---

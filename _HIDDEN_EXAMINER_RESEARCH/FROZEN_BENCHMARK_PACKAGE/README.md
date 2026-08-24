@@ -13,4 +13,5 @@ Purpose:
 Dataset cutoff: 2026-08-21
 Primary population: dist_high20 <= -8 AND near_bottom_20_pct <= 5
 Genuine robust incremental edge: NOT FOUND
-Strongest honest label: REGIME-CONDITIONAL CANDIDATE (T22) / INTERESTING OBSERVATION (sync-bottom, oversold depth)
+Strongest honest label: INTERESTING OBSERVATION only (sync-bottom is a date filter; T22 vs Baseline D ≈ 0; confirmation rules are late)
+Formal REGIME-CONDITIONAL / RESEARCH / ROBUST EDGE: none

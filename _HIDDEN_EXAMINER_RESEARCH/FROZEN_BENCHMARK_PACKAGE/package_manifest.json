@@ -210,7 +210,7 @@
     }
   },
   "panel_hash_sha256": "cb1cdec900bf7ac6be54489adbb667692603d7482b3a70565ccec3e8abe98c3d",
-  "report_hash_sha256": "a5f4fb5f75719cfdee7c3c17dab2debeab21770db8fe56f2820f91f1baee9a82",
+  "report_hash_sha256": "99bc3a180e63aa0f1e50b222d00b57c8deb9514294242366961151598803393a",
   "isolation": {
     "hidden_root": "_HIDDEN_EXAMINER_RESEARCH",
     "brain_files_modified": false,
@@ -239,11 +239,10 @@
   "verdicts_summary": {
     "ROBUST_EDGE": [],
     "RESEARCH_EDGE": [],
-    "REGIME_CONDITIONAL_CANDIDATE": [
-      "T22"
-    ],
+    "REGIME_CONDITIONAL_CANDIDATE": [],
     "INTERESTING_OBSERVATION": [
       "T21",
+      "T22",
       "T10",
       "T08",
       "T18",
@@ -262,6 +261,6 @@
       "T28",
       "T29"
     ],
-    "genuine_incremental_edge_after_same_date_and_same_decline_controls": "NO \u2014 not beyond a single-episode, mostly-beta effect. T22 excess T5 +0.70pp is the largest residual and has N_dates=3."
+    "genuine_incremental_edge_after_same_state_and_same_date_controls": "NO. T22 vs Baseline D T5 +0.05pp / T10 -0.76pp. T21 is a date filter. T10 vs D T5 +1.19pp but fails holdout (T5 -3.31) and E3. T15/T20 and MFE/MAE included."
   }
 }
