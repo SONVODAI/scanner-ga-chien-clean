@@ -4,33 +4,39 @@
   "fields": [
     {
       "feature": "foreign_net_flow",
-      "first_reliable_collection_date": null,
-      "source": "p0_market_daily \u2190 SSI HOSE fr_trade_heatmap (when available)",
+      "first_reliable_collection_date": "2026-07-31",
+      "source": "p0_market_daily.universe_foreign_* \u2190 HSX official foreign (primary) / VCI board (fallback)",
       "pit_status": "FORWARD_ONLY",
       "historical_backfill_availability": false,
       "reconstruction_policy": "DO_NOT_INVENT",
-      "notes": "HOSE scope; missing\u22600; blocked SSI \u2192 SOURCE_ERROR/NULL",
-      "forward_only": true
+      "notes": "EMS_RESEARCH_UNIVERSE_142 VALUE in VND; NOT HOSE-wide; COMPLETE only when all membership-asof symbols observed; missing\u22600",
+      "forward_only": false,
+      "scope": "EMS_RESEARCH_UNIVERSE_142",
+      "units": "VND"
     },
     {
       "feature": "foreign_buy",
-      "first_reliable_collection_date": null,
-      "source": "p0_market_daily \u2190 SSI HOSE fr_trade_heatmap (when available)",
+      "first_reliable_collection_date": "2026-07-31",
+      "source": "p0_market_daily.universe_foreign_* \u2190 HSX official foreign (primary) / VCI board (fallback)",
       "pit_status": "FORWARD_ONLY",
       "historical_backfill_availability": false,
       "reconstruction_policy": "DO_NOT_INVENT",
-      "notes": "HOSE scope; missing\u22600; blocked SSI \u2192 SOURCE_ERROR/NULL",
-      "forward_only": true
+      "notes": "EMS_RESEARCH_UNIVERSE_142 VALUE in VND; NOT HOSE-wide; COMPLETE only when all membership-asof symbols observed; missing\u22600",
+      "forward_only": false,
+      "scope": "EMS_RESEARCH_UNIVERSE_142",
+      "units": "VND"
     },
     {
       "feature": "foreign_sell",
-      "first_reliable_collection_date": null,
-      "source": "p0_market_daily \u2190 SSI HOSE fr_trade_heatmap (when available)",
+      "first_reliable_collection_date": "2026-07-31",
+      "source": "p0_market_daily.universe_foreign_* \u2190 HSX official foreign (primary) / VCI board (fallback)",
       "pit_status": "FORWARD_ONLY",
       "historical_backfill_availability": false,
       "reconstruction_policy": "DO_NOT_INVENT",
-      "notes": "HOSE scope; missing\u22600; blocked SSI \u2192 SOURCE_ERROR/NULL",
-      "forward_only": true
+      "notes": "EMS_RESEARCH_UNIVERSE_142 VALUE in VND; NOT HOSE-wide; COMPLETE only when all membership-asof symbols observed; missing\u22600",
+      "forward_only": false,
+      "scope": "EMS_RESEARCH_UNIVERSE_142",
+      "units": "VND"
     },
     {
       "feature": "market_turnover",
@@ -40,7 +46,7 @@
       "historical_backfill_availability": false,
       "reconstruction_policy": "DO_NOT_INVENT; VNINDEX volume in MDT0 is not a substitute",
       "notes": "Research-universe turnover, not official exchange total",
-      "forward_only": true
+      "forward_only": false
     },
     {
       "feature": "market_adv",
@@ -50,7 +56,7 @@
       "historical_backfill_availability": false,
       "reconstruction_policy": "DERIVE_LATER_FROM_RAW_TURNOVER_SERIES_ONLY",
       "notes": "Average traded VALUE (not volume); PIT windows only",
-      "forward_only": true
+      "forward_only": false
     },
     {
       "feature": "vnindex_rsi",
@@ -60,7 +66,7 @@
       "historical_backfill_availability": false,
       "reconstruction_policy": "DERIVE_ON_COLLECT_FROM_OHLCV_ASOF; DO_NOT_REWRITE_MDT0",
       "notes": "P1",
-      "forward_only": true
+      "forward_only": false
     },
     {
       "feature": "vnindex_macd",
@@ -70,7 +76,7 @@
       "historical_backfill_availability": false,
       "reconstruction_policy": "DERIVE_ON_COLLECT_FROM_OHLCV_ASOF; DO_NOT_REWRITE_MDT0",
       "notes": "P1",
-      "forward_only": true
+      "forward_only": false
     },
     {
       "feature": "sector_participation_json",
@@ -83,12 +89,18 @@
     }
   ],
   "p0_fields": [
-    "foreign_buy_value",
-    "foreign_sell_value",
-    "foreign_net_value",
-    "foreign_buy_volume",
-    "foreign_sell_volume",
-    "foreign_net_volume",
+    "universe_foreign_buy_value",
+    "universe_foreign_sell_value",
+    "universe_foreign_net_value",
+    "universe_foreign_buy_volume",
+    "universe_foreign_sell_volume",
+    "universe_foreign_net_volume",
+    "universe_foreign_expected_count",
+    "universe_foreign_observed_count",
+    "universe_foreign_completeness",
+    "universe_foreign_completeness_ratio",
+    "universe_foreign_source",
+    "universe_foreign_units",
     "universe_turnover_value",
     "universe_volume",
     "market_turnover_value",
@@ -106,5 +118,6 @@
     "vnindex_bb_width",
     "vnindex_bb_position"
   ],
-  "p0_schema_version": "p0_market_memory_v1"
+  "p0_schema_version": "p0_market_memory_v2",
+  "universe_foreign_membership_rule": "EMS_SNAPSHOT_DATE_EXACT"
 }

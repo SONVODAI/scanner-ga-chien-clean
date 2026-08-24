@@ -67,10 +67,23 @@ class SsiHoseForeignFlowProvider:
     Aggregate foreign buy/sell value from SSI iBoard exchange heatmap (HOSE).
 
     Scope: HOSE-listed names returned by the endpoint (not full Vietnam market).
-    Primary research fields: value (VND). Volume optional if present.
+    Units: provider-native until independently proven — do not assume VND scale.
+    Historical: unsupported (API has no trade_date) → forward-only collection.
     """
 
     scope: str = P0_FOREIGN_SCOPE_DEFAULT
+
+    def _meta(self, **extra: Any) -> Dict[str, Any]:
+        base = {
+            "provider": "ssi_fr_trade_heatmap",
+            "scope": self.scope,
+            "foreign_flow_scope": self.scope,  # explicit provenance alias
+            "units": "PROVIDER_NATIVE_UNPROVEN",
+            "historical_supported": False,
+            "forward_only": True,
+        }
+        base.update(extra)
+        return base
 
     def fetch(self, trade_date: str) -> ProviderResult:
         try:
@@ -80,7 +93,7 @@ class SsiHoseForeignFlowProvider:
                 ok=False,
                 status="SOURCE_ERROR",
                 error=f"vnstock_import:{exc}",
-                meta={"provider": "ssi_fr_trade_heatmap", "scope": self.scope},
+                meta=self._meta(),
             )
         try:
             import contextlib
@@ -89,26 +102,27 @@ class SsiHoseForeignFlowProvider:
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
                 df = fr_trade_heatmap(symbol=self.scope, report_type="FrBuyVal")
+            captured = buf.getvalue()[:500]
         except Exception as exc:  # noqa: BLE001
             return ProviderResult(
                 ok=False,
                 status="SOURCE_ERROR",
                 error=f"fetch_exception:{exc}",
-                meta={"provider": "ssi_fr_trade_heatmap", "scope": self.scope},
+                meta=self._meta(),
             )
         if df is None:
             return ProviderResult(
                 ok=False,
                 status="SOURCE_ERROR",
                 error="null_dataframe",
-                meta={"provider": "ssi_fr_trade_heatmap", "scope": self.scope},
+                meta=self._meta(provider_stdout=captured or None),
             )
         if getattr(df, "empty", True):
             return ProviderResult(
                 ok=False,
                 status="MISSING",
                 error="empty_dataframe",
-                meta={"provider": "ssi_fr_trade_heatmap", "scope": self.scope},
+                meta=self._meta(),
             )
 
         cols = {str(c).lower(): c for c in df.columns}
@@ -122,7 +136,7 @@ class SsiHoseForeignFlowProvider:
                 ok=False,
                 status="SOURCE_ERROR",
                 error=f"no_foreign_value_columns:{list(df.columns)[:20]}",
-                meta={"provider": "ssi_fr_trade_heatmap", "scope": self.scope},
+                meta=self._meta(),
             )
 
         def _sum_col(col: Optional[Any]) -> Optional[float]:
@@ -156,14 +170,15 @@ class SsiHoseForeignFlowProvider:
                 "foreign_sell_volume": sell_vol,
                 "foreign_net_volume": net_vol,
             },
-            meta={
-                "provider": "ssi_fr_trade_heatmap",
-                "scope": self.scope,
-                "n_rows": int(len(df)),
-                "observed_at": _utc_now_iso(),
-                "trade_date_requested": trade_date,
-                "note": "Live exchange heatmap; date is session-current when fetched after close",
-            },
+            meta=self._meta(
+                n_rows=int(len(df)),
+                observed_at=_utc_now_iso(),
+                trade_date_requested=trade_date,
+                note=(
+                    "Live HOSE exchange heatmap; response is session-current "
+                    "(no historical date parameter). Label as HOSE foreign flow, not whole-market."
+                ),
+            ),
         )
 
     @staticmethod
