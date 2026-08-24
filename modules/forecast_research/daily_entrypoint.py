@@ -190,10 +190,24 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--recover-historical", action="store_true", help="Run historical market core recovery")
     parser.add_argument("--mdrr-backfill", action="store_true", help="Backfill MDRR from EMS dates")
     parser.add_argument("--p0-collect", action="store_true", help="Collect P0 forward market memory")
+    parser.add_argument(
+        "--verify-p0-foreign-vps",
+        action="store_true",
+        help="Production-path probe for SSI foreign flow (run on /opt/mrbot-camera)",
+    )
     parser.add_argument("--all-research-memory", action="store_true", help="T0 freeze + mature + MDRR + historical + P0")
     args = parser.parse_args(argv)
 
     data_dir = Path(args.data_dir) if args.data_dir else None
+    if args.verify_p0_foreign_vps:
+        from modules.forecast_research.p0_foreign_vps_verify import run_verification
+
+        out = Path("diagnostics/p0_foreign_flow_vps_verification/last_probe.json")
+        payload = run_verification(trade_date=args.trade_date, persist_json=out)
+        print(json.dumps(payload, indent=2, default=str)[:20000])
+        # Non-zero only on unexpected tool failure; blocked/provider verdicts are informative.
+        return 0
+
     if args.matrix_only:
         path = write_feature_matrix(
             (data_dir or resolve_forecast_data_dir()) / "feature_availability_matrix.json"
