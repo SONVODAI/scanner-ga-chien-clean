@@ -107,15 +107,19 @@ Non-foreign P0 pieces (universe turnover, PIT ADV, VNINDEX tech) remain implemen
 
 ---
 
-## Operator: close this gap on the real VPS
+## Operator: close this gap on the real VPS (NO deploy)
+
+Missing `scripts/verify_p0_foreign_flow_on_vps.sh` on current VPS HEAD is **expected**
+(file only on unmerged PR #89). Prefer standalone probe — see
+`OPERATOR_STANDALONE_PROBE.md`.
 
 ```bash
-cd /opt/mrbot-camera
-# deploy this branch / PR tip first
-bash scripts/verify_p0_foreign_flow_on_vps.sh
-# or:
-python3 -m modules.forecast_research.daily_entrypoint --verify-p0-foreign-vps --trade-date YYYY-MM-DD
+curl -fsSL -o /tmp/standalone_ssi_foreign_flow_probe.py \
+  https://raw.githubusercontent.com/SONVODAI/scanner-ga-chien-clean/cursor/p0-foreign-flow-vps-verification-aad2/scripts/standalone_ssi_foreign_flow_probe.py
+python3 /tmp/standalone_ssi_foreign_flow_probe.py --out /tmp/ssi_foreign_probe.json
 ```
+
+Do **not** merge/deploy #85–#89 merely to run this test.
 
 Interpret `diagnostics/p0_foreign_flow_vps_verification/vps_probe.json`:
 
