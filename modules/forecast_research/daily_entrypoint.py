@@ -126,56 +126,41 @@ def maybe_freeze_after_market_daily(
     *,
     data_dir: Optional[Path] = None,
     mature: bool = True,
+    require_mdt0: bool = False,
 ) -> Dict[str, Any]:
     """
     Fail-safe hook for market_t0_capture after canonical daily T0 write.
     Never raises into Market First / trading path.
     Idempotent: ALREADY_FROZEN still counts as ok; maturity is append-only.
     Also writes MDRR + refreshes historical core for the date (fail-safe).
+
+    Streamlit path sets require_mdt0=False because MDT0 was just appended.
+    Unattended orchestration uses production_daily_integration with require_mdt0=True.
     """
     try:
-        freeze = freeze_trade_date(trade_date, data_dir=data_dir)
-        maturity: Dict[str, Any] = {"skipped": True}
-        if mature:
-            maturity = mature_all_outcomes(data_dir=data_dir)
-        mdrr: Dict[str, Any] = {"skipped": True}
-        hist: Dict[str, Any] = {"skipped": True}
-        p0: Dict[str, Any] = {"skipped": True}
-        try:
-            from modules.forecast_research.mdrr import maybe_write_mdrr_after_market_daily
+        from modules.forecast_research.production_daily_integration import (
+            run_forecast_memory_daily_stage,
+        )
 
-            mdrr = maybe_write_mdrr_after_market_daily(trade_date, data_dir=data_dir)
-        except Exception as exc:  # noqa: BLE001
-            mdrr = {"ok": False, "reason": f"mdrr_hook_error:{exc}"}
-        try:
-            from modules.forecast_research.historical_recovery import (
-                build_historical_record_for_date,
-                persist_historical_record,
-            )
-
-            rec = build_historical_record_for_date(trade_date)
-            if rec is not None:
-                ok, reason = persist_historical_record(rec, data_dir=data_dir)
-                hist = {"ok": True, "written": ok, "reason": reason, "quality_tier": rec.get("quality_tier")}
-            else:
-                hist = {"ok": False, "written": False, "reason": "no_evidence"}
-        except Exception as exc:  # noqa: BLE001
-            hist = {"ok": False, "reason": f"hist_hook_error:{exc}"}
-        try:
-            from modules.forecast_research.p0_daily import maybe_collect_p0_after_market_daily
-
-            p0 = maybe_collect_p0_after_market_daily(trade_date, data_dir=data_dir)
-        except Exception as exc:  # noqa: BLE001
-            p0 = {"ok": False, "reason": f"p0_hook_error:{exc}"}
+        stage = run_forecast_memory_daily_stage(
+            trade_date,
+            data_dir=data_dir,
+            require_mdt0=require_mdt0,
+            mature=mature,
+            write_pipeline_status=False,
+        )
+        freeze = stage.get("forecast_t0") or {}
         return {
-            "ok": bool(freeze.get("ok")),
-            "written": bool(freeze.get("written")),
-            "reason": freeze.get("reason"),
-            "completeness_status": freeze.get("completeness_status"),
-            "maturity": maturity,
-            "mdrr": mdrr,
-            "historical_core": hist,
-            "p0_market_memory": p0,
+            "ok": bool(stage.get("ok")),
+            "written": bool(stage.get("written")),
+            "reason": stage.get("reason"),
+            "completeness_status": stage.get("completeness_status"),
+            "maturity": stage.get("maturity"),
+            "mdrr": stage.get("mdrr"),
+            "historical_core": stage.get("historical_core"),
+            "p0_market_memory": stage.get("p0_market_memory"),
+            "stage_disposition": stage.get("stage_disposition"),
+            "mdt0_gate": stage.get("mdt0_gate"),
         }
     except Exception as exc:  # noqa: BLE001 — observer must not break capture
         return {"ok": False, "written": False, "reason": f"hook_error:{exc}"}
