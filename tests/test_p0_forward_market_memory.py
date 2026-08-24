@@ -37,14 +37,21 @@ class MockForeignOK:
             ok=True,
             status="OK",
             values={
-                "foreign_buy_value": self.buy,
-                "foreign_sell_value": self.sell,
-                "foreign_net_value": self.buy - self.sell,
-                "foreign_buy_volume": 10.0,
-                "foreign_sell_volume": 4.0,
-                "foreign_net_volume": 6.0,
+                "universe_foreign_buy_value": self.buy,
+                "universe_foreign_sell_value": self.sell,
+                "universe_foreign_net_value": self.buy - self.sell,
+                "universe_foreign_buy_volume": 10.0,
+                "universe_foreign_sell_volume": 4.0,
+                "universe_foreign_net_volume": 6.0,
             },
-            meta={"provider": "mock"},
+            meta={
+                "provider": "mock",
+                "completeness": "COMPLETE",
+                "expected_count": 142,
+                "observed_count": 142,
+                "completeness_ratio": 1.0,
+                "units": "VND",
+            },
         )
 
 
@@ -123,9 +130,13 @@ def test_foreign_buy_sell_net_consistent(tmp_path: Path):
         history_provider=MockHistory(_vni_hist()),
     )
     assert rec is not None
-    assert rec["foreign_buy_value"] == 100.0
-    assert rec["foreign_sell_value"] == 40.0
-    assert rec["foreign_net_value"] == 60.0
+    assert rec["universe_foreign_buy_value"] == 100.0
+    assert rec["universe_foreign_sell_value"] == 40.0
+    assert rec["universe_foreign_net_value"] == 60.0
+    assert rec["universe_foreign_units"] == "VND"
+    assert rec["universe_foreign_scope"] == "EMS_RESEARCH_UNIVERSE_142"
+    # Legacy HOSE-SSI fields stay null
+    assert rec["foreign_buy_value"] is None
 
 
 def test_missing_foreign_not_zero(tmp_path: Path):
@@ -142,10 +153,10 @@ def test_missing_foreign_not_zero(tmp_path: Path):
             foreign_provider=provider,
             history_provider=MockHistory(_vni_hist()),
         )
-        assert rec["foreign_buy_value"] is None
-        assert rec["foreign_sell_value"] is None
-        assert rec["foreign_net_value"] is None
-        assert rec["foreign_buy_value"] != 0
+        assert rec["universe_foreign_buy_value"] is None
+        assert rec["universe_foreign_sell_value"] is None
+        assert rec["universe_foreign_net_value"] is None
+        assert rec["universe_foreign_buy_value"] != 0
         assert rec["market_turnover_value"] is None  # official market turnover unavailable
 
 
@@ -278,10 +289,17 @@ def test_mdrr_immutability_preserved(tmp_path: Path):
     assert "foreign_net_value" not in before.columns or before["foreign_net_flow"].isna().all()
 
 
-def test_hook_fail_safe():
-    # invalid path still returns dict
-    out = maybe_collect_p0_after_market_daily("2026-08-24", data_dir=Path("/tmp/p0_hook_test_fr"))
-    assert "ok" in out or "reason" in out
+def test_hook_fail_safe(tmp_path: Path, monkeypatch):
+    # Prevent real HSX/VCI network from the default cascade
+    from modules.forecast_research import p0_daily as p0_daily_mod
+
+    def _fake_collect(trade_date, **kwargs):
+        return {"ok": True, "written": False, "reason": "stub"}
+
+    monkeypatch.setattr(p0_daily_mod, "collect_p0_for_date", _fake_collect)
+    out = maybe_collect_p0_after_market_daily("2026-08-24", data_dir=tmp_path / "fr")
+    assert out.get("ok") is True
+    assert out.get("reason") == "stub"
 
 
 def test_market_first_forecast_edge_surfaces_untouched():
@@ -306,6 +324,6 @@ def test_genuine_zero_foreign_allowed(tmp_path: Path):
         foreign_provider=MockForeignOK(0.0, 0.0),
         history_provider=MockHistory(_vni_hist()),
     )
-    assert rec["foreign_buy_value"] == 0.0
-    assert rec["foreign_sell_value"] == 0.0
-    assert rec["foreign_net_value"] == 0.0
+    assert rec["universe_foreign_buy_value"] == 0.0
+    assert rec["universe_foreign_sell_value"] == 0.0
+    assert rec["universe_foreign_net_value"] == 0.0

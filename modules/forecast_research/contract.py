@@ -76,7 +76,8 @@ MDRR_STATUS_FILE = "mdrr_pipeline_status.json"
 FORWARD_ONLY_REGISTRY_FILE = "forward_only_feature_registry.json"
 
 # --- P0 Forward Market Memory ---
-P0_SCHEMA_VERSION = "p0_market_memory_v1"
+# v2: universe_foreign_* (EMS 142 VALUE via HSX/VCI); legacy foreign_* HOSE-SSI fields retained as NULL.
+P0_SCHEMA_VERSION = "p0_market_memory_v2"
 P0_DAILY_FILE = "p0_market_daily.csv"
 P0_STATUS_FILE = "p0_market_pipeline_status.json"
 P0_COMPLETENESS_COMPLETE = "COMPLETE"
@@ -84,10 +85,12 @@ P0_COMPLETENESS_PARTIAL = "PARTIAL"
 P0_COMPLETENESS_WAITING = "WAITING"
 P0_COMPLETENESS_SOURCE_ERROR = "SOURCE_ERROR"
 
-# Foreign scope when using SSI exchange heatmap aggregation.
+# Legacy SSI HOSE heatmap scope (retired as preferred path; kept for provenance clarity).
 P0_FOREIGN_SCOPE_DEFAULT = "HOSE"
 # Universe turnover = sum(price * volume) over EMS board (research 142), not official exchange total.
 P0_UNIVERSE_TURNOVER_SCOPE = "EMS_RESEARCH_UNIVERSE_142"
+# Universe foreign flow = Σ EMS-membership-asof foreign VALUE (VND). NOT HOSE-wide / VNINDEX.
+P0_UNIVERSE_FOREIGN_SCOPE = "EMS_RESEARCH_UNIVERSE_142"
 # VNINDEX volume from index OHLCV provider (not VND market turnover).
 P0_VNINDEX_VOLUME_SCOPE = "VNINDEX_INDEX_VOLUME"
 
