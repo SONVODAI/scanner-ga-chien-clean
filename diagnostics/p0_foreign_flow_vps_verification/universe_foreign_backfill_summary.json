@@ -1,0 +1,32 @@
+{
+  "date_min": "2026-07-31",
+  "date_max": "2026-08-24",
+  "n_sessions": 17,
+  "complete_n": 1,
+  "partial_n": 16,
+  "complete_dates": [
+    "2026-08-24"
+  ],
+  "partial_dates": [
+    "2026-07-31",
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-05",
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-21"
+  ],
+  "membership_rule": "EMS_SNAPSHOT_DATE_EXACT",
+  "units": "VND",
+  "scope": "EMS_RESEARCH_UNIVERSE_142",
+  "note": "HSX covers HOSE-listed EMS names only (~117/142). Historical rows are honest PARTIAL. Forward COMPLETE uses coherent VCI when HSX cannot cover HNX/UPCOM members."
+}

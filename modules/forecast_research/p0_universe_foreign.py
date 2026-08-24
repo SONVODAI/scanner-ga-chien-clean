@@ -516,9 +516,15 @@ class UniverseForeignFlowCascade:
         primary = self.hsx.fetch(td)
         cross: Dict[str, Any] = {}
 
-        # HSX COMPLETE or PARTIAL with values → use HSX (single source)
-        if primary.ok and primary.values.get("universe_foreign_net_value") is not None:
-            if self.enable_cross_check and primary.meta.get("completeness") == P0_COMPLETENESS_COMPLETE:
+        hsx_complete = (
+            primary.ok
+            and primary.meta.get("completeness") == P0_COMPLETENESS_COMPLETE
+            and primary.values.get("universe_foreign_net_value") is not None
+        )
+        hsx_partial = primary.ok and primary.values.get("universe_foreign_net_value") is not None
+
+        if hsx_complete:
+            if self.enable_cross_check:
                 try:
                     fb = self.vci.fetch(td)
                     if fb.ok and fb.values.get("universe_foreign_net_value") is not None:
@@ -541,15 +547,32 @@ class UniverseForeignFlowCascade:
             primary.meta.update(cross)
             return primary
 
-        # Fallback VCI only when HSX failed / empty
+        # Prefer a coherent VCI aggregate when HSX cannot be COMPLETE (e.g. EMS has HNX/UPCOM).
         fallback = self.vci.fetch(td)
-        if fallback.ok and fallback.values.get("universe_foreign_net_value") is not None:
+        vci_complete = (
+            fallback.ok
+            and fallback.meta.get("completeness") == P0_COMPLETENESS_COMPLETE
+            and fallback.values.get("universe_foreign_net_value") is not None
+        )
+        if vci_complete:
             fallback.meta["source_hierarchy"] = "VCI_FALLBACK"
+            fallback.meta["primary_hsx_status"] = primary.status
+            fallback.meta["primary_hsx_completeness"] = primary.meta.get("completeness")
+            fallback.meta["primary_hsx_error"] = primary.error
+            return fallback
+
+        if hsx_partial:
+            primary.meta["source_hierarchy"] = "HSX_PARTIAL"
+            primary.meta["vci_fallback_status"] = fallback.status
+            primary.meta["vci_fallback_error"] = fallback.error
+            return primary
+
+        if fallback.ok and fallback.values.get("universe_foreign_net_value") is not None:
+            fallback.meta["source_hierarchy"] = "VCI_FALLBACK_PARTIAL"
             fallback.meta["primary_hsx_status"] = primary.status
             fallback.meta["primary_hsx_error"] = primary.error
             return fallback
 
-        # Neither usable
         meta = {
             "provider": "universe_foreign_cascade",
             "scope": P0_UNIVERSE_FOREIGN_SCOPE,

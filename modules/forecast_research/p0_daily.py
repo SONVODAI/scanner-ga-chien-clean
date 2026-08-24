@@ -119,14 +119,32 @@ def _universe_foreign_null(row: pd.Series) -> bool:
     return False
 
 
+def _needs_universe_foreign_enrichment(row: pd.Series, trade_date: str) -> bool:
+    """
+    Enrich when foreign fields are null, or when PARTIAL on the current calendar
+    session (VCI may complete multi-exchange EMS membership).
+    Do not re-hammer historical PARTIAL rows.
+    """
+    from datetime import date
+
+    if _universe_foreign_null(row):
+        return True
+    comp = str(row.get("universe_foreign_completeness") or "")
+    if comp == P0_COMPLETENESS_COMPLETE:
+        return False
+    return str(trade_date)[:10] == date.today().isoformat()
+
+
 def enrich_p0_universe_foreign(
     record_patch: Dict[str, Any],
     *,
     data_dir: Optional[Path] = None,
+    force: bool = False,
 ) -> Tuple[bool, str]:
     """
-    Fill universe_foreign_* on an existing P0 row only when those fields are still null.
-    Does not rewrite turnover/tech/MDT0/MDRR/Forecast. Preserves other columns.
+    Fill/upgrade universe_foreign_* on an existing P0 row.
+    Default: only when null. force=True allows PARTIAL→COMPLETE upgrade.
+    Does not rewrite turnover/tech/MDT0/MDRR/Forecast.
     """
     path = p0_path(data_dir)
     existing = load_p0_table(data_dir)
@@ -137,13 +155,18 @@ def enrich_p0_universe_foreign(
     if not mask.any():
         return False, "NO_EXISTING_ROW"
     idx = existing.index[mask][-1]
-    if not _universe_foreign_null(existing.loc[idx]):
+    if not force and not _universe_foreign_null(existing.loc[idx]):
+        return False, "FOREIGN_ALREADY_PRESENT"
+    if (
+        force
+        and not _universe_foreign_null(existing.loc[idx])
+        and str(existing.loc[idx].get("universe_foreign_completeness") or "") == P0_COMPLETENESS_COMPLETE
+    ):
         return False, "FOREIGN_ALREADY_PRESENT"
 
     for key, val in record_patch.items():
         if key in ("trade_date", "created_at", "record_hash"):
             continue
-        # Only enrich foreign-related / provenance / schema markers
         if key.startswith("universe_foreign") or key in (
             "foreign_flow_scope",
             "schema_version",
@@ -154,7 +177,6 @@ def enrich_p0_universe_foreign(
         ):
             existing.at[idx, key] = val
 
-    # Recompute hash for the enriched row
     row = existing.loc[idx].to_dict()
     hash_body = {k: v for k, v in row.items() if k not in ("created_at", "record_hash")}
     existing.at[idx, "record_hash"] = _stable_hash(hash_body)
@@ -539,11 +561,12 @@ def collect_p0_for_date(
     existing = load_p0_table(data_dir)
     if not existing.empty and (existing["trade_date"].astype(str).str[:10] == trade_date).any():
         row = existing[existing["trade_date"].astype(str).str[:10] == trade_date].iloc[-1]
-        if allow_foreign_enrichment and _universe_foreign_null(row):
+        if allow_foreign_enrichment and _needs_universe_foreign_enrichment(row, trade_date):
             record = build_p0_record(trade_date, data_dir=data_dir, **kwargs)
             if record is None:
                 return {"ok": False, "written": False, "reason": "non_trading_or_empty", "trade_date": trade_date}
-            ok, reason = enrich_p0_universe_foreign(record, data_dir=data_dir)
+            force = not _universe_foreign_null(row)
+            ok, reason = enrich_p0_universe_foreign(record, data_dir=data_dir, force=force)
             update_forward_only_registry_from_p0(data_dir=data_dir)
             return {
                 "ok": True,
