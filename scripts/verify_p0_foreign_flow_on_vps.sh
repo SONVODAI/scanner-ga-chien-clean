@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
-# Run on the REAL production VPS only.
-# Usage (as the production app user):
+# Run on the REAL production VPS only — AFTER this branch is present in the checkout.
+#
+# If this file is missing on VPS, that is NOT provider failure: it only exists on
+# unmerged PR #89. Prefer the standalone probe with NO deploy:
+#   curl -fsSL -o /tmp/standalone_ssi_foreign_flow_probe.py \
+#     https://raw.githubusercontent.com/SONVODAI/scanner-ga-chien-clean/cursor/p0-foreign-flow-vps-verification-aad2/scripts/standalone_ssi_foreign_flow_probe.py
+#   python3 /tmp/standalone_ssi_foreign_flow_probe.py --out /tmp/ssi_foreign_probe.json
+# See diagnostics/p0_foreign_flow_vps_verification/OPERATOR_STANDALONE_PROBE.md
+#
+# Usage (only when this script exists in the checkout):
 #   cd /opt/mrbot-camera
 #   bash scripts/verify_p0_foreign_flow_on_vps.sh
 # Optional:
@@ -18,6 +26,12 @@ mkdir -p "${OUT_DIR}"
 
 if [[ ! -d "${REPO}/modules/forecast_research" ]]; then
   echo "ERROR: ${REPO} is not a Mr.BOT checkout with forecast_research. Refusing." >&2
+  echo "Use scripts/standalone_ssi_foreign_flow_probe.py via /tmp instead (no deploy)." >&2
+  exit 2
+fi
+if [[ ! -f "${REPO}/modules/forecast_research/p0_foreign_vps_verify.py" ]]; then
+  echo "ERROR: p0_foreign_vps_verify.py missing (PR #89 not in this checkout)." >&2
+  echo "Use /tmp standalone probe — see OPERATOR_STANDALONE_PROBE.md" >&2
   exit 2
 fi
 
