@@ -43,7 +43,7 @@ def compute_panel_hash(panel: pd.DataFrame) -> str:
 
 
 def compute_dataset_identities(panel: pd.DataFrame) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
-    identities = ["pattern_lifecycle", "market_t0_snapshot", "outcomes"]
+    identities = ["observations", "t0_observation_freeze", "market_t0_snapshot", "outcomes"]
     hashes = [compute_panel_hash(panel)]
     return tuple(identities), tuple(hashes)
 

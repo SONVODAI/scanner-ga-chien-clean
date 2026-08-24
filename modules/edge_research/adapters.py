@@ -59,6 +59,57 @@ def load_observations(path: Optional[Path] = None) -> pd.DataFrame:
     return _read_csv(p)
 
 
+def load_t0_observation_freeze(path: Optional[Path] = None) -> pd.DataFrame:
+    """Authoritative AFTER_CLOSE T0 freeze rows (may start later than observations)."""
+    p = path or (EARNING_LEARNING_DIR / "t0_observation_freeze.csv")
+    return _read_csv(p)
+
+
+def load_pattern_snapshot(path: Optional[Path] = None) -> pd.DataFrame:
+    p = path or (EARNING_LEARNING_DIR / "pattern_snapshot.csv")
+    return _read_csv(p)
+
+
+def load_production_t0_stock_frame() -> pd.DataFrame:
+    """
+    Resolve T0 stock rows for the research panel without waiting for outcomes.
+
+    Root cause of panel lag: pattern_lifecycle is built ONLY from observations that
+    already appear in outcomes.csv (outcome-gated). Fresh EOD observations therefore
+    never enter a lifecycle-only panel until T3+ matures.
+
+    Production T0 membership uses:
+      1) observations.csv (full T0 history),
+      2) overlay t0_observation_freeze.csv when present (authoritative EOD freeze).
+    Forward labels remain attached separately via outcomes.csv / OHLCV.
+    """
+    obs = load_observations()
+    freeze = load_t0_observation_freeze()
+    if obs.empty and freeze.empty:
+        # Last-resort historical fallback (outcome-gated; may lag current EOD).
+        return load_lifecycle()
+    if freeze.empty:
+        return obs
+    if obs.empty:
+        return freeze
+
+    obs = obs.copy()
+    freeze = freeze.copy()
+    for frame in (obs, freeze):
+        if "trade_date" not in frame.columns and "date" in frame.columns:
+            frame["trade_date"] = frame["date"]
+        frame["trade_date"] = pd.to_datetime(frame["trade_date"], errors="coerce").dt.strftime("%Y-%m-%d")
+        frame["symbol"] = frame["symbol"].astype(str)
+
+    # Drop observation rows that have an authoritative freeze replacement.
+    freeze_keys = freeze[["trade_date", "symbol"]].drop_duplicates()
+    freeze_keys["_freeze_hit"] = 1
+    obs_marked = obs.merge(freeze_keys, on=["trade_date", "symbol"], how="left")
+    obs_only = obs_marked[obs_marked["_freeze_hit"].isna()].drop(columns=["_freeze_hit"])
+    combined = pd.concat([obs_only, freeze], ignore_index=True, sort=False)
+    return combined.drop_duplicates(subset=["trade_date", "symbol"], keep="last")
+
+
 def load_raw_market_snapshots(
     start: Optional[str] = None,
     end: Optional[str] = None,
@@ -214,6 +265,7 @@ def _stock_panel_from_lifecycle(
     panel_manifest: Optional[PanelExposureManifest] = None,
     contract_wired: Optional[FrozenSet[str]] = None,
 ) -> pd.DataFrame:
+    """Map a T0 stock frame (lifecycle / observations / freeze) into panel columns."""
     manifest = panel_manifest if panel_manifest is not None else get_active_panel_exposure_manifest()
     wired_optional = governed_wired_stock_columns(manifest, contract_wired=contract_wired)
     optional_cols = sorted(wired_optional - CORE_STOCK_PANEL_FIELDS)
@@ -255,30 +307,50 @@ def _stock_panel_from_lifecycle(
     return out.drop_duplicates(subset=["trade_date", "symbol"], keep="last")
 
 
+def _resolve_stock_source_frame(
+    source: str,
+    lifecycle: Optional[pd.DataFrame] = None,
+) -> pd.DataFrame:
+    """Select the T0 stock source frame for panel construction."""
+    if lifecycle is not None:
+        return lifecycle
+    if source in ("production_t0", "auto", "observations_with_freeze"):
+        return load_production_t0_stock_frame()
+    if source == "observations":
+        return load_observations()
+    if source == "t0_observation_freeze":
+        return load_t0_observation_freeze()
+    if source == "verified_decisions":
+        return load_verified_decisions()
+    if source == "pattern_snapshot":
+        return load_pattern_snapshot()
+    # Legacy default retained for explicit callers / tests.
+    return load_lifecycle()
+
+
 def build_research_panel(
     start: Optional[str] = None,
     end: Optional[str] = None,
     lifecycle: Optional[pd.DataFrame] = None,
     ohlcv_by_symbol: Optional[Dict[str, pd.DataFrame]] = None,
-    source: str = "pattern_lifecycle",
+    source: str = "production_t0",
     panel_manifest: Optional[PanelExposureManifest] = None,
     contract_wired: Optional[FrozenSet[str]] = None,
 ) -> pd.DataFrame:
     """
     Build canonical research panel (read-only sources).
 
-    T0 features from lifecycle/observations.
+    Default source ``production_t0`` uses observations (+ freeze overlay) so the
+    panel includes current EOD T0 rows without waiting for outcome maturity.
+    Explicit ``source="pattern_lifecycle"`` restores the legacy outcome-gated path.
+
+    T0 features from the selected stock source.
     Forward labels from trading-session OHLCV when provided — never from
     lifecycle t*_return_pct (observation-row semantics).
     """
-    if lifecycle is None:
-        if source == "verified_decisions":
-            lifecycle = load_verified_decisions()
-        else:
-            lifecycle = load_lifecycle()
-
+    stock_src = _resolve_stock_source_frame(source, lifecycle=lifecycle)
     stock = _stock_panel_from_lifecycle(
-        lifecycle,
+        stock_src,
         start=start,
         end=end,
         panel_manifest=panel_manifest,
@@ -385,5 +457,9 @@ def earning_learning_digests() -> Dict[str, Optional[str]]:
         "decision_archive.csv",
         "pattern_knowledge.csv",
         "continuation_knowledge.csv",
+        "pattern_snapshot.csv",
+        "market_t0_snapshot.csv",
+        "market_daily_t0.csv",
+        "outcomes.csv",
     ]
     return {n: file_digest(EARNING_LEARNING_DIR / n) for n in names}

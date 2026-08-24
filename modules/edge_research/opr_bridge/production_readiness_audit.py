@@ -29,7 +29,7 @@ def audit_end_to_end_architecture() -> Dict[str, Any]:
     boundaries = [
         {
             "stage": "REAL_EOD_DATA",
-            "input": "pattern_lifecycle.csv, market_t0_snapshot.csv, outcomes.csv",
+            "input": "observations.csv + t0_observation_freeze.csv (production_t0); market_t0_snapshot.csv; outcomes.csv",
             "output": "build_research_panel() DataFrame",
             "persistence": "read-only from data/earning_learning/",
             "identity": "source_dataset_hash on run record",

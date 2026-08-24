@@ -59,7 +59,10 @@ CAPABILITY_REGISTRY_VERSION = "research_capability_registry_v1"
 LABORATORY_MAP_VERSION = "research_laboratory_map_v1"
 
 # Research panel build path — wired in adapters.build_research_panel.
+# production_t0 default uses observations + freeze overlay (not outcome-gated lifecycle).
 _RESEARCH_PANEL_SOURCES: Tuple[Tuple[str, Path, bool], ...] = (
+    ("observations", EARNING_LEARNING_DIR / "observations.csv", True),
+    ("t0_observation_freeze", EARNING_LEARNING_DIR / "t0_observation_freeze.csv", True),
     ("pattern_lifecycle", EARNING_LEARNING_DIR / "pattern_lifecycle.csv", True),
     ("market_t0_snapshot", MARKET_T0_SNAPSHOT_PATH, True),
     ("pattern_history", PATTERN_HISTORY_PATH, True),
@@ -105,24 +108,14 @@ _DISCOVERED_NON_RESEARCH_SOURCES: Tuple[Tuple[str, Path, str], ...] = (
         "NOT_WIRED_TO_RESEARCH_PANEL_OR_TOOLS",
     ),
     (
-        "pattern_snapshot",
-        EARNING_LEARNING_DIR / "pattern_snapshot.csv",
-        "NOT_WIRED_TO_RESEARCH_PANEL_OR_TOOLS",
-    ),
-    (
         "verified_decisions",
         EARNING_LEARNING_DIR / "verified_decisions.csv",
         "ALTERNATE_PANEL_SOURCE_NOT_DEFAULT",
     ),
     (
-        "observations",
-        EARNING_LEARNING_DIR / "observations.csv",
+        "pattern_snapshot",
+        EARNING_LEARNING_DIR / "pattern_snapshot.csv",
         "ALTERNATE_PANEL_SOURCE_NOT_DEFAULT",
-    ),
-    (
-        "t0_observation_freeze",
-        EARNING_LEARNING_DIR / "t0_observation_freeze.csv",
-        "NOT_WIRED_TO_RESEARCH_PANEL_OR_TOOLS",
     ),
     (
         "intraday_camera_memory",
@@ -343,7 +336,9 @@ def discover_system_data_sources() -> List[CapabilityEntry]:
                 metadata={
                     "digest_sha256": file_digest(path),
                     "research_panel_wired": research_wired,
-                    "canonical_stock_source": source_id == "pattern_lifecycle",
+                    "canonical_stock_source": source_id
+                    in ("observations", "t0_observation_freeze", "production_t0"),
+                    "legacy_outcome_gated_source": source_id == "pattern_lifecycle",
                 },
             )
         )
