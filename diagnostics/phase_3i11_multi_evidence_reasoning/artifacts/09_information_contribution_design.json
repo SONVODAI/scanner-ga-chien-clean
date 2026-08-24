@@ -1,0 +1,16 @@
+{
+  "mechanism": "lexicographic_marginal_information_v1_3i11",
+  "ordered_checks": [
+    "covers_new_uncertainty_dimension",
+    "increases_independence_on_untested_dimension",
+    "resolves_existing_contradiction",
+    "robustness_gain_non_redundant",
+    "falsification_opportunity_unexhausted",
+    "evidence_saturation_not_reached"
+  ],
+  "rejects": [
+    "experiment_count",
+    "majority_vote",
+    "N_confirmations_rule"
+  ]
+}

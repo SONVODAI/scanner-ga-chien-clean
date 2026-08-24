@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "import_hits": [],
+  "write_hits": [],
+  "modules_audited": [
+    "production_research_observation.py",
+    "production_observation_records.py",
+    "production_observation_cutoff.py",
+    "production_observation_persistence.py",
+    "production_observation_narrative.py",
+    "production_observation_isolation.py",
+    "production_living_observation_records.py",
+    "production_living_observation_persistence.py",
+    "production_market_delta.py",
+    "production_forward_outcome_evaluator.py",
+    "production_observation_lifecycle.py",
+    "production_daily_assessment.py",
+    "production_daily_voice.py",
+    "production_living_read_model.py",
+    "production_living_research_observation.py",
+    "production_daily_run_records.py",
+    "production_trading_session_eligibility.py",
+    "production_data_readiness_gate.py",
+    "production_forward_clock.py",
+    "production_daily_run_persistence.py",
+    "production_daily_run_observability.py",
+    "production_daily_manifest.py",
+    "production_scheduling_contract.py",
+    "production_notification_contract.py",
+    "production_daily_run_orchestrator.py",
+    "production_daily_run_entrypoint.py"
+  ]
+}

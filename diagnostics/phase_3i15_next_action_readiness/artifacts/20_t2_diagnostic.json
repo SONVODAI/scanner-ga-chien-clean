@@ -1,0 +1,80 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "synthesis_id": "syn-668415e243a8",
+  "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+  "state": "SUPPORTED",
+  "e2_relationship": "PARTIAL_REPLICATION",
+  "priority": "SEEK_FALSIFICATION",
+  "redundant_test_axes": [
+    "episode_robustness"
+  ],
+  "unresolved": [
+    "temporal_regime_robustness",
+    "population_robustness",
+    "horizon_robustness",
+    "effect_stability",
+    "concentration_dominance",
+    "measurement_robustness",
+    "counterexample_exposure",
+    "alternative_explanation_exposure",
+    "regime_context_robustness"
+  ],
+  "diagnostic_questions": {
+    "A_scientific_objectives_derivable_without_human": {
+      "current_system": "NONE autonomously",
+      "design_derivable": [
+        {
+          "objective": "challenge temporal_regime_robustness",
+          "source": "uncertainty_unresolved + SEEK_FALSIFICATION"
+        },
+        {
+          "objective": "challenge population_robustness",
+          "source": "uncertainty_unresolved + LOW population_independence on E2"
+        },
+        {
+          "objective": "test concentration_dominance",
+          "source": "uncertainty_unresolved + null text"
+        },
+        {
+          "objective": "seek counterexample_exposure",
+          "source": "uncertainty_unresolved + disconfirming_spec"
+        }
+      ],
+      "note": "Objectives are inferable from frozen state but no component emits ScientificObjectiveRecord"
+    },
+    "B_multiple_distinct_candidate_actions": {
+      "current_system": "NO \u2014 3I.9 would emit only holdout (redundant)",
+      "design_distinct_candidates": [
+        "regime-separated quintile contrast (temporal_regime_robustness)",
+        "population subgroup contrast excluding prior overlap (population_robustness)",
+        "symbol concentration decomposition (concentration_dominance)",
+        "counterexample period search (counterexample_exposure)"
+      ],
+      "same_action_not_distinct": "Another episode holdout \u2014 REDUNDANT per redundant_test_axes"
+    },
+    "C_executable_with_current_tools": {
+      "partition_group_compare": [
+        "regime-separated contrast \u2014 EXECUTABLE if regime column available",
+        "population filter contrast \u2014 EXECUTABLE",
+        "holdout \u2014 EXECUTABLE_BUT_LOW_INFORMATION (redundant)"
+      ],
+      "date_decomposition": "temporal stability \u2014 may be EXECUTABLE_BUT_LOW_INFORMATION if not falsification-aligned",
+      "symbol-level tools": "concentration \u2014 may be SCIENTIFICALLY_VALID_NOT_EXECUTABLE"
+    },
+    "D_dominant_by_pre_result_information": {
+      "current_system": "Cannot compute \u2014 no candidate set",
+      "design_ranking": [
+        "1. Regime-separated falsification (temporal_regime \u2014 major, non-redundant, falsification-capable)",
+        "2. Population independence contrast (population_robustness \u2014 E2 overlap 97.7%)",
+        "3. Counterexample search (counterexample_exposure)",
+        "REJECT: independent_episode_holdout (redundant_test_axes)"
+      ],
+      "lexicographic_basis": "non-redundant major axis + independence gain + falsification alignment"
+    },
+    "E_selected_without_knowing_future_result": {
+      "current_system": "N/A",
+      "design": "YES \u2014 ranking uses only ledger, synthesis, proposition commitments"
+    }
+  },
+  "execution_status": "NOT_EXECUTED \u2014 diagnostic only"
+}

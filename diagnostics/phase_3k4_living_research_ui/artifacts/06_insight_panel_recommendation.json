@@ -1,0 +1,6 @@
+{
+  "existing_panel": "render_bot_learning_insight() in app.py",
+  "recommendation": "RETAIN_AS_LEGACY",
+  "rationale": "BOT Learning Insight summarizes aggregate T3/T5/T10 lifecycle learning from data/earning_learning/. Living Research UI surfaces daily production research voice from 3K.0\u20133K.3 persisted records. Different questions, different authority. Legacy panel now labeled explicitly; no contradictory opinions without authority explanation.",
+  "action_taken": "Added legacy caption to BOT Learning Insight pointing users to Living Research UI"
+}
