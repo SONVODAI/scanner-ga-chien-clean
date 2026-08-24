@@ -2,7 +2,7 @@
 P0 Forward Market Memory — canonical daily raw + derived features.
 
 Separate from Forecast T0 and MDRR immutability:
-- Writes p0_market_daily.csv (first-write-wins)
+- Writes p0_market_daily.csv (first-write-wins; foreign enrichment allowed when null)
 - Does not rewrite frozen MDRR / forecast_t0 / MDT0 rows
 - Missing ≠ 0
 """
@@ -29,6 +29,7 @@ from modules.forecast_research.contract import (
     P0_FOREIGN_SCOPE_DEFAULT,
     P0_SCHEMA_VERSION,
     P0_STATUS_FILE,
+    P0_UNIVERSE_FOREIGN_SCOPE,
     P0_UNIVERSE_TURNOVER_SCOPE,
     P0_VNINDEX_VOLUME_SCOPE,
     FORWARD_ONLY_REGISTRY_FILE,
@@ -38,18 +39,30 @@ from modules.forecast_research.p0_indicators import indicators_asof
 from modules.forecast_research.p0_providers import (
     ForeignFlowProvider,
     ProviderResult,
-    SsiHoseForeignFlowProvider,
     VnindexHistoryProvider,
     VnstockVnindexHistoryProvider,
     compute_universe_turnover_from_ems,
     vnindex_volume_from_mdt0_or_fetch,
     _finite_or_none,
 )
+from modules.forecast_research.p0_universe_foreign import (
+    UniverseForeignFlowCascade,
+    empty_universe_foreign_values,
+)
 from modules.forecast_research.t0_builder import DEFAULT_EMS, DEFAULT_MDT0
 from modules.forecast_research.t0_persistence import resolve_forecast_data_dir
 
 logger = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+UNIVERSE_FOREIGN_VALUE_FIELDS = (
+    "universe_foreign_buy_value",
+    "universe_foreign_sell_value",
+    "universe_foreign_net_value",
+    "universe_foreign_buy_volume",
+    "universe_foreign_sell_volume",
+    "universe_foreign_net_volume",
+)
 
 
 def _utc_now_iso() -> str:
@@ -90,8 +103,66 @@ def persist_p0_record(
     return True, "WRITTEN"
 
 
+def _universe_foreign_null(row: pd.Series) -> bool:
+    if "universe_foreign_net_value" not in row.index:
+        return True
+    v = row.get("universe_foreign_net_value")
+    if v is None or (isinstance(v, float) and np.isnan(v)):
+        return True
+    if isinstance(v, str) and v.strip() == "":
+        return True
+    try:
+        if pd.isna(v):
+            return True
+    except Exception:  # noqa: BLE001
+        pass
+    return False
+
+
+def enrich_p0_universe_foreign(
+    record_patch: Dict[str, Any],
+    *,
+    data_dir: Optional[Path] = None,
+) -> Tuple[bool, str]:
+    """
+    Fill universe_foreign_* on an existing P0 row only when those fields are still null.
+    Does not rewrite turnover/tech/MDT0/MDRR/Forecast. Preserves other columns.
+    """
+    path = p0_path(data_dir)
+    existing = load_p0_table(data_dir)
+    td = str(record_patch["trade_date"])[:10]
+    if existing.empty or "trade_date" not in existing.columns:
+        return False, "NO_EXISTING_ROW"
+    mask = existing["trade_date"].astype(str).str[:10] == td
+    if not mask.any():
+        return False, "NO_EXISTING_ROW"
+    idx = existing.index[mask][-1]
+    if not _universe_foreign_null(existing.loc[idx]):
+        return False, "FOREIGN_ALREADY_PRESENT"
+
+    for key, val in record_patch.items():
+        if key in ("trade_date", "created_at", "record_hash"):
+            continue
+        # Only enrich foreign-related / provenance / schema markers
+        if key.startswith("universe_foreign") or key in (
+            "foreign_flow_scope",
+            "schema_version",
+            "provenance_json",
+            "observed_at",
+            "completeness_status",
+            "forward_only",
+        ):
+            existing.at[idx, key] = val
+
+    # Recompute hash for the enriched row
+    row = existing.loc[idx].to_dict()
+    hash_body = {k: v for k, v in row.items() if k not in ("created_at", "record_hash")}
+    existing.at[idx, "record_hash"] = _stable_hash(hash_body)
+    existing.to_csv(path, index=False)
+    return True, "ENRICHED"
+
+
 def _avg_turnover(prior_values: Sequence[float], window: int) -> Optional[float]:
-    """PIT average of last `window` values including current (caller supplies ordered list)."""
     if len(prior_values) < window:
         return None
     chunk = prior_values[-window:]
@@ -106,11 +177,6 @@ def derive_avg_turnover_from_p0(
     *,
     data_dir: Optional[Path] = None,
 ) -> Dict[str, Optional[float]]:
-    """
-    avg_turnover_value_{5,10,20} = mean of universe_turnover_value over last N
-    trading sessions including current, using only already-persisted P0 rows
-    with dates < trade_date plus current value (no future).
-    """
     out = {"avg_turnover_value_5": None, "avg_turnover_value_10": None, "avg_turnover_value_20": None}
     if current_turnover is None:
         return out
@@ -150,14 +216,12 @@ def derive_vnindex_technicals(
     if hist.empty or "close" not in hist.columns:
         meta["status"] = "SOURCE_ERROR"
         return empty, meta
-    # Restrict to <= trade_date (no future)
     hist = hist[hist["date"].astype(str).str[:10] <= trade_date].copy()
     if hist.empty:
         meta["status"] = "MISSING"
         return empty, meta
     dates = hist["date"].astype(str).str[:10].tolist()
     if trade_date not in dates:
-        # still compute asof last available <= trade_date? Prefer exact session.
         meta["status"] = "MISSING"
         meta["last_available"] = dates[-1]
         return empty, meta
@@ -171,7 +235,6 @@ def derive_vnindex_technicals(
 
 def _merge_status(parts: List[str]) -> str:
     if any(p == P0_COMPLETENESS_SOURCE_ERROR for p in parts):
-        # If anything useful was collected, prefer PARTIAL over pure SOURCE_ERROR
         if any(p in (P0_COMPLETENESS_COMPLETE, P0_COMPLETENESS_PARTIAL) for p in parts):
             return P0_COMPLETENESS_PARTIAL
         if all(p == P0_COMPLETENESS_SOURCE_ERROR for p in parts):
@@ -185,6 +248,30 @@ def _merge_status(parts: List[str]) -> str:
     if any(p == P0_COMPLETENESS_COMPLETE for p in parts) or any(p == P0_COMPLETENESS_PARTIAL for p in parts):
         return P0_COMPLETENESS_PARTIAL
     return P0_COMPLETENESS_WAITING
+
+
+def _normalize_foreign_provider_values(fr: ProviderResult) -> Dict[str, Optional[float]]:
+    """Accept universe_foreign_* or legacy mock foreign_* keys."""
+    vals = empty_universe_foreign_values()
+    src = fr.values or {}
+    mapping = {
+        "universe_foreign_buy_value": ("universe_foreign_buy_value", "foreign_buy_value"),
+        "universe_foreign_sell_value": ("universe_foreign_sell_value", "foreign_sell_value"),
+        "universe_foreign_net_value": ("universe_foreign_net_value", "foreign_net_value"),
+        "universe_foreign_buy_volume": ("universe_foreign_buy_volume", "foreign_buy_volume"),
+        "universe_foreign_sell_volume": ("universe_foreign_sell_volume", "foreign_sell_volume"),
+        "universe_foreign_net_volume": ("universe_foreign_net_volume", "foreign_net_volume"),
+    }
+    for dest, keys in mapping.items():
+        for k in keys:
+            if k in src and src[k] is not None:
+                vals[dest] = _finite_or_none(src[k])
+                break
+    if vals["universe_foreign_buy_value"] is not None and vals["universe_foreign_sell_value"] is not None:
+        vals["universe_foreign_net_value"] = (
+            vals["universe_foreign_buy_value"] - vals["universe_foreign_sell_value"]
+        )
+    return vals
 
 
 def build_p0_record(
@@ -201,14 +288,60 @@ def build_p0_record(
     if not is_weekday_session(trade_date):
         return None
 
-    foreign_provider = foreign_provider or SsiHoseForeignFlowProvider()
+    foreign_provider = foreign_provider or UniverseForeignFlowCascade(ems_path=ems_path)
     history_provider = history_provider or VnstockVnindexHistoryProvider()
 
     statuses: List[str] = []
     provenance: Dict[str, Any] = {}
 
-    # --- Foreign ---
-    foreign_vals = {
+    # --- Universe foreign (HSX → VCI) ---
+    u_foreign = empty_universe_foreign_values()
+    u_foreign_meta: Dict[str, Any] = {
+        "completeness": P0_COMPLETENESS_WAITING,
+        "expected_count": None,
+        "observed_count": None,
+        "completeness_ratio": None,
+        "source": None,
+        "units": "VND",
+        "scope": P0_UNIVERSE_FOREIGN_SCOPE,
+    }
+    if collect_foreign:
+        fr: ProviderResult = foreign_provider.fetch(trade_date)
+        provenance["universe_foreign"] = {"status": fr.status, "meta": fr.meta, "error": fr.error}
+        u_foreign_meta.update(
+            {
+                "completeness": fr.meta.get("completeness") or P0_COMPLETENESS_WAITING,
+                "expected_count": fr.meta.get("expected_count"),
+                "observed_count": fr.meta.get("observed_count"),
+                "completeness_ratio": fr.meta.get("completeness_ratio"),
+                "source": fr.meta.get("provider") or fr.meta.get("source_hierarchy"),
+                "missing_symbols": fr.meta.get("missing_symbols"),
+                "universe_hash": fr.meta.get("universe_hash"),
+                "units": fr.meta.get("units") or "VND",
+                "report_date_match_required": fr.meta.get("report_date_match_required", True),
+            }
+        )
+        if fr.ok and fr.values:
+            u_foreign = _normalize_foreign_provider_values(fr)
+            # Incomplete universe cannot be COMPLETE
+            if fr.meta.get("completeness") == P0_COMPLETENESS_COMPLETE:
+                if (fr.meta.get("observed_count") or 0) < (fr.meta.get("expected_count") or EXPECTED_UNIVERSE_SIZE):
+                    u_foreign_meta["completeness"] = P0_COMPLETENESS_PARTIAL
+            statuses.append(
+                P0_COMPLETENESS_COMPLETE
+                if u_foreign_meta["completeness"] == P0_COMPLETENESS_COMPLETE
+                else P0_COMPLETENESS_PARTIAL
+                if u_foreign.get("universe_foreign_net_value") is not None
+                else P0_COMPLETENESS_WAITING
+            )
+        elif fr.status == "SOURCE_ERROR":
+            u_foreign_meta["completeness"] = P0_COMPLETENESS_SOURCE_ERROR
+            statuses.append(P0_COMPLETENESS_SOURCE_ERROR)
+        else:
+            statuses.append(P0_COMPLETENESS_WAITING)
+
+    # Legacy HOSE-SSI fields: intentionally NULL (retired preferred path)
+    legacy_foreign = {
         "foreign_buy_value": None,
         "foreign_sell_value": None,
         "foreign_net_value": None,
@@ -216,21 +349,6 @@ def build_p0_record(
         "foreign_sell_volume": None,
         "foreign_net_volume": None,
     }
-    if collect_foreign:
-        fr: ProviderResult = foreign_provider.fetch(trade_date)
-        provenance["foreign"] = {"status": fr.status, "meta": fr.meta, "error": fr.error}
-        if fr.ok and fr.status == "OK":
-            foreign_vals.update({k: _finite_or_none(fr.values.get(k)) for k in foreign_vals})
-            # Consistency: net = buy - sell when both present
-            if foreign_vals["foreign_buy_value"] is not None and foreign_vals["foreign_sell_value"] is not None:
-                foreign_vals["foreign_net_value"] = (
-                    foreign_vals["foreign_buy_value"] - foreign_vals["foreign_sell_value"]
-                )
-            statuses.append(P0_COMPLETENESS_PARTIAL if any(v is not None for v in foreign_vals.values()) else P0_COMPLETENESS_WAITING)
-        elif fr.status == "SOURCE_ERROR":
-            statuses.append(P0_COMPLETENESS_SOURCE_ERROR)
-        else:
-            statuses.append(P0_COMPLETENESS_WAITING)
 
     # --- Universe turnover (EMS) ---
     turn = compute_universe_turnover_from_ems(trade_date, ems_path=ems_path)
@@ -255,10 +373,8 @@ def build_p0_record(
     else:
         statuses.append(P0_COMPLETENESS_WAITING)
 
-    # --- Derived ADV from PIT turnover series ---
     avgs = derive_avg_turnover_from_p0(trade_date, universe_turnover, data_dir=data_dir)
 
-    # --- Derived VNINDEX technicals (no future bars) ---
     tech, tech_meta = derive_vnindex_technicals(trade_date, history_provider=history_provider)
     provenance["vnindex_technicals"] = tech_meta
     if tech_meta.get("status") == "OK" and any(v is not None for v in tech.values()):
@@ -266,15 +382,20 @@ def build_p0_record(
     elif tech_meta.get("status") == "SOURCE_ERROR":
         statuses.append(P0_COMPLETENESS_SOURCE_ERROR)
 
-    # Completeness: COMPLETE only when foreign net + universe turnover + vnindex volume + rsi present
-    has_foreign = foreign_vals["foreign_net_value"] is not None
+    # Overall COMPLETE only when universe foreign COMPLETE + turnover + vnindex volume + rsi
+    has_foreign_complete = u_foreign_meta.get("completeness") == P0_COMPLETENESS_COMPLETE and (
+        u_foreign.get("universe_foreign_net_value") is not None
+    )
     has_turn = universe_turnover is not None
     has_vol = vnindex_volume is not None
     has_rsi = tech.get("vnindex_rsi14") is not None
-    if has_foreign and has_turn and has_vol and has_rsi:
+    if has_foreign_complete and has_turn and has_vol and has_rsi:
         completeness = P0_COMPLETENESS_COMPLETE
     else:
         completeness = _merge_status(statuses) if statuses else P0_COMPLETENESS_WAITING
+
+    expected_count = u_foreign_meta.get("expected_count")
+    observed_count = u_foreign_meta.get("observed_count")
 
     record: Dict[str, Any] = {
         "trade_date": trade_date,
@@ -282,15 +403,26 @@ def build_p0_record(
         "observed_at": _utc_now_iso(),
         "schema_version": P0_SCHEMA_VERSION,
         "completeness_status": completeness,
+        # Legacy label retained; preferred scope is universe_foreign_scope
         "foreign_scope": P0_FOREIGN_SCOPE_DEFAULT,
-        "foreign_flow_scope": P0_FOREIGN_SCOPE_DEFAULT,  # explicit preferred provenance key
+        "foreign_flow_scope": P0_UNIVERSE_FOREIGN_SCOPE,
+        "universe_foreign_scope": P0_UNIVERSE_FOREIGN_SCOPE,
         "universe_turnover_scope": P0_UNIVERSE_TURNOVER_SCOPE,
         "vnindex_volume_scope": P0_VNINDEX_VOLUME_SCOPE,
         "expected_universe_size": EXPECTED_UNIVERSE_SIZE,
-        **foreign_vals,
+        **legacy_foreign,
+        **u_foreign,
+        "universe_foreign_expected_count": expected_count,
+        "universe_foreign_observed_count": observed_count,
+        "universe_foreign_completeness": u_foreign_meta.get("completeness"),
+        "universe_foreign_completeness_ratio": u_foreign_meta.get("completeness_ratio"),
+        "universe_foreign_source": u_foreign_meta.get("source"),
+        "universe_foreign_units": "VND",
+        "universe_foreign_missing_symbols_json": json.dumps(
+            u_foreign_meta.get("missing_symbols") or [], ensure_ascii=False
+        ),
         "universe_turnover_value": universe_turnover,
         "universe_volume": universe_volume,
-        # Official whole-market turnover not available without blocked SSI — leave NULL (not zero).
         "market_turnover_value": None,
         "vnindex_volume": vnindex_volume,
         **avgs,
@@ -305,7 +437,6 @@ def build_p0_record(
 
 
 def update_forward_only_registry_from_p0(*, data_dir: Optional[Path] = None) -> Path:
-    """Set first_reliable_collection_date when first non-null observation appears."""
     from modules.forecast_research.mdrr import default_forward_only_registry
 
     root = resolve_forecast_data_dir(data_dir)
@@ -323,11 +454,11 @@ def update_forward_only_registry_from_p0(*, data_dir: Optional[Path] = None) -> 
         return str(sorted(hit.astype(str).str[:10].tolist())[0])
 
     mapping = {
-        "foreign_net_flow": "foreign_net_value",
-        "foreign_buy": "foreign_buy_value",
-        "foreign_sell": "foreign_sell_value",
+        "foreign_net_flow": "universe_foreign_net_value",
+        "foreign_buy": "universe_foreign_buy_value",
+        "foreign_sell": "universe_foreign_sell_value",
         "market_turnover": "universe_turnover_value",
-        "market_adv": "avg_turnover_value_5",  # first available PIT avg; avg_20 once history ≥20
+        "market_adv": "avg_turnover_value_5",
         "vnindex_rsi": "vnindex_rsi14",
         "vnindex_macd": "vnindex_macd",
     }
@@ -338,10 +469,18 @@ def update_forward_only_registry_from_p0(*, data_dir: Optional[Path] = None) -> 
             continue
         fd = first_date(col)
         field["first_reliable_collection_date"] = fd
-        field["forward_only"] = True
+        field["forward_only"] = name.startswith("foreign")  # universe foreign may have HSX history
         if name in ("foreign_net_flow", "foreign_buy", "foreign_sell"):
-            field["source"] = "p0_market_daily ← SSI HOSE fr_trade_heatmap (when available)"
-            field["notes"] = "HOSE scope; missing≠0; blocked SSI → SOURCE_ERROR/NULL"
+            field["forward_only"] = False
+            field["source"] = (
+                "p0_market_daily.universe_foreign_* ← HSX official foreign (primary) / VCI board (fallback)"
+            )
+            field["notes"] = (
+                "EMS_RESEARCH_UNIVERSE_142 VALUE in VND; NOT HOSE-wide; "
+                "COMPLETE only when all membership-asof symbols observed; missing≠0"
+            )
+            field["scope"] = P0_UNIVERSE_FOREIGN_SCOPE
+            field["units"] = "VND"
         if name == "market_turnover":
             field["source"] = "p0_market_daily.universe_turnover_value ← EMS sum(price*volume)"
             field["notes"] = "Research-universe turnover, not official exchange total"
@@ -353,14 +492,19 @@ def update_forward_only_registry_from_p0(*, data_dir: Optional[Path] = None) -> 
             field["historical_backfill_availability"] = False
             field["reconstruction_policy"] = "DERIVE_ON_COLLECT_FROM_OHLCV_ASOF; DO_NOT_REWRITE_MDT0"
 
-    # Add explicit P0 field docs
     registry["p0_fields"] = [
-        "foreign_buy_value",
-        "foreign_sell_value",
-        "foreign_net_value",
-        "foreign_buy_volume",
-        "foreign_sell_volume",
-        "foreign_net_volume",
+        "universe_foreign_buy_value",
+        "universe_foreign_sell_value",
+        "universe_foreign_net_value",
+        "universe_foreign_buy_volume",
+        "universe_foreign_sell_volume",
+        "universe_foreign_net_volume",
+        "universe_foreign_expected_count",
+        "universe_foreign_observed_count",
+        "universe_foreign_completeness",
+        "universe_foreign_completeness_ratio",
+        "universe_foreign_source",
+        "universe_foreign_units",
         "universe_turnover_value",
         "universe_volume",
         "market_turnover_value",
@@ -379,6 +523,7 @@ def update_forward_only_registry_from_p0(*, data_dir: Optional[Path] = None) -> 
         "vnindex_bb_position",
     ]
     registry["p0_schema_version"] = P0_SCHEMA_VERSION
+    registry["universe_foreign_membership_rule"] = "EMS_SNAPSHOT_DATE_EXACT"
     path.write_text(json.dumps(registry, indent=2), encoding="utf-8")
     return path
 
@@ -387,12 +532,29 @@ def collect_p0_for_date(
     trade_date: str,
     *,
     data_dir: Optional[Path] = None,
+    allow_foreign_enrichment: bool = True,
     **kwargs: Any,
 ) -> Dict[str, Any]:
     trade_date = str(trade_date)[:10]
     existing = load_p0_table(data_dir)
     if not existing.empty and (existing["trade_date"].astype(str).str[:10] == trade_date).any():
         row = existing[existing["trade_date"].astype(str).str[:10] == trade_date].iloc[-1]
+        if allow_foreign_enrichment and _universe_foreign_null(row):
+            record = build_p0_record(trade_date, data_dir=data_dir, **kwargs)
+            if record is None:
+                return {"ok": False, "written": False, "reason": "non_trading_or_empty", "trade_date": trade_date}
+            ok, reason = enrich_p0_universe_foreign(record, data_dir=data_dir)
+            update_forward_only_registry_from_p0(data_dir=data_dir)
+            return {
+                "ok": True,
+                "written": ok,
+                "reason": reason,
+                "trade_date": trade_date,
+                "completeness_status": record.get("completeness_status"),
+                "universe_foreign_completeness": record.get("universe_foreign_completeness"),
+                "universe_foreign_net_value": record.get("universe_foreign_net_value"),
+                "record_hash": record.get("record_hash"),
+            }
         return {
             "ok": True,
             "written": False,
@@ -412,8 +574,9 @@ def collect_p0_for_date(
         "reason": reason,
         "trade_date": trade_date,
         "completeness_status": record.get("completeness_status"),
+        "universe_foreign_completeness": record.get("universe_foreign_completeness"),
         "record_hash": record.get("record_hash"),
-        "foreign_net_value": record.get("foreign_net_value"),
+        "universe_foreign_net_value": record.get("universe_foreign_net_value"),
         "universe_turnover_value": record.get("universe_turnover_value"),
     }
 
@@ -436,12 +599,20 @@ def run_p0_backfill(
     data_dir: Optional[Path] = None,
     dates: Optional[Sequence[str]] = None,
     collect_foreign: bool = True,
+    foreign_provider: Optional[ForeignFlowProvider] = None,
 ) -> Dict[str, Any]:
     from modules.forecast_research.outcome_maturity import list_board_trading_dates
 
     target = list(dates) if dates is not None else list_board_trading_dates(DEFAULT_EMS)
     results = [
-        collect_p0_for_date(d, data_dir=data_dir, collect_foreign=collect_foreign) for d in target if is_weekday_session(d)
+        collect_p0_for_date(
+            d,
+            data_dir=data_dir,
+            collect_foreign=collect_foreign,
+            foreign_provider=foreign_provider,
+        )
+        for d in target
+        if is_weekday_session(d)
     ]
     update_forward_only_registry_from_p0(data_dir=data_dir)
     status = {
