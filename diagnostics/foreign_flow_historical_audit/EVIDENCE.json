@@ -1,0 +1,66 @@
+{
+  "audit_id": "foreign_flow_historical_audit_v1",
+  "audited_at_utc": "2026-08-25T01:12:07Z",
+  "hsx_endpoint": "https://api.hsx.vn/mk/api/v1/market/securities/foreign/{SYM}?pageSize=N",
+  "units": "VND value; shares volume",
+  "vnm_depth_pageSize_5000": {
+    "n": 4402,
+    "first": "2009-01-02",
+    "last": "2026-08-24",
+    "approx_years": 17.1
+  },
+  "pagination": {
+    "pageSize_scales_returned_rows": true,
+    "pageIndex_works_with_smaller_pageSize": true,
+    "pageSize_2000_caps_at_recent_2000": true,
+    "pageSize_5000_returned_full_VNM_history_4402": true,
+    "total_field": null
+  },
+  "ems142": {
+    "trade_date": "2026-08-24",
+    "n_hose_eligible": 117,
+    "n_hsx_empty": 25,
+    "hsx_empty_symbols": [
+      "ACV",
+      "BVS",
+      "C4G",
+      "CEO",
+      "DDV",
+      "DRI",
+      "FOX",
+      "HUT",
+      "IDC",
+      "LAS",
+      "MBS",
+      "MML",
+      "MSR",
+      "NTP",
+      "OIL",
+      "PLC",
+      "PVB",
+      "PVC",
+      "PVS",
+      "SHS",
+      "TNG",
+      "TVN",
+      "VGI",
+      "VGS",
+      "VGT"
+    ]
+  },
+  "ems_membership_asof_sessions": 17,
+  "ems_membership_drift_in_window": "none (142\u2229142)",
+  "co_located_ohlc_in_hsx_foreign": true,
+  "market_volume_in_hsx_foreign": false,
+  "verdicts": {
+    "historical_data": "FOREIGN_FLOW_HISTORY_RESEARCH_READY",
+    "backfill": "BACKFILL_WORTHWHILE"
+  },
+  "caveats": [
+    "HOSE-only for HSX API; 25/142 EMS symbols empty",
+    "Projecting current EMS-142 backward = survivorship bias",
+    "Market-context join historically shallow (8\u201342 sessions)",
+    "ADV/turnover normalization needs separate volume source",
+    "Missing foreign must remain NULL not 0"
+  ]
+}

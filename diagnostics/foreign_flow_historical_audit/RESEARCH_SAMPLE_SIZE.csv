@@ -1,0 +1,5 @@
+panel,unique_symbols,unique_sessions_est,obs_est,date_range,missingness,independent_episodes
+raw_foreign_plus_HSX_price,117,4402,515034,2009-01-02→2026-08-24 (longlisted); shorter for new listings,25/142 EMS symbols HSX-empty (HNX/UPCOM),multi-year regimes available at stock level; market-regime labels sparse
+foreign_norm_by_turnover_ADV,117,17,1989,EMS only unless volume backfilled,HIGH,insufficient
+foreign_plus_market_context,117,42,4914,histcore FC from 2026-06-25; MDT0 from 2026-08-13,breadth/LIVE only 8d,few (~7 regime label changes historically)
+foreign_plus_sector,subset,27,EL observations only,2026-07-23→,EMS lacks sector,low

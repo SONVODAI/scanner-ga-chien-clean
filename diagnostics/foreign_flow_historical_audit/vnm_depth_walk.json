@@ -1,0 +1,74 @@
+{
+  "n_unique_dates": 2000,
+  "first": "2018-08-21",
+  "last": "2026-08-24",
+  "approx_calendar_years": 8.008213552361397,
+  "bday_missing_count": 90,
+  "bday_missing_examples": [
+    "2018-09-03",
+    "2018-12-31",
+    "2019-01-01",
+    "2019-02-04",
+    "2019-02-05",
+    "2019-02-06",
+    "2019-02-07",
+    "2019-02-08",
+    "2019-04-15",
+    "2019-04-29",
+    "2019-04-30",
+    "2019-05-01",
+    "2019-09-02",
+    "2020-01-01",
+    "2020-01-23"
+  ],
+  "weekday_hist": {
+    "1": 403,
+    "2": 402,
+    "3": 402,
+    "4": 401,
+    "0": 392
+  },
+  "windows": [
+    {
+      "pageIndex": 0,
+      "n": 2000,
+      "first": "2018-08-21",
+      "last": "2026-08-24"
+    },
+    {
+      "pageIndex": 1,
+      "n": 2000,
+      "first": "2018-08-21",
+      "last": "2026-08-24"
+    }
+  ],
+  "sample_row_keys": [
+    "reportDate",
+    "totalRoom",
+    "currentRoom",
+    "mainBuyerForeignVolume",
+    "mainBuyerForeignValue",
+    "mainSellerForeignVolume",
+    "mainSellerForeignValue",
+    "bigLotBuyerForeignVolume",
+    "bigLotBuyerForeignValue",
+    "bigLotSellerForeignVolume",
+    "bigLotSellerForeignValue",
+    "totalBuyerForeignVolume",
+    "totalSellerForeignVolume",
+    "totalbuyer",
+    "totalSeller",
+    "percent",
+    "bid",
+    "openPrice",
+    "closePrice",
+    "highPrice",
+    "lowPrice",
+    "averagePrice"
+  ],
+  "pageSize_5000_n": 4402,
+  "pageSize_5000_first": "2009-01-02",
+  "pageSize_5000_last": "2026-08-24",
+  "approx_calendar_years_ps5000": 17.639972621492127,
+  "provider_cap_note": "pageSize=5000 returned 4402 rows for VNM/HPG/FPT starting 2009-01-02; pageSize=2000 only recent 2000 sessions"
+}
