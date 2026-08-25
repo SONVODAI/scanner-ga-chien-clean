@@ -1,0 +1,38 @@
+{
+  "gate_name": "ff_confirmation_predeploy",
+  "ran_at_utc": "2026-08-25T06:55:00Z",
+  "integration_commit": "bc8152810554129e31a9f59437e0e3c6583462ca",
+  "result": "PASS",
+  "totals": {"passed": 62, "failed": 0, "warnings": 1},
+  "suites": [
+    {"file": "tests/test_foreign_flow_confirmation_forward_panel.py", "collected": 14, "passed": 14},
+    {"file": "tests/test_foreign_flow_canonical_backfill.py", "collected": 15, "passed": 15},
+    {"file": "tests/test_market_history_retention.py", "collected": 10, "passed": 10},
+    {"file": "tests/test_forecast_memory_daily_integration.py", "collected": 11, "passed": 11},
+    {"file": "tests/test_p0_universe_foreign_flow.py", "collected": 12, "passed": 12}
+  ],
+  "covers": [
+    "foreign_flow_history/client",
+    "confirmation_protocol_freeze_boundary",
+    "forward_panel",
+    "exact_date_semantics",
+    "continuity_60_252",
+    "event_immutability",
+    "t10_maturity",
+    "idempotency",
+    "rate_limit_resume",
+    "anti_peeking",
+    "forecast_memory_integration",
+    "p0_isolation",
+    "no_extra_timer"
+  ],
+  "warning": "Cloud Agent vnstock legacy banner (0.2.9.2 messaging); production documented vnstock>=4.0.5 — no upgrade in this task; confirm on VPS",
+  "cloud_agent_runtime": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "requests": "2.33.1",
+    "vnstock": "legacy_banner_no_version_attr"
+  }
+}
