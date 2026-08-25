@@ -1424,6 +1424,51 @@
       "updated_at": "2026-08-25T04:23:57Z",
       "validation_ok": true
     },
+    "SZC": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2019-01-15",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1898,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1898,
+      "sha256": "6c35e8407f363235ff29e8aa9132a51b9937fc9463301c20755da722197c3a45",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:24:57Z",
+      "validation_ok": true
+    },
+    "TCB": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2018-06-04",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2056,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2056,
+      "sha256": "bb4c6d23f20cafaf6265e3c6baea25a326372a940cbffde9660444cc59a78b95",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:25:44Z",
+      "validation_ok": true
+    },
+    "TCH": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2016-10-05",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2468,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2468,
+      "sha256": "220117c5dcba4d9224857c11e9c6aba182ecd8332b9707d51a8780f53a248e42",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:26:48Z",
+      "validation_ok": true
+    },
     "VNM": {
       "fetch_mode": "paginated",
       "first_trade_date": "2009-01-02",
@@ -1442,5 +1487,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T04:23:57Z"
+  "updated_at": "2026-08-25T04:26:48Z"
 }
