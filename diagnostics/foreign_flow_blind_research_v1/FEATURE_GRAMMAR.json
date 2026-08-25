@@ -1,0 +1,299 @@
+{
+  "version": "ff_blind_v1_grammar",
+  "features": [
+    {
+      "name": "net_pos",
+      "family": "sign",
+      "lookback": 0,
+      "pit": true,
+      "def": "foreign_net_value > 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_neg",
+      "family": "sign",
+      "lookback": 0,
+      "pit": true,
+      "def": "foreign_net_value < 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_zero",
+      "family": "sign",
+      "lookback": 0,
+      "pit": true,
+      "def": "foreign_net_value == 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "streak_pos_ge3",
+      "family": "persistence",
+      "lookback": "variable",
+      "pit": true,
+      "def": ">=3 consecutive positive net sessions",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "streak_neg_le_m3",
+      "family": "persistence",
+      "lookback": "variable",
+      "pit": true,
+      "def": ">=3 consecutive negative net sessions",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "streak_pos_ge5",
+      "family": "persistence",
+      "lookback": "variable",
+      "pit": true,
+      "def": ">=5 consecutive positive net",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "streak_neg_le_m5",
+      "family": "persistence",
+      "lookback": "variable",
+      "pit": true,
+      "def": ">=5 consecutive negative net",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_sum_5_pos",
+      "family": "persistence",
+      "lookback": 5,
+      "pit": true,
+      "def": "sum net 5 sessions > 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_sum_5_neg",
+      "family": "persistence",
+      "lookback": 5,
+      "pit": true,
+      "def": "sum net 5 sessions < 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_sum_20_pos",
+      "family": "persistence",
+      "lookback": 20,
+      "pit": true,
+      "def": "sum net 20 sessions > 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_sum_20_neg",
+      "family": "persistence",
+      "lookback": 20,
+      "pit": true,
+      "def": "sum net 20 sessions < 0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_net_pos_z15",
+      "family": "magnitude",
+      "lookback": 60,
+      "pit": true,
+      "def": "net_z_60 > 1.5",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_net_neg_z15",
+      "family": "magnitude",
+      "lookback": 60,
+      "pit": true,
+      "def": "net_z_60 < -1.5",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_net_pos_z20",
+      "family": "magnitude",
+      "lookback": 60,
+      "pit": true,
+      "def": "net_z_60 > 2.0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_net_neg_z20",
+      "family": "magnitude",
+      "lookback": 60,
+      "pit": true,
+      "def": "net_z_60 < -2.0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_abs_z20",
+      "family": "magnitude",
+      "lookback": 60,
+      "pit": true,
+      "def": "|net_z_60| > 2.0",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_hi_pct90",
+      "family": "magnitude",
+      "lookback": 252,
+      "pit": true,
+      "def": "net percentile >= 90 over 252",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "net_lo_pct10",
+      "family": "magnitude",
+      "lookback": 252,
+      "pit": true,
+      "def": "net percentile <= 10 over 252",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "trans_pos_to_neg",
+      "family": "transition",
+      "lookback": 1,
+      "pit": true,
+      "def": "prior net+ then T0 net-",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "trans_neg_to_pos",
+      "family": "transition",
+      "lookback": 1,
+      "pit": true,
+      "def": "prior net- then T0 net+",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "agree_pos",
+      "family": "interaction",
+      "lookback": 1,
+      "pit": true,
+      "def": "net+ and px+ (vs prior close)",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "agree_neg",
+      "family": "interaction",
+      "lookback": 1,
+      "pit": true,
+      "def": "net- and px-",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "diverge_buy_down",
+      "family": "interaction",
+      "lookback": 1,
+      "pit": true,
+      "def": "net+ but px-",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "diverge_sell_up",
+      "family": "interaction",
+      "lookback": 1,
+      "pit": true,
+      "def": "net- but px+",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_buy_z15_px_down",
+      "family": "interaction",
+      "lookback": 60,
+      "pit": true,
+      "def": "abnormal buy z>1.5 with px down",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_sell_z15_px_up",
+      "family": "interaction",
+      "lookback": 60,
+      "pit": true,
+      "def": "abnormal sell z<-1.5 with px up",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_buy_z15_px_up",
+      "family": "interaction",
+      "lookback": 60,
+      "pit": true,
+      "def": "abnormal buy with px up",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    },
+    {
+      "name": "abn_sell_z15_px_down",
+      "family": "interaction",
+      "lookback": 60,
+      "pit": true,
+      "def": "abnormal sell with px down",
+      "availability": "HOSE_symbol_daily_canonical",
+      "complexity": 1,
+      "missingness": 0.0
+    }
+  ],
+  "deferred": [
+    {
+      "name": "liquidity_normalized_flow",
+      "family": "liquidity",
+      "status": "DEFERRED",
+      "reason": "No PIT-safe historical ADV/turnover denominator in canonical store"
+    },
+    {
+      "name": "market_fc_regime_interaction",
+      "family": "market_context",
+      "status": "DEFERRED_LONG_HISTORY",
+      "reason": "Market FC/REAL history much shorter than foreign-flow history; kept separate"
+    }
+  ]
+}
