@@ -410,6 +410,38 @@
       "updated_at": "2026-08-25T02:24:27Z",
       "validation_ok": true
     },
+    "DXG": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-12-22",
+      "issue_codes": [
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4157,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4157,
+      "sha256": "11cf6101f2e6ed5568bc75177cd1cf0c57380bd3d923997e9cd7e4dcdfb56d98",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:26:30Z",
+      "validation_ok": true
+    },
+    "DXS": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2021-09-01",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1241,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1241,
+      "sha256": "be64ca3d0d79dd8b6ff9c75e63de1bbf148bf0110d8c22c9301aa4a9d224090a",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:27:22Z",
+      "validation_ok": true
+    },
     "FPT": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -509,5 +541,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T02:24:27Z"
+  "updated_at": "2026-08-25T02:27:22Z"
 }
