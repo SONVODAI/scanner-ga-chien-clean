@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/modules/foreign_flow_blind_research/run_v1.py", line 1224, in <module>
+  File "/workspace/modules/foreign_flow_blind_research/run_v1.py", line 974, in run_research
+    run_manifest = {
+  File "/workspace/modules/foreign_flow_blind_research/run_v1.py", line 1197, in _write_markdown_reports
+    
+  File "/workspace/modules/foreign_flow_blind_research/run_v1.py", line 1197, in <genexpr>
+    
+TypeError: unhashable type: 'dict'

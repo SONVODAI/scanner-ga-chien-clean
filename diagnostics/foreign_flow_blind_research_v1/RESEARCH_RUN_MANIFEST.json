@@ -1,0 +1,34 @@
+{
+  "research_run_id": "ff_blind_v1_20260825T055811Z",
+  "input_dataset_hash": "47e88b67b5d8a5e6264226a59454c153ff3d876d1fd905135d66313a36718c5e",
+  "dataset_version": "ff_hsx_symbol_daily_v1_20260825T045650Z",
+  "code_commit": "c812f53cc55b0d11431e6f8b9e8bd7ad521f9c6b",
+  "feature_grammar_version": "ff_blind_v1_grammar",
+  "outcome_version": "session_close_to_close_v1",
+  "temporal_split": {
+    "discovery": [
+      "2009-01-02",
+      "2016-12-31"
+    ],
+    "validation": [
+      "2017-01-01",
+      "2021-12-31"
+    ],
+    "holdout": [
+      "2022-01-01",
+      "2026-12-31"
+    ]
+  },
+  "search_budget": "bounded_grammar_x_horizons",
+  "n_hypotheses_examined": 112,
+  "parent_horserace_audit": true,
+  "verdict": "FOREIGN_FLOW_RESEARCH_CANDIDATE_FOUND",
+  "DEDICATED_CONFIRMATION_PHASE": "YES",
+  "candidate_ids_research": [
+    "FFB1_0011",
+    "FFB1_0016",
+    "FFB1_0019",
+    "FFB1_0045",
+    "FFB1_0048"
+  ]
+}

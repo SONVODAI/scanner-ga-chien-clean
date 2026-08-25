@@ -1,0 +1,6 @@
+{
+  "agree_pos_vs_px_pos": "price_alone_matches_or_beats_agree_pos_in_validation; conditional_flow_incr_given_px_pos_near_zero_or_negative_in_validation",
+  "agree_neg_vs_px_neg": "largely_price_momentum; conditional_flow_incr_unstable_across_eras",
+  "abn_abs_z20": "magnitude_signal_not_reducible_to_simple_sign; survives_disc_val_hold_at_T10_with_small_bps",
+  "simple_net_sign": "net_pos/net_neg_NOT_robust_predictors \u2014 important_null"
+}
