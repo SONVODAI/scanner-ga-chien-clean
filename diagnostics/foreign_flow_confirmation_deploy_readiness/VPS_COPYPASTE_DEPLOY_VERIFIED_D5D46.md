@@ -1,22 +1,41 @@
-# VPS Copy/Paste Deploy — Verified Prod d5d46be08 → bc8152810
+# VPS Copy/Paste Deploy — Verified Prod d5d46be08 → bc8152810 (v2)
 
-**Verified production HEAD:** `d5d46be086194088a0bca74f9a0a91ffc75c3c37`  
-**Deploy code ref:** `bc8152810554129e31a9f59437e0e3c6583462ca` (`bc8152810`)  
-**Preserve:** all runtime data (`forecast_pipeline_status.json`, `data/edge_research/`, `AGENTS.md`, Forecast/Edge/EL/P0/pattern stores).  
-**Forbidden:** `git clean`, `git reset --hard`, `git checkout -- data/...`, package upgrades, new timers.
+## Precheck failure diagnosis (2026-08-25)
 
-Run on VPS as a single block. Script **exits non-zero** on any failed safety gate.
+| Item | Detail |
+|------|--------|
+| Failure site | Step 0 deps gate, **before** backup and **before** `git checkout` |
+| Symptom | `vnstock ?` then `AssertionError` on `getattr(vnstock,"__version__","").startswith("4.0")` |
+| Root cause | Installed **vnstock 4.0.5** (proven via `importlib.metadata`) often has **no** usable `vnstock.__version__` attribute → getattr returns `""` → false-negative STOP |
+| Mutation | **None** — script never reached backup (§1) or deploy checkout (§2) |
+
+## Audit of similar false-negative risks (fixed in v2)
+
+| Check | Risk | Fix |
+|-------|------|-----|
+| `vnstock.__version__` | Missing attr on 4.0.5 | `importlib.metadata.version("vnstock")` |
+| Hardcode FPT-only join | FPT csv absent | Fallback FPT→VNM→HPG→VCB |
+| numpy/pandas `__version__` | Generally present on 2.x | Keep attr; also print metadata for clarity |
+| Runtime-dirt `grep` soft-fail | Already non-blocking | Unchanged |
+| Timer `grep foreign\|confirm` | Unrelated name collision | Keep; still no `git clean/reset` |
+
+**Unchanged pins / constraints:** PRE `d5d46be08`, DEPLOY `bc8152810`, no reset/hard/clean, no data checkout, no pip upgrade, no new timer, STOP on genuine gates.
+
+---
+
+## Corrected FULL deploy + acceptance block
 
 ```bash
 #!/usr/bin/env bash
-# FF Confirmation deploy — STOP on any failed gate
+# FF Confirmation deploy v2 — STOP on any failed gate
+# Pins: PRE=d5d46be08  DEPLOY=bc8152810
 set -euo pipefail
 
 REPO=/opt/mrbot-camera
 PY=/opt/mrbot-camera-venv/bin/python
 EXPECTED_PRE=d5d46be086194088a0bca74f9a0a91ffc75c3c37
 DEPLOY_REF=bc8152810554129e31a9f59437e0e3c6583462ca
-FREEZE_DATA_REF=df73282aa3690227e28fa56c8b7b195e892299f2   # used ONLY for archive-extract of freeze CSVs
+FREEZE_DATA_REF=df73282aa3690227e28fa56c8b7b195e892299f2   # archive-extract ONLY (never checkout tip)
 
 cd "$REPO"
 
@@ -27,9 +46,10 @@ git rev-parse HEAD | tee /tmp/mrbot-pre-ff-confirm.HEAD
 git status -sb | tee /tmp/mrbot-pre-ff-confirm.status
 git branch --show-current | tee /tmp/mrbot-pre-ff-confirm.branch || true
 
-# Runtime dirt must remain (do not clean/reset)
+# Runtime dirt must remain (do not clean/reset) — informational only
 grep -E 'forecast_pipeline_status\.json|data/edge_research|AGENTS\.md' /tmp/mrbot-pre-ff-confirm.status \
-  && echo "OK: runtime dirt present — will preserve" || echo "NOTE: expected runtime dirt markers not all visible (continue if intentional)"
+  && echo "OK: runtime dirt markers visible — will preserve" \
+  || echo "NOTE: not all runtime dirt markers visible (continue if intentional)"
 
 df -h /opt /var | tee /tmp/mrbot-pre-ff-confirm.df
 free -h | tee /tmp/mrbot-pre-ff-confirm.mem
@@ -46,16 +66,33 @@ systemctl list-timers --all | grep -iE 'foreign|confirm' \
 
 "$PY" - <<'PY' | tee /tmp/mrbot-pre-ff-confirm.deps
 import sys
+from importlib.metadata import PackageNotFoundError, version as pkg_version
+
 assert sys.version_info[:2] == (3, 12), sys.version
 import numpy, pandas, scipy, vnstock
+
+def dist_ver(name: str) -> str:
+    try:
+        return pkg_version(name)
+    except PackageNotFoundError as e:
+        raise AssertionError(f"distribution_missing:{name}") from e
+
+numpy_v = getattr(numpy, "__version__", None) or dist_ver("numpy")
+pandas_v = getattr(pandas, "__version__", None) or dist_ver("pandas")
+scipy_v = getattr(scipy, "__version__", None) or dist_ver("scipy")
+# vnstock 4.0.5 may omit module __version__ — distribution metadata is authoritative
+vnstock_v = dist_ver("vnstock")
+
 print("python", sys.version.split()[0])
-print("numpy", numpy.__version__)
-print("pandas", pandas.__version__)
-print("scipy", scipy.__version__)
-print("vnstock", getattr(vnstock, "__version__", "?"))
-assert numpy.__version__.startswith("2.")
-assert pandas.__version__.startswith("2.")
-assert str(getattr(vnstock, "__version__", "")).startswith("4.0")
+print("numpy", numpy_v)
+print("pandas", pandas_v)
+print("scipy", scipy_v)
+print("vnstock", vnstock_v, "(via importlib.metadata; module.__version__=", getattr(vnstock, "__version__", None), ")")
+
+assert str(numpy_v).startswith("2."), numpy_v
+assert str(pandas_v).startswith("2."), pandas_v
+assert str(vnstock_v).startswith("4.0"), vnstock_v
+
 from modules.forecast_research.production_daily_integration import run_forecast_memory_daily_stage
 print("forecast_memory_pre_ok")
 PY
@@ -76,7 +113,7 @@ test -f AGENTS.md && cp -a AGENTS.md "$BK/" || true
 echo "BACKUP=$BK" | tee /tmp/mrbot-pre-ff-confirm.backup
 
 echo "========== 2) DEPLOY CODE ONLY (no data reset) =========="
-# Explicit forbidden ops — do not uncomment:
+# Forbidden — do not uncomment:
 # git reset --hard
 # git clean -fd
 # git checkout -- data/
@@ -94,25 +131,24 @@ test "$(git rev-parse HEAD)" = "$DEPLOY_REF" \
 git rev-parse HEAD | tee /tmp/mrbot-post-ff-confirm.HEAD
 git merge-base --is-ancestor "$EXPECTED_PRE" HEAD \
   || { echo "STOP: verified prod base not ancestor of HEAD"; exit 1; }
-echo "OK: HEAD=$DEPLOY_REF (ancestor of d5d46be08 preserved in history)"
+echo "OK: HEAD=$DEPLOY_REF (d5d46be08 is ancestor)"
 
-# Confirm runtime dirt still present / not wiped
 git status -sb | tee /tmp/mrbot-post-ff-confirm.status
-test ! -f data/forecast_research/forecast_pipeline_status.json \
-  || echo "OK: forecast_pipeline_status.json still present"
-test -d data/edge_research && echo "OK: data/edge_research still present" || echo "NOTE: data/edge_research absent (ok if never created as dir yet)"
+test -f data/forecast_research/forecast_pipeline_status.json \
+  && echo "OK: forecast_pipeline_status.json preserved" \
+  || echo "NOTE: forecast_pipeline_status.json not present as file (unexpected but non-fatal if path differs)"
+test -d data/edge_research && echo "OK: data/edge_research preserved" \
+  || echo "NOTE: data/edge_research dir absent"
 
 echo "========== 3) FREEZE LOOKBACK CONTINUITY (60/252) =========="
-# research_freeze.json comes with deploy ref; canonical CSVs do NOT.
-# Extract ONLY canonical/by_symbol from freeze data commit via archive (does not checkout #97 tip).
 mkdir -p data/foreign_flow_history/canonical/by_symbol
 CANON_N=$(find data/foreign_flow_history/canonical/by_symbol -name '*.csv' 2>/dev/null | wc -l | tr -d ' ')
 if [ "$CANON_N" -lt 100 ]; then
-  echo "Canonical CSV count=$CANON_N — extracting freeze CSVs from $FREEZE_DATA_REF (archive only)..."
-  git fetch origin "$FREEZE_DATA_REF" 2>/dev/null || git fetch origin cursor/foreign-flow-forward-panel-wiring-aad2 || true
+  echo "Canonical CSV count=$CANON_N — archive-extract freeze CSVs from $FREEZE_DATA_REF (no tip checkout)..."
+  git fetch origin "$FREEZE_DATA_REF" 2>/dev/null \
+    || git fetch origin cursor/foreign-flow-forward-panel-wiring-aad2 || true
   git cat-file -t "$FREEZE_DATA_REF" >/dev/null \
     || { echo "STOP: cannot resolve freeze data ref $FREEZE_DATA_REF"; exit 1; }
-  # Extract into a temp dir then rsync into place (never deletes newer files)
   TMP_FF=$(mktemp -d /tmp/ff-freeze-XXXX)
   git archive "$FREEZE_DATA_REF" data/foreign_flow_history/canonical/by_symbol \
     | tar -x -C "$TMP_FF"
@@ -128,14 +164,15 @@ test -f data/foreign_flow_history/manifests/research_freeze.json \
 "$PY" - <<'PY' | tee /tmp/mrbot-post-ff-confirm.continuity
 import json
 from pathlib import Path
+import pandas as pd
+
 m = json.loads(Path("data/foreign_flow_history/manifests/research_freeze.json").read_text())
 assert m.get("last_trade_date") == "2026-08-24", m.get("last_trade_date")
 assert m.get("symbol_count") == 117, m.get("symbol_count")
 canon = Path("data/foreign_flow_history/canonical/by_symbol")
 files = sorted(canon.glob("*.csv"))
 assert len(files) >= 100, f"canonical_csv_count={len(files)}"
-# Spot-check one symbol has >= 252 sessions ending at freeze
-import pandas as pd
+
 sample = None
 for pref in ("FPT", "VNM", "HPG", "VCB"):
     p = canon / f"{pref}.csv"
@@ -155,12 +192,14 @@ PY
 echo "========== 4) IMPORT / HOOK / ANTI-PEEK SMOKE =========="
 "$PY" - <<'PY' | tee /tmp/mrbot-post-ff-confirm.smoke
 import inspect, json, sys
+from importlib.metadata import version as pkg_version
 import numpy, pandas, scipy, vnstock
+
 print("python", sys.version.split()[0])
 print("numpy", numpy.__version__)
 print("pandas", pandas.__version__)
 print("scipy", scipy.__version__)
-print("vnstock", getattr(vnstock, "__version__", "?"))
+print("vnstock", pkg_version("vnstock"))
 
 from modules.forecast_research.production_daily_integration import run_forecast_memory_daily_stage
 from modules.foreign_flow_confirmation.daily import (
@@ -178,13 +217,15 @@ assert "maybe_run_ff_confirmation_after_market_daily" in src
 assert LAST_IN_SAMPLE == "2026-08-24"
 assert compute_pass_fail_guard(unique_dates=10, unique_symbols=5, sessions_since_first_t0=10)[0] is False
 
-# Continuity join on a live symbol (history only; asof freeze)
-j = join_history_and_forward("FPT", asof_trade_date="2026-08-24")
-assert lookback_complete(j, need=60)
-assert lookback_complete(j, need=252)
-print("JOIN_LOOKBACK_OK", len(j))
+sym = None
+for s in ("FPT", "VNM", "HPG", "VCB"):
+    j = join_history_and_forward(s, asof_trade_date="2026-08-24")
+    if lookback_complete(j, need=60) and lookback_complete(j, need=252):
+        sym = s
+        print("JOIN_LOOKBACK_OK", s, len(j))
+        break
+assert sym is not None, "no symbol passed 60/252 continuity join"
 
-# Freeze boundary (no candidate trigger required)
 r = run_confirmation_daily("2026-08-24", skip_fetch=True)
 assert r.get("reason") == "freeze_boundary", r
 print("FREEZE_BOUNDARY_OK")
@@ -210,7 +251,7 @@ print(json.dumps({
 print("SMOKE_OK")
 PY
 
-# Ensure confirmation namespace dirs exist (empty OK; do not wipe existing)
+# Create confirmation dirs if missing — do not wipe existing ledgers
 mkdir -p data/foreign_flow_confirmation/{events,outcomes,baselines,status,forward_panel/by_symbol,manifests,dq_rejects}
 
 echo "========== 5) IDEMPOTENCY =========="
@@ -230,7 +271,6 @@ systemctl list-timers --all | grep -iE 'foreign|confirm' \
   && { echo "STOP: new confirmation timer appeared"; exit 1; } \
   || echo "OK: still no confirmation timer"
 systemctl status mrbot-daily-research.timer --no-pager | tee /tmp/mrbot-post-ff-confirm.timer
-# oneshot idle after success is normal
 systemctl is-active mrbot-daily-research.service | tee /tmp/mrbot-post-ff-confirm.service-active || true
 
 echo "========== 7) FINAL ACCEPTANCE SUMMARY =========="
@@ -256,20 +296,6 @@ test "$PRE" = "d5d46be086194088a0bca74f9a0a91ffc75c3c37"
 git checkout --detach "$PRE"
 test "$(git rev-parse HEAD)" = "$PRE"
 
-# KEEP:
-#   data/foreign_flow_confirmation/**
-#   data/foreign_flow_history/canonical/** (freeze lookback)
-#   data/forecast_research/**, data/earning_learning/**, data/edge_research/**
-#   forecast_pipeline_status.json, AGENTS.md, pattern_history.csv
-
 systemctl is-active mrbot-daily-research.timer
 echo "ROLLBACK_CODE_OK HEAD=$(git rev-parse --short HEAD)"
 ```
-
----
-
-## Notes
-
-1. Infrastructure acceptance does **not** require a candidate trigger.
-2. After the next `mrbot-daily-research.timer` fire, confirm `ff_confirmation_forward` appears in Forecast Memory stage output / pipeline status — still counts-only; do not inspect mean/win/incremental.
-3. If step 3 archive-extract fails (object missing), STOP and rsync freeze CSVs from your approved freeze artifact host instead — never `git checkout` the PR #97 tip onto production.
