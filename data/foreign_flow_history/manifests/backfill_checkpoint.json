@@ -564,6 +564,36 @@
       "updated_at": "2026-08-25T02:38:23Z",
       "validation_ok": true
     },
+    "GEG": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2019-09-19",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1731,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1731,
+      "sha256": "b002541737b07d2c9da2f015e8755d12a504b995a353f4ca80f4596b6337c4b5",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:39:47Z",
+      "validation_ok": true
+    },
+    "GEX": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2018-01-18",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2143,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2143,
+      "sha256": "2e90bc0c5e8e3efbb26712f1001359d6dd15a9d2f38167f3c0276153fdb6589a",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:41:43Z",
+      "validation_ok": true
+    },
     "HPG": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -646,5 +676,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T02:38:23Z"
+  "updated_at": "2026-08-25T02:41:43Z"
 }
