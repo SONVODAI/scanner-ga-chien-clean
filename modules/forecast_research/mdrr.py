@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from modules.durable_csv import durable_replace_csv
 from modules.forecast_research.contract import (
     COMPLETENESS_COMPLETE,
     COMPLETENESS_PARTIAL,
@@ -87,7 +88,16 @@ def persist_mdrr_record(
             return False, "ALREADY_PRESENT"
     row = pd.DataFrame([record])
     out = row if existing.empty else pd.concat([existing, row], ignore_index=True)
-    out.to_csv(path, index=False)
+    ok, reason = durable_replace_csv(
+        out,
+        path,
+        existing=existing if not existing.empty else None,
+        date_col="trade_date",
+        backup=True,
+        keep=5,
+    )
+    if not ok:
+        return False, reason
     return True, "WRITTEN"
 
 

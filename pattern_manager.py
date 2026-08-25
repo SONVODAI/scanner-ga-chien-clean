@@ -8,6 +8,7 @@ import re
 import base64
 from datetime import datetime
 from io import StringIO
+from pathlib import Path
 from zoneinfo import ZoneInfo
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -205,44 +206,115 @@ def get_github_token():
         return None
 
 
-def read_pattern_history():
-    token = get_github_token()
-    if token:
-        try:
-            url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_PATTERN_PATH}"
-            r = requests.get(url, headers={"Authorization": f"token {token}"}, timeout=10)
-            if r.status_code == 200:
-                content = r.json().get("content", "")
-                if content:
-                    decoded = base64.b64decode(content).decode("utf-8")
-                    if decoded.strip():
-                        return migrate_history(pd.read_csv(StringIO(decoded)))
-        except Exception as e:
-            print("READ PATTERN GITHUB ERROR:", e)
+def _pattern_date_set(df: Optional[pd.DataFrame]) -> set:
+    if df is None or df.empty or "date" not in df.columns:
+        return set()
+    s = pd.to_datetime(df["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    return set(s.dropna().astype(str).tolist())
 
+
+def _read_local_pattern_history(path: Optional[str] = None) -> pd.DataFrame:
+    file_path = path or PATTERN_FILE
     try:
-        if os.path.exists(PATTERN_FILE) and os.path.getsize(PATTERN_FILE) > 1:
-            return migrate_history(pd.read_csv(PATTERN_FILE))
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 1:
+            return migrate_history(pd.read_csv(file_path))
     except Exception as e:
         print("READ PATTERN LOCAL ERROR:", e)
-
     return pd.DataFrame(columns=REQUIRED_COLUMNS)
 
 
-def write_pattern_history(df):
+def _read_github_pattern_history() -> pd.DataFrame:
+    token = get_github_token()
+    if not token:
+        return pd.DataFrame(columns=REQUIRED_COLUMNS)
+    try:
+        url = (
+            f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/"
+            f"{GITHUB_REPO_NAME}/contents/{GITHUB_PATTERN_PATH}"
+        )
+        r = requests.get(url, headers={"Authorization": f"token {token}"}, timeout=10)
+        if r.status_code == 200:
+            content = r.json().get("content", "")
+            if content:
+                decoded = base64.b64decode(content).decode("utf-8")
+                if decoded.strip():
+                    return migrate_history(pd.read_csv(StringIO(decoded)))
+    except Exception as e:
+        print("READ PATTERN GITHUB ERROR:", e)
+    return pd.DataFrame(columns=REQUIRED_COLUMNS)
+
+
+def read_pattern_history():
+    """
+    Prefer denser local coverage over a possibly stale GitHub copy.
+    Union local∪remote when both exist so neither silently drops dates.
+    """
+    local = _read_local_pattern_history()
+    remote = _read_github_pattern_history()
+    if local.empty and remote.empty:
+        return pd.DataFrame(columns=REQUIRED_COLUMNS)
+    if local.empty:
+        return remote
+    if remote.empty:
+        return local
+    # Always union — never let a thinner GitHub snapshot replace local memory.
+    return merge_history(local, remote)
+
+
+def write_pattern_history(df, path: Optional[str] = None):
+    """
+    Durable full-file replace of pattern_history.
+
+    Always unions proposed rows with on-disk history first so an incomplete
+    in-memory frame cannot erase older trade dates. Refuses the write
+    (fail-closed) if date coverage would shrink. Uses bounded backup + atomic
+    replace so interrupted writes leave the prior file intact.
+    """
     if df is None:
         return "NO_DF"
-    out = normalize_schema(df)
-    out.to_csv(PATTERN_FILE, index=False)
+
+    from modules.durable_csv import durable_replace_csv
+
+    file_path = Path(path or PATTERN_FILE)
+    proposed = normalize_schema(df)
+    disk = _read_local_pattern_history(str(file_path))
+
+    # existing_history ∪ current_update — never write disk-incomplete frames.
+    if not disk.empty:
+        proposed = merge_history(disk, proposed)
+    else:
+        proposed = migrate_history(proposed)
+
+    disk_dates = _pattern_date_set(disk)
+    prop_dates = _pattern_date_set(proposed)
+    missing = disk_dates - prop_dates
+    if missing:
+        sample = ",".join(sorted(missing)[:8])
+        return f"REFUSED_DATE_COVERAGE_SHRINK:{sample}:count={len(missing)}"
+
+    ok, reason = durable_replace_csv(
+        proposed,
+        file_path,
+        existing=disk if not disk.empty else None,
+        date_col="date",
+        backup=True,
+        keep=5,
+        encoding="utf-8",
+    )
+    if not ok:
+        return reason
 
     token = get_github_token()
     if not token:
         return "LOCAL_ONLY"
 
     try:
-        csv_content = out.to_csv(index=False)
+        csv_content = proposed.to_csv(index=False)
         encoded = base64.b64encode(csv_content.encode("utf-8")).decode("utf-8")
-        url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_PATTERN_PATH}"
+        url = (
+            f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/"
+            f"{GITHUB_REPO_NAME}/contents/{GITHUB_PATTERN_PATH}"
+        )
         headers = {"Authorization": f"token {token}"}
         sha = None
         get_r = requests.get(url, headers=headers, timeout=10)
