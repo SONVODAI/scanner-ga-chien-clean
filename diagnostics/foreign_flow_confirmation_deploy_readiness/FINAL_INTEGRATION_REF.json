@@ -42,5 +42,8 @@
     "cursor/foreign-flow-forward-panel-wiring-aad2 (PR #97 tip \u2014 contains huge WIP data ancestry)",
     "any branch that git-checkouts data/earning_learning or pattern_history.csv"
   ],
-  "docs_commit_note": "Branch tip may include subsequent readiness-doc commits; deploy code identity is bc8152810. Prefer branch tip if only docs ahead."
+  "docs_commit_note": "Branch tip may include subsequent readiness-doc commits; deploy code identity is bc8152810. Prefer branch tip if only docs ahead.",
+  "branch_tip_commit": "d4d5ef593350f6fdd8783a666f4edc84f29462a4",
+  "branch_tip_commit_short": "d4d5ef593",
+  "deploy_instruction": "git fetch origin cursor/foreign-flow-confirmation-prod-integrate-aad2 && git checkout origin/cursor/foreign-flow-confirmation-prod-integrate-aad2 && git merge-base --is-ancestor bc8152810554129e31a9f59437e0e3c6583462ca HEAD"
 }
