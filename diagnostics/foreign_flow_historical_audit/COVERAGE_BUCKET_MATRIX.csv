@@ -1,0 +1,5 @@
+bucket,foreign,price_hsx,adv,market_ctx,membership_asof,T3,T5,T10,T20,pit,source,price_ems
+HSX_2009_2015,True,True,False,False,False,True,True,True,True,PIT_RECONSTRUCTABLE_HOSE,HSX_foreign_api,
+HSX_2016_2022,True,True,False,False,False,True,True,True,True,PIT_RECONSTRUCTABLE_HOSE,HSX_foreign_api,
+HSX_2023_2026_pre_EMS,True,True,False,PARTIAL_histcore_from_2026-06,False,True,True,True,True,MIXED,HSX+histcore_partial,
+EMS_2026-07-31_forward,True,,PARTIAL_17d,PARTIAL,True,True,True,True,False,PIT_SAFE_forward_P0,P0+HSX/VCI,True

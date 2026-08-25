@@ -1,0 +1,19 @@
+feature,raw_derived,pit_safe,min_lookback_sessions,hist_depth,missingness,denom_available,notes
+foreign_buy_value,raw,YES,0,~2009+ HOSE longlisted via HSX,NULL if no row; never 0,n/a,mainBuyerForeignValue (+optional bigLot) VND
+foreign_sell_value,raw,YES,0,same,NULL if no row,n/a,mainSellerForeignValue VND
+foreign_net_value,derived,YES,0,same,NULL if buy or sell missing,n/a,buy-sell; do not coerce NULL→0
+foreign_buy_volume,raw,YES,0,same,NULL if absent,n/a,shares
+foreign_sell_volume,raw,YES,0,same,NULL if absent,n/a,shares
+foreign_net_volume,derived,YES,0,same,NULL if either missing,n/a,
+close/open/high/low price,raw,YES_same_session,0,co-located in HSX foreign payload,present in probed rows,n/a,enables T1/T3/T5/T10 from same API
+net_value / stock_turnover,derived,CONDITIONAL,0,LIMITED,market volume NOT in HSX foreign payload,NO_in_HSX_foreign,needs separate volume/turnover source
+buy_value / turnover,derived,CONDITIONAL,0,LIMITED,same,NO_in_HSX_foreign,
+net relative ADV5/10/20,derived,YES_if_ADV_exists,20,LIMITED locally (EMS 17d); rebuild if volume sourced,high without volume history,PARTIAL,do not invent ADV
+foreign participation share,derived,CONDITIONAL,0,LIMITED,needs total market volume,NO_in_HSX_foreign,percent field observed 0.0 — unreliable
+consecutive net-buy/sell sessions,derived,YES,2,full HSX depth,breaks on NULL days,n/a,
+cumulative net 2/3/5/10,derived,YES,10,full HSX depth,requires contiguous sessions,n/a,
+acceleration/deceleration,derived,YES,3,full HSX depth,,n/a,
+sell→buy / buy→sell transition,derived,YES,2,full HSX depth,,n/a,
+stock-own percentile/z-score,derived,YES,60,OK for longlisted; weak for new listings,,n/a,rolling past-only window
+price vs flow divergence,derived,YES,5,HSX OHLC+flow co-located,,n/a,audit candidate only — not an edge
+abnormal flow | liquidity,derived,CONDITIONAL,20,LIMITED without turnover,high,PARTIAL,

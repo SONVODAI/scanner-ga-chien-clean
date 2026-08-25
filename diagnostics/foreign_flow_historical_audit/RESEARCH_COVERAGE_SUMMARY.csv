@@ -1,0 +1,6 @@
+layer,ge_1m,ge_3m,ge_6m,ge_1y,ge_2y,sessions_est,symbols_est,quality
+1_HSX_raw_foreign_VALUE,True,True,True,True,True,4402,117,HIGH_HOSE_only
+2_foreign_plus_price_HSX_OHLC,True,True,True,True,True,4402,117,HIGH_co_located_OHLC
+3_foreign_plus_liquidity_ADV,False,False,False,False,False,17,117,WEAK_no_market_volume_in_HSX_foreign
+4_foreign_plus_Market_context,True,False,False,False,False,42,117,FC~42d; MDT0 breadth/LIVE only 8d
+5_foreign_plus_membership_asof_EMS,False,False,False,False,False,17,142,EMS_asof_only_17_sessions
