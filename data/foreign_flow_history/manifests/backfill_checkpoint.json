@@ -1,0 +1,148 @@
+{
+  "eligibility_source": "diagnostics/foreign_flow_historical_audit/ems142_hsx_eligibility.json",
+  "excluded_hnx_upcom": [
+    "ACV",
+    "BVS",
+    "C4G",
+    "CEO",
+    "DDV",
+    "DRI",
+    "FOX",
+    "HUT",
+    "IDC",
+    "LAS",
+    "MBS",
+    "MML",
+    "MSR",
+    "NTP",
+    "OIL",
+    "PLC",
+    "PVB",
+    "PVC",
+    "PVS",
+    "SHS",
+    "TNG",
+    "TVN",
+    "VGI",
+    "VGS",
+    "VGT"
+  ],
+  "schema_version": "ff_hsx_symbol_daily_v1",
+  "stage": "A",
+  "symbols": {
+    "DIG": {
+      "fetch_mode": "full_page",
+      "first_trade_date": "2009-08-19",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4245,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 4245,
+      "sha256": "322a18a08493cd2990c946bf074d42baabea26a9c4c91434f983657684971048",
+      "status": "completed",
+      "stopped_reason": "ok",
+      "updated_at": "2026-08-25T01:38:12Z",
+      "validation_ok": true
+    },
+    "FPT": {
+      "fetch_mode": "full_page",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 4402,
+      "sha256": "7bcbdc8e18d5b0159c463759e5311e5a99d6e0ef7822af40fbe03557a007ce89",
+      "status": "completed",
+      "stopped_reason": "ok",
+      "updated_at": "2026-08-25T01:33:34Z",
+      "validation_ok": true
+    },
+    "HPG": {
+      "fetch_mode": "full_page",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 4402,
+      "sha256": "99fc305f3c2b402bdf3c101be1aac30c4558bec5c61943c1f1e2d250538ace7b",
+      "status": "completed",
+      "stopped_reason": "ok",
+      "updated_at": "2026-08-25T01:32:26Z",
+      "validation_ok": true
+    },
+    "MWG": {
+      "fetch_mode": "full_page",
+      "first_trade_date": "2014-07-14",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 3025,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 3025,
+      "sha256": "368e7d92d24b0afdfa6caeafe1fe710336f3be05110462c7cce5963dcbd8baf1",
+      "status": "completed",
+      "stopped_reason": "ok",
+      "updated_at": "2026-08-25T01:35:02Z",
+      "validation_ok": true
+    },
+    "NAB": {
+      "fetch_mode": "full_page",
+      "first_trade_date": "2024-03-07",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 615,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 615,
+      "sha256": "591e8ebaee060aa1f0157524e29c2aedbfab64d1b78b5bc45ad356a47953e321",
+      "status": "completed",
+      "stopped_reason": "ok",
+      "updated_at": "2026-08-25T01:35:19Z",
+      "validation_ok": true
+    },
+    "SSI": {
+      "fetch_mode": "full_page",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 4402,
+      "sha256": "cd2bbe1531d201135d49a091682ce879a38d4d7e21189c889fc52caa9a65bce3",
+      "status": "completed",
+      "stopped_reason": "ok",
+      "updated_at": "2026-08-25T01:36:41Z",
+      "validation_ok": true
+    },
+    "VNM": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 9,
+      "raw_row_count": 4402,
+      "sha256": "3aa79a09b7ade2eb6563d484a8d308b99443e6d73f403a304f1be3bac1d737d9",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:30:27Z",
+      "validation_ok": true
+    }
+  },
+  "updated_at": "2026-08-25T01:38:12Z"
+}

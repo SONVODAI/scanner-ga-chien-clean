@@ -21,10 +21,10 @@ HSX_HEADERS = {
 }
 
 # Prefer moderate page size + pagination over flaky huge payloads.
-DEFAULT_PAGE_SIZE = 500
+DEFAULT_PAGE_SIZE = 1000
 FULL_HISTORY_PAGE_SIZE = 5000
 DEFAULT_TIMEOUT_SEC = 60.0
-DEFAULT_PACING_SEC = 0.35
+DEFAULT_PACING_SEC = 0.3
 DEFAULT_MAX_RETRIES = 4
 DEFAULT_BACKOFF_BASE_SEC = 2.0
 
@@ -146,7 +146,8 @@ def fetch_symbol_pages(
     symbol: str,
     *,
     page_size: int = DEFAULT_PAGE_SIZE,
-    prefer_full_page: bool = True,
+    # Default False: large pageSize=5000 often IncompleteReads; paginated 500–1000 is safer.
+    prefer_full_page: bool = False,
     full_page_size: int = FULL_HISTORY_PAGE_SIZE,
     timeout_sec: float = DEFAULT_TIMEOUT_SEC,
     pacing_sec: float = DEFAULT_PACING_SEC,

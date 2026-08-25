@@ -113,7 +113,7 @@ def backfill_symbol(
         sym,
         page_size=page_size,
         pacing_sec=pacing_sec,
-        prefer_full_page=True,
+        prefer_full_page=False,
     )
 
     if fetch.stopped_reason == "rate_limited":
