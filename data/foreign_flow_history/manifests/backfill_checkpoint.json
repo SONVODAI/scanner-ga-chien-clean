@@ -1054,6 +1054,53 @@
       "updated_at": "2026-08-25T03:42:58Z",
       "validation_ok": true
     },
+    "NT2": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2015-06-12",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2800,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2800,
+      "sha256": "8d32be7b6ff21c6e9170b9369cc9cc7be0fb4e095ca5223b7a606107aea24afa",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:44:50Z",
+      "validation_ok": true
+    },
+    "NTL": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "29278e79281c7a4d31ef6a2097585980f8cef24124c536e5ae2e18dd76eeb75a",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:47:53Z",
+      "validation_ok": true
+    },
+    "NVL": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2016-12-28",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2408,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2408,
+      "sha256": "4026679f3fb0d275d7ee16f5abf0493ac1cedabd8694832df86ebe4d094a1869",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:49:45Z",
+      "validation_ok": true
+    },
     "SSI": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -1089,5 +1136,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T03:42:58Z"
+  "updated_at": "2026-08-25T03:49:45Z"
 }
