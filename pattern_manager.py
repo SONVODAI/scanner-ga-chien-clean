@@ -773,7 +773,7 @@ def validate_history(history_df):
 __all__ = [
     "SCHEMA_VERSION","PATTERN_FILE","LEARNING_GROUPS","REQUIRED_COLUMNS",
     "read_pattern_history","write_pattern_history","save_pattern_history",
-    "update_tplus_result","update_all_tplus","build_pattern_statistics",
+    "merge_history","update_tplus_result","update_all_tplus","build_pattern_statistics",
     "build_dna_statistics","build_learning_snapshot","export_learning_snapshot",
     "export_learning_table","get_best_learning_patterns","build_learning_insight",
     "pattern_similarity","match_pattern","calculate_learning_bonus",
