@@ -1163,6 +1163,55 @@
       "updated_at": "2026-08-25T03:53:59Z",
       "validation_ok": true
     },
+    "PET": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "227d0d9e7c86aa2f0d0429bc818b4c06676dc778b1131d565028f30b57ce9510",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:56:08Z",
+      "validation_ok": true
+    },
+    "PHR": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-08-18",
+      "issue_codes": [
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4246,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4246,
+      "sha256": "af8717e9b0fc8b95466d80e8ec3c6c872dd3b313e0e822efed5e8432757b1061",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:57:28Z",
+      "validation_ok": true
+    },
+    "PLX": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2017-04-21",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2333,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2333,
+      "sha256": "b23e7fa065a4ea6a4eaa4b6cbf3715f1445858584a12b1ae2ccfcc40c9be35fb",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:58:21Z",
+      "validation_ok": true
+    },
     "SSI": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -1198,5 +1247,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T03:53:59Z"
+  "updated_at": "2026-08-25T03:58:21Z"
 }
