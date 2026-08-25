@@ -125,6 +125,8 @@ def maybe_freeze_after_market_daily(
     trade_date: str,
     *,
     data_dir: Optional[Path] = None,
+    ems_path: Optional[Path] = None,
+    md_path: Optional[Path] = None,
     mature: bool = True,
     require_mdt0: bool = False,
 ) -> Dict[str, Any]:
@@ -142,13 +144,18 @@ def maybe_freeze_after_market_daily(
             run_forecast_memory_daily_stage,
         )
 
-        stage = run_forecast_memory_daily_stage(
-            trade_date,
-            data_dir=data_dir,
-            require_mdt0=require_mdt0,
-            mature=mature,
-            write_pipeline_status=False,
-        )
+        kwargs: Dict[str, Any] = {
+            "data_dir": data_dir,
+            "require_mdt0": require_mdt0,
+            "mature": mature,
+            "write_pipeline_status": False,
+        }
+        if ems_path is not None:
+            kwargs["ems_path"] = ems_path
+        if md_path is not None:
+            kwargs["md_path"] = md_path
+
+        stage = run_forecast_memory_daily_stage(trade_date, **kwargs)
         freeze = stage.get("forecast_t0") or {}
         return {
             "ok": bool(stage.get("ok")),
