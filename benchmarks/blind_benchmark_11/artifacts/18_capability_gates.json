@@ -1,0 +1,67 @@
+{
+  "A": {
+    "gate": "Exit valuation active in live autonomous planning",
+    "result": "PASS",
+    "evidence": "exit_audit_entries=11"
+  },
+  "B": {
+    "gate": "Branch marginal state auditable at each decision",
+    "result": "PASS",
+    "evidence": "marginal_audit_entries=11"
+  },
+  "C": {
+    "gate": "Realized information gain history recorded",
+    "result": "PASS",
+    "evidence": "rig_entries=11 experiments=11"
+  },
+  "D": {
+    "gate": "STOP competes on same revalued basis as experiments",
+    "result": "PASS",
+    "evidence": "stop_competed=3"
+  },
+  "E": {
+    "gate": "No forbidden exit shortcut patterns in implementation",
+    "result": "FAIL",
+    "evidence": "{'benchmarks/blind_benchmark_11/run_benchmark.py': ['blind_benchmark']}"
+  },
+  "F": {
+    "gate": "Information-value bridge remains active",
+    "result": "PASS",
+    "evidence": "iv_audit_entries=11"
+  },
+  "G": {
+    "gate": "Strong positive experiments can win over STOP",
+    "result": "PASS",
+    "evidence": "harmful=0 premature=0"
+  },
+  "H": {
+    "gate": "No dominant pathological premature stops",
+    "result": "PASS",
+    "evidence": "premature_stops=0"
+  },
+  "I": {
+    "gate": "Global allocator lifecycle preserved",
+    "result": "PASS",
+    "evidence": "experiments=11 stop_reason={'code': 'INSUFFICIENT_RESEARCH_VALUE', 'detail': 'Exit valuation exceeded best experiment opportunity', 'remaining_budget': 1, 'unexplored_frontier_count': 36, 'features_touched': 2, 'eligible_features': 8}"
+  },
+  "J": {
+    "gate": "Temporal legality / fingerprint / frozen commit preserved",
+    "result": "FAIL",
+    "evidence": "21d27d696441fef3927aa21e342d571ab734f2dd"
+  },
+  "K": {
+    "gate": "Production isolation preserved",
+    "result": "PASS",
+    "evidence": "[]"
+  },
+  "L": {
+    "gate": "Experiment identity dedup remains functional",
+    "result": "PASS",
+    "evidence": "spawn_dup_errors=0"
+  },
+  "M": {
+    "gate": "Late-session scientific discipline vs BB10",
+    "result": "PARTIAL",
+    "evidence": "bb10_cycling=2 bb11_cycling=2"
+  }
+}

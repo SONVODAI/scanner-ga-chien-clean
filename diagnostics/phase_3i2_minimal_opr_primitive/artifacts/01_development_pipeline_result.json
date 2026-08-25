@@ -1,0 +1,114 @@
+{
+  "records": [],
+  "silences": [
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 0 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "aa792b126b46f9163677e4b8e23e5e565f2bc0749922d8a98050e01e37cce65c"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 1 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "5a67f21ac65567ae13045474d40fffd78bdb694af7d40187a71910bfe7a86650"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 2 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "8dd46a4bda392616de7a064a3c9b0ba89de9ba88842f2818bd92584096ccfbd2"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 3 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "5e48c0f81981b3d26f53a911f288b8342c00ed6fb0653ff1df4b99c6a75c43c4"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 4 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "1c716e0ee04d9abf203bd69cce8df650dabdc4d5a0f61e3ffdff5484017bd16c"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 5 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "f3ef801d0a44f58cfcba64ce9850702c5270d7ba4bb71d2049a03f83226591cf"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 6 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "3b2bd7c6185c25756fa7227bcb494467322facd3bc7d59d1df63d5fab1e8faf0"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 7 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "4317ac1104eda766f5859ddb9bf9bda1e75ec790f30a2436b49cb932dd4c5252"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 8 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "33f24145ab4f437bb77e7317b7b92df99b4d9fef59185bef4d5e7d466ebd7cc6"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 9 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 10 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "f6ebfd5122ea5663f54a433e95b48a11adf2de47a81b9d0776500b43b5306793"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 11 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "4cb8ef0ba4c2311f14f54c8183239dbcb6824b1c83f95f61bcab73e78075e8a9"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 12 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "2a5b5340182bc1853e788dd8abddf6995be4e33f1db01db773d4bd329c60c1c3"
+    }
+  ],
+  "executability": [],
+  "laundering": [],
+  "leakage_audit": {
+    "passed": true,
+    "zone_c_populated": false,
+    "zone_c_accessible_to_generator": false,
+    "forbidden_paths_found": [],
+    "generator_module_scan": {
+      "opr_module_count": 9,
+      "forbidden_pattern_hits": []
+    },
+    "detail": "Zone C populated: False; Zone C accessible to generator: False; Zone C not yet populated \u2014 blind hidden convergence will be INDETERMINATE"
+  },
+  "eligible_observations": 13,
+  "focal_dates_scanned": [
+    "2026-07-23",
+    "2026-07-24",
+    "2026-07-26",
+    "2026-07-27",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-01",
+    "2026-08-02",
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-05"
+  ],
+  "propositions_emitted": 0,
+  "silence_rate": 1.0
+}
