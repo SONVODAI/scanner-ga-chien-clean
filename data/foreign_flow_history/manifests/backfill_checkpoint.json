@@ -1548,6 +1548,21 @@
       "updated_at": "2026-08-25T04:32:58Z",
       "validation_ok": true
     },
+    "VCG": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2020-12-29",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1408,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1408,
+      "sha256": "b15b63faca46e07d6724a3f374c1ad0bc6efd9317e2d0000fb6bcb0b2ee6b897",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:33:44Z",
+      "validation_ok": true
+    },
     "VNM": {
       "fetch_mode": "paginated",
       "first_trade_date": "2009-01-02",
@@ -1566,5 +1581,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T04:32:58Z"
+  "updated_at": "2026-08-25T04:33:44Z"
 }
