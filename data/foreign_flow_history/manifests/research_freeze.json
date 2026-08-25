@@ -1,7 +1,7 @@
 {
-  "dataset_version": "ff_hsx_symbol_daily_v1_20260825T045617Z",
+  "dataset_version": "ff_hsx_symbol_daily_v1_20260825T045650Z",
   "schema_version": "ff_hsx_symbol_daily_v1",
-  "creation_timestamp": "2026-08-25T04:56:17Z",
+  "creation_timestamp": "2026-08-25T04:56:50Z",
   "source": "HSX_FOREIGN_API",
   "grain": "trade_date x symbol",
   "symbol_count": 117,

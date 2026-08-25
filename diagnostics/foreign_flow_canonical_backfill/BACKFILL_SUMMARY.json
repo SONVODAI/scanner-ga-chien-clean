@@ -1,0 +1,13 @@
+{
+  "verdict": "FOREIGN_FLOW_CANONICAL_BACKFILL_COMPLETE",
+  "BLIND_FOREIGN_FLOW_RESEARCH_READY": "YES",
+  "n_completed": 117,
+  "total_rows": 337236,
+  "ems_hose_coverage": "117/117",
+  "freeze": "ff_hsx_symbol_daily_v1_20260825T045650Z",
+  "earliest": "2009-01-02",
+  "latest": "2026-08-24",
+  "median_sessions": 2858,
+  "max_sessions": 4402,
+  "disk_bytes": 302404651
+}

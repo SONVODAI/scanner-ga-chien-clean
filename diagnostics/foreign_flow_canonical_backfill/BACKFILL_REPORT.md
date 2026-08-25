@@ -1,65 +1,75 @@
 # Canonical HSX Foreign Flow Historical Backfill — Report
 
-**Branch:** `cursor/hsx-foreign-flow-canonical-backfill-aad2`  
 **Schema:** `ff_hsx_symbol_daily_v1`  
-**Grain:** `trade_date × symbol` (NOT today's EMS-142 projected backward)  
-**Store:** `data/foreign_flow_history/`
-
-> This report is updated as stages complete. Final verdict appears at the bottom when freeze is written.
-
----
-
-## Dual research-freeze gate
-
-| Gate | Status |
-|------|--------|
-| Canonical backfill | *pending Stage B* |
-| Blind research ready | *pending freeze* |
-
----
-
-## Stage A — pilot (COMPLETE)
-
-| Symbol | Sessions | First | Last |
-|--------|----------|-------|------|
-| VNM | 4402 | 2009-01-02 | 2026-08-24 |
-| HPG | 4402 | 2009-01-02 | 2026-08-24 |
-| FPT | 4402 | 2009-01-02 | 2026-08-24 |
-| MWG | 3025 | (listing-dependent) | 2026-08-24 |
-| NAB | 615 | (newer listing) | 2026-08-24 |
-| SSI | 4402 | 2009-01-02 | 2026-08-24 |
-| DIG | 4245 | (listing-dependent) | 2026-08-24 |
-
-**Cross-check vs PR #93 audit:** VNM/HPG/FPT session count **4402** and first date **2009-01-02** match exactly. Units VND. Net = buy − sell exact.
-
-**Resumability proof:** re-run Stage A → all symbols `skipped_completed`.
-
----
-
-## Stage B — current EMS HOSE overlap (117)
-
-*In progress — see checkpoint / this report's final section.*
-
----
-
-## Stage C — broader historical HOSE
-
-**Not claimed complete.** No safe full historical HOSE membership reconstruction available beyond current EMS HOSE eligibility list. Symbol-level history preserved without membership-as-of claims.
-
----
-
-## Exclusions
-
-25 current EMS HNX/UPCOM symbols excluded (HSX empty; not fabricated). See eligibility manifest and freeze `exclusions`.
-
----
-
-## Production safety
-
-No modifications to Forecast Memory, Forecast T0, MDRR, P0 production collector, Market First, FC/REAL/LIVE, Edge Research, Camera, Streamlit, systemd, or trading logic.
-
----
+**Grain:** `trade_date × symbol`  
+**Store:** `data/foreign_flow_history/`  
+**Freeze dataset:** `ff_hsx_symbol_daily_v1_20260825T045650Z`  
+**Created:** `2026-08-25T04:56:50Z`
 
 ## Final verdict
 
-*(filled on freeze)*
+`FOREIGN_FLOW_CANONICAL_BACKFILL_COMPLETE`
+
+`BLIND_FOREIGN_FLOW_RESEARCH_READY = YES`
+
+## Coverage summary
+
+| Metric | Value |
+|--------|-------|
+| Symbols attempted (Stage B EMS HOSE) | 117 |
+| Symbols completed | 117 |
+| Symbols failed | 0 |
+| Symbols rate-limited | 0 |
+| Total rows | 337236 |
+| Earliest date | 2009-01-02 |
+| Latest date | 2026-08-24 |
+| Median sessions/symbol | 2858 |
+| Max sessions/symbol | 4402 |
+| Current EMS HOSE coverage | 117/117 |
+| Excluded HNX/UPCOM | 25 |
+| Disk footprint (bytes) | 302404651 |
+| Integrity hard failures | 0 |
+
+## Stage A pilot
+
+Complete. Cross-check vs PR #93: VNM/HPG/FPT = **4402** sessions from **2009-01-02**. Resume skip-completed proven.
+
+## Stage B — EMS HOSE 117
+
+**COMPLETE** — all 117 HOSE-eligible EMS symbols persisted under `data/foreign_flow_history/canonical/by_symbol/`.
+
+## Stage C — broader historical HOSE
+
+**Not claimed complete.** No safe full historical HOSE membership reconstruction beyond current EMS HOSE eligibility.
+
+## Exclusions (not fabricated)
+
+ACV, BVS, C4G, CEO, DDV, DRI, FOX, HUT, IDC, LAS, MBS, MML, MSR, NTP, OIL, PLC, PVB, PVC, PVS, SHS, TNG, TVN, VGI, VGS, VGT
+
+## Known biases
+
+- Current EMS HOSE overlap is present-day relevance, not historical membership-as-of.
+- Listing-age bias: long-listed names have deeper history than recent listings.
+- No complete historical HOSE membership reconstruction claimed.
+- Raw provider OHLC; corporate-action adjustment unverified.
+- Market-context / ADV overlap much shorter than foreign-flow history.
+
+## Price outcome readiness (no labels computed)
+
+Same-provider OHLC supports later session-based T1/T3/T5/T10/(T20) and path MFE/MAE.  
+Outcome labels are **not** mixed into T0 canonical rows.
+
+## Resumability
+
+Checkpoint: `data/foreign_flow_history/manifests/backfill_checkpoint.json`.  
+Re-run stages skip `status=completed`. Partial failure does not destroy completed symbols. Proven after SIGPIPE resume.
+
+## Dataset / hash manifest
+
+See `data/foreign_flow_history/manifests/research_freeze.json` (per-symbol sha256 + coverage).
+
+## Production safety
+
+No P0 / Forecast / MDRR / Edge / Camera / Streamlit / systemd mutations.
+
+STOP — no edge discovery performed.
