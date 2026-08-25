@@ -1703,6 +1703,36 @@
       "updated_at": "2026-08-25T04:44:51Z",
       "validation_ok": true
     },
+    "VJC": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2017-02-28",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2370,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2370,
+      "sha256": "c7369b1bbfc8ed4387439e7bd492fe335f9f08df6033479ee99ea4955afb7c74",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:45:58Z",
+      "validation_ok": true
+    },
+    "VND": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2017-08-18",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2143,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2143,
+      "sha256": "f8ec6e9e9b47e86067c79a10eafc71a5de00d6aea067948a975e2fcd3d276fce",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:46:50Z",
+      "validation_ok": true
+    },
     "VNM": {
       "fetch_mode": "paginated",
       "first_trade_date": "2009-01-02",
@@ -1719,7 +1749,102 @@
       "stopped_reason": "total_pages_exhausted",
       "updated_at": "2026-08-25T01:30:27Z",
       "validation_ok": true
+    },
+    "VOS": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2010-09-08",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 3982,
+      "outcome_readiness": true,
+      "page_count": 4,
+      "raw_row_count": 3982,
+      "sha256": "af11f9f120175345f91cd3454b6901dc06b5e2c3ead783a49c4b1e5c2169d15e",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:48:30Z",
+      "validation_ok": true
+    },
+    "VPB": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2017-08-17",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2251,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2251,
+      "sha256": "7593f560c9bf83d9940d94af57155a53da5ae2836b281e8ff9d0422b443b1515",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:49:56Z",
+      "validation_ok": true
+    },
+    "VPL": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1069,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1069,
+      "sha256": "c62d5667639ff15b6d977bfa6c8809f0034ed827dd1d55423dbca0cb33ddbe45",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:50:28Z",
+      "validation_ok": true
+    },
+    "VPX": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2025-12-11",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 173,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 173,
+      "sha256": "8b7c0b888bc35510a583f3218e1ca6b05c3c2d2745e5edd201a5b11e8e75f8bf",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:50:38Z",
+      "validation_ok": true
+    },
+    "VRE": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2017-11-06",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2195,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2195,
+      "sha256": "4aeb0ffe05800e8e4a75063d22cb2db3414d5b8c32da30d2d6c2bb564ce334d2",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:51:31Z",
+      "validation_ok": true
+    },
+    "VSC": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS",
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "fc3b6ea3ac853c70a2e38acfba7744be52363dd1e99e59ccf290210607a9b926",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:53:14Z",
+      "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T04:44:51Z"
+  "updated_at": "2026-08-25T04:53:14Z"
 }
