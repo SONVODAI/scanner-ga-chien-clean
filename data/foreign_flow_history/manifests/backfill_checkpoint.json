@@ -1245,6 +1245,23 @@
       "updated_at": "2026-08-25T04:01:54Z",
       "validation_ok": true
     },
+    "PTB": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2011-07-22",
+      "issue_codes": [
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 3766,
+      "outcome_readiness": true,
+      "page_count": 4,
+      "raw_row_count": 3766,
+      "sha256": "f357acd21490fc504aa916e289ec6ea70dece3958bc93348899c1d1db278bf30",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T04:06:45Z",
+      "validation_ok": true
+    },
     "SSI": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -1280,5 +1297,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T04:01:54Z"
+  "updated_at": "2026-08-25T04:06:45Z"
 }
