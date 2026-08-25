@@ -29,13 +29,17 @@ systemctl list-timers --all | grep -i mrbot | tee /tmp/mrbot-pre-ff-confirm.time
 systemctl list-timers --all | grep -iE 'foreign|confirm|forecast' || echo "OK: no extra confirmation/forecast timer"
 
 # 4) Dependency / import proof (no upgrades)
+# vnstock 4.0.5 may omit module __version__ — use importlib.metadata
 /opt/mrbot-camera-venv/bin/python - <<'PY' | tee /tmp/mrbot-pre-ff-confirm.deps
 import sys
+from importlib.metadata import version as pkg_version
 print("python", sys.version)
-for n in ("numpy","pandas","scipy","requests"):
-    m=__import__(n); print(n, getattr(m,"__version__","?"))
-import vnstock
-print("vnstock", getattr(vnstock,"__version__", type(vnstock)))
+for n in ("numpy", "pandas", "scipy", "requests"):
+    m = __import__(n)
+    print(n, getattr(m, "__version__", pkg_version(n)))
+import vnstock  # noqa: F401
+print("vnstock", pkg_version("vnstock"), "(importlib.metadata; __version__=", getattr(vnstock, "__version__", None), ")")
+assert str(pkg_version("vnstock")).startswith("4.0")
 from modules.forecast_research.production_daily_integration import run_forecast_memory_daily_stage
 print("forecast_memory_stage_import_ok")
 PY
