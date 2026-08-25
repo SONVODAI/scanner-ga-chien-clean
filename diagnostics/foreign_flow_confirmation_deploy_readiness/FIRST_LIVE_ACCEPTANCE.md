@@ -4,7 +4,7 @@ Infrastructure can be healthy **without** any candidate trigger.
 
 ## Checklist (after deploy + ≥1 timer cycle or manual gated stage)
 
-1. **Correct HEAD** — `git rev-parse HEAD` == `bc8152810554129e31a9f59437e0e3c6583462ca`
+1. **Correct HEAD** — `git merge-base --is-ancestor bc8152810554129e31a9f59437e0e3c6583462ca HEAD` succeeds (tip may be `fe613c7e2` with docs)
 2. **Market/Forecast/Edge healthy** — daily research result not FAILED solely due to confirmation; Forecast Memory stage present; Edge disposition unchanged by ff hook errors
 3. **Hook executes** — stage payload / status contains `ff_confirmation_forward` (not missing key). Acceptable: `ok=true`, or `partial_*`, or `WAITING` via MDT0 gate skip
 4. **Exact-date rows** — if session `trade_date > 2026-08-24` ingested: `forward_panel/by_symbol/*.csv` rows have that exact date only

@@ -1,6 +1,7 @@
 # VPS Deploy Runbook — Foreign Flow Confirmation
 
-**Deploy exact ref:** `bc8152810` (`cursor/foreign-flow-confirmation-prod-integrate-aad2`)  
+**Deploy exact ref:** `bc8152810` (code) or branch tip `fe613c7e2` (code + readiness docs only)  
+Branch: `cursor/foreign-flow-confirmation-prod-integrate-aad2`  
 **Do NOT deploy:** `origin/main`, PR #97 tip `df73282aa`, or any WIP backfill branch.  
 **This task does not deploy.** Operator executes on `/opt/mrbot-camera`.
 
@@ -63,12 +64,16 @@ echo "BACKUP=$BK"
 ```bash
 cd /opt/mrbot-camera
 git fetch origin cursor/foreign-flow-confirmation-prod-integrate-aad2
-git checkout bc8152810554129e31a9f59437e0e3c6583462ca
-# optional named branch:
-# git checkout -B cursor/foreign-flow-confirmation-prod-integrate-aad2 bc8152810554129e31a9f59437e0e3c6583462ca
+# Prefer branch tip (includes readiness docs) OR pin code commit:
+git checkout fe613c7e22cda1e3af429ba8a41c233182a723d0
+# or: git checkout origin/cursor/foreign-flow-confirmation-prod-integrate-aad2
+# Verify code parent identity includes bc8152810:
+git merge-base --is-ancestor bc8152810554129e31a9f59437e0e3c6583462ca HEAD && echo "OK: clean integrate code present"
 
 git rev-parse HEAD | tee /tmp/mrbot-post-ff-confirm.HEAD
-test "$(git rev-parse HEAD)" = "bc8152810554129e31a9f59437e0e3c6583462ca"
+# If pinning code-only:
+# git checkout bc8152810554129e31a9f59437e0e3c6583462ca
+# test "$(git rev-parse HEAD)" = "bc8152810554129e31a9f59437e0e3c6583462ca"
 
 # NO package upgrades unless separately approved
 # NO: git checkout -- data/...
