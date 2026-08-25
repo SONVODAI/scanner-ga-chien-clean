@@ -1,0 +1,43 @@
+{
+  "integration_branch": "cursor/foreign-flow-confirmation-prod-integrate-aad2",
+  "integration_commit": "bc8152810554129e31a9f59437e0e3c6583462ca",
+  "integration_commit_short": "bc8152810",
+  "base_ref": "cursor/forecast-memory-prod-integrate-aad2",
+  "base_commit": "d5d46be086194088a0bca74f9a0a91ffc75c3c37",
+  "base_commit_short": "d5d46be08",
+  "source_pr97_tip": "df73282aa3690227e28fa56c8b7b195e892299f2",
+  "construction": "path-checkout squash-apply of required files onto Forecast Memory tip; excludes PR #97 WIP Stage B CSV ancestry",
+  "required_code_paths": [
+    "modules/foreign_flow_confirmation/",
+    "modules/foreign_flow_history/",
+    "modules/durable_csv.py",
+    "modules/forecast_research/production_daily_integration.py (ff_confirmation_forward hook)",
+    "retention-related forecast persistence helpers",
+    "diagnostics/foreign_flow_confirmation_v1/",
+    "diagnostics/foreign_flow_historical_audit/ems142_hsx_eligibility.json",
+    "tests/test_foreign_flow_confirmation_forward_panel.py",
+    "tests/test_foreign_flow_canonical_backfill.py",
+    "tests/test_market_history_retention.py"
+  ],
+  "excluded_from_integrate": [
+    "PR #97 Stage B WIP progress commits (~50)",
+    "data/foreign_flow_history/canonical/by_symbol/*.csv bulk (sync separately on VPS)",
+    "modules/foreign_flow_blind_research/ (not required for prospective confirmation runtime)",
+    "unrelated Edge research / Camera / Streamlit stacks"
+  ],
+  "last_documented_production_head": {
+    "commit": "8514fd7b250447bd610f2bda2684fc9e6c2f8197",
+    "branch": "cursor/phase-3k5b-waiting-data-retry-aad2",
+    "source": "diagnostics/forecast_memory_ops_readiness/VPS_DEPLOY_RUNBOOK.md",
+    "live_verified_this_task": false
+  },
+  "github_main": {
+    "commit": "19cc913a7",
+    "note": "NOT production lineage; dominated by earning-learning journal pushes"
+  },
+  "do_not_deploy": [
+    "origin/main",
+    "cursor/foreign-flow-forward-panel-wiring-aad2 (PR #97 tip — contains huge WIP data ancestry)",
+    "any branch that git-checkouts data/earning_learning or pattern_history.csv"
+  ]
+}
