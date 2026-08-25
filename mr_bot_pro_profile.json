@@ -3,16 +3,16 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-08-24 19:28:41",
-  "age_days": 60,
-  "bot_version_number": 4.633,
+  "updated_at": "2026-08-25 20:27:34",
+  "age_days": 61,
+  "bot_version_number": 4.65,
   "status": "THINKING",
   "personality": "CÂN BẰNG",
   "confidence": 46.0,
   "experience": {
-    "observations": 10669,
-    "signals": 749,
-    "completed_t5": 632,
+    "observations": 10841,
+    "signals": 779,
+    "completed_t5": 649,
     "hypotheses": 3,
     "beliefs": 0,
     "reflections": 1,
@@ -37,15 +37,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-08-19 00:07:02",
-      "status": "THINKING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 46.0,
-      "completed_t5": 553,
-      "market_real": 5.7,
-      "message": "Market REAL 5.7 < 6. Tôi chỉ lập watchlist (STB, OCB, BAF), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-08-19 00:09:16",
       "status": "THINKING",
@@ -755,6 +746,15 @@
       "confidence": 46.0,
       "completed_t5": 632,
       "market_real": 9.6,
+      "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
+    },
+    {
+      "time": "2026-08-25 20:27:34",
+      "status": "THINKING",
+      "personality": "CÂN BẰNG",
+      "confidence": 46.0,
+      "completed_t5": 649,
+      "market_real": 7.4,
       "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
     }
   ]
