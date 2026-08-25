@@ -594,6 +594,42 @@
       "updated_at": "2026-08-25T02:41:43Z",
       "validation_ok": true
     },
+    "GIL": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS",
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "752456df36a8c4376b43e78fb77336a410ecff1389ad839e1d68869ef0be48a8",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:44:51Z",
+      "validation_ok": true
+    },
+    "GMD": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS",
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "fe120d392e1b0f9fd1cd7d3ce01f7229c14a93008094ce96f98b749ef2ee1e46",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:48:07Z",
+      "validation_ok": true
+    },
     "HPG": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -676,5 +712,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T02:41:43Z"
+  "updated_at": "2026-08-25T02:48:07Z"
 }
