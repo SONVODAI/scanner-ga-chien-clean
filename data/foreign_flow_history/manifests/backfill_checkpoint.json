@@ -442,6 +442,51 @@
       "updated_at": "2026-08-25T02:27:22Z",
       "validation_ok": true
     },
+    "EIB": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-10-27",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4197,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4197,
+      "sha256": "ce9807321488513ddb21da4a1f1be1f35573508247a5a2fa22a99582e5e5bd77",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:30:02Z",
+      "validation_ok": true
+    },
+    "EVF": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2022-01-11",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1150,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1150,
+      "sha256": "172f6b1bd7ff9293019941aa6711fdd8e2bd6dae6ce600206fd28c5578d04af9",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:30:53Z",
+      "validation_ok": true
+    },
+    "FCN": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2012-07-24",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 3514,
+      "outcome_readiness": true,
+      "page_count": 4,
+      "raw_row_count": 3514,
+      "sha256": "d6a2aeb8be49ab5562cd76b1a3de3eed6a6026b93b06332be5a25ec88de28c56",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:32:35Z",
+      "validation_ok": true
+    },
     "FPT": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -541,5 +586,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T02:27:22Z"
+  "updated_at": "2026-08-25T02:32:35Z"
 }
