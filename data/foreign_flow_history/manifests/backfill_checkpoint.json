@@ -825,6 +825,21 @@
       "updated_at": "2026-08-25T03:15:55Z",
       "validation_ok": true
     },
+    "IJC": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2010-04-19",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4079,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4079,
+      "sha256": "f7f447410d58c0a4cf8222a218ef1469f7c6308ed2009689d9c41d09b417551e",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:22:52Z",
+      "validation_ok": true
+    },
     "MWG": {
       "fetch_mode": "full_page",
       "first_trade_date": "2014-07-14",
@@ -890,5 +905,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T03:15:55Z"
+  "updated_at": "2026-08-25T03:22:52Z"
 }
