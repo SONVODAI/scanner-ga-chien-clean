@@ -2,6 +2,8 @@
   "integration_branch": "cursor/foreign-flow-confirmation-prod-integrate-aad2",
   "integration_commit": "bc8152810554129e31a9f59437e0e3c6583462ca",
   "integration_commit_short": "bc8152810",
+  "code_integrate_commit": "bc8152810554129e31a9f59437e0e3c6583462ca",
+  "code_integrate_commit_short": "bc8152810",
   "base_ref": "cursor/forecast-memory-prod-integrate-aad2",
   "base_commit": "d5d46be086194088a0bca74f9a0a91ffc75c3c37",
   "base_commit_short": "d5d46be08",
@@ -37,7 +39,8 @@
   },
   "do_not_deploy": [
     "origin/main",
-    "cursor/foreign-flow-forward-panel-wiring-aad2 (PR #97 tip — contains huge WIP data ancestry)",
+    "cursor/foreign-flow-forward-panel-wiring-aad2 (PR #97 tip \u2014 contains huge WIP data ancestry)",
     "any branch that git-checkouts data/earning_learning or pattern_history.csv"
-  ]
+  ],
+  "docs_commit_note": "Branch tip may include subsequent readiness-doc commits; deploy code identity is bc8152810. Prefer branch tip if only docs ahead."
 }
