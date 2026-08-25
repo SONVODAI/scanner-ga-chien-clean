@@ -28,8 +28,135 @@
     "VGT"
   ],
   "schema_version": "ff_hsx_symbol_daily_v1",
-  "stage": "A",
+  "stage": "B",
   "symbols": {
+    "ACB": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2020-12-09",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1422,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1422,
+      "sha256": "435450629ca151cc5b59d1f46a503c14df3e3a4a3c0b00eb7df9643ade0e525c",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:39:52Z",
+      "validation_ok": true
+    },
+    "AGR": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-12-10",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4165,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4165,
+      "sha256": "4d28cd072c628fb196c154c1942b188aa1c75d9b071e5c720e0a2703afff0127",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:41:40Z",
+      "validation_ok": true
+    },
+    "ANV": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "8c8362f03a964e6d129f9133b2baec37231b4d6c4e3647518121e1e576eb534e",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:44:05Z",
+      "validation_ok": true
+    },
+    "BAF": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2021-12-02",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 1177,
+      "outcome_readiness": true,
+      "page_count": 2,
+      "raw_row_count": 1177,
+      "sha256": "2ae6d1c149585ba469286c8a0a1e555d0c1c16f8e0b92d93a04538023ba2bce9",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:45:51Z",
+      "validation_ok": true
+    },
+    "BFC": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2015-10-07",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2718,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2718,
+      "sha256": "9828f92b5fa3a9ffc8806a760d3f46061f315ca114b01d938c9718d5971d78ad",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:49:04Z",
+      "validation_ok": true
+    },
+    "BID": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2014-01-24",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 3135,
+      "outcome_readiness": true,
+      "page_count": 4,
+      "raw_row_count": 3135,
+      "sha256": "a43396d8e5e96eef6cf01c70e246bf2bb679766688941489cbdc1a9a35f12e3a",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:52:50Z",
+      "validation_ok": true
+    },
+    "BMP": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2009-01-02",
+      "issue_codes": [
+        "WEEKEND_SESSIONS",
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4402,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4402,
+      "sha256": "7545bb3c0c7dbcebe580cd20acec5d78abc1c3642e14bf16e6a013b6bc29dfc1",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:56:36Z",
+      "validation_ok": true
+    },
+    "BSI": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2011-07-19",
+      "issue_codes": [
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 3682,
+      "outcome_readiness": true,
+      "page_count": 4,
+      "raw_row_count": 3682,
+      "sha256": "8b25f327297320a0709a50b8c951a34d0b627c007d090dcafc234c855a3f253b",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T01:59:44Z",
+      "validation_ok": true
+    },
     "DIG": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-08-19",
@@ -144,5 +271,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T01:38:12Z"
+  "updated_at": "2026-08-25T01:59:44Z"
 }
