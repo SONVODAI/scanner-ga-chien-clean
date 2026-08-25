@@ -33,13 +33,13 @@ Reuse existing P0/HSX foreign collection **fields** and the accepted historical 
 | trailing 252 sessions net | `net_hi_pct90` | yes historically | **NO** in P0 |
 | streak history | anti-edge | computable from net series | **NO** in P0 |
 
-### Minimum forward-memory gap (blocking for start)
+### Forward-memory gap — CLOSED in code (pending deploy)
 
-1. **Daily symbol×day HSX foreign append** for trade dates **> 2026-08-24** into a confirmation-usable forward panel (recommended: `data/foreign_flow_confirmation/forward_panel/`), built with the same schema as canonical history.
-2. **Lookback continuity:** features for early post-freeze T0s must read **frozen history** (≤2026-08-24) **plus** new forward rows — without rewriting freeze files.
-3. **Session calendar** to resolve T10 maturity dates and count patience windows.
+1. **Daily symbol×day HSX foreign append** → `modules/foreign_flow_confirmation/daily.py` + `exact_date.py` → `data/foreign_flow_confirmation/forward_panel/by_symbol/`.
+2. **Lookback continuity** → `continuity.join_history_and_forward` (freeze READ-ONLY + forward).
+3. **Session calendar** → `offset_trading_sessions` for T10 maturity.
 
-Until (1)+(2) exist for at least one post-freeze session, events cannot be honestly logged.
+Deploy via existing Forecast Memory daily stage hook (`ff_confirmation_forward`). No new timer.
 
 ## Isolated runtime layout
 
