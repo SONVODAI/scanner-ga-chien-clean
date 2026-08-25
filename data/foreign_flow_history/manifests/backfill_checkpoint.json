@@ -157,6 +157,21 @@
       "updated_at": "2026-08-25T01:59:44Z",
       "validation_ok": true
     },
+    "BSR": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2025-01-16",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 397,
+      "outcome_readiness": true,
+      "page_count": 1,
+      "raw_row_count": 397,
+      "sha256": "ad6ea8c8c3c595e2f00b48658fe9441c1bc34d48987e05c6c076f53de1039fdb",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T02:00:06Z",
+      "validation_ok": true
+    },
     "DIG": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-08-19",
@@ -271,5 +286,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T01:59:44Z"
+  "updated_at": "2026-08-25T02:00:06Z"
 }
