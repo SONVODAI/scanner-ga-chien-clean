@@ -1131,6 +1131,38 @@
       "updated_at": "2026-08-25T03:51:16Z",
       "validation_ok": true
     },
+    "PC1": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2016-11-16",
+      "issue_codes": [],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 2438,
+      "outcome_readiness": true,
+      "page_count": 3,
+      "raw_row_count": 2438,
+      "sha256": "51512a9e80cd19c8a72d7141bbd0cb11631980d61ce374b02ee95a4663ed4f35",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:52:15Z",
+      "validation_ok": true
+    },
+    "PDR": {
+      "fetch_mode": "paginated",
+      "first_trade_date": "2010-07-30",
+      "issue_codes": [
+        "OHLC_SANITY"
+      ],
+      "last_trade_date": "2026-08-24",
+      "n_rows": 4008,
+      "outcome_readiness": true,
+      "page_count": 5,
+      "raw_row_count": 4008,
+      "sha256": "a32d3e65daa648ea187228839d6072fe970f0661c02bb8968ad1b7b77ad3acf6",
+      "status": "completed",
+      "stopped_reason": "total_pages_exhausted",
+      "updated_at": "2026-08-25T03:53:59Z",
+      "validation_ok": true
+    },
     "SSI": {
       "fetch_mode": "full_page",
       "first_trade_date": "2009-01-02",
@@ -1166,5 +1198,5 @@
       "validation_ok": true
     }
   },
-  "updated_at": "2026-08-25T03:51:16Z"
+  "updated_at": "2026-08-25T03:53:59Z"
 }
