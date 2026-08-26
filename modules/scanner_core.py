@@ -500,38 +500,57 @@ def download_symbol_data(symbol: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def fetch_live_price(symbol: str) -> dict:
+def fetch_live_price(symbol: str, *, allow_yahoo: bool = True) -> dict:
     """
-    Lấy giá live 15m từ yfinance.
-    Trả về dict để sau này dễ mở rộng.
-    Quan trọng: volume ở đây là tổng volume intraday YF nếu có, không lấy riêng cây 15m cuối.
+    Optional Yahoo live quote. NOT a primary Vietnam EOD provider.
+    Headless EOD must call with allow_yahoo=False so HNX/UPCoM never depend on Yahoo.
     """
+    if not allow_yahoo:
+        return {"price": np.nan, "volume": np.nan, "source": "YAHOO_SKIPPED_EOD", "ts": ""}
+
     if yf is None:
         return {"price": np.nan, "volume": np.nan, "source": "NO_YF", "ts": ""}
 
     ticker = f"{symbol}{YAHOO_SUFFIX}"
 
     try:
-        data = yf.download(
-            ticker,
-            period="1d",
-            interval="15m",
-            progress=False,
-            auto_adjust=False,
-            threads=False,
-        )
+        import logging as _logging
+        import warnings
+
+        yf_logger = _logging.getLogger("yfinance")
+        prev_level = yf_logger.level
+        yf_logger.setLevel(_logging.CRITICAL)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                data = yf.download(
+                    ticker,
+                    period="1d",
+                    interval="15m",
+                    progress=False,
+                    auto_adjust=False,
+                    threads=False,
+                )
+        finally:
+            yf_logger.setLevel(prev_level)
 
         source = "YF_15M"
 
         if data is None or data.empty:
-            data = yf.download(
-                ticker,
-                period="5d",
-                interval="1d",
-                progress=False,
-                auto_adjust=False,
-                threads=False,
-            )
+            yf_logger.setLevel(_logging.CRITICAL)
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    data = yf.download(
+                        ticker,
+                        period="5d",
+                        interval="1d",
+                        progress=False,
+                        auto_adjust=False,
+                        threads=False,
+                    )
+            finally:
+                yf_logger.setLevel(prev_level)
             source = "YF_1D_FALLBACK"
 
         if data is None or data.empty:
@@ -577,13 +596,19 @@ def fetch_live_price(symbol: str) -> dict:
 # =========================================================
 # REALTIME INJECTION - FIX FINAL
 # =========================================================
-def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame, dict]:
+def inject_live_into_daily(
+    raw: pd.DataFrame,
+    symbol: str,
+    *,
+    allow_yahoo: bool = True,
+) -> tuple[pd.DataFrame, dict]:
     """Bơm live price vào candle cuối theo chế độ an toàn.
 
     Nguyên tắc V19.2 SAFE:
     - Live lỗi / dữ liệu bẩn / giá rỗng => dùng D1, không crash.
     - Chỉ gán vào df sau khi final_price đã được kiểm tra là số hợp lệ.
     - Bất kỳ lỗi nào trong injection đều fallback về daily dataframe.
+    - EOD/headless: allow_yahoo=False keeps VNSTOCK D1 only (Yahoo never primary).
     """
     live = {
         "price": np.nan,
@@ -591,12 +616,15 @@ def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame
         "source": "INIT",
         "ts": "",
         "daily_last_close_before_live": np.nan,
+        "eod_provider": "VNSTOCK_D1",
+        "bar_date": "",
     }
 
     try:
-        live = fetch_live_price(symbol)
+        live = fetch_live_price(symbol, allow_yahoo=allow_yahoo)
         if not isinstance(live, dict):
             live = {"price": np.nan, "volume": np.nan, "source": "BAD_LIVE_DICT", "ts": ""}
+        live["eod_provider"] = "VNSTOCK_D1"
 
         df = raw.copy().sort_values("date").reset_index(drop=True)
         if df.empty:
@@ -619,6 +647,16 @@ def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame
         live_price = to_float(live.get("price", np.nan))
         live_volume = to_float(live.get("volume", np.nan))
         live["daily_last_close_before_live"] = last_close
+        try:
+            live["bar_date"] = str(pd.Timestamp(df.loc[last_idx, "date"]).date())
+        except Exception:
+            live["bar_date"] = ""
+
+        if not allow_yahoo:
+            live["price"] = last_close
+            live["volume"] = last_volume
+            live["source"] = "VNSTOCK_D1_EOD"
+            return df.reset_index(drop=True), live
 
         now_vn = pd.Timestamp.now(tz="Asia/Ho_Chi_Minh")
         market_closed = (now_vn.hour > 15) or (now_vn.hour == 15 and now_vn.minute >= 0)
@@ -1024,13 +1062,13 @@ def classify_group(row: dict) -> str:
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
-def analyze_symbol(symbol: str) -> dict | None:
+def analyze_symbol(symbol: str, *, eod_mode: bool = False) -> dict | None:
     raw = download_symbol_data(symbol)
     if raw.empty or len(raw) < 40:
         return None
 
-    # Sửa bệnh chính: bơm live vào D1 trước khi tính indicator.
-    live_df, live_info = inject_live_into_daily(raw, symbol)
+    # EOD/headless: VNSTOCK D1 only — do not use Yahoo as primary/fallback provider.
+    live_df, live_info = inject_live_into_daily(raw, symbol, allow_yahoo=not eod_mode)
     if live_df.empty or len(live_df) < 40:
         return None
 
@@ -1101,6 +1139,8 @@ def analyze_symbol(symbol: str) -> dict | None:
             "daily_price_before_live": safe_round(daily_price_before_live, 0),
             "live_source": live_info.get("source", ""),
             "live_ts": live_info.get("ts", ""),
+            "eod_provider": live_info.get("eod_provider", "VNSTOCK_D1"),
+            "bar_date": live_info.get("bar_date", ""),
             "ema9": safe_round(ema9_, 2),
             "ma20": safe_round(ma20_, 2),
             "ema9_ma20_slope": safe_round(slope_, 2),
@@ -1137,27 +1177,33 @@ def analyze_symbol(symbol: str) -> dict | None:
 # =========================================================
 # SCAN
 # =========================================================
-def run_scan(symbols: list[str]) -> pd.DataFrame:
+def run_scan(symbols: list[str], *, eod_mode: bool = False) -> pd.DataFrame:
     """Quét watchlist theo chế độ chịu lỗi.
 
     Một mã lỗi không được phép làm sập toàn bộ scanner.
     Lỗi được ghi vào runtime_error_log.csv, các mã còn lại vẫn chạy bình thường.
+    eod_mode=True: Vietnam D1 via vnstock only (no Yahoo live injection).
     """
     rows = []
-    progress = None
     total = len(symbols)
+    missing = []
 
     for i, symbol in enumerate(symbols):
         try:
-            item = analyze_symbol(symbol)
+            item = analyze_symbol(symbol, eod_mode=eod_mode)
             if item is not None:
                 rows.append(item)
+            else:
+                missing.append(str(symbol).upper())
         except Exception as e:
             log_runtime_error(symbol, "analyze_symbol", e)
+            missing.append(str(symbol).upper())
             continue
-        finally:
-            pass
-
+        if (i + 1) % 20 == 0 or (i + 1) == total:
+            print(
+                f"[headless_scan] progress {i+1}/{total} ok={len(rows)} missing={len(missing)}",
+                flush=True,
+            )
 
     if not rows:
         return pd.DataFrame()

@@ -559,3 +559,56 @@ def test_recovery_preserves_autonomy_status_file(tmp_path: Path):
     assert autonomy_path.read_text(encoding="utf-8") == before
     assert (fm / STATUS_RECOVERY).exists()
     assert list((fm / "recovery_runs").glob(f"RECOVERY_{td}_*.json"))
+
+
+def test_eod_mode_skips_yahoo_live_injection(monkeypatch):
+    from modules import scanner_core as sc
+    import pandas as pd
+
+    calls = {"yahoo": 0}
+
+    def _fake_fetch(symbol, *, allow_yahoo=True):
+        if allow_yahoo:
+            calls["yahoo"] += 1
+        return {"price": float("nan"), "volume": float("nan"), "source": "YAHOO_SKIPPED_EOD" if not allow_yahoo else "YF", "ts": ""}
+
+    dates = pd.date_range("2026-01-01", periods=50, freq="D")
+    raw = pd.DataFrame(
+        {
+            "date": dates,
+            "open": 10.0,
+            "high": 11.0,
+            "low": 9.0,
+            "close": 10.5,
+            "volume": 1000.0,
+        }
+    )
+    monkeypatch.setattr(sc, "fetch_live_price", _fake_fetch)
+    _df, info = sc.inject_live_into_daily(raw, "SHS", allow_yahoo=False)
+    assert info["source"] == "VNSTOCK_D1_EOD"
+    assert info.get("eod_provider") == "VNSTOCK_D1"
+    assert calls["yahoo"] == 0
+
+
+def test_health_summary_line_format():
+    from modules.production_eod.headless_eod import (
+        RUN_CLASS_AUTONOMOUS,
+        build_eod_health_summary,
+    )
+
+    h = build_eod_health_summary(
+        trade_date="2026-08-27",
+        source_rows=142,
+        expected_universe=142,
+        artifacts={
+            "ems": {"ok": True},
+            "mdt0": {"ok": True, "daily_snapshot_id": "x"},
+            "earning_learning": {"ok": True, "observations_added": 142, "github_sync": "GITHUB_OK"},
+            "forecast_memory": {"forecast_t0": {"ok": True}},
+        },
+        forecast_memory={"forecast_t0": {"ok": True}},
+        stage_disposition="SUCCESS",
+        run_class=RUN_CLASS_AUTONOMOUS,
+    )
+    assert "EOD 142/142" in h["line"]
+    assert "AUTO PASS" in h["line"]
