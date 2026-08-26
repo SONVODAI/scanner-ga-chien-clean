@@ -13,3 +13,4 @@ scikit-learn
 beautifulsoup4
 yfinance
 requests
+ipython

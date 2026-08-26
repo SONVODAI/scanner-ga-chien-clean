@@ -72,6 +72,7 @@ class HeadlessEodResult:
     market_live: Optional[float] = None
     market_forecast: Optional[float] = None
     forecast_memory: Dict[str, Any] = field(default_factory=dict)
+    health_summary: Dict[str, Any] = field(default_factory=dict)
     errors: list = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -205,7 +206,11 @@ def build_eod_scan_df(
     else:
         from modules.scanner_core import WATCHLIST, run_scan
 
-        out = run_scan(list(symbols) if symbols is not None else list(WATCHLIST))
+        # Headless EOD: Vietnam D1 via vnstock only — Yahoo is never primary.
+        out = run_scan(
+            list(symbols) if symbols is not None else list(WATCHLIST),
+            eod_mode=True,
+        )
     if out is None or out.empty:
         return pd.DataFrame()
     try:
@@ -215,6 +220,57 @@ def build_eod_scan_df(
     except Exception as exc:
         logger.warning("add_evolution_health failed safely: %s", exc)
     return out
+
+
+def build_eod_health_summary(
+    *,
+    trade_date: str,
+    source_rows: int,
+    expected_universe: int,
+    artifacts: Dict[str, Any],
+    forecast_memory: Dict[str, Any],
+    stage_disposition: str,
+    run_class: str,
+) -> Dict[str, Any]:
+    """Explicit operator-facing health line for logs/status."""
+    ems_ok = bool((artifacts.get("ems") or {}).get("ok"))
+    mdt0_ok = bool((artifacts.get("mdt0") or {}).get("ok")) and (
+        (artifacts.get("mdt0") or {}).get("canonical_added") in (0, 1, None)
+        or (artifacts.get("mdt0") or {}).get("daily_snapshot_id")
+    )
+    # Prefer explicit FM freeze result when present.
+    ft0 = (forecast_memory or {}).get("forecast_t0") or (artifacts.get("forecast_memory") or {}).get(
+        "forecast_t0"
+    ) or {}
+    fc_ok = bool(ft0.get("ok")) or str(ft0.get("reason") or "") == "ALREADY_FROZEN"
+    el = artifacts.get("earning_learning") or {}
+    el_ok = bool(el.get("ok", False)) and int(el.get("observations_added") or 0) >= 0
+    sync = el.get("github_sync") or (forecast_memory or {}).get("reason") or ""
+    auto = "N/A"
+    if run_class == RUN_CLASS_AUTONOMOUS:
+        auto = "PASS" if stage_disposition == "SUCCESS" and source_rows >= expected_universe else "FAIL"
+    elif run_class == RUN_CLASS_RECOVERY:
+        auto = "RECOVERY_NOT_AUTO"
+    line = (
+        f"EOD {source_rows}/{expected_universe} | "
+        f"MDT0 {'OK' if mdt0_ok else 'NO'} | "
+        f"FC {'OK' if fc_ok else 'NO'} | "
+        f"EL {'OK' if el_ok else 'NO'} | "
+        f"SYNC {sync or 'UNKNOWN'} | "
+        f"AUTO {auto}"
+    )
+    return {
+        "trade_date": trade_date,
+        "eod_rows": source_rows,
+        "expected_universe": expected_universe,
+        "ems_ok": ems_ok,
+        "mdt0_ok": bool(mdt0_ok),
+        "forecast_t0_ok": fc_ok,
+        "earning_learning_ok": el_ok,
+        "sync": sync,
+        "auto_verdict": auto,
+        "line": line,
+    }
 
 
 def run_headless_eod(
@@ -266,6 +322,13 @@ def run_headless_eod(
     el_dir = root / "data" / "earning_learning"
     fm_dir = root / "data" / "forecast_research"
     md_path = el_dir / "market_daily_t0.csv"
+
+    # Recovery: write STARTED checkpoint immediately so SSH drops still leave provenance.
+    if is_recovery:
+        result.stage_disposition = "RECOVERY_STARTED"
+        result.reason = "recovery_checkpoint_started"
+        result.completed_at = ""
+        _persist_status(root, result, is_recovery=True)
 
     ok_attempt, attempt_reason = should_attempt_headless_eod(
         td, now=now, allow_before_close_for_tests=allow_before_close_for_tests
@@ -368,6 +431,10 @@ def run_headless_eod(
             "rows": int(len(getattr(ems, "current", board))),
             "status": getattr(ems, "status", ""),
         }
+        if is_recovery:
+            result.stage_disposition = "RECOVERY_EMS_WRITTEN"
+            result.reason = "recovery_checkpoint_ems"
+            _persist_status(root, result, is_recovery=True)
 
         # --- MDT0 (+ nested FM hook with repo-local paths) ---
         from modules.market_t0_capture import capture_market_t0_snapshot
@@ -402,6 +469,10 @@ def run_headless_eod(
             "forecast_t0_hook": mdt0.get("forecast_t0_hook"),
             "canonical_skipped_reason": mdt0.get("canonical_skipped_reason"),
         }
+        if is_recovery:
+            result.stage_disposition = "RECOVERY_MDT0_WRITTEN"
+            result.reason = "recovery_checkpoint_mdt0"
+            _persist_status(root, result, is_recovery=True)
 
         # --- EL observations / freeze / outcomes / lifecycle ---
         from modules.earning_learning import update_learning
@@ -466,6 +537,17 @@ def run_headless_eod(
             if is_recovery
             else "headless_eod_complete"
         )
+        result.health_summary = build_eod_health_summary(
+            trade_date=td,
+            source_rows=result.source_rows,
+            expected_universe=expected_universe,
+            artifacts=result.artifacts,
+            forecast_memory=result.forecast_memory,
+            stage_disposition=result.stage_disposition,
+            run_class=effective_class,
+        )
+        logger.info("headless_eod_health %s", result.health_summary.get("line"))
+        print(f"[headless_eod] {result.health_summary.get('line')}", flush=True)
     except Exception as exc:
         logger.exception("headless EOD failed")
         result.ok = False
