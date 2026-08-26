@@ -1,5 +1,5 @@
 """
-Phase 3K.2 / 3K.5A — CLI entrypoint for future scheduled daily runs (NOT activated).
+Phase 3K.2 / 3K.5A — CLI entrypoint for scheduled daily runs + labeled recovery.
 """
 
 from __future__ import annotations
@@ -18,10 +18,15 @@ from modules.edge_research.opr_bridge.production_daily_run_records import (
     DAY_0_SMOKE,
     LIVE_FORWARD,
     PRE_DEPLOYMENT_DRY_RUN,
+    RECOVERY_MANUAL_REMEDIATION,
     RunDisposition,
 )
 from modules.edge_research.opr_bridge.production_scheduling_contract import build_scheduling_contract
 from modules.edge_research.opr_bridge.production_timezone_policy import resolve_target_trade_date
+from modules.production_eod.headless_eod import (
+    RUN_CLASS_AUTONOMOUS,
+    RUN_CLASS_RECOVERY,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -39,7 +44,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--mode",
         default=BACKFILL_NON_FORWARD,
-        choices=[BACKFILL_NON_FORWARD, LIVE_FORWARD, "HISTORICAL_REPLAY_TEST", DAY_0_SMOKE, PRE_DEPLOYMENT_DRY_RUN],
+        choices=[
+            BACKFILL_NON_FORWARD,
+            LIVE_FORWARD,
+            "HISTORICAL_REPLAY_TEST",
+            DAY_0_SMOKE,
+            PRE_DEPLOYMENT_DRY_RUN,
+            RECOVERY_MANUAL_REMEDIATION,
+        ],
     )
     parser.add_argument("--data-dir", default=None)
     parser.add_argument("--use-lock", action="store_true", help="Acquire exclusive run lock")
@@ -49,11 +61,24 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Skip headless EOD board/EMS/MDT0/EL stage (tests / emergency)",
     )
+    parser.add_argument(
+        "--recovery",
+        action="store_true",
+        help=(
+            "Label this execution as RECOVERY_MANUAL_REMEDIATION (not autonomous evidence). "
+            "Preserves prior autonomous headless_eod_status.json FAIL evidence."
+        ),
+    )
     args = parser.parse_args(argv)
 
     if args.scheduling_contract:
         print(json.dumps(build_scheduling_contract(), indent=2))
         return 0
+
+    if args.recovery and args.mode == BACKFILL_NON_FORWARD:
+        args.mode = RECOVERY_MANUAL_REMEDIATION
+    if args.mode == RECOVERY_MANUAL_REMEDIATION:
+        args.recovery = True
 
     trade_date = resolve_target_trade_date(args.trade_date)
     repo_root = Path(__file__).resolve().parents[3]
@@ -63,14 +88,24 @@ def main(argv: list[str] | None = None) -> int:
         try:
             from modules.production_eod.headless_eod import run_headless_eod
 
-            # LIVE_FORWARD / scheduled waves: attempt headless EOD before Edge readiness.
-            headless_eod = run_headless_eod(trade_date, repo_root=repo_root)
+            headless_eod = run_headless_eod(
+                trade_date,
+                repo_root=repo_root,
+                run_class=RUN_CLASS_RECOVERY if args.recovery else RUN_CLASS_AUTONOMOUS,
+                preserve_autonomy_status=bool(args.recovery),
+            )
         except Exception as exc:  # noqa: BLE001
             headless_eod = {
                 "ok": False,
                 "skipped": False,
                 "reason": f"headless_eod_error:{type(exc).__name__}:{exc}",
                 "stage_disposition": "FAILED",
+                "run_class": RUN_CLASS_RECOVERY if args.recovery else RUN_CLASS_AUTONOMOUS,
+                "autonomy_evidence": (
+                    "RECOVERY_NOT_AUTONOMOUS_EVIDENCE"
+                    if args.recovery
+                    else "AUTONOMOUS_PRODUCTION"
+                ),
             }
 
     panel = build_research_panel()
@@ -84,6 +119,12 @@ def main(argv: list[str] | None = None) -> int:
         repo_root=repo_root,
     )
     result["headless_eod"] = headless_eod
+    result["run_provenance"] = {
+        "recovery": bool(args.recovery),
+        "run_mode": args.mode,
+        "autonomy_evidence": headless_eod.get("autonomy_evidence"),
+        "headless_run_identity": headless_eod.get("run_identity"),
+    }
 
     disposition = result.get("run", {}).get("run_disposition", "FAILED_CLOSED")
     if result.get("lock_held"):
@@ -101,10 +142,15 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 "run": result.get("manifest") or result.get("run"),
+                "run_provenance": result.get("run_provenance"),
                 "headless_eod": {
                     "stage_disposition": headless_eod.get("stage_disposition"),
                     "reason": headless_eod.get("reason"),
                     "source_rows": headless_eod.get("source_rows"),
+                    "run_class": headless_eod.get("run_class"),
+                    "run_identity": headless_eod.get("run_identity"),
+                    "autonomy_evidence": headless_eod.get("autonomy_evidence"),
+                    "trading_day_probe_status": headless_eod.get("trading_day_probe_status"),
                     "artifacts": {
                         k: (v if not isinstance(v, dict) else {ik: v.get(ik) for ik in list(v)[:8]})
                         for k, v in (headless_eod.get("artifacts") or {}).items()
@@ -116,6 +162,9 @@ def main(argv: list[str] | None = None) -> int:
             default=str,
         )
     )
+    # Probe failures should exit non-zero even if Edge disposition is WAITING.
+    if headless_eod.get("stage_disposition") == "TRADING_DAY_PROBE_FAILED":
+        return 1
     return exit_map.get(disposition, 1)
 
 
