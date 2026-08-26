@@ -24,6 +24,31 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 EXPECTED_UNIVERSE = 142
 HEADLESS_EOD_VERSION = "headless_eod_v1"
 
+# Run provenance classes — autonomous FAIL evidence must stay distinct from recovery.
+RUN_CLASS_AUTONOMOUS = "AUTONOMOUS"
+RUN_CLASS_RECOVERY = "RECOVERY_MANUAL_REMEDIATION"
+
+PROBE_OK = "OK"
+PROBE_FAILED = "PROBE_FAILED"
+PROBE_NOT_TRADING = "NOT_TRADING"
+
+STATUS_AUTONOMOUS = "headless_eod_status.json"
+STATUS_RECOVERY = "headless_eod_recovery_status.json"
+STATUS_HISTORY = "headless_eod_run_history.jsonl"
+
+
+@dataclass
+class TradingDayProbeResult:
+    """Strict separation: probe failure ≠ non-trading day."""
+
+    trading_today: Optional[bool]
+    reason: str
+    probe_status: str  # OK | PROBE_FAILED | NOT_TRADING
+
+    @property
+    def probe_failed(self) -> bool:
+        return self.probe_status == PROBE_FAILED
+
 
 @dataclass
 class HeadlessEodResult:
@@ -38,6 +63,10 @@ class HeadlessEodResult:
     universe_ok: bool = False
     after_close_eligible: bool = False
     trading_today: bool = False
+    trading_day_probe_status: str = ""
+    run_class: str = RUN_CLASS_AUTONOMOUS
+    run_identity: str = ""
+    autonomy_evidence: str = "AUTONOMOUS_PRODUCTION"
     artifacts: Dict[str, Any] = field(default_factory=dict)
     market_real: Optional[float] = None
     market_live: Optional[float] = None
@@ -54,7 +83,6 @@ def vn_now() -> datetime:
 
 
 def _iso(dt: Optional[datetime] = None) -> str:
-    d = dt or datetime.now(VN_TZ).astimezone(datetime.now().astimezone().tzinfo)
     # store UTC Z
     return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
@@ -65,12 +93,26 @@ def is_after_close_eligible(now: Optional[datetime] = None) -> bool:
     return bool(is_canonical_eligible(now or vn_now()))
 
 
-def resolve_trading_today(trade_date: str) -> tuple[bool, str]:
-    """Mirror app.py is_vnindex_trading_today without Streamlit."""
+def resolve_trading_today(trade_date: str) -> TradingDayProbeResult:
+    """
+    Mirror app.py is_vnindex_trading_today without Streamlit.
+
+    Probe/dependency failures return probe_status=PROBE_FAILED — never
+    silently classified as a non-trading day.
+    """
     today = str(trade_date)[:10]
     try:
         from vnstock import stock_historical_data
+    except Exception as exc:
+        logger.warning("trading_today probe failed (import): %s", exc)
+        return TradingDayProbeResult(
+            trading_today=None,
+            reason=f"TRADING_DAY_PROBE_FAILED:import:{type(exc).__name__}:{exc}",
+            probe_status=PROBE_FAILED,
+        )
 
+    last_error: Optional[str] = None
+    try:
         for typ in ("index", "stock"):
             try:
                 df = stock_historical_data(
@@ -81,7 +123,8 @@ def resolve_trading_today(trade_date: str) -> tuple[bool, str]:
                     type=typ,
                     beautify=True,
                 )
-            except Exception:
+            except Exception as exc:
+                last_error = f"{type(exc).__name__}:{exc}"
                 continue
             if df is None or df.empty:
                 continue
@@ -98,12 +141,30 @@ def resolve_trading_today(trade_date: str) -> tuple[bool, str]:
                 continue
             last_date = df[date_col].iloc[-1].strftime("%Y-%m-%d")
             if last_date == today:
-                return True, f"VNINDEX có giao dịch hôm nay: {today}"
-            return False, f"VNINDEX phiên mới nhất {last_date} (không phải {today})"
+                return TradingDayProbeResult(
+                    trading_today=True,
+                    reason=f"VNINDEX có giao dịch hôm nay: {today}",
+                    probe_status=PROBE_OK,
+                )
+            return TradingDayProbeResult(
+                trading_today=False,
+                reason=f"VNINDEX phiên mới nhất {last_date} (không phải {today})",
+                probe_status=PROBE_NOT_TRADING,
+            )
     except Exception as exc:
         logger.warning("trading_today probe failed: %s", exc)
-    # Fail closed for LIVE production unless tests inject trading_today
-    return False, "VNINDEX trading-day probe unavailable"
+        return TradingDayProbeResult(
+            trading_today=None,
+            reason=f"TRADING_DAY_PROBE_FAILED:{type(exc).__name__}:{exc}",
+            probe_status=PROBE_FAILED,
+        )
+
+    detail = last_error or "no_vnindex_bars"
+    return TradingDayProbeResult(
+        trading_today=None,
+        reason=f"TRADING_DAY_PROBE_FAILED:unavailable:{detail}",
+        probe_status=PROBE_FAILED,
+    )
 
 
 def _simple_regime(market_real: float, market_forecast: float) -> tuple[str, str]:
@@ -168,18 +229,39 @@ def run_headless_eod(
     skip_forecast_memory: bool = False,
     expected_universe: int = EXPECTED_UNIVERSE,
     include_vnindex_ohlcv: bool = True,
+    run_class: str = RUN_CLASS_AUTONOMOUS,
+    preserve_autonomy_status: bool = False,
 ) -> Dict[str, Any]:
     """
     Produce canonical EOD artifacts without Streamlit.
 
     Order: board → EMS → MDT0 (+FM hook) → update_learning → explicit FM stage.
     Idempotent for the same trade_date (first-write-wins downstream).
+
+    run_class=RECOVERY_MANUAL_REMEDIATION writes a separate status file and never
+    overwrites autonomous FAIL evidence in headless_eod_status.json.
     """
     root = Path(repo_root) if repo_root else REPO_ROOT
     td = str(trade_date)[:10]
     now = now or vn_now()
     started = _iso()
-    result = HeadlessEodResult(ok=False, trade_date=td, started_at=started)
+    is_recovery = run_class == RUN_CLASS_RECOVERY or preserve_autonomy_status
+    effective_class = RUN_CLASS_RECOVERY if is_recovery else RUN_CLASS_AUTONOMOUS
+    run_identity = (
+        f"{effective_class}:{td}:{started}"
+    )
+    result = HeadlessEodResult(
+        ok=False,
+        trade_date=td,
+        started_at=started,
+        run_class=effective_class,
+        run_identity=run_identity,
+        autonomy_evidence=(
+            "RECOVERY_NOT_AUTONOMOUS_EVIDENCE"
+            if is_recovery
+            else "AUTONOMOUS_PRODUCTION"
+        ),
+    )
     ems_path = root / "data" / "earning_money_snapshots.csv"
     el_dir = root / "data" / "earning_learning"
     fm_dir = root / "data" / "forecast_research"
@@ -193,19 +275,39 @@ def run_headless_eod(
         result.stage_disposition = "WAITING_FOR_DATA"
         result.reason = attempt_reason
         result.completed_at = _iso()
-        _write_status(root, result)
+        _persist_status(root, result, is_recovery=is_recovery)
         return result.to_dict()
 
+    probe: Optional[TradingDayProbeResult] = None
     if trading_today is None:
-        trading_today, trading_reason = resolve_trading_today(td)
+        probe = resolve_trading_today(td)
+        trading_today = bool(probe.trading_today) if probe.trading_today is not None else False
+        trading_reason = probe.reason
+        result.trading_day_probe_status = probe.probe_status
+    else:
+        result.trading_day_probe_status = PROBE_OK if trading_today else PROBE_NOT_TRADING
+        trading_reason = trading_reason or (
+            "injected_trading_today" if trading_today else "injected_non_trading"
+        )
+
     result.trading_today = bool(trading_today)
+
+    if probe is not None and probe.probe_failed and not allow_before_close_for_tests:
+        # Loud failure — never pretend this is a non-trading day.
+        result.stage_disposition = "TRADING_DAY_PROBE_FAILED"
+        result.reason = probe.reason
+        result.ok = False
+        result.errors.append(probe.reason)
+        result.completed_at = _iso()
+        _persist_status(root, result, is_recovery=is_recovery)
+        return result.to_dict()
 
     if not trading_today and not allow_before_close_for_tests:
         result.stage_disposition = "SKIPPED_NON_TRADING_DAY"
         result.reason = trading_reason or "not_trading_today"
         result.ok = True
         result.completed_at = _iso()
-        _write_status(root, result)
+        _persist_status(root, result, is_recovery=is_recovery)
         return result.to_dict()
 
     try:
@@ -220,7 +322,7 @@ def run_headless_eod(
             result.stage_disposition = "WAITING_FOR_DATA"
             result.reason = "empty_scan_board"
             result.completed_at = _iso()
-            _write_status(root, result)
+            _persist_status(root, result, is_recovery=is_recovery)
             return result.to_dict()
         if not result.universe_ok:
             result.stage_disposition = "WAITING_FOR_DATA"
@@ -228,7 +330,7 @@ def run_headless_eod(
             result.errors.append(result.reason)
             # Fail closed: do not write partial EMS/MDT0 as canonical EOD.
             result.completed_at = _iso()
-            _write_status(root, result)
+            _persist_status(root, result, is_recovery=is_recovery)
             return result.to_dict()
 
         from modules.scanner_core import (
@@ -285,7 +387,7 @@ def run_headless_eod(
             market_action="",
             rsi_breadth_report=None,
             trading_today=True,
-            trading_reason=trading_reason or f"headless_eod:{td}",
+            trading_reason=trading_reason or f"headless_eod:{td}:{effective_class}",
             market_regime=regime_name,
             market_regime_note=regime_note,
             data_dir=str(el_dir),
@@ -359,7 +461,11 @@ def run_headless_eod(
 
         result.ok = True
         result.stage_disposition = "SUCCESS"
-        result.reason = "headless_eod_complete"
+        result.reason = (
+            "headless_eod_recovery_complete"
+            if is_recovery
+            else "headless_eod_complete"
+        )
     except Exception as exc:
         logger.exception("headless EOD failed")
         result.ok = False
@@ -368,14 +474,48 @@ def run_headless_eod(
         result.errors.append(result.reason)
 
     result.completed_at = _iso()
-    _write_status(root, result)
+    _persist_status(root, result, is_recovery=is_recovery)
     return result.to_dict()
 
 
-def _write_status(repo_root: Path, result: HeadlessEodResult) -> None:
-    path = repo_root / "data" / "forecast_research" / "headless_eod_status.json"
+def _persist_status(
+    repo_root: Path,
+    result: HeadlessEodResult,
+    *,
+    is_recovery: bool,
+) -> None:
+    """
+    Always append immutable history.
+
+    Autonomous runs update headless_eod_status.json.
+    Recovery runs update headless_eod_recovery_status.json + dated recovery
+    snapshot — never overwrite autonomous FAIL evidence.
+    """
+    fm = repo_root / "data" / "forecast_research"
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(result.to_dict(), indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+        fm.mkdir(parents=True, exist_ok=True)
+        payload = result.to_dict()
+        history = fm / STATUS_HISTORY
+        with history.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(payload, ensure_ascii=False, default=str) + "\n")
+
+        if is_recovery:
+            (fm / STATUS_RECOVERY).write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False, default=str),
+                encoding="utf-8",
+            )
+            recovery_dir = fm / "recovery_runs"
+            recovery_dir.mkdir(parents=True, exist_ok=True)
+            stamp = (result.started_at or _iso()).replace(":", "").replace("+", "")
+            snap = recovery_dir / f"RECOVERY_{result.trade_date}_{stamp}.json"
+            snap.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False, default=str),
+                encoding="utf-8",
+            )
+        else:
+            (fm / STATUS_AUTONOMOUS).write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False, default=str),
+                encoding="utf-8",
+            )
     except Exception as exc:
         logger.warning("headless EOD status write failed: %s", exc)
