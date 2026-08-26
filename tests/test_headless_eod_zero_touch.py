@@ -415,3 +415,147 @@ def test_should_attempt_gates():
     assert ok and reason == "ok"
     ok2, reason2 = should_attempt_headless_eod(td, now=_vn(td, 12), allow_before_close_for_tests=False)
     assert not ok2 and reason2 == "BEFORE_EOD_PLUS_3H"
+
+
+def test_trading_day_probe_import_failure_is_not_non_trading(tmp_path: Path, monkeypatch):
+    from modules.production_eod import headless_eod as he
+
+    def _boom(_td: str):
+        return he.TradingDayProbeResult(
+            trading_today=None,
+            reason="TRADING_DAY_PROBE_FAILED:import:ModuleNotFoundError:No module named 'vnstock'",
+            probe_status=he.PROBE_FAILED,
+        )
+
+    monkeypatch.setattr(he, "resolve_trading_today", _boom)
+    td = "2026-08-26"
+    result = he.run_headless_eod(
+        td,
+        repo_root=tmp_path,
+        scan_df=_synth_scan(142, td),
+        now=_vn(td, hour=19),
+        allow_before_close_for_tests=False,
+        include_vnindex_ohlcv=False,
+    )
+    assert result["stage_disposition"] == "TRADING_DAY_PROBE_FAILED"
+    assert result["ok"] is False
+    assert result["trading_day_probe_status"] == he.PROBE_FAILED
+    assert "PROBE_FAILED" in result["reason"] or "vnstock" in result["reason"]
+    assert not (tmp_path / "data" / "earning_money_snapshots.csv").exists()
+
+
+def test_recovery_preserves_autonomy_status_file(tmp_path: Path):
+    from modules.production_eod.headless_eod import (
+        RUN_CLASS_RECOVERY,
+        STATUS_AUTONOMOUS,
+        STATUS_RECOVERY,
+        run_headless_eod,
+    )
+
+    td = "2026-08-26"
+    fm = tmp_path / "data" / "forecast_research"
+    fm.mkdir(parents=True)
+    autonomy = {
+        "ok": True,
+        "trade_date": td,
+        "stage_disposition": "SKIPPED_NON_TRADING_DAY",
+        "reason": "VNINDEX trading-day probe unavailable",
+        "source_rows": 0,
+        "run_class": "AUTONOMOUS",
+        "autonomy_evidence": "AUTONOMOUS_PRODUCTION",
+    }
+    autonomy_path = fm / STATUS_AUTONOMOUS
+    autonomy_path.write_text(json.dumps(autonomy), encoding="utf-8")
+    before = autonomy_path.read_text(encoding="utf-8")
+
+    recovery = run_headless_eod(
+        td,
+        repo_root=tmp_path,
+        scan_df=_synth_scan(142, td),
+        now=_vn(td, hour=19),
+        trading_today=True,
+        trading_reason="recovery_test",
+        allow_before_close_for_tests=True,
+        include_vnindex_ohlcv=False,
+        run_class=RUN_CLASS_RECOVERY,
+        preserve_autonomy_status=True,
+    )
+    assert recovery["ok"] is True
+    assert recovery["run_class"] == RUN_CLASS_RECOVERY
+    assert recovery["autonomy_evidence"] == "RECOVERY_NOT_AUTONOMOUS_EVIDENCE"
+    assert autonomy_path.read_text(encoding="utf-8") == before
+    assert (fm / STATUS_RECOVERY).exists()
+    assert list((fm / "recovery_runs").glob(f"RECOVERY_{td}_*.json"))
+
+
+def test_trading_day_probe_import_failure_is_not_non_trading(tmp_path: Path, monkeypatch):
+    from modules.production_eod import headless_eod as he
+
+    def _boom(_td: str):
+        return he.TradingDayProbeResult(
+            trading_today=None,
+            reason="TRADING_DAY_PROBE_FAILED:import:ModuleNotFoundError:No module named 'vnstock'",
+            probe_status=he.PROBE_FAILED,
+        )
+
+    monkeypatch.setattr(he, "resolve_trading_today", _boom)
+    td = "2026-08-26"
+    result = he.run_headless_eod(
+        td,
+        repo_root=tmp_path,
+        scan_df=_synth_scan(142, td),
+        now=_vn(td, hour=19),
+        allow_before_close_for_tests=False,
+        include_vnindex_ohlcv=False,
+    )
+    assert result["stage_disposition"] == "TRADING_DAY_PROBE_FAILED"
+    assert result["ok"] is False
+    assert result["trading_day_probe_status"] == he.PROBE_FAILED
+    assert "PROBE_FAILED" in result["reason"] or "vnstock" in result["reason"]
+    # Must not write EMS on probe failure
+    assert not (tmp_path / "data" / "earning_money_snapshots.csv").exists()
+
+
+def test_recovery_preserves_autonomy_status_file(tmp_path: Path):
+    from modules.production_eod.headless_eod import (
+        RUN_CLASS_RECOVERY,
+        STATUS_AUTONOMOUS,
+        STATUS_RECOVERY,
+    )
+
+    td = "2026-08-26"
+    fm = tmp_path / "data" / "forecast_research"
+    fm.mkdir(parents=True)
+    autonomy = {
+        "ok": True,
+        "trade_date": td,
+        "stage_disposition": "SKIPPED_NON_TRADING_DAY",
+        "reason": "VNINDEX trading-day probe unavailable",
+        "source_rows": 0,
+        "run_class": "AUTONOMOUS",
+        "autonomy_evidence": "AUTONOMOUS_PRODUCTION",
+    }
+    autonomy_path = fm / STATUS_AUTONOMOUS
+    autonomy_path.write_text(json.dumps(autonomy), encoding="utf-8")
+    before = autonomy_path.read_text(encoding="utf-8")
+
+    from modules.production_eod.headless_eod import run_headless_eod
+
+    recovery = run_headless_eod(
+        td,
+        repo_root=tmp_path,
+        scan_df=_synth_scan(142, td),
+        now=_vn(td, hour=19),
+        trading_today=True,
+        trading_reason="recovery_test",
+        allow_before_close_for_tests=True,
+        include_vnindex_ohlcv=False,
+        run_class=RUN_CLASS_RECOVERY,
+        preserve_autonomy_status=True,
+    )
+    assert recovery["ok"] is True
+    assert recovery["run_class"] == RUN_CLASS_RECOVERY
+    assert recovery["autonomy_evidence"] == "RECOVERY_NOT_AUTONOMOUS_EVIDENCE"
+    assert autonomy_path.read_text(encoding="utf-8") == before
+    assert (fm / STATUS_RECOVERY).exists()
+    assert list((fm / "recovery_runs").glob(f"RECOVERY_{td}_*.json"))
