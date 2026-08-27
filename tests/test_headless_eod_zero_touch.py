@@ -119,6 +119,20 @@ def _fast_p0(monkeypatch):
         "modules.forecast_research.p0_daily.maybe_collect_p0_after_market_daily",
         lambda trade_date, data_dir=None: _fake(trade_date, data_dir=data_dir),
     )
+    # Live production may wire FF confirmation into the FM MDT0 stage. Stub the
+    # live HSX ingest so zero-touch unit tests stay offline/fast; FF wiring
+    # coverage remains in test_foreign_flow_confirmation_forward_panel.py.
+    monkeypatch.setattr(
+        "modules.foreign_flow_confirmation.daily.maybe_run_ff_confirmation_after_market_daily",
+        lambda trade_date, **kwargs: {
+            "ok": True,
+            "written": False,
+            "skipped": True,
+            "reason": "test_stub_no_network",
+            "trade_date": str(trade_date)[:10],
+            "stage": "ff_confirmation_forward",
+        },
+    )
 
 
 def test_watchlist_universe_is_142():

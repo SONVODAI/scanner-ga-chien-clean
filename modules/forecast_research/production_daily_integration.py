@@ -59,6 +59,7 @@ def _waiting_stage(trade_date: str, gate_reason: str) -> Dict[str, Any]:
         "mdrr": {"skipped": True, "reason": "mdt0_gate"},
         "historical_core": {"skipped": True, "reason": "mdt0_gate"},
         "p0_market_memory": {"skipped": True, "reason": "mdt0_gate"},
+        "ff_confirmation_forward": {"skipped": True, "reason": "mdt0_gate"},
     }
 
 
@@ -138,6 +139,24 @@ def run_forecast_memory_daily_stage(
             logger.warning("P0 hook failed safely: %s", exc)
             p0 = {"ok": False, "written": False, "reason": f"p0_hook_error:{exc}"}
 
+        # Isolated Foreign Flow confirmation forward-panel ingest (fail-safe).
+        # Does not alter P0 / Forecast disposition / Edge science / Camera.
+        # No additional timer — rides existing daily research MDT0 stage.
+        ff_conf: Dict[str, Any] = {"skipped": True}
+        try:
+            from modules.foreign_flow_confirmation.daily import (
+                maybe_run_ff_confirmation_after_market_daily,
+            )
+
+            ff_conf = maybe_run_ff_confirmation_after_market_daily(trade_date)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("FF confirmation forward hook failed safely: %s", exc)
+            ff_conf = {
+                "ok": False,
+                "written": False,
+                "reason": f"ff_confirmation_hook_error:{exc}",
+            }
+
         stage_disposition = STAGE_SUCCESS
         if not freeze.get("ok") and freeze.get("reason") == COMPLETENESS_WAITING:
             stage_disposition = STAGE_WAITING
@@ -156,6 +175,7 @@ def run_forecast_memory_daily_stage(
             "mdrr": mdrr,
             "historical_core": hist,
             "p0_market_memory": p0,
+            "ff_confirmation_forward": ff_conf,
             "written": bool(freeze.get("written")),
             "completeness_status": freeze.get("completeness_status"),
         }

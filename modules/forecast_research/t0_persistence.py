@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from modules.durable_csv import durable_replace_csv
 from modules.forecast_research.contract import (
     DEFAULT_DATA_DIR_NAME,
     OUTCOMES_FILE,
@@ -91,7 +92,7 @@ def persist_t0_record(
     data_dir: Optional[Path] = None,
 ) -> Tuple[bool, str]:
     """
-    First-write-wins immutable T0 persist + durable GitHub sync.
+    First-write-wins immutable T0 persist + durable local replace + GitHub sync.
     Returns (written, reason).
     """
     path = t0_path(data_dir)
@@ -105,15 +106,22 @@ def persist_t0_record(
         out = row
     else:
         out = pd.concat([existing, row], ignore_index=True)
-    out.to_csv(path, index=False)
+    ok, reason = durable_replace_csv(
+        out,
+        path,
+        existing=existing if not existing.empty else None,
+        date_col="trade_date",
+        backup=True,
+        keep=5,
+    )
+    if not ok:
+        return False, reason
     sync = _sync_forecast_csv_to_github(
         T0_FILE,
         out,
         data_dir=data_dir,
         commit_message=f"Mr.BOT forecast T0 freeze {trade_date}",
     )
-    if sync.startswith("SYNC_"):
-        return True, f"WRITTEN_{sync}"
     return True, f"WRITTEN_{sync}"
 
 
@@ -135,7 +143,16 @@ def persist_outcome_record(
             return False, "ALREADY_PRESENT"
     row = pd.DataFrame([record])
     out = row if existing.empty else pd.concat([existing, row], ignore_index=True)
-    out.to_csv(path, index=False)
+    ok, reason = durable_replace_csv(
+        out,
+        path,
+        existing=existing if not existing.empty else None,
+        date_col="trade_date",
+        backup=True,
+        keep=5,
+    )
+    if not ok:
+        return False, reason
     sync = _sync_forecast_csv_to_github(
         OUTCOMES_FILE,
         out,
