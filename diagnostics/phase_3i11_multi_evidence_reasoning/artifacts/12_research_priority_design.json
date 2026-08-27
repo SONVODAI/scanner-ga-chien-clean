@@ -1,0 +1,10 @@
+{
+  "distinction": "epistemic_uncertainty vs research_priority",
+  "existing_infrastructure": {
+    "research_frontier": "modules/edge_research/research_frontier.py \u2014 unexplored action queue",
+    "research_portfolio_intelligence": "branch scoring \u2014 not proposition-scoped",
+    "research_information_value": "template candidates \u2014 not OPR ledger"
+  },
+  "integration_deferred": true,
+  "future_join_key": "proposition_id"
+}

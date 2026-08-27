@@ -1,0 +1,131 @@
+{
+  "instances": [
+    {
+      "transition": 1,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 1,
+      "best_falsification_planner_score": 6.375,
+      "selected_falsification": false,
+      "selected_tool": "horizon_comparison",
+      "outcome": "GENERATED_BUT_LOST",
+      "recurring_debt": false
+    },
+    {
+      "transition": 2,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 1,
+      "best_falsification_planner_score": 4.2875,
+      "selected_falsification": true,
+      "selected_tool": "sensitivity_analysis",
+      "outcome": "EXECUTED",
+      "recurring_debt": false
+    },
+    {
+      "transition": 3,
+      "falsification_need_present": false,
+      "constructible": false,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "horizon_comparison",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": false
+    },
+    {
+      "transition": 4,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "adaptive_partition_compare",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 5,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "threshold_exploration",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 6,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "horizon_comparison",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 7,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "adaptive_partition_compare",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 8,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "threshold_exploration",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 9,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "horizon_comparison",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 10,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "adaptive_partition_compare",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    },
+    {
+      "transition": 11,
+      "falsification_need_present": true,
+      "constructible": true,
+      "candidates_generated": 0,
+      "best_falsification_planner_score": null,
+      "selected_falsification": false,
+      "selected_tool": "threshold_exploration",
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "recurring_debt": true
+    }
+  ],
+  "total_falsification_need_events": 10,
+  "executed_count": 1,
+  "generated_but_lost_count": 1,
+  "operational_allocation_gap": true,
+  "explanation": "Competence and grammar both recognize falsification; one sensitivity_analysis executed at T2 when it topped local planner. Later falsification needs persisted but lost to higher-ERV horizon/partition/threshold on a saturated branch.",
+  "primary_layer_after_first_success": "B7"
+}
