@@ -107,8 +107,18 @@ def _parse_iso(ts: str) -> Optional[datetime]:
         return None
 
 
-def _market_after_close_for_date(target_trade_date: str) -> Tuple[bool, Optional[str]]:
-    md = _read_csv(MARKET_T0_SNAPSHOT_PATH)
+def _market_after_close_for_date(
+    target_trade_date: str,
+    *,
+    data_root: Optional[Path] = None,
+) -> Tuple[bool, Optional[str]]:
+    """Resolve market_t0_snapshot under data_root (fail-closed when absent)."""
+    root = data_root or EARNING_LEARNING_DIR
+    snap_path = root / "market_t0_snapshot.csv"
+    # Prefer explicit root; fall back to legacy module constant only when roots match.
+    if not snap_path.exists() and data_root is None:
+        snap_path = MARKET_T0_SNAPSHOT_PATH
+    md = _read_csv(snap_path)
     if md.empty:
         return False, None
     date_col = "trade_date" if "trade_date" in md.columns else "date"
@@ -221,7 +231,7 @@ def verify_eod_completeness(
 
     lifecycle_path = (data_root or EARNING_LEARNING_DIR) / "pattern_lifecycle.csv"
 
-    market_ok, market_detail = _market_after_close_for_date(td)
+    market_ok, market_detail = _market_after_close_for_date(td, data_root=data_root)
     if require_market_after_close and not market_ok:
         errors.append(f"market_after_close_missing:{market_detail or 'none'}")
 

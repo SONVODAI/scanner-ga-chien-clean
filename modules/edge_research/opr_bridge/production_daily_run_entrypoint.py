@@ -129,6 +129,25 @@ def main(argv: list[str] | None = None) -> int:
         "headless_run_identity": headless_eod.get("run_identity"),
     }
 
+    # Observability-only daily receipt — never changes research outcomes.
+    receipt_info: dict = {"ok": False, "skipped": True}
+    try:
+        from modules.production_daily_receipt import write_receipt_from_run
+
+        receipt_info = write_receipt_from_run(
+            trade_date,
+            repo_root=repo_root,
+            edge_data_dir=data_dir,
+            headless_eod=headless_eod,
+            edge_result=result,
+            panel_freshness=panel_freshness,
+            run_provenance=result.get("run_provenance"),
+        )
+        result["daily_pipeline_receipt"] = receipt_info
+    except Exception as exc:  # noqa: BLE001
+        receipt_info = {"ok": False, "error": f"receipt_hook:{type(exc).__name__}:{exc}"}
+        result["daily_pipeline_receipt"] = receipt_info
+
     disposition = result.get("run", {}).get("run_disposition", "FAILED_CLOSED")
     if result.get("lock_held"):
         print(json.dumps(result.get("lock") or result.get("run"), indent=2, default=str))
@@ -161,6 +180,13 @@ def main(argv: list[str] | None = None) -> int:
                 },
                 "forecast_memory": (result.get("forecast_memory") or {}).get("stage_disposition"),
                 "panel_freshness": result.get("panel_freshness"),
+                "daily_pipeline_receipt": {
+                    "ok": receipt_info.get("ok"),
+                    "path": receipt_info.get("path"),
+                    "overall": (receipt_info.get("receipt") or {}).get("overall"),
+                    "first_failed_stage": (receipt_info.get("receipt") or {}).get("first_failed_stage"),
+                    "reason": (receipt_info.get("receipt") or {}).get("reason"),
+                },
             },
             indent=2,
             default=str,

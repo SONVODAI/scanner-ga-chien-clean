@@ -173,11 +173,15 @@ def run_production_daily_research(
                 edge_data_dir=data_dir,
             )
 
+    # Authoritative EOD evidence lives under the same repo_root used by headless EOD
+    # (data/earning_learning). Never silently fall back to a different checkout's data.
+    eod_data_root = (Path(repo_root) / "data" / "earning_learning") if repo_root is not None else None
     readiness = verify_data_readiness(
         panel,
         target_trade_date,
         require_authoritative_eod=run_mode in (LIVE_FORWARD,),
         require_calendar=run_mode in (LIVE_FORWARD, DAY_0_SMOKE, PRE_DEPLOYMENT_DRY_RUN),
+        eod_data_root=eod_data_root,
     )
     dataset_hash = readiness.source_dataset_hash
     identity = compute_run_identity(
