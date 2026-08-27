@@ -1,0 +1,39 @@
+{
+  "record_version": "falsification_candidate_record_v1_3i8",
+  "required_fields": {
+    "candidate_id": "stable id",
+    "proposition_id": "immutable proposition reference",
+    "proposition_hash": "content hash at selection time",
+    "source_epistemic_update_id": "3I.7 EpistemicUpdateRecord that triggered SEEK_FALSIFICATION",
+    "source_research_decision_id": "ResearchDecisionRecord with chosen_next_action=SEEK_FALSIFICATION",
+    "vulnerability_tested": "enum: directional_reversal | episode_instability | population_instability | ...",
+    "scientific_rationale": "why this experiment could disconfirm",
+    "proposed_experiment_spec": "legal ExperimentSpec draft",
+    "possible_disconfirming_outcome": "pre-registered condition \u2192 DISCONFIRMING/DISCONFIRMING_STRONG",
+    "possible_non_informative_outcome": "pre-registered condition \u2192 NON_INFORMATIVE",
+    "evidence_independence_class": "INDEPENDENT_FALSIFICATION | RELATED_FALSIFICATION | ...",
+    "independence_rationale": "why not confirmatory retest",
+    "prior_experiment_content_hash": "dedup reference",
+    "content_hash_differs_from_prior": "bool gate",
+    "executability_status": "EXECUTABLE | GRAMMAR_BLOCKED | ...",
+    "leakage_cutoff_requirements": "data_cutoff_date must match proposition",
+    "lineage_refs": {
+      "proposition_hash": "...",
+      "interpretation_contract_hash": "artifact_03 hash, not regenerated",
+      "prior_tool_result_hash": "...",
+      "lineage_hash": "..."
+    },
+    "created_at": "ISO timestamp",
+    "record_hash": "stable_hash(excluding record_hash, created_at)"
+  },
+  "optional_fields": {
+    "interpretation_contract_variant_id": "when tool != partition_group_compare",
+    "rejected_reason_if_any": "validity gate failure"
+  },
+  "explicitly_excluded": [
+    "expected_profit",
+    "zone_c_similarity",
+    "hidden_phenomenon_match",
+    "post_hoc_threshold"
+  ]
+}
