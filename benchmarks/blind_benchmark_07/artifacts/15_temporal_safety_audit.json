@@ -1,0 +1,63 @@
+{
+  "attempted_illegal_transformations": [],
+  "rejected_future_leakage_actions": 0,
+  "executed_frame_legality": [
+    {
+      "frame_id": "frame-00001",
+      "observation_horizon": 0,
+      "temporally_legal": true,
+      "outcome_field": "t5_return"
+    },
+    {
+      "frame_id": "frame-00007",
+      "observation_horizon": 5,
+      "temporally_legal": true,
+      "outcome_field": "t10_return"
+    },
+    {
+      "frame_id": "frame-00006",
+      "observation_horizon": 0,
+      "temporally_legal": true,
+      "outcome_field": null
+    },
+    {
+      "frame_id": "frame-00002",
+      "observation_horizon": 0,
+      "temporally_legal": true,
+      "outcome_field": "t3_return"
+    },
+    {
+      "frame_id": "frame-00004",
+      "observation_horizon": 0,
+      "temporally_legal": true,
+      "outcome_field": "t5_return"
+    },
+    {
+      "frame_id": "frame-00007",
+      "lineage_temporal_legal": true,
+      "transformation": "OUTCOME_TO_POPULATION"
+    },
+    {
+      "frame_id": "frame-00006",
+      "lineage_temporal_legal": true,
+      "transformation": "STRUCTURAL_TRIGGER"
+    },
+    {
+      "frame_id": "frame-00002",
+      "lineage_temporal_legal": true,
+      "transformation": "STRUCTURAL_TRIGGER"
+    },
+    {
+      "frame_id": "frame-00004",
+      "lineage_temporal_legal": true,
+      "transformation": "STRUCTURAL_TRIGGER"
+    }
+  ],
+  "all_executed_frames_temporally_legal": true,
+  "outcome_to_population_legality_decisions": [
+    {
+      "frame_id": "frame-00007",
+      "legal": true
+    }
+  ]
+}
