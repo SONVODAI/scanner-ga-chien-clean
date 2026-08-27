@@ -1,0 +1,11 @@
+{
+  "pure_noise": {
+    "propositions": 0,
+    "pass": true
+  },
+  "real_panel": {
+    "propositions": 3,
+    "silences": 21,
+    "pass": true
+  }
+}

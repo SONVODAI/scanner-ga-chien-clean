@@ -1,0 +1,62 @@
+{
+  "benchmark_id": "blind_benchmark_11",
+  "benchmark_version": "bb11_v1",
+  "completed_at": "2026-08-21T16:06:33Z",
+  "session_id": "bb11-autonomous-001",
+  "frozen_research_commit": "5c62fc334",
+  "git_commit": "21d27d696441fef3927aa21e342d571ab734f2dd",
+  "session_status": "NO_EDGE_FOUND",
+  "session_stop_reason": {
+    "code": "INSUFFICIENT_RESEARCH_VALUE",
+    "detail": "Exit valuation exceeded best experiment opportunity",
+    "remaining_budget": 1,
+    "unexplored_frontier_count": 36,
+    "features_touched": 2,
+    "eligible_features": 8
+  },
+  "experiments_used": 11,
+  "experiment_budget": 12,
+  "step_count": 11,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "tool_distribution": {
+    "horizon_comparison": 5,
+    "sensitivity_analysis": 1,
+    "adaptive_partition_compare": 2,
+    "threshold_exploration": 2,
+    "symbol_decomposition": 1
+  },
+  "exit_valuation_audit_entries": 11,
+  "stop_competed_count": 3,
+  "stop_won_count": 1,
+  "selection_changed_by_exit_count": 1,
+  "branch_marginal_audit_entries": 11,
+  "realized_gain_history_entries": 11,
+  "information_value_audit_entries": 11,
+  "late_mechanical_cycling": 2,
+  "stop_quality_counts": {
+    "JUSTIFIED_STOP": 1
+  },
+  "continue_quality_counts": {
+    "JUSTIFIED_CONTINUE": 6,
+    "MECHANICAL_CYCLING": 3,
+    "DEFENSIBLE_CONTINUE": 1
+  },
+  "intervention_class_counts": {
+    "BENEFICIAL_INTERVENTION": 1
+  },
+  "capability_gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "FAIL",
+    "F": "PASS",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "FAIL",
+    "K": "PASS",
+    "L": "PASS",
+    "M": "PARTIAL"
+  }
+}

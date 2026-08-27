@@ -1,0 +1,15 @@
+{
+  "mechanism": "CHRONOLOGICAL_FIRST_COME_UNTIL_BUDGET_CAP",
+  "selected": [
+    "2026-06-29",
+    "2026-06-30",
+    "2026-07-23"
+  ],
+  "missed_higher_spread_dates": [
+    "2026-06-30",
+    "2026-07-23"
+  ],
+  "note": "2026-06-30 had spread=4.96 but was 2nd emitted; 2026-07-24+ never reached due to cap after 3",
+  "limits_autonomy": true,
+  "prioritize_capability_missing": true
+}
