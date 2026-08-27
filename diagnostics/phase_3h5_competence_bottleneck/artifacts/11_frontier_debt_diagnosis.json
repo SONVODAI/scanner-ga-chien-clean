@@ -1,0 +1,120 @@
+{
+  "frontier_items_total": 54,
+  "duplicate_status_count": 13,
+  "top10_unresolved_by_portfolio_score": [
+    {
+      "frontier_id": "frontier-00006",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.7,
+      "portfolio_score": 8.7,
+      "status": "UNEXPLORED",
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REFRAME"
+    },
+    {
+      "frontier_id": "frontier-00007",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.7,
+      "portfolio_score": 8.7,
+      "status": "UNEXPLORED",
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REFRAME"
+    },
+    {
+      "frontier_id": "frontier-00017",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.2,
+      "portfolio_score": 8.2,
+      "status": "UNEXPLORED",
+      "reason_generated": "FRAME_REFRAME",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REPOPULATE"
+    },
+    {
+      "frontier_id": "frontier-00018",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.2,
+      "portfolio_score": 8.2,
+      "status": "EXECUTED",
+      "reason_generated": "FRAME_REFRAME",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REPOPULATE"
+    },
+    {
+      "frontier_id": "frontier-00009",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.175,
+      "portfolio_score": 8.175,
+      "status": "UNEXPLORED",
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REFRAME"
+    },
+    {
+      "frontier_id": "frontier-00010",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.175,
+      "portfolio_score": 8.175,
+      "status": "UNEXPLORED",
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REFRAME"
+    },
+    {
+      "frontier_id": "frontier-00023",
+      "tool_name": "horizon_comparison",
+      "planner_score": 8.15,
+      "portfolio_score": 8.15,
+      "status": "UNEXPLORED",
+      "reason_generated": "HORIZON_ADVANCE",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REFRAME"
+    },
+    {
+      "frontier_id": "frontier-00020",
+      "tool_name": "horizon_comparison",
+      "planner_score": 7.675,
+      "portfolio_score": 7.675,
+      "status": "UNEXPLORED",
+      "reason_generated": "FRAME_REFRAME",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REPOPULATE"
+    },
+    {
+      "frontier_id": "frontier-00021",
+      "tool_name": "horizon_comparison",
+      "planner_score": 7.675,
+      "portfolio_score": 7.675,
+      "status": "EXECUTED",
+      "reason_generated": "FRAME_REFRAME",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REPOPULATE"
+    },
+    {
+      "frontier_id": "frontier-00008",
+      "tool_name": "horizon_comparison",
+      "planner_score": 7.125,
+      "portfolio_score": 7.125,
+      "status": "UNEXPLORED",
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "branch_root_id": "obs-dbf2b9517c30",
+      "parent_experiment": "exp-264bcac5f747",
+      "action_type": "REFRAME"
+    }
+  ],
+  "high_value_unresolved_count": 38,
+  "budget_left_genuinely_valuable_science_undone": "INCONCLUSIVE",
+  "note": "Many frontier items marked DUPLICATE; revalued ERV at late decisions was below continuing local partition/threshold. Cannot prove earlier low-value work displaced higher-value frontier without counterfactual replay.",
+  "primary_layer": "B12"
+}
