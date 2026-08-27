@@ -1,0 +1,10 @@
+{
+  "evidence_derived": true,
+  "independence_computed": true,
+  "requires_ledger_structure": true,
+  "winner_changes_with_coverage": true,
+  "ordering_irrelevant": true,
+  "objective_survives_tool_change": true,
+  "slice_mining_prevented": true,
+  "cohort_semantics_frozen_pre_result": true
+}
