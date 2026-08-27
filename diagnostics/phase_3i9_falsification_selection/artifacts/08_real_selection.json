@@ -1,0 +1,10 @@
+{
+  "outcome": "SELECTED",
+  "selected_candidate_id": "fc-independent_episode_holdout",
+  "selected_record_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb",
+  "eligible_count": 1,
+  "rejected_count": 0,
+  "ambiguous_tie_ids": [],
+  "reason": "Selected fc-independent_episode_holdout: episode_instability / INDEPENDENT_FALSIFICATION \u2014 Vulnerability: Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates.",
+  "selector_version": "lexicographic_falsification_selector_v1_3i9"
+}

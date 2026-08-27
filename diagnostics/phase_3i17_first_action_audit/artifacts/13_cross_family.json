@@ -1,0 +1,8 @@
+{
+  "bb_strategy": "population_subgroup_contrast",
+  "t2_strategy": "population_subgroup_contrast",
+  "same_methodology": true,
+  "same_subgroup_binding": true,
+  "semantic_difference": "Feature name flux_index vs rs_spread \u2014 representation envelope only",
+  "adaptation_vs_template": "Same template with different variable names in envelope"
+}

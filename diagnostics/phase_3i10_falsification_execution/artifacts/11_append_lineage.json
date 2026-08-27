@@ -1,0 +1,11 @@
+{
+  "execution_version": "falsification_one_shot_execution_v1_3i10",
+  "package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+  "prior_lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+  "first_epistemic_update_id": "epu-5a7bec6e47ec",
+  "second_epistemic_update_id": "epu-e75a6e8362a8",
+  "second_research_decision_id": "dec-d71275b5fa30",
+  "execution_id": "fex-91a2102242c0",
+  "tool_result_hash": "8308ed833bf0e72cc030cd1eb385946d79ad8db445b0845b59de7be96431afff",
+  "lineage_hash": "c842ae71d39e31e4b2f2ff5d8b2f22c890fc6daed8b7c08524ab5b8032e393f7"
+}
