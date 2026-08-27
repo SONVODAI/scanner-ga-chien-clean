@@ -17,6 +17,16 @@ from modules.edge_research.research_actions import (
 )
 from modules.edge_research.research_assessment import ResearchAssessment
 from modules.edge_research.research_graph import ResearchGraph
+from modules.edge_research.research_search_accounting import (
+    COMPLEXITY_PENALTY_SCALE,
+    compute_complexity_score,
+    compute_effective_hypotheses,
+    compute_evidence_burden,
+    compute_planner_complexity_penalty,
+    compute_skepticism_escalation,
+    branch_depth as accounting_branch_depth,
+    weak_evidence_high_complexity_should_stop,
+)
 
 # Fixed weights — NOT tuned from production outcomes.
 WEIGHT_INFORMATION_GAP = 3.0
@@ -24,6 +34,7 @@ WEIGHT_FALSIFICATION_THREAT = 4.0
 WEIGHT_NOVELTY = 2.0
 WEIGHT_STOP = 5.0
 WEIGHT_ABANDON = 4.5
+WEIGHT_STRONG_EVIDENCE_EXPLORATION = 3.0
 BLOCKED_SCORE = -1000.0
 
 
@@ -50,6 +61,144 @@ class PlanDecision:
             "rationale_codes": list(self.rationale_codes),
             "candidate_count": len(self.all_candidates),
         }
+
+
+def _branch_complexity_context(graph: ResearchGraph, experiment_node_id: str) -> Optional[Dict[str, Any]]:
+    """Load branch search accounting for planner penalties."""
+    from modules.edge_research.research_search_accounting import branch_root_id
+
+    if experiment_node_id not in graph.nodes:
+        return None
+    state = graph.get_search_accounting()
+    root = branch_root_id(graph, experiment_node_id)
+    branch_ledger = state.branch_ledgers.get(root, state.session_ledger)
+    depth = accounting_branch_depth(graph, experiment_node_id)
+    complexity = compute_complexity_score(branch_ledger, branch_depth=depth)
+    mh = compute_effective_hypotheses(branch_ledger)
+    return {
+        "branch_ledger": branch_ledger,
+        "branch_depth": depth,
+        "complexity": complexity,
+        "effective_hypotheses": mh.effective_hypotheses_tested,
+    }
+
+
+def _complexity_penalty(graph: ResearchGraph, experiment_node_id: str) -> Tuple[float, Dict[str, float]]:
+    ctx = _branch_complexity_context(graph, experiment_node_id)
+    if ctx is None:
+        return 0.0, {}
+    search_pen, branch_pen = compute_planner_complexity_penalty(
+        ctx["complexity"], branch_depth=ctx["branch_depth"]
+    )
+    return search_pen + branch_pen, {
+        "search_complexity_penalty": -search_pen,
+        "branch_complexity_penalty": -branch_pen,
+    }
+
+
+def _skepticism_bonus(
+    assessment: ResearchAssessment,
+    candidate: ResearchActionCandidate,
+    graph: ResearchGraph,
+    experiment_node_id: str,
+) -> float:
+    """Escalate falsification priority when candidate looks too good."""
+    if candidate.intent != ActionIntent.FALSIFICATION.value:
+        return 0.0
+    ctx = _branch_complexity_context(graph, experiment_node_id)
+    if ctx is None:
+        return 0.0
+    hints = candidate.priority_hints
+    success_rate = hints.get("observed_success_rate")
+    threshold_strength = hints.get("threshold_strength")
+    pop_refined = hints.get("population_refined", False) or "REPOPULATE" in candidate.action_code
+    extreme_bin = "EXTREME" in candidate.action_code or "EXTREME_WINNER" in assessment.fragility_evidence
+    has_interaction = candidate.tool_name == "interaction_partition"
+    bonuses = compute_skepticism_escalation(
+        success_rate=success_rate,
+        threshold_strength=threshold_strength,
+        has_interaction=has_interaction,
+        population_refined=bool(pop_refined),
+        extreme_bin=extreme_bin,
+        effective_hypotheses=ctx["effective_hypotheses"],
+    )
+    return sum(bonuses.values())
+
+
+def _strong_evidence_exploration_bonus(
+    assessment: ResearchAssessment,
+    candidate: ResearchActionCandidate,
+    graph: ResearchGraph,
+    experiment_node_id: str,
+) -> float:
+    """Strong evidence can justify additional exploration despite complexity."""
+    if candidate.intent in (ActionIntent.STOP.value, ActionIntent.ABANDON.value):
+        return 0.0
+    ctx = _branch_complexity_context(graph, experiment_node_id)
+    if ctx is None:
+        return 0.0
+    hints = candidate.priority_hints
+    raw_effect = hints.get("observed_success_rate") or hints.get("raw_effect")
+    if raw_effect is None and assessment.interesting:
+        raw_effect = 0.15
+    if raw_effect is None:
+        return 0.0
+    evidence = compute_evidence_burden(
+        raw_effect=float(raw_effect),
+        incremental_effect=hints.get("incremental_effect"),
+        sample_size=hints.get("sample_size"),
+        uncertainty=None,
+        shape_strength=hints.get("shape_strength"),
+        complexity=ctx["complexity"],
+        search_cardinality=ctx["effective_hypotheses"],
+        concentration_flags=assessment.concentration_concerns,
+    )
+    if evidence.evidence_search_assessment == "STRONG_RELATIVE_TO_SEARCH":
+        return WEIGHT_STRONG_EVIDENCE_EXPLORATION
+    return 0.0
+
+
+def _weak_complexity_stop_bonus(
+    assessment: ResearchAssessment,
+    candidate: ResearchActionCandidate,
+    graph: ResearchGraph,
+    experiment_node_id: str,
+) -> float:
+    """Weak evidence + high complexity boosts STOP/ABANDON."""
+    if candidate.intent not in (ActionIntent.STOP.value, ActionIntent.ABANDON.value):
+        return 0.0
+    ctx = _branch_complexity_context(graph, experiment_node_id)
+    if ctx is None:
+        return 0.0
+    hints = candidate.priority_hints
+    raw_effect = hints.get("observed_success_rate") or hints.get("raw_effect") or 0.0
+    evidence = compute_evidence_burden(
+        raw_effect=float(raw_effect) if raw_effect else None,
+        incremental_effect=hints.get("incremental_effect"),
+        sample_size=hints.get("sample_size"),
+        uncertainty=None,
+        shape_strength=None,
+        complexity=ctx["complexity"],
+        search_cardinality=ctx["effective_hypotheses"],
+    )
+    if weak_evidence_high_complexity_should_stop(evidence, ctx["complexity"]):
+        return WEIGHT_STOP * 1.5 if candidate.intent == ActionIntent.STOP.value else WEIGHT_ABANDON * 1.5
+    if not assessment.additional_investigation_warranted and ctx["complexity"].aggregate_score > 10:
+        return WEIGHT_STOP if candidate.intent == ActionIntent.STOP.value else WEIGHT_ABANDON * 0.5
+    return 0.0
+
+
+def _branch_complexity_penalty_for_candidate(
+    candidate: ResearchActionCandidate,
+) -> float:
+    """Penalize unnecessarily complex branch actions (higher draft complexity)."""
+    hints = candidate.priority_hints
+    draft_complexity = hints.get("draft_complexity", 0.0)
+    parent_complexity = hints.get("parent_complexity", 0.0)
+    incremental = draft_complexity - parent_complexity
+    if incremental <= 0:
+        return 0.0
+    return incremental * COMPLEXITY_PENALTY_SCALE * 1.5
 
 
 def _remaining_budget(graph: ResearchGraph) -> Optional[int]:
@@ -104,10 +253,34 @@ def _abandon_score(assessment: ResearchAssessment, candidate: ResearchActionCand
     return base
 
 
+def _grammar_bonus(candidate: ResearchActionCandidate) -> float:
+    hints = candidate.priority_hints
+    return (
+        hints.get("grammar_reframe", 0.0)
+        + hints.get("grammar_repopulate", 0.0)
+        + hints.get("grammar_widen", 0.0)
+    )
+
+
+def _adaptive_bonus(candidate: ResearchActionCandidate) -> float:
+    hints = candidate.priority_hints
+    return (
+        hints.get("threshold_explore", 0.0)
+        + hints.get("shape_followup", 0.0)
+        + hints.get("neighborhood_test", 0.0)
+        + hints.get("slicing_explore", 0.0)
+        + hints.get("category_refinement", 0.0)
+        + hints.get("region_refinement", 0.0)
+        + hints.get("interaction_followup", 0.0)
+    )
+
+
 def score_candidate(
     candidate: ResearchActionCandidate,
     assessment: ResearchAssessment,
     graph: ResearchGraph,
+    *,
+    experiment_node_id: Optional[str] = None,
 ) -> Tuple[float, Dict[str, float]]:
     """Deterministic score with auditable components."""
     if candidate.blocked and candidate.intent not in (ActionIntent.STOP.value, ActionIntent.ABANDON.value):
@@ -117,8 +290,25 @@ def score_candidate(
     components["information_gap"] = _gap_match(assessment, candidate)
     components["falsification_threat"] = _falsification_match(assessment, candidate)
     components["novelty"] = _novelty_bonus(assessment, candidate)
+    components["grammar"] = _grammar_bonus(candidate)
+    components["adaptive"] = _adaptive_bonus(candidate)
     components["stop"] = _stop_score(assessment, candidate)
     components["abandon"] = _abandon_score(assessment, candidate)
+
+    exp_id = experiment_node_id or assessment.source_experiment_node_id
+    if exp_id:
+        pen_total, pen_parts = _complexity_penalty(graph, exp_id)
+        components.update(pen_parts)
+        components["draft_complexity_penalty"] = -_branch_complexity_penalty_for_candidate(candidate)
+        components["skepticism_escalation"] = _skepticism_bonus(
+            assessment, candidate, graph, exp_id
+        )
+        components["strong_evidence_exploration"] = _strong_evidence_exploration_bonus(
+            assessment, candidate, graph, exp_id
+        )
+        components["weak_complexity_stop"] = _weak_complexity_stop_bonus(
+            assessment, candidate, graph, exp_id
+        )
 
     total = sum(components.values())
     return total, components
@@ -128,6 +318,8 @@ def plan_next_action(
     assessment: ResearchAssessment,
     candidates: Sequence[ResearchActionCandidate],
     graph: ResearchGraph,
+    *,
+    experiment_node_id: Optional[str] = None,
 ) -> PlanDecision:
     """
     Choose among candidates, STOP, or ABANDON using weighted deterministic scoring.
@@ -147,7 +339,9 @@ def plan_next_action(
     budget_exhausted = remaining is not None and remaining <= 0
 
     for candidate in candidates:
-        total, components = score_candidate(candidate, assessment, graph)
+        total, components = score_candidate(
+            candidate, assessment, graph, experiment_node_id=experiment_node_id
+        )
         if budget_exhausted and candidate.intent == ActionIntent.STOP.value:
             total += WEIGHT_STOP * 2
             components["budget_exhausted"] = WEIGHT_STOP * 2
@@ -228,9 +422,13 @@ def score_all_candidates(
     assessment: ResearchAssessment,
     candidates: Sequence[ResearchActionCandidate],
     graph: ResearchGraph,
+    *,
+    experiment_node_id: Optional[str] = None,
 ) -> Dict[str, Tuple[float, Dict[str, float]]]:
     """Expose scores for tests and audit."""
     return {
-        c.action_id: score_candidate(c, assessment, graph)
+        c.action_id: score_candidate(
+            c, assessment, graph, experiment_node_id=experiment_node_id
+        )
         for c in candidates
     }
