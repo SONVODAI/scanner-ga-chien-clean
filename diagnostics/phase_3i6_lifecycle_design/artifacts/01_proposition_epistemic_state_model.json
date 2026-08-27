@@ -1,0 +1,48 @@
+{
+  "artifact_id": "01_proposition_epistemic_state_model",
+  "phase": "3I.6",
+  "status": "DESIGN_ONLY",
+  "principle": "States describe epistemic status, not profitability or trading readiness.",
+  "minimum_state_vocabulary": {
+    "PROPOSED": {
+      "meaning": "Autonomous proposition born with birth certificate; not yet tested by lifecycle experiment",
+      "maps_from": "PropositionRecord.epistemic_status=HYPOTHESIS at birth"
+    },
+    "UNDER_TEST": {
+      "meaning": "At least one experiment spawned from proposition's experiment_spec_draft; result pending or interpreting"
+    },
+    "SUPPORTED": {
+      "meaning": "Supporting evidence meets falsifiable_expectation without crossing disconfirm threshold; no unresolved contradiction"
+    },
+    "WEAKENED": {
+      "meaning": "Directionally consistent but below meaningful effect floor, high variance, or quality-limited support"
+    },
+    "CONFLICTED": {
+      "meaning": "Multiple valid evidence events point in opposing directions; proposition remains active but uncertain"
+    },
+    "FALSIFIED": {
+      "meaning": "Disconfirming_observation_spec threshold crossed or null_competing_explanation better supported"
+    },
+    "UNRESOLVED": {
+      "meaning": "Experiments run but non-informative; belief unchanged pending better test"
+    },
+    "ABANDONED": {
+      "meaning": "Explicit scientific decision to stop investigating; successful outcome when evidence warrants"
+    }
+  },
+  "excluded_states": {
+    "PROFITABLE": "Trading semantics — forbidden",
+    "READY_FOR_OOS": "Discovery/challenger pipeline only — not proposition lifecycle",
+    "TEMPLATE_INSTANCE": "Catalog semantics — not epistemic"
+  },
+  "transition_rules": {
+    "append_only": true,
+    "immutable_birth_record": "Original PropositionRecord never overwritten",
+    "state_changes_via": "EpistemicUpdateRecord linked to evidence interpretation"
+  },
+  "relationship_to_existing": {
+    "PropositionRecord.EpistemicStatus": "Subset at birth; lifecycle extends with UNDER_TEST, CONFLICTED, UNRESOLVED",
+    "ScientificStatus": "Separate discovery pipeline — do not merge enums",
+    "NodeStatus": "Graph node lifecycle — orthogonal to proposition epistemic state"
+  }
+}

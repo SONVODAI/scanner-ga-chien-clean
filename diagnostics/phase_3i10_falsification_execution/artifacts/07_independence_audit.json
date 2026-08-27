@@ -1,0 +1,22 @@
+{
+  "pre_execution": {
+    "motivating_episodes_excluded": [
+      "2026-08-02"
+    ],
+    "holdout_date_count": 43,
+    "overlap_with_motivating": [],
+    "independence_pass": true,
+    "post_cutoff_violations": [],
+    "missing_panel_dates": []
+  },
+  "operational_post_execution": {
+    "passed": true,
+    "motivating_episodes": [
+      "2026-08-02"
+    ],
+    "dates_in_executed_cohort": 43,
+    "overlap": [],
+    "cohort_n": 6106,
+    "population_spec_applied": true
+  }
+}
