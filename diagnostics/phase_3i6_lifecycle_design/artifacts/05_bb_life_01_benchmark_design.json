@@ -1,0 +1,87 @@
+{
+  "artifact_id": "05_bb_life_01_benchmark_design",
+  "phase": "3I.6",
+  "benchmark_id": "BB-Life-01",
+  "status": "DESIGN_ONLY",
+  "purpose": "Blind benchmark for autonomous proposition lifecycle reasoning — not proposition generation breadth",
+  "zones": {
+    "zone_a_calibration": "Public lifecycle interpretation rules frozen before blind eval",
+    "zone_b_frozen_propositions": "Pre-registered autonomous PropositionRecords + synthetic experiment result sequences",
+    "zone_c_hidden_sequences": "Hidden adversarial evidence trajectories — evaluator only",
+    "zone_d_lifecycle_evaluator": "Post-hoc capability-level scoring — never imported by lifecycle engine"
+  },
+  "test_sequences": [
+    {
+      "id": "LIFE-01",
+      "description": "Strong initial support then high-quality contradiction",
+      "expected_capabilities": ["CONFLICTED recognition", "avoid confirmation bias", "seek falsification or abandon"]
+    },
+    {
+      "id": "LIFE-02",
+      "description": "Weak support repeated many times (correlated)",
+      "expected_capabilities": ["do not inflate confidence from raw count", "quality-weight aggregation"]
+    },
+    {
+      "id": "LIFE-03",
+      "description": "One high-quality falsification event",
+      "expected_capabilities": ["FALSIFIED transition", "justified ABANDON"]
+    },
+    {
+      "id": "LIFE-04",
+      "description": "Conflicting market episodes",
+      "expected_capabilities": ["CONTRADICTORY_EVIDENCE", "CONFLICTED state"]
+    },
+    {
+      "id": "LIFE-05",
+      "description": "Non-informative experiment",
+      "expected_capabilities": ["UNRESOLVED", "no false SUPPORT"]
+    },
+    {
+      "id": "LIFE-06",
+      "description": "Invalid/leaky experiment",
+      "expected_capabilities": ["INVALID_EVIDENCE exclusion"]
+    },
+    {
+      "id": "LIFE-07",
+      "description": "Tempting post-hoc population narrowing after failure",
+      "expected_capabilities": ["reject HYPOTHESIS_RESCUE", "require LEGITIMATE_SCIENTIFIC_MUTATION with fork"]
+    },
+    {
+      "id": "LIFE-08",
+      "description": "Tempting horizon change after failure",
+      "expected_capabilities": ["evidence must motivate horizon change"]
+    },
+    {
+      "id": "LIFE-09",
+      "description": "Alternative explanation with stronger evidence",
+      "expected_capabilities": ["FORK_NEW_EXPLANATION with new birth certificate"]
+    },
+    {
+      "id": "LIFE-10",
+      "description": "Proposition that should simply be abandoned",
+      "expected_capabilities": ["ABANDON as success", "lineage preserved"]
+    }
+  ],
+  "metrics": {
+    "evidence_interpretation_accuracy": "Fraction of hidden-labeled evidence classes correctly assigned",
+    "contradiction_recognition_rate": "CONFLICTED when adversarial sequence includes contradiction",
+    "falsification_seeking_rate": "SEEK_FALSIFICATION chosen when support partial and disconfirm untested",
+    "inappropriate_confirmation_seeking_rate": "Supportive re-tests after FALSIFIED or when contradiction unresolved",
+    "hypothesis_rescue_rate": "Silent proposition mutation after disconfirm — must be 0",
+    "justified_abandonment_rate": "ABANDON when hidden sequence warrants",
+    "unjustified_abandonment_rate": "ABANDON when evidence still informative",
+    "evidence_responsive_redirection_rate": "Population/outcome/horizon change with evidence citation",
+    "lineage_completeness": "All transitions have experiment_id + evidence refs",
+    "scientific_decision_quality": "Capability-level rubric — not answer matching",
+    "research_budget_efficiency": "Informative experiments per budget unit"
+  },
+  "hidden_answer_protection": {
+    "generator_visible": false,
+    "evaluator_post_hoc_only": true,
+    "failure_feedback": "capability-level only — e.g. hypothesis_rescue_detected, not correct_action=LIFE-03-B"
+  },
+  "anti_rewards": [
+    "Do not reward keeping propositions alive",
+    "Do not reward experiment count without information gain"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "classification": "PARTIALLY_READY",
+  "execution_infrastructure": "READY \u2014 ExperimentSpec, tools, grammar, ranking, identity, dedup",
+  "generative_proposition_layer": "NOT_READY \u2014 all question_text from fixed template catalog",
+  "not_ready_items": [
+    "No LLM or rule engine synthesizes novel question semantics",
+    "Root question always human-seeded",
+    "Discovery pipeline (Phase 2) not wired to Research Brain Q-gen",
+    "No market-level anomaly detector feeds proposition synthesis"
+  ],
+  "observation_infrastructure": "PARTIAL \u2014 experiment-level OBS_* codes exist; no market-level anomaly\u2192proposition bridge",
+  "single_prerequisite": {
+    "description": "A deterministic, auditable layer that converts structured observation evidence (ToolResult metrics, OBS_* codes, panel statistics) into a CanonicalPropositionCore plus motivation metadata BEFORE any template_id binding. Must produce novel uncertainty/question semantics not isomorphic to existing template catalog entries.",
+    "name": "Observation-to-Proposition Record (OPR) bridge",
+    "why_first": "All downstream infrastructure (grammar, tools, identity, ranking, falsification) already consumes ExperimentSpec and proposition cores. The sole missing capability is originating the scientific question itself from observed structure rather than selecting from research_actions.py templates."
+  }
+}
