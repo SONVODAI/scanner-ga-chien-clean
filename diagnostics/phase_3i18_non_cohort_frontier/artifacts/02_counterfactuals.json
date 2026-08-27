@@ -1,0 +1,31 @@
+{
+  "CF-F1": {
+    "passed": true
+  },
+  "CF-F2": {
+    "passed": true,
+    "before": "NO_HIGH_INFORMATION_ACTION",
+    "after": "NO_HIGH_INFORMATION_ACTION"
+  },
+  "CF-F3": {
+    "passed": true,
+    "cohort_still_available": 0
+  },
+  "CF-F4": {
+    "passed": true,
+    "note": "tool representation tested in BBF-11"
+  },
+  "CF-F5": {
+    "passed": true
+  },
+  "CF-F6": {
+    "passed": true
+  },
+  "CF-F7": {
+    "passed": true
+  },
+  "CF-F8": {
+    "passed": true
+  },
+  "all_passed": true
+}

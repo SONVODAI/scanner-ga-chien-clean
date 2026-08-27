@@ -1,0 +1,56 @@
+{
+  "artifact_id": "07_generation_budget_policy",
+  "phase": "3I.1",
+  "status": "PRE_REGISTERED",
+  "principle": "Creativity must not be simulated by volume. Budget limits are frozen before BB-Prop-01 blind evaluation.",
+  "threshold_selection_rule": {
+    "when_exact_values_unknown": "Use panel cardinality and observation-class cardinality to set budgets proportional to evidence surface, never proportional to desired hit rate",
+    "formula_basis": "max_propositions_per_observation = min(3, ceil(sqrt(distinct_statistical_contrasts_in_observation)))",
+    "session_cap_formula": "max_total_propositions_per_session = min(50, 5 * distinct_observation_clusters)",
+    "rationale": "sqrt scaling prevents combinatorial explosion while allowing multiple falsifiable angles on rich observations"
+  },
+  "frozen_limits_v1": {
+    "note": "Values justified from 3I.0 finding that 24 template families already saturate planner; autonomous layer must stay sparse",
+    "max_propositions_per_observation": 3,
+    "max_propositions_per_research_step": 5,
+    "max_total_propositions_per_session": 50,
+    "max_survivors_after_deduplication": 15,
+    "max_executable_queue_per_session": 10,
+    "semantic_duplicate_similarity_threshold": 0.90,
+    "minimum_grounding_requirement": {
+      "required": "observation_provenance passes minimum payload (see 01_opr_source_of_truth_rule.json)",
+      "min_raw_statistic_citations": 1,
+      "min_evidence_refs": 1
+    },
+    "minimum_falsifiability_requirement": {
+      "required_fields": [
+        "falsifiable_expectation",
+        "null_competing_explanation"
+      ],
+      "reject_if_missing": true
+    }
+  },
+  "deduplication": {
+    "within_observation": "Collapse propositions with embedding similarity >= 0.90 keeping highest grounding score",
+    "within_session": "Collapse across observations if canonical_proposition_core equivalent",
+    "cross_session": "Not enforced in v1 — logged for lineage only"
+  },
+  "early_exit_rules": {
+    "generate_nothing_when": [
+      "No observation exceeds surprise threshold (see 14_minimal_3i2_boundary.json)",
+      "All candidates fail grounding or falsifiability",
+      "Budget exhausted for observation cluster",
+      "Negative control scenario (pure noise, duplicated evidence)"
+    ],
+    "silence_is_valid": true
+  },
+  "anti_spam_invariants": {
+    "hypothesis_spam_definition": "Session with >50 propositions OR >15 survivors OR <20% grounding rate OR >60% TEMPLATE_INSTANCE rate",
+    "penalty": "Session flagged PATHOLOGICAL_SPAM — excluded from creativity metrics numerator",
+    "no_reward_for_count": "Metrics use rates and survivors, never raw proposition count"
+  },
+  "development_vs_blind": {
+    "development_set": "May log budget utilization diagnostics",
+    "blind_benchmark": "Budget frozen; exceeding cap is automatic disqualification of excess propositions (lowest grounding score dropped first)"
+  }
+}

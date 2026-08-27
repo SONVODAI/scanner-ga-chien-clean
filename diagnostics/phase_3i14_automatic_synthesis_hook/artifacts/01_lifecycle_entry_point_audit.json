@@ -1,0 +1,37 @@
+{
+  "entry_points": [
+    {
+      "path": "lifecycle_runner.run_minimal_lifecycle",
+      "class": "PRODUCTION_LIFECYCLE",
+      "hooked": true
+    },
+    {
+      "path": "falsification_execution_runner.run_one_shot_falsification_execution",
+      "class": "RESEARCH_EXECUTION",
+      "hooked": true
+    },
+    {
+      "path": "proposition_experiment_interpreter.build_epistemic_update",
+      "class": "PRODUCTION_LIFECYCLE",
+      "hooked": false,
+      "note": "EPU builder only; hook at runner boundary"
+    },
+    {
+      "path": "real_ledger_adapter.apply_real_ledger_diagnostic",
+      "class": "DIAGNOSTIC_ONLY",
+      "hooked": false
+    },
+    {
+      "path": "synthesis_integration.update_proposition_knowledge_state",
+      "class": "PRODUCTION_LIFECYCLE",
+      "hooked": false,
+      "note": "called by hook"
+    },
+    {
+      "path": "bb_epistemic_01_fixtures.run_case",
+      "class": "TEST_ONLY",
+      "hooked": false
+    }
+  ],
+  "canonical_hook": "lifecycle_synthesis_hook.on_epistemic_update_completed"
+}
