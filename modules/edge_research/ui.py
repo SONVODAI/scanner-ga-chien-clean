@@ -352,10 +352,31 @@ def render_edge_research_panel(
     current_market_state: Optional[str] = None,
     current_market_transition: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Render MR.BOT — EDGE RESEARCH panel (Phase 3)."""
+    """Render MR.BOT — EDGE RESEARCH panel (autonomous daily + historical challenger)."""
     import streamlit as st
 
+    from modules.edge_research.autonomous_daily_edge_ui import (
+        HISTORICAL_CHALLENGER_SECTION,
+        build_autonomous_daily_edge_ui_view,
+        render_autonomous_daily_edge_block,
+    )
+
     st.markdown("## 🔬 MR.BOT — EDGE RESEARCH")
+
+    # --- Autonomous daily production (canonical, view-only) ---
+    autonomous_view: Dict[str, Any] = {}
+    try:
+        autonomous_view = build_autonomous_daily_edge_ui_view()
+        render_autonomous_daily_edge_block(st, autonomous_view)
+    except Exception as auto_exc:  # noqa: BLE001
+        st.warning(f"Autonomous daily research view unavailable: {auto_exc}")
+
+    st.markdown("---")
+    st.markdown(f"### {HISTORICAL_CHALLENGER_SECTION.replace('_', ' ')}")
+    st.caption(
+        "Historical Challenger / discovery research — separate from today's "
+        "AUTONOMOUS DAILY RESEARCH and SESSION_MARKET_VOICE."
+    )
 
     try:
         engine = EdgeResearchEngine()
@@ -451,11 +472,14 @@ def render_edge_research_panel(
                 cols = [c for c in display_cols if c in df.columns]
                 st.dataframe(df[cols], use_container_width=True, hide_index=True)
 
-        with st.expander("Research Voice", expanded=False):
+        with st.expander("Challenger candidate voice (historical)", expanded=False):
+            st.caption(
+                "This is NOT the autonomous SESSION_MARKET_VOICE / Daily Market Voice."
+            )
             if top_candidates:
                 st.markdown(_format_research_voice(top_candidates[0]))
             else:
-                st.caption("No research voice events. Silence is valid.")
+                st.caption("No challenger candidate voice events. Silence is valid.")
 
         with st.expander("Challenger details", expanded=False):
             if challenger and challenger.get("run_id") not in (None, "skipped"):
@@ -517,8 +541,16 @@ def render_edge_research_panel(
                 execute_pending_research_action(st.session_state, engine)
             st.rerun()
 
-        return status.to_dict()
+        out = status.to_dict()
+        out["autonomous_daily"] = {
+            "session_date": autonomous_view.get("session_date"),
+            "run_disposition": autonomous_view.get("run_disposition"),
+            "discovery_count": autonomous_view.get("discovery_count"),
+            "daily_market_voice_exists": autonomous_view.get("daily_market_voice_exists"),
+            "session_voice_observation_id": autonomous_view.get("session_voice_observation_id"),
+        }
+        return out
 
     except Exception as exc:
         st.warning(f"Edge Research: CHALLENGER UNAVAILABLE — {exc}")
-        return {"error": str(exc)}
+        return {"error": str(exc), "autonomous_daily": autonomous_view}
