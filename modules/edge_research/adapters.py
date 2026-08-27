@@ -8,12 +8,19 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, FrozenSet, Iterable, List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
 
 from modules.edge_research.contracts import RESEARCH_OBSERVATION_COLUMNS, ResearchObservation
+from modules.edge_research.research_panel_exposure import (
+    CORE_STOCK_PANEL_FIELDS,
+    GOVERNED_OPTIONAL_PANEL_COLUMNS,
+    PanelExposureManifest,
+    get_active_panel_exposure_manifest,
+    governed_wired_stock_columns,
+)
 from modules.edge_research.market_state import (
     RawMarketSnapshot,
     enrich_date_with_market_research,
@@ -203,9 +210,17 @@ def _stock_panel_from_lifecycle(
     lifecycle: pd.DataFrame,
     start: Optional[str] = None,
     end: Optional[str] = None,
+    *,
+    panel_manifest: Optional[PanelExposureManifest] = None,
+    contract_wired: Optional[FrozenSet[str]] = None,
 ) -> pd.DataFrame:
+    manifest = panel_manifest if panel_manifest is not None else get_active_panel_exposure_manifest()
+    wired_optional = governed_wired_stock_columns(manifest, contract_wired=contract_wired)
+    optional_cols = sorted(wired_optional - CORE_STOCK_PANEL_FIELDS)
+
     if lifecycle.empty:
-        return pd.DataFrame(columns=list(RESEARCH_OBSERVATION_COLUMNS))
+        cols = ["trade_date", "symbol"] + sorted(CORE_STOCK_PANEL_FIELDS) + optional_cols
+        return pd.DataFrame(columns=cols)
 
     df = lifecycle.copy()
     date_col = "trade_date" if "trade_date" in df.columns else "date"
@@ -230,6 +245,13 @@ def _stock_panel_from_lifecycle(
         out["rs_spread"] = pd.to_numeric(df["rs_spread"], errors="coerce")
     else:
         out["rs_spread"] = out["rs5"] - out["rs10"]
+
+    for col in optional_cols:
+        if col in df.columns:
+            out[col] = pd.to_numeric(df[col], errors="coerce")
+        else:
+            out[col] = np.nan
+
     return out.drop_duplicates(subset=["trade_date", "symbol"], keep="last")
 
 
@@ -239,6 +261,8 @@ def build_research_panel(
     lifecycle: Optional[pd.DataFrame] = None,
     ohlcv_by_symbol: Optional[Dict[str, pd.DataFrame]] = None,
     source: str = "pattern_lifecycle",
+    panel_manifest: Optional[PanelExposureManifest] = None,
+    contract_wired: Optional[FrozenSet[str]] = None,
 ) -> pd.DataFrame:
     """
     Build canonical research panel (read-only sources).
@@ -253,7 +277,13 @@ def build_research_panel(
         else:
             lifecycle = load_lifecycle()
 
-    stock = _stock_panel_from_lifecycle(lifecycle, start=start, end=end)
+    stock = _stock_panel_from_lifecycle(
+        lifecycle,
+        start=start,
+        end=end,
+        panel_manifest=panel_manifest,
+        contract_wired=contract_wired,
+    )
     if stock.empty:
         return pd.DataFrame(columns=list(RESEARCH_OBSERVATION_COLUMNS))
 
@@ -303,6 +333,9 @@ def build_research_panel(
                 "market_snapshot_count": snap_count,
                 **market_fields,
             }
+            for col in stock.columns:
+                if col not in row and col not in {"trade_date", "symbol"}:
+                    row[col] = srow.get(col, np.nan)
             enriched_rows.append(row)
 
     panel = pd.DataFrame(enriched_rows)
@@ -320,7 +353,17 @@ def build_research_panel(
     for col in RESEARCH_OBSERVATION_COLUMNS:
         if col not in panel.columns:
             panel[col] = np.nan
-    return panel[list(RESEARCH_OBSERVATION_COLUMNS)]
+
+    manifest = panel_manifest if panel_manifest is not None else get_active_panel_exposure_manifest()
+    wired_optional = governed_wired_stock_columns(manifest, contract_wired=contract_wired)
+    wired_optional -= CORE_STOCK_PANEL_FIELDS
+
+    output_columns = [
+        col
+        for col in RESEARCH_OBSERVATION_COLUMNS
+        if col not in GOVERNED_OPTIONAL_PANEL_COLUMNS or col in wired_optional
+    ]
+    return panel[list(output_columns)]
 
 
 def panel_to_observations(panel: pd.DataFrame) -> List[ResearchObservation]:
