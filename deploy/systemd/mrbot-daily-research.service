@@ -7,6 +7,9 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/mrbot-camera
+# Artifact-server contract (ARTIFACT_*) so post-receipt sidecar publish can
+# write/serve production_observations.tar.gz without requiring DURABLE_* on VPS.
+EnvironmentFile=-/etc/mrbot/edge-artifacts.env
 EnvironmentFile=-/etc/mrbot/daily-research.env
 # Dedicated research/headless interpreter (must include vnstock==0.2.9.2 via
 # requirements-research.txt). Do NOT use a Streamlit-only or empty venv.
