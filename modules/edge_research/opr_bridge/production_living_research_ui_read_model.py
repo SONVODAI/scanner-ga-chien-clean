@@ -357,9 +357,9 @@ def build_historical_date_read_model(
     data_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Historical view — no future information beyond trade_date."""
-    run = lookup_run_for_date(trade_date, BACKFILL_NON_FORWARD, data_dir=data_dir)
+    run = lookup_run_for_date(trade_date, LIVE_FORWARD, data_dir=data_dir)
     if run is None:
-        run = lookup_run_for_date(trade_date, LIVE_FORWARD, data_dir=data_dir)
+        run = lookup_run_for_date(trade_date, BACKFILL_NON_FORWARD, data_dir=data_dir)
     snapshots = [s for s in list_snapshots(data_dir=data_dir) if s.as_of_trade_date <= trade_date]
     cal_snap = snapshots[-1] if snapshots else None
     return {
@@ -395,9 +395,9 @@ def build_living_research_ui_read_model(
             "available_dates": list_available_trade_dates(data_dir=data_dir),
         }
 
-    run = lookup_run_for_date(effective_date, BACKFILL_NON_FORWARD, data_dir=data_dir)
+    run = lookup_run_for_date(effective_date, LIVE_FORWARD, data_dir=data_dir)
     if run is None:
-        run = lookup_run_for_date(effective_date, LIVE_FORWARD, data_dir=data_dir)
+        run = lookup_run_for_date(effective_date, BACKFILL_NON_FORWARD, data_dir=data_dir)
 
     stale_warning = (
         trade_date is None

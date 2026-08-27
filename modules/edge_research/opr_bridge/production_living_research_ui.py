@@ -128,8 +128,10 @@ def render_living_research_ui_panel(
 
     st.markdown("## 🧠 MR.BOT — HÔM NAY TÔI ĐANG NGHĨ GÌ?")
     st.caption(
-        "Research Brain notebook — read-only. "
-        "Không khuyến nghị mua/bán. Không chạy research khi render."
+        "Autonomous living research notebook — read-only from "
+        "data/edge_research/production_observations. "
+        "Không khuyến nghị mua/bán. Không chạy research khi render. "
+        "Distinct from Historical Challenger research."
     )
     st.info(f"🏷 **{AUTHORITY_BADGE_RESEARCH_ONLY}** — UI này không có trading authority.")
 
