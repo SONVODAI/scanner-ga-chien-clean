@@ -1,9 +1,12 @@
 """
-Autonomous daily Edge Research UI view — read-only.
+Autonomous daily Edge Research UI view — read-only, Streamlit-safe.
 
-Surfaces the latest successful production session from
-``data/edge_research/production_observations`` for Streamlit display.
+Reads ONLY the canonical production root:
+  data/edge_research/production_observations
+
 Does not execute research, mutate artifacts, or substitute Challenger voices.
+Intentionally avoids heavy opr_bridge imports so Streamlit Cloud (main) can
+render this surface without requiring the full OPR stack on the deploy branch.
 """
 
 from __future__ import annotations
@@ -12,44 +15,68 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from modules.edge_research.opr_bridge.production_daily_run_persistence import (
-    lookup_run,
-    lookup_run_for_date,
-    manifest_path,
-)
-from modules.edge_research.opr_bridge.production_daily_run_records import (
-    BACKFILL_NON_FORWARD,
-    LIVE_FORWARD,
-)
-from modules.edge_research.opr_bridge.production_living_observation_persistence import (
-    session_voice_path,
-)
-from modules.edge_research.opr_bridge.production_living_research_ui_read_model import (
-    build_living_research_ui_read_model,
-    build_ui_health_read_model,
-    resolve_production_data_dir,
-)
-from modules.edge_research.storage import resolve_data_dir
+from modules.edge_research.storage import resolve_data_dir, resolve_production_runs_root
 
 AUTONOMOUS_DAILY_SECTION = "AUTONOMOUS_DAILY_RESEARCH"
 HISTORICAL_CHALLENGER_SECTION = "HISTORICAL_CHALLENGER_RESEARCH"
 
+_SESSION_VOICE_KEYS = (
+    "q1_today_i_see_vi",
+    "q2_vs_prior_session_vi",
+    "q3_market_change_vi",
+    "q4_new_evidence_vi",
+    "q5_belief_changed_vi",
+    "q6_if_not_why_vi",
+    "q9_waiting_for_vi",
+    "observation_id",
+    "assessment_trade_date",
+    "voice_kind",
+)
 
-def _load_manifest_dict(run_id: str, *, data_dir: Optional[Path] = None) -> Dict[str, Any]:
-    path = manifest_path(run_id, data_dir)
-    if not path.exists():
-        return {}
+
+def _read_json(path: Path) -> Optional[Dict[str, Any]]:
+    if not path.exists() or path.stat().st_size <= 0:
+        return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
-        return {}
+        return None
+    return payload if isinstance(payload, dict) else None
 
 
-def _prefer_live_forward_run(trade_date: str, *, data_dir: Optional[Path] = None):
-    run = lookup_run_for_date(trade_date, LIVE_FORWARD, data_dir=data_dir)
-    if run is None:
-        run = lookup_run_for_date(trade_date, BACKFILL_NON_FORWARD, data_dir=data_dir)
-    return run
+def _latest_successful_run_meta(prod_root: Path) -> Optional[Dict[str, Any]]:
+    index = _read_json(prod_root / "daily_run_index.json") or {}
+    runs = index.get("runs") or {}
+    candidates = [
+        m
+        for m in runs.values()
+        if isinstance(m, dict) and m.get("run_disposition") == "SUCCESS" and m.get("target_trade_date")
+    ]
+    if not candidates:
+        return None
+    # Prefer LIVE_FORWARD when dates tie; otherwise latest trade_date wins.
+    def _key(m: Dict[str, Any]) -> tuple:
+        mode_rank = 1 if m.get("run_mode") == "LIVE_FORWARD" else 0
+        return (str(m.get("target_trade_date")), mode_rank, str(m.get("run_id") or ""))
+
+    return max(candidates, key=_key)
+
+
+def _load_run_payload(prod_root: Path, run_id: str) -> Dict[str, Any]:
+    return _read_json(prod_root / "daily_runs" / f"{run_id}.json") or {}
+
+
+def _load_manifest(prod_root: Path, run_id: str) -> Dict[str, Any]:
+    return _read_json(prod_root / "daily_manifests" / f"{run_id}.json") or {}
+
+
+def _load_session_voice(prod_root: Path, trade_date: str) -> Optional[Dict[str, Any]]:
+    return _read_json(prod_root / "daily_voices" / f"session_{trade_date}.json")
+
+
+def _compose_narrative(session_voice: Dict[str, Any]) -> str:
+    parts = [session_voice.get(k, "") for k in _SESSION_VOICE_KEYS if k.startswith("q")]
+    return "\n\n".join(p for p in parts if p)
 
 
 def build_autonomous_daily_edge_ui_view(
@@ -60,63 +87,62 @@ def build_autonomous_daily_edge_ui_view(
     """
     Build the view the Edge Research Streamlit panel must show first.
 
-    Uses the canonical living-research read model over production_observations.
-    Latest successful session is selected when trade_date is omitted.
+    Latest successful autonomous session is selected when trade_date is omitted.
     """
+    # Best-effort durable restore for Streamlit Cloud (no-op when backend absent).
+    try:
+        from modules.edge_research.production_observations_sync import (
+            try_restore_production_observations_durable,
+        )
+
+        try_restore_production_observations_durable(data_dir=data_dir)
+    except Exception:  # noqa: BLE001
+        pass
+
     edge_root = resolve_data_dir(data_dir)
-    canon = resolve_production_data_dir(edge_root)
-    # Pass edge root (or explicit) — resolve_production_runs_root never double-nests.
-    rm = build_living_research_ui_read_model(trade_date=trade_date, data_dir=edge_root)
-    health = rm.get("health") or build_ui_health_read_model(data_dir=edge_root)
-    session_date = rm.get("trade_date") or health.get("latest_successful_research_date")
+    canon = resolve_production_runs_root(edge_root)
+    meta = None
+    if trade_date:
+        index = _read_json(canon / "daily_run_index.json") or {}
+        matches = [
+            m
+            for m in (index.get("runs") or {}).values()
+            if isinstance(m, dict)
+            and m.get("target_trade_date") == trade_date
+            and m.get("run_disposition") == "SUCCESS"
+        ]
+        if matches:
+            live = [m for m in matches if m.get("run_mode") == "LIVE_FORWARD"]
+            meta = (live or matches)[0]
+    else:
+        meta = _latest_successful_run_meta(canon)
 
-    run = _prefer_live_forward_run(session_date, data_dir=edge_root) if session_date else None
-    if run is None and health.get("latest_run_id"):
-        run = lookup_run(str(health["latest_run_id"]), edge_root)
+    session_date = (meta or {}).get("target_trade_date")
+    run_id = (meta or {}).get("run_id")
+    run_payload = _load_run_payload(canon, str(run_id)) if run_id else {}
+    manifest = _load_manifest(canon, str(run_id)) if run_id else {}
+    session_voice = _load_session_voice(canon, str(session_date)) if session_date else None
 
-    manifest = _load_manifest_dict(run.run_id, data_dir=edge_root) if run else {}
     discovery_count = manifest.get("discovery_count")
-    if discovery_count is None and run is not None:
-        discovery_count = len(getattr(run, "observations_born", ()) or ())
+    if discovery_count is None and run_payload:
+        discovery_count = len(run_payload.get("observations_born") or [])
     if discovery_count is None:
-        dc = rm.get("daily_change") or {}
-        discovery_count = 1 if dc.get("new_discovery") else 0
+        discovery_count = 0
 
-    voice_block = rm.get("voice") or {}
-    session_voice = voice_block.get("session_voice")
-    if session_voice is None and session_date:
-        spath = session_voice_path(session_date, edge_root)
-        if spath.exists():
-            try:
-                session_voice = json.loads(spath.read_text(encoding="utf-8"))
-            except Exception:  # noqa: BLE001
-                session_voice = None
-
-    session_questions = {}
+    session_questions: Dict[str, Any] = {}
     if isinstance(session_voice, dict):
-        for key in (
-            "q1_today_i_see_vi",
-            "q2_vs_prior_session_vi",
-            "q3_market_change_vi",
-            "q4_new_evidence_vi",
-            "q5_belief_changed_vi",
-            "q6_if_not_why_vi",
-            "q9_waiting_for_vi",
-            "observation_id",
-            "assessment_trade_date",
-            "voice_kind",
-        ):
+        for key in _SESSION_VOICE_KEYS:
             if key in session_voice:
                 session_questions[key] = session_voice.get(key)
 
+    narrative = _compose_narrative(session_voice) if isinstance(session_voice, dict) else ""
+
     disposition = (
-        (run.run_disposition if run else None)
-        or health.get("latest_run_disposition")
-        or rm.get("failure_state")
-        or "NO_DATA"
+        (meta or {}).get("run_disposition")
+        or run_payload.get("run_disposition")
+        or ("NO_DATA" if not session_date else "UNKNOWN")
     )
-    run_id = (run.run_id if run else None) or health.get("latest_run_id")
-    run_mode = (run.run_mode if run else None) or health.get("latest_run_mode") or rm.get("run_mode")
+    run_mode = (meta or {}).get("run_mode") or run_payload.get("run_mode")
 
     return {
         "section": AUTONOMOUS_DAILY_SECTION,
@@ -130,20 +156,24 @@ def build_autonomous_daily_edge_ui_view(
         "run_disposition": disposition,
         "run_mode": run_mode,
         "discovery_count": int(discovery_count or 0),
-        "bot_spoke_today": bool(manifest.get("bot_spoke_today", voice_block.get("voice_count", 0) > 0)),
+        "bot_spoke_today": bool(manifest.get("bot_spoke_today", bool(session_voice))),
         "silence_or_no_discovery": bool(
-            manifest.get("silence_or_no_discovery", voice_block.get("silence_or_no_discovery", False))
+            manifest.get("silence_or_no_discovery", int(discovery_count or 0) == 0)
         ),
         "daily_market_voice_exists": bool(session_voice),
         "session_voice_observation_id": (
             (session_voice or {}).get("observation_id") if isinstance(session_voice, dict) else None
         ),
         "session_voice_questions": session_questions,
-        "narrative_vi": voice_block.get("narrative_vi") or "",
-        "active_observations": rm.get("active_observations") or [],
-        "health": health,
-        "authority_badge": rm.get("authority_badge"),
-        "living_read_model": rm,
+        "narrative_vi": narrative,
+        "active_observations": [],
+        "health": {
+            "latest_successful_research_date": session_date,
+            "latest_run_id": run_id,
+            "latest_run_mode": run_mode,
+            "latest_run_disposition": disposition,
+        },
+        "authority_badge": "RESEARCH ONLY",
         "view_only": True,
         "requires_streamlit_action": False,
         "challenger_voice_substituted": False,
@@ -225,12 +255,3 @@ def render_autonomous_daily_edge_block(st: Any, view: Dict[str, Any]) -> None:
             st.markdown(view["narrative_vi"])
     else:
         st.warning("SESSION_MARKET_VOICE chưa có cho session này.")
-
-    obs = view.get("active_observations") or []
-    if obs:
-        with st.expander(f"Current observations ({len(obs)})", expanded=False):
-            for o in obs[:12]:
-                st.caption(
-                    f"{o.get('observation_id', '')[:16]}… | "
-                    f"{o.get('epistemic_state')} | age={o.get('age_trading_days')}"
-                )

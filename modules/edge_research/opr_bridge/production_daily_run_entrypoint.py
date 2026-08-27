@@ -148,6 +148,21 @@ def main(argv: list[str] | None = None) -> int:
         receipt_info = {"ok": False, "error": f"receipt_hook:{type(exc).__name__}:{exc}"}
         result["daily_pipeline_receipt"] = receipt_info
 
+    # Fail-safe Streamlit Cloud sync of production_observations (observability only).
+    try:
+        from modules.edge_research.production_observations_sync import (
+            publish_production_observations_durable,
+        )
+
+        result["production_observations_sync"] = publish_production_observations_durable(
+            data_dir=data_dir
+        )
+    except Exception as sync_exc:  # noqa: BLE001
+        result["production_observations_sync"] = {
+            "ok": False,
+            "error": f"sync_hook:{type(sync_exc).__name__}:{sync_exc}",
+        }
+
     disposition = result.get("run", {}).get("run_disposition", "FAILED_CLOSED")
     if result.get("lock_held"):
         print(json.dumps(result.get("lock") or result.get("run"), indent=2, default=str))
