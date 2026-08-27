@@ -1,0 +1,390 @@
+[
+  {
+    "decision_index": 1,
+    "triggering_experiment_node_id": "exp-952b8ab91072",
+    "resulting_experiment_node_id": "exp-e1d941951ed8",
+    "selected_opportunity_id": "1546513c8254481f",
+    "selected_action_id": "1546513c8254481f",
+    "selected_source": "LOCAL",
+    "selected_erv": 16.83,
+    "erv_components": {
+      "exploration_component": 2.6,
+      "exploitation_component": 1.5,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 4.199999999999999,
+      "sample_burden_penalty": 0.0
+    },
+    "best_local_erv": 16.83,
+    "best_frontier_erv": 0.0,
+    "best_deferred_erv": 0.0,
+    "best_global_alternative_erv": 14.83,
+    "global_opportunity_cost": 0.0,
+    "globally_comparable_count": 16,
+    "excluded_count": 15,
+    "exclusion_reasons": [
+      {
+        "opportunity_id": "local:3748fab4eca45505",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:8de135eec95ffea3",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:9af3129b9c0f6726",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:a353c61494d68984",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:2553a36d694b3fef",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:294794538da87a3b",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:380d6b066fba1184",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:9f863f39276d3025",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:ae6ed0a837b1d031",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:49022f03695315b8",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:3bd0567dabf64b1d",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:d8ae00e4c2500467",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:fd0876343b97f1d0",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:fe3ab55226b9633f",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:e0d6e94eb5336156",
+        "reason": "terminal_intent"
+      }
+    ],
+    "context_switch_occurred": false,
+    "historical_vs_revalued_non_local": null,
+    "branch_before": "obs-62e3cd748dd9",
+    "branch_after": "obs-62e3cd748dd9",
+    "frame_before": "frame-00007",
+    "observation_horizon_before": 5,
+    "budget_remaining": 11,
+    "valuation_sequence": 1,
+    "local_would_have_selected": "1546513c8254481f",
+    "decision_type": "EXPERIMENT",
+    "selected_frontier_id": "",
+    "revisit_audit": {},
+    "why_selected_over_alternative": "selected ERV=16.830 over alternative 11e2217be7ac6585 ERV=14.830",
+    "global_allocation_summary": {
+      "comparable_count": 16,
+      "excluded_count": 15,
+      "best_local_erv": 16.83,
+      "best_frontier_erv": 0.0
+    }
+  },
+  {
+    "decision_index": 2,
+    "triggering_experiment_node_id": "exp-e1d941951ed8",
+    "resulting_experiment_node_id": "exp-5f1e13ae9c7c",
+    "selected_opportunity_id": "ea37630b08516f35",
+    "selected_action_id": "ea37630b08516f35",
+    "selected_source": "LOCAL",
+    "selected_erv": 12.385625,
+    "erv_components": {
+      "exploration_component": 0.0,
+      "exploitation_component": 2.5,
+      "falsification_component": 2.025,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 6.7375,
+      "sample_burden_penalty": 0.0
+    },
+    "best_local_erv": 12.385625,
+    "best_frontier_erv": 6.73875,
+    "best_deferred_erv": 0.0,
+    "best_global_alternative_erv": 11.08875,
+    "global_opportunity_cost": 0.0,
+    "globally_comparable_count": 25,
+    "excluded_count": 7,
+    "exclusion_reasons": [
+      {
+        "opportunity_id": "local:ee5087a47300fb20",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:d4e83e1b6b8dda53",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:c8e6db8250089435",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:4f219ee6ee39f4c4",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:fd0876343b97f1d0",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:fe3ab55226b9633f",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:e0d6e94eb5336156",
+        "reason": "terminal_intent"
+      }
+    ],
+    "context_switch_occurred": false,
+    "historical_vs_revalued_non_local": null,
+    "branch_before": "obs-62e3cd748dd9",
+    "branch_after": "obs-62e3cd748dd9",
+    "frame_before": "",
+    "observation_horizon_before": 0,
+    "budget_remaining": 10,
+    "valuation_sequence": 2,
+    "local_would_have_selected": "ea37630b08516f35",
+    "decision_type": "EXPERIMENT",
+    "selected_frontier_id": "",
+    "revisit_audit": {},
+    "why_selected_over_alternative": "selected ERV=12.386 over alternative 1cd8543301912be7 ERV=11.089",
+    "global_allocation_summary": {
+      "comparable_count": 25,
+      "excluded_count": 7,
+      "best_local_erv": 12.385625,
+      "best_frontier_erv": 6.73875
+    }
+  },
+  {
+    "decision_index": 3,
+    "triggering_experiment_node_id": "exp-5f1e13ae9c7c",
+    "resulting_experiment_node_id": "exp-0f6d01eb1bb9",
+    "selected_opportunity_id": "380d6b066fba1184",
+    "selected_action_id": "380d6b066fba1184",
+    "selected_source": "FRONTIER",
+    "selected_erv": 4.968750000000002,
+    "erv_components": {
+      "exploration_component": 1.3,
+      "exploitation_component": 1.5,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 7.437499999999999,
+      "sample_burden_penalty": 0.0
+    },
+    "best_local_erv": 0.0,
+    "best_frontier_erv": 4.968750000000002,
+    "best_deferred_erv": 0.0,
+    "best_global_alternative_erv": 4.968750000000002,
+    "global_opportunity_cost": 0.0,
+    "globally_comparable_count": 18,
+    "excluded_count": 3,
+    "exclusion_reasons": [
+      {
+        "opportunity_id": "local:fd0876343b97f1d0",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:fe3ab55226b9633f",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:e0d6e94eb5336156",
+        "reason": "terminal_intent"
+      }
+    ],
+    "context_switch_occurred": false,
+    "historical_vs_revalued_non_local": {
+      "historical_planner_score": 8.2,
+      "current_revalued_value": 4.968750000000002,
+      "delta": -3.2312499999999975
+    },
+    "branch_before": "obs-62e3cd748dd9",
+    "branch_after": "obs-62e3cd748dd9",
+    "frame_before": "frame-00003",
+    "observation_horizon_before": 0,
+    "budget_remaining": 9,
+    "valuation_sequence": 3,
+    "local_would_have_selected": "fd0876343b97f1d0",
+    "decision_type": "SWITCH_OPPORTUNITY",
+    "selected_frontier_id": "frontier-00021",
+    "revisit_audit": {},
+    "why_selected_over_alternative": "selected ERV=4.969 over alternative 49022f03695315b8 ERV=4.969",
+    "global_allocation_summary": {
+      "comparable_count": 18,
+      "excluded_count": 3,
+      "best_local_erv": 0.0,
+      "best_frontier_erv": 4.968750000000002
+    }
+  },
+  {
+    "decision_index": 4,
+    "triggering_experiment_node_id": "exp-0f6d01eb1bb9",
+    "resulting_experiment_node_id": null,
+    "selected_opportunity_id": "ea37630b08516f35",
+    "selected_action_id": "ea37630b08516f35",
+    "selected_source": "FRONTIER",
+    "selected_erv": 8.39,
+    "erv_components": {
+      "exploration_component": 0.0,
+      "exploitation_component": 1.5,
+      "falsification_component": 4.0,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 9.1,
+      "sample_burden_penalty": 0.0
+    },
+    "best_local_erv": 5.49,
+    "best_frontier_erv": 8.39,
+    "best_deferred_erv": 0.0,
+    "best_global_alternative_erv": 5.49,
+    "global_opportunity_cost": 0.0,
+    "globally_comparable_count": 26,
+    "excluded_count": 24,
+    "exclusion_reasons": [
+      {
+        "opportunity_id": "local:e8415614d364331f",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:288ef208675e4c25",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:0fbabdc2926b2f1b",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:ee012fa331168e78",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:ea37630b08516f35",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:8ee3518aa9773967",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:5d8937857f27f6f1",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:a40e4c3294f53b2e",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:c56dff05aaa3875b",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:70a40bfd2f1bbc29",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:798b451e67bd0b82",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:c8ac0aaf36030a0b",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:51215c2965e9e6ad",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:45f1bbcde49148b8",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:cc3c106eacfcf5d4",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:efc531c2e38c44b6",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:7b134d9b39f931a2",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:93110045e00e9bf0",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:1e75151208f695d7",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:da1679b8bbb2b1c0",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:3e052dbaf3d27ee8",
+        "reason": "dominated"
+      },
+      {
+        "opportunity_id": "local:fd0876343b97f1d0",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:fe3ab55226b9633f",
+        "reason": "terminal_intent"
+      },
+      {
+        "opportunity_id": "local:e0d6e94eb5336156",
+        "reason": "terminal_intent"
+      }
+    ],
+    "context_switch_occurred": false,
+    "historical_vs_revalued_non_local": {
+      "historical_planner_score": 6.375,
+      "current_revalued_value": 8.39,
+      "delta": 2.0150000000000006
+    },
+    "branch_before": "obs-62e3cd748dd9",
+    "branch_after": "obs-62e3cd748dd9",
+    "frame_before": "",
+    "observation_horizon_before": 0,
+    "budget_remaining": 8,
+    "valuation_sequence": 4,
+    "local_would_have_selected": "1cd8543301912be7",
+    "decision_type": null,
+    "selected_frontier_id": "",
+    "revisit_audit": {},
+    "why_selected_over_alternative": "selected ERV=8.390 over alternative 1cd8543301912be7 ERV=5.490",
+    "global_allocation_summary": {
+      "comparable_count": null,
+      "excluded_count": null,
+      "best_local_erv": null,
+      "best_frontier_erv": null
+    }
+  }
+]

@@ -11,6 +11,16 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 from modules.edge_research.contracts import GUARDRAILS_CONFIG_VERSION
+from modules.edge_research.research_search_accounting import (
+    SearchAccountingState,
+    record_abandoned_branch,
+    record_candidates_considered,
+    record_experiment_executed,
+    record_question_generated,
+)
+from modules.edge_research.research_frontier import ResearchFrontier
+from modules.edge_research.research_frame import ResearchFrame, ResearchFrameRegistry
+from modules.edge_research.research_portfolio import PortfolioSessionState
 from modules.edge_research.research_state import (
     RESEARCH_GRAPH_SCHEMA_VERSION,
     EvidenceReference,
@@ -22,6 +32,7 @@ from modules.edge_research.research_state import (
     QuestionRationale,
     ResearchGraphSnapshot,
     ResearchNode,
+    ResearchQuestionContext,
     ResearchSession,
     ResearchTrigger,
     SessionStatus,
@@ -67,6 +78,71 @@ class ResearchGraph:
         self.session = session
         self.nodes: Dict[str, ResearchNode] = dict(nodes or {})
         self.experiment_index: Dict[str, str] = dict(experiment_index or {})
+        self._search_accounting: Optional[SearchAccountingState] = None
+        self._research_frontier: Optional[ResearchFrontier] = None
+        self._frame_registry: Optional[ResearchFrameRegistry] = None
+        self._portfolio_state: Optional[PortfolioSessionState] = None
+
+    def get_search_accounting(self) -> SearchAccountingState:
+        if self._search_accounting is None:
+            raw = self.session.search_accounting
+            self._search_accounting = (
+                SearchAccountingState.from_dict(raw) if raw else SearchAccountingState()
+            )
+        return self._search_accounting
+
+    def persist_search_accounting(self) -> None:
+        state = self.get_search_accounting()
+        self.session.search_accounting = state.to_dict()
+
+    def sync_search_accounting(self) -> None:
+        """Write in-memory search accounting back to session dict."""
+        if self._search_accounting is not None:
+            self.session.search_accounting = self._search_accounting.to_dict()
+
+    def get_frontier(self) -> ResearchFrontier:
+        if self._research_frontier is None:
+            raw = self.session.research_frontier
+            self._research_frontier = (
+                ResearchFrontier.from_dict(raw) if raw else ResearchFrontier()
+            )
+        return self._research_frontier
+
+    def persist_frontier(self) -> None:
+        frontier = self.get_frontier()
+        self.session.research_frontier = frontier.to_dict()
+
+    def sync_frontier(self) -> None:
+        if self._research_frontier is not None:
+            self.session.research_frontier = self._research_frontier.to_dict()
+
+    def get_frame_registry(self) -> ResearchFrameRegistry:
+        if self._frame_registry is None:
+            raw = self.session.research_frames
+            self._frame_registry = (
+                ResearchFrameRegistry.from_dict(raw) if raw else ResearchFrameRegistry()
+            )
+        return self._frame_registry
+
+    def persist_frames(self) -> None:
+        reg = self.get_frame_registry()
+        self.session.research_frames = reg.to_dict()
+
+    def get_portfolio_state(self) -> PortfolioSessionState:
+        if self._portfolio_state is None:
+            raw = self.session.research_portfolio
+            self._portfolio_state = (
+                PortfolioSessionState.from_dict(raw) if raw else PortfolioSessionState()
+            )
+        return self._portfolio_state
+
+    def persist_portfolio_state(self) -> None:
+        state = self.get_portfolio_state()
+        self.session.research_portfolio = state.to_dict()
+
+    def sync_portfolio_state(self) -> None:
+        if self._portfolio_state is not None:
+            self.session.research_portfolio = self._portfolio_state.to_dict()
 
     @classmethod
     def create_session(
@@ -176,6 +252,7 @@ class ResearchGraph:
         parent_node_ids: Sequence[str],
         question_text: str,
         rationale: QuestionRationale,
+        question_context: Optional[ResearchQuestionContext] = None,
         node_id: Optional[str] = None,
         created_at: Optional[str] = None,
     ) -> str:
@@ -191,10 +268,13 @@ class ResearchGraph:
             parent_node_ids=list(parent_node_ids),
             question_text=question_text,
             rationale=rationale,
+            question_context=question_context,
         )
         self.nodes[nid] = node
         for pid in parent_node_ids:
             self._link_parent_child(pid, nid)
+        record_question_generated(self.get_search_accounting(), self, nid)
+        self.persist_search_accounting()
         return nid
 
     def add_experiment(
@@ -308,6 +388,7 @@ class ResearchGraph:
         question_text: str,
         reason_code: str,
         evidence_summary: Optional[Dict[str, Any]] = None,
+        question_context: Optional[ResearchQuestionContext] = None,
         node_id: Optional[str] = None,
     ) -> str:
         exp = self.get_node(experiment_node_id)
@@ -323,6 +404,7 @@ class ResearchGraph:
                 prior_node_id=experiment_node_id,
                 evidence_summary=dict(evidence_summary or {}),
             ),
+            question_context=question_context,
             node_id=node_id,
         )
 
@@ -335,6 +417,8 @@ class ResearchGraph:
         node.status = NodeStatus.ABANDONED
         node.terminal_reason = reason.strip()
         node.completed_at = _utc_now_iso()
+        record_abandoned_branch(self.get_search_accounting(), self, node_id)
+        self.persist_search_accounting()
 
     def resolve_node(self, node_id: str, *, terminal_reason: str = "") -> None:
         node = self.get_node(node_id)
