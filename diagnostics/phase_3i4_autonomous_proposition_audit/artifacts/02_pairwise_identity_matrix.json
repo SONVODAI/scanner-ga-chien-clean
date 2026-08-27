@@ -1,0 +1,47 @@
+[
+  {
+    "pair": [
+      "prop-b0a0e135ec0dc857",
+      "prop-1b00bc69f4ebd1be"
+    ],
+    "dates": [
+      "2026-06-29",
+      "2026-06-30"
+    ],
+    "classification": "SAME_PROPOSITION_DIFFERENT_EVIDENCE",
+    "same_scientific_question_text": true,
+    "same_canonical_identity_hash": true,
+    "scientific_question_a": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+    "scientific_question_b": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?"
+  },
+  {
+    "pair": [
+      "prop-b0a0e135ec0dc857",
+      "prop-74c9fbabe3d93115"
+    ],
+    "dates": [
+      "2026-06-29",
+      "2026-07-23"
+    ],
+    "classification": "SAME_PROPOSITION_DIFFERENT_EVIDENCE",
+    "same_scientific_question_text": true,
+    "same_canonical_identity_hash": true,
+    "scientific_question_a": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+    "scientific_question_b": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?"
+  },
+  {
+    "pair": [
+      "prop-1b00bc69f4ebd1be",
+      "prop-74c9fbabe3d93115"
+    ],
+    "dates": [
+      "2026-06-30",
+      "2026-07-23"
+    ],
+    "classification": "SAME_PROPOSITION_DIFFERENT_EVIDENCE",
+    "same_scientific_question_text": true,
+    "same_canonical_identity_hash": true,
+    "scientific_question_a": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+    "scientific_question_b": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?"
+  }
+]
