@@ -1,0 +1,29 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "provenance_ok": true,
+    "birth_certificate_ok": true,
+    "falsification_ok": true,
+    "template_class": "SCIENTIFICALLY_NOVEL",
+    "executability": "EXECUTABLE",
+    "laundering_replay_ok": true
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "provenance_ok": true,
+    "birth_certificate_ok": true,
+    "falsification_ok": true,
+    "template_class": "SCIENTIFICALLY_NOVEL",
+    "executability": "EXECUTABLE",
+    "laundering_replay_ok": true
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "provenance_ok": true,
+    "birth_certificate_ok": true,
+    "falsification_ok": true,
+    "template_class": "SCIENTIFICALLY_NOVEL",
+    "executability": "EXECUTABLE",
+    "laundering_replay_ok": true
+  }
+]

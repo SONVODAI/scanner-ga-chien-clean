@@ -1,0 +1,65 @@
+{
+  "artifact_id": "13_falsification_birthright",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "principle": "Every autonomous proposition should preferably be born with a falsification path: 'What observation would make this idea less believable?'",
+  "proposition_record_fields": {
+    "null_competing_explanation": {
+      "purpose": "Primary competing scientific account if proposition false",
+      "required_for_autonomous": true,
+      "example": "Dispersion effect is liquidity artifact — disappears when controlling spread quintile"
+    },
+    "falsifiable_expectation": {
+      "purpose": "Operational prediction that experiment measures",
+      "structure": {
+        "direction": "positive | negative | non_monotonic | threshold_cross",
+        "effect_size_floor": "optional minimum meaningful delta",
+        "horizon": "when relevant",
+        "population": "where tested"
+      }
+    },
+    "disconfirming_observation_spec": {
+      "purpose": "Explicit answer to falsification birthright question",
+      "new_field_in_v1": true,
+      "structure": {
+        "description": "Plain language: what would weaken belief",
+        "operational_test": "Measurable pattern that would disconfirm",
+        "threshold": "Numeric or qualitative boundary",
+        "alternative_interpretation": "What we'd conclude if disconfirmed"
+      },
+      "example": {
+        "description": "If high-dispersion names do not outperform low-dispersion within same liquidity tier over 5d",
+        "operational_test": "Spread-adjusted quintile spread of forward returns <= 0",
+        "threshold": "t-stat < 1.0 within tier",
+        "alternative_interpretation": "Dispersion signal is liquidity confound"
+      }
+    }
+  },
+  "birth_certificate_link": {
+    "BC_Q6": "Maps directly to disconfirming_observation_spec + null_competing_explanation",
+    "pass_requires": "Both fields populated with operational content"
+  },
+  "epistemic_status_interaction": {
+    "at_birth": [
+      "HYPOTHESIS",
+      "TENTATIVE"
+    ],
+    "after_WEAKEN": "TENTATIVE or DEMOTED",
+    "after_FALSIFY": "FALSIFIED — proposition inactive for execution queue",
+    "WITHHELD": "Surprise insufficient for strong claim — may still seek counterexample"
+  },
+  "future_challenger_connection": {
+    "status": "NOT_INTEGRATED_IN_3I.1",
+    "design_intent": {
+      "challenger_role": "Generate targeted experiments from disconfirming_observation_spec",
+      "opr_exports": "disconfirming_observation_spec as structured input to challenger adapter",
+      "separation": "OPR owns the falsification spec at birth; Challenger owns counterexperiment design later",
+      "interface": "PropositionRecord.disconfirming_observation_spec → ChallengerSeed (future type)"
+    },
+    "anti_leakage": "Challenger must not use hidden benchmark phenomena to craft disconfirming tests during BB-Prop-01"
+  },
+  "evaluator_checks": {
+    "falsifiability_rate": "Includes disconfirming_observation_spec completeness",
+    "reject_if": "Only generic 'null is no effect' without operational threshold"
+  }
+}

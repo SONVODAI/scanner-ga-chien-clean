@@ -1,0 +1,104 @@
+{
+  "artifact_id": "15_readiness_gate",
+  "phase": "3I.1",
+  "status": "FINAL",
+  "verdict": "READY_FOR_MINIMAL_OPR",
+  "blocker_if_not_ready": null,
+  "checklist": {
+    "opr_bridge_contract_defined": {
+      "artifact": "02_proposition_record_contract.json",
+      "status": "COMPLETE"
+    },
+    "input_evidence_classification": {
+      "artifact": "00_input_evidence_classification.json",
+      "status": "COMPLETE"
+    },
+    "observation_provenance_rule": {
+      "artifact": "01_opr_source_of_truth_rule.json",
+      "status": "COMPLETE"
+    },
+    "scientific_birth_certificate": {
+      "artifact": "03_scientific_birth_certificate.json",
+      "status": "COMPLETE"
+    },
+    "template_independence_evaluator": {
+      "artifact": "04_template_independence_evaluator.json",
+      "status": "COMPLETE"
+    },
+    "obs_gap_laundering_protection": {
+      "artifact": "05_obs_gap_laundering_protection.json",
+      "status": "COMPLETE"
+    },
+    "executability_boundary": {
+      "artifact": "06_executability_boundary.json",
+      "status": "COMPLETE"
+    },
+    "generation_budget_policy": {
+      "artifact": "07_generation_budget_policy.json",
+      "status": "COMPLETE"
+    },
+    "bb_prop_01_frozen_design": {
+      "artifact": "08_bb_prop_01_frozen_manifest.json",
+      "status": "COMPLETE"
+    },
+    "hidden_benchmark_protection": {
+      "artifact": "09_hidden_benchmark_protection_policy.json",
+      "status": "COMPLETE"
+    },
+    "creativity_metrics_preregistered": {
+      "artifact": "10_creativity_metrics_preregistration.json",
+      "status": "COMPLETE"
+    },
+    "negative_adversarial_controls": {
+      "artifact": "11_negative_adversarial_controls.json",
+      "status": "COMPLETE"
+    },
+    "evidence_responsive_lineage": {
+      "artifact": "12_evidence_responsive_lineage.json",
+      "status": "COMPLETE"
+    },
+    "falsification_birthright": {
+      "artifact": "13_falsification_birthright.json",
+      "status": "COMPLETE"
+    },
+    "minimal_3i2_boundary": {
+      "artifact": "14_minimal_3i2_implementation_boundary.json",
+      "status": "COMPLETE"
+    },
+    "production_systems_unmodified": {
+      "status": "VERIFIED — diagnostics and design artifacts only"
+    }
+  },
+  "remaining_risks": [
+    {
+      "risk": "Zone C hidden phenomena not yet populated",
+      "severity": "MEDIUM",
+      "mitigation": "Populate zone C in protected store before first zone B blind run; manifest hash frozen at population time"
+    },
+    {
+      "risk": "Semantic similarity thresholds in template independence evaluator may miscalibrate",
+      "severity": "MEDIUM",
+      "mitigation": "10% human adjudication sample; thresholds frozen pre-blind; adjust only on zone A"
+    },
+    {
+      "risk": "Dispersion observation class may correlate with existing T8 template family",
+      "severity": "LOW",
+      "mitigation": "Template independence audit + adjacent vs novel separation; honest TEMPLATE_INSTANCE labeling acceptable in 3I.2"
+    },
+    {
+      "risk": "Surprise detector thresholds require zone A calibration that could leak structure",
+      "severity": "LOW",
+      "mitigation": "Freeze thresholds before zone B; document in manifest hash"
+    },
+    {
+      "risk": "Evaluator abstraction may be insufficient if aggregate buckets correlate 1:1 with phenomena",
+      "severity": "LOW",
+      "mitigation": "09 policy forbids per-phenomenon reporting; use coarse convergence class only"
+    }
+  ],
+  "final_questions": {
+    "A_provenance": "YES — observation_provenance + evidence_hash + birth certificate BC_Q1-Q2 require concrete empirical payloads; OBS/GAP alone insufficient",
+    "B_template_distinction": "YES — template independence evaluator with frozen decision tree separates INSTANCE/REFRAME/ADJACENT/NOVEL; laundering tests block ontology decode",
+    "C_blind_eval_safety": "YES — zone C isolation + abstract diagnostic feedback + log redaction + one-shot eval prevent teaching generator hidden answers"
+  }
+}
