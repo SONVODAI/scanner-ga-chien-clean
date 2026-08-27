@@ -1,0 +1,20 @@
+{
+  "record_version": "evidence_saturation_assessment_v1_3i11",
+  "forbidden_rules": [
+    "after_2_supports_stop",
+    "after_3_tests_stop"
+  ],
+  "derived_from": [
+    "uncertainty_dimension_coverage_complete",
+    "diminishing_independence_between_new_experiments",
+    "no_unresolved_contradictions",
+    "no_executable_high_value_falsification_remaining",
+    "marginal_information_below_threshold"
+  ],
+  "outputs": [
+    "NOT_SATURATED",
+    "PARTIALLY_SATURATED",
+    "SATURATED_FOR_CURRENT_UNCERTAINTY"
+  ],
+  "allows_silence": true
+}

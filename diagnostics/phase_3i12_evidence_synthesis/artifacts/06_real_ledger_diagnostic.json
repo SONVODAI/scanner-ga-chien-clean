@@ -1,0 +1,208 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "prior_epistemic_state": "SUPPORTED",
+  "synthesis": {
+    "synthesis_id": "syn-02b8340a3389",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "evidence_ids": [
+      "epu-5a7bec6e47ec",
+      "epu-e75a6e8362a8"
+    ],
+    "evidence_hashes": [
+      "43adb1ec0d66a6a4fd5ee517d19edde5e169ee82f1b9a711a1469a939d5e78ba",
+      "339b44baed42826527f3dba884faf6a5c2ad5abef6e149093fc1903dad170915"
+    ],
+    "relationship_map": {
+      "epu-5a7bec6e47ec": "INITIAL",
+      "epu-e75a6e8362a8": "PARTIAL_REPLICATION"
+    },
+    "independence_profiles": {
+      "epu-5a7bec6e47ec": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "temporal_independence": "HIGH",
+        "population_independence": "HIGH",
+        "measurement_independence": "HIGH",
+        "methodological_independence": "HIGH",
+        "semantic_independence": "HIGH",
+        "rationale": [
+          "Initial evidence \u2014 no prior ledger entries."
+        ]
+      },
+      "epu-e75a6e8362a8": {
+        "sample_independence": "NONE",
+        "episode_independence": "LOW",
+        "temporal_independence": "NONE",
+        "population_independence": "LOW",
+        "measurement_independence": "NONE",
+        "methodological_independence": "NONE",
+        "semantic_independence": "HIGH",
+        "rationale": [
+          "cohort_overlap_ratio=0.977",
+          "episode holdout with high overlap \u2014 partial episode independence"
+        ]
+      }
+    },
+    "supporting_structure": [
+      {
+        "evidence_id": "epu-5a7bec6e47ec",
+        "evidence_class": "SUPPORTING",
+        "relationship": "INITIAL",
+        "uncertainty_axis": "directional_effect_full_universe",
+        "effect_magnitude": "strong",
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "HIGH",
+          "temporal_independence": "HIGH",
+          "population_independence": "HIGH",
+          "measurement_independence": "HIGH",
+          "methodological_independence": "HIGH",
+          "semantic_independence": "HIGH",
+          "rationale": [
+            "Initial evidence \u2014 no prior ledger entries."
+          ]
+        }
+      },
+      {
+        "evidence_id": "epu-e75a6e8362a8",
+        "evidence_class": "SUPPORTING",
+        "relationship": "PARTIAL_REPLICATION",
+        "uncertainty_axis": "episode_robustness",
+        "effect_magnitude": "strong",
+        "independence_profile": {
+          "sample_independence": "NONE",
+          "episode_independence": "LOW",
+          "temporal_independence": "NONE",
+          "population_independence": "LOW",
+          "measurement_independence": "NONE",
+          "methodological_independence": "NONE",
+          "semantic_independence": "HIGH",
+          "rationale": [
+            "cohort_overlap_ratio=0.977",
+            "episode holdout with high overlap \u2014 partial episode independence"
+          ]
+        }
+      }
+    ],
+    "disconfirming_structure": [],
+    "contradiction_structure": [],
+    "invalid_non_informative": [],
+    "uncertainty_covered": [
+      "directional_effect_full_universe",
+      "episode_robustness"
+    ],
+    "uncertainty_unresolved": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "saturation_assessment": {
+      "level": "PARTIAL",
+      "unresolved_contradictions": false,
+      "major_uncertainty_dimensions_remaining": [
+        "temporal_regime_robustness",
+        "population_robustness",
+        "horizon_robustness",
+        "effect_stability"
+      ],
+      "independence_obtained": [
+        "epu-5a7bec6e47ec",
+        "epu-e75a6e8362a8"
+      ],
+      "redundant_test_axes": [
+        "episode_robustness"
+      ],
+      "executable_high_info_opportunities": [
+        "temporal_regime_robustness",
+        "population_robustness",
+        "horizon_robustness",
+        "effect_stability",
+        "concentration_dominance",
+        "measurement_robustness",
+        "counterexample_exposure",
+        "alternative_explanation_exposure",
+        "regime_context_robustness"
+      ],
+      "marginal_information": "low",
+      "rationale": [
+        "Evidence predominantly redundant \u2014 PARTIAL saturation on tested axes."
+      ]
+    },
+    "synthesized_epistemic_state": "SUPPORTED",
+    "prior_epistemic_state": "SUPPORTED",
+    "scientific_rationale": [
+      "Supporting evidence \u2014 state remains SUPPORTED (not upgraded by count).",
+      "Evidence predominantly redundant \u2014 PARTIAL saturation on tested axes.",
+      "Major uncertainty dimensions remain ['temporal_regime_robustness', 'population_robustness', 'horizon_robustness', 'effect_stability'] \u2014 SEEK_FALSIFICATION despite low marginal on redundant axes."
+    ],
+    "counterfactual_causality_refs": [
+      "epu-5a7bec6e47ec:SUPPORTING:INITIAL",
+      "epu-e75a6e8362a8:SUPPORTING:PARTIAL_REPLICATION"
+    ],
+    "synthesis_engine_version": "evidence_synthesis_v1_3i12",
+    "created_at": "2026-08-22T02:56:51.252552+00:00",
+    "synthesis_hash": "fe4a484cc9592aa33d455a5ba8d5f2370d166c584c76f750bbe3e6259af27c81"
+  },
+  "research_priority_decision": {
+    "decision_id": "rpd-ebf0706bfd43",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "synthesis_id": "syn-02b8340a3389",
+    "synthesized_epistemic_state": "SUPPORTED",
+    "unresolved_uncertainty": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "saturation_level": "PARTIAL",
+    "marginal_information": "low",
+    "contradiction_status": "NONE",
+    "independence_summary": "predominantly_independent",
+    "chosen_priority_action": "SEEK_FALSIFICATION",
+    "rationale": [
+      "Major uncertainty dimensions remain ['temporal_regime_robustness', 'population_robustness', 'horizon_robustness', 'effect_stability'] \u2014 SEEK_FALSIFICATION despite low marginal on redundant axes."
+    ],
+    "rejected_alternatives": [
+      {
+        "action": "SEEK_REPLICATION",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "SEEK_CONTRADICTION_RESOLUTION",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "HOLD_PROVISIONALLY",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "HOLD_UNRESOLVED",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "ABANDON",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      }
+    ],
+    "created_at": "2026-08-22T02:56:51.252552+00:00",
+    "synthesis_engine_version": "evidence_synthesis_v1_3i12",
+    "record_hash": "1a6d0a006d75988e68cbed42d0049ce530b73ff0648abca94adab69f4bc3ea01"
+  },
+  "relationship_e1_to_e2": "PARTIAL_REPLICATION",
+  "diagnostic_only": true,
+  "no_trading_semantics": true,
+  "no_new_experiment": true
+}

@@ -1,0 +1,12 @@
+{
+  "phase": "3I.8",
+  "mode": "AUDIT_DESIGN_ONLY",
+  "git_head": "f038fcc34721b873301bb9a32bc1635da85571e1",
+  "verdict": "PARTIALLY_READY",
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "3i7_chosen_action": "SEEK_FALSIFICATION",
+  "3i7_epistemic_state": "SUPPORTED",
+  "missing_capability": "FalsificationCandidateGenerator",
+  "second_experiment_executed": false
+}

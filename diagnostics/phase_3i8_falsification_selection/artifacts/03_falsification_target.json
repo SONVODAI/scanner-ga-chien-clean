@@ -1,0 +1,43 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "core_empirical_claim": "Cross-sectional rs_spread quintile tier predicts differential forward t5_return (high-rs_spread quintile outperforms low-rs_spread quintile)",
+  "must_fail_for_disbelief": "partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0",
+  "disconfirm_threshold": "median_spread <= 0 or group rank reversal",
+  "null_competing_explanation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+  "vulnerability_axes": {
+    "directional_reversal": {
+      "description": "High quintile no longer beats low quintile on t5_return",
+      "strength": "STRONG \u2014 direct test of disconfirming_observation_spec"
+    },
+    "replication_failure": {
+      "description": "Same partition test on independent dates fails to reproduce spread",
+      "strength": "MODERATE \u2014 tests generalization beyond first supportive run"
+    },
+    "episode_instability": {
+      "description": "Effect disappears when focal date 2026-08-02 excluded (date-artifact)",
+      "strength": "MODERATE \u2014 targets stated null explanation"
+    },
+    "context_instability": {
+      "description": "Effect holds only in narrow market regime not in proposition scope",
+      "strength": "WEAK for falsification \u2014 population narrowing risks rescue"
+    },
+    "population_instability": {
+      "description": "Driven by few symbols; leave-one-symbol collapses contrast",
+      "strength": "MODERATE \u2014 robustness, not directional reversal"
+    },
+    "horizon_instability": {
+      "description": "Effect absent at other horizons",
+      "strength": "NOT VALID \u2014 changes proposition horizon (anti-rescue violation)"
+    },
+    "alternative_explanation": {
+      "description": "Confounding market-wide level effect on focal date",
+      "strength": "MODERATE \u2014 episode/date decomposition tests"
+    },
+    "statistical_non_resolution": {
+      "description": "Spread too small to resolve after support",
+      "strength": "NON-FALSIFICATION \u2014 would not weaken SUPPORTED state"
+    }
+  },
+  "not_equally_strong": true,
+  "strongest_pre_registered": "directional_reversal via partition_group_compare median_spread <= 0 or rank reversal"
+}
