@@ -1,0 +1,10 @@
+{
+  "git_head": "0b00fa7c3a601d5ef2a6c7d0df9d23cb7aead17c",
+  "phase": "3J.3",
+  "bbfex_all_passed": true,
+  "cf_ex_all_passed": true,
+  "frozen_hashes_unchanged": true,
+  "hidden_answer_clean": false,
+  "real_diagnostic_execution_status": "SUCCESS",
+  "stop_boundary": "STOP_FIRST_EXPERIMENT_EXECUTED"
+}

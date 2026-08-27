@@ -1,0 +1,11 @@
+{
+  "phase": "3I.17",
+  "mode": "AUDIT ONLY",
+  "head": "eb47bf86976bde55d4390d2dce3ebea4f721b119",
+  "artifact_package_hash": "db7b869ab18dc156a59f91fed3766232411853cf8efd1db43892e0ffc381cd70",
+  "user_cited_package_hash": "32377898803d348f317c92be57bf6ed6350230c9a179db5d1e4e3e42256efe",
+  "scientific_action_core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+  "execution_status": "NOT_EXECUTED",
+  "verdict": "FIRST_AUTONOMOUS_ACTION_AUDIT_PARTIAL",
+  "execution_ready": false
+}

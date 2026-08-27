@@ -1,0 +1,114 @@
+{
+  "artifact_id": "10_creativity_metrics_preregistration",
+  "phase": "3I.1",
+  "status": "PRE_REGISTERED",
+  "principle": "Metrics reward quality and novelty rates, NOT raw hypothesis count.",
+  "primary_metrics": {
+    "observational_grounding_rate": {
+      "definition": "Fraction of propositions passing observation_provenance minimum payload + LAUNDER tests",
+      "numerator": "grounded propositions",
+      "denominator": "total propositions generated",
+      "target_direction": "maximize",
+      "does_not_reward": "volume"
+    },
+    "falsifiability_rate": {
+      "definition": "Fraction with complete falsifiable_expectation + null_competing_explanation + BC_Q5/Q6 pass",
+      "target_direction": "maximize"
+    },
+    "executability_rate": {
+      "definition": "Fraction with executability_status=EXECUTABLE after grammar validation",
+      "target_direction": "maximize"
+    },
+    "semantic_duplicate_rate": {
+      "definition": "Fraction collapsed as duplicates within session (similarity >= 0.90)",
+      "target_direction": "minimize"
+    },
+    "template_instance_rate": {
+      "definition": "Fraction classified TEMPLATE_INSTANCE",
+      "target_direction": "minimize for autonomous claims"
+    },
+    "template_reframe_rate": {
+      "definition": "Fraction classified TEMPLATE_REFRAME",
+      "target_direction": "minimize for autonomous claims"
+    },
+    "template_adjacent_rate": {
+      "definition": "Fraction classified TEMPLATE_ADJACENT",
+      "target_direction": "track separately — counts toward extended creativity"
+    },
+    "scientifically_novel_rate": {
+      "definition": "Fraction classified SCIENTIFICALLY_NOVEL",
+      "target_direction": "maximize — primary novelty metric"
+    },
+    "propositions_per_useful_survivor": {
+      "definition": "total_generated / count(survivors with grounding AND falsifiability AND executability)",
+      "target_direction": "minimize — efficiency metric"
+    },
+    "abandoned_hypothesis_rate": {
+      "definition": "Fraction reaching ABANDON or FALSIFY in lineage within session",
+      "target_direction": "neutral — high abandon after test is healthy; high abandon pre-test may indicate spam"
+    },
+    "evidence_responsive_redirection_rate": {
+      "definition": "Fraction of lineage transitions triggered by experiment evidence (not fixed catalog)",
+      "target_direction": "maximize post-experiment"
+    },
+    "hidden_convergence_class": {
+      "definition": "Aggregate bucket from zone D — NONE/PARTIAL/MODERATE/HIGH",
+      "target_direction": "maximize bucket without per-phenomenon feedback",
+      "note": "Separate from scientific novelty"
+    },
+    "research_budget_efficiency": {
+      "definition": "useful_survivors / research_steps_consumed",
+      "target_direction": "maximize"
+    }
+  },
+  "evaluation_separation": {
+    "scientific_novelty": {
+      "metrics": [
+        "scientifically_novel_rate",
+        "template_adjacent_rate",
+        "template_instance_rate"
+      ],
+      "question": "Is the question genuinely new relative to encoded priors?"
+    },
+    "scientific_quality": {
+      "metrics": [
+        "observational_grounding_rate",
+        "falsifiability_rate",
+        "executability_rate",
+        "semantic_duplicate_rate"
+      ],
+      "question": "Is it grounded, coherent, falsifiable, executable?"
+    },
+    "empirical_usefulness": {
+      "metrics": [
+        "evidence_responsive_redirection_rate",
+        "SUPPORT vs FALSIFY rates post-experiment"
+      ],
+      "question": "Does evidence support it?",
+      "note": "Evaluated AFTER experiments — not at proposition birth"
+    },
+    "market_edge": {
+      "metrics": [
+        "Incremental predictive value vs baseline — OUT OF SCOPE for BB-Prop-01 v1"
+      ],
+      "question": "Actionable value?",
+      "note": "Deferred to separate benchmark; novel-but-false propositions are NOT generator failures"
+    }
+  },
+  "pathological_hypothesis_spam_run": {
+    "criteria_any_two": [
+      "total_propositions > 50",
+      "survivors_after_dedup > 15",
+      "observational_grounding_rate < 0.20",
+      "template_instance_rate > 0.60",
+      "semantic_duplicate_rate < 0.05 with total_propositions > 30 (suspiciously diverse spam)",
+      "scientifically_novel_rate > 0.50 with grounding_rate < 0.30 (novelty without evidence)"
+    ],
+    "verdict": "PATHOLOGICAL_SPAM",
+    "reporting": "Session excluded from primary scoreboard; flagged for architecture review"
+  },
+  "novelty_not_usefulness_rule": {
+    "explicit": "A scientifically novel proposition may be empirically false — that is NOT generator failure",
+    "generator_failure_is": "Ungrounded, unfalsifiable, template-laundered, or spam-volume driven"
+  }
+}

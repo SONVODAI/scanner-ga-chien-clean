@@ -1,0 +1,11 @@
+{
+  "phase": "3I.6",
+  "mode": "AUDIT_DESIGN_ONLY",
+  "git_head": "713a8620e109c2f2c4bb215b1e091ddd1551ca2c",
+  "capability_chain_current": "OBSERVE \u2192 WONDER \u2192 PROPOSE \u2192 PRIORITIZE",
+  "capability_chain_target": "\u2192 TEST \u2192 INTERPRET \u2192 UPDATE \u2192 DECIDE",
+  "readiness_verdict": "PARTIALLY_READY",
+  "single_prerequisite": "PropositionExperimentInterpreter",
+  "can_change_mind_today": false,
+  "smallest_missing_mechanism": "PropositionExperimentInterpreter"
+}
