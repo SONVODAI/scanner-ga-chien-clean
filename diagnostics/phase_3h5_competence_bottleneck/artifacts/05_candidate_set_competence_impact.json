@@ -1,0 +1,28 @@
+{
+  "competence_modifies_candidate_generation": false,
+  "competence_modifies_filtering": false,
+  "competence_modifies_scoring": false,
+  "competence_modifies_selection": false,
+  "code_evidence": "plan_after_experiment: competence built pre-generation, audit post-allocation only",
+  "candidate_set_overlap_pct_mean": 90.45,
+  "candidate_set_overlap_pct_per_transition": [
+    96.43,
+    94.44,
+    100.0,
+    93.33,
+    90.91,
+    90.91,
+    81.25,
+    90.91,
+    90.91,
+    75.0,
+    90.91
+  ],
+  "candidates_added_due_to_competence": 0,
+  "candidates_removed_due_to_competence": 0,
+  "selected_winner_changed_due_to_competence": 0,
+  "decisions_competence_changed_top_k": 0,
+  "decisions_competence_observational_only": 11,
+  "grammar_already_encodes_same_gaps": true,
+  "explanation": "generate_action_candidates uses assessment.information_gaps \u2014 same triggers as competence UNCERTAINTY_REDUCTION_REGISTRY. Phase 3H.4 annotates the existing candidate set without altering construction, filtering, or valuation."
+}
