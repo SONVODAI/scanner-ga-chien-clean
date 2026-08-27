@@ -32,7 +32,12 @@ def build_daily_manifest(
     silence = summary.get("silence_or_no_discovery", False) or (
         not assessments and not run.observations_born
     )
-    bot_spoke = bool(summary.get("summary_id") or assessments)
+    bot_spoke = bool(
+        summary.get("summary_id")
+        or assessments
+        or summary.get("session_voice")
+        or assessment_results.get("session_voice")
+    )
 
     return DailyManifest(
         trade_date=run.target_trade_date,

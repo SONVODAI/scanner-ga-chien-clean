@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from modules.edge_research.adapters import build_research_panel
+from modules.edge_research.opr_bridge.production_panel_freshness import diagnose_panel_freshness
 from modules.edge_research.opr_bridge.production_daily_run_orchestrator import (
     run_production_daily_research,
 )
@@ -108,7 +109,8 @@ def main(argv: list[str] | None = None) -> int:
                 ),
             }
 
-    panel = build_research_panel()
+    panel = build_research_panel(repo_root=repo_root)
+    panel_freshness = diagnose_panel_freshness(panel, trade_date, headless_eod=headless_eod)
     data_dir = Path(args.data_dir) if args.data_dir else None
     result = run_production_daily_research(
         panel,
@@ -119,6 +121,7 @@ def main(argv: list[str] | None = None) -> int:
         repo_root=repo_root,
     )
     result["headless_eod"] = headless_eod
+    result["panel_freshness"] = panel_freshness
     result["run_provenance"] = {
         "recovery": bool(args.recovery),
         "run_mode": args.mode,
@@ -157,6 +160,7 @@ def main(argv: list[str] | None = None) -> int:
                     },
                 },
                 "forecast_memory": (result.get("forecast_memory") or {}).get("stage_disposition"),
+                "panel_freshness": result.get("panel_freshness"),
             },
             indent=2,
             default=str,

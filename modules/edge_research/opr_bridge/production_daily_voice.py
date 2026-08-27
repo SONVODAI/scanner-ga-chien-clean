@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from modules.edge_research.opr_bridge.production_living_observation_records import (
     DailyResearchAssessment,
+    DailyResearchSummary,
     DailyVoiceContract,
 )
 from modules.edge_research.opr_bridge.production_observation_narrative import assert_narrative_faithful
@@ -92,6 +93,108 @@ def render_daily_voice(assessment: DailyResearchAssessment) -> DailyVoiceContrac
         assessment_id=assessment.assessment_id,
         observation_id=assessment.observation_id,
         assessment_trade_date=assessment.assessment_trade_date,
+        q1_today_i_see_vi=q1,
+        q2_vs_prior_session_vi=q2,
+        q3_market_change_vi=q3,
+        q4_new_evidence_vi=q4,
+        q5_belief_changed_vi=q5,
+        q6_if_not_why_vi=q6,
+        q7_counter_hypothesis_vi=q7,
+        q8_still_unknown_vi=q8,
+        q9_waiting_for_vi=q9,
+        q10_old_observations_vi=q10,
+        structured_trace=trace,
+    )
+
+
+def render_session_market_voice(
+    summary: DailyResearchSummary,
+    assessments: List[DailyResearchAssessment],
+) -> DailyVoiceContract:
+    """
+    Session-level daily market voice — descriptive research diary from structured fields.
+
+    Distinct from stock-edge discovery. Uses summary market snapshot and reassessment
+    aggregates only; no hardcoded market opinions.
+    """
+    td = summary.trade_date
+    mkt = summary.market_state_summary or {}
+    belief_changes = sum(1 for a in assessments if a.epistemic_delta.changed)
+    unchanged = len(assessments) - belief_changes
+
+    if summary.new_observations_born:
+        discovery_line = (
+            f"Có {len(summary.new_observations_born)} observation mới được sinh hôm nay."
+        )
+    else:
+        discovery_line = "Không có stock edge / observation mới hôm nay."
+
+    q1 = (
+        f"Hôm nay ({td}) — nhật ký research session. "
+        f"{discovery_line} "
+        f"Đang theo dõi {len(summary.active_observations_reassessed)} observation(s)."
+    )
+
+    q2 = (
+        f"Market context (structured): market_real={mkt.get('market_real', 'N/A')}, "
+        f"breadth={mkt.get('breadth_score', mkt.get('breadth_t0', 'N/A'))}, "
+        f"transition={mkt.get('market_transition_t0', mkt.get('transition', 'N/A'))}."
+    )
+
+    delta_keys = summary.most_meaningful_market_delta
+    q3 = (
+        f"Market delta đáng chú ý: {delta_keys or 'market:unchanged'}."
+        if delta_keys
+        else "Market delta: không ghi nhận thay đổi lớn so với các assessment hiện có."
+    )
+
+    q4 = (
+        f"Forward evidence mới: {len(summary.newly_arrived_forward_evidence)} outcome(s)."
+        if summary.newly_arrived_forward_evidence
+        else "Không có forward outcome mới đủ điều kiện hôm nay."
+    )
+
+    q5 = (
+        f"Belief changes: {belief_changes}; unchanged reassessments: {unchanged}."
+    )
+
+    q6 = (
+        "Không có belief change — các observation giữ epistemic state vì chưa đủ evidence mới."
+        if belief_changes == 0 and assessments
+        else (
+            "Chưa có observation assessment — session voice từ market snapshot structured."
+            if not assessments
+            else f"Có {belief_changes} belief change(s) từ evidence mới."
+        )
+    )
+
+    q7 = "Counter-hypothesis: xem từng observation assessment nếu có."
+
+    q8 = (
+        f"Câu hỏi mở: {summary.most_important_unresolved_question or 'chưa ghi nhận'}."
+    )
+
+    q9 = summary.what_bot_is_waiting_for or "Đang chờ forward horizons hoặc evidence mới."
+
+    q10 = (
+        f"Session summary_id={summary.summary_id}; "
+        f"strengthened={summary.strengthened_count}, "
+        f"weakened/challenged={summary.weakened_or_challenged_count}."
+    )
+
+    session_id = f"session-{td}"
+    trace = {
+        "voice_kind": "SESSION_MARKET_VOICE",
+        "summary_id": summary.summary_id,
+        "assessment_ids": [a.assessment_id for a in assessments],
+        "silence_or_no_stock_discovery": summary.silence_or_no_discovery,
+        "structured_trace_only": True,
+    }
+
+    return DailyVoiceContract(
+        assessment_id=session_id,
+        observation_id="SESSION_MARKET_VOICE",
+        assessment_trade_date=td,
         q1_today_i_see_vi=q1,
         q2_vs_prior_session_vi=q2,
         q3_market_change_vi=q3,
