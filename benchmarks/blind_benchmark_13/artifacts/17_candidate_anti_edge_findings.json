@@ -1,0 +1,731 @@
+{
+  "candidate_discoveries": [
+    {
+      "candidate_id": "exp-ddcbf27ec5b6",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "conditions": {},
+      "raw_outcome_metric": null,
+      "parent_baseline": null,
+      "incremental_effect": null,
+      "n": null,
+      "dates": [],
+      "episodes": [],
+      "shape_evidence": {},
+      "threshold_neighborhood_evidence": {},
+      "concentration_evidence": {},
+      "search_accounting": {
+        "session": {
+          "experiments_executed": 1,
+          "questions_generated": 1,
+          "candidate_actions_considered": 28,
+          "unique_outcome_specs": [
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          ],
+          "unique_research_frames": [],
+          "explanatory_features_tested": [],
+          "partitions_evaluated": 0,
+          "threshold_candidates_evaluated": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 0,
+          "interactions_attempted": 0,
+          "branch_depth_max": 1,
+          "refinements_reframes": 0,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 0
+        },
+        "branch": {
+          "experiments_executed": 1,
+          "questions_generated": 1,
+          "candidate_actions_considered": 28,
+          "unique_outcome_specs": [
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          ],
+          "unique_research_frames": [],
+          "explanatory_features_tested": [],
+          "partitions_evaluated": 0,
+          "threshold_candidates_evaluated": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 0,
+          "interactions_attempted": 0,
+          "branch_depth_max": 1,
+          "refinements_reframes": 0,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 0
+        }
+      },
+      "complexity_score": {
+        "branch_depth": 1,
+        "predicate_count": 1,
+        "outcome_complexity": 1,
+        "population_complexity": 1,
+        "thresholds_explored": 0,
+        "features_explored": 0,
+        "partitions_evaluated": 0,
+        "interaction_depth": 0,
+        "alternatives_considered": 0,
+        "categorical_levels": 0,
+        "neighborhood_cuts": 0,
+        "refinements": 0,
+        "aggregate_score": 7.5
+      },
+      "effective_hypotheses_tested": 32,
+      "discovery_evidence_type": "DISCOVERY",
+      "confirmation_status": "NOT_AVAILABLE",
+      "confirmation_split": {
+        "discovery_cutoff": "2026-08-17",
+        "discovery_date_range": null,
+        "confirmation_cutoff": null,
+        "confirmation_date_range": null,
+        "observations_overlap": null,
+        "confirmation_independence_status": "NOT_AVAILABLE",
+        "confirmation_status": "NOT_AVAILABLE"
+      },
+      "fragility_flags": [],
+      "current_research_status": "EXPLORATORY",
+      "why_interesting": "Descriptive group difference with effect=None",
+      "why_not_validated": "Research-only; validated=False always in Phase 3G.",
+      "next_required_test": "",
+      "parent_comparison": null,
+      "evidence_burden": {
+        "raw_effect": null,
+        "incremental_effect": null,
+        "sample_size": null,
+        "uncertainty": null,
+        "shape_strength": null,
+        "search_complexity": 7.5,
+        "search_cardinality_preceding": 32,
+        "concentration_flags": [],
+        "evidence_to_search_ratio": 0.0,
+        "evidence_search_assessment": "INSUFFICIENT"
+      },
+      "lineage_discovery_vs_falsification": [
+        "DISCOVERY"
+      ],
+      "validated": false,
+      "actionable": false,
+      "originating_frame_id": "",
+      "observation_horizon": 0
+    },
+    {
+      "candidate_id": "exp-7af31f0b3899",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "conditions": {},
+      "raw_outcome_metric": null,
+      "parent_baseline": null,
+      "incremental_effect": null,
+      "n": null,
+      "dates": [],
+      "episodes": [],
+      "shape_evidence": {},
+      "threshold_neighborhood_evidence": {},
+      "concentration_evidence": {},
+      "search_accounting": {
+        "session": {
+          "experiments_executed": 2,
+          "questions_generated": 2,
+          "candidate_actions_considered": 46,
+          "unique_outcome_specs": [
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [],
+          "partitions_evaluated": 0,
+          "threshold_candidates_evaluated": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 0,
+          "interactions_attempted": 0,
+          "branch_depth_max": 2,
+          "refinements_reframes": 1,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 0
+        },
+        "branch": {
+          "experiments_executed": 2,
+          "questions_generated": 2,
+          "candidate_actions_considered": 46,
+          "unique_outcome_specs": [
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [],
+          "partitions_evaluated": 0,
+          "threshold_candidates_evaluated": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 0,
+          "interactions_attempted": 0,
+          "branch_depth_max": 2,
+          "refinements_reframes": 1,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 0
+        }
+      },
+      "complexity_score": {
+        "branch_depth": 2,
+        "predicate_count": 3,
+        "outcome_complexity": 1,
+        "population_complexity": 2,
+        "thresholds_explored": 0,
+        "features_explored": 0,
+        "partitions_evaluated": 0,
+        "interaction_depth": 0,
+        "alternatives_considered": 0,
+        "categorical_levels": 0,
+        "neighborhood_cuts": 0,
+        "refinements": 1,
+        "aggregate_score": 15.75
+      },
+      "effective_hypotheses_tested": 55,
+      "discovery_evidence_type": "DISCOVERY",
+      "confirmation_status": "NOT_AVAILABLE",
+      "confirmation_split": {
+        "discovery_cutoff": "2026-08-17",
+        "discovery_date_range": null,
+        "confirmation_cutoff": null,
+        "confirmation_date_range": null,
+        "observations_overlap": null,
+        "confirmation_independence_status": "NOT_AVAILABLE",
+        "confirmation_status": "NOT_AVAILABLE"
+      },
+      "fragility_flags": [],
+      "current_research_status": "EXPLORATORY",
+      "why_interesting": "Descriptive group difference with effect=None",
+      "why_not_validated": "Research-only; validated=False always in Phase 3G.",
+      "next_required_test": "",
+      "parent_comparison": {
+        "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+        "parent_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+        "parent_effect": null,
+        "candidate_effect": null,
+        "incremental_effect": null,
+        "parent_n": null,
+        "candidate_n": 3124,
+        "sample_loss": null,
+        "complexity_increase": 2,
+        "incremental_warranted": false
+      },
+      "evidence_burden": {
+        "raw_effect": null,
+        "incremental_effect": null,
+        "sample_size": null,
+        "uncertainty": null,
+        "shape_strength": null,
+        "search_complexity": 15.75,
+        "search_cardinality_preceding": 55,
+        "concentration_flags": [],
+        "evidence_to_search_ratio": 0.0,
+        "evidence_search_assessment": "INSUFFICIENT"
+      },
+      "lineage_discovery_vs_falsification": [
+        "DISCOVERY",
+        "DISCOVERY"
+      ],
+      "validated": false,
+      "actionable": false,
+      "originating_frame_id": "frame-00007",
+      "observation_horizon": 5
+    },
+    {
+      "candidate_id": "exp-189ec7e0d687",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t3_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "conditions": {},
+      "raw_outcome_metric": null,
+      "parent_baseline": null,
+      "incremental_effect": null,
+      "n": null,
+      "dates": [],
+      "episodes": [],
+      "shape_evidence": {},
+      "threshold_neighborhood_evidence": {},
+      "concentration_evidence": {},
+      "search_accounting": {
+        "session": {
+          "experiments_executed": 4,
+          "questions_generated": 4,
+          "candidate_actions_considered": 79,
+          "unique_outcome_specs": [
+            "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00003",
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [],
+          "partitions_evaluated": 0,
+          "threshold_candidates_evaluated": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 0,
+          "interactions_attempted": 0,
+          "branch_depth_max": 3,
+          "refinements_reframes": 2,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 1
+        },
+        "branch": {
+          "experiments_executed": 4,
+          "questions_generated": 4,
+          "candidate_actions_considered": 79,
+          "unique_outcome_specs": [
+            "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00003",
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [],
+          "partitions_evaluated": 0,
+          "threshold_candidates_evaluated": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 0,
+          "interactions_attempted": 0,
+          "branch_depth_max": 3,
+          "refinements_reframes": 2,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 1
+        }
+      },
+      "complexity_score": {
+        "branch_depth": 3,
+        "predicate_count": 1,
+        "outcome_complexity": 1,
+        "population_complexity": 2,
+        "thresholds_explored": 0,
+        "features_explored": 0,
+        "partitions_evaluated": 0,
+        "interaction_depth": 0,
+        "alternatives_considered": 0,
+        "categorical_levels": 0,
+        "neighborhood_cuts": 0,
+        "refinements": 2,
+        "aggregate_score": 16.0
+      },
+      "effective_hypotheses_tested": 93,
+      "discovery_evidence_type": "DISCOVERY",
+      "confirmation_status": "NOT_AVAILABLE",
+      "confirmation_split": {
+        "discovery_cutoff": "2026-08-17",
+        "discovery_date_range": null,
+        "confirmation_cutoff": null,
+        "confirmation_date_range": null,
+        "observations_overlap": null,
+        "confirmation_independence_status": "NOT_AVAILABLE",
+        "confirmation_status": "NOT_AVAILABLE"
+      },
+      "fragility_flags": [],
+      "current_research_status": "EXPLORATORY",
+      "why_interesting": "Descriptive group difference with effect=None",
+      "why_not_validated": "Research-only; validated=False always in Phase 3G.",
+      "next_required_test": "",
+      "parent_comparison": null,
+      "evidence_burden": {
+        "raw_effect": null,
+        "incremental_effect": null,
+        "sample_size": null,
+        "uncertainty": null,
+        "shape_strength": null,
+        "search_complexity": 16.0,
+        "search_cardinality_preceding": 93,
+        "concentration_flags": [],
+        "evidence_to_search_ratio": 0.0,
+        "evidence_search_assessment": "INSUFFICIENT"
+      },
+      "lineage_discovery_vs_falsification": [
+        "DISCOVERY",
+        "DISCOVERY"
+      ],
+      "validated": false,
+      "actionable": false,
+      "originating_frame_id": "frame-00003",
+      "observation_horizon": 0
+    },
+    {
+      "candidate_id": "exp-cc36cce39c4f",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "continuation",
+        "operator": ">",
+        "threshold": 0.0,
+        "early_horizon": "T5",
+        "late_horizon": "T10"
+      },
+      "conditions": {},
+      "raw_outcome_metric": null,
+      "parent_baseline": null,
+      "incremental_effect": null,
+      "n": null,
+      "dates": [],
+      "episodes": [],
+      "shape_evidence": {},
+      "threshold_neighborhood_evidence": {},
+      "concentration_evidence": {},
+      "search_accounting": {
+        "session": {
+          "experiments_executed": 8,
+          "questions_generated": 8,
+          "candidate_actions_considered": 120,
+          "unique_outcome_specs": [
+            "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00003",
+            "frame-00006",
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [
+            "rs10"
+          ],
+          "partitions_evaluated": 1,
+          "threshold_candidates_evaluated": 1,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 4,
+          "interactions_attempted": 0,
+          "branch_depth_max": 5,
+          "refinements_reframes": 3,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 2
+        },
+        "branch": {
+          "experiments_executed": 8,
+          "questions_generated": 8,
+          "candidate_actions_considered": 120,
+          "unique_outcome_specs": [
+            "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00003",
+            "frame-00006",
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [
+            "rs10"
+          ],
+          "partitions_evaluated": 1,
+          "threshold_candidates_evaluated": 1,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 4,
+          "interactions_attempted": 0,
+          "branch_depth_max": 5,
+          "refinements_reframes": 3,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 2
+        }
+      },
+      "complexity_score": {
+        "branch_depth": 5,
+        "predicate_count": 2,
+        "outcome_complexity": 2,
+        "population_complexity": 2,
+        "thresholds_explored": 1,
+        "features_explored": 1,
+        "partitions_evaluated": 1,
+        "interaction_depth": 0,
+        "alternatives_considered": 0,
+        "categorical_levels": 4,
+        "neighborhood_cuts": 0,
+        "refinements": 3,
+        "aggregate_score": 29.5
+      },
+      "effective_hypotheses_tested": 143,
+      "discovery_evidence_type": "DISCOVERY",
+      "confirmation_status": "NOT_AVAILABLE",
+      "confirmation_split": {
+        "discovery_cutoff": "2026-08-17",
+        "discovery_date_range": null,
+        "confirmation_cutoff": null,
+        "confirmation_date_range": null,
+        "observations_overlap": null,
+        "confirmation_independence_status": "NOT_AVAILABLE",
+        "confirmation_status": "NOT_AVAILABLE"
+      },
+      "fragility_flags": [],
+      "current_research_status": "EXPLORATORY",
+      "why_interesting": "Descriptive group difference with effect=None",
+      "why_not_validated": "Research-only; validated=False always in Phase 3G.",
+      "next_required_test": "",
+      "parent_comparison": null,
+      "evidence_burden": {
+        "raw_effect": null,
+        "incremental_effect": null,
+        "sample_size": null,
+        "uncertainty": null,
+        "shape_strength": null,
+        "search_complexity": 29.5,
+        "search_cardinality_preceding": 143,
+        "concentration_flags": [],
+        "evidence_to_search_ratio": 0.0,
+        "evidence_search_assessment": "INSUFFICIENT"
+      },
+      "lineage_discovery_vs_falsification": [
+        "DISCOVERY",
+        "DISCOVERY"
+      ],
+      "validated": false,
+      "actionable": false,
+      "originating_frame_id": "frame-00006",
+      "observation_horizon": 0
+    },
+    {
+      "candidate_id": "exp-b8cd6582e58a",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "persist",
+        "field": "t5_return",
+        "operator": ">",
+        "horizons": [
+          "T5",
+          "T10"
+        ],
+        "threshold": 0.0
+      },
+      "conditions": {},
+      "raw_outcome_metric": null,
+      "parent_baseline": null,
+      "incremental_effect": null,
+      "n": null,
+      "dates": [],
+      "episodes": [],
+      "shape_evidence": {},
+      "threshold_neighborhood_evidence": {},
+      "concentration_evidence": {},
+      "search_accounting": {
+        "session": {
+          "experiments_executed": 11,
+          "questions_generated": 11,
+          "candidate_actions_considered": 158,
+          "unique_outcome_specs": [
+            "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+            "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00003",
+            "frame-00004",
+            "frame-00006",
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [
+            "rs10",
+            "rs_spread"
+          ],
+          "partitions_evaluated": 2,
+          "threshold_candidates_evaluated": 2,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 8,
+          "interactions_attempted": 0,
+          "branch_depth_max": 5,
+          "refinements_reframes": 4,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 2
+        },
+        "branch": {
+          "experiments_executed": 11,
+          "questions_generated": 11,
+          "candidate_actions_considered": 158,
+          "unique_outcome_specs": [
+            "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+            "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+          ],
+          "unique_research_frames": [
+            "frame-00003",
+            "frame-00004",
+            "frame-00006",
+            "frame-00007"
+          ],
+          "explanatory_features_tested": [
+            "rs10",
+            "rs_spread"
+          ],
+          "partitions_evaluated": 2,
+          "threshold_candidates_evaluated": 2,
+          "neighborhood_cuts_evaluated": 0,
+          "categorical_levels_evaluated": 8,
+          "interactions_attempted": 0,
+          "branch_depth_max": 5,
+          "refinements_reframes": 4,
+          "duplicate_experiments_blocked": 0,
+          "abandoned_branches": 0,
+          "falsification_experiments_executed": 2
+        }
+      },
+      "complexity_score": {
+        "branch_depth": 5,
+        "predicate_count": 4,
+        "outcome_complexity": 4,
+        "population_complexity": 2,
+        "thresholds_explored": 2,
+        "features_explored": 2,
+        "partitions_evaluated": 2,
+        "interaction_depth": 0,
+        "alternatives_considered": 0,
+        "categorical_levels": 8,
+        "neighborhood_cuts": 0,
+        "refinements": 4,
+        "aggregate_score": 42.5
+      },
+      "effective_hypotheses_tested": 199,
+      "discovery_evidence_type": "DISCOVERY",
+      "confirmation_status": "NOT_AVAILABLE",
+      "confirmation_split": {
+        "discovery_cutoff": "2026-08-17",
+        "discovery_date_range": null,
+        "confirmation_cutoff": null,
+        "confirmation_date_range": null,
+        "observations_overlap": null,
+        "confirmation_independence_status": "NOT_AVAILABLE",
+        "confirmation_status": "NOT_AVAILABLE"
+      },
+      "fragility_flags": [],
+      "current_research_status": "EXPLORATORY",
+      "why_interesting": "Descriptive group difference with effect=None",
+      "why_not_validated": "Research-only; validated=False always in Phase 3G.",
+      "next_required_test": "",
+      "parent_comparison": null,
+      "evidence_burden": {
+        "raw_effect": null,
+        "incremental_effect": null,
+        "sample_size": null,
+        "uncertainty": null,
+        "shape_strength": null,
+        "search_complexity": 42.5,
+        "search_cardinality_preceding": 199,
+        "concentration_flags": [],
+        "evidence_to_search_ratio": 0.0,
+        "evidence_search_assessment": "INSUFFICIENT"
+      },
+      "lineage_discovery_vs_falsification": [
+        "DISCOVERY",
+        "DISCOVERY"
+      ],
+      "validated": false,
+      "actionable": false,
+      "originating_frame_id": "frame-00004",
+      "observation_horizon": 0
+    }
+  ],
+  "anti_edge_findings": [],
+  "rejected_abandoned": [],
+  "candidate_count": 5,
+  "anti_edge_count": 0
+}

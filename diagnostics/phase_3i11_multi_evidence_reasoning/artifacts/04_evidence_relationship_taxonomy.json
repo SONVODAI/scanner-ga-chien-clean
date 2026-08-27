@@ -1,0 +1,24 @@
+{
+  "taxonomy_version": "evidence_relationship_v1_3i11",
+  "classes": {
+    "EXACT_REPLICATION": "Identical experiment content hash",
+    "REPRESENTATION_REPLICATION": "Same scientific question, different instrument only",
+    "PARTIAL_REPLICATION": "Overlapping cohort/measurement with subset change",
+    "INDEPENDENT_REPLICATION": "New independent sample/episode with same proposition semantics",
+    "INDEPENDENT_FALSIFICATION": "Test designed to disconfirm; independent cohort",
+    "RELATED_EVIDENCE": "Same proposition, overlapping uncertainty dimension",
+    "CONTRADICTORY_EVIDENCE": "Valid opposing directional implications",
+    "NON_INFORMATIVE": "Valid but non-resolving",
+    "INVALID": "Failed validity gate"
+  },
+  "independence_not_from": [
+    "tool_change_alone",
+    "date_label_alone",
+    "representation_change_alone"
+  ],
+  "reuse": [
+    "3H research_line_relationship",
+    "3I.9 evidence_independence_class",
+    "compute_experiment_content_hash"
+  ]
+}
