@@ -42,8 +42,10 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 DEFAULT_MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 BUNDLE_OBJECT_NAME = "bundle.tar.gz"
+PRODUCTION_OBS_OBJECT_NAME = "production_observations.tar.gz"
 ALLOWED_METHODS = {"GET", "PUT"}
 ALLOWED_PATH = "/current/bundle.tar.gz"
+ALLOWED_PRODUCTION_OBS_PATH = "/current/production_observations.tar.gz"
 
 
 @dataclass(frozen=True)
@@ -190,6 +192,39 @@ def load_bundle_bytes(config: ArtifactServerConfig) -> bytes:
     return path.read_bytes()
 
 
+def publish_production_observations_bytes(config: ArtifactServerConfig, tar_bytes: bytes) -> None:
+    """Atomic sidecar publish for autonomous production_observations (no Challenger validation)."""
+    if len(tar_bytes) > config.max_upload_bytes:
+        raise BundleValidationError("upload exceeds max size")
+    if len(tar_bytes) == 0:
+        raise BundleValidationError("empty upload")
+    # Light path safety check only.
+    with tarfile.open(fileobj=io.BytesIO(tar_bytes), mode="r:gz") as tar:
+        for member in tar.getmembers():
+            name = member.name.replace("\\", "/")
+            if name.startswith("/") or ".." in name.split("/"):
+                raise BundleValidationError("tar archive contains disallowed paths")
+            if not (
+                name == "production_observations"
+                or name.startswith("production_observations/")
+            ):
+                raise BundleValidationError(f"unexpected member: {name}")
+
+    current_dir = config.storage_root / "current"
+    current_dir.mkdir(parents=True, exist_ok=True)
+    tmp = current_dir / f".{PRODUCTION_OBS_OBJECT_NAME}.tmp"
+    final = current_dir / PRODUCTION_OBS_OBJECT_NAME
+    tmp.write_bytes(tar_bytes)
+    os.replace(tmp, final)
+
+
+def load_production_observations_bytes(config: ArtifactServerConfig) -> bytes:
+    path = config.storage_root / "current" / PRODUCTION_OBS_OBJECT_NAME
+    if not path.exists():
+        raise FileNotFoundError("no production_observations sidecar published")
+    return path.read_bytes()
+
+
 def create_wsgi_app(config: ArtifactServerConfig):
     def app(environ, start_response):
         method = environ.get("REQUEST_METHOD", "GET").upper()
@@ -197,6 +232,35 @@ def create_wsgi_app(config: ArtifactServerConfig):
 
         if path == "/health" and method == "GET":
             return _json_response(start_response, 200, {"ok": True, "service": "edge_research_artifacts"})
+
+        if path == ALLOWED_PRODUCTION_OBS_PATH and method in ALLOWED_METHODS:
+            if not _authorize(environ, config.token):
+                return _json_response(start_response, 401, {"error": "unauthorized"})
+            if method == "GET":
+                try:
+                    body = load_production_observations_bytes(config)
+                except FileNotFoundError:
+                    return _json_response(start_response, 404, {"error": "production_observations_not_found"})
+                return _bytes_response(start_response, 200, body, "application/gzip")
+            try:
+                length = int(environ.get("CONTENT_LENGTH") or "0")
+            except ValueError:
+                return _json_response(start_response, 400, {"error": "invalid_content_length"})
+            if length <= 0:
+                return _json_response(start_response, 400, {"error": "empty_body"})
+            if length > config.max_upload_bytes:
+                return _json_response(start_response, 413, {"error": "payload_too_large"})
+            body = environ["wsgi.input"].read(length)
+            if len(body) != length:
+                return _json_response(start_response, 400, {"error": "incomplete_body"})
+            try:
+                publish_production_observations_bytes(config, body)
+            except BundleValidationError as exc:
+                return _json_response(start_response, 400, {"error": "invalid_sidecar", "detail": str(exc)})
+            except Exception:
+                return _json_response(start_response, 500, {"error": "publish_failed"})
+            digest = hashlib.sha256(body).hexdigest()
+            return _json_response(start_response, 200, {"ok": True, "sha256": digest, "kind": "production_observations"})
 
         if path != ALLOWED_PATH or method not in ALLOWED_METHODS:
             return _json_response(start_response, 404, {"error": "not_found"})

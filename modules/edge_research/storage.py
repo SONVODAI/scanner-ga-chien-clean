@@ -155,6 +155,19 @@ def resolve_data_dir(explicit: Optional[Path] = None) -> Path:
     return DEFAULT_DATA_DIR
 
 
+def resolve_production_runs_root(data_dir: Optional[Path] = None) -> Path:
+    """
+    Canonical root for production daily runs, assessments, voices, manifests.
+
+    Accepts either the edge data dir (``data/edge_research``) or an already-canonical
+    ``.../production_observations`` path. Never double-nests.
+    """
+    root = resolve_data_dir(data_dir)
+    if root.name == "production_observations":
+        return root
+    return root / "production_observations"
+
+
 def ensure_storage(data_dir: Optional[Path] = None) -> Path:
     root = resolve_data_dir(data_dir)
     root.mkdir(parents=True, exist_ok=True)
