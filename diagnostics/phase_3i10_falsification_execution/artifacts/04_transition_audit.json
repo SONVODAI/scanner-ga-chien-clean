@@ -1,0 +1,11 @@
+{
+  "prior_state": "SUPPORTED",
+  "evidence_class": "SUPPORTING",
+  "transition_key": "SUPPORTING",
+  "frozen_transition_mapping_entry": "SUPPORTED",
+  "resulting_state": "SUPPORTED",
+  "preregistered_in_frozen_contract": true,
+  "decision_preregistered": true,
+  "state_transition_not_preregistered": false,
+  "note": "Frozen artifact 03 transition_mapping is evidence-absolute; validated at 3I.7 from HYPOTHESIS but applied uniformly to all interpretations under the same contract without post-hoc modification."
+}

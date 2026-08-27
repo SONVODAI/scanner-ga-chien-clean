@@ -1,0 +1,111 @@
+{
+  "bb11": {
+    "available": true,
+    "session_id": "bb11-autonomous-001",
+    "experiments_used": 11,
+    "session_status": "NO_EDGE_FOUND",
+    "late_mechanical_cycling": 2,
+    "bridge_changed_decisions": 2,
+    "exit_valuation_active": true,
+    "stop_competed_count": 3,
+    "selection_changed_by_exit_count": 1,
+    "tool_distribution": {
+      "horizon_comparison": 5,
+      "sensitivity_analysis": 1,
+      "adaptive_partition_compare": 2,
+      "threshold_exploration": 2,
+      "symbol_decomposition": 1
+    },
+    "mechanical_cycling_total": 3,
+    "premature_stop_count": 0,
+    "unexplored_frontier_at_stop": 36,
+    "global_allocation_decisions": 11,
+    "novelty_gating_active": false,
+    "novelty_gating_applied_count": 0
+  },
+  "bb12": {
+    "session_id": "bb12-autonomous-001",
+    "experiments_used": 11,
+    "session_status": "NO_EDGE_FOUND",
+    "late_mechanical_cycling": 2,
+    "bridge_changed_decisions": 2,
+    "exit_valuation_active": true,
+    "stop_competed_count": 3,
+    "selection_changed_by_exit_count": 1,
+    "tool_distribution": {
+      "horizon_comparison": 5,
+      "sensitivity_analysis": 1,
+      "adaptive_partition_compare": 2,
+      "threshold_exploration": 2,
+      "symbol_decomposition": 1
+    },
+    "novelty_gating_applied_count": 0
+  },
+  "comparison_table": {
+    "experiments_executed": {
+      "bb11": 11,
+      "bb12": 11
+    },
+    "terminal_status": {
+      "bb11": "NO_EDGE_FOUND",
+      "bb12": "NO_EDGE_FOUND"
+    },
+    "late_mechanical_cycling": {
+      "bb11": 2,
+      "bb12": 2
+    },
+    "mechanical_cycling_total": {
+      "bb11": 3,
+      "bb12": 3
+    },
+    "premature_stops": {
+      "bb11": 0,
+      "bb12": 0
+    },
+    "exit_selection_changes": {
+      "bb11": 1,
+      "bb12": 1
+    },
+    "stop_competed_count": {
+      "bb11": 3,
+      "bb12": 3
+    },
+    "unexplored_frontier_at_stop": {
+      "bb11": 36,
+      "bb12": 36
+    },
+    "novelty_gating_applied_count": {
+      "bb11": 0,
+      "bb12": 0
+    },
+    "representation_gated_count": {
+      "bb11": 0,
+      "bb12": 0
+    },
+    "tool_distribution": {
+      "bb11": {
+        "horizon_comparison": 5,
+        "sensitivity_analysis": 1,
+        "adaptive_partition_compare": 2,
+        "threshold_exploration": 2,
+        "symbol_decomposition": 1
+      },
+      "bb12": {
+        "horizon_comparison": 5,
+        "sensitivity_analysis": 1,
+        "adaptive_partition_compare": 2,
+        "threshold_exploration": 2,
+        "symbol_decomposition": 1
+      }
+    },
+    "beneficial_interventions": {
+      "bb11": 1,
+      "bb12": 1
+    }
+  },
+  "not_comparable_fields": [
+    "exact_decision_sequence",
+    "planner_novelty_bonus"
+  ],
+  "primary_question": "Does Phase 3H.11 reduce representation-only novelty inflation during opportunity ranking without suppressing independent research lines?"
+}

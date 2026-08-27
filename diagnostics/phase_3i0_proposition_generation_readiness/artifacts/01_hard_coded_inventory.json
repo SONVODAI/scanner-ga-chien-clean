@@ -1,0 +1,80 @@
+{
+  "bootstrap_seed": {
+    "classification": "HUMAN-SEED",
+    "initial_question": "What non-trivial, statistically and economically interesting relationships can be discovered...",
+    "source": "bb07_run_benchmark.py ROOT_CONFIG"
+  },
+  "classifications_summary": {
+    "EXECUTION_SAFETY_CONSTRAINT": [
+      "Panel preflight eligible_explanatory",
+      "Prohibited feature columns",
+      "data_cutoff_date temporal legality",
+      "Experiment dedup / content hash",
+      "Operational awareness legal set"
+    ],
+    "HUMAN-SEED": [
+      "ROOT_CONFIG initial_observation / initial_question",
+      "Benchmark frozen panel",
+      "Discovery grid features"
+    ],
+    "REPRESENTATIONAL_CONSTRAINT": [
+      "OutcomeSpec grammar kinds",
+      "PopulationSpec grammar kinds",
+      "Tool registry (executable instruments)",
+      "RETURN_COLUMNS / horizon lists",
+      "ExperimentSpec schema"
+    ],
+    "SCIENTIFIC_PRIOR": [
+      "question_template_id catalog (implicit hypothesis families)",
+      "GAP_* codes (what uncertainties exist)",
+      "ResearchNeedType registry",
+      "SEARCH_FEATURES / FEATURE_BUCKETS",
+      "Initial bootstrap question"
+    ]
+  },
+  "discovery_pipeline_separate": {
+    "classification": "HUMAN-SEED feature buckets in contracts.py SEARCH_FEATURES",
+    "connected_to_research_brain_qgen": false,
+    "module": "discovery.py + challenger.py"
+  },
+  "gap_codes": [
+    "TIME_DISTRIBUTION",
+    "SYMBOL_DISTRIBUTION",
+    "EPISODE_REPLICATION",
+    "MARKET_DEPENDENCE",
+    "HORIZON_STABILITY",
+    "NEIGHBORHOOD_STABILITY",
+    "TRAJECTORY_ROLE",
+    "SUBGROUP_ARTIFACT",
+    "THRESHOLD_EXPLORATION",
+    "NEIGHBORHOOD_THRESHOLD",
+    "CATEGORY_REFINEMENT",
+    "INTERACTION_FOLLOWUP"
+  ],
+  "template_ids": [
+    "UNCERTAIN_TIME_DISTRIBUTION",
+    "UNCERTAIN_SYMBOL_DISTRIBUTION",
+    "UNCERTAIN_EPISODE_REPLICATION",
+    "UNCERTAIN_MARKET_DEPENDENCE",
+    "UNCERTAIN_HORIZON_STABILITY",
+    "UNCERTAIN_TRAJECTORY_ROLE",
+    "FALSIFY_EXTREME_WINNER",
+    "FALSIFY_DATE_ARTIFACT",
+    "FALSIFY_SYMBOL_DOMINANCE",
+    "REFRAME_ALTERNATIVE_OUTCOME",
+    "REPOPULATE_REFINED_COHORT",
+    "REPOPULATE_WIDENED_COHORT",
+    "ADAPTIVE_PARTITION",
+    "THRESHOLD_EXPLORATION",
+    "THRESHOLD_NEIGHBORHOOD",
+    "CATEGORY_POPULATION_REFINE",
+    "THRESHOLD_POPULATION_REFINE",
+    "INTERACTION_PARTITION",
+    "FRAME_REFRAME",
+    "EVIDENCE_POPULATION_REFINE",
+    "HORIZON_ADVANCEMENT",
+    "STOP_NO_FURTHER_VALUE",
+    "ABANDON_FRAGILE",
+    "STOP_SESSION_GLOBAL"
+  ]
+}
