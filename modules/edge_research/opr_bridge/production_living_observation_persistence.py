@@ -24,7 +24,7 @@ from modules.edge_research.opr_bridge.production_observation_records import (
     ShadowAuthoritySemantics,
     DEFAULT_SHADOW_AUTHORITY,
 )
-from modules.edge_research.storage import resolve_data_dir
+from modules.edge_research.storage import resolve_production_runs_root
 
 LIVING_PERSISTENCE_VERSION = "living_observation_persistence_v1_3k1"
 ASSESSMENTS_DIR = "daily_assessments"
@@ -38,7 +38,7 @@ SUMMARY_LEDGER = "daily_summary_ledger.jsonl"
 
 
 def living_root(data_dir: Optional[Path] = None) -> Path:
-    root = resolve_data_dir(data_dir) / "production_observations"
+    root = resolve_production_runs_root(data_dir)
     root.mkdir(parents=True, exist_ok=True)
     return root
 
@@ -80,6 +80,11 @@ def summary_path(summary_id: str, data_dir: Optional[Path] = None) -> Path:
 def voice_path(assessment_id: str, data_dir: Optional[Path] = None) -> Path:
     safe = assessment_id.replace("/", "_")
     return _subdir(VOICES_DIR, data_dir) / f"{safe}.json"
+
+
+def session_voice_path(trade_date: str, data_dir: Optional[Path] = None) -> Path:
+    safe = str(trade_date).replace("/", "_")
+    return _subdir(VOICES_DIR, data_dir) / f"session_{safe}.json"
 
 
 def assessment_ledger_path(data_dir: Optional[Path] = None) -> Path:
@@ -199,6 +204,12 @@ def persist_summary(
 
 def persist_voice(voice: DailyVoiceContract, *, data_dir: Optional[Path] = None) -> Path:
     path = voice_path(voice.assessment_id, data_dir)
+    _atomic_write(path, json.dumps(voice.to_dict(), indent=2, default=str))
+    return path
+
+
+def persist_session_voice(voice: DailyVoiceContract, *, data_dir: Optional[Path] = None) -> Path:
+    path = session_voice_path(voice.assessment_trade_date, data_dir)
     _atomic_write(path, json.dumps(voice.to_dict(), indent=2, default=str))
     return path
 

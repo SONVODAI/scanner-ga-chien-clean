@@ -195,7 +195,8 @@ def test_forecast_t0_immutable(tmp_path):
         "completeness_status": "COMPLETE",
     }
     ok, reason = persist_t0_record(rec, data_dir=data_dir)
-    assert ok and reason == "WRITTEN"
+    # Integration retains durable_replace_csv + optional GitHub sync suffix (WRITTEN_*).
+    assert ok and str(reason).startswith("WRITTEN")
     ok2, reason2 = persist_t0_record({**rec, "market_forecast": 9.9}, data_dir=data_dir)
     assert ok2 is False and reason2 == "ALREADY_FROZEN"
     t0 = load_t0_table(data_dir)

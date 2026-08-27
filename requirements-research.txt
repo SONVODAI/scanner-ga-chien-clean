@@ -1,0 +1,16 @@
+# Mr.BOT daily-research / headless EOD runtime (no Streamlit required).
+# Install into the systemd research interpreter, e.g.:
+#   /opt/mrbot-research-venv/bin/pip install -r requirements-research.txt
+#
+# Pins match production app requirements.txt for market data (vnstock Legacy),
+# excluding Streamlit so the research timer stays headless.
+
+pandas
+numpy
+vnstock==0.2.9.2
+scipy
+scikit-learn
+beautifulsoup4
+yfinance
+requests
+ipython

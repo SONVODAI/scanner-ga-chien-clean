@@ -33,6 +33,7 @@ from modules.edge_research.opr_bridge.production_living_observation_persistence 
     list_outcomes_for_observation,
     list_summaries,
     lookup_assessment,
+    session_voice_path,
     voice_path,
 )
 from modules.edge_research.opr_bridge.production_living_research_ui_records import (
@@ -44,11 +45,12 @@ from modules.edge_research.opr_bridge.production_observation_persistence import 
     load_observation_index,
     lookup_birth_record,
 )
-from modules.edge_research.storage import resolve_data_dir
+from modules.edge_research.storage import resolve_data_dir, resolve_production_runs_root
 
 
 def resolve_production_data_dir(data_dir: Optional[Path] = None) -> Path:
-    return resolve_data_dir(data_dir) / "production_observations"
+    """Canonical production runs root (assessments, voices, daily runs)."""
+    return resolve_production_runs_root(data_dir)
 
 
 def list_available_trade_dates(*, data_dir: Optional[Path] = None) -> List[str]:
@@ -308,31 +310,44 @@ def build_ui_voice_narrative(
     data_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Aggregate DailyVoiceContract into readable Vietnamese narrative."""
+    import json
+
     assessments = _assessments_on_date(trade_date, data_dir)
     voices = []
     for a in assessments:
         vpath = voice_path(a.assessment_id, data_dir)
         if vpath.exists():
-            import json
             voice = json.loads(vpath.read_text(encoding="utf-8"))
         else:
             voice = render_daily_voice(a).to_dict()
         voices.append(voice)
 
+    session_voice = None
+    spath = session_voice_path(trade_date, data_dir)
+    if spath.exists():
+        session_voice = json.loads(spath.read_text(encoding="utf-8"))
+
     summary = next((s for s in list_summaries(data_dir=data_dir) if s.trade_date == trade_date), None)
-    if not voices and summary and summary.silence_or_no_discovery:
+
+    if session_voice and voices:
+        narrative = _compose_session_and_observation_voice(session_voice, voices, summary)
+    elif session_voice:
+        narrative = _compose_session_voice_only(session_voice)
+    elif not voices and summary and summary.silence_or_no_discovery:
         narrative = _silence_day_narrative(trade_date, summary, data_dir)
     elif not voices:
         narrative = _empty_state_narrative(trade_date, data_dir)
     else:
         narrative = _compose_voice_narrative(voices, summary)
 
+    all_voices = ([session_voice] if session_voice else []) + voices
     return {
         "trade_date": trade_date,
-        "voices": voices,
+        "voices": all_voices,
+        "session_voice": session_voice,
         "narrative_vi": narrative,
-        "voice_count": len(voices),
-        "silence_or_no_discovery": bool(summary.silence_or_no_discovery) if summary else len(voices) == 0,
+        "voice_count": len(all_voices),
+        "silence_or_no_discovery": bool(summary.silence_or_no_discovery) if summary else len(all_voices) == 0,
     }
 
 
@@ -422,6 +437,28 @@ def _assessments_on_date(trade_date: Optional[str], data_dir: Optional[Path]) ->
             if a:
                 rows.append(a)
     return rows
+
+
+def _compose_session_voice_only(session_voice: Dict[str, Any]) -> str:
+    parts = [
+        session_voice.get("q1_today_i_see_vi", ""),
+        session_voice.get("q2_vs_prior_session_vi", ""),
+        session_voice.get("q3_market_change_vi", ""),
+        session_voice.get("q5_belief_changed_vi", ""),
+        session_voice.get("q6_if_not_why_vi", ""),
+        session_voice.get("q9_waiting_for_vi", ""),
+    ]
+    return "\n\n".join(p for p in parts if p)
+
+
+def _compose_session_and_observation_voice(
+    session_voice: Dict[str, Any],
+    voices: List[Dict[str, Any]],
+    summary: Any,
+) -> str:
+    head = _compose_session_voice_only(session_voice)
+    body = _compose_voice_narrative(voices, summary)
+    return f"{head}\n\n---\n\n{body}" if body else head
 
 
 def _compose_voice_narrative(voices: List[Dict[str, Any]], summary: Any) -> str:

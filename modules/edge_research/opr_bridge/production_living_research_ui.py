@@ -123,7 +123,7 @@ def render_living_research_ui_panel(
     """
     import streamlit as st
 
-    data_dir = data_dir or resolve_data_dir(None) / "production_observations"
+    data_dir = data_dir or resolve_data_dir(None)
     available = build_living_research_ui_read_model(data_dir=data_dir).get("available_dates") or []
 
     st.markdown("## 🧠 MR.BOT — HÔM NAY TÔI ĐANG NGHĨ GÌ?")
