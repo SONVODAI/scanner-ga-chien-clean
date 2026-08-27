@@ -1,0 +1,13 @@
+{
+  "subgroup_field": "research_market_state",
+  "subgroup_values": [
+    "NORMAL"
+  ],
+  "source": "HUMAN_AUTHORED_FIXED_CATEGORY in scientific_action_executability._population_for_strategy",
+  "candidate_schemes_enumerated": 1,
+  "evidence_derived": false,
+  "proposition_derived": false,
+  "frozen_in_package": true,
+  "execution_ready": false,
+  "autonomy_gap": "Subgroup choice is prescribed, not selected from evidence structure"
+}

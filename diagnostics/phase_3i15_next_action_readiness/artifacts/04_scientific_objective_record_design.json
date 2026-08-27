@@ -1,0 +1,46 @@
+{
+  "record_type": "ScientificObjectiveRecord",
+  "immutable": true,
+  "required_fields": {
+    "objective_id": "obj-{uuid12}",
+    "proposition_id": "from PropositionRecord",
+    "proposition_hash": "content hash",
+    "synthesis_id": "from EvidenceSynthesisRecord",
+    "synthesis_hash": "synthesis hash",
+    "priority_decision_id": "from ResearchPriorityDecision",
+    "priority_record_hash": "priority hash",
+    "target_uncertainty": "single axis from unresolved_uncertainty",
+    "scientific_vulnerability": "e.g. episode_instability, directional_reversal, concentration",
+    "reason_this_uncertainty_matters": "derived from saturation + synthesis rationale",
+    "current_evidence_coverage": "axes covered touching this uncertainty",
+    "desired_information_gain_type": "falsify | replicate | resolve_contradiction | expose_counterexample",
+    "disconfirming_potential": "bool + rationale",
+    "contradiction_resolution_potential": "bool \u2014 only if contradiction_structure non-empty",
+    "independence_requirement": "min independence profile required vs prior ledger",
+    "forbidden_rescue_mutations": [
+      "outcome_field",
+      "horizon",
+      "population_refine",
+      "feature_change"
+    ],
+    "provenance_refs": [
+      "synthesis_hash",
+      "priority_record_hash",
+      "ledger_entry_ids"
+    ],
+    "objective_hash": "deterministic stable_hash of canonical payload"
+  },
+  "explicitly_excluded": [
+    "tool_name",
+    "experiment_spec",
+    "gap_code",
+    "template_id"
+  ],
+  "derivation_sources_allowed": [
+    "EvidenceSynthesisRecord.uncertainty_unresolved",
+    "EvidenceSynthesisRecord.saturation_assessment",
+    "EvidenceSynthesisRecord.contradiction_structure",
+    "ResearchPriorityDecision.chosen_priority_action",
+    "PropositionRecord commitments (disconfirming_observation_spec, null_competing_explanation)"
+  ]
+}

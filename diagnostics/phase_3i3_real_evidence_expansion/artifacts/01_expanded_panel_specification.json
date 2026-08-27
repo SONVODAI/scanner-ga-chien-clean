@@ -1,0 +1,75 @@
+{
+  "phase": "3I.3",
+  "panel_id": "expanded_panel_v3i3",
+  "frozen_before_generator_run": true,
+  "date_range": {
+    "start": "2026-06-01",
+    "end": "2026-08-17"
+  },
+  "total_dates": 44,
+  "total_rows": 6248,
+  "distinct_symbols": 142,
+  "universe_rule": "symbols present in source CSVs with per-date cross-section >= 15",
+  "required_columns": [
+    "trade_date",
+    "symbol",
+    "rs_spread",
+    "t5_return"
+  ],
+  "cutoff_rule": "trade_date <= 2026-08-17",
+  "missingness_policy": "drop rows with null rs_spread; require >=15 symbols per date",
+  "minimum_cross_sectional_sample": 15,
+  "baseline_construction": "historical self-baseline from prior trade_dates cross-sectional std",
+  "eligible_observation_definition": "date with >=15 symbols, non-zero rs_spread std, valid t5_return cohort",
+  "sources": [
+    {
+      "path": "research_exports/edge_oos_20260601_20260630.csv",
+      "rows": 3124
+    },
+    {
+      "path": "build_research_panel(end=2026-08-17)",
+      "rows": 3124
+    }
+  ],
+  "schema_consistency_audit": {
+    "june_rows": 3124,
+    "july_aug_rows": 3124,
+    "overlap_dates": [],
+    "dedup_policy": "keep_last_on_trade_date_symbol",
+    "issues": []
+  },
+  "missingness_audit": {
+    "row_count": 6248,
+    "fields": {
+      "trade_date": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "symbol": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "rs_spread": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "t5_return": {
+        "non_null": 6106,
+        "coverage": 0.9773
+      },
+      "t3_return": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "t10_return": {
+        "non_null": 5396,
+        "coverage": 0.8636
+      }
+    }
+  },
+  "panel_fingerprint_sha256": "a5a3e950266615e358b145d4bff9933237c8cc8b6b15f85a9a0bce6dfb7f2647",
+  "no_synthetic_rows": true,
+  "no_future_leakage": true,
+  "panel_csv_path": "benchmarks/bb_prop_01/zone_b_blind_panel/expanded_panel_v3i3.csv",
+  "panel_csv_sha256": "513d5d68f4b5560a75ae079033f6994ad2569b970ced0c6c2d657900e542f008"
+}
