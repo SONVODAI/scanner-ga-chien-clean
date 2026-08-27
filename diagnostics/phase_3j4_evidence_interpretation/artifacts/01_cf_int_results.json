@@ -1,0 +1,46 @@
+{
+  "benchmark_version": "bb_first_experiment_interpretation_01_v1_3j4",
+  "counterfactuals": {
+    "CF-INT1": {
+      "passed": true,
+      "description": "Post-result contract substitution rejected"
+    },
+    "CF-INT2": {
+      "passed": true,
+      "description": "Same numbers may differ by scientific intent/cohort strategy"
+    },
+    "CF-INT3": {
+      "passed": true,
+      "description": "Non-independent attractive effect not overstated as STRONG"
+    },
+    "CF-INT4": {
+      "passed": true,
+      "description": "Independent falsification weakens/contradicts appropriately"
+    },
+    "CF-INT5": {
+      "passed": true,
+      "description": "Large N alone does not auto-strengthen without relevance"
+    },
+    "CF-INT6": {
+      "passed": true,
+      "description": "Tool semantic labels do not auto-judge proposition"
+    },
+    "CF-INT7": {
+      "passed": true,
+      "description": "Only tested null updated; others may remain alive"
+    },
+    "CF-INT8": {
+      "passed": true,
+      "description": "Missing evidence \u2192 INVALID not fabricated support"
+    },
+    "CF-INT9": {
+      "passed": true,
+      "description": "Interpretation identity invariant to session ordering"
+    },
+    "CF-INT10": {
+      "passed": true,
+      "description": "No decide_next_action / synthesis hook"
+    }
+  },
+  "all_passed": true
+}
