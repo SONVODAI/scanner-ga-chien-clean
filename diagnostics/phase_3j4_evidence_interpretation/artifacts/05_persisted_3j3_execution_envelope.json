@@ -1,0 +1,117 @@
+{
+  "execution_id": "iefx-8fccf6e59b73",
+  "record_version": "first_experiment_execution_envelope_v1_3j3",
+  "package_id": "iefp-b18094e5669f",
+  "package_hash": "b61daf4dc6742fa04e47e57c661f9660b74086f3203472d5dbea6627f2308e2f",
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "session_id": "phase-3j3-real-diagnostic",
+  "selected_candidate_id": "fec-642ea1c70c47",
+  "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+  "experiment_content_hash": "383e822e4c33a1eddf806200dbfd48013efc9bc88e947765526a9cfa1fae442d",
+  "execution_identity_hash": "82ac3a49f72803bccdc38be92e031453d7750d51f3020990bbd0d995ca81f15b",
+  "binding_audit": {
+    "scientific_spec_hash": "3ceceaaf55033c845f646114d17aae41e652d7460e590740a4df1dc0dddac8df",
+    "execution_spec_hash": "383e822e4c33a1eddf806200dbfd48013efc9bc88e947765526a9cfa1fae442d",
+    "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+    "population_spec": {
+      "kind": "filter",
+      "field": "trade_date",
+      "operator": "not_in",
+      "values": [
+        "2026-08-02"
+      ],
+      "grammar_version": "research_grammar_v1"
+    },
+    "outcome_spec": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "observation_horizon": 0,
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "binding_notes": [
+      "binding_version=first_experiment_execution_binding_v1_3j3",
+      "executed_question_equals_selected_question",
+      "cohort_strategy=counterexample_period_search"
+    ]
+  },
+  "tool_result_hash": "30a9f15dcc793afd7d578cb4207cfa546250b0aec4975d678c4561d755bf1c52",
+  "raw_quintile_metrics": {
+    "quintile_means": [
+      -0.417532745719201,
+      -0.06763937231746465,
+      0.04048012119072728,
+      0.6013393454050148,
+      1.9343427937275541
+    ],
+    "quintile_ns": [
+      1222,
+      1221,
+      1221,
+      1221,
+      1221
+    ],
+    "low_quintile_mean": -0.417532745719201,
+    "high_quintile_mean": 1.9343427937275541,
+    "quintile_mean_spread": 2.351875539446755,
+    "low_high_delta": 2.351875539446755,
+    "sample_size": 6106
+  },
+  "panel_provenance_hash": "ff537aaacda385fc290e80d852d55f0a3c43148b7ad768117276173c6e9c2349",
+  "execution_outcome": "SUCCESS",
+  "tool_status": "OK",
+  "sample_size": 6106,
+  "warnings": [],
+  "errors": [],
+  "executor_version": "first_experiment_executor_v1_3j3",
+  "created_at": "2026-08-22T05:38:35.848154+00:00",
+  "envelope_hash": "f0874c531ee93af56636c121deabcd12b767435d9b51157712b364cf7aae128f",
+  "persistence_version": "first_experiment_execution_persistence_v1_3j3",
+  "tool_result": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "data_cutoff_date": "2026-08-17",
+    "input_hash": "383e822e4c33a1ed",
+    "sample_size": 6106,
+    "status": "OK",
+    "metrics": {
+      "horizon": "T5",
+      "group_count": 4926,
+      "outcome_spread": 100.0,
+      "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+      "baseline_success_rate": 50.605961349492304,
+      "uses_outcome_spec": true
+    },
+    "diagnostics": {
+      "cutoff": {
+        "data_cutoff_date": "2026-08-17",
+        "rows_before_cutoff_filter": 6248,
+        "rows_excluded_after_t0_cutoff": 0,
+        "rows_after_t0_cutoff": 6248
+      },
+      "population_spec_error": "Operator 'not_in' not allowed",
+      "cohort_n": 6248
+    },
+    "limitations": [],
+    "structured_observations": [
+      {
+        "code": "TRAJECTORY_GROUP_DIFFERENCE",
+        "severity": "MEDIUM",
+        "evidence": {
+          "outcome_spread": 100.0,
+          "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "groups": 4926
+        }
+      }
+    ]
+  },
+  "_artifact_note": "Slim persisted 3J.3 execution envelope (iefx-8fccf6e59b73); groups omitted \u2014 interpretation uses raw_quintile_metrics"
+}

@@ -1,0 +1,17 @@
+{
+  "artifact_03_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "artifact_03_frozen_at": "2026-08-22T02:24:20.667765+00:00",
+  "lineage_contract_hash": "6cde6297c37276cdc22b6f06975e7eff5c928223095ac63aa10e864e809ff9e7",
+  "rebuilt_contract_hash_now": "3ebe58a7453d0bf177ba450f64a6e2cdc31b603f776571897a53a2f01e2f89e2",
+  "post_hoc_contract_hash_matches": false,
+  "root_cause": "build_interpretation_contract() embeds utc_now_iso() frozen_at in hash body; run_minimal_lifecycle() rebuilds contract at execution time",
+  "rule_content_identical": {
+    "supporting_rule": true,
+    "disconfirming_rule": true,
+    "transition_mapping": true,
+    "decision_mapping": true
+  },
+  "scientific_impact": "none \u2014 rules unchanged; provenance link broken between pre-freeze artifact and lineage node",
+  "design_recommendation": "Lineage MUST reference artifact_03 contract_hash directly. Pass pre-built InterpretationContract into run_minimal_lifecycle() OR exclude frozen_at from contract_hash body (store frozen_at separately). Do not modify 3I.7 production behavior in this phase.",
+  "future_lineage_field": "interpretation_contract_ref: {artifact_path, contract_hash}"
+}

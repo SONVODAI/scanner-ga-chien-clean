@@ -1,0 +1,13 @@
+{
+  "generic_builder": "evidence_ledger_builder.py",
+  "adapter_role": "diagnostic_convenience_only",
+  "adapter_uses_generic_builder": true,
+  "builder_proposition_specific_tokens": [],
+  "classification": {
+    "A_generic_lifecycle_normalization": "evidence_ledger_builder.py",
+    "B_proposition_specific": "removed from builder",
+    "C_diagnostic_convenience": "real_ledger_adapter.load_real_lifecycle_events",
+    "D_scientific_inference": "evidence_synthesis_engine.py (frozen)"
+  },
+  "production_path_uses_builder_only": true
+}
