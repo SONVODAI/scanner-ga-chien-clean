@@ -1,0 +1,48 @@
+{
+  "artifact_id": "03_belief_representation",
+  "phase": "3I.6",
+  "status": "DESIGN_ONLY",
+  "recommendation": "CATEGORICAL_EPISTEMIC_STATE_PLUS_EVIDENCE_LEDGER",
+  "rationale": "Least assumption-heavy representation supporting rational next actions without pseudo-precision.",
+  "alternatives_evaluated": {
+    "categorical_epistemic_state": {
+      "pros": ["Auditable", "Matches existing EpistemicStatus", "Clear decision gates"],
+      "cons": ["Coarse granularity"],
+      "verdict": "ADOPT as primary state"
+    },
+    "ordinal_evidence_balance": {
+      "pros": ["Tracks support vs disconfirm without probability", "Handles CONFLICTED naturally"],
+      "cons": ["Requires explicit aggregation rules"],
+      "verdict": "ADOPT as secondary ledger"
+    },
+    "bayesian_probability": {
+      "pros": ["Formal belief updating"],
+      "cons": ["Requires priors", "Pseudo-precision risk", "Hard to audit without full model"],
+      "verdict": "REJECT at this stage"
+    },
+    "scalar_confidence_only": {
+      "pros": ["Simple"],
+      "cons": ["PropositionRecord.confidence already LOW at birth — no update path", "Obscures contradiction"],
+      "verdict": "REJECT as sole representation"
+    },
+    "evidence_ledger_without_scalar": {
+      "pros": ["Full audit trail", "No hidden belief compression"],
+      "cons": ["Requires interpreter to summarize for decisions"],
+      "verdict": "ADOPT as append-only store"
+    }
+  },
+  "proposed_structure": {
+    "epistemic_state": "One of minimum vocabulary (artifact 01)",
+    "evidence_ledger": {
+      "entries": "Append-only EvidenceInterpretationRecord[]",
+      "fields_per_entry": ["evidence_class", "experiment_id", "quality_tier", "direction_vs_expectation", "exclusion_reason_if_invalid"]
+    },
+    "ordinal_balance": {
+      "supporting_independent_count": "int — quality-weighted, not raw count",
+      "disconfirming_independent_count": "int",
+      "contradiction_flag": "bool",
+      "last_informative_evidence_at": "ISO8601"
+    },
+    "no_numeric_probability": true
+  }
+}
