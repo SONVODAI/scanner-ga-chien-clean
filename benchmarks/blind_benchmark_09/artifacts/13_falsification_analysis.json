@@ -1,0 +1,16 @@
+{
+  "falsification_needs_recognized_total": 10,
+  "falsification_candidates_constructed_total": 2,
+  "falsification_experiments_executed": 1,
+  "falsification_events": [
+    {
+      "experiment_node_id": "exp-ce4706215fe5",
+      "tool": "sensitivity_analysis",
+      "observation_codes": [
+        "EXTREME_WINNER_ROBUST"
+      ]
+    }
+  ],
+  "falsification_warranted_by_evidence": true,
+  "falsification_attempted_when_warranted": true
+}
