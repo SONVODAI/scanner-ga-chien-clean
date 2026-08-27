@@ -1,0 +1,57 @@
+{
+  "choices": [
+    {
+      "locus": "disconfirming_observation_spec at birth",
+      "author": "opr_generator_v1_3i2 / proposition_synthesizer",
+      "classification": "SCIENTIFIC PRIOR (autonomous at proposition birth, frozen before 3I.7 test)",
+      "blocks_readiness": false
+    },
+    {
+      "locus": "interpretation contract spread floors (0.5, 0.0)",
+      "author": "interpretation_contract.py constants",
+      "classification": "REPRESENTATIONAL CHOICE",
+      "blocks_readiness": false,
+      "note": "Frozen before 3I.7 result; applies to interpretation not candidate selection"
+    },
+    {
+      "locus": "FALSIFY_* template triggers in research_actions",
+      "author": "GAP-code mapping from research_interpreter",
+      "classification": "SCIENTIFIC PRIOR (human template catalog)",
+      "blocks_readiness": true,
+      "note": "Not proposition-scoped \u2014 cannot serve OPR falsification autonomy"
+    },
+    {
+      "locus": "Which falsification strategy to run after SEEK_FALSIFICATION",
+      "author": "NONE \u2014 no generator exists",
+      "classification": "MISSING AUTONOMY",
+      "blocks_readiness": true
+    },
+    {
+      "locus": "Grammar allowed population filters",
+      "author": "research_grammar_v1 schema",
+      "classification": "EXECUTION CONSTRAINT",
+      "blocks_readiness": false
+    },
+    {
+      "locus": "Tool registry availability",
+      "author": "research_tools build_default_tool_registry",
+      "classification": "EXECUTION CONSTRAINT",
+      "blocks_readiness": false
+    },
+    {
+      "locus": "Lexicographic selector criteria ordering",
+      "author": "Phase 3I.8 design (not yet implemented)",
+      "classification": "REPRESENTATIONAL CHOICE",
+      "blocks_readiness": false,
+      "note": "Must be frozen before candidate set examination in 3I.9"
+    },
+    {
+      "locus": "Panel data cutoff date",
+      "author": "proposition evidence_anchor",
+      "classification": "SAFETY CONSTRAINT",
+      "blocks_readiness": false
+    }
+  ],
+  "scientific_intent_still_human_selected_for_falsification_choice": true,
+  "reason": "No FalsificationCandidateGenerator \u2014 SEEK_FALSIFICATION is a terminal label"
+}

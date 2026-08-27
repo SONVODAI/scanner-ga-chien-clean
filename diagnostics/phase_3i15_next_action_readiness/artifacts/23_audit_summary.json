@@ -1,0 +1,12 @@
+{
+  "phase": "3I.15",
+  "mode": "AUDIT + DESIGN ONLY",
+  "branch": "cursor/phase-3i15-next-action-readiness-aad2",
+  "head": "5cf3241895693701dd3bfe248d60e7169c4d2b91",
+  "prior_accepted": "3I.14 AUTOMATIC_SYNTHESIS_HOOK_PASS",
+  "verdict": "PARTIALLY_READY",
+  "missing_capability": "ScientificActionGenerator",
+  "new_experiment": false,
+  "implementation": false,
+  "artifact_count": 23
+}
