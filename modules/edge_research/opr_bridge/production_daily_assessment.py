@@ -346,7 +346,7 @@ def build_daily_summary(
     forward_new = tuple(
         oid for a in assessments for oid in a.forward_outcomes_newly_available
     )
-    silence = not assessments and not new_observation_ids
+    silence = not new_observation_ids
 
     market_deltas = [a.market_delta for a in assessments]
     most_delta = None

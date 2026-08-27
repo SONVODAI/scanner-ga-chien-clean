@@ -30,6 +30,22 @@ from modules.edge_research.outcomes import attach_outcomes_to_panel
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+
+def _repo_paths(repo_root: Optional[Path] = None) -> Dict[str, Path]:
+    """Resolve read-only earning_learning / market source paths for a repo root."""
+    root = repo_root or REPO_ROOT
+    el = root / "data" / "earning_learning"
+    return {
+        "earning_learning": el,
+        "observations": el / "observations.csv",
+        "t0_observation_freeze": el / "t0_observation_freeze.csv",
+        "market_t0_snapshot": el / "market_t0_snapshot.csv",
+        "outcomes": el / "outcomes.csv",
+        "pattern_history": root / "pattern_history.csv",
+        "buy_elite_history": root / "buy_elite_learning_history.csv",
+    }
+
+
 EARNING_LEARNING_DIR = REPO_ROOT / "data" / "earning_learning"
 PATTERN_HISTORY_PATH = REPO_ROOT / "pattern_history.csv"
 BUY_ELITE_HISTORY_PATH = REPO_ROOT / "buy_elite_learning_history.csv"
@@ -54,14 +70,16 @@ def load_verified_decisions(path: Optional[Path] = None) -> pd.DataFrame:
     return _read_csv(p)
 
 
-def load_observations(path: Optional[Path] = None) -> pd.DataFrame:
-    p = path or (EARNING_LEARNING_DIR / "observations.csv")
+def load_observations(path: Optional[Path] = None, *, repo_root: Optional[Path] = None) -> pd.DataFrame:
+    paths = _repo_paths(repo_root)
+    p = path or paths["observations"]
     return _read_csv(p)
 
 
-def load_t0_observation_freeze(path: Optional[Path] = None) -> pd.DataFrame:
+def load_t0_observation_freeze(path: Optional[Path] = None, *, repo_root: Optional[Path] = None) -> pd.DataFrame:
     """Authoritative AFTER_CLOSE T0 freeze rows (may start later than observations)."""
-    p = path or (EARNING_LEARNING_DIR / "t0_observation_freeze.csv")
+    paths = _repo_paths(repo_root)
+    p = path or paths["t0_observation_freeze"]
     return _read_csv(p)
 
 
@@ -70,7 +88,7 @@ def load_pattern_snapshot(path: Optional[Path] = None) -> pd.DataFrame:
     return _read_csv(p)
 
 
-def load_production_t0_stock_frame() -> pd.DataFrame:
+def load_production_t0_stock_frame(repo_root: Optional[Path] = None) -> pd.DataFrame:
     """
     Resolve T0 stock rows for the research panel without waiting for outcomes.
 
@@ -83,8 +101,8 @@ def load_production_t0_stock_frame() -> pd.DataFrame:
       2) overlay t0_observation_freeze.csv when present (authoritative EOD freeze).
     Forward labels remain attached separately via outcomes.csv / OHLCV.
     """
-    obs = load_observations()
-    freeze = load_t0_observation_freeze()
+    obs = load_observations(repo_root=repo_root)
+    freeze = load_t0_observation_freeze(repo_root=repo_root)
     if obs.empty and freeze.empty:
         # Last-resort historical fallback (outcome-gated; may lag current EOD).
         return load_lifecycle()
@@ -113,11 +131,14 @@ def load_production_t0_stock_frame() -> pd.DataFrame:
 def load_raw_market_snapshots(
     start: Optional[str] = None,
     end: Optional[str] = None,
+    *,
+    repo_root: Optional[Path] = None,
 ) -> List[RawMarketSnapshot]:
     """Load raw market snapshots from read-only repo sources."""
+    paths = _repo_paths(repo_root)
     frames: List[pd.DataFrame] = []
 
-    md = _read_csv(MARKET_T0_SNAPSHOT_PATH)
+    md = _read_csv(paths["market_t0_snapshot"])
     if not md.empty and "market_real" in md.columns:
         date_col = "trade_date" if "trade_date" in md.columns else "date"
         sub = md[[date_col, "time", "market_real", "market_forecast", "breadth_score"]].copy()
@@ -126,7 +147,7 @@ def load_raw_market_snapshots(
         sub["source"] = "market_t0_snapshot"
         frames.append(sub)
 
-    ph = _read_csv(PATTERN_HISTORY_PATH)
+    ph = _read_csv(paths["pattern_history"])
     if not ph.empty and {"date", "market_real"}.issubset(ph.columns):
         sub = ph[["date", "time", "market_real", "market_forecast", "breadth_score"]].copy()
         sub = sub.dropna(subset=["date"])
@@ -134,7 +155,7 @@ def load_raw_market_snapshots(
         sub["source"] = "pattern_history"
         frames.append(sub)
 
-    be = _read_csv(BUY_ELITE_HISTORY_PATH)
+    be = _read_csv(paths["buy_elite_history"])
     if not be.empty and "market_real" in be.columns:
         sub = be[["date", "time", "market_real", "market_forecast"]].copy()
         sub["breadth_score"] = np.nan
@@ -185,8 +206,10 @@ def load_raw_market_snapshots(
 def build_canonical_market_series(
     start: Optional[str] = None,
     end: Optional[str] = None,
+    *,
+    repo_root: Optional[Path] = None,
 ) -> pd.DataFrame:
-    snapshots = load_raw_market_snapshots(start=start, end=end)
+    snapshots = load_raw_market_snapshots(start=start, end=end, repo_root=repo_root)
     if not snapshots:
         return pd.DataFrame(
             columns=["date", "market_real", "market_forecast", "breadth_score", "ambiguous"]
@@ -217,14 +240,14 @@ def build_canonical_market_series(
     return pd.DataFrame(canonical_rows)
 
 
-def attach_outcomes_from_outcomes_csv(panel: pd.DataFrame) -> pd.DataFrame:
+def attach_outcomes_from_outcomes_csv(panel: pd.DataFrame, *, repo_root: Optional[Path] = None) -> pd.DataFrame:
     """
     Read-only join to earning_learning outcomes.csv (explicit target_date labels).
     Does NOT use lifecycle t*_return_pct observation-row columns.
     """
     if panel.empty:
         return panel.copy()
-    outcomes = _read_csv(OUTCOMES_PATH)
+    outcomes = _read_csv(_repo_paths(repo_root)["outcomes"])
     if outcomes.empty:
         return panel.copy()
 
@@ -310,16 +333,18 @@ def _stock_panel_from_lifecycle(
 def _resolve_stock_source_frame(
     source: str,
     lifecycle: Optional[pd.DataFrame] = None,
+    *,
+    repo_root: Optional[Path] = None,
 ) -> pd.DataFrame:
     """Select the T0 stock source frame for panel construction."""
     if lifecycle is not None:
         return lifecycle
     if source in ("production_t0", "auto", "observations_with_freeze"):
-        return load_production_t0_stock_frame()
+        return load_production_t0_stock_frame(repo_root=repo_root)
     if source == "observations":
-        return load_observations()
+        return load_observations(repo_root=repo_root)
     if source == "t0_observation_freeze":
-        return load_t0_observation_freeze()
+        return load_t0_observation_freeze(repo_root=repo_root)
     if source == "verified_decisions":
         return load_verified_decisions()
     if source == "pattern_snapshot":
@@ -336,6 +361,7 @@ def build_research_panel(
     source: str = "production_t0",
     panel_manifest: Optional[PanelExposureManifest] = None,
     contract_wired: Optional[FrozenSet[str]] = None,
+    repo_root: Optional[Path] = None,
 ) -> pd.DataFrame:
     """
     Build canonical research panel (read-only sources).
@@ -348,7 +374,7 @@ def build_research_panel(
     Forward labels from trading-session OHLCV when provided — never from
     lifecycle t*_return_pct (observation-row semantics).
     """
-    stock_src = _resolve_stock_source_frame(source, lifecycle=lifecycle)
+    stock_src = _resolve_stock_source_frame(source, lifecycle=lifecycle, repo_root=repo_root)
     stock = _stock_panel_from_lifecycle(
         stock_src,
         start=start,
@@ -359,7 +385,7 @@ def build_research_panel(
     if stock.empty:
         return pd.DataFrame(columns=list(RESEARCH_OBSERVATION_COLUMNS))
 
-    market_canonical = build_canonical_market_series(start=start, end=end)
+    market_canonical = build_canonical_market_series(start=start, end=end, repo_root=repo_root)
     if market_canonical.empty:
         market_series = pd.DataFrame(
             columns=["date", "market_real", "market_forecast", "breadth_score", "ambiguous"]
@@ -420,7 +446,7 @@ def build_research_panel(
         panel["t10_return"] = np.nan
         panel["outcome_source"] = "unavailable"
         panel["outcome_missing_reason"] = "ohlcv_not_provided"
-        panel = attach_outcomes_from_outcomes_csv(panel)
+        panel = attach_outcomes_from_outcomes_csv(panel, repo_root=repo_root)
 
     for col in RESEARCH_OBSERVATION_COLUMNS:
         if col not in panel.columns:

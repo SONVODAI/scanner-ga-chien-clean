@@ -20,7 +20,7 @@ from modules.edge_research.opr_bridge.production_observation_records import (
     DEFAULT_SHADOW_AUTHORITY,
     ShadowAuthoritySemantics,
 )
-from modules.edge_research.storage import resolve_data_dir
+from modules.edge_research.storage import resolve_production_runs_root
 
 RUN_PERSISTENCE_VERSION = "production_daily_run_persistence_v1_3k2"
 RUNS_DIR = "daily_runs"
@@ -32,7 +32,7 @@ MANIFEST_LEDGER = "daily_manifest_ledger.jsonl"
 
 
 def runs_root(data_dir: Optional[Path] = None) -> Path:
-    root = resolve_data_dir(data_dir) / "production_observations"
+    root = resolve_production_runs_root(data_dir)
     root.mkdir(parents=True, exist_ok=True)
     return root
 

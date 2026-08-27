@@ -13,8 +13,13 @@ from modules.edge_research.opr_bridge.production_daily_assessment import (
     build_daily_assessment,
     build_daily_summary,
 )
+from modules.edge_research.opr_bridge.production_daily_voice import (
+    render_daily_voice,
+    render_session_market_voice,
+)
 from modules.edge_research.opr_bridge.production_living_observation_persistence import (
     persist_summary,
+    persist_session_voice,
 )
 from modules.edge_research.opr_bridge.production_living_observation_records import (
     HISTORICAL_MULTI_DAY_REPLAY,
@@ -41,6 +46,7 @@ def run_daily_living_assessment(
     *,
     assessment_trade_date: str,
     observation_ids: Optional[List[str]] = None,
+    new_observation_ids: Optional[List[str]] = None,
     data_dir: Optional[Path] = None,
     persist: bool = True,
     replay_mode: Optional[str] = None,
@@ -74,19 +80,24 @@ def run_daily_living_assessment(
         all_new_outcomes.extend(outcomes)
 
     snap = extract_market_snapshot(truncated, assessment_trade_date)
+    born_ids = tuple(new_observation_ids or ())
     summary = build_daily_summary(
         trade_date=assessment_trade_date,
         assessments=assessments,
         market_snapshot=snap,
+        new_observation_ids=born_ids,
         replay_mode=replay_mode,
     )
+    session_voice = render_session_market_voice(summary, assessments)
     if persist:
         persist_summary(summary, data_dir=data_dir)
+        persist_session_voice(session_voice, data_dir=data_dir)
 
     return {
         "assessment_trade_date": assessment_trade_date,
         "assessments": [a.to_dict() for a in assessments],
         "summary": summary.to_dict(),
+        "session_voice": session_voice.to_dict(),
         "new_outcome_count": len(all_new_outcomes),
         "idempotent_keys": [a.assessment_identity_hash for a in assessments],
     }
