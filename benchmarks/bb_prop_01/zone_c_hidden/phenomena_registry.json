@@ -1,0 +1,186 @@
+{
+  "registry_id": "bb_prop_01_zone_c_v1",
+  "phase": "3I.3",
+  "status": "EVALUATOR_ONLY",
+  "warning": "THIS FILE MUST NOT BE IMPORTED BY OPR GENERATOR RUNTIME",
+  "phenomenon_count": 10,
+  "phenomena": [
+    {
+      "phenomenon_id": "PHEN_001",
+      "scientific_description": "In STRESS market state, stocks with RS10<=-10 and RS5 in (-5,0] show elevated T10 forward returns vs same-transition baseline.",
+      "embedding_text": "stress market rs10 oversold rs5 weak positive forward t10 return incremental edge",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs10", "rs5", "research_market_state"],
+        "outcome": "t10_return",
+        "horizon": 10,
+        "relation": "conditional_incremental"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000001",
+        "discovery_run_id": "b9fd8f21c1a6",
+        "timestamp": "2026-08-19T13:01:32Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_002",
+      "scientific_description": "In STRESS, RS5<=-10 combined with RS_SPREAD>5 predicts higher T10 returns.",
+      "embedding_text": "stress rs5 deep negative rs spread wide forward t10 outperformance",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs5", "rs_spread"],
+        "outcome": "t10_return",
+        "horizon": 10,
+        "relation": "threshold_conditional"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000002",
+        "discovery_run_id": "b9fd8f21c1a6",
+        "timestamp": "2026-08-19T13:01:32Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_003",
+      "scientific_description": "RS_SPREAD>5 with RSI14<=30 in stress-transition episodes predicts T10 outperformance.",
+      "embedding_text": "rs spread elevated rsi oversold stress transition t10 return edge",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs_spread", "rsi14"],
+        "outcome": "t10_return",
+        "horizon": 10,
+        "relation": "interaction_threshold"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000003",
+        "discovery_run_id": "b9fd8f21c1a6",
+        "timestamp": "2026-08-19T13:01:32Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_004",
+      "scientific_description": "In BROAD_RECOVERY after EARLY_RECOVERY transition, RS10<=-10 names outperform on T10 horizon.",
+      "embedding_text": "broad recovery early recovery transition rs10 oversold t10 forward return",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs10", "research_market_transition"],
+        "outcome": "t10_return",
+        "horizon": 10,
+        "relation": "regime_conditional"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000005",
+        "discovery_run_id": "b9fd8f21c1a6",
+        "timestamp": "2026-08-19T13:01:32Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_005",
+      "scientific_description": "In EARLY_RECOVERY from BROAD_RECOVERY, deeply oversold RS10<=-10 predicts T5 rebound.",
+      "embedding_text": "early recovery broad recovery reversal rs10 oversold t5 return rebound",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs10", "research_market_transition"],
+        "outcome": "t5_return",
+        "horizon": 5,
+        "relation": "regime_conditional"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000029",
+        "discovery_run_id": "81f99e159d9a",
+        "timestamp": "2026-08-19T13:02:52Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_006",
+      "scientific_description": "Cross-sectional RS_SPREAD>5 alone in STRESS episodes shows incremental T10 return vs baseline.",
+      "embedding_text": "rs spread threshold stress market forward t10 incremental return",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs_spread"],
+        "outcome": "t10_return",
+        "horizon": 10,
+        "relation": "threshold_filter"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000017",
+        "discovery_run_id": "b9fd8f21c1a6",
+        "timestamp": "2026-08-19T13:01:32Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_007",
+      "scientific_description": "Market breadth deterioration (delta_breadth_3 negative) coincides with cross-sectional return dispersion widening.",
+      "embedding_text": "breadth decline cross sectional return dispersion widening market structure",
+      "population_outcome_horizon_signature": {
+        "population_features": ["delta_breadth_3", "pct_rs10_negative"],
+        "outcome": "t5_return",
+        "horizon": 5,
+        "relation": "macro_micro_interaction"
+      },
+      "discovery_provenance": {
+        "source": "pattern_history.csv aggregate analysis",
+        "note": "Independent macro-structure observation predating OPR",
+        "timestamp": "2026-07-15T00:00:00Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_008",
+      "scientific_description": "Horizon heterogeneity: relationships stable at T3 weaken or invert by T10 for oversold cohorts.",
+      "embedding_text": "horizon stability t3 t5 t10 oversold cohort return decay",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs10"],
+        "outcome": "multi_horizon",
+        "horizon": 10,
+        "relation": "horizon_decay"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/discovery_runs.csv",
+        "run_id": "16be6274546d",
+        "timestamp": "2026-08-19T13:02:43Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_009",
+      "scientific_description": "RS5>-5 & RS5<=0 & RS_SPREAD>5 in STRESS shows intermediate forward return advantage at T10.",
+      "embedding_text": "rs5 weak negative rs spread wide stress intermediate t10 edge",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs5", "rs_spread"],
+        "outcome": "t10_return",
+        "horizon": 10,
+        "relation": "multi_threshold"
+      },
+      "discovery_provenance": {
+        "source": "data/edge_research/edge_hypothesis_ledger.csv",
+        "edge_id": "EDGE-000014",
+        "discovery_run_id": "b9fd8f21c1a6",
+        "timestamp": "2026-08-19T13:01:32Z",
+        "independent_of_opr": true
+      }
+    },
+    {
+      "phenomenon_id": "PHEN_010",
+      "scientific_description": "Cross-sectional dispersion of RS_SPREAD predicts differential forward T5 returns across quintile tiers on high-dispersion dates.",
+      "embedding_text": "cross sectional dispersion rs spread quintile forward t5 return differential",
+      "population_outcome_horizon_signature": {
+        "population_features": ["rs_spread"],
+        "outcome": "t5_return",
+        "horizon": 5,
+        "relation": "cross_sectional_dispersion_quintile"
+      },
+      "discovery_provenance": {
+        "source": "Independent empirical structure hypothesis for OPR primitive evaluation",
+        "note": "Structural analogue to dispersion anomaly class — NOT used in generator",
+        "timestamp": "2026-08-22T00:00:00Z",
+        "independent_of_opr": true
+      }
+    }
+  ]
+}
