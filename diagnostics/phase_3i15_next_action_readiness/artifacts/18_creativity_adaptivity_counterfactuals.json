@@ -1,0 +1,41 @@
+{
+  "tests": [
+    {
+      "id": "CF-01",
+      "manipulation": "Change unresolved uncertainty while holding tools constant",
+      "expected": "Candidate scientific action set changes",
+      "current_system": "FAIL \u2014 3I.9 always emits holdout regardless of synthesis axes"
+    },
+    {
+      "id": "CF-02",
+      "manipulation": "Change prior evidence independence profile",
+      "expected": "Candidate ranking changes",
+      "current_system": "FAIL \u2014 no ranking over multi-axis candidates"
+    },
+    {
+      "id": "CF-03",
+      "manipulation": "Remove contradiction from synthesis",
+      "expected": "Contradiction-resolution actions disappear",
+      "current_system": "FAIL \u2014 no contradiction actions generated"
+    },
+    {
+      "id": "CF-04",
+      "manipulation": "Saturate one uncertainty dimension",
+      "expected": "Actions targeting it lose priority",
+      "current_system": "PARTIAL \u2014 synthesis marks redundant_test_axes but generator ignores"
+    },
+    {
+      "id": "CF-05",
+      "manipulation": "Change only tool availability",
+      "expected": "Scientific objective unchanged; executability status may change",
+      "current_system": "FAIL \u2014 tool defines candidate existence in 3I.9"
+    },
+    {
+      "id": "CF-06",
+      "manipulation": "Change representation only (same cohort semantics)",
+      "expected": "Scientific action core hash unchanged",
+      "current_system": "NOT TESTED \u2014 no core hash layer"
+    }
+  ],
+  "pass_requirement": "All CF tests must pass in 3I.16 implementation"
+}
