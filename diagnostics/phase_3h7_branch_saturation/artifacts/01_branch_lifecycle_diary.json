@@ -1,0 +1,693 @@
+[
+  {
+    "transition": 1,
+    "experiment_id": "exp-1b163c2078b0",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "LOCAL",
+    "tool": "horizon_comparison",
+    "intent": "REFRAME",
+    "uncertainty_addressed": "FRAME_REFRAME",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ]
+    },
+    "information_value_contribution": 0.0,
+    "base_planner_score": 10.15,
+    "final_planner_score": 10.15,
+    "erv_components": {
+      "exploration_component": 2.6,
+      "exploitation_component": 1.5,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 4.199999999999999,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 16.83,
+    "best_local_erv": 16.83,
+    "best_frontier_erv": 0.0,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "information_gain_class": "LOW_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 1
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "INCREASING_OR_STABLE"
+  },
+  {
+    "transition": 2,
+    "experiment_id": "exp-d2e781b13246",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "frame-00007",
+    "source": "LOCAL",
+    "tool": "horizon_comparison",
+    "intent": "FALSIFICATION",
+    "uncertainty_addressed": "EXTREME_WINNER",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ]
+    },
+    "information_value_contribution": 2.25,
+    "base_planner_score": 4.2875,
+    "final_planner_score": 6.5375,
+    "erv_components": {
+      "exploration_component": 0.0,
+      "exploitation_component": 2.5,
+      "falsification_component": 2.025,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 6.7375,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 14.635625,
+    "best_local_erv": 14.635625,
+    "best_frontier_erv": 6.73875,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "information_gain_class": "REDUNDANT",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 2
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "INCREASING_OR_STABLE"
+  },
+  {
+    "transition": 3,
+    "experiment_id": "exp-76e1a836a5bc",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "FRONTIER",
+    "tool": "sensitivity_analysis",
+    "intent": null,
+    "uncertainty_addressed": null,
+    "evidence_before": {
+      "information_gaps": [],
+      "falsification_targets": [],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "sensitivity_analysis"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "EXTREME_WINNER_ROBUST"
+      ]
+    },
+    "information_value_contribution": null,
+    "base_planner_score": null,
+    "final_planner_score": null,
+    "erv_components": {
+      "exploration_component": 1.3,
+      "exploitation_component": 1.5,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 7.437499999999999,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 4.968750000000002,
+    "best_local_erv": 0.0,
+    "best_frontier_erv": 4.968750000000002,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "EXTREME_WINNER_ROBUST"
+    ],
+    "information_gain_class": "HIGH_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 3
+    },
+    "resolved_new": true,
+    "marginal_branch_value": "INCREASING_OR_STABLE"
+  },
+  {
+    "transition": 4,
+    "experiment_id": "exp-310e6edee836",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "frame-00006",
+    "source": "LOCAL",
+    "tool": "horizon_comparison",
+    "intent": "SLICING",
+    "uncertainty_addressed": "ADAPTIVE_PARTITION",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ]
+    },
+    "information_value_contribution": 0.0,
+    "base_planner_score": -1.5999999999999996,
+    "final_planner_score": -1.5999999999999996,
+    "erv_components": {
+      "exploration_component": 2.0,
+      "exploitation_component": 1.5,
+      "falsification_component": 0.0,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 9.1,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 5.49,
+    "best_local_erv": 5.49,
+    "best_frontier_erv": 0.9733333333333335,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "information_gain_class": "LOW_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 2
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "INCREASING_OR_STABLE"
+  },
+  {
+    "transition": 5,
+    "experiment_id": "exp-7dc0eb0c8fb0",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "LOCAL",
+    "tool": "adaptive_partition_compare",
+    "intent": "EXPLORE_THRESHOLD",
+    "uncertainty_addressed": "THRESHOLD_EXPLORATION",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ]
+    },
+    "information_value_contribution": 2.5,
+    "base_planner_score": 1.0875000000000004,
+    "final_planner_score": 3.5875000000000004,
+    "erv_components": {
+      "exploration_component": 0.0,
+      "exploitation_component": 7.64393675,
+      "falsification_component": 0.0,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 3.0,
+      "complexity_penalty": 10.4125,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 12.19018675,
+    "best_local_erv": 12.19018675,
+    "best_frontier_erv": 2.029583333333333,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "SHAPE_STEP_CHANGE",
+      "TRAJECTORY_GROUP_DIFFERENCE"
+    ],
+    "information_gain_class": "MODERATE_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 3
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "FLAT"
+  },
+  {
+    "transition": 6,
+    "experiment_id": "exp-e0d883184cab",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "LOCAL",
+    "tool": "threshold_exploration",
+    "intent": "DECOMPOSITION",
+    "uncertainty_addressed": "SYMBOL_DISTRIBUTION",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ]
+    },
+    "information_value_contribution": 2.5,
+    "base_planner_score": -6.462499999999999,
+    "final_planner_score": -3.9624999999999986,
+    "erv_components": {
+      "exploration_component": 0.6,
+      "exploitation_component": 5.0,
+      "falsification_component": 0.0,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 11.462499999999999,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 4.3616875,
+    "best_local_erv": 4.3616875,
+    "best_frontier_erv": 4.2508541666666675,
+    "best_deferred_erv": 4.2508541666666675,
+    "context_switch": false,
+    "result_observations": [
+      "TRAJECTORY_GROUP_DIFFERENCE"
+    ],
+    "information_gain_class": "HIGH_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 4
+    },
+    "resolved_new": true,
+    "marginal_branch_value": "FLAT"
+  },
+  {
+    "transition": 7,
+    "experiment_id": "exp-82504efb7e41",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "REVISIT",
+    "tool": "symbol_decomposition",
+    "intent": null,
+    "uncertainty_addressed": null,
+    "evidence_before": {
+      "information_gaps": [],
+      "falsification_targets": [],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration",
+        "symbol_decomposition"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "SYMBOL_BROAD"
+      ]
+    },
+    "information_value_contribution": null,
+    "base_planner_score": null,
+    "final_planner_score": null,
+    "erv_components": {
+      "exploration_component": 1.7333333333333334,
+      "exploitation_component": 2.5,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 12.1625,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 1.1443541666666666,
+    "best_local_erv": 0.0,
+    "best_frontier_erv": 1.1443541666666666,
+    "best_deferred_erv": 1.1443541666666666,
+    "context_switch": false,
+    "result_observations": [
+      "SYMBOL_BROAD"
+    ],
+    "information_gain_class": "HIGH_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 5
+    },
+    "resolved_new": true,
+    "marginal_branch_value": "FLAT"
+  },
+  {
+    "transition": 8,
+    "experiment_id": "exp-38879aba5554",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "frame-00002",
+    "source": "LOCAL",
+    "tool": "horizon_comparison",
+    "intent": "REFRAME",
+    "uncertainty_addressed": "OUTCOME_SPEC_ALTERNATIVE",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ]
+    },
+    "information_value_contribution": 0.0,
+    "base_planner_score": -4.999999999999999,
+    "final_planner_score": -4.999999999999999,
+    "erv_components": {
+      "exploration_component": 0.8,
+      "exploitation_component": 1.5,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 14.35,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": -1.0782499999999995,
+    "best_local_erv": -1.0782499999999995,
+    "best_frontier_erv": -4.092125,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "information_gain_class": "LOW_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 2
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "DECLINING"
+  },
+  {
+    "transition": 9,
+    "experiment_id": "exp-03165d3a7dec",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "LOCAL",
+    "tool": "horizon_comparison",
+    "intent": "SLICING",
+    "uncertainty_addressed": "ADAPTIVE_PARTITION",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ]
+    },
+    "information_value_contribution": 0.0,
+    "base_planner_score": -8.487499999999999,
+    "final_planner_score": -8.487499999999999,
+    "erv_components": {
+      "exploration_component": 1.75,
+      "exploitation_component": 2.5,
+      "falsification_component": 0.0,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 15.487499999999999,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": -2.1133124999999993,
+    "best_local_erv": -2.1133124999999993,
+    "best_frontier_erv": -4.365812499999999,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "information_gain_class": "REDUNDANT",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 3
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "DECLINING"
+  },
+  {
+    "transition": 10,
+    "experiment_id": "exp-37b8e05cc4bd",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "LOCAL",
+    "tool": "adaptive_partition_compare",
+    "intent": "EXPLORE_THRESHOLD",
+    "uncertainty_addressed": "THRESHOLD_EXPLORATION",
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ]
+    },
+    "information_value_contribution": 2.5,
+    "base_planner_score": -5.799999999999997,
+    "final_planner_score": -3.299999999999997,
+    "erv_components": {
+      "exploration_component": 0.0,
+      "exploitation_component": 7.75,
+      "falsification_component": 0.0,
+      "novelty_component": 2.0,
+      "redundancy_penalty": 3.0,
+      "complexity_penalty": 16.799999999999997,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": 3.799500000000002,
+    "best_local_erv": 3.799500000000002,
+    "best_frontier_erv": -4.317999999999997,
+    "best_deferred_erv": 0.0,
+    "context_switch": false,
+    "result_observations": [
+      "SHAPE_STEP_CHANGE",
+      "TRAJECTORY_GROUP_DIFFERENCE"
+    ],
+    "information_gain_class": "MODERATE_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 4
+    },
+    "resolved_new": false,
+    "marginal_branch_value": "DECLINING"
+  },
+  {
+    "transition": 11,
+    "experiment_id": "exp-3e90dbf9a738",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "",
+    "source": "REVISIT",
+    "tool": "threshold_exploration",
+    "intent": null,
+    "uncertainty_addressed": null,
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ]
+    },
+    "information_value_contribution": null,
+    "base_planner_score": null,
+    "final_planner_score": null,
+    "erv_components": {
+      "exploration_component": 1.65,
+      "exploitation_component": 5.0,
+      "falsification_component": 0.0,
+      "novelty_component": 0.6,
+      "redundancy_penalty": 0.0,
+      "complexity_penalty": 17.15,
+      "sample_burden_penalty": 0.0
+    },
+    "selected_erv": -1.6114999999999993,
+    "best_local_erv": -2.2714999999999996,
+    "best_frontier_erv": -1.6114999999999993,
+    "best_deferred_erv": -1.6114999999999993,
+    "context_switch": false,
+    "result_observations": [
+      "TRAJECTORY_GROUP_DIFFERENCE"
+    ],
+    "information_gain_class": "HIGH_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 5
+    },
+    "resolved_new": true,
+    "marginal_branch_value": "FLAT"
+  },
+  {
+    "transition": 12,
+    "experiment_id": "exp-3f17dab233c5",
+    "branch_root_id": "obs-b08a47b141fd",
+    "frame_id": "frame-00004",
+    "source": null,
+    "tool": "horizon_comparison",
+    "intent": null,
+    "uncertainty_addressed": null,
+    "evidence_before": {
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ]
+    },
+    "information_value_contribution": null,
+    "base_planner_score": null,
+    "final_planner_score": null,
+    "erv_components": null,
+    "selected_erv": null,
+    "best_local_erv": null,
+    "best_frontier_erv": null,
+    "best_deferred_erv": null,
+    "context_switch": null,
+    "result_observations": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "information_gain_class": "HIGH_INFORMATION_GAIN",
+    "redundancy_state": {
+      "tool_repeated_on_branch": true,
+      "branch_tool_count": 2
+    },
+    "resolved_new": true,
+    "marginal_branch_value": "FLAT"
+  }
+]

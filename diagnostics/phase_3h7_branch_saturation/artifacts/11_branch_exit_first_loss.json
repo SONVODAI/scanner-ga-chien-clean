@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "transition": 7,
+      "first_loss_layer": "L12",
+      "reason": "Stay selected despite negative ERV"
+    },
+    {
+      "transition": 8,
+      "first_loss_layer": "L9",
+      "reason": "All exit alternatives also negative ERV \u2014 local least bad"
+    },
+    {
+      "transition": 9,
+      "first_loss_layer": "L9",
+      "reason": "All exit alternatives also negative ERV \u2014 local least bad"
+    },
+    {
+      "transition": 10,
+      "first_loss_layer": "L9",
+      "reason": "All exit alternatives also negative ERV \u2014 local least bad"
+    },
+    {
+      "transition": 11,
+      "first_loss_layer": "L11",
+      "reason": "STOP not competitive (-100 penalty); budget continues"
+    }
+  ],
+  "aggregate_counts": {
+    "L12": 1,
+    "L9": 3,
+    "L11": 1
+  },
+  "layer_names": {
+    "L1": "SATURATION EVIDENCE",
+    "L2": "SATURATION RECOGNITION",
+    "L3": "EXIT NEED",
+    "L4": "EXIT CAPABILITY",
+    "L5": "EXIT CANDIDATE CONSTRUCTION",
+    "L6": "FILTER",
+    "L7": "PLANNER VALUE",
+    "L8": "INFORMATION VALUE",
+    "L9": "PORTFOLIO / ERV",
+    "L10": "GLOBAL ALLOCATION",
+    "L11": "STOP COMPETITION",
+    "L12": "EXIT / STAY"
+  },
+  "primary_first_loss": "L9"
+}

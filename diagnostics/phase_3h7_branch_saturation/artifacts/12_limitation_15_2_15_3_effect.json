@@ -1,0 +1,39 @@
+{
+  "limitation_15_2": {
+    "description": "Frontier exploitation uses current-branch assessment not branch-origin reconstruction",
+    "materially_contributes": true,
+    "evidence": [
+      {
+        "transition": 3,
+        "source": "FRONTIER",
+        "selected_erv": 4.968750000000002,
+        "note_15_2": "Frontier revaluation uses current experiment assessment for exploitation/MIG"
+      },
+      {
+        "transition": 7,
+        "source": "REVISIT",
+        "selected_erv": 1.1443541666666666,
+        "note_15_2": "Frontier revaluation uses current experiment assessment for exploitation/MIG"
+      },
+      {
+        "transition": 11,
+        "source": "REVISIT",
+        "selected_erv": -1.6114999999999993,
+        "note_15_2": "Frontier revaluation uses current experiment assessment for exploitation/MIG"
+      }
+    ],
+    "bb10_impact": "T3 FRONTIER sensitivity selection; T7/T11 REVISIT \u2014 all same branch_root"
+  },
+  "limitation_15_3": {
+    "description": "evaluate_global_stop uses historical planner_score via best_unexplored_score()",
+    "materially_contributes": true,
+    "historical_best_at_termination": 8.7,
+    "revalued_frontier_at_late": [
+      -4.092125,
+      -4.365812499999999,
+      -4.317999999999997,
+      -1.6114999999999993
+    ],
+    "bb10_impact": "Stop never triggered: historical frontier scores (8.7) exceed 0.5 threshold while revalued ERV at planning was negative. Session exhausted budget instead."
+  }
+}

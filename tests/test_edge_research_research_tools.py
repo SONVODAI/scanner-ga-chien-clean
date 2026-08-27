@@ -138,7 +138,7 @@ def test_registry_lists_tools_deterministically():
     names1 = [(m.tool_name, m.tool_version) for m in reg.list_tools()]
     names2 = [(m.tool_name, m.tool_version) for m in reg.list_tools()]
     assert names1 == names2
-    assert len(names1) == 9
+    assert len(names1) == 14
 
 
 def test_unknown_tool_rejected():
@@ -160,7 +160,7 @@ def test_tool_metadata_serializable():
     payload = reg.metadata_dicts()
     text = json.dumps(payload, sort_keys=True)
     reloaded = json.loads(text)
-    assert len(reloaded) == 9
+    assert len(reloaded) == 14
     assert all("tool_name" in m and "input_schema" in m for m in reloaded)
 
 
@@ -945,6 +945,16 @@ def _default_inputs(tool_name: str) -> dict:
             "bins": [{"lo": None, "hi": 0, "label": "a"}, {"lo": 0, "hi": None, "label": "b"}],
             "horizon": "T5",
         }
+    if tool_name == "adaptive_partition_compare":
+        return {"feature_column": "rs10", "max_bins": 3, "min_bin_n": 2, "min_total_n": 5}
+    if tool_name == "threshold_exploration":
+        return {"feature_column": "rs10", "candidate_cuts": [-5.0, 0.0, 5.0], "direction": "high"}
+    if tool_name == "threshold_neighborhood":
+        return {"feature_column": "rs10", "center_threshold": 0.0, "direction": "high"}
+    if tool_name == "categorical_adaptive_compare":
+        return {"feature_column": "partition_group", "min_category_n": 2}
+    if tool_name == "interaction_partition":
+        return {"primary_feature": "rs10", "secondary_feature": "research_market_state"}
     return {"horizon": "T5"}
 
 
