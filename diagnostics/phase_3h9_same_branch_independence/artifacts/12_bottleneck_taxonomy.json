@@ -1,0 +1,23 @@
+{
+  "primary": "S1 \u2014 SCIENTIFIC IDENTITY NOT REPRESENTED",
+  "primary_evidence": [
+    "BB11: 1 structural root vs 4+ semantic branches",
+    "3 cycling transitions: selected candidates semantically overlap current line",
+    "0 genuinely independent frontier alternatives at late transitions"
+  ],
+  "secondary": "S3 \u2014 MARGINAL DECAY DOES NOT TRANSFER ACROSS SEMANTIC EQUIVALENTS",
+  "secondary_evidence": [
+    "Marginal state attached to branch_root_id only",
+    "Same-question-different-tool selections do not inherit exhaustion from prior ZERO gains on semantic equivalents",
+    "T8/T9 continued under DIMINISHING while attacking same horizon-heterogeneity proposition"
+  ],
+  "also_applicable": [
+    "S8",
+    "S5",
+    "S6",
+    "S9"
+  ],
+  "suspected_not_primary": [
+    "S10 \u2014 STOP intervened at T11; too late to prevent T8/T9 cycling but not primary cause"
+  ]
+}
