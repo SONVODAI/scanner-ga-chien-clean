@@ -1,0 +1,371 @@
+{
+  "heterogeneity_events": [
+    {
+      "transition": 1,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 1,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 1,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 1,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 2,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 2,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 2,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 2,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 4,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 4,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 4,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 4,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 5,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 5,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 5,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 5,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 6,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 6,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": true,
+      "result": "PENDING"
+    },
+    {
+      "transition": 6,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 6,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 8,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 8,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 8,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 8,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 9,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 9,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 9,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 9,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 10,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 10,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 10,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 10,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 11,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 11,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 11,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 11,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": true,
+      "information_value_contribution": 2.5,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 12,
+      "dimension": "TIME_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 0,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 12,
+      "dimension": "SYMBOL_DISTRIBUTION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 0,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 12,
+      "dimension": "EPISODE_REPLICATION",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 0,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    },
+    {
+      "transition": 12,
+      "dimension": "MARKET_DEPENDENCE",
+      "evidence_of_heterogeneity": true,
+      "decomposition_candidate_generated": false,
+      "information_value_contribution": 0,
+      "selected": false,
+      "result": "NOT_SELECTED"
+    }
+  ],
+  "decomposition_experiments_executed": 1,
+  "decomposition_events": [
+    {
+      "experiment": "exp-82504efb7e41",
+      "tool": "symbol_decomposition"
+    }
+  ]
+}

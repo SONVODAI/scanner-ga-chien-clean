@@ -1,0 +1,127 @@
+{
+  "interactions": [
+    {
+      "transition": 1,
+      "local_winner_before_bridge": "1546513c8254481f",
+      "local_winner_after_bridge": "1546513c8254481f",
+      "globally_selected": "1546513c8254481f",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": 0.0,
+      "selected_erv": 16.83
+    },
+    {
+      "transition": 2,
+      "local_winner_before_bridge": "ea37630b08516f35",
+      "local_winner_after_bridge": "ea37630b08516f35",
+      "globally_selected": "ea37630b08516f35",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": 6.73875,
+      "selected_erv": 14.635625
+    },
+    {
+      "transition": 3,
+      "local_winner_before_bridge": "fd0876343b97f1d0",
+      "local_winner_after_bridge": "fd0876343b97f1d0",
+      "globally_selected": "49022f03695315b8",
+      "selected_source": "FRONTIER",
+      "global_reversed_local_bridged_winner": true,
+      "best_frontier_erv": 4.968750000000002,
+      "selected_erv": 4.968750000000002
+    },
+    {
+      "transition": 4,
+      "local_winner_before_bridge": "a5e6a03dd8497469",
+      "local_winner_after_bridge": "e8415614d364331f",
+      "globally_selected": "1cd8543301912be7",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": 0.9733333333333335,
+      "selected_erv": 5.49
+    },
+    {
+      "transition": 5,
+      "local_winner_before_bridge": "b9d2cb9334755ac8",
+      "local_winner_after_bridge": "b9d2cb9334755ac8",
+      "globally_selected": "b9d2cb9334755ac8",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": 2.029583333333333,
+      "selected_erv": 12.19018675
+    },
+    {
+      "transition": 6,
+      "local_winner_before_bridge": "e8415614d364331f",
+      "local_winner_after_bridge": "e8415614d364331f",
+      "globally_selected": "288ef208675e4c25",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": 4.2508541666666675,
+      "selected_erv": 4.3616875
+    },
+    {
+      "transition": 7,
+      "local_winner_before_bridge": "fd0876343b97f1d0",
+      "local_winner_after_bridge": "fd0876343b97f1d0",
+      "globally_selected": "984f7b9a3a54527e",
+      "selected_source": "REVISIT",
+      "global_reversed_local_bridged_winner": true,
+      "best_frontier_erv": 1.1443541666666666,
+      "selected_erv": 1.1443541666666666
+    },
+    {
+      "transition": 8,
+      "local_winner_before_bridge": "3a9a3206829541b2",
+      "local_winner_after_bridge": "3a9a3206829541b2",
+      "globally_selected": "3a9a3206829541b2",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": -4.092125,
+      "selected_erv": -1.0782499999999995
+    },
+    {
+      "transition": 9,
+      "local_winner_before_bridge": "9dcc1c45f493cb26",
+      "local_winner_after_bridge": "9dcc1c45f493cb26",
+      "globally_selected": "5001c4d3def13df5",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": -4.365812499999999,
+      "selected_erv": -2.1133124999999993
+    },
+    {
+      "transition": 10,
+      "local_winner_before_bridge": "a88b152867f4eb26",
+      "local_winner_after_bridge": "a88b152867f4eb26",
+      "globally_selected": "a88b152867f4eb26",
+      "selected_source": "LOCAL",
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": -4.317999999999997,
+      "selected_erv": 3.799500000000002
+    },
+    {
+      "transition": 11,
+      "local_winner_before_bridge": "fd0876343b97f1d0",
+      "local_winner_after_bridge": "e8415614d364331f",
+      "globally_selected": "9f863f39276d3025",
+      "selected_source": "REVISIT",
+      "global_reversed_local_bridged_winner": true,
+      "best_frontier_erv": -1.6114999999999993,
+      "selected_erv": -1.6114999999999993
+    },
+    {
+      "transition": 12,
+      "local_winner_before_bridge": null,
+      "local_winner_after_bridge": null,
+      "globally_selected": null,
+      "selected_source": null,
+      "global_reversed_local_bridged_winner": false,
+      "best_frontier_erv": null,
+      "selected_erv": null
+    }
+  ],
+  "global_reversal_count": 3,
+  "frontier_selections": 1,
+  "revisit_selections": 2
+}

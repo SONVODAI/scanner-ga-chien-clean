@@ -1,0 +1,28 @@
+{
+  "tools_used": [
+    "adaptive_partition_compare",
+    "horizon_comparison",
+    "sensitivity_analysis",
+    "symbol_decomposition",
+    "threshold_exploration"
+  ],
+  "tools_available": [
+    "adaptive_partition_compare",
+    "categorical_adaptive_compare",
+    "date_decomposition",
+    "episode_decomposition",
+    "horizon_comparison",
+    "interaction_partition",
+    "market_conditioning",
+    "neighborhood_stability",
+    "partition_group_compare",
+    "sensitivity_analysis",
+    "symbol_decomposition",
+    "threshold_exploration",
+    "threshold_neighborhood",
+    "trajectory_partition_compare"
+  ],
+  "tool_count_used": 5,
+  "tool_count_available": 14,
+  "rsi_slope_used": false
+}
