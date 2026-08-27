@@ -1,0 +1,43 @@
+{
+  "evidence_1": {
+    "ref": "lifecycle_real_001",
+    "class": "SUPPORTING",
+    "scope": "full_panel_all_dates",
+    "sample_size": 6106,
+    "spread": 2.351875539446755
+  },
+  "evidence_2": {
+    "ref": "falsification_fc-independent_episode_holdout",
+    "class": "SUPPORTING",
+    "scope": "holdout_exclude_2026-08-02",
+    "sample_size": 5964,
+    "spread": 2.0887694594595527,
+    "candidate_class": "INDEPENDENT_FALSIFICATION"
+  },
+  "relationship_e1_to_e2": "PARTIAL_REPLICATION with episode_independence attempt \u2014 high cohort overlap (~97.7% rows)",
+  "independence_assessment": {
+    "episode_independence": "partial \u2014 one motivating date excluded",
+    "sample_independence": "low \u2014 5964/6106 shared structure",
+    "measurement_independence": "none \u2014 same partition/quintile/outcome",
+    "semantic_independence": "low \u2014 same uncertainty dimension (directional spread)"
+  },
+  "uncertainty_dimensions_covered": [
+    "directional_effect_full_market",
+    "directional_effect_holdout_without_focal_date"
+  ],
+  "uncertainty_dimensions_untouched": [
+    "temporal_regime_robustness",
+    "symbol_concentration",
+    "horizon_variation",
+    "population_subsets",
+    "counterexample_conditions",
+    "alternative_explanation_resolution",
+    "measurement_formulation_change"
+  ],
+  "seek_falsification_still_justified": "On untouched axes yes; generic holdout repeat NO",
+  "another_generic_holdout_redundant": true,
+  "better_next_axis": "counterexample search, symbol/date decomposition, regime slice \u2014 not another date-exclusion holdout",
+  "hold_provisionally_justified_yet": false,
+  "hold_provisionally_reason": "Two correlated supports on same measurement; major uncertainty dimensions remain open; not saturation \u2014 marginal value remains on non-redundant axes.",
+  "note": "Diagnostic from frozen design principles \u2014 not tuned to desired answer"
+}
