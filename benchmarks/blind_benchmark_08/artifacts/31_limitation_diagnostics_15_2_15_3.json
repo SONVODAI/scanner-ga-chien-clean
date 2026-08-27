@@ -1,0 +1,904 @@
+{
+  "limitation_15_2_frontier_exploitation_assessment": {
+    "description": "Frontier revaluation may use current experiment assessment for exploitation components",
+    "evidence_cases": [
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00006",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.7,
+        "current_revalued_value": 0.6687500000000008,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00007",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.7,
+        "current_revalued_value": 4.468750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00008",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 7.125,
+        "current_revalued_value": 4.468750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00009",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.175,
+        "current_revalued_value": 4.468750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00010",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.175,
+        "current_revalued_value": 4.468750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00020",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.2,
+        "current_revalued_value": 1.1687500000000008,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00021",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.2,
+        "current_revalued_value": 4.968750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00022",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 6.625,
+        "current_revalued_value": 4.968750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00023",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 7.675,
+        "current_revalued_value": 4.968750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00024",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 7.675,
+        "current_revalued_value": 4.968750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00025",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 3.7,
+        "current_revalued_value": -0.3312499999999996,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00026",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 8.15,
+        "current_revalued_value": -0.3312499999999996,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00027",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 3.2,
+        "current_revalued_value": -0.3312499999999996,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00028",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 4.0875,
+        "current_revalued_value": 3.9687500000000013,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00030",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": 3.5875000000000004,
+        "current_revalued_value": 4.468750000000002,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00031",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": -0.38749999999999984,
+        "current_revalued_value": -0.8312499999999996,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 3,
+        "frontier_id": "frontier-00032",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-a45e70395b69",
+        "historical_planner_score": -0.8874999999999998,
+        "current_revalued_value": -0.8312499999999996,
+        "exploitation_component_in_erv": 1.5,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00052",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -2.4124999999999996,
+        "current_revalued_value": 3.8866875000000003,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00006",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 8.7,
+        "current_revalued_value": 0.32418750000000046,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00007",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 8.7,
+        "current_revalued_value": 0.32418750000000046,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00008",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 7.125,
+        "current_revalued_value": 3.9341875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00009",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 8.175,
+        "current_revalued_value": 3.9341875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00010",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 8.175,
+        "current_revalued_value": 3.9341875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00020",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 8.2,
+        "current_revalued_value": 0.6408541666666677,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00022",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 6.625,
+        "current_revalued_value": 4.2508541666666675,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00023",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 7.675,
+        "current_revalued_value": 4.2508541666666675,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00024",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 7.675,
+        "current_revalued_value": 4.2508541666666675,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00025",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 3.7,
+        "current_revalued_value": -0.7841458333333322,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00026",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 8.15,
+        "current_revalued_value": -0.7841458333333322,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00027",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 3.2,
+        "current_revalued_value": -0.7841458333333322,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00028",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 4.0875,
+        "current_revalued_value": 3.4591875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00030",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": 3.5875000000000004,
+        "current_revalued_value": 3.7758541666666674,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00031",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -0.38749999999999984,
+        "current_revalued_value": -1.2591458333333323,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00032",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -0.8874999999999998,
+        "current_revalued_value": -1.2591458333333323,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00033",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -2.7499999999999996,
+        "current_revalued_value": -0.15081249999999952,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00034",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -2.7499999999999996,
+        "current_revalued_value": -0.15081249999999952,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00035",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -1.3249999999999993,
+        "current_revalued_value": 3.4591875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00036",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -0.2749999999999996,
+        "current_revalued_value": 3.4591875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00037",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -0.2749999999999996,
+        "current_revalued_value": 3.4591875,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00041",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -3.2499999999999996,
+        "current_revalued_value": 0.1658541666666677,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00042",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -3.2499999999999996,
+        "current_revalued_value": 0.1658541666666677,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00043",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -1.8249999999999993,
+        "current_revalued_value": 3.7758541666666674,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00044",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -0.7749999999999996,
+        "current_revalued_value": 3.7758541666666674,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00045",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -0.7749999999999996,
+        "current_revalued_value": 3.7758541666666674,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00046",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -1.2999999999999994,
+        "current_revalued_value": 3.7758541666666674,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00047",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -1.2999999999999994,
+        "current_revalued_value": 3.7758541666666674,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00048",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -4.75,
+        "current_revalued_value": -1.2591458333333323,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00049",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -3.2999999999999994,
+        "current_revalued_value": 2.3508541666666676,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00050",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -3.2999999999999994,
+        "current_revalued_value": 2.3508541666666676,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00051",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -5.25,
+        "current_revalued_value": -1.2591458333333323,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 6,
+        "frontier_id": "frontier-00053",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-31d5cd106819",
+        "historical_planner_score": -7.4125,
+        "current_revalued_value": -6.088312499999999,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00006",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 8.7,
+        "current_revalued_value": -2.4788125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00007",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 8.7,
+        "current_revalued_value": -2.4788125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00008",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 7.125,
+        "current_revalued_value": 0.7511874999999998,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00009",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 8.175,
+        "current_revalued_value": 0.7511874999999998,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00010",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 8.175,
+        "current_revalued_value": -2.4788125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00020",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 8.2,
+        "current_revalued_value": -2.2663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00022",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 6.625,
+        "current_revalued_value": 0.9636874999999998,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00023",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 7.675,
+        "current_revalued_value": 0.9636874999999998,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00025",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 3.7,
+        "current_revalued_value": -3.5413124999999996,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00026",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 8.15,
+        "current_revalued_value": -3.5413124999999996,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00027",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 3.2,
+        "current_revalued_value": -3.5413124999999996,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00028",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 4.0875,
+        "current_revalued_value": -2.9038125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00030",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": 3.5875000000000004,
+        "current_revalued_value": -2.6913125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00031",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -0.38749999999999984,
+        "current_revalued_value": -3.9663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00032",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -0.8874999999999998,
+        "current_revalued_value": -3.9663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00033",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -2.7499999999999996,
+        "current_revalued_value": -2.9038125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00034",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -2.7499999999999996,
+        "current_revalued_value": -2.9038125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00035",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -1.3249999999999993,
+        "current_revalued_value": 0.32618749999999963,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00036",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -0.2749999999999996,
+        "current_revalued_value": 0.32618749999999963,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00037",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -0.2749999999999996,
+        "current_revalued_value": -2.9038125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00041",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -3.2499999999999996,
+        "current_revalued_value": -2.6913125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00042",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -3.2499999999999996,
+        "current_revalued_value": -2.6913125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00043",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -1.8249999999999993,
+        "current_revalued_value": 0.5386874999999999,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00044",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -0.7749999999999996,
+        "current_revalued_value": 0.5386874999999999,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00045",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -0.7749999999999996,
+        "current_revalued_value": -2.6913125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00046",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -1.2999999999999994,
+        "current_revalued_value": 0.5386874999999999,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00047",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -1.2999999999999994,
+        "current_revalued_value": 0.5386874999999999,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00048",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -4.75,
+        "current_revalued_value": -3.9663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00049",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -3.2999999999999994,
+        "current_revalued_value": -0.7363125000000004,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00050",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -3.2999999999999994,
+        "current_revalued_value": -0.7363125000000004,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00051",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -5.25,
+        "current_revalued_value": -3.9663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00054",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -10.462499999999999,
+        "current_revalued_value": -8.641312500000002,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00058",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -8.775,
+        "current_revalued_value": -3.9663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00059",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -9.275,
+        "current_revalued_value": -3.9663125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      },
+      {
+        "decision_index": 9,
+        "frontier_id": "frontier-00060",
+        "branch_root_id": "obs-fce070a7afdf",
+        "triggering_experiment": "exp-cd47d01aa9b3",
+        "historical_planner_score": -11.437499999999998,
+        "current_revalued_value": -8.2163125,
+        "exploitation_component_in_erv": 5.0,
+        "note": "15.2: exploitation may reflect current-branch assessment rather than reconstructed branch-origin assessment"
+      }
+    ],
+    "case_count": 86
+  },
+  "limitation_15_3_session_stop_historical_scores": {
+    "limitation": "15.3",
+    "evaluate_global_stop_uses_historical_planner_score": true,
+    "historical_best_unexplored_score": 8.7,
+    "unexplored_count": 37,
+    "session_stop_evaluated": true,
+    "stop_reason_code": "BUDGET_EXHAUSTED",
+    "note": "Session stop threshold uses frontier.best_unexplored_score() which sorts by historical planner_score \u2014 not current-state revalued ERV used at planning decisions",
+    "top_unexplored_by_historical_score": [
+      {
+        "frontier_id": "frontier-00006",
+        "historical_planner_score": 8.7,
+        "portfolio_score_at_enqueue": 8.7
+      },
+      {
+        "frontier_id": "frontier-00007",
+        "historical_planner_score": 8.7,
+        "portfolio_score_at_enqueue": 8.7
+      },
+      {
+        "frontier_id": "frontier-00020",
+        "historical_planner_score": 8.2,
+        "portfolio_score_at_enqueue": 8.2
+      },
+      {
+        "frontier_id": "frontier-00009",
+        "historical_planner_score": 8.175,
+        "portfolio_score_at_enqueue": 8.175
+      },
+      {
+        "frontier_id": "frontier-00010",
+        "historical_planner_score": 8.175,
+        "portfolio_score_at_enqueue": 8.175
+      }
+    ]
+  }
+}
