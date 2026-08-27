@@ -8,6 +8,7 @@ No LLM, no production coupling, no arbitrary code execution.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -25,9 +26,11 @@ from modules.edge_research.research_state import (
     NodeStatus,
     NodeType,
     QuestionRationale,
+    ResearchQuestionContext,
     SessionStatus,
 )
 from modules.edge_research.research_tools import ToolRegistry, ToolResult, execute_research_experiment
+from modules.edge_research.storage import write_research_graph
 
 DEFAULT_SESSION_EXPERIMENT_BUDGET = 12
 
@@ -91,7 +94,11 @@ def plan_after_experiment(
     """Interpret result, generate candidates, plan next step, record on graph."""
     assessment = interpret_tool_result(graph, experiment_node_id, tool_result)
     candidates = generate_action_candidates(
-        assessment, graph, registry, research_scope=research_scope
+        assessment,
+        graph,
+        registry,
+        research_scope=research_scope,
+        experiment_node_id=experiment_node_id,
     )
     scores = score_all_candidates(assessment, candidates, graph)
     decision = plan_next_action(assessment, candidates, graph)
@@ -156,15 +163,31 @@ def apply_plan_decision(
     if selected is None or selected.draft_spec is None:
         raise ResearchGraphError("EXPERIMENT decision missing draft ExperimentSpec")
 
+    pending_ctx: Optional[ResearchQuestionContext] = None
+    scope = selected.draft_spec.research_scope
+    if scope.get("pending_question_context"):
+        pending_ctx = ResearchQuestionContext.from_dict(scope["pending_question_context"])
+
+    evidence_summary = {
+        "uncertainty_addressed": selected.uncertainty_addressed,
+        "intent": selected.intent,
+        "planner_rationale": list(decision.rationale_codes),
+    }
+    if scope.get("pending_lineage"):
+        evidence_summary["lineage"] = dict(scope["pending_lineage"])
+        evidence_summary["triggering_experiment"] = scope["pending_lineage"].get(
+            "triggering_experiment", experiment_node_id
+        )
+        evidence_summary["triggering_observation"] = scope["pending_lineage"].get(
+            "triggering_observation", selected.action_code
+        )
+
     qid = graph.spawn_child_question_from_experiment(
         experiment_node_id,
         question_text=selected.question_text,
         reason_code=selected.action_code,
-        evidence_summary={
-            "uncertainty_addressed": selected.uncertainty_addressed,
-            "intent": selected.intent,
-            "planner_rationale": list(decision.rationale_codes),
-        },
+        evidence_summary=evidence_summary,
+        question_context=pending_ctx,
     )
     eid = graph.add_experiment(question_node_id=qid, spec=selected.draft_spec)
     return ControllerStepResult(
@@ -176,6 +199,16 @@ def apply_plan_decision(
     )
 
 
+def _maybe_persist_graph(
+    graph: ResearchGraph,
+    *,
+    auto_persist: bool,
+    persist_dir: Optional[Path],
+) -> None:
+    if auto_persist and persist_dir is not None:
+        write_research_graph(graph, data_dir=persist_dir)
+
+
 def run_experiment_and_plan(
     graph: ResearchGraph,
     experiment_node_id: str,
@@ -183,6 +216,8 @@ def run_experiment_and_plan(
     registry: ToolRegistry,
     *,
     research_scope: Optional[Dict[str, Any]] = None,
+    auto_persist: bool = False,
+    persist_dir: Optional[Path] = None,
 ) -> ControllerStepResult:
     """Execute tool, attach result, interpret, plan, and apply decision."""
     tool_result = execute_research_experiment(
@@ -194,6 +229,7 @@ def run_experiment_and_plan(
     step = apply_plan_decision(graph, experiment_node_id, planning.decision)
     step.tool_result = tool_result
     step.planning = planning
+    _maybe_persist_graph(graph, auto_persist=auto_persist, persist_dir=persist_dir)
     return step
 
 
@@ -219,6 +255,8 @@ def run_research_session(
     initial_experiment_id: str,
     research_scope: Optional[Dict[str, Any]] = None,
     max_steps: int = DEFAULT_SESSION_EXPERIMENT_BUDGET,
+    auto_persist: bool = False,
+    persist_dir: Optional[Path] = None,
 ) -> List[ControllerStepResult]:
     """
     Minimal deterministic research loop starting from a pending experiment node.
@@ -232,7 +270,13 @@ def run_research_session(
         if graph.get_node(current_exp).experiment_result is not None:
             break
         step = run_experiment_and_plan(
-            graph, current_exp, panel, registry, research_scope=research_scope
+            graph,
+            current_exp,
+            panel,
+            registry,
+            research_scope=research_scope,
+            auto_persist=auto_persist,
+            persist_dir=persist_dir,
         )
         steps.append(step)
         if step.terminal:
@@ -240,5 +284,8 @@ def run_research_session(
         if step.spawned_experiment_id is None:
             break
         current_exp = step.spawned_experiment_id
+
+    if auto_persist and persist_dir is not None:
+        write_research_graph(graph, data_dir=persist_dir)
 
     return steps

@@ -14,20 +14,39 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from modules.edge_research.research_assessment import ResearchAssessment
 from modules.edge_research.research_graph import ResearchGraph
+from modules.edge_research.research_grammar import (
+    OutcomeSpec,
+    PopulationSpec,
+    build_search_accounting,
+    population_spec_to_research_scope,
+    propose_outcome_reframes,
+    propose_population_refinements,
+    propose_population_widenings,
+)
 from modules.edge_research.research_interpreter import (
     FALSIFY_DATE_ARTIFACT,
     FALSIFY_EPISODE_FLUKE,
     FALSIFY_EXTREME_WINNER,
     FALSIFY_SYMBOL_DOMINANCE,
+    GAP_CATEGORY_REFINEMENT,
     GAP_EPISODE_REPLICATION,
     GAP_HORIZON_STABILITY,
+    GAP_INTERACTION_FOLLOWUP,
     GAP_MARKET_DEPENDENCE,
+    GAP_NEIGHBORHOOD_THRESHOLD,
     GAP_NEIGHBORHOOD_STABILITY,
     GAP_SYMBOL_DISTRIBUTION,
+    GAP_THRESHOLD_EXPLORATION,
     GAP_TIME_DISTRIBUTION,
     GAP_TRAJECTORY_ROLE,
 )
-from modules.edge_research.research_state import ExperimentSpec, NextActionCandidate, compute_experiment_content_hash
+from modules.edge_research.research_state import (
+    ExperimentSpec,
+    NextActionCandidate,
+    NodeType,
+    ResearchQuestionContext,
+    compute_experiment_content_hash,
+)
 from modules.edge_research.research_tools import ToolRegistry
 
 DEFAULT_HORIZON = "T5"
@@ -45,6 +64,12 @@ class ActionIntent(str, Enum):
     REPLICATION = "REPLICATION"
     ROBUSTNESS = "ROBUSTNESS"
     FALSIFICATION = "FALSIFICATION"
+    REFRAME = "REFRAME"
+    REPOPULATE = "REPOPULATE"
+    REDESCRIBE_OUTCOME = "REDESCRIBE_OUTCOME"
+    EXPLORE_THRESHOLD = "EXPLORE_THRESHOLD"
+    TEST_NEIGHBORHOOD = "TEST_NEIGHBORHOOD"
+    SLICING = "SLICING"
     STOP = "STOP"
     ABANDON = "ABANDON"
 
@@ -207,12 +232,482 @@ def _check_candidate(
     )
 
 
+def _question_context_from_experiment(graph: ResearchGraph, experiment_node_id: str) -> Optional[ResearchQuestionContext]:
+    """Resolve parent question context for grammar-driven candidates."""
+    exp = graph.get_node(experiment_node_id)
+    for pid in exp.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.node_type == NodeType.QUESTION and parent.question_context is not None:
+            return parent.question_context
+    return None
+
+
+def _parse_specs_from_context(ctx: ResearchQuestionContext) -> Tuple[PopulationSpec, OutcomeSpec]:
+    pop = PopulationSpec.from_dict(ctx.population_spec)
+    out = OutcomeSpec.from_dict(ctx.outcome_spec)
+    return pop, out
+
+
+def _grammar_scope(
+    population: PopulationSpec,
+    outcome: OutcomeSpec,
+    base_scope: Dict[str, Any],
+) -> Dict[str, Any]:
+    scope = _base_scope(base_scope)
+    scope.update(population_spec_to_research_scope(population))
+    scope["outcome_spec"] = outcome.to_dict()
+    scope["outcome_spec_hash"] = outcome.content_hash()
+    return scope
+
+
+def _add_grammar_candidates(
+    candidates: List[ResearchActionCandidate],
+    *,
+    assessment: ResearchAssessment,
+    graph: ResearchGraph,
+    registry: ToolRegistry,
+    scope: Dict[str, Any],
+    cutoff: str,
+    experiment_node_id: str,
+) -> None:
+    """Propose REFRAME / REPOPULATE / WIDEN candidates from question grammar."""
+    ctx = _question_context_from_experiment(graph, experiment_node_id)
+    if ctx is None:
+        return
+
+    population, outcome = _parse_specs_from_context(ctx)
+    depth = ctx.research_depth
+    parent_hash = population.content_hash()
+    evidence = {
+        "source_experiment": experiment_node_id,
+        "interesting": assessment.interesting,
+        "strength": assessment.descriptive_strength,
+    }
+
+    def add(**kwargs: Any) -> None:
+        candidates.append(_check_candidate(graph, registry=registry, **kwargs))
+
+    # REFRAME / REDESCRIBE OUTCOME — when branch shows signal worth reframing.
+    if assessment.interesting or assessment.descriptive_strength == "GROUP_DIFFERENCE":
+        for alt_outcome in propose_outcome_reframes(outcome):
+            new_depth = depth + 1
+            accounting = build_search_accounting(
+                population_spec=population,
+                outcome_spec=alt_outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(population, alt_outcome, scope)
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=population.to_dict(),
+                outcome_spec=alt_outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": evidence,
+                },
+            ).to_dict()
+            add(
+                action_code="REFRAME_OUTCOME",
+                intent=ActionIntent.REFRAME,
+                template_id="REFRAME_ALTERNATIVE_OUTCOME",
+                question=f"Does an alternative outcome specification ({alt_outcome.kind}) reveal a stable relationship?",
+                tool_name="horizon_comparison",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="horizon_comparison",
+                    tool_version="v1",
+                    inputs={"horizons": list(HORIZONS)},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="OUTCOME_SPEC_ALTERNATIVE",
+                expected_info=ExpectedInformation.MEDIUM,
+                rationale_codes=("REFRAME", "ALTERNATIVE_OUTCOME"),
+                priority_hints={"information_gap": 2.5, "grammar_reframe": 2.0},
+            )
+
+    # REPOPULATE — refine population when signal warrants conditional cohort.
+    if assessment.additional_investigation_warranted and not assessment.fragility_evidence:
+        for refined in propose_population_refinements(
+            population,
+            reason_code="EVIDENCE_CONDITIONAL_COHORT",
+            triggering_evidence=evidence,
+        ):
+            new_depth = depth + 1
+            accounting = build_search_accounting(
+                population_spec=refined,
+                outcome_spec=outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(refined, outcome, scope)
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=refined.to_dict(),
+                outcome_spec=outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": "REPOPULATE_REFINE",
+                    "triggering_evidence": evidence,
+                },
+            ).to_dict()
+            add(
+                action_code="REPOPULATE_REFINE",
+                intent=ActionIntent.REPOPULATE,
+                template_id="REPOPULATE_REFINED_COHORT",
+                question="Does the relationship hold within a refined conditional population?",
+                tool_name="partition_group_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="partition_group_compare",
+                    tool_version="v1",
+                    inputs={
+                        "horizon": DEFAULT_HORIZON,
+                        "partition_column": "partition_group",
+                        "partition_type": "categorical",
+                    },
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="POPULATION_REFINEMENT",
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("REPOPULATE", "REFINED_COHORT"),
+                priority_hints={"information_gap": 3.0, "grammar_repopulate": 2.5},
+            )
+
+    # WIDEN — when population is already refined and sample may be too narrow.
+    if population.kind in ("refine", "and", "filter") and population.kind != "all":
+        for widened in propose_population_widenings(
+            population,
+            reason_code="EVIDENCE_SAMPLE_NARROW",
+            triggering_evidence=evidence,
+        ):
+            new_depth = max(0, depth)
+            accounting = build_search_accounting(
+                population_spec=widened,
+                outcome_spec=outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(widened, outcome, scope)
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=widened.to_dict(),
+                outcome_spec=outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": "REPOPULATE_WIDEN",
+                    "triggering_evidence": evidence,
+                },
+            ).to_dict()
+            add(
+                action_code="REPOPULATE_WIDEN",
+                intent=ActionIntent.REPOPULATE,
+                template_id="REPOPULATE_WIDENED_COHORT",
+                question="Does widening the population preserve or weaken the observed relationship?",
+                tool_name="partition_group_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="partition_group_compare",
+                    tool_version="v1",
+                    inputs={
+                        "horizon": DEFAULT_HORIZON,
+                        "partition_column": "partition_group",
+                        "partition_type": "categorical",
+                    },
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="POPULATION_WIDENING",
+                expected_info=ExpectedInformation.MEDIUM,
+                rationale_codes=("REPOPULATE", "WIDEN_COHORT"),
+                priority_hints={"information_gap": 1.5, "grammar_widen": 2.0},
+            )
+
+
+def _experiment_metrics(graph: ResearchGraph, experiment_node_id: str) -> Dict[str, Any]:
+    node = graph.get_node(experiment_node_id)
+    if node.experiment_result and node.experiment_result.metrics:
+        return dict(node.experiment_result.metrics)
+    return {}
+
+
+def _derive_threshold_cuts(metrics: Dict[str, Any]) -> Tuple[List[float], str, str]:
+    """Data-derived cut candidates from adaptive partition experiment."""
+    feature = str(metrics.get("feature_column", "feature_x"))
+    edges = metrics.get("discovered_boundaries") or []
+    shape = metrics.get("shape") or {}
+    direction = "high"
+    if shape.get("shape_code") == "SHAPE_MONOTONIC_DECREASING":
+        direction = "low"
+    cuts = [float(e) for e in edges]
+    if not cuts and metrics.get("best_threshold"):
+        cuts = [float(metrics["best_threshold"].get("threshold", 0.0))]
+    return cuts, direction, feature
+
+
+def _add_adaptive_candidates(
+    candidates: List[ResearchActionCandidate],
+    *,
+    assessment: ResearchAssessment,
+    graph: ResearchGraph,
+    registry: ToolRegistry,
+    scope: Dict[str, Any],
+    cutoff: str,
+    experiment_node_id: str,
+) -> None:
+    """Phase 3F evidence-driven adaptive slicing follow-ups."""
+
+    def add(**kwargs: Any) -> None:
+        candidates.append(_check_candidate(graph, registry=registry, **kwargs))
+
+    metrics = _experiment_metrics(graph, experiment_node_id)
+    exp_node = graph.get_node(experiment_node_id)
+    parent_tool = exp_node.experiment_spec.tool_name if exp_node.experiment_spec else ""
+
+    # Initial adaptive partition on eligible continuous feature (exploration).
+    if parent_tool not in ("adaptive_partition_compare", "threshold_exploration", "threshold_neighborhood"):
+        if assessment.additional_investigation_warranted or assessment.interesting:
+            for feat in ("feature_x", "feature_y", "rs10", "health_score"):
+                add(
+                    action_code=f"ADAPTIVE_PARTITION_{feat}",
+                    intent=ActionIntent.SLICING,
+                    template_id="ADAPTIVE_PARTITION",
+                    question=f"Does partitioning {feat} by data-derived quantiles reveal outcome structure?",
+                    tool_name="adaptive_partition_compare",
+                    tool_version="v1",
+                    spec=_make_spec(
+                        tool_name="adaptive_partition_compare",
+                        tool_version="v1",
+                        inputs={"feature_column": feat, "max_bins": 4, "min_bin_n": 5, "min_total_n": 20},
+                        research_scope=scope,
+                        cutoff=cutoff,
+                    ),
+                    uncertainty="ADAPTIVE_PARTITION",
+                    expected_info=ExpectedInformation.HIGH,
+                    rationale_codes=("SLICING", "ADAPTIVE_PARTITION"),
+                    priority_hints={"slicing_explore": 2.0},
+                )
+
+    # Threshold exploration when shape/gradient evidence exists.
+    if GAP_THRESHOLD_EXPLORATION in assessment.information_gaps or any(
+        c.startswith("SHAPE_") for c in assessment.empirical_findings
+    ):
+        cuts, direction, feature = _derive_threshold_cuts(metrics)
+        if cuts:
+            new_scope = dict(scope)
+            new_scope["pending_lineage"] = {
+                "triggering_experiment": experiment_node_id,
+                "triggering_observation": "SHAPE_GRADIENT",
+                "reason_code": "EXPLORE_THRESHOLD",
+                "discovered_boundaries": cuts,
+            }
+            add(
+                action_code="EXPLORE_THRESHOLD",
+                intent=ActionIntent.EXPLORE_THRESHOLD,
+                template_id="THRESHOLD_EXPLORATION",
+                question=f"Which data-derived cut on {feature} best separates outcomes?",
+                tool_name="threshold_exploration",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="threshold_exploration",
+                    tool_version="v1",
+                    inputs={
+                        "feature_column": feature,
+                        "candidate_cuts": cuts,
+                        "direction": direction,
+                        "parent_experiment_id": experiment_node_id,
+                    },
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty=GAP_THRESHOLD_EXPLORATION,
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("EXPLORE_THRESHOLD", "SHAPE_EVIDENCE"),
+                priority_hints={"threshold_explore": 4.5, "shape_followup": 3.5},
+            )
+
+    # Neighborhood stability after threshold exploration.
+    if parent_tool == "threshold_exploration" or GAP_NEIGHBORHOOD_THRESHOLD in assessment.information_gaps:
+        best = metrics.get("best_threshold") or {}
+        threshold = best.get("threshold")
+        feature = str(metrics.get("feature_column", "feature_x"))
+        if threshold is not None:
+            add(
+                action_code="TEST_NEIGHBORHOOD",
+                intent=ActionIntent.TEST_NEIGHBORHOOD,
+                template_id="THRESHOLD_NEIGHBORHOOD",
+                question=f"Is the threshold region around {threshold} on {feature} stable?",
+                tool_name="threshold_neighborhood",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="threshold_neighborhood",
+                    tool_version="v1",
+                    inputs={
+                        "feature_column": feature,
+                        "center_threshold": float(threshold),
+                        "direction": best.get("direction", "high"),
+                    },
+                    research_scope={
+                        **scope,
+                        "pending_lineage": {
+                            "triggering_experiment": experiment_node_id,
+                            "reason_code": "TEST_NEIGHBORHOOD",
+                            "center_threshold": threshold,
+                        },
+                    },
+                    cutoff=cutoff,
+                ),
+                uncertainty=GAP_NEIGHBORHOOD_THRESHOLD,
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("TEST_NEIGHBORHOOD", "THRESHOLD_REGION"),
+                priority_hints={"neighborhood_test": 4.0},
+            )
+
+    # Population refinement from high/low region or category separation.
+    if GAP_CATEGORY_REFINEMENT in assessment.information_gaps or "CATEGORY_SEPARATION_DETECTED" in assessment.empirical_findings:
+        feature = str(metrics.get("feature_column", "partition_group"))
+        best_cat = metrics.get("best_category", "A")
+        ctx = _question_context_from_experiment(graph, experiment_node_id)
+        if ctx:
+            pop, out = _parse_specs_from_context(ctx)
+            refined = PopulationSpec.refine(
+                pop,
+                PopulationSpec.filter_categorical(feature, [str(best_cat)]),
+                reason_code="CONDITION_ON_CATEGORY",
+                triggering_evidence={"source_experiment": experiment_node_id},
+            )
+            new_scope = _grammar_scope(refined, out, scope)
+            add(
+                action_code="CONDITION_ON_CATEGORY",
+                intent=ActionIntent.REPOPULATE,
+                template_id="CATEGORY_POPULATION_REFINE",
+                question=f"Does conditioning on {feature}={best_cat} preserve the relationship?",
+                tool_name="categorical_adaptive_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="categorical_adaptive_compare",
+                    tool_version="v1",
+                    inputs={"feature_column": feature},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty=GAP_CATEGORY_REFINEMENT,
+                expected_info=ExpectedInformation.MEDIUM,
+                rationale_codes=("REPOPULATE", "CATEGORY_SEPARATION"),
+                priority_hints={"category_refinement": 3.0},
+            )
+
+    # High/low region population conditioning after threshold discovery.
+    if parent_tool == "threshold_exploration" and metrics.get("best_threshold"):
+        best = metrics["best_threshold"]
+        threshold = best.get("threshold")
+        feature = str(metrics.get("feature_column", "feature_x"))
+        direction = best.get("direction", "high")
+        op = ">=" if direction == "high" else "<="
+        ctx = _question_context_from_experiment(graph, experiment_node_id)
+        if ctx and threshold is not None:
+            pop, out = _parse_specs_from_context(ctx)
+            filt = PopulationSpec.filter_numeric(feature, op, float(threshold))
+            refined = PopulationSpec.refine(
+                pop,
+                filt,
+                reason_code="CONDITION_ON_HIGH_REGION" if direction == "high" else "CONDITION_ON_LOW_REGION",
+                triggering_evidence={
+                    "source_experiment": experiment_node_id,
+                    "threshold": threshold,
+                },
+            )
+            new_scope = _grammar_scope(refined, out, scope)
+            action_code = "CONDITION_ON_HIGH_REGION" if direction == "high" else "CONDITION_ON_LOW_REGION"
+            add(
+                action_code=action_code,
+                intent=ActionIntent.REPOPULATE,
+                template_id="THRESHOLD_POPULATION_REFINE",
+                question=f"Does the outcome pattern hold within the {direction} region of {feature}?",
+                tool_name="adaptive_partition_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="adaptive_partition_compare",
+                    tool_version="v1",
+                    inputs={"feature_column": feature, "max_bins": 3, "min_bin_n": 5},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="POPULATION_REGION",
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("REPOPULATE", "THRESHOLD_REGION"),
+                priority_hints={"region_refinement": 3.5},
+            )
+
+    # Bounded interaction when shape interesting and market context untested.
+    if assessment.interesting and GAP_MARKET_DEPENDENCE in assessment.information_gaps:
+        feature = str(metrics.get("feature_column", "feature_x"))
+        add(
+            action_code="TEST_MARKET_INTERACTION",
+            intent=ActionIntent.CONDITIONING,
+            template_id="INTERACTION_PARTITION",
+            question=f"Does market context interact with {feature} for outcomes?",
+            tool_name="interaction_partition",
+            tool_version="v1",
+            spec=_make_spec(
+                tool_name="interaction_partition",
+                tool_version="v1",
+                inputs={
+                    "primary_feature": feature,
+                    "secondary_feature": "research_market_state",
+                },
+                research_scope={**scope, "complexity_increment": 2},
+                cutoff=cutoff,
+            ),
+            uncertainty=GAP_INTERACTION_FOLLOWUP,
+            expected_info=ExpectedInformation.MEDIUM,
+            rationale_codes=("INTERACTION", "MARKET_CONTEXT"),
+            priority_hints={"interaction_followup": 2.5},
+        )
+
+    # Explicit falsification concentration tests (compete with exploration).
+    if FALSIFY_DATE_ARTIFACT in assessment.possible_falsification_targets:
+        add(
+            action_code="FALSIFY_DATE_CONCENTRATION",
+            intent=ActionIntent.FALSIFICATION,
+            template_id="FALSIFY_DATE_ARTIFACT",
+            question="Does the result survive leave-one-date-out removal?",
+            tool_name="sensitivity_analysis",
+            tool_version="v1",
+            spec=_make_spec(
+                tool_name="sensitivity_analysis",
+                tool_version="v1",
+                inputs={"horizon": DEFAULT_HORIZON, "tests": ["leave_one_date"]},
+                research_scope=scope,
+                cutoff=cutoff,
+            ),
+            uncertainty=FALSIFY_DATE_ARTIFACT,
+            expected_info=ExpectedInformation.HIGH,
+            rationale_codes=("FALSIFY", "DATE_CONCENTRATION"),
+            priority_hints={"falsification_threat": 3.5},
+        )
+
+
+DEFAULT_HORIZON_LIST = ["T3", "T5", "T10"]
+HORIZONS = DEFAULT_HORIZON_LIST  # alias for grammar candidates
+
+
 def generate_action_candidates(
     assessment: ResearchAssessment,
     graph: ResearchGraph,
     registry: ToolRegistry,
     *,
     research_scope: Optional[Dict[str, Any]] = None,
+    experiment_node_id: Optional[str] = None,
 ) -> Tuple[ResearchActionCandidate, ...]:
     """
     Generate multiple scientifically legitimate next actions from assessment.
@@ -422,6 +917,27 @@ def generate_action_candidates(
             expected_info=ExpectedInformation.MEDIUM,
             rationale_codes=("FALSIFY", "SYMBOL_DOMINANCE"),
             priority_hints={"falsification_threat": 3.0},
+        )
+
+    # Grammar-driven REFRAME / REPOPULATE candidates (Phase 3E).
+    if experiment_node_id:
+        _add_grammar_candidates(
+            candidates,
+            assessment=assessment,
+            graph=graph,
+            registry=registry,
+            scope=scope,
+            cutoff=cutoff,
+            experiment_node_id=experiment_node_id,
+        )
+        _add_adaptive_candidates(
+            candidates,
+            assessment=assessment,
+            graph=graph,
+            registry=registry,
+            scope=scope,
+            cutoff=cutoff,
+            experiment_node_id=experiment_node_id,
         )
 
     # Terminal candidates — always available; planner may select immediately.
