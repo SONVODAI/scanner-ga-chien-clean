@@ -1,0 +1,125 @@
+{
+  "artifact_id": "03_scientific_birth_certificate",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "mandatory": true,
+  "purpose": "Every autonomous proposition must carry a scientific birth certificate answering eight audit questions. If any required answer cannot be derived from recorded evidence, the proposition does NOT qualify as autonomous.",
+  "storage": {
+    "embedded_in": "PropositionRecord.birth_certificate",
+    "standalone_export": "diagnostics/phase_3i1_opr_bridge_contract/birth_certificates/{proposition_id}.json"
+  },
+  "questions": [
+    {
+      "id": "BC_Q1",
+      "question": "What exactly was observed?",
+      "required_fields": [
+        "observation_provenance",
+        "motivating_observation"
+      ],
+      "pass_criterion": "References concrete empirical statistics, distributions, trajectories, or tool-result payloads — not merely an OBS/GAP label.",
+      "fail_examples": [
+        "Because GAP_DISPERSION was flagged",
+        "Because OBS_03 exists in the interpreter output"
+      ]
+    },
+    {
+      "id": "BC_Q2",
+      "question": "Why was that observation surprising, unresolved, asymmetric, conflicting, or unexplained?",
+      "required_fields": [
+        "surprise_or_uncertainty"
+      ],
+      "pass_criterion": "States a quantitative or structural contrast against a declared baseline, prior expectation, or competing sub-population — with evidence pointers.",
+      "fail_examples": [
+        "Dispersion is interesting",
+        "This gap type is worth exploring"
+      ]
+    },
+    {
+      "id": "BC_Q3",
+      "question": "What scientific question arose from it?",
+      "required_fields": [
+        "surprise_or_uncertainty",
+        "canonical_proposition_core"
+      ],
+      "pass_criterion": "Question is a direct inference from Q1+Q2, not a lookup from template catalog.",
+      "fail_examples": [
+        "Does dispersion predict returns? (because template T8 exists)"
+      ]
+    },
+    {
+      "id": "BC_Q4",
+      "question": "What proposition is being tested?",
+      "required_fields": [
+        "canonical_proposition_core",
+        "population_context",
+        "explanatory_relation",
+        "outcome",
+        "horizon"
+      ],
+      "pass_criterion": "Falsifiable claim with explicit population, relation, outcome, and horizon when relevant.",
+      "fail_examples": [
+        "Reframe of existing template with synonym population label only"
+      ]
+    },
+    {
+      "id": "BC_Q5",
+      "question": "What evidence would support it?",
+      "required_fields": [
+        "falsifiable_expectation",
+        "evidence_required"
+      ],
+      "pass_criterion": "Directional or threshold-based expectation that an experiment could measure.",
+      "fail_examples": [
+        "If true, returns will be different",
+        "Support if experiment runs successfully"
+      ]
+    },
+    {
+      "id": "BC_Q6",
+      "question": "What evidence would weaken or falsify it?",
+      "required_fields": [
+        "null_competing_explanation",
+        "falsifiable_expectation"
+      ],
+      "pass_criterion": "At least one concrete disconfirming pattern, null outcome, or stronger competing explanation.",
+      "fail_examples": [
+        "No falsification path defined",
+        "Only states 'null hypothesis is no effect' without operational test"
+      ]
+    },
+    {
+      "id": "BC_Q7",
+      "question": "Why is this proposition not merely a reformulation of an existing template/question?",
+      "required_fields": [
+        "template_independence_audit"
+      ],
+      "pass_criterion": "template_independence_audit.classification in {TEMPLATE_ADJACENT, SCIENTIFICALLY_NOVEL} OR TEMPLATE_REFRAME with documented new scientific axis from observation.",
+      "fail_examples": [
+        "Same GAP family, same population/outcome, only horizon changed without new observational motivation"
+      ]
+    },
+    {
+      "id": "BC_Q8",
+      "question": "What executable experiment could test it?",
+      "required_fields": [
+        "execution_requirements",
+        "executability_status"
+      ],
+      "pass_criterion": "Maps to legal ExperimentSpec grammar with resolvable tool, population, outcome, horizon.",
+      "fail_examples": [
+        "Conceptual proposition with no legal execution path",
+        "Requires unavailable columns or illegal grammar"
+      ]
+    }
+  ],
+  "qualification_rule": {
+    "autonomous_qualified": "ALL eight questions pass AND template_independence_audit.classification NOT IN {TEMPLATE_INSTANCE, INSUFFICIENT_EVIDENCE}",
+    "non_autonomous_but_executable": "May still execute as human-seeded/template-derived research — must be labeled TEMPLATE_INSTANCE or TEMPLATE_REFRAME",
+    "reject": "Any required field missing OR BC_Q1/Q2 fail OR classification INSUFFICIENT_EVIDENCE"
+  },
+  "audit_trail": {
+    "reviewer": "offline evaluator or human auditor",
+    "timestamp_required": true,
+    "immutable_after_freeze": true
+  }
+}

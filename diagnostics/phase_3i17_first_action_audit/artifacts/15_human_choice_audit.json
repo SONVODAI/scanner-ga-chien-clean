@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "locus": "PARTITION_UNCERTAINTY_AXES taxonomy",
+      "class": "LEGITIMATE_SCIENTIFIC_METHOD_PRIOR"
+    },
+    {
+      "locus": "population_robustness \u2192 population_subgroup_contrast",
+      "class": "LEGITIMATE_SCIENTIFIC_METHOD_PRIOR_WITH_TEMPLATE_RISK"
+    },
+    {
+      "locus": "research_market_state=NORMAL subgroup",
+      "class": "HUMAN_SCIENTIFIC_ANSWER"
+    },
+    {
+      "locus": "sample_independence=HIGH for population_subgroup",
+      "class": "AUTONOMY_LIMITATION"
+    },
+    {
+      "locus": "lexicographic rank order",
+      "class": "LEGITIMATE_SCIENTIFIC_METHOD_PRIOR"
+    },
+    {
+      "locus": "axis alphabetical tiebreaker",
+      "class": "AUTONOMY_LIMITATION"
+    },
+    {
+      "locus": "partition_group_compare availability",
+      "class": "LEGITIMATE_EXECUTION_CONSTRAINT"
+    }
+  ],
+  "winner_materially_affected_by": [
+    "HUMAN_SCIENTIFIC_ANSWER (NORMAL subgroup binding)",
+    "AUTONOMY_LIMITATION (hardcoded HIGH independence ranking)"
+  ]
+}
