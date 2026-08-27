@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from modules.edge_research.adapters import build_research_panel
+from modules.edge_research.opr_bridge.production_panel_freshness import diagnose_panel_freshness
 from modules.edge_research.opr_bridge.production_daily_run_orchestrator import (
     run_production_daily_research,
 )
@@ -108,7 +109,8 @@ def main(argv: list[str] | None = None) -> int:
                 ),
             }
 
-    panel = build_research_panel()
+    panel = build_research_panel(repo_root=repo_root)
+    panel_freshness = diagnose_panel_freshness(panel, trade_date, headless_eod=headless_eod)
     data_dir = Path(args.data_dir) if args.data_dir else None
     result = run_production_daily_research(
         panel,
@@ -119,12 +121,47 @@ def main(argv: list[str] | None = None) -> int:
         repo_root=repo_root,
     )
     result["headless_eod"] = headless_eod
+    result["panel_freshness"] = panel_freshness
     result["run_provenance"] = {
         "recovery": bool(args.recovery),
         "run_mode": args.mode,
         "autonomy_evidence": headless_eod.get("autonomy_evidence"),
         "headless_run_identity": headless_eod.get("run_identity"),
     }
+
+    # Observability-only daily receipt — never changes research outcomes.
+    receipt_info: dict = {"ok": False, "skipped": True}
+    try:
+        from modules.production_daily_receipt import write_receipt_from_run
+
+        receipt_info = write_receipt_from_run(
+            trade_date,
+            repo_root=repo_root,
+            edge_data_dir=data_dir,
+            headless_eod=headless_eod,
+            edge_result=result,
+            panel_freshness=panel_freshness,
+            run_provenance=result.get("run_provenance"),
+        )
+        result["daily_pipeline_receipt"] = receipt_info
+    except Exception as exc:  # noqa: BLE001
+        receipt_info = {"ok": False, "error": f"receipt_hook:{type(exc).__name__}:{exc}"}
+        result["daily_pipeline_receipt"] = receipt_info
+
+    # Fail-safe Streamlit Cloud sync of production_observations (observability only).
+    try:
+        from modules.edge_research.production_observations_sync import (
+            publish_production_observations_durable,
+        )
+
+        result["production_observations_sync"] = publish_production_observations_durable(
+            data_dir=data_dir
+        )
+    except Exception as sync_exc:  # noqa: BLE001
+        result["production_observations_sync"] = {
+            "ok": False,
+            "error": f"sync_hook:{type(sync_exc).__name__}:{sync_exc}",
+        }
 
     disposition = result.get("run", {}).get("run_disposition", "FAILED_CLOSED")
     if result.get("lock_held"):
@@ -157,6 +194,14 @@ def main(argv: list[str] | None = None) -> int:
                     },
                 },
                 "forecast_memory": (result.get("forecast_memory") or {}).get("stage_disposition"),
+                "panel_freshness": result.get("panel_freshness"),
+                "daily_pipeline_receipt": {
+                    "ok": receipt_info.get("ok"),
+                    "path": receipt_info.get("path"),
+                    "overall": (receipt_info.get("receipt") or {}).get("overall"),
+                    "first_failed_stage": (receipt_info.get("receipt") or {}).get("first_failed_stage"),
+                    "reason": (receipt_info.get("receipt") or {}).get("reason"),
+                },
             },
             indent=2,
             default=str,

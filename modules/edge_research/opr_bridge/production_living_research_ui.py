@@ -123,13 +123,15 @@ def render_living_research_ui_panel(
     """
     import streamlit as st
 
-    data_dir = data_dir or resolve_data_dir(None) / "production_observations"
+    data_dir = data_dir or resolve_data_dir(None)
     available = build_living_research_ui_read_model(data_dir=data_dir).get("available_dates") or []
 
     st.markdown("## 🧠 MR.BOT — HÔM NAY TÔI ĐANG NGHĨ GÌ?")
     st.caption(
-        "Research Brain notebook — read-only. "
-        "Không khuyến nghị mua/bán. Không chạy research khi render."
+        "Autonomous living research notebook — read-only from "
+        "data/edge_research/production_observations. "
+        "Không khuyến nghị mua/bán. Không chạy research khi render. "
+        "Distinct from Historical Challenger research."
     )
     st.info(f"🏷 **{AUTHORITY_BADGE_RESEARCH_ONLY}** — UI này không có trading authority.")
 

@@ -227,6 +227,59 @@ def reject_second_genesis_creation(data_dir: Optional[Path] = None) -> Tuple[boo
     return True, "ok"
 
 
+def ensure_live_forward_genesis_once(
+    *,
+    first_eligible_trade_date: str,
+    code_commit: str,
+    deployment_identity: str,
+    data_dir: Optional[Path] = None,
+    repo_root: Optional[Path] = None,
+    dataset_identities: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """
+    Idempotent go-live helper: create genesis if missing; never overwrite.
+
+    Safe for deploy scripts. Does not run research. Does not mutate existing genesis.
+    """
+    if genesis_exists(data_dir):
+        existing = load_genesis(data_dir)
+        return {
+            "ok": True,
+            "created": False,
+            "reason": "genesis_already_exists",
+            "path": str(genesis_path(data_dir)),
+            "first_eligible_trade_date": existing.first_eligible_trade_date if existing else None,
+            "genesis_id": existing.genesis_id if existing else None,
+        }
+    root = repo_root or Path(__file__).resolve().parents[3]
+    policy = compute_research_policy_hashes_safe(root)
+    genesis = build_genesis_record(
+        first_eligible_trade_date=first_eligible_trade_date,
+        code_commit=code_commit,
+        policy_hashes=policy,
+        dataset_identities=dataset_identities or {"panel": "production"},
+        deployment_identity=deployment_identity,
+    )
+    path = persist_genesis(genesis, data_dir=data_dir, allow_overwrite=False)
+    return {
+        "ok": True,
+        "created": True,
+        "reason": "genesis_created",
+        "path": str(path),
+        "first_eligible_trade_date": genesis.first_eligible_trade_date,
+        "genesis_id": genesis.genesis_id,
+        "genesis_hash": genesis.genesis_hash,
+    }
+
+
+def compute_research_policy_hashes_safe(repo_root: Path) -> Dict[str, str]:
+    from modules.edge_research.opr_bridge.blind_research_examination_runner import (
+        compute_research_policy_hashes,
+    )
+
+    return compute_research_policy_hashes(repo_root)
+
+
 def reject_non_forward_mode_as_live(run_mode: str) -> Tuple[bool, str]:
     if run_mode in (BACKFILL_NON_FORWARD, HISTORICAL_REPLAY_TEST, DAY_0_SMOKE, PRE_DEPLOYMENT_DRY_RUN):
         return False, f"mode_not_live_forward:{run_mode}"
