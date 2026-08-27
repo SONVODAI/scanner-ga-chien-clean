@@ -1,0 +1,36 @@
+{
+  "phase": "3I.5",
+  "git_head": "34d6d86fea3634427d151eeb610dd6d9d781c9eb",
+  "prioritizer_version": "opr_prioritizer_v1_3i5",
+  "generator_version": "opr_generator_v1_3i2",
+  "verdict": "PRIORITIZE_PASS",
+  "replay_improvements": {
+    "proposition_spam_decreased": true,
+    "higher_information_representative": true,
+    "duplicate_compression": 2,
+    "scientific_diversity_unchanged": true
+  },
+  "blind_evaluation": {
+    "unique_scientific_propositions_emitted": 1,
+    "duplicate_evidence_compression": 2,
+    "representative_evidence_quality": {
+      "old_max_spread": 4.958937580569271,
+      "new_representative_spread": 6.402072074074837,
+      "improved": true
+    },
+    "research_worthiness_rate": 1.0,
+    "scientific_diversity": 1,
+    "grounding": true,
+    "falsifiability": true,
+    "executability": true,
+    "silence_behavior": {
+      "aggregated_as_evidence_silences": 21
+    },
+    "budget_efficiency": {
+      "unique_ideas_per_budget_slot": 0.3333333333333333,
+      "old_unique_per_slot": 0.3333333333333333
+    }
+  },
+  "hidden_firewall_passed": true,
+  "highest_leverage_remaining": "BROADER_OBSERVATION_REPERTOIRE"
+}
