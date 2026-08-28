@@ -43,6 +43,12 @@ OPTIONAL_ARTIFACT_NAMES: Tuple[str, ...] = (
     "edge_robustness_history.csv",
     "edge_episode_registry.csv",
     "discovery_runs.csv",
+    "edge_memory.csv",
+    "edge_validation_history.csv",
+    "frozen_specs.json",
+    "edge_forward_ledger.csv",
+    "edge_session_assessments.csv",
+    "latest_future_recognition.json",
 )
 
 
@@ -144,7 +150,43 @@ def is_publishable_state(data_dir: Optional[Path] = None) -> bool:
     return not cohort.empty
 
 
+def _pack_frozen_specs(source_dir: Path) -> Optional[Path]:
+    """Snapshot individual frozen spec files into a single bundle artifact."""
+    from modules.edge_research.contracts import FROZEN_SPECS_DIRNAME
+
+    spec_dir = source_dir / FROZEN_SPECS_DIRNAME
+    if not spec_dir.exists():
+        return None
+    payload: Dict[str, Any] = {}
+    for path in sorted(spec_dir.glob("*.json")):
+        try:
+            payload[path.stem] = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+    if not payload:
+        return None
+    out = source_dir / "frozen_specs.json"
+    out.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    return out
+
+
+def _unpack_frozen_specs(data_dir: Path, packed: Path) -> None:
+    from modules.edge_research.contracts import FROZEN_SPECS_DIRNAME
+
+    payload = json.loads(packed.read_text(encoding="utf-8"))
+    spec_dir = data_dir / FROZEN_SPECS_DIRNAME
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    if not isinstance(payload, dict):
+        return
+    for hid, spec in payload.items():
+        (spec_dir / f"{hid}.json").write_text(
+            json.dumps(spec, indent=2, ensure_ascii=False, sort_keys=True),
+            encoding="utf-8",
+        )
+
+
 def _collect_artifact_paths(source_dir: Path) -> Dict[str, Path]:
+    _pack_frozen_specs(source_dir)
     paths: Dict[str, Path] = {}
     for name in CANONICAL_ARTIFACT_NAMES:
         p = source_dir / name
@@ -356,6 +398,8 @@ def restore_bundle_to_working_dir(bundle_dir: Path, data_dir: Path) -> Dict[str,
 
     for name in restore_names:
         shutil.copy2(artifacts_dir / name, data_dir / name)
+        if name == "frozen_specs.json":
+            _unpack_frozen_specs(data_dir, data_dir / name)
 
     return manifest
 

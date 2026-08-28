@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
-ENGINE_VERSION = "3.0.0-challenger"
+ENGINE_VERSION = "5.0.0-future-recognition"
 GUARDRAILS_CONFIG_VERSION = "guardrails_v1"
 DISCOVERY_CONFIG_VERSION = "discovery_v1"
 ROBUSTNESS_CONFIG_VERSION = "robustness_v1"
@@ -18,6 +18,8 @@ FEATURE_BUCKET_CONFIG_VERSION = "feature_buckets_v1"
 MARKET_LEVEL_CONFIG_VERSION = "market_level_v1_provisional"
 MARKET_STATE_CONFIG_VERSION = "market_state_v1_provisional"
 SNAPSHOT_POLICY_VERSION = "canonical_market_t0_v2_eod_preferred"
+FROZEN_SPEC_SCHEMA_VERSION = "frozen_hypothesis_spec_v2"
+OOS_POLICY_VERSION = "oos_policy_v1_conservative"
 
 # Phase 2 sample guards — research defaults, NOT optimized from returns.
 CANDIDATE_MIN_N = 20
@@ -34,6 +36,41 @@ CANDIDATE_STATUS_INSUFFICIENT_SAMPLE = "INSUFFICIENT_SAMPLE"
 ROBUSTNESS_PASS = "PASS"
 ROBUSTNESS_FRAGILE = "FRAGILE"
 ROBUSTNESS_REJECT = "REJECT"
+
+OOS_STATUS_NOT_TESTED = "NOT_TESTED"
+OOS_STATUS_PENDING = "OOS_PENDING"
+OOS_STATUS_PASS = "OOS_PASS"
+OOS_STATUS_FAIL = "OOS_FAIL"
+OOS_STATUS_INCONCLUSIVE = "OOS_INCONCLUSIVE"
+OOS_STATUS_ABORTED_LEAKAGE = "EVALUATION_ABORTED_LEAKAGE"
+
+FREEZE_ELIGIBLE = "ELIGIBLE"
+FREEZE_HISTORICAL_ONLY = "HISTORICAL_ONLY"
+FREEZE_NON_FREEZABLE = "NON_FREEZABLE"
+FREEZE_FRAGILE = "FRAGILE_NOT_ELIGIBLE"
+FREEZE_REJECT = "REJECT_NOT_ELIGIBLE"
+FREEZE_CHALLENGER_PENDING = "CHALLENGER_PENDING"
+
+OOS_MODE_HOLDOUT_SPLIT = "HOLDOUT_SPLIT"
+OOS_MODE_PROSPECTIVE_AFTER_FREEZE = "PROSPECTIVE_AFTER_FREEZE"
+
+EDGE_MEMORY_STATUS_ACTIVE = "ACTIVE"
+EDGE_MEMORY_STATUS_INACTIVE = "INACTIVE"
+
+FROZEN_SPECS_DIRNAME = "frozen_specs"
+FUTURE_RECOGNITION_VERSION = "future_recognition_v1"
+
+ASSESSMENT_QUALIFIED_MATCH_FOUND = "QUALIFIED_MATCH_FOUND"
+ASSESSMENT_NO_QUALIFIED_MATCH = "NO_QUALIFIED_MATCH"
+ASSESSMENT_UNABLE_TO_ASSESS = "UNABLE_TO_ASSESS"
+
+CONTEXT_COMPATIBLE = "COMPATIBLE"
+CONTEXT_INCOMPATIBLE = "INCOMPATIBLE"
+CONTEXT_UNKNOWN = "UNKNOWN"
+
+FORWARD_OUTCOME_PENDING = "PENDING"
+
+REASON_NO_ACTIVE_EDGE_AVAILABLE = "NO_ACTIVE_EDGE_AVAILABLE"
 
 # Fixed robustness thresholds — NOT optimized from returns.
 DATE_CONCENTRATION_SEVERE = 0.50
@@ -142,6 +179,16 @@ EDGE_HYPOTHESIS_LEDGER_COLUMNS: Tuple[str, ...] = (
     "fragility_flags",
     "rejection_reasons",
     "main_fragility_flag",
+    # Phase A additive scientific lifecycle (backward-compatible)
+    "condition_key",
+    "feature_clauses_json",
+    "scientific_status",
+    "hypothesis_id",
+    "frozen_spec_path",
+    "frozen_spec_hash",
+    "freeze_eligibility",
+    "oos_mode",
+    "challenger_run_id",
 )
 
 DISCOVERY_RUN_COLUMNS: Tuple[str, ...] = (
@@ -232,6 +279,33 @@ EDGE_VALIDATION_HISTORY_COLUMNS: Tuple[str, ...] = (
     "validation_type",
     "result",
     "validated_at",
+    # Phase A additive OOS audit fields
+    "edge_id",
+    "evaluated_at",
+    "evaluation_seq",
+    "oos_start",
+    "oos_end",
+    "candidate_n",
+    "baseline_n",
+    "candidate_mean",
+    "candidate_median",
+    "candidate_win_rate",
+    "baseline_mean",
+    "baseline_median",
+    "baseline_win_rate",
+    "incremental_mean",
+    "incremental_median",
+    "incremental_win_rate",
+    "best_horizon",
+    "baseline_type",
+    "market_episode_count",
+    "concentration_json",
+    "threshold_policy_version",
+    "frozen_spec_hash",
+    "embargo_trading_sessions",
+    "data_cutoff_date",
+    "leakage_check",
+    "reason",
 )
 
 EDGE_MEMORY_COLUMNS: Tuple[str, ...] = (
@@ -241,6 +315,31 @@ EDGE_MEMORY_COLUMNS: Tuple[str, ...] = (
     "confirmed_at",
     "decayed_at",
     "notes",
+    # Phase A additive ACTIVE memory fields for future matcher (Phase B)
+    "spec_path",
+    "spec_hash",
+    "market_state",
+    "market_transition",
+    "baseline_type",
+    "feature_clauses_json",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "feature_bucket_config_version",
+    "market_state_config_version",
+    "activated_at",
+    "oos_result",
+    "oos_candidate_n",
+    "oos_baseline_n",
+    "oos_incremental_median",
+    "oos_incremental_mean",
+    "oos_incremental_win_rate",
+    "oos_evaluated_at",
+    "episode_count",
+    "concentration_notes",
+    "forward_matches",
+    "forward_matured",
+    "forward_hits",
 )
 
 EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
@@ -250,6 +349,60 @@ EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
     "symbol",
     "frozen_at",
     "outcome_status",
+    # Phase B additive birth fields
+    "edge_id",
+    "t0_trade_date",
+    "born_at",
+    "spec_path",
+    "spec_hash",
+    "spec_schema_version",
+    "feature_bucket_config_version",
+    "market_state_config_version",
+    "market_state_t0",
+    "market_transition_t0",
+    "context_verdict",
+    "context_reason",
+    "stock_feature_values_json",
+    "matched_clauses_json",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "active_status_at_birth",
+    "oos_evidence_json",
+    "universe_count",
+    "universe_hash",
+    "pit_artifact",
+    "pit_artifact_hash",
+    "assessment_run_id",
+    "selection_reason",
+    "selection_reason_vi",
+    "research_label",
+)
+
+EDGE_SESSION_ASSESSMENT_COLUMNS: Tuple[str, ...] = (
+    "trade_date",
+    "run_id",
+    "started_at",
+    "completed_at",
+    "assessment_state",
+    "reason",
+    "t0_source_status",
+    "universe_count",
+    "universe_hash",
+    "active_edge_count",
+    "edges_loaded_ok",
+    "edges_uninterpretable",
+    "edges_context_compatible",
+    "edges_context_incompatible",
+    "edges_context_unknown",
+    "stock_edge_evaluations",
+    "qualified_match_count",
+    "new_birth_count",
+    "duplicate_skip_count",
+    "matcher_version",
+    "spec_schema_version",
+    "pit_artifact",
+    "failure_detail",
 )
 
 RESEARCH_OBSERVATION_COLUMNS: Tuple[str, ...] = (
