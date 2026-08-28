@@ -1,0 +1,11 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "pre_resume_decision_kind": "STOP",
+  "pre_resume_stop_reason": "STOP_LOW_INCREMENTAL",
+  "pre_resume_chosen_action": "HOLD_UNRESOLVED",
+  "lifecycle_outcome": "SCIENTIFIC_STOP",
+  "experiments_completed": 2,
+  "experiment_three_generated": false,
+  "termination_reason": "STOP_LOW_INCREMENTAL",
+  "lifecycle_phase": "STOPPED"
+}
