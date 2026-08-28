@@ -637,13 +637,15 @@ def test_no_buy_execution_coupling_and_no_human_edge_rule():
         "build_buy_elite_decision_engine",
         "build_final_decision",
         "place_order",
-        "AUTOMATIC BUY",
         "BUY ELITE",
     )
     for name in names:
         src = inspect.getsource(importlib.import_module(f"modules.edge_research.{name}"))
         for tok in forbidden_buy:
             assert tok not in src
+        assert "RESEARCH MATCH — NOT AUTOMATIC BUY" in inspect.getsource(
+            importlib.import_module("modules.edge_research.forward_ledger")
+        )
         assert "NEW1" not in src
         assert "TCB" not in src
         assert '"S000"' not in src
