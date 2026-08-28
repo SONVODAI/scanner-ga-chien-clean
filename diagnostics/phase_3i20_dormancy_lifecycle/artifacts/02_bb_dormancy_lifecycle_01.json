@@ -1,0 +1,149 @@
+{
+  "benchmark": "BB-DormancyLifecycle-01",
+  "passed": 20,
+  "case_count": 20,
+  "all_passed": true,
+  "results": [
+    {
+      "case_id": "BBDL-01",
+      "passed": true,
+      "checks": {
+        "dormant": true,
+        "epistemic": true
+      }
+    },
+    {
+      "case_id": "BBDL-02",
+      "passed": true,
+      "checks": {
+        "separate": true
+      }
+    },
+    {
+      "case_id": "BBDL-03",
+      "passed": true,
+      "checks": {
+        "idempotent": true
+      }
+    },
+    {
+      "case_id": "BBDL-04",
+      "passed": true,
+      "checks": {
+        "reconstruct": true
+      }
+    },
+    {
+      "case_id": "BBDL-05",
+      "passed": true,
+      "checks": {
+        "dedup": true
+      }
+    },
+    {
+      "case_id": "BBDL-06",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-07",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-08",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-09",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-10",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-11",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-12",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-13",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-14",
+      "passed": true,
+      "checks": {
+        "reopening_in": true
+      }
+    },
+    {
+      "case_id": "BBDL-15",
+      "passed": true,
+      "checks": {
+        "isolation": true
+      }
+    },
+    {
+      "case_id": "BBDL-16",
+      "passed": true,
+      "checks": {
+        "no_fabricated": true
+      }
+    },
+    {
+      "case_id": "BBDL-17",
+      "passed": true,
+      "checks": {
+        "stale": true
+      }
+    },
+    {
+      "case_id": "BBDL-18",
+      "passed": true,
+      "checks": {
+        "ordering": true
+      }
+    },
+    {
+      "case_id": "BBDL-19",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBDL-20",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    }
+  ]
+}
