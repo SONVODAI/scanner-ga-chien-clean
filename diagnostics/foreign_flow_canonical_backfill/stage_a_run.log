@@ -1,0 +1,92 @@
+[A:1/7] VNM ...
+  -> completed rows=4402 elapsed=353.813s
+[A:2/7] HPG ...
+  -> completed rows=4402 elapsed=118.193s
+[A:3/7] FPT ...
+  -> completed rows=4402 elapsed=67.56s
+[A:4/7] MWG ...
+  -> completed rows=3025 elapsed=88.041s
+[A:5/7] NAB ...
+  -> completed rows=615 elapsed=16.369s
+[A:6/7] SSI ...
+  -> completed rows=4402 elapsed=82.209s
+[A:7/7] DIG ...
+  -> completed rows=4245 elapsed=89.683s
+{
+  "stage": "A",
+  "created_at": "2026-08-25T01:38:12Z",
+  "symbols_attempted": [
+    "VNM",
+    "HPG",
+    "FPT",
+    "MWG",
+    "NAB",
+    "SSI",
+    "DIG"
+  ],
+  "n_attempted": 7,
+  "n_completed_this_run": 7,
+  "n_failed_this_run": 0,
+  "rate_limited": false,
+  "aggregate": {
+    "symbols_completed_on_disk": [
+      "DIG",
+      "FPT",
+      "HPG",
+      "MWG",
+      "NAB",
+      "SSI",
+      "VNM"
+    ],
+    "total_rows": 25493,
+    "earliest_date": "2009-01-02",
+    "latest_date": "2026-08-24",
+    "median_sessions_per_symbol": 4402.0,
+    "max_sessions_per_symbol": 4402,
+    "current_ems_hose_coverage": {
+      "n_eligible": 117,
+      "n_completed": 7,
+      "symbols": [
+        "DIG",
+        "FPT",
+        "HPG",
+        "MWG",
+        "NAB",
+        "SSI",
+        "VNM"
+      ]
+    },
+    "excluded_hnx_upcom": [
+      "ACV",
+      "BVS",
+      "C4G",
+      "CEO",
+      "DDV",
+      "DRI",
+      "FOX",
+      "HUT",
+      "IDC",
+      "LAS",
+      "MBS",
+      "MML",
+      "MSR",
+      "NTP",
+      "OIL",
+      "PLC",
+      "PVB",
+      "PVC",
+      "PVS",
+      "SHS",
+      "TNG",
+      "TVN",
+      "VGI",
+      "VGS",
+      "VGT"
+    ],
+    "integrity_failures": [],
+    "disk_footprint_bytes": 23473338
+  },
+  "schema_version": "ff_hsx_symbol_daily_v1",
+  "source": "HSX_FOREIGN_API",
+  "data_root": "data/foreign_flow_history"
+}

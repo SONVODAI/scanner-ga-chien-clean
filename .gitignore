@@ -10,3 +10,7 @@ __pycache__/
 
 # Intraday memory Parquet data (local/test — not committed to Git)
 /intraday_memory/
+
+# Foreign-flow history: keep canonical + manifests; raw provider JSONL is regenerable
+data/foreign_flow_history/raw/*.jsonl
+!data/foreign_flow_history/raw/.gitkeep

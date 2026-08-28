@@ -1,0 +1,171 @@
+{
+  "stage": "A",
+  "created_at": "2026-08-25T01:38:46Z",
+  "symbols_attempted": [
+    "VNM",
+    "HPG",
+    "FPT",
+    "MWG",
+    "NAB",
+    "SSI",
+    "DIG"
+  ],
+  "n_attempted": 7,
+  "n_completed_this_run": 7,
+  "n_failed_this_run": 0,
+  "results": [
+    {
+      "symbol": "VNM",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "VNM",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "3aa79a09b7ade2eb6563d484a8d308b99443e6d73f403a304f1be3bac1d737d9",
+        "bytes": 1343618
+      }
+    },
+    {
+      "symbol": "HPG",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "HPG",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "99fc305f3c2b402bdf3c101be1aac30c4558bec5c61943c1f1e2d250538ace7b",
+        "bytes": 1312509
+      }
+    },
+    {
+      "symbol": "FPT",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "FPT",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "7bcbdc8e18d5b0159c463759e5311e5a99d6e0ef7822af40fbe03557a007ce89",
+        "bytes": 1294577
+      }
+    },
+    {
+      "symbol": "MWG",
+      "status": "skipped_completed",
+      "n_rows": 3025,
+      "coverage": {
+        "symbol": "MWG",
+        "n_rows": 3025,
+        "first_trade_date": "2014-07-14",
+        "last_trade_date": "2026-08-24",
+        "sha256": "368e7d92d24b0afdfa6caeafe1fe710336f3be05110462c7cce5963dcbd8baf1",
+        "bytes": 854749
+      }
+    },
+    {
+      "symbol": "NAB",
+      "status": "skipped_completed",
+      "n_rows": 615,
+      "coverage": {
+        "symbol": "NAB",
+        "n_rows": 615,
+        "first_trade_date": "2024-03-07",
+        "last_trade_date": "2026-08-24",
+        "sha256": "591e8ebaee060aa1f0157524e29c2aedbfab64d1b78b5bc45ad356a47953e321",
+        "bytes": 175641
+      }
+    },
+    {
+      "symbol": "SSI",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "SSI",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "cd2bbe1531d201135d49a091682ce879a38d4d7e21189c889fc52caa9a65bce3",
+        "bytes": 1290009
+      }
+    },
+    {
+      "symbol": "DIG",
+      "status": "skipped_completed",
+      "n_rows": 4245,
+      "coverage": {
+        "symbol": "DIG",
+        "n_rows": 4245,
+        "first_trade_date": "2009-08-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "322a18a08493cd2990c946bf074d42baabea26a9c4c91434f983657684971048",
+        "bytes": 1183364
+      }
+    }
+  ],
+  "rate_limited": false,
+  "aggregate": {
+    "symbols_completed_on_disk": [
+      "DIG",
+      "FPT",
+      "HPG",
+      "MWG",
+      "NAB",
+      "SSI",
+      "VNM"
+    ],
+    "total_rows": 25493,
+    "earliest_date": "2009-01-02",
+    "latest_date": "2026-08-24",
+    "median_sessions_per_symbol": 4402.0,
+    "max_sessions_per_symbol": 4402,
+    "current_ems_hose_coverage": {
+      "n_eligible": 117,
+      "n_completed": 7,
+      "symbols": [
+        "DIG",
+        "FPT",
+        "HPG",
+        "MWG",
+        "NAB",
+        "SSI",
+        "VNM"
+      ]
+    },
+    "excluded_hnx_upcom": [
+      "ACV",
+      "BVS",
+      "C4G",
+      "CEO",
+      "DDV",
+      "DRI",
+      "FOX",
+      "HUT",
+      "IDC",
+      "LAS",
+      "MBS",
+      "MML",
+      "MSR",
+      "NTP",
+      "OIL",
+      "PLC",
+      "PVB",
+      "PVC",
+      "PVS",
+      "SHS",
+      "TNG",
+      "TVN",
+      "VGI",
+      "VGS",
+      "VGT"
+    ],
+    "integrity_failures": [],
+    "disk_footprint_bytes": 23473338
+  },
+  "schema_version": "ff_hsx_symbol_daily_v1",
+  "source": "HSX_FOREIGN_API",
+  "data_root": "data/foreign_flow_history"
+}

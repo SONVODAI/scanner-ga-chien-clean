@@ -1,0 +1,99 @@
+{
+  "audit_id": "forecast_market_history_forensic_audit_v1",
+  "audited_at_utc": "2026-08-25T00:30:00Z",
+  "workspace_head_note": "audited against workspace data copies present at audit time",
+  "earliest_genuine_market_observation": "2026-06-25",
+  "latest_observation": "2026-08-24",
+  "counts": {
+    "all_calendar_dates_any_source": 52,
+    "weekday_sessions_any_source": 42,
+    "sessions_with_FC": 51,
+    "weekday_sessions_with_FC": 42,
+    "sessions_with_REAL": 51,
+    "sessions_with_LIVE": 8,
+    "sessions_with_regime": 12,
+    "sessions_with_breadth": 8,
+    "sessions_with_full_142_dna": 17,
+    "forecast_outcomes_T3": 14,
+    "forecast_outcomes_T5": 12,
+    "forecast_outcomes_T10": 7,
+    "root_pattern_history_dates": 43,
+    "root_pattern_history_rows": 33343,
+    "ems_dates": 17,
+    "ems_symbols_per_date": 142,
+    "mdt0_dates": 8,
+    "buy_elite_dates": 41,
+    "historical_market_core_rows": 42,
+    "regime_label_changes_along_fc_timeline": 7,
+    "fc_direction_flips": 15
+  },
+  "history_class_spans": {
+    "A_market_core": {
+      "earliest": "2026-06-25",
+      "latest": "2026-08-24",
+      "sessions": 42,
+      "approx_calendar_months": 2.0,
+      "ge_1m": true,
+      "ge_2m": true,
+      "ge_3m": false,
+      "ge_6m": false,
+      "gaps": ["2026-06-26"],
+      "quality_note": "FC+REAL nearly continuous weekdays; breadth/LIVE sparse before MDT0"
+    },
+    "B_rich_market": {
+      "earliest": "2026-07-02",
+      "latest": "2026-08-24",
+      "sessions": 38,
+      "approx_calendar_months": 1.7,
+      "ge_1m": true,
+      "ge_2m": false,
+      "ge_3m": false,
+      "ge_6m": false
+    },
+    "C_full_142_forecast_compatible": {
+      "earliest": "2026-07-31",
+      "latest": "2026-08-24",
+      "sessions": 17,
+      "approx_calendar_months": 0.8,
+      "ge_1m": false,
+      "ge_2m": false,
+      "ge_3m": false,
+      "ge_6m": false
+    },
+    "D_outcome_matured_market_T3": {
+      "earliest": "2026-07-31",
+      "latest": "2026-08-19",
+      "sessions": 14,
+      "approx_calendar_months": 0.6,
+      "T5_sessions": 12,
+      "T10_sessions": 7
+    }
+  },
+  "why_prior_recovery_saw_42_fc_and_17_t0": {
+    "forecast_t0_requires": "exact EMS universe_count=142 board for COMPLETE T0",
+    "ems_sessions_available": 17,
+    "historical_fc_recovery_sources": [
+      "buy_elite_learning_history (from 2026-06-25)",
+      "root pattern_history (from 2026-07-02)",
+      "EMS group-composition FC reconstruction (from 2026-07-31)",
+      "MDT0 (from 2026-08-13)"
+    ],
+    "weekday_fc_recoverable": 42,
+    "root_ph_has_more_than_t0_but": "partial universe (median ~64 symbols), multi-FC intraday scans, classified LEAKAGE_RISK_SOURCE — not Forecast T0 schema"
+  },
+  "pattern_history_three_month_question": {
+    "useful_market_history_ge_3_months": false,
+    "useful_market_core_sessions": 43,
+    "approx_months": 1.7,
+    "full_142_forecast_t0_ge_3_months": false,
+    "full_142_sessions": 2,
+    "note": "Separates MARKET CORE usefulness from Forecast-T0-compatible 142 DNA"
+  },
+  "ems_market_scalars_in_workspace": {
+    "market_forecast_nonnull": 0,
+    "market_real_nonnull": 0,
+    "market_live_nonnull": 0,
+    "note": "Matches historical_recovery design: EMS FC reconstructed from group composition when scalars null"
+  },
+  "verdict": "MARKET_HISTORY_PARTIALLY_SUFFICIENT_KEEP_COLLECTING"
+}

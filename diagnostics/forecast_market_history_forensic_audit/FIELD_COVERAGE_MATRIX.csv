@@ -1,0 +1,17 @@
+field,root_ph,el_ph,ems,mdt0,buy_elite,forecast_t0,hist_core,p0,notes,el_obs,legacy_ssi,el,forecast_outcomes,el_outcomes
+FC,YES_all_43,PARTIAL,EMPTY_in_workspace,YES_8,YES_41,YES_17,YES_42,NO,Best long FC series via hist_core/PH/buy_elite,,,,,
+REAL,YES_all_43,,EMPTY,YES_8,YES,YES_via_mdt0,PARTIAL,,,,,,,
+LIVE,NO_scalar_but_live_flags,,EMPTY,YES_8,,YES_8_overlap,,,LIVE only reliable on MDT0 window,,,,,
+regime,YES_text,,EMPTY,YES_8,,,PARTIAL,,Sparse vs FC,,,,,
+breadth,COLUMN_ALL_NULL,,EMPTY,YES_8,,,PARTIAL,,Critical gap pre-MDT0,,,,,
+group_8,PARTIAL_2to4,,YES_full_8,,,YES_17,,,Full 8-group only on EMS/Forecast T0,YES,,,,
+sector,NO,YES,NO,,,,,,Not in EMS; EL only,YES,,,,
+vnindex_ohlcv,,,,YES_8,,,,volume_17,OHLC only MDT0; P0 has volume+tech,,,,,
+vnindex_tech,,,,COLS_EMPTY,,,,YES_17,P0 derives RSI/MACD/BB,,,,,
+universe_142_dna,NO_median_64,,YES_17,,,YES_17,,,Hard ceiling for Forecast-compatible T0,,,,,
+foreign_flow,,,,,,,,YES_17_universe142,Forward-only from P0 automation,,NULL,,,
+turnover,,,DERIVABLE,,,,,YES_17,,,,,,
+stock_technicals,YES,,YES,,,,,,,,,YES,,
+T3_market_outcome,COLS_EMPTY,,,,,,,,Market-level T3 only via forecast_outcomes,,,,YES_14,stock_not_market
+T5_market_outcome,,,,,,,,,,,,,YES_12,
+T10_market_outcome,,,,,,,,,,,,,YES_7,

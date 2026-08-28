@@ -1,0 +1,663 @@
+[B:1/117] ACB ...
+  -> completed rows=1422 elapsed=50.028s
+[B:2/117] AGR ...
+  -> completed rows=4165 elapsed=107.335s
+[B:3/117] ANV ...
+  -> completed rows=4402 elapsed=144.922s
+[B:4/117] BAF ...
+  -> completed rows=1177 elapsed=105.205s
+[B:5/117] BFC ...
+  -> completed rows=2718 elapsed=192.742s
+[B:6/117] BID ...
+  -> completed rows=3135 elapsed=226.239s
+[B:7/117] BMP ...
+  -> completed rows=4402 elapsed=225.943s
+[B:8/117] BSI ...
+  -> completed rows=3682 elapsed=187.833s
+[B:9/117] BSR ...
+  -> completed rows=397 elapsed=21.2s
+[B:10/117] BVH ...
+EXIT:141
+RESUME_START 02:05:22Z
+[B:1/117] ACB ...
+  -> skipped_completed rows=1422 elapsed=Nones
+[B:2/117] AGR ...
+  -> skipped_completed rows=4165 elapsed=Nones
+[B:3/117] ANV ...
+  -> skipped_completed rows=4402 elapsed=Nones
+[B:4/117] BAF ...
+  -> skipped_completed rows=1177 elapsed=Nones
+[B:5/117] BFC ...
+  -> skipped_completed rows=2718 elapsed=Nones
+[B:6/117] BID ...
+  -> skipped_completed rows=3135 elapsed=Nones
+[B:7/117] BMP ...
+  -> skipped_completed rows=4402 elapsed=Nones
+[B:8/117] BSI ...
+  -> skipped_completed rows=3682 elapsed=Nones
+[B:9/117] BSR ...
+  -> skipped_completed rows=397 elapsed=Nones
+[B:10/117] BVH ...
+  -> skipped_completed rows=4286 elapsed=Nones
+[B:11/117] CII ...
+  -> completed rows=4402 elapsed=154.202s
+[B:12/117] CMG ...
+  -> completed rows=4135 elapsed=114.184s
+[B:13/117] CSV ...
+  -> completed rows=2858 elapsed=60.691s
+[B:14/117] CTD ...
+  -> completed rows=4137 elapsed=114.75s
+[B:15/117] CTG ...
+  -> completed rows=4269 elapsed=94.73s
+[B:16/117] CTR ...
+  -> completed rows=1125 elapsed=23.74s
+[B:17/117] DBC ...
+  -> completed rows=1769 elapsed=49.402s
+[B:18/117] DCM ...
+  -> completed rows=2849 elapsed=81.999s
+[B:19/117] DGC ...
+  -> completed rows=1517 elapsed=56.911s
+[B:20/117] DGW ...
+  -> completed rows=2764 elapsed=90.395s
+[B:21/117] DIG ...
+  -> skipped_completed rows=4245 elapsed=Nones
+[B:22/117] DPG ...
+  -> completed rows=2065 elapsed=63.892s
+[B:23/117] DPM ...
+  -> completed rows=4402 elapsed=115.148s
+[B:24/117] DPR ...
+  -> completed rows=4402 elapsed=116.375s
+[B:25/117] DXG ...
+  -> completed rows=4157 elapsed=122.62s
+[B:26/117] DXS ...
+  -> completed rows=1241 elapsed=52.157s
+[B:27/117] EIB ...
+  -> completed rows=4197 elapsed=160.014s
+[B:28/117] EVF ...
+  -> completed rows=1150 elapsed=50.19s
+[B:29/117] FCN ...
+  -> completed rows=3514 elapsed=101.741s
+[B:30/117] FPT ...
+  -> skipped_completed rows=4402 elapsed=Nones
+[B:31/117] FRT ...
+  -> completed rows=2081 elapsed=83.547s
+[B:32/117] FTS ...
+  -> completed rows=2397 elapsed=99.642s
+[B:33/117] GAS ...
+  -> completed rows=3560 elapsed=146.724s
+[B:34/117] GEE ...
+  -> completed rows=506 elapsed=16.89s
+[B:35/117] GEG ...
+  -> completed rows=1731 elapsed=83.148s
+[B:36/117] GEX ...
+  -> completed rows=2143 elapsed=116.007s
+[B:37/117] GIL ...
+  -> completed rows=4402 elapsed=187.432s
+[B:38/117] GMD ...
+  -> completed rows=4402 elapsed=196.049s
+[B:39/117] GVR ...
+  -> completed rows=1609 elapsed=85.419s
+[B:40/117] HAG ...
+  -> completed rows=4402 elapsed=160.069s
+[B:41/117] HAH ...
+  -> completed rows=2863 elapsed=145.765s
+[B:42/117] HCM ...
+  -> completed rows=4313 elapsed=223.141s
+[B:43/117] HDB ...
+  -> completed rows=2152 elapsed=153.761s
+[B:44/117] HDC ...
+  -> completed rows=4402 elapsed=162.085s
+[B:45/117] HDG ...
+  -> completed rows=4128 elapsed=179.176s
+[B:46/117] HHS ...
+  -> completed rows=3625 elapsed=199.636s
+[B:47/117] HHV ...
+  -> completed rows=1144 elapsed=54.958s
+[B:48/117] HPG ...
+  -> skipped_completed rows=4402 elapsed=Nones
+[B:49/117] HSG ...
+  -> completed rows=4402 elapsed=204.259s
+[B:50/117] HVN ...
+  -> completed rows=1827 elapsed=95.703s
+[B:51/117] IJC ...
+  -> completed rows=4079 elapsed=417.144s
+[B:52/117] KBC ...
+  -> completed rows=4159 elapsed=181.877s
+[B:53/117] KDH ...
+  -> completed rows=4129 elapsed=104.54s
+[B:54/117] KSB ...
+  -> completed rows=4137 elapsed=117.054s
+[B:55/117] LPB ...
+  -> completed rows=1444 elapsed=65.167s
+[B:56/117] MBB ...
+  -> completed rows=3695 elapsed=107.574s
+[B:57/117] MCH ...
+  -> completed rows=163 elapsed=4.038s
+[B:58/117] MSB ...
+  -> completed rows=1412 elapsed=42.549s
+[B:59/117] MSH ...
+  -> completed rows=1930 elapsed=56.346s
+[B:60/117] MSN ...
+  -> completed rows=4190 elapsed=226.727s
+[B:61/117] MWG ...
+  -> skipped_completed rows=3025 elapsed=Nones
+[B:62/117] NAB ...
+  -> skipped_completed rows=615 elapsed=Nones
+[B:63/117] NHA ...
+  -> completed rows=1392 elapsed=50.508s
+[B:64/117] NKG ...
+  -> completed rows=3891 elapsed=137.152s
+[B:65/117] NLG ...
+  -> completed rows=3338 elapsed=108.209s
+[B:66/117] NT2 ...
+  -> completed rows=2800 elapsed=111.872s
+[B:67/117] NTL ...
+  -> completed rows=4402 elapsed=182.38s
+[B:68/117] NVL ...
+  -> completed rows=2408 elapsed=111.91s
+[B:69/117] OCB ...
+  -> completed rows=1387 elapsed=59.906s
+[B:70/117] ORS ...
+  -> completed rows=1198 elapsed=30.386s
+[B:71/117] PC1 ...
+  -> completed rows=2438 elapsed=58.557s
+[B:72/117] PDR ...
+  -> completed rows=4008 elapsed=103.186s
+[B:73/117] PET ...
+  -> completed rows=4402 elapsed=128.863s
+[B:74/117] PHR ...
+  -> completed rows=4246 elapsed=79.515s
+[B:75/117] PLX ...
+  -> completed rows=2333 elapsed=53.27s
+[B:76/117] PNJ ...
+  -> completed rows=4351 elapsed=125.326s
+[B:77/117] POW ...
+  -> completed rows=1899 elapsed=87.335s
+[B:78/117] PTB ...
+  -> completed rows=3766 elapsed=290.092s
+[B:79/117] PVD ...
+  -> completed rows=4402 elapsed=215.799s
+[B:80/117] PVT ...
+  -> completed rows=4402 elapsed=128.899s
+[B:81/117] REE ...
+  -> completed rows=4402 elapsed=151.453s
+[B:82/117] SAB ...
+  -> completed rows=2424 elapsed=105.53s
+[B:83/117] SBT ...
+  -> completed rows=4402 elapsed=175.413s
+[B:84/117] SHB ...
+  -> completed rows=1216 elapsed=50.922s
+[B:85/117] SIP ...
+  -> completed rows=760 elapsed=32.536s
+[B:86/117] SSB ...
+  -> completed rows=1353 elapsed=52.016s
+[B:87/117] SSI ...
+  -> skipped_completed rows=4402 elapsed=Nones
+[B:88/117] STB ...
+  -> completed rows=4402 elapsed=116.185s
+[B:89/117] SZC ...
+  -> completed rows=1898 elapsed=60.092s
+[B:90/117] TCB ...
+  -> completed rows=2056 elapsed=46.776s
+[B:91/117] TCH ...
+  -> completed rows=2468 elapsed=63.225s
+[B:92/117] TCM ...
+  -> completed rows=4402 elapsed=128.64s
+[B:93/117] TCX ...
+  -> completed rows=210 elapsed=8.567s
+[B:94/117] TPB ...
+  -> completed rows=2085 elapsed=67.801s
+[B:95/117] TVS ...
+  -> completed rows=2896 elapsed=62.593s
+[B:96/117] VCB ...
+  -> completed rows=4283 elapsed=101.629s
+[B:97/117] VCG ...
+  -> completed rows=1408 elapsed=45.565s
+[B:98/117] VCI ...
+  -> completed rows=2280 elapsed=85.846s
+[B:99/117] VCK ...
+  -> completed rows=170 elapsed=6.363s
+[B:100/117] VDS ...
+  -> completed rows=2272 elapsed=80.229s
+[B:101/117] VGC ...
+  -> completed rows=1811 elapsed=46.518s
+[B:102/117] VHC ...
+  -> completed rows=4402 elapsed=147.214s
+[B:103/117] VHM ...
+  -> completed rows=2068 elapsed=71.364s
+[B:104/117] VIB ...
+  -> completed rows=1443 elapsed=45.609s
+[B:105/117] VIC ...
+  -> completed rows=4402 elapsed=135.904s
+[B:106/117] VIX ...
+  -> completed rows=1401 elapsed=44.918s
+[B:107/117] VJC ...
+  -> completed rows=2370 elapsed=67.131s
+[B:108/117] VND ...
+  -> completed rows=2143 elapsed=51.547s
+[B:109/117] VNM ...
+  -> skipped_completed rows=4402 elapsed=Nones
+[B:110/117] VOS ...
+  -> completed rows=3982 elapsed=99.101s
+[B:111/117] VPB ...
+  -> completed rows=2251 elapsed=85.347s
+[B:112/117] VPL ...
+  -> completed rows=1069 elapsed=32.001s
+[B:113/117] VPX ...
+  -> completed rows=173 elapsed=9.633s
+[B:114/117] VRE ...
+  -> completed rows=2195 elapsed=53.212s
+[B:115/117] VSC ...
+  -> completed rows=4402 elapsed=102.127s
+[B:116/117] VTO ...
+  -> completed rows=4402 elapsed=113.406s
+[B:117/117] VTP ...
+  -> completed rows=613 elapsed=16.122s
+{
+  "stage": "B",
+  "created_at": "2026-08-25T04:55:24Z",
+  "symbols_attempted": [
+    "ACB",
+    "AGR",
+    "ANV",
+    "BAF",
+    "BFC",
+    "BID",
+    "BMP",
+    "BSI",
+    "BSR",
+    "BVH",
+    "CII",
+    "CMG",
+    "CSV",
+    "CTD",
+    "CTG",
+    "CTR",
+    "DBC",
+    "DCM",
+    "DGC",
+    "DGW",
+    "DIG",
+    "DPG",
+    "DPM",
+    "DPR",
+    "DXG",
+    "DXS",
+    "EIB",
+    "EVF",
+    "FCN",
+    "FPT",
+    "FRT",
+    "FTS",
+    "GAS",
+    "GEE",
+    "GEG",
+    "GEX",
+    "GIL",
+    "GMD",
+    "GVR",
+    "HAG",
+    "HAH",
+    "HCM",
+    "HDB",
+    "HDC",
+    "HDG",
+    "HHS",
+    "HHV",
+    "HPG",
+    "HSG",
+    "HVN",
+    "IJC",
+    "KBC",
+    "KDH",
+    "KSB",
+    "LPB",
+    "MBB",
+    "MCH",
+    "MSB",
+    "MSH",
+    "MSN",
+    "MWG",
+    "NAB",
+    "NHA",
+    "NKG",
+    "NLG",
+    "NT2",
+    "NTL",
+    "NVL",
+    "OCB",
+    "ORS",
+    "PC1",
+    "PDR",
+    "PET",
+    "PHR",
+    "PLX",
+    "PNJ",
+    "POW",
+    "PTB",
+    "PVD",
+    "PVT",
+    "REE",
+    "SAB",
+    "SBT",
+    "SHB",
+    "SIP",
+    "SSB",
+    "SSI",
+    "STB",
+    "SZC",
+    "TCB",
+    "TCH",
+    "TCM",
+    "TCX",
+    "TPB",
+    "TVS",
+    "VCB",
+    "VCG",
+    "VCI",
+    "VCK",
+    "VDS",
+    "VGC",
+    "VHC",
+    "VHM",
+    "VIB",
+    "VIC",
+    "VIX",
+    "VJC",
+    "VND",
+    "VNM",
+    "VOS",
+    "VPB",
+    "VPL",
+    "VPX",
+    "VRE",
+    "VSC",
+    "VTO",
+    "VTP"
+  ],
+  "n_attempted": 117,
+  "n_completed_this_run": 117,
+  "n_failed_this_run": 0,
+  "rate_limited": false,
+  "aggregate": {
+    "symbols_completed_on_disk": [
+      "ACB",
+      "AGR",
+      "ANV",
+      "BAF",
+      "BFC",
+      "BID",
+      "BMP",
+      "BSI",
+      "BSR",
+      "BVH",
+      "CII",
+      "CMG",
+      "CSV",
+      "CTD",
+      "CTG",
+      "CTR",
+      "DBC",
+      "DCM",
+      "DGC",
+      "DGW",
+      "DIG",
+      "DPG",
+      "DPM",
+      "DPR",
+      "DXG",
+      "DXS",
+      "EIB",
+      "EVF",
+      "FCN",
+      "FPT",
+      "FRT",
+      "FTS",
+      "GAS",
+      "GEE",
+      "GEG",
+      "GEX",
+      "GIL",
+      "GMD",
+      "GVR",
+      "HAG",
+      "HAH",
+      "HCM",
+      "HDB",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "HPG",
+      "HSG",
+      "HVN",
+      "IJC",
+      "KBC",
+      "KDH",
+      "KSB",
+      "LPB",
+      "MBB",
+      "MCH",
+      "MSB",
+      "MSH",
+      "MSN",
+      "MWG",
+      "NAB",
+      "NHA",
+      "NKG",
+      "NLG",
+      "NT2",
+      "NTL",
+      "NVL",
+      "OCB",
+      "ORS",
+      "PC1",
+      "PDR",
+      "PET",
+      "PHR",
+      "PLX",
+      "PNJ",
+      "POW",
+      "PTB",
+      "PVD",
+      "PVT",
+      "REE",
+      "SAB",
+      "SBT",
+      "SHB",
+      "SIP",
+      "SSB",
+      "SSI",
+      "STB",
+      "SZC",
+      "TCB",
+      "TCH",
+      "TCM",
+      "TCX",
+      "TPB",
+      "TVS",
+      "VCB",
+      "VCG",
+      "VCI",
+      "VCK",
+      "VDS",
+      "VGC",
+      "VHC",
+      "VHM",
+      "VIB",
+      "VIC",
+      "VIX",
+      "VJC",
+      "VND",
+      "VNM",
+      "VOS",
+      "VPB",
+      "VPL",
+      "VPX",
+      "VRE",
+      "VSC",
+      "VTO",
+      "VTP"
+    ],
+    "total_rows": 337236,
+    "earliest_date": "2009-01-02",
+    "latest_date": "2026-08-24",
+    "median_sessions_per_symbol": 2858.0,
+    "max_sessions_per_symbol": 4402,
+    "current_ems_hose_coverage": {
+      "n_eligible": 117,
+      "n_completed": 117,
+      "symbols": [
+        "ACB",
+        "AGR",
+        "ANV",
+        "BAF",
+        "BFC",
+        "BID",
+        "BMP",
+        "BSI",
+        "BSR",
+        "BVH",
+        "CII",
+        "CMG",
+        "CSV",
+        "CTD",
+        "CTG",
+        "CTR",
+        "DBC",
+        "DCM",
+        "DGC",
+        "DGW",
+        "DIG",
+        "DPG",
+        "DPM",
+        "DPR",
+        "DXG",
+        "DXS",
+        "EIB",
+        "EVF",
+        "FCN",
+        "FPT",
+        "FRT",
+        "FTS",
+        "GAS",
+        "GEE",
+        "GEG",
+        "GEX",
+        "GIL",
+        "GMD",
+        "GVR",
+        "HAG",
+        "HAH",
+        "HCM",
+        "HDB",
+        "HDC",
+        "HDG",
+        "HHS",
+        "HHV",
+        "HPG",
+        "HSG",
+        "HVN",
+        "IJC",
+        "KBC",
+        "KDH",
+        "KSB",
+        "LPB",
+        "MBB",
+        "MCH",
+        "MSB",
+        "MSH",
+        "MSN",
+        "MWG",
+        "NAB",
+        "NHA",
+        "NKG",
+        "NLG",
+        "NT2",
+        "NTL",
+        "NVL",
+        "OCB",
+        "ORS",
+        "PC1",
+        "PDR",
+        "PET",
+        "PHR",
+        "PLX",
+        "PNJ",
+        "POW",
+        "PTB",
+        "PVD",
+        "PVT",
+        "REE",
+        "SAB",
+        "SBT",
+        "SHB",
+        "SIP",
+        "SSB",
+        "SSI",
+        "STB",
+        "SZC",
+        "TCB",
+        "TCH",
+        "TCM",
+        "TCX",
+        "TPB",
+        "TVS",
+        "VCB",
+        "VCG",
+        "VCI",
+        "VCK",
+        "VDS",
+        "VGC",
+        "VHC",
+        "VHM",
+        "VIB",
+        "VIC",
+        "VIX",
+        "VJC",
+        "VND",
+        "VNM",
+        "VOS",
+        "VPB",
+        "VPL",
+        "VPX",
+        "VRE",
+        "VSC",
+        "VTO",
+        "VTP"
+      ]
+    },
+    "excluded_hnx_upcom": [
+      "ACV",
+      "BVS",
+      "C4G",
+      "CEO",
+      "DDV",
+      "DRI",
+      "FOX",
+      "HUT",
+      "IDC",
+      "LAS",
+      "MBS",
+      "MML",
+      "MSR",
+      "NTP",
+      "OIL",
+      "PLC",
+      "PVB",
+      "PVC",
+      "PVS",
+      "SHS",
+      "TNG",
+      "TVN",
+      "VGI",
+      "VGS",
+      "VGT"
+    ],
+    "integrity_failures": [],
+    "disk_footprint_bytes": 302111270
+  },
+  "schema_version": "ff_hsx_symbol_daily_v1",
+  "source": "HSX_FOREIGN_API",
+  "data_root": "data/foreign_flow_history"
+}

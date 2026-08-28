@@ -1,0 +1,98 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "motivating_dates": [
+    "2026-08-02"
+  ],
+  "vulnerabilities": [
+    {
+      "kind": "directional_reversal",
+      "description": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile"
+    },
+    {
+      "kind": "episode_instability",
+      "description": "Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates"
+    }
+  ],
+  "executability_status": "EXECUTABLE",
+  "initial_experiment_package": {
+    "package_id": "iefp-design-preview-not-executed",
+    "execution_status": "NOT_EXECUTED",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "scientific_vulnerability_primary": "directional_reversal",
+    "objectives_sketch": [
+      {
+        "target_uncertainty": "directional_effect_full_universe",
+        "derived_from": "falsifiable_expectation + disconfirming_observation_spec"
+      },
+      {
+        "target_uncertainty": "episode_robustness",
+        "derived_from": "null_competing_explanation episode artifact"
+      }
+    ],
+    "candidates": [
+      {
+        "candidate_id": "birth-executability-default",
+        "source": "executability_adapter",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0,
+            "pending_question_context": {
+              "population_spec": {
+                "kind": "all",
+                "grammar_version": "research_grammar_v1"
+              },
+              "outcome_spec": {
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0,
+                "grammar_version": "research_grammar_v1"
+              },
+              "observation_horizon": 0
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "classification": "REDUNDANT_WITH_BIRTH_EVIDENCE",
+        "classification_rationale": "Same partition_column rs_spread, same outcome t5_return, full-panel quintile recompute includes motivating focal_date ('2026-08-02',) \u2014 duplicates birth quintile contrast",
+        "independence_from_birth": "LOW",
+        "falsification_capable": true,
+        "confirmatory_only": true
+      },
+      {
+        "candidate_id": "sketch-fc-episode_holdout_excluding_motivating",
+        "source": "falsification_generator_sketch_NOT_INVOKED",
+        "classification": "FALSIFICATION_CAPABLE if independent",
+        "note": "Generator requires epistemic_update \u2014 not invokable at birth today"
+      },
+      {
+        "candidate_id": "sketch-fc-directional_reversal_partition",
+        "source": "falsification_generator_sketch_NOT_INVOKED",
+        "classification": "FALSIFICATION_CAPABLE if independent",
+        "note": "Generator requires epistemic_update \u2014 not invokable at birth today"
+      }
+    ],
+    "selected_candidate": null,
+    "selection_reason": "No selector exists. Default executability_adapter candidate would win by being the only invokable path \u2014 human/tool prior (partition_group_compare hardcoded), not scientific dominance.",
+    "human_choice_material": true,
+    "human_choice_reason": "executability_adapter hardcodes single tool; no comparative selection"
+  }
+}

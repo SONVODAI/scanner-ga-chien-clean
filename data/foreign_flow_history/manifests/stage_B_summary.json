@@ -1,0 +1,7094 @@
+{
+  "stage": "B",
+  "created_at": "2026-08-25T04:55:24Z",
+  "symbols_attempted": [
+    "ACB",
+    "AGR",
+    "ANV",
+    "BAF",
+    "BFC",
+    "BID",
+    "BMP",
+    "BSI",
+    "BSR",
+    "BVH",
+    "CII",
+    "CMG",
+    "CSV",
+    "CTD",
+    "CTG",
+    "CTR",
+    "DBC",
+    "DCM",
+    "DGC",
+    "DGW",
+    "DIG",
+    "DPG",
+    "DPM",
+    "DPR",
+    "DXG",
+    "DXS",
+    "EIB",
+    "EVF",
+    "FCN",
+    "FPT",
+    "FRT",
+    "FTS",
+    "GAS",
+    "GEE",
+    "GEG",
+    "GEX",
+    "GIL",
+    "GMD",
+    "GVR",
+    "HAG",
+    "HAH",
+    "HCM",
+    "HDB",
+    "HDC",
+    "HDG",
+    "HHS",
+    "HHV",
+    "HPG",
+    "HSG",
+    "HVN",
+    "IJC",
+    "KBC",
+    "KDH",
+    "KSB",
+    "LPB",
+    "MBB",
+    "MCH",
+    "MSB",
+    "MSH",
+    "MSN",
+    "MWG",
+    "NAB",
+    "NHA",
+    "NKG",
+    "NLG",
+    "NT2",
+    "NTL",
+    "NVL",
+    "OCB",
+    "ORS",
+    "PC1",
+    "PDR",
+    "PET",
+    "PHR",
+    "PLX",
+    "PNJ",
+    "POW",
+    "PTB",
+    "PVD",
+    "PVT",
+    "REE",
+    "SAB",
+    "SBT",
+    "SHB",
+    "SIP",
+    "SSB",
+    "SSI",
+    "STB",
+    "SZC",
+    "TCB",
+    "TCH",
+    "TCM",
+    "TCX",
+    "TPB",
+    "TVS",
+    "VCB",
+    "VCG",
+    "VCI",
+    "VCK",
+    "VDS",
+    "VGC",
+    "VHC",
+    "VHM",
+    "VIB",
+    "VIC",
+    "VIX",
+    "VJC",
+    "VND",
+    "VNM",
+    "VOS",
+    "VPB",
+    "VPL",
+    "VPX",
+    "VRE",
+    "VSC",
+    "VTO",
+    "VTP"
+  ],
+  "n_attempted": 117,
+  "n_completed_this_run": 117,
+  "n_failed_this_run": 0,
+  "results": [
+    {
+      "symbol": "ACB",
+      "status": "skipped_completed",
+      "n_rows": 1422,
+      "coverage": {
+        "symbol": "ACB",
+        "n_rows": 1422,
+        "first_trade_date": "2020-12-09",
+        "last_trade_date": "2026-08-24",
+        "sha256": "435450629ca151cc5b59d1f46a503c14df3e3a4a3c0b00eb7df9643ade0e525c",
+        "bytes": 400563
+      }
+    },
+    {
+      "symbol": "AGR",
+      "status": "skipped_completed",
+      "n_rows": 4165,
+      "coverage": {
+        "symbol": "AGR",
+        "n_rows": 4165,
+        "first_trade_date": "2009-12-10",
+        "last_trade_date": "2026-08-24",
+        "sha256": "4d28cd072c628fb196c154c1942b188aa1c75d9b071e5c720e0a2703afff0127",
+        "bytes": 1083772
+      }
+    },
+    {
+      "symbol": "ANV",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "ANV",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "8c8362f03a964e6d129f9133b2baec37231b4d6c4e3647518121e1e576eb534e",
+        "bytes": 1171040
+      }
+    },
+    {
+      "symbol": "BAF",
+      "status": "skipped_completed",
+      "n_rows": 1177,
+      "coverage": {
+        "symbol": "BAF",
+        "n_rows": 1177,
+        "first_trade_date": "2021-12-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2ae6d1c149585ba469286c8a0a1e555d0c1c16f8e0b92d93a04538023ba2bce9",
+        "bytes": 327698
+      }
+    },
+    {
+      "symbol": "BFC",
+      "status": "skipped_completed",
+      "n_rows": 2718,
+      "coverage": {
+        "symbol": "BFC",
+        "n_rows": 2718,
+        "first_trade_date": "2015-10-07",
+        "last_trade_date": "2026-08-24",
+        "sha256": "9828f92b5fa3a9ffc8806a760d3f46061f315ca114b01d938c9718d5971d78ad",
+        "bytes": 735633
+      }
+    },
+    {
+      "symbol": "BID",
+      "status": "skipped_completed",
+      "n_rows": 3135,
+      "coverage": {
+        "symbol": "BID",
+        "n_rows": 3135,
+        "first_trade_date": "2014-01-24",
+        "last_trade_date": "2026-08-24",
+        "sha256": "a43396d8e5e96eef6cf01c70e246bf2bb679766688941489cbdc1a9a35f12e3a",
+        "bytes": 905934
+      }
+    },
+    {
+      "symbol": "BMP",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "BMP",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "7545bb3c0c7dbcebe580cd20acec5d78abc1c3642e14bf16e6a013b6bc29dfc1",
+        "bytes": 1226356
+      }
+    },
+    {
+      "symbol": "BSI",
+      "status": "skipped_completed",
+      "n_rows": 3682,
+      "coverage": {
+        "symbol": "BSI",
+        "n_rows": 3682,
+        "first_trade_date": "2011-07-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "8b25f327297320a0709a50b8c951a34d0b627c007d090dcafc234c855a3f253b",
+        "bytes": 965614
+      }
+    },
+    {
+      "symbol": "BSR",
+      "status": "skipped_completed",
+      "n_rows": 397,
+      "coverage": {
+        "symbol": "BSR",
+        "n_rows": 397,
+        "first_trade_date": "2025-01-16",
+        "last_trade_date": "2026-08-24",
+        "sha256": "ad6ea8c8c3c595e2f00b48658fe9441c1bc34d48987e05c6c076f53de1039fdb",
+        "bytes": 115002
+      }
+    },
+    {
+      "symbol": "BVH",
+      "status": "skipped_completed",
+      "n_rows": 4286,
+      "coverage": {
+        "symbol": "BVH",
+        "n_rows": 4286,
+        "first_trade_date": "2009-06-25",
+        "last_trade_date": "2026-08-24",
+        "sha256": "fa1c19e8085ffbbb264fe5cd10e3825ca58598d384a3f4495df855e33f7a90f8",
+        "bytes": 1234352
+      }
+    },
+    {
+      "symbol": "CII",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "CII",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "df2e06b0d956915019d36e08bb20f873a55dcaa9232616b325c2b6ddcdb958dc",
+        "bytes": 1245640
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "CII",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "CII",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 154.202
+    },
+    {
+      "symbol": "CMG",
+      "status": "completed",
+      "n_rows": 4135,
+      "coverage": {
+        "symbol": "CMG",
+        "n_rows": 4135,
+        "first_trade_date": "2010-01-22",
+        "last_trade_date": "2026-08-24",
+        "sha256": "7a0651ee58a29f15aa06d5106f861d0b17b74f65ad90628188127de9d32dedc4",
+        "bytes": 1108075
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 3,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4135,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "CMG",
+                "n_sessions": 4135,
+                "first": "2010-01-22",
+                "last": "2026-08-24",
+                "bday_gap_count": 192
+              }
+            ],
+            "session_count_min": 4135,
+            "session_count_max": 4135,
+            "session_count_median": 4135.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4135,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4135,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 114.184
+    },
+    {
+      "symbol": "CSV",
+      "status": "completed",
+      "n_rows": 2858,
+      "coverage": {
+        "symbol": "CSV",
+        "n_rows": 2858,
+        "first_trade_date": "2015-03-18",
+        "last_trade_date": "2026-08-24",
+        "sha256": "d2da43dfdef6f292f5f6f14f38b67dcebb8c9bca2907be6403eb6edfbef24600",
+        "bytes": 776435
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2858,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "CSV",
+                "n_sessions": 2858,
+                "first": "2015-03-18",
+                "last": "2026-08-24",
+                "bday_gap_count": 126
+              }
+            ],
+            "session_count_min": 2858,
+            "session_count_max": 2858,
+            "session_count_median": 2858.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2858,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2858,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 60.691
+    },
+    {
+      "symbol": "CTD",
+      "status": "completed",
+      "n_rows": 4137,
+      "coverage": {
+        "symbol": "CTD",
+        "n_rows": 4137,
+        "first_trade_date": "2010-01-20",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2d80af0d527b27370094148f7d857874178cccbca104b560f29d4c684192faf8",
+        "bytes": 1143243
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 39,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4137,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "CTD",
+                "n_sessions": 4137,
+                "first": "2010-01-20",
+                "last": "2026-08-24",
+                "bday_gap_count": 192
+              }
+            ],
+            "session_count_min": 4137,
+            "session_count_max": 4137,
+            "session_count_median": 4137.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4137,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4137,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 114.75
+    },
+    {
+      "symbol": "CTG",
+      "status": "completed",
+      "n_rows": 4269,
+      "coverage": {
+        "symbol": "CTG",
+        "n_rows": 4269,
+        "first_trade_date": "2009-07-16",
+        "last_trade_date": "2026-08-24",
+        "sha256": "f259eac227b06f0ad15a01ee6631f5be26d9f302a2d93ac30775548f79a5fe03",
+        "bytes": 1229461
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 4269,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "CTG",
+                "n_sessions": 4269,
+                "first": "2009-07-16",
+                "last": "2026-08-24",
+                "bday_gap_count": 194
+              }
+            ],
+            "session_count_min": 4269,
+            "session_count_max": 4269,
+            "session_count_median": 4269.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4269,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4269,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 94.73
+    },
+    {
+      "symbol": "CTR",
+      "status": "completed",
+      "n_rows": 1125,
+      "coverage": {
+        "symbol": "CTR",
+        "n_rows": 1125,
+        "first_trade_date": "2022-02-22",
+        "last_trade_date": "2026-08-24",
+        "sha256": "27dfdab54f2833bec8159c92832c050902a2ae95cbd32ee52d28c07abfcde929",
+        "bytes": 322383
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1125,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "CTR",
+                "n_sessions": 1125,
+                "first": "2022-02-22",
+                "last": "2026-08-24",
+                "bday_gap_count": 50
+              }
+            ],
+            "session_count_min": 1125,
+            "session_count_max": 1125,
+            "session_count_median": 1125.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1125,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1125,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 23.74
+    },
+    {
+      "symbol": "DBC",
+      "status": "completed",
+      "n_rows": 1769,
+      "coverage": {
+        "symbol": "DBC",
+        "n_rows": 1769,
+        "first_trade_date": "2019-07-26",
+        "last_trade_date": "2026-08-24",
+        "sha256": "4e907b4744b57dc5fd7db9cda7047c88519114238c6043d787cbecb152a78be3",
+        "bytes": 502006
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1769,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DBC",
+                "n_sessions": 1769,
+                "first": "2019-07-26",
+                "last": "2026-08-24",
+                "bday_gap_count": 78
+              }
+            ],
+            "session_count_min": 1769,
+            "session_count_max": 1769,
+            "session_count_median": 1769.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1769,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1769,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 49.402
+    },
+    {
+      "symbol": "DCM",
+      "status": "completed",
+      "n_rows": 2849,
+      "coverage": {
+        "symbol": "DCM",
+        "n_rows": 2849,
+        "first_trade_date": "2015-03-31",
+        "last_trade_date": "2026-08-24",
+        "sha256": "81dda3b32b8f3c1e28626b47324cb588b2f7dd642b798a0b0324ad03daa5ba31",
+        "bytes": 784984
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2849,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DCM",
+                "n_sessions": 2849,
+                "first": "2015-03-31",
+                "last": "2026-08-24",
+                "bday_gap_count": 126
+              }
+            ],
+            "session_count_min": 2849,
+            "session_count_max": 2849,
+            "session_count_median": 2849.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2849,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2849,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 81.999
+    },
+    {
+      "symbol": "DGC",
+      "status": "completed",
+      "n_rows": 1517,
+      "coverage": {
+        "symbol": "DGC",
+        "n_rows": 1517,
+        "first_trade_date": "2020-07-28",
+        "last_trade_date": "2026-08-24",
+        "sha256": "5d1a6017a318d5c988c42f5f896fcfbd136422ec0ab537ffb37fc9ee0f099df2",
+        "bytes": 443789
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1517,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DGC",
+                "n_sessions": 1517,
+                "first": "2020-07-28",
+                "last": "2026-08-24",
+                "bday_gap_count": 68
+              }
+            ],
+            "session_count_min": 1517,
+            "session_count_max": 1517,
+            "session_count_median": 1517.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1517,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1517,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 56.911
+    },
+    {
+      "symbol": "DGW",
+      "status": "completed",
+      "n_rows": 2764,
+      "coverage": {
+        "symbol": "DGW",
+        "n_rows": 2764,
+        "first_trade_date": "2015-08-03",
+        "last_trade_date": "2026-08-24",
+        "sha256": "ae081e059e62517618c5a9b2f3754e778cb246a50728c1652fc9c11a74808d90",
+        "bytes": 770408
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2764,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DGW",
+                "n_sessions": 2764,
+                "first": "2015-08-03",
+                "last": "2026-08-24",
+                "bday_gap_count": 122
+              }
+            ],
+            "session_count_min": 2764,
+            "session_count_max": 2764,
+            "session_count_median": 2764.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2764,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2764,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 90.395
+    },
+    {
+      "symbol": "DIG",
+      "status": "skipped_completed",
+      "n_rows": 4245,
+      "coverage": {
+        "symbol": "DIG",
+        "n_rows": 4245,
+        "first_trade_date": "2009-08-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "322a18a08493cd2990c946bf074d42baabea26a9c4c91434f983657684971048",
+        "bytes": 1183364
+      }
+    },
+    {
+      "symbol": "DPG",
+      "status": "completed",
+      "n_rows": 2065,
+      "coverage": {
+        "symbol": "DPG",
+        "n_rows": 2065,
+        "first_trade_date": "2018-05-22",
+        "last_trade_date": "2026-08-24",
+        "sha256": "963c7b3ef5ee4bfbf4d3889cbcd2b041dc3b6b781fc0bd25c1a62af722d2f5a1",
+        "bytes": 567779
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2065,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DPG",
+                "n_sessions": 2065,
+                "first": "2018-05-22",
+                "last": "2026-08-24",
+                "bday_gap_count": 90
+              }
+            ],
+            "session_count_min": 2065,
+            "session_count_max": 2065,
+            "session_count_median": 2065.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2065,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2065,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 63.892
+    },
+    {
+      "symbol": "DPM",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "DPM",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "dfb41264afdd2089186de773db789fbc96789ff9c81c8ab3aa79b8a24101041d",
+        "bytes": 1275819
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "DPM",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DPM",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 115.148
+    },
+    {
+      "symbol": "DPR",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "DPR",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "5de7781bd7527216517f592ab0c186834c97b6a92badc7a93b2664ec23a59943",
+        "bytes": 1197286
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "DPR",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 32,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DPR",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 116.375
+    },
+    {
+      "symbol": "DXG",
+      "status": "completed",
+      "n_rows": 4157,
+      "coverage": {
+        "symbol": "DXG",
+        "n_rows": 4157,
+        "first_trade_date": "2009-12-22",
+        "last_trade_date": "2026-08-24",
+        "sha256": "11cf6101f2e6ed5568bc75177cd1cf0c57380bd3d923997e9cd7e4dcdfb56d98",
+        "bytes": 1161962
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4157,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DXG",
+                "n_sessions": 4157,
+                "first": "2009-12-22",
+                "last": "2026-08-24",
+                "bday_gap_count": 193
+              }
+            ],
+            "session_count_min": 4157,
+            "session_count_max": 4157,
+            "session_count_median": 4157.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4157,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4157,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 122.62
+    },
+    {
+      "symbol": "DXS",
+      "status": "completed",
+      "n_rows": 1241,
+      "coverage": {
+        "symbol": "DXS",
+        "n_rows": 1241,
+        "first_trade_date": "2021-09-01",
+        "last_trade_date": "2026-08-24",
+        "sha256": "be64ca3d0d79dd8b6ff9c75e63de1bbf148bf0110d8c22c9301aa4a9d224090a",
+        "bytes": 350825
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1241,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "DXS",
+                "n_sessions": 1241,
+                "first": "2021-09-01",
+                "last": "2026-08-24",
+                "bday_gap_count": 58
+              }
+            ],
+            "session_count_min": 1241,
+            "session_count_max": 1241,
+            "session_count_median": 1241.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1241,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1241,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 52.157
+    },
+    {
+      "symbol": "EIB",
+      "status": "completed",
+      "n_rows": 4197,
+      "coverage": {
+        "symbol": "EIB",
+        "n_rows": 4197,
+        "first_trade_date": "2009-10-27",
+        "last_trade_date": "2026-08-24",
+        "sha256": "ce9807321488513ddb21da4a1f1be1f35573508247a5a2fa22a99582e5e5bd77",
+        "bytes": 1153267
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 4197,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "EIB",
+                "n_sessions": 4197,
+                "first": "2009-10-27",
+                "last": "2026-08-24",
+                "bday_gap_count": 193
+              }
+            ],
+            "session_count_min": 4197,
+            "session_count_max": 4197,
+            "session_count_median": 4197.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4197,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4197,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 160.014
+    },
+    {
+      "symbol": "EVF",
+      "status": "completed",
+      "n_rows": 1150,
+      "coverage": {
+        "symbol": "EVF",
+        "n_rows": 1150,
+        "first_trade_date": "2022-01-11",
+        "last_trade_date": "2026-08-24",
+        "sha256": "172f6b1bd7ff9293019941aa6711fdd8e2bd6dae6ce600206fd28c5578d04af9",
+        "bytes": 320250
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1150,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "EVF",
+                "n_sessions": 1150,
+                "first": "2022-01-11",
+                "last": "2026-08-24",
+                "bday_gap_count": 55
+              }
+            ],
+            "session_count_min": 1150,
+            "session_count_max": 1150,
+            "session_count_median": 1150.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1150,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1150,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 50.19
+    },
+    {
+      "symbol": "FCN",
+      "status": "completed",
+      "n_rows": 3514,
+      "coverage": {
+        "symbol": "FCN",
+        "n_rows": 3514,
+        "first_trade_date": "2012-07-24",
+        "last_trade_date": "2026-08-24",
+        "sha256": "d6a2aeb8be49ab5562cd76b1a3de3eed6a6026b93b06332be5a25ec88de28c56",
+        "bytes": 949919
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 3514,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "FCN",
+                "n_sessions": 3514,
+                "first": "2012-07-24",
+                "last": "2026-08-24",
+                "bday_gap_count": 161
+              }
+            ],
+            "session_count_min": 3514,
+            "session_count_max": 3514,
+            "session_count_median": 3514.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3514,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3514,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 101.741
+    },
+    {
+      "symbol": "FPT",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "FPT",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "7bcbdc8e18d5b0159c463759e5311e5a99d6e0ef7822af40fbe03557a007ce89",
+        "bytes": 1294577
+      }
+    },
+    {
+      "symbol": "FRT",
+      "status": "completed",
+      "n_rows": 2081,
+      "coverage": {
+        "symbol": "FRT",
+        "n_rows": 2081,
+        "first_trade_date": "2018-04-26",
+        "last_trade_date": "2026-08-24",
+        "sha256": "9290aac2529b1ab2aaf51c0ec13fecd63b23f483d19639080f9429ad9d98f185",
+        "bytes": 604761
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2081,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "FRT",
+                "n_sessions": 2081,
+                "first": "2018-04-26",
+                "last": "2026-08-24",
+                "bday_gap_count": 92
+              }
+            ],
+            "session_count_min": 2081,
+            "session_count_max": 2081,
+            "session_count_median": 2081.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2081,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2081,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 83.547
+    },
+    {
+      "symbol": "FTS",
+      "status": "completed",
+      "n_rows": 2397,
+      "coverage": {
+        "symbol": "FTS",
+        "n_rows": 2397,
+        "first_trade_date": "2017-01-13",
+        "last_trade_date": "2026-08-24",
+        "sha256": "c99ba7311d14990182b97b4b4fa8a157c1b0dbae5675c551aa133fae8faf1c52",
+        "bytes": 659169
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2397,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "FTS",
+                "n_sessions": 2397,
+                "first": "2017-01-13",
+                "last": "2026-08-24",
+                "bday_gap_count": 110
+              }
+            ],
+            "session_count_min": 2397,
+            "session_count_max": 2397,
+            "session_count_median": 2397.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2397,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2397,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 99.642
+    },
+    {
+      "symbol": "GAS",
+      "status": "completed",
+      "n_rows": 3560,
+      "coverage": {
+        "symbol": "GAS",
+        "n_rows": 3560,
+        "first_trade_date": "2012-05-21",
+        "last_trade_date": "2026-08-24",
+        "sha256": "18e1a64f37c164648b27475c914312b52c9c208c96838ae7eadb852e1e5cd3a2",
+        "bytes": 1037376
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 3560,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GAS",
+                "n_sessions": 3560,
+                "first": "2012-05-21",
+                "last": "2026-08-24",
+                "bday_gap_count": 161
+              }
+            ],
+            "session_count_min": 3560,
+            "session_count_max": 3560,
+            "session_count_median": 3560.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3560,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3560,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 146.724
+    },
+    {
+      "symbol": "GEE",
+      "status": "completed",
+      "n_rows": 506,
+      "coverage": {
+        "symbol": "GEE",
+        "n_rows": 506,
+        "first_trade_date": "2024-08-13",
+        "last_trade_date": "2026-08-24",
+        "sha256": "11138621381af7e2046b9701eb5e4d7a4cbeae1260d84a2a8bfc9cec13ba15e2",
+        "bytes": 144258
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 506,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GEE",
+                "n_sessions": 506,
+                "first": "2024-08-13",
+                "last": "2026-08-24",
+                "bday_gap_count": 24
+              }
+            ],
+            "session_count_min": 506,
+            "session_count_max": 506,
+            "session_count_median": 506.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 506,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 506,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 16.89
+    },
+    {
+      "symbol": "GEG",
+      "status": "completed",
+      "n_rows": 1731,
+      "coverage": {
+        "symbol": "GEG",
+        "n_rows": 1731,
+        "first_trade_date": "2019-09-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b002541737b07d2c9da2f015e8755d12a504b995a353f4ca80f4596b6337c4b5",
+        "bytes": 476173
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1731,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GEG",
+                "n_sessions": 1731,
+                "first": "2019-09-19",
+                "last": "2026-08-24",
+                "bday_gap_count": 77
+              }
+            ],
+            "session_count_min": 1731,
+            "session_count_max": 1731,
+            "session_count_median": 1731.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1731,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1731,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 83.148
+    },
+    {
+      "symbol": "GEX",
+      "status": "completed",
+      "n_rows": 2143,
+      "coverage": {
+        "symbol": "GEX",
+        "n_rows": 2143,
+        "first_trade_date": "2018-01-18",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2e90bc0c5e8e3efbb26712f1001359d6dd15a9d2f38167f3c0276153fdb6589a",
+        "bytes": 619348
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2143,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GEX",
+                "n_sessions": 2143,
+                "first": "2018-01-18",
+                "last": "2026-08-24",
+                "bday_gap_count": 100
+              }
+            ],
+            "session_count_min": 2143,
+            "session_count_max": 2143,
+            "session_count_median": 2143.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2143,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2143,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 116.007
+    },
+    {
+      "symbol": "GIL",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "GIL",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "752456df36a8c4376b43e78fb77336a410ecff1389ad839e1d68869ef0be48a8",
+        "bytes": 1162204
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "GIL",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 71,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GIL",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 187.432
+    },
+    {
+      "symbol": "GMD",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "GMD",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "fe120d392e1b0f9fd1cd7d3ce01f7229c14a93008094ce96f98b749ef2ee1e46",
+        "bytes": 1227566
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "GMD",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 1,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GMD",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 196.049
+    },
+    {
+      "symbol": "GVR",
+      "status": "completed",
+      "n_rows": 1609,
+      "coverage": {
+        "symbol": "GVR",
+        "n_rows": 1609,
+        "first_trade_date": "2020-03-17",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b50d8be39656a230657afa7b50ee1217f5a2ce80d7b70ecf8371c4a21e44fbf9",
+        "bytes": 461765
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1609,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "GVR",
+                "n_sessions": 1609,
+                "first": "2020-03-17",
+                "last": "2026-08-24",
+                "bday_gap_count": 71
+              }
+            ],
+            "session_count_min": 1609,
+            "session_count_max": 1609,
+            "session_count_median": 1609.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1609,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1609,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 85.419
+    },
+    {
+      "symbol": "HAG",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "HAG",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "10912b7c7f38e61f5147704aff530087944961d5e8465c245e26caa55e993dc7",
+        "bytes": 1246515
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "HAG",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HAG",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 160.069
+    },
+    {
+      "symbol": "HAH",
+      "status": "completed",
+      "n_rows": 2863,
+      "coverage": {
+        "symbol": "HAH",
+        "n_rows": 2863,
+        "first_trade_date": "2015-03-11",
+        "last_trade_date": "2026-08-24",
+        "sha256": "ae99bae42398acedddf144a43553afc634e1363f3088f551a06c337aa9b0afd0",
+        "bytes": 790654
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2863,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HAH",
+                "n_sessions": 2863,
+                "first": "2015-03-11",
+                "last": "2026-08-24",
+                "bday_gap_count": 126
+              }
+            ],
+            "session_count_min": 2863,
+            "session_count_max": 2863,
+            "session_count_median": 2863.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2863,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2863,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 145.765
+    },
+    {
+      "symbol": "HCM",
+      "status": "completed",
+      "n_rows": 4313,
+      "coverage": {
+        "symbol": "HCM",
+        "n_rows": 4313,
+        "first_trade_date": "2009-05-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "383fc842dc398dc2c81b4f5ca622cbe13c60b2647f4d4d7fe756174325e46037",
+        "bytes": 1188876
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "HCM",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4313,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HCM",
+                "n_sessions": 4313,
+                "first": "2009-05-19",
+                "last": "2026-08-24",
+                "bday_gap_count": 194
+              }
+            ],
+            "session_count_min": 4313,
+            "session_count_max": 4313,
+            "session_count_median": 4313.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4313,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4313,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 223.141
+    },
+    {
+      "symbol": "HDB",
+      "status": "completed",
+      "n_rows": 2152,
+      "coverage": {
+        "symbol": "HDB",
+        "n_rows": 2152,
+        "first_trade_date": "2018-01-05",
+        "last_trade_date": "2026-08-24",
+        "sha256": "c5c257e17e13e1ce03290bf1b5ce8c21e40184aad536bf4c1a741b184e816850",
+        "bytes": 638810
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2152,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HDB",
+                "n_sessions": 2152,
+                "first": "2018-01-05",
+                "last": "2026-08-24",
+                "bday_gap_count": 100
+              }
+            ],
+            "session_count_min": 2152,
+            "session_count_max": 2152,
+            "session_count_median": 2152.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2152,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2152,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 153.761
+    },
+    {
+      "symbol": "HDC",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "HDC",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "6d7bde9b82321c253b987355558c103682776129f2c15d5e7dee9cf956fc4e4c",
+        "bytes": 1170961
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "HDC",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 33,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HDC",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 162.085
+    },
+    {
+      "symbol": "HDG",
+      "status": "completed",
+      "n_rows": 4128,
+      "coverage": {
+        "symbol": "HDG",
+        "n_rows": 4128,
+        "first_trade_date": "2010-02-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "61f7cc1d15a2108a7c86f1d06b25e4b873d2d4381ab9dc14ec86abcffebb4cfe",
+        "bytes": 1113175
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 7,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4128,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HDG",
+                "n_sessions": 4128,
+                "first": "2010-02-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 192
+              }
+            ],
+            "session_count_min": 4128,
+            "session_count_max": 4128,
+            "session_count_median": 4128.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4128,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4128,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 179.176
+    },
+    {
+      "symbol": "HHS",
+      "status": "completed",
+      "n_rows": 3625,
+      "coverage": {
+        "symbol": "HHS",
+        "n_rows": 3625,
+        "first_trade_date": "2012-02-15",
+        "last_trade_date": "2026-08-24",
+        "sha256": "c412e4ac6286f34b8df9b9613b09471793a3fd2984fa5d3e442cbba4320bc795",
+        "bytes": 974975
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 30,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 3625,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HHS",
+                "n_sessions": 3625,
+                "first": "2012-02-15",
+                "last": "2026-08-24",
+                "bday_gap_count": 164
+              }
+            ],
+            "session_count_min": 3625,
+            "session_count_max": 3625,
+            "session_count_median": 3625.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3625,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3625,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 199.636
+    },
+    {
+      "symbol": "HHV",
+      "status": "completed",
+      "n_rows": 1144,
+      "coverage": {
+        "symbol": "HHV",
+        "n_rows": 1144,
+        "first_trade_date": "2022-01-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "ae25425d7c1c7ddd26ede6a157a180dd24ea63a136e088e09a9e8214ad9cbf94",
+        "bytes": 325027
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1144,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HHV",
+                "n_sessions": 1144,
+                "first": "2022-01-19",
+                "last": "2026-08-24",
+                "bday_gap_count": 55
+              }
+            ],
+            "session_count_min": 1144,
+            "session_count_max": 1144,
+            "session_count_median": 1144.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1144,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1144,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 54.958
+    },
+    {
+      "symbol": "HPG",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "HPG",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "99fc305f3c2b402bdf3c101be1aac30c4558bec5c61943c1f1e2d250538ace7b",
+        "bytes": 1312509
+      }
+    },
+    {
+      "symbol": "HSG",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "HSG",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "e25a0f24e14b9d7e2956fce3401f7d06845c7d895984cb0dcc281855764d0356",
+        "bytes": 1247929
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "HSG",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HSG",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 204.259
+    },
+    {
+      "symbol": "HVN",
+      "status": "completed",
+      "n_rows": 1827,
+      "coverage": {
+        "symbol": "HVN",
+        "n_rows": 1827,
+        "first_trade_date": "2019-05-07",
+        "last_trade_date": "2026-08-24",
+        "sha256": "e633581ad82b71fe1cd8183758cf21e462e71635dc656556123276bc07a3c8a6",
+        "bytes": 519828
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1827,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "HVN",
+                "n_sessions": 1827,
+                "first": "2019-05-07",
+                "last": "2026-08-24",
+                "bday_gap_count": 78
+              }
+            ],
+            "session_count_min": 1827,
+            "session_count_max": 1827,
+            "session_count_median": 1827.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1827,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1827,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 95.703
+    },
+    {
+      "symbol": "IJC",
+      "status": "completed",
+      "n_rows": 4079,
+      "coverage": {
+        "symbol": "IJC",
+        "n_rows": 4079,
+        "first_trade_date": "2010-04-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "f7f447410d58c0a4cf8222a218ef1469f7c6308ed2009689d9c41d09b417551e",
+        "bytes": 1109770
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 4079,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "IJC",
+                "n_sessions": 4079,
+                "first": "2010-04-19",
+                "last": "2026-08-24",
+                "bday_gap_count": 187
+              }
+            ],
+            "session_count_min": 4079,
+            "session_count_max": 4079,
+            "session_count_median": 4079.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4079,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4079,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 417.144
+    },
+    {
+      "symbol": "KBC",
+      "status": "completed",
+      "n_rows": 4159,
+      "coverage": {
+        "symbol": "KBC",
+        "n_rows": 4159,
+        "first_trade_date": "2009-12-18",
+        "last_trade_date": "2026-08-24",
+        "sha256": "42b816fb33846c50ad216304a2679b07fa93322e066922eeb49b15adc5cfa888",
+        "bytes": 1190365
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 4159,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "KBC",
+                "n_sessions": 4159,
+                "first": "2009-12-18",
+                "last": "2026-08-24",
+                "bday_gap_count": 193
+              }
+            ],
+            "session_count_min": 4159,
+            "session_count_max": 4159,
+            "session_count_median": 4159.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4159,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4159,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 181.877
+    },
+    {
+      "symbol": "KDH",
+      "status": "completed",
+      "n_rows": 4129,
+      "coverage": {
+        "symbol": "KDH",
+        "n_rows": 4129,
+        "first_trade_date": "2010-02-01",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2318e3b4776da36d2abd5fd421a12cd91c2cc821948af58f52f2eb72bde8e42d",
+        "bytes": 1140096
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 4129,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "KDH",
+                "n_sessions": 4129,
+                "first": "2010-02-01",
+                "last": "2026-08-24",
+                "bday_gap_count": 192
+              }
+            ],
+            "session_count_min": 4129,
+            "session_count_max": 4129,
+            "session_count_median": 4129.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4129,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4129,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 104.54
+    },
+    {
+      "symbol": "KSB",
+      "status": "completed",
+      "n_rows": 4137,
+      "coverage": {
+        "symbol": "KSB",
+        "n_rows": 4137,
+        "first_trade_date": "2010-01-20",
+        "last_trade_date": "2026-08-24",
+        "sha256": "3fd10840c3f66e9abb66f9025252655abfd6ea7a7da88a2b583ee76364d2a67f",
+        "bytes": 1111642
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 128,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4137,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "KSB",
+                "n_sessions": 4137,
+                "first": "2010-01-20",
+                "last": "2026-08-24",
+                "bday_gap_count": 192
+              }
+            ],
+            "session_count_min": 4137,
+            "session_count_max": 4137,
+            "session_count_median": 4137.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4137,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4137,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 117.054
+    },
+    {
+      "symbol": "LPB",
+      "status": "completed",
+      "n_rows": 1444,
+      "coverage": {
+        "symbol": "LPB",
+        "n_rows": 1444,
+        "first_trade_date": "2020-11-09",
+        "last_trade_date": "2026-08-24",
+        "sha256": "f291d5e6ce131f9eeae12638cf40f85c6240914f77c64350a21643c6250bbae4",
+        "bytes": 414329
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1444,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "LPB",
+                "n_sessions": 1444,
+                "first": "2020-11-09",
+                "last": "2026-08-24",
+                "bday_gap_count": 67
+              }
+            ],
+            "session_count_min": 1444,
+            "session_count_max": 1444,
+            "session_count_median": 1444.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1444,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1444,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 65.167
+    },
+    {
+      "symbol": "MBB",
+      "status": "completed",
+      "n_rows": 3695,
+      "coverage": {
+        "symbol": "MBB",
+        "n_rows": 3695,
+        "first_trade_date": "2011-11-01",
+        "last_trade_date": "2026-08-24",
+        "sha256": "27826fc1ccddb5563ec6212295368cf626e095419365f437e33ab180e04949e9",
+        "bytes": 1051514
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 3695,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "MBB",
+                "n_sessions": 3695,
+                "first": "2011-11-01",
+                "last": "2026-08-24",
+                "bday_gap_count": 170
+              }
+            ],
+            "session_count_min": 3695,
+            "session_count_max": 3695,
+            "session_count_median": 3695.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3695,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3695,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 107.574
+    },
+    {
+      "symbol": "MCH",
+      "status": "completed",
+      "n_rows": 163,
+      "coverage": {
+        "symbol": "MCH",
+        "n_rows": 163,
+        "first_trade_date": "2025-12-25",
+        "last_trade_date": "2026-08-24",
+        "sha256": "420aa77615300b9773d3fd431a79709b9dcf3e1cbbb06f189a324ea0755f544d",
+        "bytes": 47991
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 163,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "MCH",
+                "n_sessions": 163,
+                "first": "2025-12-25",
+                "last": "2026-08-24",
+                "bday_gap_count": 10
+              }
+            ],
+            "session_count_min": 163,
+            "session_count_max": 163,
+            "session_count_median": 163.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 163,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 163,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 4.038
+    },
+    {
+      "symbol": "MSB",
+      "status": "completed",
+      "n_rows": 1412,
+      "coverage": {
+        "symbol": "MSB",
+        "n_rows": 1412,
+        "first_trade_date": "2020-12-23",
+        "last_trade_date": "2026-08-24",
+        "sha256": "f85237f513f08c47bc2ec103faf45ac246174e7a9cb38e41da5de03899eb1830",
+        "bytes": 395868
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1412,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "MSB",
+                "n_sessions": 1412,
+                "first": "2020-12-23",
+                "last": "2026-08-24",
+                "bday_gap_count": 67
+              }
+            ],
+            "session_count_min": 1412,
+            "session_count_max": 1412,
+            "session_count_median": 1412.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1412,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1412,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 42.549
+    },
+    {
+      "symbol": "MSH",
+      "status": "completed",
+      "n_rows": 1930,
+      "coverage": {
+        "symbol": "MSH",
+        "n_rows": 1930,
+        "first_trade_date": "2018-11-28",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b96138383ab159a404c866987accb82358e5e80b10e7f6554e93f7601d181d21",
+        "bytes": 534294
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1930,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "MSH",
+                "n_sessions": 1930,
+                "first": "2018-11-28",
+                "last": "2026-08-24",
+                "bday_gap_count": 89
+              }
+            ],
+            "session_count_min": 1930,
+            "session_count_max": 1930,
+            "session_count_median": 1930.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1930,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1930,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 56.346
+    },
+    {
+      "symbol": "MSN",
+      "status": "completed",
+      "n_rows": 4190,
+      "coverage": {
+        "symbol": "MSN",
+        "n_rows": 4190,
+        "first_trade_date": "2009-11-05",
+        "last_trade_date": "2026-08-24",
+        "sha256": "0cbe659a6632aff71134e265d7ee953debe1c6da6ad284dcef04d6889978b747",
+        "bytes": 1242202
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 4190,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "MSN",
+                "n_sessions": 4190,
+                "first": "2009-11-05",
+                "last": "2026-08-24",
+                "bday_gap_count": 193
+              }
+            ],
+            "session_count_min": 4190,
+            "session_count_max": 4190,
+            "session_count_median": 4190.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4190,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4190,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 226.727
+    },
+    {
+      "symbol": "MWG",
+      "status": "skipped_completed",
+      "n_rows": 3025,
+      "coverage": {
+        "symbol": "MWG",
+        "n_rows": 3025,
+        "first_trade_date": "2014-07-14",
+        "last_trade_date": "2026-08-24",
+        "sha256": "368e7d92d24b0afdfa6caeafe1fe710336f3be05110462c7cce5963dcbd8baf1",
+        "bytes": 854749
+      }
+    },
+    {
+      "symbol": "NAB",
+      "status": "skipped_completed",
+      "n_rows": 615,
+      "coverage": {
+        "symbol": "NAB",
+        "n_rows": 615,
+        "first_trade_date": "2024-03-07",
+        "last_trade_date": "2026-08-24",
+        "sha256": "591e8ebaee060aa1f0157524e29c2aedbfab64d1b78b5bc45ad356a47953e321",
+        "bytes": 175641
+      }
+    },
+    {
+      "symbol": "NHA",
+      "status": "completed",
+      "n_rows": 1392,
+      "coverage": {
+        "symbol": "NHA",
+        "n_rows": 1392,
+        "first_trade_date": "2021-01-21",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b82de554fe9c8b1503f0ce04b234d507fd7613a1966e8d49567a72ed141f8ade",
+        "bytes": 379157
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1392,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "NHA",
+                "n_sessions": 1392,
+                "first": "2021-01-21",
+                "last": "2026-08-24",
+                "bday_gap_count": 66
+              }
+            ],
+            "session_count_min": 1392,
+            "session_count_max": 1392,
+            "session_count_median": 1392.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1392,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1392,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 50.508
+    },
+    {
+      "symbol": "NKG",
+      "status": "completed",
+      "n_rows": 3891,
+      "coverage": {
+        "symbol": "NKG",
+        "n_rows": 3891,
+        "first_trade_date": "2011-01-14",
+        "last_trade_date": "2026-08-24",
+        "sha256": "0deaa8c2f7844fa94febf2b8c96ddc63c0041c662ed2419232fcad9663a96402",
+        "bytes": 1046984
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 3891,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "NKG",
+                "n_sessions": 3891,
+                "first": "2011-01-14",
+                "last": "2026-08-24",
+                "bday_gap_count": 181
+              }
+            ],
+            "session_count_min": 3891,
+            "session_count_max": 3891,
+            "session_count_median": 3891.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3891,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3891,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 137.152
+    },
+    {
+      "symbol": "NLG",
+      "status": "completed",
+      "n_rows": 3338,
+      "coverage": {
+        "symbol": "NLG",
+        "n_rows": 3338,
+        "first_trade_date": "2013-04-08",
+        "last_trade_date": "2026-08-24",
+        "sha256": "bd6599fe396b7c6f0cc4226dbdcb680a76dd0b369a231161df9881d636b0f66f",
+        "bytes": 934119
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 4,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 3338,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "NLG",
+                "n_sessions": 3338,
+                "first": "2013-04-08",
+                "last": "2026-08-24",
+                "bday_gap_count": 153
+              }
+            ],
+            "session_count_min": 3338,
+            "session_count_max": 3338,
+            "session_count_median": 3338.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3338,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3338,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 108.209
+    },
+    {
+      "symbol": "NT2",
+      "status": "completed",
+      "n_rows": 2800,
+      "coverage": {
+        "symbol": "NT2",
+        "n_rows": 2800,
+        "first_trade_date": "2015-06-12",
+        "last_trade_date": "2026-08-24",
+        "sha256": "8d32be7b6ff21c6e9170b9369cc9cc7be0fb4e095ca5223b7a606107aea24afa",
+        "bytes": 799743
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2800,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "NT2",
+                "n_sessions": 2800,
+                "first": "2015-06-12",
+                "last": "2026-08-24",
+                "bday_gap_count": 122
+              }
+            ],
+            "session_count_min": 2800,
+            "session_count_max": 2800,
+            "session_count_median": 2800.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2800,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2800,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 111.872
+    },
+    {
+      "symbol": "NTL",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "NTL",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "29278e79281c7a4d31ef6a2097585980f8cef24124c536e5ae2e18dd76eeb75a",
+        "bytes": 1204506
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "NTL",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "NTL",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 182.38
+    },
+    {
+      "symbol": "NVL",
+      "status": "completed",
+      "n_rows": 2408,
+      "coverage": {
+        "symbol": "NVL",
+        "n_rows": 2408,
+        "first_trade_date": "2016-12-28",
+        "last_trade_date": "2026-08-24",
+        "sha256": "4026679f3fb0d275d7ee16f5abf0493ac1cedabd8694832df86ebe4d094a1869",
+        "bytes": 701168
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2408,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "NVL",
+                "n_sessions": 2408,
+                "first": "2016-12-28",
+                "last": "2026-08-24",
+                "bday_gap_count": 111
+              }
+            ],
+            "session_count_min": 2408,
+            "session_count_max": 2408,
+            "session_count_median": 2408.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2408,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2408,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 111.91
+    },
+    {
+      "symbol": "OCB",
+      "status": "completed",
+      "n_rows": 1387,
+      "coverage": {
+        "symbol": "OCB",
+        "n_rows": 1387,
+        "first_trade_date": "2021-01-28",
+        "last_trade_date": "2026-08-24",
+        "sha256": "d7757acf07283bcec84985ac24074e819d50c4085e186646cc2531cca75fc06f",
+        "bytes": 396307
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1387,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "OCB",
+                "n_sessions": 1387,
+                "first": "2021-01-28",
+                "last": "2026-08-24",
+                "bday_gap_count": 66
+              }
+            ],
+            "session_count_min": 1387,
+            "session_count_max": 1387,
+            "session_count_median": 1387.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1387,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1387,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 59.906
+    },
+    {
+      "symbol": "ORS",
+      "status": "completed",
+      "n_rows": 1198,
+      "coverage": {
+        "symbol": "ORS",
+        "n_rows": 1198,
+        "first_trade_date": "2021-11-03",
+        "last_trade_date": "2026-08-24",
+        "sha256": "91f7ac590808bee8ddebf6143fc89eed324dc6c874e72b8d12e6e4de434b4623",
+        "bytes": 335663
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1198,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "ORS",
+                "n_sessions": 1198,
+                "first": "2021-11-03",
+                "last": "2026-08-24",
+                "bday_gap_count": 56
+              }
+            ],
+            "session_count_min": 1198,
+            "session_count_max": 1198,
+            "session_count_median": 1198.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1198,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1198,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 30.386
+    },
+    {
+      "symbol": "PC1",
+      "status": "completed",
+      "n_rows": 2438,
+      "coverage": {
+        "symbol": "PC1",
+        "n_rows": 2438,
+        "first_trade_date": "2016-11-16",
+        "last_trade_date": "2026-08-24",
+        "sha256": "51512a9e80cd19c8a72d7141bbd0cb11631980d61ce374b02ee95a4663ed4f35",
+        "bytes": 689309
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2438,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PC1",
+                "n_sessions": 2438,
+                "first": "2016-11-16",
+                "last": "2026-08-24",
+                "bday_gap_count": 111
+              }
+            ],
+            "session_count_min": 2438,
+            "session_count_max": 2438,
+            "session_count_median": 2438.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2438,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2438,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 58.557
+    },
+    {
+      "symbol": "PDR",
+      "status": "completed",
+      "n_rows": 4008,
+      "coverage": {
+        "symbol": "PDR",
+        "n_rows": 4008,
+        "first_trade_date": "2010-07-30",
+        "last_trade_date": "2026-08-24",
+        "sha256": "a32d3e65daa648ea187228839d6072fe970f0661c02bb8968ad1b7b77ad3acf6",
+        "bytes": 1082829
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 83,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4008,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PDR",
+                "n_sessions": 4008,
+                "first": "2010-07-30",
+                "last": "2026-08-24",
+                "bday_gap_count": 184
+              }
+            ],
+            "session_count_min": 4008,
+            "session_count_max": 4008,
+            "session_count_median": 4008.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4008,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4008,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 103.186
+    },
+    {
+      "symbol": "PET",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "PET",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "227d0d9e7c86aa2f0d0429bc818b4c06676dc778b1131d565028f30b57ce9510",
+        "bytes": 1166256
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "PET",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PET",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 128.863
+    },
+    {
+      "symbol": "PHR",
+      "status": "completed",
+      "n_rows": 4246,
+      "coverage": {
+        "symbol": "PHR",
+        "n_rows": 4246,
+        "first_trade_date": "2009-08-18",
+        "last_trade_date": "2026-08-24",
+        "sha256": "af8717e9b0fc8b95466d80e8ec3c6c872dd3b313e0e822efed5e8432757b1061",
+        "bytes": 1169708
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 1,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4246,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PHR",
+                "n_sessions": 4246,
+                "first": "2009-08-18",
+                "last": "2026-08-24",
+                "bday_gap_count": 194
+              }
+            ],
+            "session_count_min": 4246,
+            "session_count_max": 4246,
+            "session_count_median": 4246.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4246,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4246,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 79.515
+    },
+    {
+      "symbol": "PLX",
+      "status": "completed",
+      "n_rows": 2333,
+      "coverage": {
+        "symbol": "PLX",
+        "n_rows": 2333,
+        "first_trade_date": "2017-04-21",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b23e7fa065a4ea6a4eaa4b6cbf3715f1445858584a12b1ae2ccfcc40c9be35fb",
+        "bytes": 674195
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2333,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PLX",
+                "n_sessions": 2333,
+                "first": "2017-04-21",
+                "last": "2026-08-24",
+                "bday_gap_count": 104
+              }
+            ],
+            "session_count_min": 2333,
+            "session_count_max": 2333,
+            "session_count_median": 2333.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2333,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2333,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 53.27
+    },
+    {
+      "symbol": "PNJ",
+      "status": "completed",
+      "n_rows": 4351,
+      "coverage": {
+        "symbol": "PNJ",
+        "n_rows": 4351,
+        "first_trade_date": "2009-03-23",
+        "last_trade_date": "2026-08-24",
+        "sha256": "7cc3432096aae13c1b0ab6d211b1fc76348ff699ca196e0e1cd07a6bded24c36",
+        "bytes": 1204051
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "PNJ",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 1,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4351,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PNJ",
+                "n_sessions": 4351,
+                "first": "2009-03-23",
+                "last": "2026-08-24",
+                "bday_gap_count": 197
+              }
+            ],
+            "session_count_min": 4351,
+            "session_count_max": 4351,
+            "session_count_median": 4351.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4351,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4351,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 125.326
+    },
+    {
+      "symbol": "POW",
+      "status": "completed",
+      "n_rows": 1899,
+      "coverage": {
+        "symbol": "POW",
+        "n_rows": 1899,
+        "first_trade_date": "2019-01-14",
+        "last_trade_date": "2026-08-24",
+        "sha256": "9eb52f3df5e7b439012b3e55b90a4deac810d5beb356c6e7526b35be2f4c4212",
+        "bytes": 555624
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1899,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "POW",
+                "n_sessions": 1899,
+                "first": "2019-01-14",
+                "last": "2026-08-24",
+                "bday_gap_count": 87
+              }
+            ],
+            "session_count_min": 1899,
+            "session_count_max": 1899,
+            "session_count_median": 1899.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1899,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1899,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 87.335
+    },
+    {
+      "symbol": "PTB",
+      "status": "completed",
+      "n_rows": 3766,
+      "coverage": {
+        "symbol": "PTB",
+        "n_rows": 3766,
+        "first_trade_date": "2011-07-22",
+        "last_trade_date": "2026-08-24",
+        "sha256": "f357acd21490fc504aa916e289ec6ea70dece3958bc93348899c1d1db278bf30",
+        "bytes": 1023742
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "OHLC_SANITY",
+            "count": 29,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 3766,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PTB",
+                "n_sessions": 3766,
+                "first": "2011-07-22",
+                "last": "2026-08-24",
+                "bday_gap_count": 171
+              }
+            ],
+            "session_count_min": 3766,
+            "session_count_max": 3766,
+            "session_count_median": 3766.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3766,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3766,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 290.092
+    },
+    {
+      "symbol": "PVD",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "PVD",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "6dd08e081884765f2d24f96c1b0505d9a7ca8aee0b6cbe65e4ceb69fa4df9b00",
+        "bytes": 1275143
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "PVD",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PVD",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 215.799
+    },
+    {
+      "symbol": "PVT",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "PVT",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b0716e372bb94b8b67a47a9af3091e041844a0d4ea3bd12b18b274a776c27510",
+        "bytes": 1228631
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "PVT",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "PVT",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 128.899
+    },
+    {
+      "symbol": "REE",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "REE",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2c66ca1a164af1c888dda9713553252900fe32fe50097f642666e2480c3e525b",
+        "bytes": 1181707
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "REE",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "REE",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 151.453
+    },
+    {
+      "symbol": "SAB",
+      "status": "completed",
+      "n_rows": 2424,
+      "coverage": {
+        "symbol": "SAB",
+        "n_rows": 2424,
+        "first_trade_date": "2016-12-06",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2b08a5262fddea657c2fbf2424eb91527b1f2e687c6fa53e5f401376d7d447ef",
+        "bytes": 722099
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2424,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "SAB",
+                "n_sessions": 2424,
+                "first": "2016-12-06",
+                "last": "2026-08-24",
+                "bday_gap_count": 111
+              }
+            ],
+            "session_count_min": 2424,
+            "session_count_max": 2424,
+            "session_count_median": 2424.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2424,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2424,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 105.53
+    },
+    {
+      "symbol": "SBT",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "SBT",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "55d9cb5e3cf2b4ce23eddad6c51a332297b914e9f1b9c981210d516ec3c03ba2",
+        "bytes": 1221842
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "SBT",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "SBT",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 175.413
+    },
+    {
+      "symbol": "SHB",
+      "status": "completed",
+      "n_rows": 1216,
+      "coverage": {
+        "symbol": "SHB",
+        "n_rows": 1216,
+        "first_trade_date": "2021-10-08",
+        "last_trade_date": "2026-08-24",
+        "sha256": "1eadec32486a663913b51b6569e4a9b1239b3528ddae886ce37333a5b1c4092d",
+        "bytes": 354499
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1216,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "SHB",
+                "n_sessions": 1216,
+                "first": "2021-10-08",
+                "last": "2026-08-24",
+                "bday_gap_count": 56
+              }
+            ],
+            "session_count_min": 1216,
+            "session_count_max": 1216,
+            "session_count_median": 1216.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1216,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1216,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 50.922
+    },
+    {
+      "symbol": "SIP",
+      "status": "completed",
+      "n_rows": 760,
+      "coverage": {
+        "symbol": "SIP",
+        "n_rows": 760,
+        "first_trade_date": "2023-08-07",
+        "last_trade_date": "2026-08-24",
+        "sha256": "552984d00ffa08dc557a0bd262b0a62ff8874cfa9cc579d202f957d3c877d933",
+        "bytes": 214734
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 760,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "SIP",
+                "n_sessions": 760,
+                "first": "2023-08-07",
+                "last": "2026-08-24",
+                "bday_gap_count": 36
+              }
+            ],
+            "session_count_min": 760,
+            "session_count_max": 760,
+            "session_count_median": 760.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 760,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 760,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 32.536
+    },
+    {
+      "symbol": "SSB",
+      "status": "completed",
+      "n_rows": 1353,
+      "coverage": {
+        "symbol": "SSB",
+        "n_rows": 1353,
+        "first_trade_date": "2021-03-24",
+        "last_trade_date": "2026-08-24",
+        "sha256": "5fdb9b2f29abd2dbbf629ab1ce9a7cc61ad77914db8dae785b4f547f0e13129d",
+        "bytes": 375841
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1353,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "SSB",
+                "n_sessions": 1353,
+                "first": "2021-03-24",
+                "last": "2026-08-24",
+                "bday_gap_count": 61
+              }
+            ],
+            "session_count_min": 1353,
+            "session_count_max": 1353,
+            "session_count_median": 1353.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1353,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1353,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 52.016
+    },
+    {
+      "symbol": "SSI",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "SSI",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "cd2bbe1531d201135d49a091682ce879a38d4d7e21189c889fc52caa9a65bce3",
+        "bytes": 1290009
+      }
+    },
+    {
+      "symbol": "STB",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "STB",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "0092fa155fe741c17d75c70f74fe72e45ac3096faccf724bdb586fa64f36febf",
+        "bytes": 1269969
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "STB",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "STB",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 116.185
+    },
+    {
+      "symbol": "SZC",
+      "status": "completed",
+      "n_rows": 1898,
+      "coverage": {
+        "symbol": "SZC",
+        "n_rows": 1898,
+        "first_trade_date": "2019-01-15",
+        "last_trade_date": "2026-08-24",
+        "sha256": "6c35e8407f363235ff29e8aa9132a51b9937fc9463301c20755da722197c3a45",
+        "bytes": 527531
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1898,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "SZC",
+                "n_sessions": 1898,
+                "first": "2019-01-15",
+                "last": "2026-08-24",
+                "bday_gap_count": 87
+              }
+            ],
+            "session_count_min": 1898,
+            "session_count_max": 1898,
+            "session_count_median": 1898.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1898,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1898,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 60.092
+    },
+    {
+      "symbol": "TCB",
+      "status": "completed",
+      "n_rows": 2056,
+      "coverage": {
+        "symbol": "TCB",
+        "n_rows": 2056,
+        "first_trade_date": "2018-06-04",
+        "last_trade_date": "2026-08-24",
+        "sha256": "bb4c6d23f20cafaf6265e3c6baea25a326372a940cbffde9660444cc59a78b95",
+        "bytes": 590032
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2056,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "TCB",
+                "n_sessions": 2056,
+                "first": "2018-06-04",
+                "last": "2026-08-24",
+                "bday_gap_count": 90
+              }
+            ],
+            "session_count_min": 2056,
+            "session_count_max": 2056,
+            "session_count_median": 2056.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2056,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2056,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 46.776
+    },
+    {
+      "symbol": "TCH",
+      "status": "completed",
+      "n_rows": 2468,
+      "coverage": {
+        "symbol": "TCH",
+        "n_rows": 2468,
+        "first_trade_date": "2016-10-05",
+        "last_trade_date": "2026-08-24",
+        "sha256": "220117c5dcba4d9224857c11e9c6aba182ecd8332b9707d51a8780f53a248e42",
+        "bytes": 693229
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2468,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "TCH",
+                "n_sessions": 2468,
+                "first": "2016-10-05",
+                "last": "2026-08-24",
+                "bday_gap_count": 111
+              }
+            ],
+            "session_count_min": 2468,
+            "session_count_max": 2468,
+            "session_count_median": 2468.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2468,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2468,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 63.225
+    },
+    {
+      "symbol": "TCM",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "TCM",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "5b3c9da58af45a4c31f09ba4b40037782ba2a770b40eab5f73284675d895e006",
+        "bytes": 1161789
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "TCM",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "TCM",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 128.64
+    },
+    {
+      "symbol": "TCX",
+      "status": "completed",
+      "n_rows": 210,
+      "coverage": {
+        "symbol": "TCX",
+        "n_rows": 210,
+        "first_trade_date": "2025-10-21",
+        "last_trade_date": "2026-08-24",
+        "sha256": "8177b9e59324a17d4506e70c5ab0ec9e0f29309ce16fb999d4db1fb85ec3beed",
+        "bytes": 62529
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 210,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "TCX",
+                "n_sessions": 210,
+                "first": "2025-10-21",
+                "last": "2026-08-24",
+                "bday_gap_count": 10
+              }
+            ],
+            "session_count_min": 210,
+            "session_count_max": 210,
+            "session_count_median": 210.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 210,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 210,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 8.567
+    },
+    {
+      "symbol": "TPB",
+      "status": "completed",
+      "n_rows": 2085,
+      "coverage": {
+        "symbol": "TPB",
+        "n_rows": 2085,
+        "first_trade_date": "2018-04-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "af01f218a61e6b6403bfa0b65f6eec420fcddf0235cf84394115076f04a0721c",
+        "bytes": 572504
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2085,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "TPB",
+                "n_sessions": 2085,
+                "first": "2018-04-19",
+                "last": "2026-08-24",
+                "bday_gap_count": 93
+              }
+            ],
+            "session_count_min": 2085,
+            "session_count_max": 2085,
+            "session_count_median": 2085.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2085,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2085,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 67.801
+    },
+    {
+      "symbol": "TVS",
+      "status": "completed",
+      "n_rows": 2896,
+      "coverage": {
+        "symbol": "TVS",
+        "n_rows": 2896,
+        "first_trade_date": "2015-01-15",
+        "last_trade_date": "2026-08-24",
+        "sha256": "54b862d9f8389f4832934e57018a811b169345555f546071bbf83abe05ca4244",
+        "bytes": 761507
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2896,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "TVS",
+                "n_sessions": 2896,
+                "first": "2015-01-15",
+                "last": "2026-08-24",
+                "bday_gap_count": 132
+              }
+            ],
+            "session_count_min": 2896,
+            "session_count_max": 2896,
+            "session_count_median": 2896.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2896,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2896,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 62.593
+    },
+    {
+      "symbol": "VCB",
+      "status": "completed",
+      "n_rows": 4283,
+      "coverage": {
+        "symbol": "VCB",
+        "n_rows": 4283,
+        "first_trade_date": "2009-06-30",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b896c17d1f282b469b3dffb7ba78b67c949625c8369178fd53d9e2a5d8acb28c",
+        "bytes": 1270705
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "VCB",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4283,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VCB",
+                "n_sessions": 4283,
+                "first": "2009-06-30",
+                "last": "2026-08-24",
+                "bday_gap_count": 194
+              }
+            ],
+            "session_count_min": 4283,
+            "session_count_max": 4283,
+            "session_count_median": 4283.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4283,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4283,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 101.629
+    },
+    {
+      "symbol": "VCG",
+      "status": "completed",
+      "n_rows": 1408,
+      "coverage": {
+        "symbol": "VCG",
+        "n_rows": 1408,
+        "first_trade_date": "2020-12-29",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b15b63faca46e07d6724a3f374c1ad0bc6efd9317e2d0000fb6bcb0b2ee6b897",
+        "bytes": 401141
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1408,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VCG",
+                "n_sessions": 1408,
+                "first": "2020-12-29",
+                "last": "2026-08-24",
+                "bday_gap_count": 67
+              }
+            ],
+            "session_count_min": 1408,
+            "session_count_max": 1408,
+            "session_count_median": 1408.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1408,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1408,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 45.565
+    },
+    {
+      "symbol": "VCI",
+      "status": "completed",
+      "n_rows": 2280,
+      "coverage": {
+        "symbol": "VCI",
+        "n_rows": 2280,
+        "first_trade_date": "2017-07-07",
+        "last_trade_date": "2026-08-24",
+        "sha256": "a8e408dbd76040424dcaa3673e2814c87508e773c3a59b310fe823e9ca2a87f9",
+        "bytes": 660723
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2280,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VCI",
+                "n_sessions": 2280,
+                "first": "2017-07-07",
+                "last": "2026-08-24",
+                "bday_gap_count": 102
+              }
+            ],
+            "session_count_min": 2280,
+            "session_count_max": 2280,
+            "session_count_median": 2280.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2280,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2280,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 85.846
+    },
+    {
+      "symbol": "VCK",
+      "status": "completed",
+      "n_rows": 170,
+      "coverage": {
+        "symbol": "VCK",
+        "n_rows": 170,
+        "first_trade_date": "2025-12-16",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b629ebb4035fb46d0e821d4f4097a9d6bdb83cecf198fd23af6af107170f751c",
+        "bytes": 49555
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 170,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VCK",
+                "n_sessions": 170,
+                "first": "2025-12-16",
+                "last": "2026-08-24",
+                "bday_gap_count": 10
+              }
+            ],
+            "session_count_min": 170,
+            "session_count_max": 170,
+            "session_count_median": 170.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 170,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 170,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 6.363
+    },
+    {
+      "symbol": "VDS",
+      "status": "completed",
+      "n_rows": 2272,
+      "coverage": {
+        "symbol": "VDS",
+        "n_rows": 2272,
+        "first_trade_date": "2017-07-19",
+        "last_trade_date": "2026-08-24",
+        "sha256": "8467c0b31df51a2d6e8d0cd6921cb36a3bd57696eee9fe2418c75a208b79c80c",
+        "bytes": 607652
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2272,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VDS",
+                "n_sessions": 2272,
+                "first": "2017-07-19",
+                "last": "2026-08-24",
+                "bday_gap_count": 102
+              }
+            ],
+            "session_count_min": 2272,
+            "session_count_max": 2272,
+            "session_count_median": 2272.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2272,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2272,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 80.229
+    },
+    {
+      "symbol": "VGC",
+      "status": "completed",
+      "n_rows": 1811,
+      "coverage": {
+        "symbol": "VGC",
+        "n_rows": 1811,
+        "first_trade_date": "2019-05-29",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2d364742834cb15e80e2cc8e6b09961b9e058955ff7327d5c37b1f5e3f687ea6",
+        "bytes": 514831
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1811,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VGC",
+                "n_sessions": 1811,
+                "first": "2019-05-29",
+                "last": "2026-08-24",
+                "bday_gap_count": 78
+              }
+            ],
+            "session_count_min": 1811,
+            "session_count_max": 1811,
+            "session_count_median": 1811.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1811,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1811,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 46.518
+    },
+    {
+      "symbol": "VHC",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "VHC",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "b9f0e27561b4252d7ec2c0daf1ac995b38ca39baece5c1ac1e4a935b000fc1e3",
+        "bytes": 1213583
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "VHC",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 132,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VHC",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 147.214
+    },
+    {
+      "symbol": "VHM",
+      "status": "completed",
+      "n_rows": 2068,
+      "coverage": {
+        "symbol": "VHM",
+        "n_rows": 2068,
+        "first_trade_date": "2018-05-17",
+        "last_trade_date": "2026-08-24",
+        "sha256": "0a45d32ef1019cb3bc98826bf60ed8717e1913b33c2fc7953f7b498a556c04e4",
+        "bytes": 632991
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2068,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VHM",
+                "n_sessions": 2068,
+                "first": "2018-05-17",
+                "last": "2026-08-24",
+                "bday_gap_count": 90
+              }
+            ],
+            "session_count_min": 2068,
+            "session_count_max": 2068,
+            "session_count_median": 2068.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2068,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2068,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 71.364
+    },
+    {
+      "symbol": "VIB",
+      "status": "completed",
+      "n_rows": 1443,
+      "coverage": {
+        "symbol": "VIB",
+        "n_rows": 1443,
+        "first_trade_date": "2020-11-10",
+        "last_trade_date": "2026-08-24",
+        "sha256": "416eed74e7d53d7ce057f5c0a3b4af7b6e867d1184de304b70a834c03027ca8f",
+        "bytes": 393610
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1443,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VIB",
+                "n_sessions": 1443,
+                "first": "2020-11-10",
+                "last": "2026-08-24",
+                "bday_gap_count": 67
+              }
+            ],
+            "session_count_min": 1443,
+            "session_count_max": 1443,
+            "session_count_median": 1443.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1443,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1443,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 45.609
+    },
+    {
+      "symbol": "VIC",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "VIC",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "ba9b449037f810f80e37f3997e0fc174b860b431d480d1b7553a3c9e4ef2deca",
+        "bytes": 1308647
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "VIC",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VIC",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 135.904
+    },
+    {
+      "symbol": "VIX",
+      "status": "completed",
+      "n_rows": 1401,
+      "coverage": {
+        "symbol": "VIX",
+        "n_rows": 1401,
+        "first_trade_date": "2021-01-08",
+        "last_trade_date": "2026-08-24",
+        "sha256": "2a0b86d8168f3ae75e419c54977607f286e6d3fe1ab08a03a8f6a344959c5458",
+        "bytes": 404354
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 1401,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VIX",
+                "n_sessions": 1401,
+                "first": "2021-01-08",
+                "last": "2026-08-24",
+                "bday_gap_count": 66
+              }
+            ],
+            "session_count_min": 1401,
+            "session_count_max": 1401,
+            "session_count_median": 1401.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1401,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1401,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 44.918
+    },
+    {
+      "symbol": "VJC",
+      "status": "completed",
+      "n_rows": 2370,
+      "coverage": {
+        "symbol": "VJC",
+        "n_rows": 2370,
+        "first_trade_date": "2017-02-28",
+        "last_trade_date": "2026-08-24",
+        "sha256": "c7369b1bbfc8ed4387439e7bd492fe335f9f08df6033479ee99ea4955afb7c74",
+        "bytes": 698165
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2370,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VJC",
+                "n_sessions": 2370,
+                "first": "2017-02-28",
+                "last": "2026-08-24",
+                "bday_gap_count": 105
+              }
+            ],
+            "session_count_min": 2370,
+            "session_count_max": 2370,
+            "session_count_median": 2370.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2370,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2370,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 67.131
+    },
+    {
+      "symbol": "VND",
+      "status": "completed",
+      "n_rows": 2143,
+      "coverage": {
+        "symbol": "VND",
+        "n_rows": 2143,
+        "first_trade_date": "2017-08-18",
+        "last_trade_date": "2026-08-24",
+        "sha256": "f8ec6e9e9b47e86067c79a10eafc71a5de00d6aea067948a975e2fcd3d276fce",
+        "bytes": 620651
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2143,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VND",
+                "n_sessions": 2143,
+                "first": "2017-08-18",
+                "last": "2026-08-24",
+                "bday_gap_count": 209
+              }
+            ],
+            "session_count_min": 2143,
+            "session_count_max": 2143,
+            "session_count_median": 2143.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2143,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2143,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 51.547
+    },
+    {
+      "symbol": "VNM",
+      "status": "skipped_completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "VNM",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "3aa79a09b7ade2eb6563d484a8d308b99443e6d73f403a304f1be3bac1d737d9",
+        "bytes": 1343618
+      }
+    },
+    {
+      "symbol": "VOS",
+      "status": "completed",
+      "n_rows": 3982,
+      "coverage": {
+        "symbol": "VOS",
+        "n_rows": 3982,
+        "first_trade_date": "2010-09-08",
+        "last_trade_date": "2026-08-24",
+        "sha256": "af11f9f120175345f91cd3454b6901dc06b5e2c3ead783a49c4b1e5c2169d15e",
+        "bytes": 1032728
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 3982,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VOS",
+                "n_sessions": 3982,
+                "first": "2010-09-08",
+                "last": "2026-08-24",
+                "bday_gap_count": 182
+              }
+            ],
+            "session_count_min": 3982,
+            "session_count_max": 3982,
+            "session_count_median": 3982.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 3982,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 4,
+        "raw_row_count": 3982,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 99.101
+    },
+    {
+      "symbol": "VPB",
+      "status": "completed",
+      "n_rows": 2251,
+      "coverage": {
+        "symbol": "VPB",
+        "n_rows": 2251,
+        "first_trade_date": "2017-08-17",
+        "last_trade_date": "2026-08-24",
+        "sha256": "7593f560c9bf83d9940d94af57155a53da5ae2836b281e8ff9d0422b443b1515",
+        "bytes": 647990
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2251,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VPB",
+                "n_sessions": 2251,
+                "first": "2017-08-17",
+                "last": "2026-08-24",
+                "bday_gap_count": 102
+              }
+            ],
+            "session_count_min": 2251,
+            "session_count_max": 2251,
+            "session_count_median": 2251.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2251,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2251,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 85.347
+    },
+    {
+      "symbol": "VPL",
+      "status": "completed",
+      "n_rows": 1069,
+      "coverage": {
+        "symbol": "VPL",
+        "n_rows": 1069,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "c62d5667639ff15b6d977bfa6c8809f0034ed827dd1d55423dbca0cb33ddbe45",
+        "bytes": 288060
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "VPL",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 1069,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VPL",
+                "n_sessions": 1069,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 3535
+              }
+            ],
+            "session_count_min": 1069,
+            "session_count_max": 1069,
+            "session_count_median": 1069.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 1069,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 2,
+        "raw_row_count": 1069,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 32.001
+    },
+    {
+      "symbol": "VPX",
+      "status": "completed",
+      "n_rows": 173,
+      "coverage": {
+        "symbol": "VPX",
+        "n_rows": 173,
+        "first_trade_date": "2025-12-11",
+        "last_trade_date": "2026-08-24",
+        "sha256": "8b7c0b888bc35510a583f3218e1ca6b05c3c2d2745e5edd201a5b11e8e75f8bf",
+        "bytes": 50545
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 173,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VPX",
+                "n_sessions": 173,
+                "first": "2025-12-11",
+                "last": "2026-08-24",
+                "bday_gap_count": 10
+              }
+            ],
+            "session_count_min": 173,
+            "session_count_max": 173,
+            "session_count_median": 173.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 173,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 173,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 9.633
+    },
+    {
+      "symbol": "VRE",
+      "status": "completed",
+      "n_rows": 2195,
+      "coverage": {
+        "symbol": "VRE",
+        "n_rows": 2195,
+        "first_trade_date": "2017-11-06",
+        "last_trade_date": "2026-08-24",
+        "sha256": "4aeb0ffe05800e8e4a75063d22cb2db3414d5b8c32da30d2d6c2bb564ce334d2",
+        "bytes": 665987
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 2195,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VRE",
+                "n_sessions": 2195,
+                "first": "2017-11-06",
+                "last": "2026-08-24",
+                "bday_gap_count": 101
+              }
+            ],
+            "session_count_min": 2195,
+            "session_count_max": 2195,
+            "session_count_median": 2195.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 2195,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 3,
+        "raw_row_count": 2195,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 53.212
+    },
+    {
+      "symbol": "VSC",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "VSC",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "fc3b6ea3ac853c70a2e38acfba7744be52363dd1e99e59ccf290210607a9b926",
+        "bytes": 1184185
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "VSC",
+            "count": 2,
+            "severity": "soft"
+          },
+          {
+            "code": "OHLC_SANITY",
+            "count": 8,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VSC",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 102.127
+    },
+    {
+      "symbol": "VTO",
+      "status": "completed",
+      "n_rows": 4402,
+      "coverage": {
+        "symbol": "VTO",
+        "n_rows": 4402,
+        "first_trade_date": "2009-01-02",
+        "last_trade_date": "2026-08-24",
+        "sha256": "13709bc2fee4d5bdbafbebc2855996bf886eeb163adc656ac72baf3eb1f6bec5",
+        "bytes": 1136393
+      },
+      "validation": {
+        "ok": true,
+        "issues": [
+          {
+            "code": "WEEKEND_SESSIONS",
+            "symbol": "VTO",
+            "count": 2,
+            "severity": "soft"
+          }
+        ],
+        "stats": {
+          "n_rows": 4402,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VTO",
+                "n_sessions": 4402,
+                "first": "2009-01-02",
+                "last": "2026-08-24",
+                "bday_gap_count": 202
+              }
+            ],
+            "session_count_min": 4402,
+            "session_count_max": 4402,
+            "session_count_median": 4402.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 4402,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 5,
+        "raw_row_count": 4402,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 113.406
+    },
+    {
+      "symbol": "VTP",
+      "status": "completed",
+      "n_rows": 613,
+      "coverage": {
+        "symbol": "VTP",
+        "n_rows": 613,
+        "first_trade_date": "2024-03-11",
+        "last_trade_date": "2026-08-24",
+        "sha256": "defd4ba1c5d487874c848592d65cf773929d4854ca2613065257560c6bd61b58",
+        "bytes": 177087
+      },
+      "validation": {
+        "ok": true,
+        "issues": [],
+        "stats": {
+          "n_rows": 613,
+          "n_symbols": 1,
+          "future_count": 0,
+          "invalid_dates": 0,
+          "gap": {
+            "per_symbol": [
+              {
+                "symbol": "VTP",
+                "n_sessions": 613,
+                "first": "2024-03-11",
+                "last": "2026-08-24",
+                "bday_gap_count": 28
+              }
+            ],
+            "session_count_min": 613,
+            "session_count_max": 613,
+            "session_count_median": 613.0
+          }
+        }
+      },
+      "outcome_readiness": {
+        "ready": true,
+        "n_sessions_with_close": 613,
+        "horizons_supported_in_principle": [
+          "T1",
+          "T3",
+          "T5",
+          "T10",
+          "T20"
+        ],
+        "mfe_mae_path_ready_in_principle": true,
+        "caveats": [
+          "Raw provider OHLC; corporate actions / adjustments not verified.",
+          "Session-based horizons (trading days), not calendar days.",
+          "Do not mix outcome labels into T0 canonical rows."
+        ]
+      },
+      "fetch": {
+        "mode": "paginated",
+        "page_count": 1,
+        "raw_row_count": 613,
+        "stopped_reason": "total_pages_exhausted",
+        "errors": []
+      },
+      "elapsed_sec": 16.122
+    }
+  ],
+  "rate_limited": false,
+  "aggregate": {
+    "symbols_completed_on_disk": [
+      "ACB",
+      "AGR",
+      "ANV",
+      "BAF",
+      "BFC",
+      "BID",
+      "BMP",
+      "BSI",
+      "BSR",
+      "BVH",
+      "CII",
+      "CMG",
+      "CSV",
+      "CTD",
+      "CTG",
+      "CTR",
+      "DBC",
+      "DCM",
+      "DGC",
+      "DGW",
+      "DIG",
+      "DPG",
+      "DPM",
+      "DPR",
+      "DXG",
+      "DXS",
+      "EIB",
+      "EVF",
+      "FCN",
+      "FPT",
+      "FRT",
+      "FTS",
+      "GAS",
+      "GEE",
+      "GEG",
+      "GEX",
+      "GIL",
+      "GMD",
+      "GVR",
+      "HAG",
+      "HAH",
+      "HCM",
+      "HDB",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "HPG",
+      "HSG",
+      "HVN",
+      "IJC",
+      "KBC",
+      "KDH",
+      "KSB",
+      "LPB",
+      "MBB",
+      "MCH",
+      "MSB",
+      "MSH",
+      "MSN",
+      "MWG",
+      "NAB",
+      "NHA",
+      "NKG",
+      "NLG",
+      "NT2",
+      "NTL",
+      "NVL",
+      "OCB",
+      "ORS",
+      "PC1",
+      "PDR",
+      "PET",
+      "PHR",
+      "PLX",
+      "PNJ",
+      "POW",
+      "PTB",
+      "PVD",
+      "PVT",
+      "REE",
+      "SAB",
+      "SBT",
+      "SHB",
+      "SIP",
+      "SSB",
+      "SSI",
+      "STB",
+      "SZC",
+      "TCB",
+      "TCH",
+      "TCM",
+      "TCX",
+      "TPB",
+      "TVS",
+      "VCB",
+      "VCG",
+      "VCI",
+      "VCK",
+      "VDS",
+      "VGC",
+      "VHC",
+      "VHM",
+      "VIB",
+      "VIC",
+      "VIX",
+      "VJC",
+      "VND",
+      "VNM",
+      "VOS",
+      "VPB",
+      "VPL",
+      "VPX",
+      "VRE",
+      "VSC",
+      "VTO",
+      "VTP"
+    ],
+    "total_rows": 337236,
+    "earliest_date": "2009-01-02",
+    "latest_date": "2026-08-24",
+    "median_sessions_per_symbol": 2858.0,
+    "max_sessions_per_symbol": 4402,
+    "current_ems_hose_coverage": {
+      "n_eligible": 117,
+      "n_completed": 117,
+      "symbols": [
+        "ACB",
+        "AGR",
+        "ANV",
+        "BAF",
+        "BFC",
+        "BID",
+        "BMP",
+        "BSI",
+        "BSR",
+        "BVH",
+        "CII",
+        "CMG",
+        "CSV",
+        "CTD",
+        "CTG",
+        "CTR",
+        "DBC",
+        "DCM",
+        "DGC",
+        "DGW",
+        "DIG",
+        "DPG",
+        "DPM",
+        "DPR",
+        "DXG",
+        "DXS",
+        "EIB",
+        "EVF",
+        "FCN",
+        "FPT",
+        "FRT",
+        "FTS",
+        "GAS",
+        "GEE",
+        "GEG",
+        "GEX",
+        "GIL",
+        "GMD",
+        "GVR",
+        "HAG",
+        "HAH",
+        "HCM",
+        "HDB",
+        "HDC",
+        "HDG",
+        "HHS",
+        "HHV",
+        "HPG",
+        "HSG",
+        "HVN",
+        "IJC",
+        "KBC",
+        "KDH",
+        "KSB",
+        "LPB",
+        "MBB",
+        "MCH",
+        "MSB",
+        "MSH",
+        "MSN",
+        "MWG",
+        "NAB",
+        "NHA",
+        "NKG",
+        "NLG",
+        "NT2",
+        "NTL",
+        "NVL",
+        "OCB",
+        "ORS",
+        "PC1",
+        "PDR",
+        "PET",
+        "PHR",
+        "PLX",
+        "PNJ",
+        "POW",
+        "PTB",
+        "PVD",
+        "PVT",
+        "REE",
+        "SAB",
+        "SBT",
+        "SHB",
+        "SIP",
+        "SSB",
+        "SSI",
+        "STB",
+        "SZC",
+        "TCB",
+        "TCH",
+        "TCM",
+        "TCX",
+        "TPB",
+        "TVS",
+        "VCB",
+        "VCG",
+        "VCI",
+        "VCK",
+        "VDS",
+        "VGC",
+        "VHC",
+        "VHM",
+        "VIB",
+        "VIC",
+        "VIX",
+        "VJC",
+        "VND",
+        "VNM",
+        "VOS",
+        "VPB",
+        "VPL",
+        "VPX",
+        "VRE",
+        "VSC",
+        "VTO",
+        "VTP"
+      ]
+    },
+    "excluded_hnx_upcom": [
+      "ACV",
+      "BVS",
+      "C4G",
+      "CEO",
+      "DDV",
+      "DRI",
+      "FOX",
+      "HUT",
+      "IDC",
+      "LAS",
+      "MBS",
+      "MML",
+      "MSR",
+      "NTP",
+      "OIL",
+      "PLC",
+      "PVB",
+      "PVC",
+      "PVS",
+      "SHS",
+      "TNG",
+      "TVN",
+      "VGI",
+      "VGS",
+      "VGT"
+    ],
+    "integrity_failures": [],
+    "disk_footprint_bytes": 302111270
+  },
+  "schema_version": "ff_hsx_symbol_daily_v1",
+  "source": "HSX_FOREIGN_API",
+  "data_root": "data/foreign_flow_history"
+}
