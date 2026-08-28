@@ -68,6 +68,7 @@ def fetch_exact_trade_date_row(
     timeout_sec: float = DEFAULT_TIMEOUT_SEC,
     pacing_sec: float = DEFAULT_PACING_SEC,
     max_retries: int = DEFAULT_MAX_RETRIES,
+    backoff_base_sec: float = 2.0,
     opener: Optional[Callable[..., Any]] = None,
     sleeper: Callable[[float], None] = time.sleep,
 ) -> Dict[str, Any]:
@@ -101,6 +102,7 @@ def fetch_exact_trade_date_row(
                 url,
                 timeout_sec=timeout_sec,
                 max_retries=max_retries,
+                backoff_base_sec=backoff_base_sec,
                 opener=opener,
                 sleeper=sleeper,
             )

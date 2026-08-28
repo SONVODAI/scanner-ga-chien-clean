@@ -1,5 +1,15 @@
 """
 Phase 3K.5 — Production daily run file lock (exclusive non-blocking).
+
+Contract:
+  --use-lock at the authoritative entrypoint MUST be acquired BEFORE any
+  data-producing stage (headless scan, T0, Forecast, A/C/B, ledgers).
+  A second --use-lock invocation exits immediately with LOCK_HELD / lock_held
+  and must not scan the universe or mutate scientific stores.
+
+  Live holder PID is never stolen via the stale-age heuristic.
+  Kernel flock is the primary exclusion; metadata pid is defense in depth.
+  Release is idempotent (normal completion, exception, SIGTERM).
 """
 
 from __future__ import annotations
@@ -14,8 +24,11 @@ from typing import Any, Dict, Optional, Tuple
 from modules.edge_research.storage import resolve_data_dir
 
 LOCK_FILENAME = "daily_run.lock"
-LOCK_VERSION = "daily_run_lock_v1_3k5"
-DEFAULT_STALE_SECONDS = 7200  # 2 hours
+LOCK_VERSION = "daily_run_lock_v2_timeout_repair"
+DEFAULT_STALE_SECONDS = 7200  # 2 hours — only when holder PID is dead or missing
+
+# Process-local hold so release is idempotent across finally + signal + atexit.
+_HELD_BY_PATH: Dict[str, Any] = {}
 
 
 @dataclass(frozen=True)
@@ -67,10 +80,22 @@ def _pid_alive(pid: int) -> bool:
 
 
 def is_lock_stale(meta: Dict[str, Any], *, stale_seconds: int = DEFAULT_STALE_SECONDS) -> bool:
+    """
+    Stale iff the recorded holder is dead (or metadata is unusable).
+
+    A live PID is never stale, even if acquired_at is older than stale_seconds.
+    Stealing a live holder's lock is how overlapping writers would be created.
+    """
     if meta.get("corrupt"):
         return True
     pid = meta.get("pid")
-    if pid and not _pid_alive(int(pid)):
+    if pid:
+        try:
+            ipid = int(pid)
+        except (TypeError, ValueError):
+            return True
+        if _pid_alive(ipid):
+            return False
         return True
     acquired_at = meta.get("acquired_at")
     if acquired_at:
@@ -92,9 +117,11 @@ def acquire_run_lock(
 ) -> Tuple[Optional[Any], RunLockResult]:
     """
     Acquire exclusive non-blocking lock. Returns (file_handle, result).
-  file_handle must be kept open until release_run_lock().
+    file_handle must be kept open until release_run_lock().
     """
     path = lock_path(data_dir)
+    key = str(path)
+
     if path.exists():
         meta = _read_lock_metadata(path)
         if not is_lock_stale(meta, stale_seconds=stale_seconds):
@@ -119,8 +146,19 @@ def acquire_run_lock(
     fh = path.open("w", encoding="utf-8")
     try:
         import fcntl
+
         fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except (ImportError, BlockingIOError, OSError):
+    except BlockingIOError:
+        fh.close()
+        meta = _read_lock_metadata(path)
+        return None, RunLockResult(
+            acquired=False,
+            reason="lock_held",
+            lock_path=str(path),
+            holder_pid=meta.get("pid"),
+            holder_run_id=meta.get("run_id"),
+        )
+    except (ImportError, OSError):
         fh.close()
         meta = _read_lock_metadata(path)
         return None, RunLockResult(
@@ -141,22 +179,39 @@ def acquire_run_lock(
     fh.truncate()
     fh.write(json.dumps(meta, indent=2))
     fh.flush()
-    return fh, RunLockResult(acquired=True, reason="acquired", lock_path=str(path))
+    _HELD_BY_PATH[key] = fh
+    return fh, RunLockResult(
+        acquired=True,
+        reason="acquired",
+        lock_path=str(path),
+        holder_pid=os.getpid(),
+        holder_run_id=run_id,
+    )
 
 
 def release_run_lock(fh: Any, *, data_dir: Optional[Path] = None) -> None:
     path = lock_path(data_dir)
+    key = str(path)
+    _HELD_BY_PATH.pop(key, None)
+    if fh is None:
+        return
     try:
         import fcntl
-        fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+
+        if not getattr(fh, "closed", False):
+            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
     except Exception:
         pass
     try:
-        fh.close()
+        if not getattr(fh, "closed", False):
+            fh.close()
     except Exception:
         pass
     try:
         if path.exists():
-            path.unlink()
+            meta = _read_lock_metadata(path)
+            holder = meta.get("pid")
+            if holder is None or int(holder) == os.getpid() or is_lock_stale(meta):
+                path.unlink()
     except OSError:
         pass

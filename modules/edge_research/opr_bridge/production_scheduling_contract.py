@@ -36,6 +36,7 @@ def build_scheduling_contract() -> Dict[str, Any]:
             # SUCCESS / SKIPPED_NON_TRADING_DAY: idempotent replay.
             # WAITING_FOR_DATA: retry on later timer cycles when source/EOD advances;
             # unchanged waiting readiness remains idempotent; prior waiting records stay immutable.
+            "lock_acquired_before": "headless_eod_and_all_data_producing_stages",
             "duplicate_same_day": "idempotent_replay_terminal_or_unchanged_waiting",
             "waiting_for_data_policy": "retry_when_source_or_eod_advances",
         },

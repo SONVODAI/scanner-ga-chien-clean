@@ -17,6 +17,8 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
+from modules.production_stage_telemetry import emit_stage_end, emit_stage_start
+
 logger = logging.getLogger(__name__)
 
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -374,6 +376,7 @@ def run_headless_eod(
         return result.to_dict()
 
     try:
+        t_scan = emit_stage_start("headless_scan", trade_date=td)
         board = build_eod_scan_df(scan_df=scan_df)
         # Stamp trade_date so EL adaptation does not fall back to calendar today.
         if not board.empty and "trade_date" not in board.columns:
@@ -382,12 +385,24 @@ def run_headless_eod(
         result.source_rows = int(len(board))
         result.universe_ok = result.source_rows >= expected_universe
         if board.empty:
+            emit_stage_end(
+                "headless_scan",
+                started_monotonic=t_scan,
+                disposition="EMPTY",
+                source_rows=0,
+            )
             result.stage_disposition = "WAITING_FOR_DATA"
             result.reason = "empty_scan_board"
             result.completed_at = _iso()
             _persist_status(root, result, is_recovery=is_recovery)
             return result.to_dict()
         if not result.universe_ok:
+            emit_stage_end(
+                "headless_scan",
+                started_monotonic=t_scan,
+                disposition="INCOMPLETE",
+                source_rows=result.source_rows,
+            )
             result.stage_disposition = "WAITING_FOR_DATA"
             result.reason = f"incomplete_universe:{result.source_rows}/{expected_universe}"
             result.errors.append(result.reason)
@@ -413,6 +428,12 @@ def run_headless_eod(
         result.market_real = market_real
         result.market_live = market_live
         result.market_forecast = market_forecast
+        emit_stage_end(
+            "headless_scan",
+            started_monotonic=t_scan,
+            disposition="OK" if result.universe_ok else "INCOMPLETE",
+            source_rows=result.source_rows,
+        )
 
         # --- EMS (durable via snapshot_storage GitHub path when configured) ---
         from modules.daily_summary import run_daily_summary
@@ -513,6 +534,7 @@ def run_headless_eod(
                 run_forecast_memory_daily_stage,
             )
 
+            t_fm = emit_stage_start("forecast_memory", trade_date=td)
             fm = run_forecast_memory_daily_stage(
                 td,
                 data_dir=fm_dir,
@@ -520,6 +542,12 @@ def run_headless_eod(
                 md_path=md_path,
                 require_mdt0=True,
                 mature=True,
+            )
+            emit_stage_end(
+                "forecast_memory",
+                started_monotonic=t_fm,
+                disposition=str(fm.get("stage_disposition") or "UNKNOWN"),
+                reason=fm.get("reason"),
             )
             result.forecast_memory = fm
             result.artifacts["forecast_memory"] = {
