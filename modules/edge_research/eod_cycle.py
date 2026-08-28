@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Sequence
 
@@ -23,7 +24,22 @@ from modules.edge_research.contracts import ASSESSMENT_UNABLE_TO_ASSESS
 from modules.edge_research.forward_evidence import apply_health_transitions, attach_baselines_to_matured_births
 from modules.edge_research.forward_health_policy import DEFAULT_FORWARD_HEALTH_POLICY, ForwardHealthPolicy
 from modules.edge_research.forward_maturity import mature_edge_forward_ledger
-from modules.edge_research.storage import resolve_data_dir
+from modules.edge_research.storage import ensure_storage
+
+EOD_STATUS_FILENAME = "latest_eod_run.json"
+SYSTEM_SUCCESS = "SUCCESS"
+SYSTEM_FAILED = "FAILED"
+SYSTEM_SKIPPED = "SKIPPED"
+
+
+def _iso_now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def write_latest_eod_status(payload: Mapping[str, Any], data_dir: Optional[Path] = None) -> Path:
+    path = ensure_storage(data_dir) / EOD_STATUS_FILENAME
+    path.write_text(json.dumps(dict(payload), indent=2, default=str), encoding="utf-8")
+    return path
 
 
 def run_continuous_learning(
@@ -154,13 +170,18 @@ def run_edge_research_eod_cycle(
     continuous: Dict[str, Any] = {}
     recognition: Dict[str, Any] = {}
     shadow: Dict[str, Any] = {}
+    step_timestamps: Dict[str, str] = {}
+    started_at = _iso_now()
 
+    step_timestamps["qualification_started_at"] = _iso_now()
     try:
         qualification = engine.run_qualification_cycle(panel=panel)
     except Exception as exc:
         errors.append(f"qualification: {exc}")
         qualification = {"errors": [str(exc)]}
+    step_timestamps["qualification_finished_at"] = _iso_now()
 
+    step_timestamps["continuous_learning_started_at"] = _iso_now()
     try:
         continuous = run_continuous_learning(
             session,
@@ -177,7 +198,9 @@ def run_edge_research_eod_cycle(
     except Exception as exc:
         errors.append(f"continuous_learning: {exc}")
         continuous = {"ok": False, "error": str(exc)}
+    step_timestamps["continuous_learning_finished_at"] = _iso_now()
 
+    step_timestamps["recognition_started_at"] = _iso_now()
     try:
         recognition = engine.run_future_recognition(
             trade_date=session or None,
@@ -192,7 +215,9 @@ def run_edge_research_eod_cycle(
             "reason": "MATCHER_EXCEPTION",
             "failure_detail": str(exc),
         }
+    step_timestamps["recognition_finished_at"] = _iso_now()
 
+    step_timestamps["shadow_started_at"] = _iso_now()
     try:
         shadow = run_shadow_counterfactual_scan(
             session,
@@ -204,8 +229,11 @@ def run_edge_research_eod_cycle(
     except Exception as exc:
         errors.append(f"shadow: {exc}")
         shadow = {"ok": False, "error": str(exc)}
+    step_timestamps["shadow_finished_at"] = _iso_now()
 
-    return {
+    rec_state = str((recognition or {}).get("assessment_state") or "")
+    rec_reason = str((recognition or {}).get("reason") or "")
+    result = {
         "trade_date": session,
         "qualification": qualification,
         "continuous_learning": continuous,
@@ -213,7 +241,30 @@ def run_edge_research_eod_cycle(
         "shadow": shadow,
         "errors": errors,
         "order": ["qualification", "continuous_learning", "recognition", "shadow"],
+        "step_timestamps": step_timestamps,
+        "started_at": started_at,
+        "finished_at": _iso_now(),
+        "system_status": SYSTEM_SUCCESS,
+        "ran_science": True,
+        "assessment_state": rec_state,
+        "assessment_reason": rec_reason,
     }
+    try:
+        write_latest_eod_status(
+            {
+                "trade_date": session,
+                "system_status": SYSTEM_SUCCESS,
+                "assessment_state": rec_state,
+                "assessment_reason": rec_reason,
+                "order": result["order"],
+                "step_timestamps": step_timestamps,
+                "errors": errors,
+            },
+            data_dir=engine.data_dir,
+        )
+    except Exception:
+        pass
+    return result
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

@@ -6417,17 +6417,10 @@ try:
 except Exception as e:
     st.warning(f"Earning Learning: {type(e).__name__}: {e}")
 
-try:
-    from modules.edge_research.eod_cycle import run_edge_research_eod_cycle
-
-    _fr_trade_date = ""
-    try:
-        _fr_trade_date = str(daily_result.current_date)
-    except Exception:
-        _fr_trade_date = ""
-    run_edge_research_eod_cycle(trade_date=_fr_trade_date or None)
-except Exception as _edge_eod_err:
-    st.caption(f"Edge Research EOD cycle skipped: {_edge_eod_err}")
+# Closed-loop Edge A→C→B is owned by mrbot-daily-research.timer
+# (production_daily_run_entrypoint → _finish_daily_run). Streamlit only reads
+# persisted latest_future_recognition.json / latest_eod_run.json. Do not call
+# run_edge_research_eod_cycle from UI render.
 
 try:
     from modules.regime_alpha_forward_eval import mature_forward_outcomes

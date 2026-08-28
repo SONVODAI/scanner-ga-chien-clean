@@ -260,6 +260,14 @@ def build_daily_pipeline_receipt(
             "silence_or_no_discovery": manifest.get("silence_or_no_discovery"),
             "idempotent_replay": edge.get("idempotent_replay"),
         },
+        "closed_loop_edge": {
+            "ran_science": (edge.get("closed_loop_edge") or {}).get("ran_science"),
+            "system_status": (edge.get("closed_loop_edge") or {}).get("system_status"),
+            "assessment_state": (edge.get("closed_loop_edge") or {}).get("assessment_state"),
+            "assessment_reason": (edge.get("closed_loop_edge") or {}).get("assessment_reason"),
+            "skip_reason": (edge.get("closed_loop_edge") or {}).get("skip_reason"),
+            "order": (edge.get("closed_loop_edge") or {}).get("order"),
+        },
         "daily_market_voice": voice,
         "ui_read_model": {
             "canonical_root": str(canon),

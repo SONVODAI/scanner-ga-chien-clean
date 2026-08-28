@@ -78,17 +78,46 @@ def _finish_daily_run(
     repo_root: Path,
     edge_data_dir: Optional[Path],
 ) -> Dict[str, Any]:
-    """Append isolated Forecast Memory stage; never mutates Edge run disposition."""
+    """Append isolated Forecast Memory then closed-loop A→C→B.
+
+    Never mutates Edge/OPR run disposition. Closed-loop failures stay nested.
+    """
     if result.get("genesis_blocked"):
         out = dict(result)
         out["forecast_memory"] = {"skipped": True, "reason": "edge_genesis_blocked"}
+        from modules.edge_research.closed_loop_daily_hook import run_closed_loop_edge_after_daily
+
+        out["closed_loop_edge"] = run_closed_loop_edge_after_daily(
+            target_trade_date=target_trade_date,
+            daily_result=out,
+            repo_root=repo_root,
+            data_dir=edge_data_dir,
+        )
         return out
-    return attach_forecast_memory_to_daily_run_result(
+    out = attach_forecast_memory_to_daily_run_result(
         result,
         target_trade_date=target_trade_date,
         repo_root=repo_root,
         edge_data_dir=edge_data_dir,
     )
+    try:
+        from modules.edge_research.closed_loop_daily_hook import run_closed_loop_edge_after_daily
+
+        out["closed_loop_edge"] = run_closed_loop_edge_after_daily(
+            target_trade_date=target_trade_date,
+            daily_result=out,
+            repo_root=repo_root,
+            data_dir=edge_data_dir,
+        )
+    except Exception as exc:  # noqa: BLE001
+        out["closed_loop_edge"] = {
+            "ran_science": False,
+            "system_status": "FAILED",
+            "assessment_state": "UNABLE_TO_ASSESS",
+            "assessment_reason": "MATCHER_EXCEPTION",
+            "failure_detail": f"{type(exc).__name__}: {exc}",
+        }
+    return out
 
 
 def _policy_bundle(policy_hashes: Dict[str, str]) -> str:

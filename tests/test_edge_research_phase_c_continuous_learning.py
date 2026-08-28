@@ -702,9 +702,15 @@ def test_eod_cycle_order_and_headless_entrypoint():
     assert src.index("run_qualification_cycle") < src.index("run_continuous_learning")
     assert src.index("run_continuous_learning") < src.index("run_future_recognition")
     app_src = (REPO / "app.py").read_text(encoding="utf-8")
-    assert "run_edge_research_eod_cycle" in app_src
+    assert "run_edge_research_eod_cycle(" not in app_src
+    orch = (REPO / "modules/edge_research/opr_bridge/production_daily_run_orchestrator.py").read_text(encoding="utf-8")
+    assert "run_closed_loop_edge_after_daily" in orch
     unit = (REPO / "deploy/systemd/mrbot-edge-research-eod.service").read_text(encoding="utf-8")
     assert "python -m modules.edge_research.eod_cycle" in unit
+    daily_timer = (REPO / "deploy/systemd/mrbot-daily-research.timer").read_text(encoding="utf-8")
+    assert "mrbot-daily-research.service" in daily_timer
+    retired = (REPO / "deploy/systemd/mrbot-edge-research-eod.timer").read_text(encoding="utf-8")
+    assert not any(ln.startswith("OnCalendar=") for ln in retired.splitlines())
     assert callable(main)
 
 

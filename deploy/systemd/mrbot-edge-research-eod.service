@@ -1,5 +1,5 @@
 [Unit]
-Description=Mr.BOT Edge Research headless EOD cycle (Phase A → C → B)
+Description=DEBUG ONLY manual A→C→B. Production scheduler is mrbot-daily-research.timer.
 After=network-online.target
 Wants=network-online.target
 
