@@ -6407,14 +6407,16 @@ except Exception as e:
     st.warning(f"Earning Learning: {type(e).__name__}: {e}")
 
 try:
-    from modules.edge_research.eod_cycle import run_edge_research_eod_cycle
+    from modules.edge_research.eod_cycle import run_edge_research_eod_cycle, run_edge_research_eod_from_ui
 
     _fr_trade_date = ""
     try:
         _fr_trade_date = str(daily_result.current_date)
     except Exception:
         _fr_trade_date = ""
-    run_edge_research_eod_cycle(trade_date=_fr_trade_date or None)
+    # Headless systemd/CLI is authoritative. Streamlit only fallback-runs if
+    # no headless SUCCESS/SKIPPED status exists for this trade_date.
+    run_edge_research_eod_from_ui(trade_date=_fr_trade_date or None)
 except Exception as _edge_eod_err:
     st.caption(f"Edge Research EOD cycle skipped: {_edge_eod_err}")
 

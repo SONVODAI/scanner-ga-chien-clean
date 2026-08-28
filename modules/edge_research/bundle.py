@@ -52,6 +52,7 @@ OPTIONAL_ARTIFACT_NAMES: Tuple[str, ...] = (
     "edge_shadow_observations.csv",
     "edge_anti_context.csv",
     "latest_edge_health.json",
+    "latest_eod_run.json",
 )
 
 

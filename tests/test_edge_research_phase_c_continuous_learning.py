@@ -705,6 +705,10 @@ def test_eod_cycle_order_and_headless_entrypoint():
     assert "run_edge_research_eod_cycle" in app_src
     unit = (REPO / "deploy/systemd/mrbot-edge-research-eod.service").read_text(encoding="utf-8")
     assert "python -m modules.edge_research.eod_cycle" in unit
+    timer = (REPO / "deploy/systemd/mrbot-edge-research-eod.timer").read_text(encoding="utf-8")
+    on_calendar = [ln for ln in timer.splitlines() if ln.startswith("OnCalendar=")]
+    assert all("16:05" not in ln for ln in on_calendar)
+    assert "Asia/Ho_Chi_Minh" in timer
     assert callable(main)
 
 
