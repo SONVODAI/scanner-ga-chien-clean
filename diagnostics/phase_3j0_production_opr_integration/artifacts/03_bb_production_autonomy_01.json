@@ -1,0 +1,69 @@
+{
+  "benchmark": "BB-ProductionAutonomy-01",
+  "passed": 8,
+  "case_count": 8,
+  "all_passed": true,
+  "results": [
+    {
+      "case_id": "BBPA-01-autonomous-session-start",
+      "passed": true,
+      "checks": {
+        "session_created": true,
+        "stop_boundary": true
+      }
+    },
+    {
+      "case_id": "BBPA-02-legitimate-silence",
+      "passed": true,
+      "checks": {
+        "silent": true
+      }
+    },
+    {
+      "case_id": "BBPA-03-deterministic-opportunity-identity",
+      "passed": true,
+      "checks": {
+        "deterministic": true
+      }
+    },
+    {
+      "case_id": "BBPA-04-duplicate-suppression",
+      "passed": true,
+      "checks": {
+        "first_created": true,
+        "second_suppressed": true,
+        "idempotent": true
+      }
+    },
+    {
+      "case_id": "BBPA-05-persistence-restart",
+      "passed": true,
+      "checks": {
+        "created": true,
+        "reconstructed": true,
+        "has_auth_state": true
+      }
+    },
+    {
+      "case_id": "BBPA-06-authority-conflict",
+      "passed": true,
+      "checks": {
+        "legacy_blocked": true
+      }
+    },
+    {
+      "case_id": "BBPA-07-stop-boundary-enforcement",
+      "passed": true,
+      "checks": {
+        "stop_present": true
+      }
+    },
+    {
+      "case_id": "BBPA-08-failure-isolation",
+      "passed": true,
+      "checks": {
+        "frozen_integrity": true
+      }
+    }
+  ]
+}

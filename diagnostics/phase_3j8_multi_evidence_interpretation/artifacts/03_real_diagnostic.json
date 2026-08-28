@@ -1,0 +1,45 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "experiment_2_objective": "Test whether directional rs_spread quintile commitment holds on the full cross-section",
+  "target_null": "directional_reversal",
+  "frozen_contract_hash": "28af8d5ec8720b0188cf913b48555445cb6c09283605fcafe17069e50a996eab",
+  "frozen_contract_ref_hash": "231a10122d88ee3eb008e4e1b022895baf0ea16ec827d642bc330b4ac1bdd5a9",
+  "tool_result_hash": "3a8df080cd3dc01d6c08db0a605ecc98fc65540d1beb23303033757969af72ac",
+  "execution_id": "sefx-afb1b59c434c",
+  "evidence_relevance": "HIGH",
+  "evidence_direction": "SUPPORTS",
+  "raw_evidence_strength": "MODERATE",
+  "row_overlap": 0.9772727272727273,
+  "question_novelty": "HIGH",
+  "incremental_strength": "WEAK",
+  "incremental_direction": "SUPPORTS",
+  "counted_as_independent_replication": false,
+  "double_counting_blocked": false,
+  "cumulative_summary": "ordinal_2;relationship=PARTIAL_REPLICATION;incremental_strength=WEAK;sample_dependence=HIGH;question_novelty=HIGH",
+  "null_ledger": [
+    {
+      "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+      "null_key": "directional_reversal",
+      "state_before": "STILL_PLAUSIBLE",
+      "state_after": "WEAKENED",
+      "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+    },
+    {
+      "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+      "null_key": "episode_artifact",
+      "state_before": "STILL_PLAUSIBLE",
+      "state_after": "WEAKENED",
+      "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+    }
+  ],
+  "prior_epistemic_state": "SUPPORTED",
+  "resulting_epistemic_state": "SUPPORTED",
+  "limitations": [
+    "high_sample_overlap_with_experiment_1",
+    "not_counted_as_independent_replication"
+  ],
+  "research_decision_generated": false,
+  "interpretation_id": "iefi2-fa66e56ee0a3",
+  "stop_boundary": "STOP_SECOND_EVIDENCE_INTERPRETED",
+  "idempotent_replay": false
+}
