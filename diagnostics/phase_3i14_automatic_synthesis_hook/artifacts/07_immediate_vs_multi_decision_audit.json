@@ -1,0 +1,13 @@
+{
+  "immediate_decision": "ResearchDecisionRecord \u2014 single-evidence transition_mapping/decision_mapping (3I.7)",
+  "multi_evidence_priority": "ResearchPriorityDecision \u2014 body-of-evidence synthesis (3I.12/3I.13)",
+  "immediate_still_useful": true,
+  "immediate_status": "transitional",
+  "conflict_rule": "ResearchPriorityDecision authoritative; immediate must not override",
+  "decision_conflict_example": {
+    "case": "BE-11 saturated body",
+    "immediate_on_supporting": "SEEK_FALSIFICATION",
+    "multi_evidence": "HOLD_PROVISIONALLY or HOLD_UNRESOLVED",
+    "authoritative": "ResearchPriorityDecision"
+  }
+}
