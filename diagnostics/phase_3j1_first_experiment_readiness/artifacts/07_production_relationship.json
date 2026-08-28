@@ -1,0 +1,12 @@
+{
+  "current_3j0_flow": [
+    "production evidence",
+    "\u2192 detect_production_opportunity",
+    "\u2192 STOP_PROPOSITION_PERSISTED",
+    "\u2192 persist OprProductionSessionRecord",
+    "\u2192 STOP (no experiment)"
+  ],
+  "required_future_insertion": "[future first-experiment selector] between STOP_PROPOSITION_PERSISTED and InitialExperimentPackage",
+  "wired_in_3j1": false,
+  "stop_after_package": true
+}

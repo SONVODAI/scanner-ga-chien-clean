@@ -1,0 +1,82 @@
+{
+  "version": "proposition_pair_matrix_v1",
+  "frozen_before_implementation": true,
+  "cases": {
+    "A": {
+      "label": "Same scientific question, different tool",
+      "expected_relationship": "SAME_QUESTION_DIFFERENT_INSTRUMENT",
+      "expected_core_match": true,
+      "expected_gating": "REPRESENTATION_NOVELTY_ONLY"
+    },
+    "B": {
+      "label": "Same scientific question, different frame/action representation",
+      "expected_relationship": "SAME_QUESTION_DIFFERENT_INSTRUMENT",
+      "expected_core_match": true,
+      "expected_gating": "REPRESENTATION_NOVELTY_ONLY"
+    },
+    "C": {
+      "label": "Same question, fresh evidence",
+      "expected_relationship": "SAME_LINE_NEW_EVIDENCE",
+      "expected_core_match": true,
+      "expected_gating": "EVIDENCE_NOVELTY"
+    },
+    "D": {
+      "label": "Same feature, different outcome",
+      "expected_relationship": "RELATED_BUT_DISTINCT",
+      "expected_core_match": false,
+      "must_not_collapse": true
+    },
+    "E": {
+      "label": "Same outcome, materially different population",
+      "expected_relationship": "GENUINELY_INDEPENDENT",
+      "expected_core_match": false,
+      "must_not_collapse": true
+    },
+    "F": {
+      "label": "Same pop/out but different uncertainty",
+      "expected_relationship": "RELATED_BUT_DISTINCT",
+      "expected_core_match": false,
+      "must_not_collapse": true
+    },
+    "G": {
+      "label": "Superficial slice representation change, same core",
+      "expected_relationship": "SAME_QUESTION_DIFFERENT_INSTRUMENT",
+      "expected_core_match": true,
+      "note": "Instrument partition mechanism differs, same explanatory target"
+    },
+    "H": {
+      "label": "Materially different subpopulation/slice",
+      "expected_relationship": "SAME_UNCERTAINTY_DIFFERENT_SLICE",
+      "expected_core_match": false,
+      "must_not_collapse": true
+    },
+    "I": {
+      "label": "Different horizon changing scientific claim",
+      "expected_relationship": "RELATED_BUT_DISTINCT",
+      "expected_core_match": false,
+      "must_not_collapse": true
+    },
+    "J": {
+      "label": "Missing critical proposition fields",
+      "expected_relationship": "INSUFFICIENT_EVIDENCE",
+      "expected_core_match": false,
+      "expected_gating": "fail_closed"
+    },
+    "K": {
+      "label": "Independent proposition",
+      "expected_relationship": "GENUINELY_INDEPENDENT",
+      "expected_core_match": false
+    },
+    "L": {
+      "label": "Tool name alone must never determine sameness",
+      "expected_relationship": "varies_by_core_not_tool",
+      "adversarial": true
+    }
+  },
+  "adversarial_near_duplicates": [
+    "same_pop_out_diff_feature_material",
+    "same_unc_diff_out",
+    "same_tool_diff_core",
+    "empty_out_with_rich_branch_context"
+  ]
+}

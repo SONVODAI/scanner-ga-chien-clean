@@ -1,0 +1,170 @@
+{
+  "protocol_id": "ff_confirmation_v1",
+  "criteria_frozen_at": "PRE_REGISTRATION_BEFORE_ANY_POST_FREEZE_T10_INSPECTION",
+  "last_in_sample_trade_date": "2026-08-24",
+  "judgment_unit": "per_candidate_independent",
+  "primary_metric": "incremental_mean_ret_t10_vs_same_era_unconditional_eligible_baseline",
+  "absolute_return_alone_insufficient": true,
+  "historical_reference_split": "V1 holdout (2022-01-01 through 2026-08-24)",
+  "justification_notes": {
+    "why_holdout_not_discovery": "Holdout is the most recent pre-freeze era and the decisive V1 evidence slice; discovery/validation already consumed for selection.",
+    "why_50pct_retention": "Historical effect is small (~28–36 bps / 10 sessions). Requiring 100% retention would conflate sampling noise with failure. Requiring only sign would be too weak for confirmation. Half of holdout incremental is a pre-registered economically modest floor that still demands material replication of the V1 effect class.",
+    "why_not_p_value_primary": "V1 did not pre-register a confirmatory p-value; inventing a new α after freeze would be arbitrary. Direction + retention + breadth + concentration + stability + price-control are the confirmatory battery."
+  },
+  "candidates": {
+    "FFC1_PRIMARY_ABN_ABS_Z20_T10": {
+      "expected_incremental_sign": "+",
+      "historical_holdout_incremental": 0.0027638842721887514,
+      "A_direction": {
+        "rule": "incremental_mean_ret_t10 > 0",
+        "fail_if": "incremental_mean_ret_t10 <= 0"
+      },
+      "B_magnitude_retention": {
+        "rule": "incremental_mean_ret_t10 >= 0.50 * historical_holdout_incremental",
+        "min_incremental_mean_ret": 0.0013819421360943757,
+        "fail_if": "incremental_mean_ret_t10 < min_incremental_mean_ret"
+      },
+      "C_breadth": {
+        "at_final_judgment": {
+          "min_unique_symbols": 40,
+          "min_unique_trigger_dates": 80,
+          "min_matured_stock_day_rows": 400
+        },
+        "fail_if_any_below": true
+      },
+      "D_concentration": {
+        "max_top1_symbol_share_abs_sumret": 0.15,
+        "max_top5_symbol_share_abs_sumret": 0.40,
+        "max_top1_date_share_abs_sumret": 0.10,
+        "max_top5_date_share_abs_sumret": 0.25,
+        "max_top1_sector_share_abs_sumret_if_sector_available": 0.35,
+        "sector_rule": "If sector mapping unavailable, skip sector test and record SECTOR_UNAVAILABLE; do not invent sectors."
+      },
+      "E_stability": {
+        "rules": [
+          "After dropping the single calendar month with largest positive contribution to candidate sum of T10 returns, incremental_mean_ret must remain > 0",
+          "No single calendar month may account for > 50% of the absolute sum of candidate T10 returns"
+        ]
+      },
+      "F_price_control_survival": {
+        "controls_frozen": [
+          "px_ret_1 (T0 close / prior close - 1)",
+          "px_ret_20 (T0 close / close_t-20 - 1) when 20 prior sessions exist"
+        ],
+        "tests": [
+          {
+            "name": "residual_after_ols_px_ret_20",
+            "rule": "OLS of ret_t10 on const + px_ret_20 within confirmation matured sample; mean residual on candidate rows minus mean residual on baseline rows must have sign + and magnitude >= 0.25 * raw incremental"
+          },
+          {
+            "name": "tercile_sign_majority",
+            "rule": "Split matured eligible universe into terciles of px_ret_20; candidate incremental vs within-tercile baseline must be > 0 in at least 2 of 3 terciles"
+          }
+        ],
+        "fail_if": "either test fails"
+      },
+      "G_corporate_action_robustness": {
+        "exclude_if": [
+          "close_price <= 0 at T0 or T10",
+          "prior_close→T0 ratio > 1.8 or < 0.55 (extreme_jump_flag)",
+          "unresolved CA anomaly flagged by operator DQ gate"
+        ],
+        "note": "Same V1 filters; raw OHLC CA status remains unknown — document caveat, do not silently impute."
+      },
+      "H_missingness": {
+        "null_never_becomes_zero": true,
+        "incomplete_lookback_not_eligible": true,
+        "foreign_net_value_null_not_eligible": true,
+        "feature_intermediate_nan_not_eligible": true
+      }
+    },
+    "FFC1_SECONDARY_NET_HI_PCT90_T10": {
+      "expected_incremental_sign": "+",
+      "historical_holdout_incremental": 0.0036243207852603193,
+      "A_direction": {
+        "rule": "incremental_mean_ret_t10 > 0",
+        "fail_if": "incremental_mean_ret_t10 <= 0"
+      },
+      "B_magnitude_retention": {
+        "rule": "incremental_mean_ret_t10 >= 0.50 * historical_holdout_incremental",
+        "min_incremental_mean_ret": 0.0018121603926301597,
+        "fail_if": "incremental_mean_ret_t10 < min_incremental_mean_ret"
+      },
+      "C_breadth": {
+        "at_final_judgment": {
+          "min_unique_symbols": 40,
+          "min_unique_trigger_dates": 80,
+          "min_matured_stock_day_rows": 600
+        }
+      },
+      "D_concentration": {
+        "max_top1_symbol_share_abs_sumret": 0.15,
+        "max_top5_symbol_share_abs_sumret": 0.40,
+        "max_top1_date_share_abs_sumret": 0.10,
+        "max_top5_date_share_abs_sumret": 0.25,
+        "max_top1_sector_share_abs_sumret_if_sector_available": 0.35
+      },
+      "E_stability": {
+        "rules": [
+          "After dropping strongest positive calendar month, incremental_mean_ret must remain > 0",
+          "No single calendar month > 50% of abs sum of candidate T10 returns"
+        ]
+      },
+      "F_price_control_survival": {
+        "same_as_primary": true
+      },
+      "G_corporate_action_robustness": {
+        "same_as_primary": true
+      },
+      "H_missingness": {
+        "same_as_primary": true
+      }
+    },
+    "FFC1_OPTIONAL_STREAK_NEG_LE_M5_T10": {
+      "expected_incremental_sign": "-",
+      "historical_holdout_incremental": -0.0014566291099041787,
+      "A_direction": {
+        "rule": "incremental_mean_ret_t10 < 0",
+        "fail_if": "incremental_mean_ret_t10 >= 0"
+      },
+      "B_magnitude_retention": {
+        "rule": "incremental_mean_ret_t10 <= 0.50 * historical_holdout_incremental (more negative or equal to half of holdout magnitude)",
+        "max_incremental_mean_ret": -0.0007283145549520893,
+        "fail_if": "incremental_mean_ret_t10 > max_incremental_mean_ret"
+      },
+      "C_breadth": {
+        "at_final_judgment": {
+          "min_unique_symbols": 40,
+          "min_unique_trigger_dates": 80,
+          "min_matured_stock_day_rows": 400
+        }
+      },
+      "D_concentration": {
+        "same_caps_as_primary": true
+      },
+      "E_stability": {
+        "rules": [
+          "After dropping strongest negative calendar month, incremental_mean_ret must remain < 0",
+          "No single calendar month > 50% of abs sum of candidate T10 returns"
+        ]
+      },
+      "F_price_control_survival": {
+        "note": "Anti-edge: residual incremental after px_ret_20 OLS must remain negative with magnitude >= 0.25 * |raw incremental|"
+      },
+      "G_corporate_action_robustness": {
+        "same_as_primary": true
+      },
+      "H_missingness": {
+        "same_as_primary": true
+      },
+      "exploratory_status_note": "Optional anti-edge remains labeled EXPLORATORY in operator output even if CONFIRMED/FAILED under these criteria."
+    }
+  },
+  "final_states": {
+    "CONFIRMED": "All of A–H pass at preferred window (or at max patience if preferred reached early metrics already stable and preferred thresholds met).",
+    "FAILED_CONFIRMATION": "Preferred window matured sample meets breadth minima but any of A–H fails.",
+    "INCONCLUSIVE": "Maximum patience window exhausted without meeting breadth minima, or data-quality coverage too poor to judge."
+  },
+  "no_soft_labels": true,
+  "secondary_cannot_rescue_primary": true
+}

@@ -42,6 +42,9 @@ def _request(method: str, url: str, token: str | None = None, data: bytes | None
 def reference_copy(tmp_path) -> Path:
     if not REFERENCE_SOURCE.exists():
         pytest.skip("reference data/edge_research unavailable")
+    required = ("latest_discovery_run.json", "edge_hypothesis_ledger.csv")
+    if any(not (REFERENCE_SOURCE / name).exists() for name in required):
+        pytest.skip("reference data/edge_research is not a Discovery bundle (OPR/A-B-C runtime dir)")
     dest = tmp_path / "reference_edge_research"
     shutil.copytree(REFERENCE_SOURCE, dest)
     return dest

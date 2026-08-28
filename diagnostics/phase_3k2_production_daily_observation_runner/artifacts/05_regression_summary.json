@@ -1,0 +1,41 @@
+{
+  "suites": {
+    "tests/test_edge_research_opr_phase_3k2.py -k not regression": {
+      "passed": true,
+      "tail": "8 passed, 2 deselected in 6.99s"
+    },
+    "tests/test_edge_research_opr_phase_3k2.py::test_3k1_regression": {
+      "passed": true,
+      "tail": "1 passed in 5.81s"
+    },
+    "tests/test_edge_research_opr_phase_3k2.py::test_3k0_regression": {
+      "passed": true,
+      "tail": "1 passed in 202.93s (0:03:22)"
+    },
+    "tests/test_edge_research_opr_phase_3j14a.py": {
+      "passed": true,
+      "tail": "13 passed in 193.85s (0:03:13)"
+    },
+    "tests/test_edge_research_opr_phase_3j14.py::test_cf_cg_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 0.51s"
+    },
+    "tests/test_edge_research_opr_phase_3j13.py::test_cf_fg_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 5.10s"
+    },
+    "tests/test_edge_research_opr_phase_3j12.py::test_cf_nx_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 5.00s"
+    },
+    "tests/test_edge_research_opr_phase_3j11.py::test_cf_br_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 1.06s"
+    },
+    "tests/test_edge_research_opr_phase_3j10.py::test_cf_arl1_arl12_pass": {
+      "passed": true,
+      "tail": "1 passed in 3.58s"
+    }
+  },
+  "all_passed": true
+}

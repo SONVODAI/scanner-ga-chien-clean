@@ -1,0 +1,74 @@
+{
+  "protocol_id": "ff_confirmation_v1",
+  "title": "Foreign Flow Confirmation Protocol V1",
+  "created_for": "prospective_pre_registered_confirmation",
+  "last_in_sample_trade_date": "2026-08-24",
+  "first_eligible_confirmation_t0": "AFTER_2026-08-24",
+  "blind_research_run_id": "ff_blind_v1_20260825T055811Z",
+  "blind_dataset_version": "ff_hsx_symbol_daily_v1_20260825T045650Z",
+  "blind_code_commit_at_design": "5f0d10e91b4bc5db975715337bdb7c9e8847ab03",
+  "artifacts": [
+    "AUTOMATION_DESIGN.md",
+    "BASELINE_SCHEMA.json",
+    "CANDIDATE_FREEZE.json",
+    "CONFIRMATION_MANIFEST.json",
+    "CONFIRMATION_PROTOCOL.md",
+    "CONTINUITY.md",
+    "DATA_QUALITY_GATES.md",
+    "EXPECTED_TRIGGER_FREQUENCY.md",
+    "FORWARD_EVENT_SCHEMA.json",
+    "FORWARD_PANEL_WIRING.md",
+    "NO_PEEKING.md",
+    "OPERATOR_SUMMARY_TEMPLATE.json",
+    "OUTCOME_SCHEMA.json",
+    "PASS_FAIL_CRITERIA.json",
+    "README_VI.md"
+  ],
+  "runtime_namespace": "data/foreign_flow_confirmation/",
+  "code_module": "modules/foreign_flow_confirmation/",
+  "candidates_frozen": [
+    "FFC1_PRIMARY_ABN_ABS_Z20_T10",
+    "FFC1_SECONDARY_NET_HI_PCT90_T10",
+    "FFC1_OPTIONAL_STREAK_NEG_LE_M5_T10"
+  ],
+  "windows": {
+    "minimum_trigger_sessions_approx": 90,
+    "preferred_trigger_sessions_approx": 200,
+    "maximum_patience_sessions": 504,
+    "horizon_sessions": 10
+  },
+  "forward_fields_gap": {
+    "symbol_day_foreign_net_post_freeze": "WIRED_FORWARD_PANEL_PENDING_DEPLOY",
+    "lookback_60_and_252_continuity": "IMPLEMENTED_JOIN_HISTORY_AND_FORWARD",
+    "p0_universe_aggregate_sufficient": false,
+    "canonical_history_has_post_freeze_rows_at_design": false
+  },
+  "safety": {
+    "modifies_market_first": false,
+    "modifies_forecast_score": false,
+    "modifies_p0_semantics": false,
+    "modifies_edge_research": false,
+    "modifies_camera": false,
+    "creates_buy_sell_signals": false,
+    "sends_alerts": false,
+    "trains_model": false,
+    "optimizes_thresholds": false,
+    "reopens_v1_search": false,
+    "uses_post_freeze_results_to_design_criteria": false
+  },
+  "readiness_verdict": "FOREIGN_FLOW_CONFIRMATION_PROTOCOL_READY",
+  "FORWARD_CONFIRMATION_CAN_START": "NO_UNTIL_DEPLOY",
+  "FORWARD_CONFIRMATION_CAN_START_reason": "Protocol and ledgers are frozen, but post-2026-08-24 symbol\u00d7day HSX foreign forward panel + lookback continuity are not yet ingested into data/foreign_flow_confirmation/forward_panel/. P0 universe aggregates lack per-symbol 60/252 history required by frozen candidates.",
+  "deployment_recommendation": "DO_NOT_AUTO_DEPLOY. Wire isolated daily append into confirmation forward_panel using modules/foreign_flow_history HSX client patterns; start event logging only after first post-freeze T0 is DQ-clean; keep operator view counts-only until preferred window.",
+  "protocol_hash": "sha256:ef86fa51f2f62b403b19eac67c418fef0085b0848c89c053ae389b06bb3f2cad",
+  "forward_panel_wiring": {
+    "status": "READY_TO_DEPLOY",
+    "forward_panel_path": "data/foreign_flow_confirmation/forward_panel/by_symbol/",
+    "daily_source": "modules/foreign_flow_history/hsx_client.py via exact_date.fetch_exact_trade_date_row",
+    "hook": "modules/forecast_research/production_daily_integration.py::run_forecast_memory_daily_stage",
+    "extra_timer": false,
+    "post_freeze_t0_events_operational": 0,
+    "FORWARD_CONFIRMATION_CAN_START_AFTER_DEPLOY": "YES",
+    "verdict": "FOREIGN_FLOW_FORWARD_PANEL_READY_TO_DEPLOY"
+  }
+}

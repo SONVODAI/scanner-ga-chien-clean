@@ -1,0 +1,25 @@
+[Unit]
+Description=Mr.BOT Production Daily Research run
+Documentation=file:/opt/mrbot-camera/diagnostics/phase_3k5_live_forward_production_readiness/LIVE_FORWARD_DEPLOYMENT_RUNBOOK.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+# Artifact-server contract (ARTIFACT_*) so post-receipt sidecar publish can
+# write/serve production_observations.tar.gz without requiring DURABLE_* on VPS.
+EnvironmentFile=-/etc/mrbot/edge-artifacts.env
+EnvironmentFile=-/etc/mrbot/daily-research.env
+# Dedicated research/headless interpreter (must include vnstock==0.2.9.2 via
+# requirements-research.txt). Do NOT use a Streamlit-only or empty venv.
+# Fallback documented historically: /opt/mrbot-camera-venv — prefer research-venv.
+ExecStart=/opt/mrbot-research-venv/bin/python -m modules.edge_research.opr_bridge.production_daily_run_entrypoint --derive-vn-date --mode LIVE_FORWARD --use-lock
+Nice=10
+IOSchedulingClass=best-effort
+TimeoutStartSec=3600
+Restart=no
+SuccessExitStatus=2 3 10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "remove_decisive_disconfirm",
+      "full_state": "CONFLICTED",
+      "partial_state": "SUPPORTED",
+      "changed": true,
+      "passed": true
+    },
+    {
+      "name": "invalid_disconfirm_no_weaken",
+      "state": "SUPPORTED",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

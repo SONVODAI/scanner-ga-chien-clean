@@ -1,0 +1,28 @@
+{
+  "CF-L1": {
+    "passed": true,
+    "skip_when_selected": true
+  },
+  "CF-L2": {
+    "passed": true
+  },
+  "CF-L3": {
+    "passed": true
+  },
+  "CF-L4": {
+    "passed": true
+  },
+  "CF-L5": {
+    "passed": true
+  },
+  "CF-L6": {
+    "passed": true
+  },
+  "CF-L7": {
+    "passed": true
+  },
+  "CF-L8": {
+    "passed": true
+  },
+  "all_passed": true
+}

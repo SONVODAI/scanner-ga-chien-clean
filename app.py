@@ -618,8 +618,9 @@ def render_bot_learning_insight() -> dict:
     """
     st.markdown("## 🧠 BOT LEARNING INSIGHT")
     st.caption(
-        "BOT tự rút kinh nghiệm từ các cổ phiếu đã hoàn thành T3/T5/T10. "
-        "Bảng này chỉ đọc bộ nhớ Learning, không thay đổi dữ liệu và không can thiệp logic giao dịch."
+        "**Legacy lifecycle summary** — tổng hợp T3/T5/T10 từ kho Learning (`data/earning_learning/`). "
+        "Để xem Mr.BOT nghĩ gì *hôm nay* theo production research, dùng panel **MR.BOT — HÔM NAY TÔI ĐANG NGHĨ GÌ?** phía trên. "
+        "Bảng này chỉ đọc, không thay đổi dữ liệu và không can thiệp logic giao dịch."
     )
 
     try:
@@ -6262,6 +6263,16 @@ try:
 except Exception as _edge_research_err:
     st.caption(f"Edge Research panel skipped: {_edge_research_err}")
 
+# =========================================================
+# LIVING RESEARCH UI — MR.BOT SPEAKS TODAY (RESEARCH ONLY, READ-ONLY)
+# =========================================================
+try:
+    from modules.edge_research.opr_bridge.production_living_research_ui import render_living_research_ui_panel
+
+    render_living_research_ui_panel()
+except Exception as _living_research_ui_err:
+    st.caption(f"Living Research UI skipped: {_living_research_ui_err}")
+
 st.markdown("---")
 # =========================================================
 # EARNING MONEY BOARD - BẢNG ĐIỀU KHIỂN CHÍNH
@@ -6405,6 +6416,11 @@ try:
     )
 except Exception as e:
     st.warning(f"Earning Learning: {type(e).__name__}: {e}")
+
+# Closed-loop Edge A→C→B is owned by mrbot-daily-research.timer
+# (production_daily_run_entrypoint → _finish_daily_run). Streamlit only reads
+# persisted latest_future_recognition.json / latest_eod_run.json. Do not call
+# run_edge_research_eod_cycle from UI render.
 
 try:
     from modules.regime_alpha_forward_eval import mature_forward_outcomes
