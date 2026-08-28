@@ -1,0 +1,56 @@
+{
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "proposition_hash_recomputed_match": true,
+  "lineage_37_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+  "package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+  "evidence_events": 2,
+  "chain": [
+    {
+      "node": "PropositionRecord",
+      "id": "prop-efb650d9bd5c451f",
+      "hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b"
+    },
+    {
+      "node": "ExperimentSpec_1",
+      "ref": "lifecycle_real_001",
+      "hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff"
+    },
+    {
+      "node": "EpistemicUpdate_1",
+      "id": "epu-5a7bec6e47ec",
+      "class": "SUPPORTING",
+      "state": "SUPPORTED"
+    },
+    {
+      "node": "ResearchDecision_1",
+      "id": "dec-c92fb28fdc13",
+      "action": "SEEK_FALSIFICATION"
+    },
+    {
+      "node": "FalsificationCandidate",
+      "id": "fc-independent_episode_holdout"
+    },
+    {
+      "node": "OneShotPackage",
+      "hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+      "status": "NOT_EXECUTED"
+    },
+    {
+      "node": "ExperimentSpec_2",
+      "hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e"
+    },
+    {
+      "node": "EpistemicUpdate_2",
+      "id": "epu-e75a6e8362a8",
+      "class": "SUPPORTING",
+      "state": "SUPPORTED"
+    },
+    {
+      "node": "ResearchDecision_2",
+      "id": "dec-d71275b5fa30",
+      "action": "SEEK_FALSIFICATION"
+    }
+  ],
+  "history_summary": "HYPOTHESIS\u2192SUPPORTED\u2192SEEK_FALSIFICATION\u2192holdout SUPPORTING\u2192SUPPORTED\u2192SEEK_FALSIFICATION",
+  "passed": true
+}

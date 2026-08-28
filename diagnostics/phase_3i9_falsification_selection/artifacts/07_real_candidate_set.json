@@ -1,0 +1,120 @@
+{
+  "candidates": [
+    {
+      "candidate_id": "fc-independent_episode_holdout",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "episode_instability",
+      "scientific_rationale": "Vulnerability: Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates. Operational test: direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 on independent episodes.",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "experiment_content_hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e",
+      "evidence_independence_class": "INDEPENDENT_FALSIFICATION",
+      "independence_rationale": "Partition contrast on 43 holdout dates excluding motivating episodes ['2026-08-02'] \u2014 new evidence cohort, same proposition semantics",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": true,
+      "counterfactual_falsifiable": true,
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Cohort n=6106 passes grammar and sample gates",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.250973+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb"
+    }
+  ],
+  "candidate_set_hash": "0eb83024a6e21aade8692974b22e40a70cc52785feecdeaedaca66de1d76cbfe"
+}
