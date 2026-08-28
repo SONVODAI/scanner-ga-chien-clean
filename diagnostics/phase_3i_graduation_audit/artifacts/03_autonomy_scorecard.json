@@ -1,0 +1,221 @@
+{
+  "audit_version": "phase_3i_graduation_audit_v1",
+  "capabilities": [
+    {
+      "capability": "Observe",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.2 evidence_ingest; 3I.3 real panel",
+      "main_limitation": "Limited to dispersion-evidence primitive"
+    },
+    {
+      "capability": "Surprise detection",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.4 audit; surprise_detector",
+      "main_limitation": "Human-set thresholds; closed observation classes"
+    },
+    {
+      "capability": "Wonder",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "Surprise text \u2192 scientific question in synthesizer",
+      "main_limitation": "Question template fixed by CONTRAST_TO_PROPOSITION"
+    },
+    {
+      "capability": "Proposition origination",
+      "demonstrated": false,
+      "partial": true,
+      "missing": false,
+      "evidence": "3I.4 PARTIAL_VALIDATION; T2 prop born from evidence not catalog lookup",
+      "main_limitation": "Single synthesis relation; CROSS_SECTIONAL_DISPERSION family only"
+    },
+    {
+      "capability": "Proposition identity",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.5 PRIORITIZE_PASS; scientific_identity.py",
+      "main_limitation": "First-come bias within identity group"
+    },
+    {
+      "capability": "Prioritization",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.5 PRIORITIZE_PASS",
+      "main_limitation": "Among OPR-generated candidates only"
+    },
+    {
+      "capability": "Test design",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.7 experiment_spec from proposition",
+      "main_limitation": "Tool catalog bounded"
+    },
+    {
+      "capability": "Evidence interpretation",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.7 LIFECYCLE_PASS; interpretation_contract",
+      "main_limitation": "Pre-registered conditions human-authored"
+    },
+    {
+      "capability": "Belief revision",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "HYPOTHESIS\u2192SUPPORTED; synthesis handles disconfirmation",
+      "main_limitation": "Not demonstrated FALSIFIED path on T2"
+    },
+    {
+      "capability": "Falsification intent",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.7 SEEK_FALSIFICATION; 3I.12 priority",
+      "main_limitation": null
+    },
+    {
+      "capability": "Falsification design",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.9 FALSIFICATION_SELECTION_PASS",
+      "main_limitation": "Strategy catalog human-authored"
+    },
+    {
+      "capability": "Multi-evidence synthesis",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.12 EVIDENCE_SYNTHESIS_PASS",
+      "main_limitation": "Uncertainty axes from human taxonomy"
+    },
+    {
+      "capability": "Uncertainty awareness",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "9 unresolved axes in synthesis",
+      "main_limitation": "Closed axis vocabulary"
+    },
+    {
+      "capability": "Research prioritization",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "ResearchPriorityDecision separate from epistemic",
+      "main_limitation": null
+    },
+    {
+      "capability": "Scientific action generation",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.16 SCIENTIFIC_ACTION_GENERATION_PASS",
+      "main_limitation": "Operator catalog human-authored"
+    },
+    {
+      "capability": "Evidence-derived cohort choice",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.17b EVIDENCE_DERIVED_COHORT_BINDING_PASS",
+      "main_limitation": null
+    },
+    {
+      "capability": "Frontier reassessment",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.18 SCIENTIFIC_FRONTIER_REASSESSMENT_PASS",
+      "main_limitation": null
+    },
+    {
+      "capability": "Rational silence",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.18 NO_HIGH_INFORMATION_ACTION",
+      "main_limitation": null
+    },
+    {
+      "capability": "Dormancy",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.19 AUTONOMOUS_RESEARCH_DORMANCY_PASS",
+      "main_limitation": null
+    },
+    {
+      "capability": "Reopening",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.19/20 reopening evaluator + lifecycle hooks",
+      "main_limitation": "REOPEN_CANDIDATE only; no auto-experiment"
+    },
+    {
+      "capability": "Scientific memory",
+      "demonstrated": false,
+      "partial": true,
+      "missing": false,
+      "evidence": "Append-only lineage, dormancy ledger, synthesis history",
+      "main_limitation": "Not production-persistent; diagnostic artifacts"
+    },
+    {
+      "capability": "Explanatory creativity",
+      "demonstrated": false,
+      "partial": false,
+      "missing": true,
+      "evidence": "3I.4 audit",
+      "main_limitation": "Null competing explanation template-bound"
+    },
+    {
+      "capability": "Experimental creativity",
+      "demonstrated": false,
+      "partial": true,
+      "missing": false,
+      "evidence": "3I.9 autonomous falsification selection",
+      "main_limitation": "Within fixed strategy catalog"
+    },
+    {
+      "capability": "Strategic creativity",
+      "demonstrated": true,
+      "partial": false,
+      "missing": false,
+      "evidence": "3I.18 direction change to silence",
+      "main_limitation": "Within synthesis priority rules"
+    },
+    {
+      "capability": "Frontier creativity",
+      "demonstrated": false,
+      "partial": false,
+      "missing": true,
+      "evidence": "No demonstrated new researchable axis invention",
+      "main_limitation": "Closed uncertainty ontology"
+    },
+    {
+      "capability": "End-to-end autonomy",
+      "demonstrated": false,
+      "partial": true,
+      "missing": false,
+      "evidence": "T2 chain complete under diagnostic orchestration",
+      "main_limitation": "Not production-connected; human initiates chain"
+    }
+  ],
+  "verdicts": {
+    "research_primitives": "AUTONOMOUS_RESEARCH_PRIMITIVES_PASS",
+    "research_lifecycle": "AUTONOMOUS_RESEARCH_LIFECYCLE_PARTIAL",
+    "scientific_generality": "AUTONOMOUS_SCIENTIFIC_GENERALITY_PARTIAL",
+    "phase_3i_graduation": "PHASE_3I_NOT_YET_GRADUATED"
+  },
+  "highest_leverage_blocker": "OPR lifecycle is disconnected from production research_controller \u2014 demonstrated end-to-end autonomy requires human-initiated diagnostic orchestration and cannot self-sustain as a market research process",
+  "minimal_next_phase_proposal": "Phase 3J.0 \u2014 Production OPR Lifecycle Integration Audit & Wiring (integration-only; no new scientific capability)"
+}
