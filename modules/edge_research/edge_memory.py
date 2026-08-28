@@ -167,6 +167,7 @@ def apply_memory_health_update(
     if not mask.any():
         return
     idx = memory.index[mask][0]
+    memory = memory.astype(object)
     prev = str(memory.at[idx, "status"] or "")
     new_status = str(decision.get("status") or prev)
     frozen_identity = (
