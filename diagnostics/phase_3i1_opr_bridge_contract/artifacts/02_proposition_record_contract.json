@@ -1,0 +1,128 @@
+{
+  "phase": "3I.1",
+  "version": "proposition_record_v1",
+  "schema_id": "PropositionRecord",
+  "status": "DESIGN_ONLY — not implemented in production",
+  "fields": {
+    "proposition_id": {
+      "type": "string",
+      "format": "stable hash of core + provenance anchor",
+      "purpose": "Deduplication and lineage tracking"
+    },
+    "record_version": {
+      "type": "string",
+      "value": "proposition_record_v1",
+      "purpose": "Schema evolution audit"
+    },
+    "created_at": {
+      "type": "iso8601",
+      "purpose": "Temporal audit"
+    },
+    "research_step": {
+      "type": "integer",
+      "purpose": "Session position at birth"
+    },
+    "observation_provenance": {
+      "type": "ObservationProvenance",
+      "required": true,
+      "purpose": "Source-of-truth empirical chain — see 01_opr_source_of_truth_rule.json"
+    },
+    "motivating_observation": {
+      "type": "string",
+      "max_words": 120,
+      "purpose": "Human-auditable statement of what was empirically seen (not template text)"
+    },
+    "surprise_or_uncertainty": {
+      "type": "string",
+      "purpose": "Why evidence is surprising, unresolved, asymmetric, conflicting, or unexplained"
+    },
+    "scientific_question": {
+      "type": "string",
+      "purpose": "Question arising from evidence — must not be isomorphic to catalog template question_text"
+    },
+    "canonical_proposition_core": {
+      "type": "CanonicalPropositionCore",
+      "ref": "modules/edge_research/research_proposition_core.py",
+      "purpose": "Executable semantic identity for dedup and blind eval"
+    },
+    "population_context": {
+      "type": "PopulationSpec dict",
+      "purpose": "Who is being studied — derived from evidence context"
+    },
+    "explanatory_relation": {
+      "type": "object",
+      "fields": ["feature_or_contrast", "relation_type", "comparison_groups"],
+      "purpose": "What explanatory structure is hypothesized"
+    },
+    "outcome": {
+      "type": "OutcomeSpec dict",
+      "purpose": "What is predicted or compared"
+    },
+    "observation_horizon": {
+      "type": "integer",
+      "optional": true,
+      "purpose": "Horizon when scientifically relevant to the proposition"
+    },
+    "falsifiable_expectation": {
+      "type": "string",
+      "purpose": "What result pattern would support vs weaken the proposition"
+    },
+    "null_competing_explanation": {
+      "type": "string",
+      "purpose": "Plausible alternative explanation the proposition discriminates against"
+    },
+    "evidence_required": {
+      "type": "string",
+      "purpose": "What new empirical evidence would resolve the uncertainty"
+    },
+    "execution_requirements": {
+      "type": "object",
+      "fields": ["required_tool_capabilities", "min_sample", "legal_grammar_refs"],
+      "purpose": "Executability pre-check without selecting tool"
+    },
+    "epistemic_status": {
+      "type": "enum",
+      "values": ["HYPOTHESIS", "SUPPORTED", "WEAKENED", "FALSIFIED", "ABANDONED", "INSUFFICIENT_EVIDENCE"],
+      "purpose": "Lifecycle state at record time"
+    },
+    "confidence": {
+      "type": "enum",
+      "values": ["LOW", "MEDIUM", "HIGH"],
+      "purpose": "Grounding strength — not market edge confidence"
+    },
+    "semantic_parent_id": {
+      "type": "string|null",
+      "purpose": "Prior proposition this derives from (evidence-responsive fork)"
+    },
+    "generation_lineage": {
+      "type": "array",
+      "items": "proposition_id or experiment_node_id",
+      "purpose": "Audit chain from root observation to this record"
+    },
+    "birth_certificate": {
+      "type": "ScientificBirthCertificate",
+      "required": true,
+      "ref": "artifacts/03_scientific_birth_certificate.json"
+    },
+    "template_independence_audit": {
+      "type": "TemplateIndependenceResult",
+      "required": true,
+      "ref": "artifacts/04_template_independence_evaluator.json"
+    },
+    "leakage_audit": {
+      "type": "object",
+      "fields": ["hidden_phenomenon_contact", "generator_dev_set_overlap", "passed"],
+      "purpose": "Blind benchmark contamination check"
+    },
+    "executability_status": {
+      "type": "enum",
+      "values": ["EXECUTABLE", "GRAMMAR_BLOCKED", "TOOL_BLOCKED", "SAMPLE_INSUFFICIENT", "NOT_ATTEMPTED"],
+      "purpose": "Whether existing validation can bind an ExperimentSpec"
+    }
+  },
+  "explicitly_excluded_fields": {
+    "planner_score": "Ranking belongs downstream — not part of proposition birth",
+    "template_id_used": "Must not be populated at synthesis time; only post-hoc audit may compare",
+    "hidden_edge_label": "Never stored in generator-visible records"
+  }
+}
