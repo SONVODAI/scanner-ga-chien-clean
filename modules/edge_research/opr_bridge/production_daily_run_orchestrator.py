@@ -78,10 +78,13 @@ def _finish_daily_run(
     repo_root: Path,
     edge_data_dir: Optional[Path],
     panel: Optional[pd.DataFrame] = None,
+    reuse_forecast_memory: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Append isolated Forecast Memory then closed-loop A→C→B.
 
     Never mutates Edge/OPR run disposition. Closed-loop failures stay nested.
+    Headless EOD already runs Forecast Memory (P0 HSX + FF). Reuse that payload
+    in the same process so api.hsx.vn is not walked twice.
     """
     if result.get("genesis_blocked"):
         out = dict(result)
@@ -101,6 +104,7 @@ def _finish_daily_run(
         target_trade_date=target_trade_date,
         repo_root=repo_root,
         edge_data_dir=edge_data_dir,
+        reuse_forecast_memory=reuse_forecast_memory,
     )
     try:
         from modules.edge_research.closed_loop_daily_hook import run_closed_loop_edge_after_daily
@@ -174,12 +178,16 @@ def run_production_daily_research(
     resume_run_id: Optional[str] = None,
     crash_after_phase: Optional[str] = None,
     use_run_lock: bool = False,
+    reuse_forecast_memory: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Execute one complete production daily research run for target_trade_date.
 
     crash_after_phase: test hook — abort after named phase (crash recovery matrix).
-    use_run_lock: acquire exclusive file lock (production entrypoint / dry run).
+    use_run_lock: acquire exclusive file lock (dry-run / tests). The authoritative
+    production entrypoint acquires the lock itself before headless EOD.
+    reuse_forecast_memory: Forecast Memory payload already produced by headless EOD
+    in this process — skip a second HSX/P0/FF walk.
     """
     repo_root = repo_root or Path(__file__).resolve().parents[3]
     policy_hashes = compute_research_policy_hashes(repo_root)
@@ -204,6 +212,7 @@ def run_production_daily_research(
                 repo_root=repo_root,
                 edge_data_dir=data_dir,
                 panel=panel,
+                reuse_forecast_memory=reuse_forecast_memory,
             )
 
     # Authoritative EOD evidence lives under the same repo_root used by headless EOD
@@ -245,6 +254,7 @@ def run_production_daily_research(
                 repo_root=repo_root,
                 edge_data_dir=data_dir,
                 panel=panel,
+                reuse_forecast_memory=reuse_forecast_memory,
             )
 
     run_id = resume_run_id or allocate_daily_run_id(identity, data_dir=data_dir)
@@ -266,6 +276,7 @@ def run_production_daily_research(
                 repo_root=repo_root,
                 edge_data_dir=data_dir,
                 panel=panel,
+                reuse_forecast_memory=reuse_forecast_memory,
             )
 
     try:
@@ -289,6 +300,7 @@ def run_production_daily_research(
             repo_root=repo_root,
             edge_data_dir=data_dir,
             panel=panel,
+            reuse_forecast_memory=reuse_forecast_memory,
         )
     finally:
         if lock_fh is not None:

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
@@ -77,6 +78,8 @@ def ingest_trade_date(
     fetch_fn: Optional[Callable[..., Dict[str, Any]]] = None,
     pacing_sleeper: Callable[[float], None] = lambda _s: None,
     mark_delayed_operational: bool = False,
+    stage_budget_sec: Optional[float] = None,
+    time_fn: Callable[[], float] = time.monotonic,
 ) -> Dict[str, Any]:
     """
     Fetch and persist exact-date symbol×day rows for one post-freeze session.
@@ -103,38 +106,72 @@ def ingest_trade_date(
         "trade_date": td,
         "written": False,
         "n_symbols_target": len(syms),
+        "target": len(syms),
+        "success": 0,
+        "failed": 0,
+        "skipped": 0,
+        "timeouts": 0,
+        "retries": 0,
         "n_ok": 0,
         "n_missing": 0,
         "n_rejected": 0,
         "n_rate_limited": 0,
         "n_errors": 0,
         "n_skipped_already": 0,
+        "n_skipped_budget": 0,
+        "n_timeouts": 0,
         "errors": [],
         "delayed_operational_ingest": bool(mark_delayed_operational),
         "cohort_id": cohort["cohort_id"],
         "reason": "ok",
+        "budget_exhausted": False,
+        "elapsed_s": 0.0,
+        "optional_enrichment": True,
     }
+
+    from modules.production_io_bounds import FF_CONFIRMATION_STAGE_BUDGET_SEC
+
+    budget = float(stage_budget_sec) if stage_budget_sec is not None else float(FF_CONFIRMATION_STAGE_BUDGET_SEC)
+    results["budget_sec"] = budget
+    started = time_fn()
 
     completed = set(already_done)
     for sym in syms:
+        elapsed = time_fn() - started
+        if elapsed >= budget:
+            remaining = [s for s in syms if str(s).upper() not in completed]
+            leftover = remaining
+            results["n_skipped_budget"] = len(leftover)
+            results["skipped"] = int(results["skipped"]) + len(leftover)
+            results["budget_exhausted"] = True
+            results["reason"] = "stage_budget_exhausted"
+            break
         sym = str(sym).upper()
         if sym in already_done:
             results["n_skipped_already"] += 1
             # still count as ok coverage for idempotent replay
             results["n_ok"] += 1
+            results["success"] += 1
             continue
 
         try:
             fr = fetch(sym, td, sleeper=pacing_sleeper)
         except Exception as exc:  # noqa: BLE001
             results["n_errors"] += 1
+            results["failed"] += 1
             results["errors"].append(f"{sym}:fetch_exc:{exc}")
+            msg = str(exc).lower()
+            if "timed out" in msg or "timeout" in msg:
+                results["n_timeouts"] += 1
+                results["timeouts"] += 1
             continue
 
         if fr.get("rate_limited"):
             results["n_rate_limited"] += 1
+            results["failed"] += 1
             results["ok"] = False
             results["reason"] = "rate_limited_partial"
+            results["elapsed_s"] = round(time_fn() - started, 3)
             # persist progress so later cycle can resume
             date_meta.update(
                 {
@@ -149,6 +186,11 @@ def ingest_trade_date(
 
         if not fr.get("ok"):
             reason = fr.get("reason") or "fetch_failed"
+            results["failed"] += 1
+            blob = " ".join([reason] + [str(x) for x in (fr.get("errors") or [])]).lower()
+            if "timed out" in blob or "timeout" in blob or reason == "provider_transient":
+                results["n_timeouts"] += 1
+                results["timeouts"] += 1
             if reason == "exact_date_missing":
                 results["n_missing"] += 1
                 record_cohort_event(
@@ -170,6 +212,7 @@ def ingest_trade_date(
         ok, status, _n = append_forward_rows(sym, rows, trade_date=td, root=root)
         if not ok:
             results["n_rejected"] += 1
+            results["failed"] += 1
             results["errors"].append(f"{sym}:{status}")
             _append_jsonl(
                 root / "dq_rejects" / f"{td}.jsonl",
@@ -179,6 +222,7 @@ def ingest_trade_date(
 
         completed.add(sym)
         results["n_ok"] += 1
+        results["success"] += 1
         results["written"] = True
 
     incomplete = [s for s in syms if str(s).upper() not in completed]
@@ -191,15 +235,18 @@ def ingest_trade_date(
             "n_missing": results["n_missing"],
             "updated_at": utc_now_iso(),
             "delayed_operational_ingest": bool(mark_delayed_operational),
+            "budget_exhausted": bool(results.get("budget_exhausted")),
         }
     )
     cp.setdefault("dates", {})[td] = date_meta
     cp["latest_trade_date"] = max(str(cp.get("latest_trade_date") or ""), td)
     save_forward_checkpoint(cp, root)
 
+    results["elapsed_s"] = round(time_fn() - started, 3)
     if incomplete:
-        results["ok"] = results["n_ok"] > 0
-        results["reason"] = "partial_coverage"
+        results["ok"] = results["n_ok"] > 0 or bool(results.get("budget_exhausted"))
+        if not results.get("budget_exhausted"):
+            results["reason"] = "partial_coverage"
     return results
 
 
@@ -581,6 +628,34 @@ def counts_only_status(
     return summary
 
 
+def production_ff_fetch_exact_row(
+    symbol: str,
+    trade_date: str,
+    *,
+    sleeper: Callable[[float], None] = time.sleep,
+    **_kwargs: Any,
+) -> Dict[str, Any]:
+    """Bounded HSX exact-date fetch for the daily production path."""
+    from modules.production_io_bounds import (
+        FF_PRODUCTION_MAX_PAGES,
+        HSX_BACKOFF_BASE_SEC,
+        HSX_MAX_RETRIES,
+        HSX_PACING_SEC,
+        HSX_URLLIB_TIMEOUT_SEC,
+    )
+
+    return fetch_exact_trade_date_row(
+        symbol,
+        trade_date,
+        timeout_sec=HSX_URLLIB_TIMEOUT_SEC,
+        max_retries=HSX_MAX_RETRIES,
+        backoff_base_sec=HSX_BACKOFF_BASE_SEC,
+        pacing_sec=HSX_PACING_SEC,
+        max_pages=FF_PRODUCTION_MAX_PAGES,
+        sleeper=sleeper,
+    )
+
+
 def run_confirmation_daily(
     trade_date: str,
     *,
@@ -589,6 +664,8 @@ def run_confirmation_daily(
     fetch_fn: Optional[Callable[..., Dict[str, Any]]] = None,
     skip_fetch: bool = False,
     mark_delayed_operational: bool = False,
+    stage_budget_sec: Optional[float] = None,
+    time_fn: Callable[[], float] = time.monotonic,
 ) -> Dict[str, Any]:
     """
     Full daily cycle for one trade_date (fail-safe wrapper target).
@@ -614,8 +691,10 @@ def run_confirmation_daily(
             td,
             confirmation_root=root,
             history_root=history_root,
-            fetch_fn=fetch_fn,
+            fetch_fn=fetch_fn or production_ff_fetch_exact_row,
             mark_delayed_operational=mark_delayed_operational,
+            stage_budget_sec=stage_budget_sec,
+            time_fn=time_fn,
         )
 
     events = evaluate_and_append_events(

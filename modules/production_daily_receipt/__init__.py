@@ -30,6 +30,19 @@ OVERALL_FAIL = "FAIL"
 OVERALL_WAITING = "WAITING"
 OVERALL_SKIPPED = "SKIPPED"
 
+PIPELINE_TERMINATED = "PIPELINE_TERMINATED_BEFORE_COMPLETE"
+CLOSED_LOOP_NOT_RUN = "CLOSED_LOOP_NOT_RUN"
+
+_VALID_CLOSED_LOOP_SKIPS = frozenset(
+    {
+        "SKIPPED_NON_TRADING_DAY",
+        "SKIPPED_T0_NOT_READY",
+        "SKIPPED_GENESIS_BLOCKED",
+        "SKIPPED_LOCK_HELD",
+        "SKIPPED_WAITING_FOR_DATA",
+    }
+)
+
 
 def receipts_root(repo_root: Optional[Path] = None) -> Path:
     root = Path(repo_root) if repo_root is not None else Path(__file__).resolve().parents[2]
@@ -194,6 +207,16 @@ def build_daily_pipeline_receipt(
         "reason": fm.get("reason") if isinstance(fm, dict) else None,
     }
 
+    cle = edge.get("closed_loop_edge") or {}
+    closed_loop_ran = bool(cle.get("ran_science"))
+    closed_loop_skip = str(cle.get("skip_reason") or "")
+    closed_loop_valid_skip = closed_loop_skip in _VALID_CLOSED_LOOP_SKIPS
+    closed_loop_complete = bool(closed_loop_ran or closed_loop_valid_skip)
+    closed_loop_status = (
+        str(cle.get("assessment_state") or cle.get("system_status") or closed_loop_skip or CLOSED_LOOP_NOT_RUN)
+    )
+    pipeline_terminated = bool(edge.get("pipeline_terminated")) or str(edge_disp) == "PIPELINE_TERMINATED"
+
     he_status = headless.get("stage_disposition") or headless.get("reason") or "UNKNOWN"
     recovery = bool(provenance.get("recovery"))
     autonomous = (not recovery) and (
@@ -212,6 +235,8 @@ def build_daily_pipeline_receipt(
         voice_exists=bool(voice.get("exists")),
         ems_rows=int(ems.get("rows") or 0),
         mdt0_rows=int(mdt0.get("rows") or 0),
+        pipeline_terminated=pipeline_terminated,
+        terminated_reason=str(edge.get("termination_reason") or edge_reason or ""),
     )
 
     ui_latest = None
@@ -261,13 +286,21 @@ def build_daily_pipeline_receipt(
             "idempotent_replay": edge.get("idempotent_replay"),
         },
         "closed_loop_edge": {
-            "ran_science": (edge.get("closed_loop_edge") or {}).get("ran_science"),
-            "system_status": (edge.get("closed_loop_edge") or {}).get("system_status"),
-            "assessment_state": (edge.get("closed_loop_edge") or {}).get("assessment_state"),
-            "assessment_reason": (edge.get("closed_loop_edge") or {}).get("assessment_reason"),
-            "skip_reason": (edge.get("closed_loop_edge") or {}).get("skip_reason"),
-            "order": (edge.get("closed_loop_edge") or {}).get("order"),
+            "ran_science": cle.get("ran_science"),
+            "system_status": cle.get("system_status"),
+            "assessment_state": cle.get("assessment_state"),
+            "assessment_reason": cle.get("assessment_reason"),
+            "skip_reason": cle.get("skip_reason"),
+            "order": cle.get("order"),
+            "complete": closed_loop_complete,
+            "visible_status": closed_loop_status,
         },
+        "closed_loop_complete": closed_loop_complete,
+        "closed_loop_status": closed_loop_status,
+        "pipeline_complete": bool(
+            not pipeline_terminated and closed_loop_complete and overall in (OVERALL_PASS, OVERALL_SKIPPED, OVERALL_WAITING)
+        ),
+        "pipeline_terminated": pipeline_terminated,
         "daily_market_voice": voice,
         "ui_read_model": {
             "canonical_root": str(canon),
@@ -297,7 +330,15 @@ def _classify_overall(
     voice_exists: bool,
     ems_rows: int,
     mdt0_rows: int,
+    pipeline_terminated: bool = False,
+    terminated_reason: str = "",
 ) -> tuple[str, Optional[str], str]:
+    if pipeline_terminated or edge_disp in ("PIPELINE_TERMINATED", PIPELINE_TERMINATED):
+        return (
+            OVERALL_FAIL,
+            "pipeline_wall_clock",
+            terminated_reason or edge_reason or PIPELINE_TERMINATED,
+        )
     if "TRADING_DAY_PROBE_FAILED" in he_status or he_status == "TRADING_DAY_PROBE_FAILED":
         return OVERALL_FAIL, "trading_day_probe", he_reason or he_status
 
@@ -390,3 +431,67 @@ def write_receipt_from_run(
             "error": f"{type(exc).__name__}:{exc}",
             "receipt": None,
         }
+
+
+def write_incomplete_pipeline_receipt(
+    trade_date: str,
+    *,
+    repo_root: Optional[Path] = None,
+    edge_data_dir: Optional[Path] = None,
+    headless_eod: Optional[Dict[str, Any]] = None,
+    edge_result: Optional[Dict[str, Any]] = None,
+    panel_freshness: Optional[Dict[str, Any]] = None,
+    run_provenance: Optional[Dict[str, Any]] = None,
+    termination_reason: str = PIPELINE_TERMINATED,
+    stage: str = "pipeline_wall_clock",
+) -> Dict[str, Any]:
+    """
+    Durable operator evidence when systemd/SIGTERM kills a still-running job.
+
+    Never invents NO_QUALIFIED_MATCH. Never overwrites a completed PASS receipt
+    that already recorded a closed loop.
+    """
+    try:
+        existing_path = receipt_path(trade_date, repo_root=repo_root)
+        if existing_path.exists():
+            try:
+                prior = json.loads(existing_path.read_text(encoding="utf-8"))
+            except Exception:
+                prior = {}
+            if prior.get("overall") == OVERALL_PASS and prior.get("closed_loop_complete"):
+                return {
+                    "ok": True,
+                    "skipped": True,
+                    "reason": "existing_complete_pass_preserved",
+                    "path": str(existing_path),
+                    "receipt": prior,
+                }
+        terminated = dict(edge_result or {})
+        terminated["pipeline_terminated"] = True
+        terminated["termination_reason"] = termination_reason
+        terminated["termination_stage"] = stage
+        run = dict(terminated.get("run") or {})
+        run["run_disposition"] = "PIPELINE_TERMINATED"
+        run["failure_or_skip_reason"] = termination_reason
+        terminated["run"] = run
+        if not terminated.get("closed_loop_edge"):
+            terminated["closed_loop_edge"] = {
+                "ran_science": False,
+                "system_status": "NOT_RUN",
+                "assessment_state": "",
+                "assessment_reason": "",
+                "skip_reason": CLOSED_LOOP_NOT_RUN,
+                "order": ["qualification", "continuous_learning", "recognition", "shadow"],
+            }
+        return write_receipt_from_run(
+            trade_date,
+            repo_root=repo_root,
+            edge_data_dir=edge_data_dir,
+            headless_eod=headless_eod,
+            edge_result=terminated,
+            panel_freshness=panel_freshness,
+            run_provenance=run_provenance,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("incomplete pipeline receipt failed safely: %s", exc)
+        return {"ok": False, "error": f"{type(exc).__name__}:{exc}", "receipt": None}

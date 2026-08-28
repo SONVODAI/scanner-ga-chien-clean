@@ -145,13 +145,32 @@ def parse_hsx_foreign_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     return out
 
 
-def default_hsx_get_json(url: str, *, timeout_s: float = 20.0) -> Dict[str, Any]:
+def default_hsx_get_json(url: str, *, timeout_s: Any = None) -> Dict[str, Any]:
     import requests
 
-    resp = requests.get(url, headers=HSX_HEADERS, timeout=timeout_s)
-    if resp.status_code != 200:
-        raise RuntimeError(f"http_{resp.status_code}")
-    return resp.json()
+    from modules.production_io_bounds import (
+        HSX_BACKOFF_BASE_SEC,
+        HSX_CONNECT_TIMEOUT_SEC,
+        HSX_MAX_RETRIES,
+        HSX_READ_TIMEOUT_SEC,
+    )
+
+    if timeout_s is None:
+        timeout_s = (HSX_CONNECT_TIMEOUT_SEC, HSX_READ_TIMEOUT_SEC)
+    last_exc: Optional[BaseException] = None
+    attempts = HSX_MAX_RETRIES + 1
+    for attempt in range(attempts):
+        try:
+            resp = requests.get(url, headers=HSX_HEADERS, timeout=timeout_s)
+            if resp.status_code != 200:
+                raise RuntimeError(f"http_{resp.status_code}")
+            return resp.json()
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            if attempt >= HSX_MAX_RETRIES:
+                break
+            time.sleep(HSX_BACKOFF_BASE_SEC * (2**attempt))
+    raise last_exc if last_exc is not None else RuntimeError("hsx_fetch_failed")
 
 
 def fetch_hsx_symbol_history(
@@ -307,6 +326,9 @@ class HsXUniverseForeignProvider:
     sleep_s: float = 0.05
     # Optional preloaded {symbol: [rows]} for tests / backfill cache
     cache: Dict[str, List[Dict[str, Any]]] = field(default_factory=dict)
+    stage_budget_sec: Optional[float] = None
+    time_fn: Callable[[], float] = time.monotonic
+    last_io_summary: Dict[str, Any] = field(default_factory=dict)
 
     def fetch_symbol(self, symbol: str) -> List[Dict[str, Any]]:
         sym = str(symbol).upper()
@@ -316,35 +338,78 @@ class HsXUniverseForeignProvider:
             rows = fetch_hsx_symbol_history(sym, page_size=self.page_size, get_json=self.get_json)
         except Exception as exc:  # noqa: BLE001
             logger.warning("HSX foreign fetch failed for %s: %s", sym, exc)
-            return []
+            raise
         self.cache[sym] = rows
         if self.sleep_s:
             time.sleep(self.sleep_s)
         return rows
 
     def fetch(self, trade_date: str) -> ProviderResult:
+        from modules.production_io_bounds import (
+            P0_UNIVERSE_FOREIGN_STAGE_BUDGET_SEC,
+            empty_io_summary,
+        )
+
         td = str(trade_date)[:10]
         symbols = ems_universe_symbols(td, ems_path=self.ems_path)
         mem = universe_membership_meta(td, symbols, ems_path=self.ems_path)
+        budget = (
+            float(self.stage_budget_sec)
+            if self.stage_budget_sec is not None
+            else float(P0_UNIVERSE_FOREIGN_STAGE_BUDGET_SEC)
+        )
+        io = empty_io_summary(target=len(symbols))
+        io["budget_sec"] = budget
+        started = self.time_fn()
         if not symbols:
+            io["elapsed_s"] = round(self.time_fn() - started, 3)
+            self.last_io_summary = io
             return ProviderResult(
                 ok=False,
                 status="MISSING",
                 error="no_ems_membership_for_date",
-                meta={**mem, "provider": "hsx_official_foreign", "units": "VND", "historical_supported": True},
+                meta={
+                    **mem,
+                    "provider": "hsx_official_foreign",
+                    "units": "VND",
+                    "historical_supported": True,
+                    "io_summary": io,
+                },
             )
 
         per: Dict[str, List[Dict[str, Any]]] = {}
         fetch_errors = 0
+        timeouts = 0
+        retries = 0
         for sym in symbols:
+            elapsed = self.time_fn() - started
+            if elapsed >= budget:
+                remaining = [s for s in symbols if s not in per]
+                io["skipped"] = len(remaining)
+                io["budget_exhausted"] = True
+                for s in remaining:
+                    per[s] = []
+                break
             try:
                 per[sym] = self.fetch_symbol(sym)
-                if not per[sym]:
-                    # empty list may be valid (no history) or error — count as missing later
-                    pass
-            except Exception:  # noqa: BLE001
+                io["success"] += 1
+            except Exception as exc:  # noqa: BLE001
                 fetch_errors += 1
                 per[sym] = []
+                io["failed"] += 1
+                msg = str(exc).lower()
+                if "timed out" in msg or "timeout" in msg or "incompleteread" in msg:
+                    timeouts += 1
+                    io["timeouts"] += 1
+                    logger.warning("HSX foreign fetch failed for %s: %s", sym, exc)
+                else:
+                    logger.warning("HSX foreign fetch failed for %s: %s", sym, exc)
+            # default_hsx_get_json performs bounded retries internally; count budget path
+            retries = io.get("retries") or 0
+
+        io["retries"] = retries
+        io["elapsed_s"] = round(self.time_fn() - started, 3)
+        self.last_io_summary = io
 
         result = aggregate_symbol_rows(td, symbols, per, source="hsx_official_foreign")
         result.meta.update(
@@ -353,9 +418,12 @@ class HsXUniverseForeignProvider:
                 "historical_supported": True,
                 "historical_capability": "HISTORICAL_AND_FORWARD",
                 "fetch_errors": fetch_errors,
+                "timeouts": timeouts,
+                "io_summary": io,
+                "optional_enrichment": True,
             }
         )
-        if fetch_errors == len(symbols):
+        if fetch_errors == len(symbols) and io["success"] == 0 and not io["budget_exhausted"]:
             return ProviderResult(
                 ok=False,
                 status="SOURCE_ERROR",

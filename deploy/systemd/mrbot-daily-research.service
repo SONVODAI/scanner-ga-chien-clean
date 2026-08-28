@@ -17,9 +17,16 @@ EnvironmentFile=-/etc/mrbot/daily-research.env
 ExecStart=/opt/mrbot-research-venv/bin/python -m modules.edge_research.opr_bridge.production_daily_run_entrypoint --derive-vn-date --mode LIVE_FORWARD --use-lock
 Nice=10
 IOSchedulingClass=best-effort
-TimeoutStartSec=3600
+TimeoutStartSec=5400
+TimeoutStopSec=60
 Restart=no
 SuccessExitStatus=2 3 10
+# TimeoutStartSec is a safety ceiling above the internally bounded degraded
+# envelope (see modules/production_io_bounds.py expected_runtime_envelope):
+#   normal ~24min, degraded HSX ~56min, hard bound ~56min (P0+FF stage budgets
+#   8min each; duplicate same-process Forecast Memory HSX walk skipped).
+# Slow api.hsx.vn calls are bounded per-request (5s connect / 8s read, 1 retry)
+# and per-stage (8min). Do not use this systemd timeout as the API watchdog.
 
 [Install]
 WantedBy=multi-user.target

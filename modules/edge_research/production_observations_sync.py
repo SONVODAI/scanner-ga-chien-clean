@@ -35,6 +35,7 @@ from modules.edge_research.artifact_server import (
 )
 from modules.edge_research.durable import _secret_or_env, resolve_durable_backend
 from modules.edge_research.storage import resolve_data_dir, resolve_production_runs_root
+from modules.production_io_bounds import ARTIFACT_PUBLISH_TIMEOUT_SEC
 
 PRODUCTION_OBS_OBJECT = "production_observations.tar.gz"
 ARTIFACT_ENV_FILE = Path("/etc/mrbot/edge-artifacts.env")
@@ -233,13 +234,13 @@ def _put_http(url: str, token: str, blob: bytes) -> None:
         headers={**_headers(token), "Content-Type": "application/gzip"},
         method="PUT",
     )
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    with urllib.request.urlopen(req, timeout=ARTIFACT_PUBLISH_TIMEOUT_SEC) as resp:
         _ = resp.read()
 
 
 def _get_http(url: str, token: str) -> bytes:
     req = urllib.request.Request(url, headers=_headers(token), method="GET")
-    with urllib.request.urlopen(req, timeout=60) as resp:
+    with urllib.request.urlopen(req, timeout=ARTIFACT_PUBLISH_TIMEOUT_SEC) as resp:
         return resp.read()
 
 

@@ -84,7 +84,9 @@ def run_closed_loop_edge_after_daily(
             freeze_df = None
 
         from modules.edge_research.eod_cycle import run_edge_research_eod_cycle
+        from modules.production_stage_telemetry import emit_stage_end, emit_stage_start
 
+        t_abc = emit_stage_start("closed_loop_abc", trade_date=td)
         result = run_edge_research_eod_cycle(
             trade_date=td,
             data_dir=data_dir,
@@ -98,6 +100,12 @@ def run_closed_loop_edge_after_daily(
             result["assessment_state"] = rec.get("assessment_state") or ""
         if not result.get("assessment_reason"):
             result["assessment_reason"] = rec.get("reason") or ""
+        emit_stage_end(
+            "closed_loop_abc",
+            started_monotonic=t_abc,
+            disposition=str(result.get("assessment_state") or result.get("system_status") or "UNKNOWN"),
+            reason=result.get("assessment_reason"),
+        )
         return result
     except Exception as exc:  # noqa: BLE001
         return {

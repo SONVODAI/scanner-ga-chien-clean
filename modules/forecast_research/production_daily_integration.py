@@ -131,23 +131,37 @@ def run_forecast_memory_daily_stage(
             hist = {"ok": False, "reason": f"hist_hook_error:{exc}"}
 
         p0: Dict[str, Any] = {"skipped": True}
+        t_p0 = None
         try:
             from modules.forecast_research.p0_daily import maybe_collect_p0_after_market_daily
+            from modules.production_stage_telemetry import emit_stage_end, emit_stage_start, io_fields
 
+            t_p0 = emit_stage_start("p0_universe_foreign", trade_date=trade_date)
             p0 = maybe_collect_p0_after_market_daily(trade_date, data_dir=root)
         except Exception as exc:  # noqa: BLE001
             logger.warning("P0 hook failed safely: %s", exc)
             p0 = {"ok": False, "written": False, "reason": f"p0_hook_error:{exc}"}
+        if t_p0 is not None:
+            from modules.production_stage_telemetry import emit_stage_end, io_fields
+
+            emit_stage_end(
+                "p0_universe_foreign",
+                started_monotonic=t_p0,
+                disposition=str(p0.get("reason") or ("OK" if p0.get("ok") else "FAILED")),
+                **io_fields(p0.get("io_summary")),
+            )
 
         # Isolated Foreign Flow confirmation forward-panel ingest (fail-safe).
-        # Does not alter P0 / Forecast disposition / Edge science / Camera.
-        # No additional timer — rides existing daily research MDT0 stage.
+        # OPTIONAL enrichment — must not block A→C→B. Bounded I/O.
         ff_conf: Dict[str, Any] = {"skipped": True}
+        t_ff = None
         try:
             from modules.foreign_flow_confirmation.daily import (
                 maybe_run_ff_confirmation_after_market_daily,
             )
+            from modules.production_stage_telemetry import emit_stage_end, emit_stage_start, io_fields
 
+            t_ff = emit_stage_start("ff_confirmation_forward", trade_date=trade_date)
             ff_conf = maybe_run_ff_confirmation_after_market_daily(trade_date)
         except Exception as exc:  # noqa: BLE001
             logger.warning("FF confirmation forward hook failed safely: %s", exc)
@@ -156,6 +170,16 @@ def run_forecast_memory_daily_stage(
                 "written": False,
                 "reason": f"ff_confirmation_hook_error:{exc}",
             }
+        if t_ff is not None:
+            from modules.production_stage_telemetry import emit_stage_end, io_fields
+
+            ingest = ff_conf.get("ingest") if isinstance(ff_conf, dict) else None
+            emit_stage_end(
+                "ff_confirmation_forward",
+                started_monotonic=t_ff,
+                disposition=str(ff_conf.get("reason") or ("OK" if ff_conf.get("ok") else "FAILED")),
+                **io_fields(ingest if isinstance(ingest, dict) else ff_conf.get("io_summary")),
+            )
 
         stage_disposition = STAGE_SUCCESS
         if not freeze.get("ok") and freeze.get("reason") == COMPLETENESS_WAITING:
@@ -210,6 +234,7 @@ def attach_forecast_memory_to_daily_run_result(
     target_trade_date: str,
     repo_root: Path,
     edge_data_dir: Optional[Path] = None,
+    reuse_forecast_memory: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Append Forecast Memory stage to a production daily run result dict.
@@ -223,6 +248,31 @@ def attach_forecast_memory_to_daily_run_result(
             "reason": "edge_run_lock_held",
             "stage": "forecast_memory",
         }
+        return out
+
+    if reuse_forecast_memory:
+        out = dict(result)
+        reused = dict(reuse_forecast_memory)
+        reused["reused_from_headless_eod"] = True
+        out["forecast_memory"] = reused
+        run_id = (result.get("run") or {}).get("run_id")
+        if run_id and edge_data_dir is not None:
+            try:
+                from modules.edge_research.opr_bridge.production_daily_run_persistence import persist_phase_marker
+                from modules.edge_research.opr_bridge.production_daily_run_records import RunPhase
+
+                persist_phase_marker(
+                    run_id,
+                    RunPhase.FORECAST_MEMORY_COMPLETED.value,
+                    data_dir=edge_data_dir,
+                    extra={
+                        "stage_disposition": reused.get("stage_disposition"),
+                        "forecast_t0_reason": (reused.get("forecast_t0") or {}).get("reason"),
+                        "reused_from_headless_eod": True,
+                    },
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Forecast Memory phase marker failed safely: %s", exc)
         return out
 
     forecast_dir = repo_root / "data" / "forecast_research"
