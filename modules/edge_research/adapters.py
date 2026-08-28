@@ -51,6 +51,9 @@ PATTERN_HISTORY_PATH = REPO_ROOT / "pattern_history.csv"
 BUY_ELITE_HISTORY_PATH = REPO_ROOT / "buy_elite_learning_history.csv"
 MARKET_T0_SNAPSHOT_PATH = EARNING_LEARNING_DIR / "market_t0_snapshot.csv"
 OUTCOMES_PATH = EARNING_LEARNING_DIR / "outcomes.csv"
+MARKET_DAILY_T0_PATH = EARNING_LEARNING_DIR / "market_daily_t0.csv"
+T0_FREEZE_PATH = EARNING_LEARNING_DIR / "t0_observation_freeze.csv"
+OBSERVATIONS_PATH = EARNING_LEARNING_DIR / "observations.csv"
 RESEARCH_EXPORTS_DIR = REPO_ROOT / "research_exports"
 
 
@@ -238,6 +241,36 @@ def build_canonical_market_series(
             }
         )
     return pd.DataFrame(canonical_rows)
+
+
+def load_canonical_maturity_inputs() -> tuple[pd.DataFrame, List[str]]:
+    """
+    Read-only production inputs for Phase C maturity.
+
+    Returns (outcomes.csv frame, unique trading-session date strings).
+    Calendar is assembled from market_daily_t0, T0 freeze, observations, and
+    outcomes entry/target dates — never from lifecycle t*_return_pct.
+    """
+    outcomes = _read_csv(OUTCOMES_PATH)
+    dates: List[str] = []
+
+    def _collect(path: Path, *cols: str) -> None:
+        frame = _read_csv(path)
+        if frame.empty:
+            return
+        for col in cols:
+            if col not in frame.columns:
+                continue
+            parsed = pd.to_datetime(frame[col], errors="coerce").dropna()
+            dates.extend(pd.Timestamp(v).normalize().strftime("%Y-%m-%d") for v in parsed)
+
+    _collect(MARKET_DAILY_T0_PATH, "trade_date", "date")
+    _collect(T0_FREEZE_PATH, "trade_date")
+    _collect(OBSERVATIONS_PATH, "trade_date")
+    if not outcomes.empty:
+        _collect(OUTCOMES_PATH, "entry_date", "target_date")
+    unique = sorted(set(dates))
+    return outcomes, unique
 
 
 def attach_outcomes_from_outcomes_csv(panel: pd.DataFrame, *, repo_root: Optional[Path] = None) -> pd.DataFrame:
