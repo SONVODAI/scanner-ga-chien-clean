@@ -1,0 +1,32 @@
+{
+  "CF-C1": {
+    "passed": true,
+    "pop_strategies_remaining": []
+  },
+  "CF-C2": {
+    "passed": true,
+    "before": "SELECTED",
+    "after": "NO_DEFENSIBLE_COHORT"
+  },
+  "CF-C3": {
+    "passed": true,
+    "note": "overlap-driven ranking tested in BBC-02"
+  },
+  "CF-C4": {
+    "passed": true
+  },
+  "CF-C5": {
+    "passed": true
+  },
+  "CF-C6": {
+    "passed": true
+  },
+  "CF-C7": {
+    "passed": true,
+    "note": "representation duplicate BBC-09"
+  },
+  "CF-C8": {
+    "passed": true
+  },
+  "all_passed": true
+}

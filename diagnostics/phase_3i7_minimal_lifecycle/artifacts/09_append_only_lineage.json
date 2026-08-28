@@ -1,0 +1,169 @@
+{
+  "lifecycle_version": "opr_lifecycle_v1_3i7",
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "proposition_immutable": true,
+  "experiment_spec": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "research_scope": {
+      "population_spec": {
+        "kind": "all",
+        "grammar_version": "research_grammar_v1"
+      },
+      "outcome_spec": {
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0,
+        "grammar_version": "research_grammar_v1"
+      },
+      "observation_horizon": 0,
+      "pending_question_context": {
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0
+      }
+    },
+    "data_cutoff_date": "2026-08-17"
+  },
+  "tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+  "interpretation_contract_hash": "6cde6297c37276cdc22b6f06975e7eff5c928223095ac63aa10e864e809ff9e7",
+  "interpretation": {
+    "evidence_class": "SUPPORTING",
+    "metrics_used": {
+      "quintile_means": [
+        -0.417532745719201,
+        -0.06763937231746465,
+        0.04048012119072728,
+        0.6013393454050148,
+        1.9343427937275541
+      ],
+      "low_quintile_mean": -0.417532745719201,
+      "high_quintile_mean": 1.9343427937275541,
+      "quintile_mean_spread": 2.351875539446755,
+      "low_high_delta": 2.351875539446755,
+      "outcome_spread": 100.0,
+      "tool_status": "OK",
+      "sample_size": 6106,
+      "contrast_direction": "positive"
+    },
+    "condition_matched": "high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5",
+    "validity_passed": true,
+    "validity_failures": []
+  },
+  "epistemic_update": {
+    "update_id": "epu-5a7bec6e47ec",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "prior_epistemic_state": "HYPOTHESIS",
+    "resulting_epistemic_state": "SUPPORTED",
+    "evidence_class": "SUPPORTING",
+    "experiment_ref": "lifecycle_real_001",
+    "tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+    "metrics_used": {
+      "quintile_means": [
+        -0.417532745719201,
+        -0.06763937231746465,
+        0.04048012119072728,
+        0.6013393454050148,
+        1.9343427937275541
+      ],
+      "low_quintile_mean": -0.417532745719201,
+      "high_quintile_mean": 1.9343427937275541,
+      "quintile_mean_spread": 2.351875539446755,
+      "low_high_delta": 2.351875539446755,
+      "outcome_spread": 100.0,
+      "tool_status": "OK",
+      "sample_size": 6106,
+      "contrast_direction": "positive"
+    },
+    "condition_matched": "high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5",
+    "unresolved_uncertainty": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+    "created_at": "2026-08-22T02:24:28.496519+00:00",
+    "lifecycle_version": "opr_lifecycle_v1_3i7",
+    "record_hash": "f55c373db5c4e7c696146ebf359e8256e81b0f6579c1316c1565fb0dc2594aab"
+  },
+  "research_decision": {
+    "decision_id": "dec-c92fb28fdc13",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "epistemic_update_id": "epu-5a7bec6e47ec",
+    "prior_epistemic_state": "HYPOTHESIS",
+    "resulting_epistemic_state": "SUPPORTED",
+    "evidence_considered": [
+      {
+        "experiment_ref": "lifecycle_real_001",
+        "evidence_class": "SUPPORTING",
+        "metrics_used": {
+          "quintile_means": [
+            -0.417532745719201,
+            -0.06763937231746465,
+            0.04048012119072728,
+            0.6013393454050148,
+            1.9343427937275541
+          ],
+          "low_quintile_mean": -0.417532745719201,
+          "high_quintile_mean": 1.9343427937275541,
+          "quintile_mean_spread": 2.351875539446755,
+          "low_high_delta": 2.351875539446755,
+          "outcome_spread": 100.0,
+          "tool_status": "OK",
+          "sample_size": 6106,
+          "contrast_direction": "positive"
+        },
+        "condition_matched": "high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5"
+      }
+    ],
+    "unresolved_uncertainty": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+    "candidate_next_actions": [
+      {
+        "action_code": "SEEK_FALSIFICATION",
+        "scientific_justification": "Falsification-first"
+      },
+      {
+        "action_code": "SEEK_REPLICATION",
+        "scientific_justification": "Replication"
+      },
+      {
+        "action_code": "HOLD_UNRESOLVED",
+        "scientific_justification": "Hold"
+      },
+      {
+        "action_code": "ABANDON",
+        "scientific_justification": "Abandon"
+      }
+    ],
+    "chosen_next_action": "SEEK_FALSIFICATION",
+    "reason": "Evidence class SUPPORTING (high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5): direction matches pre-registered expectation; seek falsification before further confirmation (falsification-first).",
+    "rejected_alternatives": [
+      {
+        "action_code": "SEEK_REPLICATION",
+        "scientific_justification": "Independent replication of partition contrast"
+      },
+      {
+        "action_code": "HOLD_UNRESOLVED",
+        "scientific_justification": "Insufficient information to change research course"
+      },
+      {
+        "action_code": "ABANDON",
+        "scientific_justification": "Pre-registered falsification threshold crossed"
+      }
+    ],
+    "created_at": "2026-08-22T02:24:28.496581+00:00",
+    "lifecycle_version": "opr_lifecycle_v1_3i7",
+    "record_hash": "736f7b6368f4735a2e586a72f23fc5979e7a13df2f97fde22fe4d04f34c5cf9c"
+  },
+  "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+}

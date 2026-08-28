@@ -1,0 +1,20 @@
+{
+  "diagnostic_only": true,
+  "CF-O1_remove_population_unresolved": {
+    "passed": true,
+    "population_action_disappears": true
+  },
+  "CF-O2_population_saturated": {
+    "passed": true
+  },
+  "CF-O4_prior_population_evidence": {
+    "passed": true,
+    "population_still_unresolved": false,
+    "population_still_winner": false
+  },
+  "CF-O5_tool_only_change": {
+    "note": "ScientificActionCore excludes tool \u2014 verified in code",
+    "passed": true
+  },
+  "baseline_had_population_action": true
+}

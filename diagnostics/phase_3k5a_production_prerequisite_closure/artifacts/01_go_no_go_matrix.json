@@ -1,0 +1,62 @@
+{
+  "matrix": {
+    "EOD authoritative completion": "PASS",
+    "Vietnam trading calendar": "PASS",
+    "Timezone semantics": "PASS",
+    "Scheduler artifacts": "PASS",
+    "Single-writer safety": "PASS",
+    "Persistence": "PASS",
+    "Backup": "PASS_WITH_OPERATOR_ACTION",
+    "Restore verification": "PASS_WITH_OPERATOR_ACTION",
+    "Operational health": "PASS",
+    "DAY_0_SMOKE": "PASS",
+    "Temporal integrity": "PASS",
+    "Trading isolation": "PASS"
+  },
+  "any_fail": false,
+  "recommendation": "READY_FOR_DEPLOYMENT_DAY_0",
+  "eod_completeness": {
+    "complete": true,
+    "disposition": "COMPLETE",
+    "reason": "authoritative_eod_complete",
+    "freeze_row_count": 142,
+    "panel_row_count": 142,
+    "market_after_close": true,
+    "freeze_max_frozen_at": "2026-08-18T12:13:06Z",
+    "source_mutation_detected": false,
+    "freeze_content_hash": "107aadb05e3c4caa3d95ca7576e9837a290761c70cdb35fce0667f7f6f493b47",
+    "panel_content_hash": "d02068a58bcece8737c56d00f3f65e60a1b547f07cdb221410b7e46e5eb3eb77",
+    "errors": [],
+    "version": "eod_completeness_v1_3k5a"
+  },
+  "eod_audit_verdict": "PASS",
+  "calendar_identity": {
+    "calendar_id": "vn_hose_hnx_v1",
+    "version": "vn_trading_calendar_v1_2026",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "holiday_count": 11,
+    "override_count": 0
+  },
+  "calendar_eligibility": {
+    "trade_date": "2026-08-18",
+    "eligible": true,
+    "disposition": "ELIGIBLE",
+    "reason": "calendar_trading_session",
+    "is_weekend": false,
+    "is_holiday": false,
+    "is_closure_override": false,
+    "calendar_identity": {
+      "calendar_id": "vn_hose_hnx_v1",
+      "version": "vn_trading_calendar_v1_2026",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "holiday_count": 11,
+      "override_count": 0
+    }
+  },
+  "scheduler_contract": {
+    "activated": false,
+    "artifacts_prepared": true
+  },
+  "genesis_exists": false,
+  "live_forward_activated": false
+}

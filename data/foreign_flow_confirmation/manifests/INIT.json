@@ -1,0 +1,8 @@
+{
+  "namespace": "data/foreign_flow_confirmation",
+  "protocol_id": "ff_confirmation_v1",
+  "initialized": true,
+  "events": 0,
+  "outcomes": 0,
+  "note": "Empty ledger at protocol freeze. Forward panel not yet populated."
+}

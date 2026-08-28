@@ -1,0 +1,7 @@
+{
+  "t1_state": true,
+  "t1_action": true,
+  "t2_state": true,
+  "t2_action": true,
+  "t2_relationship": "PARTIAL_REPLICATION"
+}

@@ -21,6 +21,9 @@ from modules.edge_research.autonomous_daily_edge_ui import (
     build_autonomous_daily_edge_ui_view,
     render_autonomous_daily_edge_text_snapshot,
 )
+from modules.edge_research.opr_bridge.production_living_observation_persistence import (
+    session_voice_path,
+)
 from modules.edge_research.storage import resolve_production_runs_root
 
 
@@ -253,7 +256,7 @@ def test_explicit_older_date_still_resolvable_without_mutation(tmp_path: Path):
     assert view["session_date"] == "2026-08-27"
     assert view["discovery_count"] == 1
     assert _sha(v27) == before
-    assert (edge / "production_observations" / "daily_voices" / "session_2026-08-27.json").exists()
+    assert session_voice_path("2026-08-27", edge).exists()
 
 
 def test_ui_py_precedence_labels_challenger_not_as_research_voice():
