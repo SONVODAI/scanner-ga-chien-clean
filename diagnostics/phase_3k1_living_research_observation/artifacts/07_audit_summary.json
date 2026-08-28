@@ -1,0 +1,29 @@
+{
+  "head": "55f1a2ceceeed27dc8d0eea53ce0876e4a2c8a7d",
+  "phase": "3K.1",
+  "stop_boundary": "STOP_LIVING_RESEARCH_OBSERVATION_READY",
+  "cf_live_pass": true,
+  "historical_replay_days": 10,
+  "counts_as_forward_evidence": false,
+  "demonstrations": {
+    "unchanged_belief_days": [
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-26"
+    ],
+    "market_delta_days": [
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-26"
+    ],
+    "forward_horizon_arrival_days": [
+      "2026-07-28",
+      "2026-07-30"
+    ],
+    "changed_assessment_days": []
+  },
+  "trading_isolation_pass": true,
+  "hidden_answer_audit_pass": true,
+  "regressions_pass": true,
+  "phase_pass": true
+}

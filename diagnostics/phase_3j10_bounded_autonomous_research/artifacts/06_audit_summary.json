@@ -1,0 +1,10 @@
+{
+  "phase": "3J.10",
+  "branch": "cursor/phase-3j10-bounded-autonomous-research-lifecycle-aad2",
+  "git_head": "1232db6142d65d4bf075fe9433f1abd297e9b92b",
+  "cf_arl_all_passed": true,
+  "stop_resume_outcome": "SCIENTIFIC_STOP",
+  "experiment_three_generated": false,
+  "fresh_outcome": "BUDGET_EXHAUSTED",
+  "regression_failures": []
+}

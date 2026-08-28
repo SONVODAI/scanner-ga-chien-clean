@@ -1,0 +1,75 @@
+{
+  "mechanisms": [
+    {
+      "component": "executability_adapter.adapt_executability",
+      "location": "opr_bridge/executability_adapter.py",
+      "when": "At proposition emission (pipeline.py L126)",
+      "classification": "TOOL_BINDING_ONLY",
+      "notes": "Hardcodes partition_group_compare; single candidate; no comparison"
+    },
+    {
+      "component": "proposition_synthesizer.experiment_spec expectations",
+      "location": "opr_bridge/proposition_synthesizer.py",
+      "when": "At proposition birth",
+      "classification": "SCIENTIFIC_OBJECTIVE_DERIVED (partial)",
+      "notes": "falsifiable_expectation + disconfirming_observation_spec derived from contrast; tool named in BC_Q8"
+    },
+    {
+      "component": "scientific_action_generator",
+      "location": "opr_bridge/scientific_action_generator.py",
+      "when": "Post-synthesis only",
+      "classification": "NOT_APPLICABLE_AT_PROPOSITION_BIRTH",
+      "notes": "Requires EvidenceSynthesisRecord + ResearchPriorityDecision"
+    },
+    {
+      "component": "falsification_candidate_generator",
+      "location": "opr_bridge/falsification_candidate_generator.py",
+      "when": "Post-first-experiment + SEEK_FALSIFICATION",
+      "classification": "NOT_APPLICABLE_AT_PROPOSITION_BIRTH",
+      "notes": "Requires epistemic_update, research_decision, prior_tool_result_hash"
+    },
+    {
+      "component": "derive_proposition_vulnerabilities",
+      "location": "falsification_candidate_generator.py",
+      "when": "Callable at birth (unused for first experiment)",
+      "classification": "SCIENTIFIC_OBJECTIVE_DERIVED (partial)",
+      "notes": "Vulnerabilities from disconfirm spec; not wired to first-experiment selection"
+    },
+    {
+      "component": "research_actions.generate_action_candidates",
+      "location": "research_actions.py",
+      "when": "Post-experiment legacy planner",
+      "classification": "LEGACY_PRIOR",
+      "notes": "GAP \u2192 24 templates; blocked under OPR authority"
+    },
+    {
+      "component": "research_planner.plan_next_action",
+      "location": "research_planner.py",
+      "when": "Post-experiment",
+      "classification": "LEGACY_PRIOR",
+      "notes": "Weighted template ranking; not proposition-birth"
+    },
+    {
+      "component": "lifecycle_runner.run_minimal_lifecycle",
+      "location": "lifecycle_runner.py",
+      "when": "Manual/diagnostic with pre-selected spec",
+      "classification": "EXECUTION_UTILITY",
+      "notes": "Executes given spec; does not select first experiment"
+    },
+    {
+      "component": "production_orchestrator STOP_PROPOSITION_PERSISTED",
+      "location": "production_orchestrator.py",
+      "when": "3J.0 production birth",
+      "classification": "NOT_APPLICABLE_AT_PROPOSITION_BIRTH",
+      "notes": "Explicit stop before any experiment selection"
+    },
+    {
+      "component": "cohort_overlap_estimator",
+      "location": "cohort_overlap_estimator.py",
+      "when": "3I.17b post-synthesis actions",
+      "classification": "EXECUTION_UTILITY (reusable)",
+      "notes": "Can quantify birth-evidence overlap if wired at birth"
+    }
+  ],
+  "count": 10
+}
