@@ -1,9 +1,9 @@
 """
-Edge Research Engine V1 — orchestrator (Phase 0–4 / Phase A qualification).
+Edge Research Engine V1 — orchestrator (Phase 0–4 / Phase A + Phase B).
 
-No production coupling. Discovery → Challenger → freeze → prospective OOS →
-ACTIVE memory. Future Matcher, LIVE_FORWARD births, and BUY/execution are
-out of scope.
+No production BUY/execution coupling. Discovery → Challenger → freeze →
+prospective OOS → ACTIVE memory → isolated future recognition (LIVE_FORWARD
+research births). Phase C maturity/decay is out of scope.
 """
 
 from __future__ import annotations
@@ -103,7 +103,7 @@ class FoundationStatus:
 
 
 class EdgeResearchEngine:
-    """Research-only engine — foundation, discovery, challenger, freeze, OOS, memory."""
+    """Research-only engine — foundation, discovery, challenger, freeze, OOS, memory, recognition."""
 
     def __init__(self, data_dir: Optional[Path] = None) -> None:
         self.data_dir = resolve_data_dir(data_dir)
@@ -376,6 +376,37 @@ class EdgeResearchEngine:
             "migration_audit": audit.get("counts", {}),
             "errors": errors,
         }
+
+    def run_future_recognition(
+        self,
+        *,
+        trade_date: Optional[str] = None,
+        freeze_df: Optional[pd.DataFrame] = None,
+        freeze_path: Optional[Path] = None,
+        market_context: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Isolated Phase B recognition session.
+
+        Failures here must never corrupt earning-learning canonical truth or
+        Phase A qualification artifacts. Does not place orders or mature
+        forward outcomes.
+        """
+        from modules.edge_research.future_recognition import run_future_recognition as _run_fr
+
+        self.initialize()
+        result = _run_fr(
+            trade_date=trade_date,
+            data_dir=self.data_dir,
+            freeze_df=freeze_df,
+            freeze_path=freeze_path,
+            market_context=market_context,
+        )
+        try:
+            publish_durable(self.data_dir)
+        except Exception:
+            pass
+        return result
 
     @staticmethod
     def _format_challenger_voice(cr: Any) -> str:

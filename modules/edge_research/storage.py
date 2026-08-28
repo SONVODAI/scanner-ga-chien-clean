@@ -24,6 +24,7 @@ from modules.edge_research.contracts import (
     EDGE_VALIDATION_HISTORY_COLUMNS,
     ENGINE_VERSION,
     FROZEN_SPECS_DIRNAME,
+    EDGE_SESSION_ASSESSMENT_COLUMNS,
 )
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "edge_research"
@@ -37,6 +38,7 @@ LEDGER_FILES: Dict[str, Tuple[str, ...]] = {
     "discovery_runs.csv": DISCOVERY_RUN_COLUMNS,
     "edge_robustness_history.csv": EDGE_ROBUSTNESS_HISTORY_COLUMNS,
     "challenger_runs.csv": CHALLENGER_RUN_COLUMNS,
+    "edge_session_assessments.csv": EDGE_SESSION_ASSESSMENT_COLUMNS,
 }
 
 # Challenger persistence schema — explicit dtypes before categorical assignment.

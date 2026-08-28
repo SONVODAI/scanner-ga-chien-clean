@@ -46,6 +46,9 @@ OPTIONAL_ARTIFACT_NAMES: Tuple[str, ...] = (
     "edge_memory.csv",
     "edge_validation_history.csv",
     "frozen_specs.json",
+    "edge_forward_ledger.csv",
+    "edge_session_assessments.csv",
+    "latest_future_recognition.json",
 )
 
 
