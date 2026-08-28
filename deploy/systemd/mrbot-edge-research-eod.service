@@ -1,0 +1,16 @@
+[Unit]
+Description=Mr.BOT Edge Research headless EOD cycle (Phase A → C → B)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+EnvironmentFile=-/etc/mrbot/edge-research.env
+ExecStart=/opt/mrbot-camera-venv/bin/python -m modules.edge_research.eod_cycle
+Nice=10
+IOSchedulingClass=best-effort
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
