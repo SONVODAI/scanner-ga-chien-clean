@@ -6418,6 +6418,14 @@ except Exception as e:
     st.warning(f"Earning Learning: {type(e).__name__}: {e}")
 
 try:
+    from modules.edge_research.engine import EdgeResearchEngine
+
+    _edge_qual = EdgeResearchEngine()
+    _edge_qual.run_qualification_cycle()
+except Exception as _edge_qual_err:
+    st.caption(f"Edge Research qualification skipped: {_edge_qual_err}")
+
+try:
     from modules.regime_alpha_forward_eval import mature_forward_outcomes
 
     mature_forward_outcomes(
