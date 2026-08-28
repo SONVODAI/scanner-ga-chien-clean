@@ -1,0 +1,27 @@
+{
+  "record_version": "initial_experiment_objective_v1_design_3j1",
+  "purpose": "State what uncertainty the first experiment should reduce, derived from proposition commitments",
+  "required_fields": {
+    "objective_id": "stable id",
+    "proposition_id": "parent proposition",
+    "proposition_hash": "immutable commitment anchor",
+    "target_uncertainty": "derived from falsifiable_expectation / disconfirming_observation_spec / canonical core",
+    "scientific_vulnerability": "e.g. directional_reversal, episode_artifact, population_specificity",
+    "why_first": "Why this uncertainty ranks first before any evidence",
+    "outcome_branches": {
+      "more_credible": "pre-result description",
+      "less_credible": "pre-result description",
+      "unresolved": "pre-result description"
+    },
+    "forbidden_rescue_mutations": "from proposition commitments",
+    "provenance": "fields used for derivation \u2014 no tool names required"
+  },
+  "derivation_sources_at_birth": [
+    "falsifiable_expectation",
+    "disconfirming_observation_spec",
+    "null_competing_explanation",
+    "canonical_proposition_core",
+    "observation_provenance.structural_context"
+  ],
+  "capability_gap": "No production module derives InitialExperimentObjectiveRecord at STOP_PROPOSITION_PERSISTED"
+}
