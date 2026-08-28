@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
-ENGINE_VERSION = "4.0.0-qualification"
+ENGINE_VERSION = "5.0.0-future-recognition"
 GUARDRAILS_CONFIG_VERSION = "guardrails_v1"
 DISCOVERY_CONFIG_VERSION = "discovery_v1"
 ROBUSTNESS_CONFIG_VERSION = "robustness_v1"
@@ -58,6 +58,19 @@ EDGE_MEMORY_STATUS_ACTIVE = "ACTIVE"
 EDGE_MEMORY_STATUS_INACTIVE = "INACTIVE"
 
 FROZEN_SPECS_DIRNAME = "frozen_specs"
+FUTURE_RECOGNITION_VERSION = "future_recognition_v1"
+
+ASSESSMENT_QUALIFIED_MATCH_FOUND = "QUALIFIED_MATCH_FOUND"
+ASSESSMENT_NO_QUALIFIED_MATCH = "NO_QUALIFIED_MATCH"
+ASSESSMENT_UNABLE_TO_ASSESS = "UNABLE_TO_ASSESS"
+
+CONTEXT_COMPATIBLE = "COMPATIBLE"
+CONTEXT_INCOMPATIBLE = "INCOMPATIBLE"
+CONTEXT_UNKNOWN = "UNKNOWN"
+
+FORWARD_OUTCOME_PENDING = "PENDING"
+
+REASON_NO_ACTIVE_EDGE_AVAILABLE = "NO_ACTIVE_EDGE_AVAILABLE"
 
 # Fixed robustness thresholds — NOT optimized from returns.
 DATE_CONCENTRATION_SEVERE = 0.50
@@ -336,6 +349,60 @@ EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
     "symbol",
     "frozen_at",
     "outcome_status",
+    # Phase B additive birth fields
+    "edge_id",
+    "t0_trade_date",
+    "born_at",
+    "spec_path",
+    "spec_hash",
+    "spec_schema_version",
+    "feature_bucket_config_version",
+    "market_state_config_version",
+    "market_state_t0",
+    "market_transition_t0",
+    "context_verdict",
+    "context_reason",
+    "stock_feature_values_json",
+    "matched_clauses_json",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "active_status_at_birth",
+    "oos_evidence_json",
+    "universe_count",
+    "universe_hash",
+    "pit_artifact",
+    "pit_artifact_hash",
+    "assessment_run_id",
+    "selection_reason",
+    "selection_reason_vi",
+    "research_label",
+)
+
+EDGE_SESSION_ASSESSMENT_COLUMNS: Tuple[str, ...] = (
+    "trade_date",
+    "run_id",
+    "started_at",
+    "completed_at",
+    "assessment_state",
+    "reason",
+    "t0_source_status",
+    "universe_count",
+    "universe_hash",
+    "active_edge_count",
+    "edges_loaded_ok",
+    "edges_uninterpretable",
+    "edges_context_compatible",
+    "edges_context_incompatible",
+    "edges_context_unknown",
+    "stock_edge_evaluations",
+    "qualified_match_count",
+    "new_birth_count",
+    "duplicate_skip_count",
+    "matcher_version",
+    "spec_schema_version",
+    "pit_artifact",
+    "failure_detail",
 )
 
 RESEARCH_OBSERVATION_COLUMNS: Tuple[str, ...] = (

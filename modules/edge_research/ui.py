@@ -243,6 +243,82 @@ def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _render_future_recognition_assessment(st: Any, assessment: Mapping[str, Any]) -> None:
+    """Minimum operator surface for QUALIFIED / NO MATCH / UNABLE."""
+    from modules.edge_research.contracts import (
+        ASSESSMENT_NO_QUALIFIED_MATCH,
+        ASSESSMENT_QUALIFIED_MATCH_FOUND,
+        ASSESSMENT_UNABLE_TO_ASSESS,
+        REASON_NO_ACTIVE_EDGE_AVAILABLE,
+    )
+    from modules.edge_research.forward_ledger import RESEARCH_LABEL
+
+    if not assessment:
+        st.error("UNABLE TO ASSESS")
+        st.markdown(
+            "Reason: canonical session assessment has not run yet "
+            "(no `latest_future_recognition.json`)."
+        )
+        st.caption("This is not 'no opportunities today.'")
+        return
+    state = str(assessment.get("assessment_state") or ASSESSMENT_UNABLE_TO_ASSESS)
+    reason = str(assessment.get("reason") or "")
+    if assessment.get("trade_date"):
+        st.caption(f"Session `{assessment.get('trade_date')}` · run `{assessment.get('run_id') or ''}`")
+    if state == ASSESSMENT_QUALIFIED_MATCH_FOUND:
+        st.success("QUALIFIED MATCH FOUND")
+        matches = list(assessment.get("matches") or [])
+        if not matches:
+            st.markdown("Qualified births are in `edge_forward_ledger.csv`.")
+        for match in matches:
+            oos = match.get("oos_evidence") or {}
+            st.markdown(
+                f"**{match.get('symbol')}** · `{match.get('edge_id')}` · LIVE_FORWARD"
+            )
+            st.markdown(
+                f"Market context: **{match.get('context_verdict')}** — {match.get('context_reason')}"
+            )
+            st.markdown(f"Why selected: `{match.get('condition_text')}`")
+            st.markdown(f"Expected horizon: **{match.get('best_horizon')}**")
+            st.markdown(
+                "Edge evidence: ACTIVE"
+                f" · OOS n={oos.get('oos_candidate_n', '—')}"
+                f" · incremental median={oos.get('oos_incremental_median', '—')}"
+                f" · episodes={oos.get('episode_count', '—')}"
+            )
+            st.caption(str(match.get("research_label") or RESEARCH_LABEL))
+            if match.get("selection_reason"):
+                st.markdown(f"Reason: {match.get('selection_reason')}")
+            if match.get("selection_reason_vi"):
+                st.caption(str(match.get("selection_reason_vi")))
+        return
+    if state == ASSESSMENT_NO_QUALIFIED_MATCH:
+        st.info("NO QUALIFIED MATCH")
+        st.markdown("Assessment completed successfully.")
+        st.markdown(
+            f"ACTIVE edges checked: **{assessment.get('active_edge_count', 0)}**  \n"
+            f"Compatible edges: **{assessment.get('edges_context_compatible', 0)}**  \n"
+            f"Universe scanned: **{assessment.get('universe_count', 0)}**  \n"
+            f"Qualified stocks: **{assessment.get('qualified_match_count', 0)}**"
+        )
+        if reason == REASON_NO_ACTIVE_EDGE_AVAILABLE:
+            st.markdown(
+                "Reason: **NO_ACTIVE_EDGE_AVAILABLE** — the BOT assessed its current "
+                "reusable knowledge and had nothing scientifically allowed to apply."
+            )
+        else:
+            st.markdown(
+                f"Reason: {reason or 'No current stock satisfies an ACTIVE learned edge in compatible context.'}"
+            )
+        st.caption(RESEARCH_LABEL)
+        return
+    st.error("UNABLE TO ASSESS")
+    st.markdown(f"Reason: {reason or 'assessment could not be completed scientifically.'}")
+    if assessment.get("failure_detail"):
+        st.caption(str(assessment.get("failure_detail")))
+    st.caption("This is not 'no opportunities today.'")
+
+
 def compute_edge_research_button_state(
     *,
     coverage_start: Optional[str],
@@ -370,6 +446,23 @@ def render_edge_research_panel(
         render_autonomous_daily_edge_block(st, autonomous_view)
     except Exception as auto_exc:  # noqa: BLE001
         st.warning(f"Autonomous daily research view unavailable: {auto_exc}")
+
+    try:
+        from modules.edge_research.forward_ledger import read_latest_assessment
+        from modules.edge_research.future_recognition import format_future_recognition_operator_text
+
+        fr_assessment = read_latest_assessment()
+        st.markdown("### FUTURE RECOGNITION — LIVE_FORWARD")
+        st.caption(
+            "RESEARCH MATCH — NOT AUTOMATIC BUY. "
+            "Scans ACTIVE BOT-learned edges against the canonical T0 freeze. "
+            "Opening this expander does not run matching."
+        )
+        _render_future_recognition_assessment(st, fr_assessment)
+        with st.expander("Future recognition machine record", expanded=False):
+            st.text(format_future_recognition_operator_text(fr_assessment))
+    except Exception as fr_exc:  # noqa: BLE001
+        st.warning(f"UNABLE TO ASSESS — future recognition surface unavailable: {fr_exc}")
 
     st.markdown("---")
     st.markdown(f"### {HISTORICAL_CHALLENGER_SECTION.replace('_', ' ')}")
