@@ -1,0 +1,122 @@
+{
+  "decisions": [
+    {
+      "decision_index": 1,
+      "selected_source": "LOCAL",
+      "selected_erv": 16.83,
+      "best_local_erv": 16.83,
+      "best_frontier_erv": 0.0,
+      "best_global_alternative_erv": 14.83,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 2,
+      "selected_source": "LOCAL",
+      "selected_erv": 12.385625,
+      "best_local_erv": 12.385625,
+      "best_frontier_erv": 8.08875,
+      "best_global_alternative_erv": 11.08875,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 3,
+      "selected_source": "FRONTIER",
+      "selected_erv": 4.968750000000002,
+      "best_local_erv": 0.0,
+      "best_frontier_erv": 4.968750000000002,
+      "best_global_alternative_erv": 4.968750000000002,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 4,
+      "selected_source": "LOCAL",
+      "selected_erv": 5.49,
+      "best_local_erv": 5.49,
+      "best_frontier_erv": 0.9733333333333335,
+      "best_global_alternative_erv": 5.49,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 5,
+      "selected_source": "LOCAL",
+      "selected_erv": 9.69018675,
+      "best_local_erv": 9.69018675,
+      "best_frontier_erv": 2.029583333333333,
+      "best_global_alternative_erv": 7.04018675,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 6,
+      "selected_source": "REVISIT",
+      "selected_erv": 4.2508541666666675,
+      "best_local_erv": 1.9866875000000004,
+      "best_frontier_erv": 4.2508541666666675,
+      "best_global_alternative_erv": 4.2508541666666675,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 7,
+      "selected_source": "LOCAL",
+      "selected_erv": 1.5318749999999997,
+      "best_local_erv": 1.5318749999999997,
+      "best_frontier_erv": -1.4606250000000007,
+      "best_global_alternative_erv": 1.5318749999999997,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 8,
+      "selected_source": "LOCAL",
+      "selected_erv": 4.815312500000003,
+      "best_local_erv": 4.815312500000003,
+      "best_frontier_erv": -2.357187499999998,
+      "best_global_alternative_erv": 2.5828125000000015,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 9,
+      "selected_source": "REVISIT",
+      "selected_erv": 0.9636874999999998,
+      "best_local_erv": -1.2463125000000006,
+      "best_frontier_erv": 0.9636874999999998,
+      "best_global_alternative_erv": 0.9636874999999998,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 10,
+      "selected_source": "LOCAL",
+      "selected_erv": -3.0982499999999993,
+      "best_local_erv": -3.0982499999999993,
+      "best_frontier_erv": -4.45825,
+      "best_global_alternative_erv": -3.0982499999999993,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    },
+    {
+      "decision_index": 11,
+      "selected_source": "LOCAL",
+      "selected_erv": 1.552375000000001,
+      "best_local_erv": 1.552375000000001,
+      "best_frontier_erv": -6.807625000000001,
+      "best_global_alternative_erv": -1.032625,
+      "opportunity_cost": 0.0,
+      "context_switch": false
+    }
+  ],
+  "global_context_switch_count": 3,
+  "negative_local_with_positive_global_alternative": 0,
+  "negative_local_cases": [],
+  "strong_local_beats_frontier_count": 8,
+  "frontier_interrupts_viable_local": 1,
+  "systematic_superior_alternative_ignored": false,
+  "primary_layer": "B14",
+  "note": "Allocator switched to FRONTIER once (T3) and REVISIT twice (T6,T9); no negative-local-with-positive-global pattern."
+}

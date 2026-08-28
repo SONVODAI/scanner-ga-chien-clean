@@ -1,0 +1,17 @@
+{
+  "forbidden_tokens_checked": [
+    "bb10_special_case",
+    "blind_benchmark",
+    "branch_depth_stop_threshold",
+    "branch_quota",
+    "chatgpt",
+    "diversity_bonus",
+    "force_switch",
+    "negative_erv_stop_rule",
+    "stop_bonus"
+  ],
+  "scanner_vocabulary_file": "modules/edge_research/exit_valuation_negative_control_tokens.py",
+  "implementation_hits": {},
+  "passed": true,
+  "scanned_at": "2026-08-22T01:02:08Z"
+}

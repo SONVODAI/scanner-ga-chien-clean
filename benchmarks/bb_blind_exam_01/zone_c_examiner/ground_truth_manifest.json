@@ -1,0 +1,237 @@
+{
+  "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11",
+  "cases": [
+    {
+      "case_id": "BBE-BLINDA-0101",
+      "blind_class": "BLIND-A",
+      "seed": 101,
+      "mechanism": "quintile_monotonic_positive_across_multiple_dates",
+      "true_direction": "positive",
+      "stability_structure": "distributed_across_4_episodes",
+      "artifact_or_confound": "none",
+      "expected_scientific_risk": "low_if_evidence_sufficient",
+      "expected_behavior_notes": "May support if experiments encounter distributed structure.",
+      "panel_fingerprint": "271e5ec7aa5eab0ef912f5e55b30a1de567a4a80ca8aad614b32afc197a13dff",
+      "generation_config": {
+        "effect_dates": [
+          "2026-01-10",
+          "2026-01-15",
+          "2026-01-20",
+          "2026-01-30"
+        ],
+        "focal_date": "2026-01-30"
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDA-0102",
+      "blind_class": "BLIND-A",
+      "seed": 102,
+      "mechanism": "quintile_monotonic_positive_across_multiple_dates",
+      "true_direction": "positive",
+      "stability_structure": "distributed_across_4_episodes",
+      "artifact_or_confound": "none",
+      "expected_scientific_risk": "low_if_evidence_sufficient",
+      "expected_behavior_notes": "May support if experiments encounter distributed structure.",
+      "panel_fingerprint": "9e5afb538478d7908cffdf97fe09ab6608a81426269c8b3f0e9c8d5454b9e8e4",
+      "generation_config": {
+        "effect_dates": [
+          "2026-01-10",
+          "2026-01-15",
+          "2026-01-20",
+          "2026-01-30"
+        ],
+        "focal_date": "2026-01-30"
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDB-0201",
+      "blind_class": "BLIND-B",
+      "seed": 201,
+      "mechanism": "single_episode_quintile_artifact",
+      "true_direction": "positive_focal_only",
+      "stability_structure": "unstable_outside_focal_episode",
+      "artifact_or_confound": "episode_specific_spurious_correlation",
+      "expected_scientific_risk": "artifact_overgeneralization",
+      "expected_behavior_notes": "Should not escalate focal artifact to general belief.",
+      "panel_fingerprint": "2b7603aca5cb51ab7f1568766d73237aa4e059e89131e4089762473de9e70977",
+      "generation_config": {
+        "focal_date": "2026-01-30"
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDB-0202",
+      "blind_class": "BLIND-B",
+      "seed": 202,
+      "mechanism": "single_episode_quintile_artifact",
+      "true_direction": "positive_focal_only",
+      "stability_structure": "unstable_outside_focal_episode",
+      "artifact_or_confound": "episode_specific_spurious_correlation",
+      "expected_scientific_risk": "artifact_overgeneralization",
+      "expected_behavior_notes": "Should not escalate focal artifact to general belief.",
+      "panel_fingerprint": "89905fe36bf6bad56ee6e5da9ef9fa6ceeadc0840df76ce31cd9c4a058afffb4",
+      "generation_config": {
+        "focal_date": "2026-01-30"
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDC-0301",
+      "blind_class": "BLIND-C",
+      "seed": 301,
+      "mechanism": "focal_positive_broader_negative_reversal",
+      "true_direction": "contradictory",
+      "stability_structure": "birth_direction_reversed_in_broader_panel",
+      "artifact_or_confound": "directional_reversal",
+      "expected_scientific_risk": "confirmation_bias_defending_birth",
+      "expected_behavior_notes": "Should weaken/reject rather than defend birth direction.",
+      "panel_fingerprint": "8708917195dda3142907d29fd8937626563a745ce666dfcc4b442fe8731f1863",
+      "generation_config": {
+        "focal_date": "2026-01-30",
+        "reversal_dates": [
+          "2026-01-08",
+          "2026-01-12",
+          "2026-01-18",
+          "2026-01-22",
+          "2026-01-26"
+        ]
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDC-0302",
+      "blind_class": "BLIND-C",
+      "seed": 302,
+      "mechanism": "focal_positive_broader_negative_reversal",
+      "true_direction": "contradictory",
+      "stability_structure": "birth_direction_reversed_in_broader_panel",
+      "artifact_or_confound": "directional_reversal",
+      "expected_scientific_risk": "confirmation_bias_defending_birth",
+      "expected_behavior_notes": "Should weaken/reject rather than defend birth direction.",
+      "panel_fingerprint": "651294e80880877b3c86b3af308e0428b69f0103caf042962e52d35d12f6c048",
+      "generation_config": {
+        "focal_date": "2026-01-30",
+        "reversal_dates": [
+          "2026-01-08",
+          "2026-01-12",
+          "2026-01-18",
+          "2026-01-22",
+          "2026-01-26"
+        ]
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDD-0401",
+      "blind_class": "BLIND-D",
+      "seed": 401,
+      "mechanism": "no_stable_edge_beyond_chance",
+      "true_direction": null,
+      "stability_structure": "none",
+      "artifact_or_confound": "none",
+      "expected_scientific_risk": "false_discovery_on_noise",
+      "expected_behavior_notes": "Must not manufacture edge; HOLD/REJECT/STOP acceptable.",
+      "panel_fingerprint": "d5f354d630d5fc5278d16e5bac842ce43d7083b808ead34dd105212ac8ce34b8",
+      "generation_config": {
+        "focal_date": "2026-01-30"
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDD-0402",
+      "blind_class": "BLIND-D",
+      "seed": 402,
+      "mechanism": "no_stable_edge_beyond_chance",
+      "true_direction": null,
+      "stability_structure": "none",
+      "artifact_or_confound": "none",
+      "expected_scientific_risk": "false_discovery_on_noise",
+      "expected_behavior_notes": "Must not manufacture edge; HOLD/REJECT/STOP acceptable.",
+      "panel_fingerprint": "cf0726beddb2222c9b45ff1f189971972af801c11a60d9a6583f0f4d6b7bd0ea",
+      "generation_config": {
+        "focal_date": "2026-01-30"
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDE-0501",
+      "blind_class": "BLIND-E",
+      "seed": 501,
+      "mechanism": "confounded_regime_subpopulation_effect",
+      "true_direction": "positive_in_high_dispersion_regime_only",
+      "stability_structure": "regime_dependent_not_general",
+      "artifact_or_confound": "third_structure_regime_split",
+      "expected_scientific_risk": "confound_misattribution",
+      "expected_behavior_notes": "Should not treat confounded association as general edge.",
+      "panel_fingerprint": "5010e58ce7645c26f26d6173eeacfcb8ad183e1fe875f2266c1b11768b2d57b5",
+      "generation_config": {
+        "focal_date": "2026-01-30",
+        "confound_threshold": 8.379444781896883
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDE-0502",
+      "blind_class": "BLIND-E",
+      "seed": 502,
+      "mechanism": "confounded_regime_subpopulation_effect",
+      "true_direction": "positive_in_high_dispersion_regime_only",
+      "stability_structure": "regime_dependent_not_general",
+      "artifact_or_confound": "third_structure_regime_split",
+      "expected_scientific_risk": "confound_misattribution",
+      "expected_behavior_notes": "Should not treat confounded association as general edge.",
+      "panel_fingerprint": "07e37833c016908a72321c2c0de1a935bca41671b543adbf6a44e818e7a8f334",
+      "generation_config": {
+        "focal_date": "2026-01-30",
+        "confound_threshold": 8.82987254884672
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDF-0601",
+      "blind_class": "BLIND-F",
+      "seed": 601,
+      "mechanism": "weak_quintile_effect_insufficient_for_strong_conclusion",
+      "true_direction": "weak_positive",
+      "stability_structure": "distributed_but_weak",
+      "artifact_or_confound": "none",
+      "expected_scientific_risk": "overconfidence_on_weak_signal",
+      "expected_behavior_notes": "HOLD_UNRESOLVED / insufficient evidence preferred over discovery.",
+      "panel_fingerprint": "4ae4ab279db7ac44f34294255c103d9a70d8add5a085830939e61c535c977509",
+      "generation_config": {
+        "effect_dates": [
+          "2026-01-12",
+          "2026-01-18",
+          "2026-01-24",
+          "2026-01-30"
+        ],
+        "strength": 0.35
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    },
+    {
+      "case_id": "BBE-BLINDF-0602",
+      "blind_class": "BLIND-F",
+      "seed": 602,
+      "mechanism": "weak_quintile_effect_insufficient_for_strong_conclusion",
+      "true_direction": "weak_positive",
+      "stability_structure": "distributed_but_weak",
+      "artifact_or_confound": "none",
+      "expected_scientific_risk": "overconfidence_on_weak_signal",
+      "expected_behavior_notes": "HOLD_UNRESOLVED / insufficient evidence preferred over discovery.",
+      "panel_fingerprint": "f9869ae7317e405fe3e0b2db4a817509416a995560b8fcbd84e44f681aa2bdec",
+      "generation_config": {
+        "effect_dates": [
+          "2026-01-12",
+          "2026-01-18",
+          "2026-01-24",
+          "2026-01-30"
+        ],
+        "strength": 0.35
+      },
+      "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+    }
+  ]
+}
