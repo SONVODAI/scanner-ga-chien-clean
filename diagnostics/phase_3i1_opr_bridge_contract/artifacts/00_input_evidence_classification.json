@@ -1,0 +1,94 @@
+{
+  "phase": "3I.1",
+  "version": "input_evidence_classification_v1",
+  "purpose": "Classify every potential OPR bridge input so human ontology is not mistaken for independent observational creativity",
+  "classes": {
+    "RAW_DERIVED_MARKET_EVIDENCE": {
+      "definition": "Empirical quantities computed from panel rows or tool outputs without presupposing a hypothesis family",
+      "examples": [
+        "cohort_n, cohort_mean, cohort_median, cohort_win_rate",
+        "median_spread, outcome_spread, group_count",
+        "largest_date_share, unique_t0_dates, largest_symbol_share",
+        "horizon group return distributions",
+        "partition bin means and counts",
+        "threshold region effect sizes",
+        "correlation/co-concentration diagnostics",
+        "temporal consistency statistics",
+        "leave-one-out sensitivity deltas",
+        "residual structure from decomposition tools"
+      ],
+      "opr_allowed_as_primary_provenance": true,
+      "code_references": [
+        "modules/edge_research/research_tools.py (ToolResult.metrics, observation.payload)",
+        "modules/edge_research/research_shape.py",
+        "modules/edge_research/research_adaptive_tools.py"
+      ]
+    },
+    "HUMAN_DEFINED_DESCRIPTIVE_ONTOLOGY": {
+      "definition": "Developer-authored labels that summarize evidence into fixed semantic categories",
+      "examples": [
+        "OBS_* codes (DATE_CONCENTRATED, HORIZON_HETEROGENEOUS, SHAPE_GRADIENT, etc.)",
+        "GAP_* codes (TIME_DISTRIBUTION, HORIZON_STABILITY, etc.)",
+        "FALSIFY_* targets",
+        "ResearchAssessment flags (interesting, conditional_candidate, etc.)",
+        "ObservationKind classifications",
+        "DescriptiveStrength enums",
+        "ResearchNeedType mappings"
+      ],
+      "opr_allowed_as_primary_provenance": false,
+      "may_appear_as_secondary_index": true,
+      "note": "OBS/GAP may index evidence but cannot alone satisfy observation_provenance"
+    },
+    "HUMAN_SCIENTIFIC_PRIOR": {
+      "definition": "Structures that implicitly prescribe what relationships are interesting or askable",
+      "examples": [
+        "24 question_template_id families",
+        "Fixed question_text strings in research_actions.py",
+        "ROOT_CONFIG bootstrap question",
+        "SEARCH_FEATURES / FEATURE_BUCKETS",
+        "FrameTransformationType catalog",
+        "ResearchNeedType → tool mappings",
+        "Initial population/outcome in benchmark seed"
+      ],
+      "opr_allowed_as_input": false,
+      "opr_allowed_for_isomorphism_audit_only": true
+    },
+    "EXECUTION_METADATA": {
+      "definition": "Constraints required to produce executable ExperimentSpec without prescribing scientific content",
+      "examples": [
+        "Tool registry and capabilities",
+        "RETURN_COLUMNS / legal outcome fields",
+        "PopulationSpec / OutcomeSpec grammar kinds",
+        "Horizon lists (T3/T5/T10)",
+        "Panel preflight eligible_explanatory",
+        "Prohibited feature columns",
+        "data_cutoff_date",
+        "ExperimentSpec schema",
+        "Experiment content hash / dedup rules"
+      ],
+      "opr_allowed_as_input": true,
+      "must_not_prescribe_proposition": true
+    }
+  },
+  "inventory_by_current_module": {
+    "ToolResult.metrics": "RAW_DERIVED_MARKET_EVIDENCE",
+    "ToolResult.observations[].payload": "RAW_DERIVED_MARKET_EVIDENCE (when numeric/structural)",
+    "ToolResult.observations[].code": "HUMAN_DEFINED_DESCRIPTIVE_ONTOLOGY",
+    "ResearchAssessment.information_gaps": "HUMAN_DEFINED_DESCRIPTIVE_ONTOLOGY",
+    "ResearchAssessment.possible_falsification_targets": "HUMAN_DEFINED_DESCRIPTIVE_ONTOLOGY",
+    "generate_action_candidates templates": "HUMAN_SCIENTIFIC_PRIOR",
+    "propose_outcome_reframes": "HUMAN_SCIENTIFIC_PRIOR (bounded combinatorics)",
+    "PopulationSpec.from_panel_column": "EXECUTION_METADATA + RAW (column values)",
+    "build_panel_preflight": "EXECUTION_METADATA"
+  },
+  "opr_bridge_may_read": [
+    "RAW_DERIVED_MARKET_EVIDENCE",
+    "EXECUTION_METADATA"
+  ],
+  "opr_bridge_may_index_not_derive_from": [
+    "HUMAN_DEFINED_DESCRIPTIVE_ONTOLOGY"
+  ],
+  "opr_bridge_must_not_read_for_synthesis": [
+    "HUMAN_SCIENTIFIC_PRIOR"
+  ]
+}

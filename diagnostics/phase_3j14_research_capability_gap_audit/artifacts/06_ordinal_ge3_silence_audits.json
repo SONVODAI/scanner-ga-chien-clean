@@ -1,0 +1,907 @@
+[
+  {
+    "experiment_ordinal": 3,
+    "package_disposition": "NO_FAITHFUL_EXPERIMENT",
+    "silence_classification": {
+      "audit_version": "bb_capability_gap_audit_silence_classifier_v1_3j14",
+      "classification": "REDUNDANCY_STOP",
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION",
+      "experiment_ordinal": 3,
+      "generator_version": "follow_on_experiment_generator_v1_3j13",
+      "candidate_count": 2,
+      "admissible_count": 0,
+      "rejection_reasons_aggregate": [
+        "previously_rejected_core_hash",
+        "representation_alias_core_hash_match"
+      ],
+      "grammar_families_for_null": [
+        {
+          "family": "counterexample_period_search",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        },
+        {
+          "family": "episode_holdout_excluding_motivating",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        }
+      ],
+      "families_exhausted": true,
+      "toolbox_coverage": {
+        "audit_version": "bb_capability_gap_audit_toolbox_map_v1_3j14",
+        "rows": [
+          {
+            "null_key": "directional_reversal",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "directional_effect_full_universe",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": true,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "counterexample_period_search",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "episode_holdout_excluding_motivating",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "population_concentration",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "population_generalization",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "context_instability",
+            "cohort_strategy": "regime_partition_contrast",
+            "target_uncertainty": "context_stability",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          }
+        ],
+        "unrepresented_categories": [
+          {
+            "category": "independent_temporal_episode",
+            "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+          },
+          {
+            "category": "interaction_test",
+            "description": "Conditional effect test across feature \u00d7 context interaction"
+          },
+          {
+            "category": "alternative_outcome_semantics",
+            "description": "Same scientific question with orthogonal outcome field / horizon"
+          },
+          {
+            "category": "negative_control",
+            "description": "Explicit negative-control population or sham contrast"
+          },
+          {
+            "category": "orthogonal_measurement",
+            "description": "Different tool/representation answering same null when quintile path exhausted"
+          }
+        ],
+        "null_keys_in_grammar": [
+          "directional_reversal",
+          "episode_artifact",
+          "population_concentration",
+          "context_instability"
+        ]
+      },
+      "rationale": [
+        "all_faithful_families_redundant_or_exhausted"
+      ],
+      "rejected_selector": [
+        {
+          "candidate_id": "sec-7e6718d12cc7",
+          "reasons": "representation_alias_core_hash_match; previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "counterexample_period_search"
+        },
+        {
+          "candidate_id": "sec-3f887839382e",
+          "reasons": "previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "episode_holdout_excluding_motivating"
+        }
+      ]
+    },
+    "capability_probe": {
+      "audit_version": "bb_capability_gap_audit_capability_probe_v1_3j14",
+      "gap_found": false,
+      "abstract_gaps": [],
+      "known_unrepresented_categories": [
+        {
+          "category": "independent_temporal_episode",
+          "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+        },
+        {
+          "category": "interaction_test",
+          "description": "Conditional effect test across feature \u00d7 context interaction"
+        },
+        {
+          "category": "alternative_outcome_semantics",
+          "description": "Same scientific question with orthogonal outcome field / horizon"
+        },
+        {
+          "category": "negative_control",
+          "description": "Explicit negative-control population or sham contrast"
+        },
+        {
+          "category": "orthogonal_measurement",
+          "description": "Different tool/representation answering same null when quintile path exhausted"
+        }
+      ],
+      "notes": [
+        "unexercised_grammar_families_remain_but_all_inadmissible"
+      ],
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION"
+    },
+    "prior_decision_summary": {
+      "chosen_action": "SEEK_FALSIFICATION",
+      "decision_kind": "ACTION"
+    },
+    "seed": 501
+  },
+  {
+    "experiment_ordinal": 3,
+    "package_disposition": "NO_FAITHFUL_EXPERIMENT",
+    "silence_classification": {
+      "audit_version": "bb_capability_gap_audit_silence_classifier_v1_3j14",
+      "classification": "REDUNDANCY_STOP",
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION",
+      "experiment_ordinal": 3,
+      "generator_version": "follow_on_experiment_generator_v1_3j13",
+      "candidate_count": 2,
+      "admissible_count": 0,
+      "rejection_reasons_aggregate": [
+        "previously_rejected_core_hash",
+        "representation_alias_core_hash_match"
+      ],
+      "grammar_families_for_null": [
+        {
+          "family": "counterexample_period_search",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        },
+        {
+          "family": "episode_holdout_excluding_motivating",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        }
+      ],
+      "families_exhausted": true,
+      "toolbox_coverage": {
+        "audit_version": "bb_capability_gap_audit_toolbox_map_v1_3j14",
+        "rows": [
+          {
+            "null_key": "directional_reversal",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "directional_effect_full_universe",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": true,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "counterexample_period_search",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "episode_holdout_excluding_motivating",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "population_concentration",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "population_generalization",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "context_instability",
+            "cohort_strategy": "regime_partition_contrast",
+            "target_uncertainty": "context_stability",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          }
+        ],
+        "unrepresented_categories": [
+          {
+            "category": "independent_temporal_episode",
+            "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+          },
+          {
+            "category": "interaction_test",
+            "description": "Conditional effect test across feature \u00d7 context interaction"
+          },
+          {
+            "category": "alternative_outcome_semantics",
+            "description": "Same scientific question with orthogonal outcome field / horizon"
+          },
+          {
+            "category": "negative_control",
+            "description": "Explicit negative-control population or sham contrast"
+          },
+          {
+            "category": "orthogonal_measurement",
+            "description": "Different tool/representation answering same null when quintile path exhausted"
+          }
+        ],
+        "null_keys_in_grammar": [
+          "directional_reversal",
+          "episode_artifact",
+          "population_concentration",
+          "context_instability"
+        ]
+      },
+      "rationale": [
+        "all_faithful_families_redundant_or_exhausted"
+      ],
+      "rejected_selector": [
+        {
+          "candidate_id": "sec-5fa3add02889",
+          "reasons": "representation_alias_core_hash_match; previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "counterexample_period_search"
+        },
+        {
+          "candidate_id": "sec-fbeaf99b8bd1",
+          "reasons": "previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "episode_holdout_excluding_motivating"
+        }
+      ]
+    },
+    "capability_probe": {
+      "audit_version": "bb_capability_gap_audit_capability_probe_v1_3j14",
+      "gap_found": false,
+      "abstract_gaps": [],
+      "known_unrepresented_categories": [
+        {
+          "category": "independent_temporal_episode",
+          "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+        },
+        {
+          "category": "interaction_test",
+          "description": "Conditional effect test across feature \u00d7 context interaction"
+        },
+        {
+          "category": "alternative_outcome_semantics",
+          "description": "Same scientific question with orthogonal outcome field / horizon"
+        },
+        {
+          "category": "negative_control",
+          "description": "Explicit negative-control population or sham contrast"
+        },
+        {
+          "category": "orthogonal_measurement",
+          "description": "Different tool/representation answering same null when quintile path exhausted"
+        }
+      ],
+      "notes": [
+        "unexercised_grammar_families_remain_but_all_inadmissible"
+      ],
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION"
+    },
+    "prior_decision_summary": {
+      "chosen_action": "SEEK_FALSIFICATION",
+      "decision_kind": "ACTION"
+    },
+    "seed": 502
+  },
+  {
+    "experiment_ordinal": 3,
+    "package_disposition": "NO_FAITHFUL_EXPERIMENT",
+    "silence_classification": {
+      "audit_version": "bb_capability_gap_audit_silence_classifier_v1_3j14",
+      "classification": "REDUNDANCY_STOP",
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION",
+      "experiment_ordinal": 3,
+      "generator_version": "follow_on_experiment_generator_v1_3j13",
+      "candidate_count": 2,
+      "admissible_count": 0,
+      "rejection_reasons_aggregate": [
+        "previously_rejected_core_hash",
+        "representation_alias_core_hash_match"
+      ],
+      "grammar_families_for_null": [
+        {
+          "family": "counterexample_period_search",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        },
+        {
+          "family": "episode_holdout_excluding_motivating",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        }
+      ],
+      "families_exhausted": true,
+      "toolbox_coverage": {
+        "audit_version": "bb_capability_gap_audit_toolbox_map_v1_3j14",
+        "rows": [
+          {
+            "null_key": "directional_reversal",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "directional_effect_full_universe",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": true,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "counterexample_period_search",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "episode_holdout_excluding_motivating",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "population_concentration",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "population_generalization",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "context_instability",
+            "cohort_strategy": "regime_partition_contrast",
+            "target_uncertainty": "context_stability",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          }
+        ],
+        "unrepresented_categories": [
+          {
+            "category": "independent_temporal_episode",
+            "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+          },
+          {
+            "category": "interaction_test",
+            "description": "Conditional effect test across feature \u00d7 context interaction"
+          },
+          {
+            "category": "alternative_outcome_semantics",
+            "description": "Same scientific question with orthogonal outcome field / horizon"
+          },
+          {
+            "category": "negative_control",
+            "description": "Explicit negative-control population or sham contrast"
+          },
+          {
+            "category": "orthogonal_measurement",
+            "description": "Different tool/representation answering same null when quintile path exhausted"
+          }
+        ],
+        "null_keys_in_grammar": [
+          "directional_reversal",
+          "episode_artifact",
+          "population_concentration",
+          "context_instability"
+        ]
+      },
+      "rationale": [
+        "all_faithful_families_redundant_or_exhausted"
+      ],
+      "rejected_selector": [
+        {
+          "candidate_id": "sec-d76727eda8b1",
+          "reasons": "representation_alias_core_hash_match; previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "counterexample_period_search"
+        },
+        {
+          "candidate_id": "sec-21da1ed9c992",
+          "reasons": "previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "episode_holdout_excluding_motivating"
+        }
+      ]
+    },
+    "capability_probe": {
+      "audit_version": "bb_capability_gap_audit_capability_probe_v1_3j14",
+      "gap_found": false,
+      "abstract_gaps": [],
+      "known_unrepresented_categories": [
+        {
+          "category": "independent_temporal_episode",
+          "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+        },
+        {
+          "category": "interaction_test",
+          "description": "Conditional effect test across feature \u00d7 context interaction"
+        },
+        {
+          "category": "alternative_outcome_semantics",
+          "description": "Same scientific question with orthogonal outcome field / horizon"
+        },
+        {
+          "category": "negative_control",
+          "description": "Explicit negative-control population or sham contrast"
+        },
+        {
+          "category": "orthogonal_measurement",
+          "description": "Different tool/representation answering same null when quintile path exhausted"
+        }
+      ],
+      "notes": [
+        "unexercised_grammar_families_remain_but_all_inadmissible"
+      ],
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION"
+    },
+    "prior_decision_summary": {
+      "chosen_action": "SEEK_FALSIFICATION",
+      "decision_kind": "ACTION"
+    },
+    "seed": 601
+  },
+  {
+    "experiment_ordinal": 3,
+    "package_disposition": "NO_FAITHFUL_EXPERIMENT",
+    "silence_classification": {
+      "audit_version": "bb_capability_gap_audit_silence_classifier_v1_3j14",
+      "classification": "REDUNDANCY_STOP",
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION",
+      "experiment_ordinal": 3,
+      "generator_version": "follow_on_experiment_generator_v1_3j13",
+      "candidate_count": 2,
+      "admissible_count": 0,
+      "rejection_reasons_aggregate": [
+        "previously_rejected_core_hash",
+        "representation_alias_core_hash_match"
+      ],
+      "grammar_families_for_null": [
+        {
+          "family": "counterexample_period_search",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        },
+        {
+          "family": "episode_holdout_excluding_motivating",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        }
+      ],
+      "families_exhausted": true,
+      "toolbox_coverage": {
+        "audit_version": "bb_capability_gap_audit_toolbox_map_v1_3j14",
+        "rows": [
+          {
+            "null_key": "directional_reversal",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "directional_effect_full_universe",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": true,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "counterexample_period_search",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "episode_holdout_excluding_motivating",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "population_concentration",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "population_generalization",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "context_instability",
+            "cohort_strategy": "regime_partition_contrast",
+            "target_uncertainty": "context_stability",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          }
+        ],
+        "unrepresented_categories": [
+          {
+            "category": "independent_temporal_episode",
+            "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+          },
+          {
+            "category": "interaction_test",
+            "description": "Conditional effect test across feature \u00d7 context interaction"
+          },
+          {
+            "category": "alternative_outcome_semantics",
+            "description": "Same scientific question with orthogonal outcome field / horizon"
+          },
+          {
+            "category": "negative_control",
+            "description": "Explicit negative-control population or sham contrast"
+          },
+          {
+            "category": "orthogonal_measurement",
+            "description": "Different tool/representation answering same null when quintile path exhausted"
+          }
+        ],
+        "null_keys_in_grammar": [
+          "directional_reversal",
+          "episode_artifact",
+          "population_concentration",
+          "context_instability"
+        ]
+      },
+      "rationale": [
+        "all_faithful_families_redundant_or_exhausted"
+      ],
+      "rejected_selector": [
+        {
+          "candidate_id": "sec-d39a7b108d7f",
+          "reasons": "representation_alias_core_hash_match; previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "counterexample_period_search"
+        },
+        {
+          "candidate_id": "sec-d9cb1afb1dbd",
+          "reasons": "previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "episode_holdout_excluding_motivating"
+        }
+      ]
+    },
+    "capability_probe": {
+      "audit_version": "bb_capability_gap_audit_capability_probe_v1_3j14",
+      "gap_found": false,
+      "abstract_gaps": [],
+      "known_unrepresented_categories": [
+        {
+          "category": "independent_temporal_episode",
+          "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+        },
+        {
+          "category": "interaction_test",
+          "description": "Conditional effect test across feature \u00d7 context interaction"
+        },
+        {
+          "category": "alternative_outcome_semantics",
+          "description": "Same scientific question with orthogonal outcome field / horizon"
+        },
+        {
+          "category": "negative_control",
+          "description": "Explicit negative-control population or sham contrast"
+        },
+        {
+          "category": "orthogonal_measurement",
+          "description": "Different tool/representation answering same null when quintile path exhausted"
+        }
+      ],
+      "notes": [
+        "unexercised_grammar_families_remain_but_all_inadmissible"
+      ],
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION"
+    },
+    "prior_decision_summary": {
+      "chosen_action": "SEEK_FALSIFICATION",
+      "decision_kind": "ACTION"
+    },
+    "seed": 602
+  },
+  {
+    "experiment_ordinal": 3,
+    "package_disposition": "NO_FAITHFUL_EXPERIMENT",
+    "silence_classification": {
+      "audit_version": "bb_capability_gap_audit_silence_classifier_v1_3j14",
+      "classification": "REDUNDANCY_STOP",
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION",
+      "experiment_ordinal": 3,
+      "generator_version": "follow_on_experiment_generator_v1_3j13",
+      "candidate_count": 2,
+      "admissible_count": 0,
+      "rejection_reasons_aggregate": [
+        "previously_rejected_core_hash",
+        "representation_alias_core_hash_match"
+      ],
+      "grammar_families_for_null": [
+        {
+          "family": "counterexample_period_search",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        },
+        {
+          "family": "episode_holdout_excluding_motivating",
+          "target_uncertainty": "episode_robustness",
+          "population": "holdout",
+          "tool_binding": "quintile_spread_compare",
+          "representable": true,
+          "executable": true
+        }
+      ],
+      "families_exhausted": true,
+      "toolbox_coverage": {
+        "audit_version": "bb_capability_gap_audit_toolbox_map_v1_3j14",
+        "rows": [
+          {
+            "null_key": "directional_reversal",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "directional_effect_full_universe",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": true,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "counterexample_period_search",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "episode_artifact",
+            "cohort_strategy": "episode_holdout_excluding_motivating",
+            "target_uncertainty": "episode_robustness",
+            "population": "holdout",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "population_concentration",
+            "cohort_strategy": "full_panel_contrast",
+            "target_uncertainty": "population_generalization",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          },
+          {
+            "null_key": "context_instability",
+            "cohort_strategy": "regime_partition_contrast",
+            "target_uncertainty": "context_stability",
+            "population": "all",
+            "tool_binding": "quintile_spread_compare",
+            "representable": true,
+            "executable": true,
+            "previously_exercised": false,
+            "missing_abstraction": null
+          }
+        ],
+        "unrepresented_categories": [
+          {
+            "category": "independent_temporal_episode",
+            "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+          },
+          {
+            "category": "interaction_test",
+            "description": "Conditional effect test across feature \u00d7 context interaction"
+          },
+          {
+            "category": "alternative_outcome_semantics",
+            "description": "Same scientific question with orthogonal outcome field / horizon"
+          },
+          {
+            "category": "negative_control",
+            "description": "Explicit negative-control population or sham contrast"
+          },
+          {
+            "category": "orthogonal_measurement",
+            "description": "Different tool/representation answering same null when quintile path exhausted"
+          }
+        ],
+        "null_keys_in_grammar": [
+          "directional_reversal",
+          "episode_artifact",
+          "population_concentration",
+          "context_instability"
+        ]
+      },
+      "rationale": [
+        "all_faithful_families_redundant_or_exhausted"
+      ],
+      "rejected_selector": [
+        {
+          "candidate_id": "sec-c523b8ba098f",
+          "reasons": "representation_alias_core_hash_match; previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "counterexample_period_search"
+        },
+        {
+          "candidate_id": "sec-103b6907b6ae",
+          "reasons": "previously_rejected_core_hash",
+          "target_null_key": "episode_artifact",
+          "cohort_strategy": "episode_holdout_excluding_motivating"
+        }
+      ]
+    },
+    "capability_probe": {
+      "audit_version": "bb_capability_gap_audit_capability_probe_v1_3j14",
+      "gap_found": false,
+      "abstract_gaps": [],
+      "known_unrepresented_categories": [
+        {
+          "category": "independent_temporal_episode",
+          "description": "Holdout on a genuinely new episode slice not covered by existing holdout strategies"
+        },
+        {
+          "category": "interaction_test",
+          "description": "Conditional effect test across feature \u00d7 context interaction"
+        },
+        {
+          "category": "alternative_outcome_semantics",
+          "description": "Same scientific question with orthogonal outcome field / horizon"
+        },
+        {
+          "category": "negative_control",
+          "description": "Explicit negative-control population or sham contrast"
+        },
+        {
+          "category": "orthogonal_measurement",
+          "description": "Different tool/representation answering same null when quintile path exhausted"
+        }
+      ],
+      "notes": [
+        "unexercised_grammar_families_remain_but_all_inadmissible"
+      ],
+      "target_null_key": "episode_artifact",
+      "target_uncertainty": "episode_robustness",
+      "selected_action": "SEEK_FALSIFICATION"
+    },
+    "prior_decision_summary": {
+      "chosen_action": "SEEK_FALSIFICATION",
+      "decision_kind": "ACTION"
+    },
+    "seed": 77
+  }
+]
