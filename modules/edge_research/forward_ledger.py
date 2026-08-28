@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -24,6 +24,41 @@ from modules.edge_research.storage import ensure_storage, read_ledger, resolve_d
 LATEST_RECOGNITION_FILE = "latest_future_recognition.json"
 SIDECAR_DIRNAME = "daily_edge_matches"
 RESEARCH_LABEL = "RESEARCH MATCH — NOT AUTOMATIC BUY"
+
+IMMUTABLE_BIRTH_FIELDS: Tuple[str, ...] = (
+    "ledger_id",
+    "hypothesis_id",
+    "t0_date",
+    "symbol",
+    "frozen_at",
+    "edge_id",
+    "t0_trade_date",
+    "born_at",
+    "spec_path",
+    "spec_hash",
+    "spec_schema_version",
+    "feature_bucket_config_version",
+    "market_state_config_version",
+    "market_state_t0",
+    "market_transition_t0",
+    "context_verdict",
+    "context_reason",
+    "stock_feature_values_json",
+    "matched_clauses_json",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "active_status_at_birth",
+    "oos_evidence_json",
+    "universe_count",
+    "universe_hash",
+    "pit_artifact",
+    "pit_artifact_hash",
+    "assessment_run_id",
+    "selection_reason",
+    "selection_reason_vi",
+    "research_label",
+)
 
 
 def _iso_now() -> str:
@@ -97,6 +132,51 @@ def persist_births(
         "total": int(len(ledger)),
         "new_edge_ids": new_edge_ids,
     }
+
+
+def persist_maturity_updates(
+    updates: List[Dict[str, Any]],
+    *,
+    data_dir: Optional[Path] = None,
+) -> int:
+    """
+    Append/update only maturity fields. T0 birth facts are never rewritten.
+    Already-MATURE horizon cells are left untouched by the caller.
+    """
+    if not updates:
+        return 0
+    root = ensure_storage(data_dir)
+    ledger = read_ledger("edge_forward_ledger.csv", data_dir=root)
+    if ledger.empty:
+        return 0
+    immutable = set(IMMUTABLE_BIRTH_FIELDS)
+    applied = 0
+    for patch in updates:
+        lid = str(patch.get("ledger_id") or "")
+        if not lid or "ledger_id" not in ledger.columns:
+            continue
+        mask = ledger["ledger_id"].astype(str) == lid
+        if not mask.any():
+            continue
+        idx = ledger.index[mask][0]
+        for key, value in patch.items():
+            if key in immutable or key == "ledger_id":
+                continue
+            existing_status = str(ledger.at[idx, key]) if key.endswith("_status") and key in ledger.columns else ""
+            if key.endswith("_return") or key.endswith("_close_t0") or key.endswith("_close_tn") or key.endswith("_matured_at") or key.endswith("_source"):
+                status_key = key.split("_", 1)[0] + "_status"
+                if status_key in ledger.columns and str(ledger.at[idx, status_key]) == "MATURE" and key != "outcome_status":
+                    continue
+            if key.endswith("_status") and existing_status == "MATURE" and key != "outcome_status":
+                continue
+            ledger.at[idx, key] = value
+        applied += 1
+    out_cols = list(EDGE_FORWARD_LEDGER_COLUMNS)
+    for col in ledger.columns:
+        if col not in out_cols:
+            out_cols.append(col)
+    ledger.reindex(columns=out_cols).to_csv(root / "edge_forward_ledger.csv", index=False)
+    return applied
 
 
 def append_session_assessment(

@@ -1,9 +1,10 @@
 """
-Edge Research Engine V1 — orchestrator (Phase 0–4 / Phase A + Phase B).
+Edge Research Engine V1 — orchestrator (Phase 0–4 / Phase A + B + C).
 
 No production BUY/execution coupling. Discovery → Challenger → freeze →
-prospective OOS → ACTIVE memory → isolated future recognition (LIVE_FORWARD
-research births). Phase C maturity/decay is out of scope.
+prospective OOS → ACTIVE memory → future recognition (LIVE_FORWARD births) →
+trading-session maturity → contemporaneous baseline → edge health
+(ACTIVE / DECAYING / INVALIDATED) → research-only anti-context.
 """
 
 from __future__ import annotations
@@ -395,6 +396,32 @@ class EdgeResearchEngine:
             freeze_path=freeze_path,
             market_context=market_context,
         )
+        try:
+            publish_durable(self.data_dir)
+        except Exception:
+            pass
+        return result
+
+    def run_continuous_learning(
+        self,
+        session_date: str,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        from modules.edge_research.eod_cycle import run_continuous_learning
+
+        self.initialize()
+        result = run_continuous_learning(session_date, data_dir=self.data_dir, **kwargs)
+        try:
+            publish_durable(self.data_dir)
+        except Exception:
+            pass
+        return result
+
+    def run_eod_cycle(self, **kwargs: Any) -> Dict[str, Any]:
+        from modules.edge_research.eod_cycle import run_edge_research_eod_cycle
+
+        self.initialize()
+        result = run_edge_research_eod_cycle(data_dir=self.data_dir, **kwargs)
         try:
             publish_durable(self.data_dir)
         except Exception:

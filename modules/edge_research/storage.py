@@ -16,11 +16,13 @@ import pandas as pd
 from modules.edge_research.contracts import (
     CHALLENGER_RUN_COLUMNS,
     DISCOVERY_RUN_COLUMNS,
+    EDGE_ANTI_CONTEXT_COLUMNS,
     EDGE_EPISODE_REGISTRY_COLUMNS,
     EDGE_FORWARD_LEDGER_COLUMNS,
     EDGE_HYPOTHESIS_LEDGER_COLUMNS,
     EDGE_MEMORY_COLUMNS,
     EDGE_ROBUSTNESS_HISTORY_COLUMNS,
+    EDGE_SHADOW_OBSERVATION_COLUMNS,
     EDGE_VALIDATION_HISTORY_COLUMNS,
     ENGINE_VERSION,
     FROZEN_SPECS_DIRNAME,
@@ -39,6 +41,8 @@ LEDGER_FILES: Dict[str, Tuple[str, ...]] = {
     "edge_robustness_history.csv": EDGE_ROBUSTNESS_HISTORY_COLUMNS,
     "challenger_runs.csv": CHALLENGER_RUN_COLUMNS,
     "edge_session_assessments.csv": EDGE_SESSION_ASSESSMENT_COLUMNS,
+    "edge_shadow_observations.csv": EDGE_SHADOW_OBSERVATION_COLUMNS,
+    "edge_anti_context.csv": EDGE_ANTI_CONTEXT_COLUMNS,
 }
 
 # Challenger persistence schema — explicit dtypes before categorical assignment.

@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
-ENGINE_VERSION = "5.0.0-future-recognition"
+ENGINE_VERSION = "6.0.0-continuous-learning"
 GUARDRAILS_CONFIG_VERSION = "guardrails_v1"
 DISCOVERY_CONFIG_VERSION = "discovery_v1"
 ROBUSTNESS_CONFIG_VERSION = "robustness_v1"
@@ -56,6 +56,34 @@ OOS_MODE_PROSPECTIVE_AFTER_FREEZE = "PROSPECTIVE_AFTER_FREEZE"
 
 EDGE_MEMORY_STATUS_ACTIVE = "ACTIVE"
 EDGE_MEMORY_STATUS_INACTIVE = "INACTIVE"
+EDGE_MEMORY_STATUS_DECAYING = "DECAYING"
+EDGE_MEMORY_STATUS_INVALIDATED = "INVALIDATED"
+
+FORWARD_HEALTH_POLICY_VERSION = "forward_edge_health_policy_v1"
+ANTI_CONTEXT_POLICY_VERSION = "anti_context_policy_v1"
+FORWARD_MATURITY_VERSION = "forward_maturity_v1"
+BASELINE_CALC_VERSION = "contemporaneous_baseline_v1"
+
+HORIZON_STATUS_PENDING = "PENDING"
+HORIZON_STATUS_MATURE = "MATURE"
+HORIZON_STATUS_UNAVAILABLE = "UNAVAILABLE"
+
+FORWARD_OUTCOME_PARTIAL = "PARTIAL"
+FORWARD_OUTCOME_MATURE = "MATURE"
+
+HEALTH_SUPPORTED = "SUPPORTED"
+HEALTH_INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+HEALTH_WEAKENED = "WEAKENED"
+HEALTH_FAILED = "FAILED"
+
+VALIDATION_TYPE_FORWARD_HEALTH = "FORWARD_HEALTH"
+VALIDATION_TYPE_STATE_TRANSITION = "STATE_TRANSITION"
+VALIDATION_TYPE_ANTI_CONTEXT = "ANTI_CONTEXT"
+
+REASON_ALL_ACTIVE_EDGES_CONTEXT_INCOMPATIBLE = "ALL_ACTIVE_EDGES_CONTEXT_INCOMPATIBLE"
+REASON_MATCHES_SUPPRESSED_BY_EDGE_HEALTH = "MATCHES_SUPPRESSED_BY_EDGE_HEALTH"
+REASON_MATCHES_SUPPRESSED_BY_ANTI_CONTEXT = "MATCHES_SUPPRESSED_BY_ANTI_CONTEXT"
+REASON_NO_STOCK_SATISFIES_ACTIVE_EDGE = "NO_STOCK_SATISFIES_ACTIVE_EDGE_IN_COMPATIBLE_CONTEXT"
 
 FROZEN_SPECS_DIRNAME = "frozen_specs"
 FUTURE_RECOGNITION_VERSION = "future_recognition_v1"
@@ -306,6 +334,12 @@ EDGE_VALIDATION_HISTORY_COLUMNS: Tuple[str, ...] = (
     "data_cutoff_date",
     "leakage_check",
     "reason",
+    # Phase C additive health / anti-context audit
+    "policy_version",
+    "from_status",
+    "to_status",
+    "session_date",
+    "evidence_json",
 )
 
 EDGE_MEMORY_COLUMNS: Tuple[str, ...] = (
@@ -340,6 +374,20 @@ EDGE_MEMORY_COLUMNS: Tuple[str, ...] = (
     "forward_matches",
     "forward_matured",
     "forward_hits",
+    # Phase C additive health summary
+    "health_status",
+    "health_reason",
+    "health_policy_version",
+    "last_health_evaluated_at",
+    "last_state_change_at",
+    "last_state_change_from",
+    "last_state_change_to",
+    "forward_incremental_median",
+    "forward_incremental_mean",
+    "forward_unique_sessions",
+    "forward_unique_episodes",
+    "forward_evidence_json",
+    "anti_context_json",
 )
 
 EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
@@ -377,6 +425,40 @@ EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
     "selection_reason",
     "selection_reason_vi",
     "research_label",
+    # Phase C additive maturity / contemporaneous baseline (T0 birth fields stay immutable)
+    "t3_target_date",
+    "t3_status",
+    "t3_return",
+    "t3_close_t0",
+    "t3_close_tn",
+    "t3_matured_at",
+    "t3_source",
+    "t5_target_date",
+    "t5_status",
+    "t5_return",
+    "t5_close_t0",
+    "t5_close_tn",
+    "t5_matured_at",
+    "t5_source",
+    "t10_target_date",
+    "t10_status",
+    "t10_return",
+    "t10_close_t0",
+    "t10_close_tn",
+    "t10_matured_at",
+    "t10_source",
+    "baseline_type",
+    "baseline_context_key",
+    "baseline_horizon",
+    "baseline_n",
+    "baseline_median",
+    "baseline_mean",
+    "candidate_horizon_return",
+    "incremental_return",
+    "baseline_status",
+    "baseline_source",
+    "baseline_calc_version",
+    "maturity_policy_version",
 )
 
 EDGE_SESSION_ASSESSMENT_COLUMNS: Tuple[str, ...] = (
@@ -403,6 +485,61 @@ EDGE_SESSION_ASSESSMENT_COLUMNS: Tuple[str, ...] = (
     "spec_schema_version",
     "pit_artifact",
     "failure_detail",
+)
+
+EDGE_SHADOW_OBSERVATION_COLUMNS: Tuple[str, ...] = (
+    "shadow_id",
+    "hypothesis_id",
+    "edge_id",
+    "spec_hash",
+    "t0_trade_date",
+    "symbol",
+    "context_y",
+    "market_state_t0",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "research_label",
+    "born_at",
+    "outcome_status",
+    "t3_target_date",
+    "t3_status",
+    "t3_return",
+    "t3_matured_at",
+    "t5_target_date",
+    "t5_status",
+    "t5_return",
+    "t5_matured_at",
+    "t10_target_date",
+    "t10_status",
+    "t10_return",
+    "t10_matured_at",
+    "baseline_n",
+    "baseline_median",
+    "incremental_return",
+    "baseline_status",
+    "universe_count",
+    "assessment_run_id",
+)
+
+EDGE_ANTI_CONTEXT_COLUMNS: Tuple[str, ...] = (
+    "anti_context_id",
+    "hypothesis_id",
+    "edge_id",
+    "spec_hash",
+    "condition_key",
+    "context_y",
+    "sample_n",
+    "baseline_n",
+    "incremental_median",
+    "incremental_mean",
+    "unique_sessions",
+    "unique_episodes",
+    "evidence_status",
+    "learned_at",
+    "policy_version",
+    "reason",
+    "evidence_json",
 )
 
 RESEARCH_OBSERVATION_COLUMNS: Tuple[str, ...] = (

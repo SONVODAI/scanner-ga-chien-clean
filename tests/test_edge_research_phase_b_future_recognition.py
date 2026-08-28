@@ -654,11 +654,13 @@ def test_no_buy_execution_coupling_and_no_human_edge_rule():
     for tok in ("future_matcher", "FutureMatcher", "match_active_edges", "scan_universe_for_edges", "create_live_forward_from_edge"):
         assert tok not in engine_src
     app_src = (REPO_ROOT / "app.py").read_text(encoding="utf-8")
-    assert "run_qualification_cycle()" in app_src
-    assert "run_future_recognition(" in app_src
-    qual_idx = app_src.index("run_qualification_cycle()")
-    fr_idx = app_src.index("run_future_recognition(")
-    assert qual_idx < fr_idx
+    assert "run_edge_research_eod_cycle" in app_src
+    eod_src = inspect.getsource(importlib.import_module("modules.edge_research.eod_cycle").run_edge_research_eod_cycle)
+    assert "run_qualification_cycle" in eod_src
+    assert "run_continuous_learning" in eod_src
+    assert "run_future_recognition" in eod_src
+    assert eod_src.index("run_qualification_cycle") < eod_src.index("run_continuous_learning")
+    assert eod_src.index("run_continuous_learning") < eod_src.index("run_future_recognition")
 
 
 def test_ui_distinguishes_three_assessment_states():

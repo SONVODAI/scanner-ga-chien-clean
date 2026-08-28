@@ -6407,24 +6407,16 @@ except Exception as e:
     st.warning(f"Earning Learning: {type(e).__name__}: {e}")
 
 try:
-    from modules.edge_research.engine import EdgeResearchEngine
-
-    _edge_qual = EdgeResearchEngine()
-    _edge_qual.run_qualification_cycle()
-except Exception as _edge_qual_err:
-    st.caption(f"Edge Research qualification skipped: {_edge_qual_err}")
-
-try:
-    from modules.edge_research.engine import EdgeResearchEngine
+    from modules.edge_research.eod_cycle import run_edge_research_eod_cycle
 
     _fr_trade_date = ""
     try:
         _fr_trade_date = str(daily_result.current_date)
     except Exception:
         _fr_trade_date = ""
-    EdgeResearchEngine().run_future_recognition(trade_date=_fr_trade_date or None)
-except Exception as _edge_fr_err:
-    st.caption(f"Edge Research future recognition skipped: {_edge_fr_err}")
+    run_edge_research_eod_cycle(trade_date=_fr_trade_date or None)
+except Exception as _edge_eod_err:
+    st.caption(f"Edge Research EOD cycle skipped: {_edge_eod_err}")
 
 try:
     from modules.regime_alpha_forward_eval import mature_forward_outcomes

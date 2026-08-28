@@ -286,6 +286,14 @@ def _render_future_recognition_assessment(st: Any, assessment: Mapping[str, Any]
                 f" · incremental median={oos.get('oos_incremental_median', '—')}"
                 f" · episodes={oos.get('episode_count', '—')}"
             )
+            fwd = match.get("forward_evidence") or {}
+            st.markdown(
+                f"Status: **{match.get('edge_status') or 'ACTIVE'}**  \n"
+                f"Forward evidence: {fwd.get('mature_n') or 0} mature matches / "
+                f"{fwd.get('sessions') or 0} sessions / {fwd.get('episodes') or 0} episodes  \n"
+                f"Forward incremental median: {fwd.get('incremental_median') or '—'}  \n"
+                f"Health: {match.get('edge_health') or 'INSUFFICIENT_EVIDENCE'}"
+            )
             st.caption(str(match.get("research_label") or RESEARCH_LABEL))
             if match.get("selection_reason"):
                 st.markdown(f"Reason: {match.get('selection_reason')}")
@@ -317,6 +325,39 @@ def _render_future_recognition_assessment(st: Any, assessment: Mapping[str, Any]
     if assessment.get("failure_detail"):
         st.caption(str(assessment.get("failure_detail")))
     st.caption("This is not 'no opportunities today.'")
+
+
+def _render_edge_health_block(st: Any) -> None:
+    from modules.edge_research.storage import read_ledger, resolve_data_dir
+
+    st.markdown("#### EDGE HEALTH")
+    mem = read_ledger("edge_memory.csv", data_dir=resolve_data_dir())
+    if mem.empty:
+        st.caption("No durable edge memory yet.")
+        return
+    show_cols = [
+        c
+        for c in (
+            "edge_id",
+            "status",
+            "best_horizon",
+            "health_status",
+            "oos_incremental_median",
+            "forward_matured",
+            "forward_incremental_median",
+            "forward_unique_sessions",
+            "forward_unique_episodes",
+            "last_state_change_to",
+            "health_reason",
+        )
+        if c in mem.columns
+    ]
+    st.dataframe(mem[show_cols], use_container_width=True, hide_index=True)
+    anti = read_ledger("edge_anti_context.csv", data_dir=resolve_data_dir())
+    if anti.empty:
+        st.caption("Anti-context: none learned. DECAYING / INVALIDATED edges are not qualified reusable knowledge.")
+    else:
+        st.caption(f"Anti-context rows: {len(anti)}. DECAYING / INVALIDATED edges are not qualified reusable knowledge.")
 
 
 def compute_edge_research_button_state(
@@ -461,6 +502,7 @@ def render_edge_research_panel(
         _render_future_recognition_assessment(st, fr_assessment)
         with st.expander("Future recognition machine record", expanded=False):
             st.text(format_future_recognition_operator_text(fr_assessment))
+        _render_edge_health_block(st)
     except Exception as fr_exc:  # noqa: BLE001
         st.warning(f"UNABLE TO ASSESS — future recognition surface unavailable: {fr_exc}")
 

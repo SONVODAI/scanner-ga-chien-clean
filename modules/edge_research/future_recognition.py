@@ -32,6 +32,10 @@ from modules.edge_research.contracts import (
     FUTURE_RECOGNITION_VERSION,
     MARKET_STATE_CONFIG_VERSION,
     REASON_NO_ACTIVE_EDGE_AVAILABLE,
+    REASON_ALL_ACTIVE_EDGES_CONTEXT_INCOMPATIBLE,
+    REASON_MATCHES_SUPPRESSED_BY_ANTI_CONTEXT,
+    REASON_MATCHES_SUPPRESSED_BY_EDGE_HEALTH,
+    REASON_NO_STOCK_SATISFIES_ACTIVE_EDGE,
 )
 from modules.edge_research.discovery import ConditionClause, apply_condition, canonical_condition_text
 from modules.edge_research.edge_memory import load_active_memory
@@ -475,6 +479,16 @@ def run_future_recognition(
         current_state = str(market.get("research_market_state") or "UNKNOWN")
 
         if not loaded:
+            from modules.edge_research.contracts import EDGE_MEMORY_STATUS_DECAYING
+            from modules.edge_research.edge_memory import load_memory_by_status
+
+            decaying = load_memory_by_status(EDGE_MEMORY_STATUS_DECAYING, root)
+            if not decaying.empty:
+                return _finish(
+                    ASSESSMENT_NO_QUALIFIED_MATCH,
+                    REASON_MATCHES_SUPPRESSED_BY_EDGE_HEALTH,
+                    f"decaying_edges={len(decaying)}; no ACTIVE reusable edges",
+                )
             return _finish(
                 ASSESSMENT_NO_QUALIFIED_MATCH,
                 REASON_NO_ACTIVE_EDGE_AVAILABLE,
@@ -524,6 +538,14 @@ def run_future_recognition(
                 assessment["edges_context_unknown"] += 1
                 continue
 
+            from modules.edge_research.anti_context import anti_context_for
+
+            blocked = anti_context_for(spec.hypothesis_id, current_transition, root)
+            if blocked:
+                assessment["anti_context_suppressions"] = int(assessment.get("anti_context_suppressions") or 0) + 1
+                assessment["anti_context_reason"] = blocked.get("reason") or REASON_MATCHES_SUPPRESSED_BY_ANTI_CONTEXT
+                continue
+
             clauses = clauses_from_frozen_spec(spec)
             for _, row in universe.frame.iterrows():
                 evaluations += 1
@@ -561,6 +583,15 @@ def run_future_recognition(
                         "feature_values": json.loads(birth["stock_feature_values_json"]),
                         "research_label": RESEARCH_LABEL,
                         "live_forward_status": FORWARD_OUTCOME_PENDING,
+                        "edge_health": edge.memory_row.get("health_status") or EDGE_MEMORY_STATUS_ACTIVE,
+                        "edge_status": EDGE_MEMORY_STATUS_ACTIVE,
+                        "forward_evidence": {
+                            "mature_n": edge.memory_row.get("forward_matured"),
+                            "incremental_median": edge.memory_row.get("forward_incremental_median"),
+                            "sessions": edge.memory_row.get("forward_unique_sessions"),
+                            "episodes": edge.memory_row.get("forward_unique_episodes"),
+                            "health_reason": edge.memory_row.get("health_reason"),
+                        },
                     }
                 )
 
@@ -576,9 +607,21 @@ def run_future_recognition(
 
         if births:
             return _finish(ASSESSMENT_QUALIFIED_MATCH_FOUND, "QUALIFIED_MATCHES_PERSISTED")
+        if int(assessment.get("anti_context_suppressions") or 0) > 0:
+            return _finish(
+                ASSESSMENT_NO_QUALIFIED_MATCH,
+                REASON_MATCHES_SUPPRESSED_BY_ANTI_CONTEXT,
+                str(assessment.get("anti_context_reason") or ""),
+            )
+        if assessment["edges_context_compatible"] == 0 and assessment["active_edge_count"] > 0:
+            return _finish(
+                ASSESSMENT_NO_QUALIFIED_MATCH,
+                REASON_ALL_ACTIVE_EDGES_CONTEXT_INCOMPATIBLE,
+                f"incompatible={assessment['edges_context_incompatible']}",
+            )
         return _finish(
             ASSESSMENT_NO_QUALIFIED_MATCH,
-            "NO_STOCK_SATISFIES_ACTIVE_EDGE_IN_COMPATIBLE_CONTEXT",
+            REASON_NO_STOCK_SATISFIES_ACTIVE_EDGE,
             (
                 f"compatible_edges={assessment['edges_context_compatible']} "
                 f"universe={universe.universe_count}"
@@ -626,6 +669,18 @@ def format_future_recognition_operator_text(assessment: Dict[str, Any]) -> str:
                         f" OOS n={oos.get('oos_candidate_n', '')}"
                         f" incremental median={oos.get('oos_incremental_median', '')}"
                         f" episodes={oos.get('episode_count', '')}"
+                    ),
+                    (
+                        f"Health: {match.get('edge_health') or 'INSUFFICIENT_EVIDENCE'} "
+                        f"status={match.get('edge_status') or 'ACTIVE'}"
+                    ),
+                    (
+                        "Forward evidence: "
+                        f"{(match.get('forward_evidence') or {}).get('mature_n') or 0} mature "
+                        f"{match.get('best_horizon') or 'T5'} matches / "
+                        f"{(match.get('forward_evidence') or {}).get('sessions') or 0} sessions / "
+                        f"{(match.get('forward_evidence') or {}).get('episodes') or 0} episodes; "
+                        f"incremental median={(match.get('forward_evidence') or {}).get('incremental_median') or '—'}"
                     ),
                     f"Status: {match.get('research_label') or RESEARCH_LABEL}",
                     f"Reason: {match.get('selection_reason') or ''}",
