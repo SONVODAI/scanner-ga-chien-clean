@@ -1,0 +1,44 @@
+{
+  "CF-SD1": {
+    "passed": true,
+    "description": "Easier wrong-null experiment rejected under frozen directional_reversal decision"
+  },
+  "CF-SD2": {
+    "passed": true,
+    "description": "Replication-disguised candidate detected or faithful distinct design selected"
+  },
+  "CF-SD3": {
+    "passed": true,
+    "description": "High first-experiment overlap penalized even when birth overlap is low"
+  },
+  "CF-SD4": {
+    "passed": true,
+    "description": "Faithful design selected or valid silence when no faithful executable design"
+  },
+  "CF-SD5": {
+    "passed": true,
+    "description": "Non-executable faithful design yields silence, not substitution"
+  },
+  "CF-SD6": {
+    "passed": true,
+    "description": "Confirmation-only candidates rejected under SEEK_FALSIFICATION"
+  },
+  "CF-SD7": {
+    "passed": true,
+    "description": "Different surviving null history may yield different second-experiment design"
+  },
+  "CF-SD8": {
+    "passed": true,
+    "description": "Candidate ordering does not change scientific selection"
+  },
+  "CF-SD9": {
+    "passed": true,
+    "description": "Stale decision hash/provenance fails closed"
+  },
+  "CF-SD10": {
+    "passed": true,
+    "description": "Valid package is NOT_EXECUTED with no ToolResult"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_second_experiment_design_01_v1_3j6"
+}

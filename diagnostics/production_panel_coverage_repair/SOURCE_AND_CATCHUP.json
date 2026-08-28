@@ -1,0 +1,30 @@
+{
+  "panel_max": "2026-08-24",
+  "panel_dates_n": 27,
+  "source_report": {
+    "2026-08-20": {
+      "in_panel": true,
+      "panel_rows": 142,
+      "classification_panel_t0": "SAFE_TO_RECONSTRUCT",
+      "autonomous_history_policy": "DO_NOT_FABRICATE \u2014 honest start-now baseline; optional explicit BACKFILL_NON_FORWARD later"
+    },
+    "2026-08-21": {
+      "in_panel": true,
+      "panel_rows": 142,
+      "classification_panel_t0": "SAFE_TO_RECONSTRUCT",
+      "autonomous_history_policy": "DO_NOT_FABRICATE \u2014 honest start-now baseline; optional explicit BACKFILL_NON_FORWARD later"
+    },
+    "2026-08-24": {
+      "in_panel": true,
+      "panel_rows": 142,
+      "classification_panel_t0": "SAFE_TO_RECONSTRUCT",
+      "autonomous_history_policy": "DO_NOT_FABRICATE \u2014 honest start-now baseline; optional explicit BACKFILL_NON_FORWARD later"
+    }
+  },
+  "production_baseline": {
+    "policy": "HONEST_START_NOW",
+    "first_safe_production_cutoff": "2026-08-24",
+    "do_not_backfill_autonomous_sessions_for_gap_by_default": true,
+    "rationale": "No durable LIVE/BACKFILL observations existed; inventing multi-day autonomy would fabricate research history."
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "proposition_id": "prop-dc32de31fc388d30",
+  "lifecycle_outcome": "BUDGET_EXHAUSTED",
+  "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+  "experiments_completed": 2,
+  "iteration_log": [
+    {
+      "ordinal": 1,
+      "stage": "execute",
+      "phase_in": "PROPOSITION_PERSISTED",
+      "phase_out": "EXECUTED",
+      "outcome": "ok",
+      "detail": {}
+    },
+    {
+      "ordinal": 1,
+      "stage": "interpret",
+      "phase_in": "EXPERIMENT_EXECUTED",
+      "phase_out": "INTERPRETED",
+      "outcome": "ok",
+      "detail": {}
+    },
+    {
+      "ordinal": 1,
+      "stage": "decide",
+      "phase_in": "EVIDENCE_INTERPRETED",
+      "phase_out": "DECIDED",
+      "outcome": "ok",
+      "detail": {}
+    },
+    {
+      "ordinal": 2,
+      "stage": "design",
+      "phase_in": "RESEARCH_DECISION_FROZEN",
+      "phase_out": "DESIGNED",
+      "outcome": "ok",
+      "detail": {}
+    },
+    {
+      "ordinal": 2,
+      "stage": "execute",
+      "phase_in": "EXPERIMENT_DESIGNED",
+      "phase_out": "EXECUTED",
+      "outcome": "ok",
+      "detail": {}
+    }
+  ],
+  "journey_rows": [
+    {
+      "ordinal": 1,
+      "epistemic_in": "HYPOTHESIS",
+      "epistemic_out": "INSUFFICIENT_EVIDENCE",
+      "execution_id": "iefx-bf2b0c06aa62",
+      "interpretation_id": "iefi-840a373a30ab",
+      "decision_kind": "ACTION",
+      "stop_reason": null,
+      "row_overlap": null,
+      "incremental_strength": null
+    },
+    {
+      "ordinal": 2,
+      "epistemic_in": null,
+      "epistemic_out": null,
+      "execution_id": "sefx-c962424e87b4",
+      "interpretation_id": null,
+      "decision_kind": null,
+      "stop_reason": null,
+      "row_overlap": null,
+      "incremental_strength": null
+    }
+  ],
+  "audit": {
+    "lifecycle_run_id": "blc-6f82b74a498f",
+    "proposition_id": "prop-dc32de31fc388d30",
+    "proposition_hash": "68230f427c19ce5017b39a0bc45c6ee01c41acb501e4d547d451b1e4ce8aaa29",
+    "session_id": "opr-prod-prop-dc32de31fc388d30-sess-b1d",
+    "start_phase": "PROPOSITION_PERSISTED",
+    "end_phase": "BUDGET_EXHAUSTED",
+    "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+    "budget_initial": {
+      "max_experiment_iterations": 2,
+      "max_search_complexity": 15.0,
+      "max_search_cardinality": 20,
+      "max_execution_failures": 1,
+      "max_redundancy_burden": 0.95
+    },
+    "budget_used": {
+      "experiments_completed": 2,
+      "max_iterations": 2
+    },
+    "experiment_count": 2,
+    "experiment_identities": [
+      "iefp-faa3226949db",
+      "sefp-5f3a0151407d"
+    ],
+    "tool_result_identities": [
+      "iefx-bf2b0c06aa62",
+      "sefx-c962424e87b4"
+    ],
+    "interpretation_identities": [
+      "iefi-840a373a30ab"
+    ],
+    "decision_identities": [
+      "iefd-183ad6aca15e"
+    ],
+    "cumulative_null_ledger": [
+      {
+        "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+        "null_key": "episode_artifact",
+        "state_before": "STILL_PLAUSIBLE",
+        "state_after": "STILL_PLAUSIBLE",
+        "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+      }
+    ],
+    "dependence_summary": {},
+    "failures": [],
+    "warnings": [],
+    "controller_version": "bounded_lifecycle_controller_v1_3j10",
+    "created_at": "2026-08-22T07:10:11.158212+00:00",
+    "audit_hash": "ace6ea1a68dc0d89a6621e7e722c17920838a9ddd6905484679c0c76b65351ba"
+  }
+}

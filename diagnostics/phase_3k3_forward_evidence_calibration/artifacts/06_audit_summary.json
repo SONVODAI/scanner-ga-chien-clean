@@ -1,0 +1,13 @@
+{
+  "head": "e06f91d23253d18e566220cd1b08011188f87b25",
+  "phase": "3K.3",
+  "stop_boundary": "STOP_FORWARD_EVIDENCE_CALIBRATION_READY",
+  "cf_cal_pass": true,
+  "simulation_backfill_rejected": true,
+  "forward_ledger_entry_count": 0,
+  "idempotent_rebuild": true,
+  "trading_isolation_pass": true,
+  "self_knowledge_no_buy_sell": true,
+  "regressions_pass": true,
+  "phase_pass": true
+}

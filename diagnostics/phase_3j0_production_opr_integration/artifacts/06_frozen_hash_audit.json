@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "checks": {
+    "evidence_synthesis_engine": true,
+    "scientific_action_generator": true,
+    "dormancy_module": true,
+    "lifecycle_integration": true
+  }
+}
