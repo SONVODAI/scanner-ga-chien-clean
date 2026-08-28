@@ -1,0 +1,59 @@
+{
+  "selection_mechanism": "lexicographic_falsification_selector_v1_3i8",
+  "no_weighted_score": true,
+  "tie_policy": "report_ambiguity \u2014 do not invent precision",
+  "ordered_criteria": [
+    {
+      "rank": 1,
+      "criterion": "validity_gate",
+      "gates": [
+        "executability_status == EXECUTABLE",
+        "content_hash != prior_experiment_content_hash",
+        "anti_rescue_pass (no population/outcome/horizon/direction/threshold mutation)",
+        "cutoff_integrity",
+        "not NOT_ACTUALLY_FALSIFICATION"
+      ]
+    },
+    {
+      "rank": 2,
+      "criterion": "counterfactual_falsifiability",
+      "rule": "If strongest valid opposing result, 3I.7 interpreter (or pre-registered variant) must reach WEAKENED or FALSIFIED"
+    },
+    {
+      "rank": 3,
+      "criterion": "directness_against_proposition",
+      "rule": "Operationalizes disconfirming_observation_spec before alternative robustness",
+      "order": [
+        "directional_reversal",
+        "episode_instability",
+        "population_instability",
+        "instrument_variant"
+      ]
+    },
+    {
+      "rank": 4,
+      "criterion": "evidence_independence",
+      "rule": "Prefer INDEPENDENT_FALSIFICATION over RELATED; reject SAME instrument identical spec"
+    },
+    {
+      "rank": 5,
+      "criterion": "redundancy_with_prior",
+      "rule": "Reject confirmatory retest (identical content hash)"
+    },
+    {
+      "rank": 6,
+      "criterion": "rescue_risk",
+      "rule": "Reject population narrowing, horizon mutation, threshold relaxation"
+    },
+    {
+      "rank": 7,
+      "criterion": "executability_tiebreak",
+      "rule": "Higher sample adequacy margin; deterministic candidate_id order if still tied"
+    }
+  ],
+  "outputs": [
+    "SELECTED",
+    "NO_VALID_FALSIFICATION_CANDIDATE",
+    "AMBIGUOUS_TIE \u2014 multiple equally valid candidates"
+  ]
+}

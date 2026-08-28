@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "zone_c_populated": false,
+  "zone_c_accessible_to_generator": false,
+  "forbidden_paths_found": [],
+  "generator_module_scan": {
+    "opr_module_count": 9,
+    "forbidden_pattern_hits": []
+  },
+  "detail": "Zone C populated: False; Zone C accessible to generator: False; Zone C not yet populated \u2014 blind hidden convergence will be INDETERMINATE"
+}

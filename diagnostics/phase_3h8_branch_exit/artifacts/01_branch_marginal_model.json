@@ -1,0 +1,19 @@
+{
+  "version": "research_branch_marginal_state_v1",
+  "states": [
+    "PRODUCTIVE",
+    "DIMINISHING",
+    "LOW_MARGINAL_VALUE",
+    "EXHAUSTION_EVIDENCE",
+    "INSUFFICIENT_EVIDENCE"
+  ],
+  "inputs": [
+    "experiments_on_branch",
+    "realized_information_gain_history",
+    "recent_revalued_opportunity_history",
+    "unresolved_uncertainty_codes",
+    "redundancy_evidence",
+    "frame_saturation"
+  ],
+  "no_branch_depth_threshold": true
+}

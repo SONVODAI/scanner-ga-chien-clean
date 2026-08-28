@@ -1,0 +1,414 @@
+{
+  "phase": "3J.1",
+  "mode": "AUDIT_DESIGN_ONLY",
+  "git_head": "74ec7a9f0a19e12723ec0ae0f31d2d1fe167e1d3",
+  "frozen_hashes": {
+    "evidence_synthesis_engine": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+    "note": "3J.0 integration hash unchanged \u2014 no scientific modules modified"
+  },
+  "mechanism_inventory": {
+    "mechanisms": [
+      {
+        "component": "executability_adapter.adapt_executability",
+        "location": "opr_bridge/executability_adapter.py",
+        "when": "At proposition emission (pipeline.py L126)",
+        "classification": "TOOL_BINDING_ONLY",
+        "notes": "Hardcodes partition_group_compare; single candidate; no comparison"
+      },
+      {
+        "component": "proposition_synthesizer.experiment_spec expectations",
+        "location": "opr_bridge/proposition_synthesizer.py",
+        "when": "At proposition birth",
+        "classification": "SCIENTIFIC_OBJECTIVE_DERIVED (partial)",
+        "notes": "falsifiable_expectation + disconfirming_observation_spec derived from contrast; tool named in BC_Q8"
+      },
+      {
+        "component": "scientific_action_generator",
+        "location": "opr_bridge/scientific_action_generator.py",
+        "when": "Post-synthesis only",
+        "classification": "NOT_APPLICABLE_AT_PROPOSITION_BIRTH",
+        "notes": "Requires EvidenceSynthesisRecord + ResearchPriorityDecision"
+      },
+      {
+        "component": "falsification_candidate_generator",
+        "location": "opr_bridge/falsification_candidate_generator.py",
+        "when": "Post-first-experiment + SEEK_FALSIFICATION",
+        "classification": "NOT_APPLICABLE_AT_PROPOSITION_BIRTH",
+        "notes": "Requires epistemic_update, research_decision, prior_tool_result_hash"
+      },
+      {
+        "component": "derive_proposition_vulnerabilities",
+        "location": "falsification_candidate_generator.py",
+        "when": "Callable at birth (unused for first experiment)",
+        "classification": "SCIENTIFIC_OBJECTIVE_DERIVED (partial)",
+        "notes": "Vulnerabilities from disconfirm spec; not wired to first-experiment selection"
+      },
+      {
+        "component": "research_actions.generate_action_candidates",
+        "location": "research_actions.py",
+        "when": "Post-experiment legacy planner",
+        "classification": "LEGACY_PRIOR",
+        "notes": "GAP \u2192 24 templates; blocked under OPR authority"
+      },
+      {
+        "component": "research_planner.plan_next_action",
+        "location": "research_planner.py",
+        "when": "Post-experiment",
+        "classification": "LEGACY_PRIOR",
+        "notes": "Weighted template ranking; not proposition-birth"
+      },
+      {
+        "component": "lifecycle_runner.run_minimal_lifecycle",
+        "location": "lifecycle_runner.py",
+        "when": "Manual/diagnostic with pre-selected spec",
+        "classification": "EXECUTION_UTILITY",
+        "notes": "Executes given spec; does not select first experiment"
+      },
+      {
+        "component": "production_orchestrator STOP_PROPOSITION_PERSISTED",
+        "location": "production_orchestrator.py",
+        "when": "3J.0 production birth",
+        "classification": "NOT_APPLICABLE_AT_PROPOSITION_BIRTH",
+        "notes": "Explicit stop before any experiment selection"
+      },
+      {
+        "component": "cohort_overlap_estimator",
+        "location": "cohort_overlap_estimator.py",
+        "when": "3I.17b post-synthesis actions",
+        "classification": "EXECUTION_UTILITY (reusable)",
+        "notes": "Can quantify birth-evidence overlap if wired at birth"
+      }
+    ],
+    "count": 10
+  },
+  "initial_experiment_objective_design": {
+    "record_version": "initial_experiment_objective_v1_design_3j1",
+    "purpose": "State what uncertainty the first experiment should reduce, derived from proposition commitments",
+    "required_fields": {
+      "objective_id": "stable id",
+      "proposition_id": "parent proposition",
+      "proposition_hash": "immutable commitment anchor",
+      "target_uncertainty": "derived from falsifiable_expectation / disconfirming_observation_spec / canonical core",
+      "scientific_vulnerability": "e.g. directional_reversal, episode_artifact, population_specificity",
+      "why_first": "Why this uncertainty ranks first before any evidence",
+      "outcome_branches": {
+        "more_credible": "pre-result description",
+        "less_credible": "pre-result description",
+        "unresolved": "pre-result description"
+      },
+      "forbidden_rescue_mutations": "from proposition commitments",
+      "provenance": "fields used for derivation \u2014 no tool names required"
+    },
+    "derivation_sources_at_birth": [
+      "falsifiable_expectation",
+      "disconfirming_observation_spec",
+      "null_competing_explanation",
+      "canonical_proposition_core",
+      "observation_provenance.structural_context"
+    ],
+    "capability_gap": "No production module derives InitialExperimentObjectiveRecord at STOP_PROPOSITION_PERSISTED"
+  },
+  "selection_policy_design": {
+    "policy_version": "first_experiment_selector_lex_v1_design_3j1",
+    "ordering": [
+      "1. Reject NON_EXECUTABLE, RESCUE_MUTATION, NEW_PROPOSITION_REQUIRED",
+      "2. Reject REDUNDANT_WITH_BIRTH_EVIDENCE (overlap thresholds)",
+      "3. Reject CONFIRMATORY_ONLY when FALSIFICATION_CAPABLE available",
+      "4. Reject REPRESENTATION_ONLY duplicates",
+      "5. Prefer higher birth-evidence independence (lexicographic dimensions)",
+      "6. Prefer directness to central proposition commitment",
+      "7. Prefer falsification-capable outcome branches",
+      "8. Executability tie-break only \u2014 tools last"
+    ],
+    "valid_non_selection_outcomes": [
+      "AMBIGUOUS_FIRST_EXPERIMENT",
+      "NO_HIGH_INFORMATION_FIRST_EXPERIMENT"
+    ],
+    "capability_gap": "No FirstExperimentSelector module exists"
+  },
+  "real_proposition_diagnostic": {
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "motivating_dates": [
+      "2026-08-02"
+    ],
+    "vulnerabilities": [
+      {
+        "kind": "directional_reversal",
+        "description": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile"
+      },
+      {
+        "kind": "episode_instability",
+        "description": "Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates"
+      }
+    ],
+    "executability_status": "EXECUTABLE",
+    "initial_experiment_package": {
+      "package_id": "iefp-design-preview-not-executed",
+      "execution_status": "NOT_EXECUTED",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "scientific_vulnerability_primary": "directional_reversal",
+      "objectives_sketch": [
+        {
+          "target_uncertainty": "directional_effect_full_universe",
+          "derived_from": "falsifiable_expectation + disconfirming_observation_spec"
+        },
+        {
+          "target_uncertainty": "episode_robustness",
+          "derived_from": "null_competing_explanation episode artifact"
+        }
+      ],
+      "candidates": [
+        {
+          "candidate_id": "birth-executability-default",
+          "source": "executability_adapter",
+          "experiment_spec": {
+            "tool_name": "partition_group_compare",
+            "tool_version": "v1",
+            "inputs": {
+              "partition_column": "rs_spread",
+              "n_groups": 5
+            },
+            "research_scope": {
+              "population_spec": {
+                "kind": "all",
+                "grammar_version": "research_grammar_v1"
+              },
+              "outcome_spec": {
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0,
+                "grammar_version": "research_grammar_v1"
+              },
+              "observation_horizon": 0,
+              "pending_question_context": {
+                "population_spec": {
+                  "kind": "all",
+                  "grammar_version": "research_grammar_v1"
+                },
+                "outcome_spec": {
+                  "kind": "compare",
+                  "field": "t5_return",
+                  "operator": ">",
+                  "value": 0.0,
+                  "grammar_version": "research_grammar_v1"
+                },
+                "observation_horizon": 0
+              }
+            },
+            "data_cutoff_date": "2026-08-17"
+          },
+          "classification": "REDUNDANT_WITH_BIRTH_EVIDENCE",
+          "classification_rationale": "Same partition_column rs_spread, same outcome t5_return, full-panel quintile recompute includes motivating focal_date ('2026-08-02',) \u2014 duplicates birth quintile contrast",
+          "independence_from_birth": "LOW",
+          "falsification_capable": true,
+          "confirmatory_only": true
+        },
+        {
+          "candidate_id": "sketch-fc-episode_holdout_excluding_motivating",
+          "source": "falsification_generator_sketch_NOT_INVOKED",
+          "classification": "FALSIFICATION_CAPABLE if independent",
+          "note": "Generator requires epistemic_update \u2014 not invokable at birth today"
+        },
+        {
+          "candidate_id": "sketch-fc-directional_reversal_partition",
+          "source": "falsification_generator_sketch_NOT_INVOKED",
+          "classification": "FALSIFICATION_CAPABLE if independent",
+          "note": "Generator requires epistemic_update \u2014 not invokable at birth today"
+        }
+      ],
+      "selected_candidate": null,
+      "selection_reason": "No selector exists. Default executability_adapter candidate would win by being the only invokable path \u2014 human/tool prior (partition_group_compare hardcoded), not scientific dominance.",
+      "human_choice_material": true,
+      "human_choice_reason": "executability_adapter hardcodes single tool; no comparative selection"
+    }
+  },
+  "counterfactuals": {
+    "CF-FE1": {
+      "description": "Remove motivating evidence \u2192 rationale changes",
+      "current_capability": "NOT_DEMONSTRATED",
+      "passed": false,
+      "reason": "No first-experiment objective derivation module"
+    },
+    "CF-FE2": {
+      "description": "Increase birth overlap \u2192 independence falls",
+      "current_capability": "PARTIAL",
+      "passed": false,
+      "reason": "cohort_overlap_estimator exists but not wired at proposition birth"
+    },
+    "CF-FE3": {
+      "description": "Resolve central uncertainty \u2192 experiment disappears",
+      "current_capability": "NOT_DEMONSTRATED",
+      "passed": false,
+      "reason": "No objective lifecycle at birth"
+    },
+    "CF-FE4": {
+      "description": "Rename/reorder tools \u2192 scientific winner unchanged",
+      "current_capability": "NOT_APPLICABLE",
+      "passed": false,
+      "reason": "Only one candidate path \u2014 no selection invariance test possible"
+    },
+    "CF-FE5": {
+      "description": "Representation change only \u2192 identity unchanged",
+      "current_capability": "PARTIAL",
+      "passed": false,
+      "reason": "scientific_action_core dedup exists for post-synthesis actions, not first experiment"
+    },
+    "CF-FE6": {
+      "description": "Redundant cohort \u2192 alternate or silence",
+      "current_capability": "NOT_DEMONSTRATED",
+      "passed": false,
+      "reason": "No first-experiment selector"
+    },
+    "CF-FE7": {
+      "description": "Best candidate non-executable \u2192 no silent inferior substitution",
+      "current_capability": "NOT_DEMONSTRATED",
+      "passed": false,
+      "reason": "No selector policy at birth"
+    },
+    "CF-FE8": {
+      "description": "Rescue mutation \u2192 reject",
+      "current_capability": "PARTIAL",
+      "passed": true,
+      "reason": "Anti-rescue in falsification generator + scientific_action_operators \u2014 but post-synthesis only"
+    },
+    "all_passed": false
+  },
+  "bb_first_experiment_01": {
+    "benchmark": "BB-FirstExperiment-01",
+    "version": "design_pre_registered",
+    "case_count": 20,
+    "firewall_passed": true,
+    "implementation_status": "NOT_IMPLEMENTED \u2014 design only for 3J.1",
+    "expected_current_pass_rate": "0/20 against existing birth-time mechanisms",
+    "cases": [
+      {
+        "case_id": "BBFE-01",
+        "family": "flux_tier_dispersion",
+        "scenario": "obvious_direct_test"
+      },
+      {
+        "case_id": "BBFE-02",
+        "family": "flux_tier_dispersion",
+        "scenario": "confirmatory_only_lure"
+      },
+      {
+        "case_id": "BBFE-03",
+        "family": "delta_yield_gate",
+        "scenario": "same_evidence_different_tool"
+      },
+      {
+        "case_id": "BBFE-04",
+        "family": "flux_tier_dispersion",
+        "scenario": "birth_evidence_duplication"
+      },
+      {
+        "case_id": "BBFE-05",
+        "family": "context_gate_modulation",
+        "scenario": "independent_cohort"
+      },
+      {
+        "case_id": "BBFE-06",
+        "family": "context_gate_modulation",
+        "scenario": "non_independent_cohort"
+      },
+      {
+        "case_id": "BBFE-07",
+        "family": "delta_yield_gate",
+        "scenario": "rescue_by_horizon_mutation"
+      },
+      {
+        "case_id": "BBFE-08",
+        "family": "flux_tier_dispersion",
+        "scenario": "rescue_by_population_narrowing"
+      },
+      {
+        "case_id": "BBFE-09",
+        "family": "modulation_axis",
+        "scenario": "outcome_mutation"
+      },
+      {
+        "case_id": "BBFE-10",
+        "family": "flux_tier_dispersion",
+        "scenario": "representation_only_candidate"
+      },
+      {
+        "case_id": "BBFE-11",
+        "family": "delta_yield_gate",
+        "scenario": "two_equivalent_tools"
+      },
+      {
+        "case_id": "BBFE-12",
+        "family": "context_gate_modulation",
+        "scenario": "invalid_evidence_path"
+      },
+      {
+        "case_id": "BBFE-13",
+        "family": "modulation_axis",
+        "scenario": "non_executable_best_idea"
+      },
+      {
+        "case_id": "BBFE-14",
+        "family": "flux_tier_dispersion",
+        "scenario": "ambiguous_tie"
+      },
+      {
+        "case_id": "BBFE-15",
+        "family": "delta_yield_gate",
+        "scenario": "valid_silence"
+      },
+      {
+        "case_id": "BBFE-16",
+        "family": "flux_tier_dispersion",
+        "scenario": "proposition_fully_encoded_by_birth"
+      },
+      {
+        "case_id": "BBFE-17",
+        "family": "context_gate_modulation",
+        "scenario": "counterexample_capable_test"
+      },
+      {
+        "case_id": "BBFE-18",
+        "family": "modulation_axis",
+        "scenario": "candidate_order_perturbation"
+      },
+      {
+        "case_id": "BBFE-19",
+        "family": "delta_yield_gate",
+        "scenario": "tool_order_perturbation"
+      },
+      {
+        "case_id": "BBFE-20",
+        "family": "volatility_surface_skew",
+        "scenario": "abstract_family_not_dispersion_return"
+      }
+    ]
+  },
+  "production_relationship": {
+    "current_3j0_flow": [
+      "production evidence",
+      "\u2192 detect_production_opportunity",
+      "\u2192 STOP_PROPOSITION_PERSISTED",
+      "\u2192 persist OprProductionSessionRecord",
+      "\u2192 STOP (no experiment)"
+    ],
+    "required_future_insertion": "[future first-experiment selector] between STOP_PROPOSITION_PERSISTED and InitialExperimentPackage",
+    "wired_in_3j1": false,
+    "stop_after_package": true
+  },
+  "legacy_firewall": {
+    "legacy_can_choose_first_experiment": true,
+    "path": "bootstrap_research_graph \u2192 human seed question \u2192 template experiment",
+    "opr_blocks_legacy_when_active": true,
+    "first_experiment_via_template_map": "Would be TEMPLATE_TRANSLATION if OPR not active",
+    "verdict": "Legacy cannot silently choose when OPR authority active, but no OPR first-experiment selector exists either"
+  },
+  "verdicts": {
+    "FIRST_EXPERIMENT_OBJECTIVE_READINESS": "PARTIALLY_READY",
+    "FIRST_EXPERIMENT_CANDIDATE_GENERATION_READINESS": "NOT_READY",
+    "FIRST_EXPERIMENT_SELECTION_READINESS": "NOT_READY",
+    "BIRTH_EVIDENCE_INDEPENDENCE_READINESS": "NOT_READY",
+    "OVERALL": "NOT_READY"
+  }
+}
