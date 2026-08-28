@@ -1,0 +1,15 @@
+[Unit]
+Description=Run Mr.BOT Edge Research EOD after canonical T0 eligibility (EOD+3H)
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+
+[Timer]
+# Canonical Market T0 freezes only at/after 18:00 Asia/Ho_Chi_Minh.
+# Do not fire at market close; that races ahead of T0 eligibility.
+# 19:15 = first attempt after eligibility; 20:30 = retry if freeze was late.
+OnCalendar=Mon..Fri *-*-* 19:15:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 20:30:00 Asia/Ho_Chi_Minh
+Persistent=true
+Unit=mrbot-edge-research-eod.service
+
+[Install]
+WantedBy=timers.target
