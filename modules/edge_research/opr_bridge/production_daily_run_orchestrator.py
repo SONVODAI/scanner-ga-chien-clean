@@ -77,6 +77,7 @@ def _finish_daily_run(
     target_trade_date: str,
     repo_root: Path,
     edge_data_dir: Optional[Path],
+    panel: Optional[pd.DataFrame] = None,
 ) -> Dict[str, Any]:
     """Append isolated Forecast Memory then closed-loop A→C→B.
 
@@ -92,6 +93,7 @@ def _finish_daily_run(
             daily_result=out,
             repo_root=repo_root,
             data_dir=edge_data_dir,
+            panel=panel,
         )
         return out
     out = attach_forecast_memory_to_daily_run_result(
@@ -108,6 +110,7 @@ def _finish_daily_run(
             daily_result=out,
             repo_root=repo_root,
             data_dir=edge_data_dir,
+            panel=panel,
         )
     except Exception as exc:  # noqa: BLE001
         out["closed_loop_edge"] = {
@@ -200,6 +203,7 @@ def run_production_daily_research(
                 target_trade_date=target_trade_date,
                 repo_root=repo_root,
                 edge_data_dir=data_dir,
+                panel=panel,
             )
 
     # Authoritative EOD evidence lives under the same repo_root used by headless EOD
@@ -240,6 +244,7 @@ def run_production_daily_research(
                 target_trade_date=target_trade_date,
                 repo_root=repo_root,
                 edge_data_dir=data_dir,
+                panel=panel,
             )
 
     run_id = resume_run_id or allocate_daily_run_id(identity, data_dir=data_dir)
@@ -260,6 +265,7 @@ def run_production_daily_research(
                 target_trade_date=target_trade_date,
                 repo_root=repo_root,
                 edge_data_dir=data_dir,
+                panel=panel,
             )
 
     try:
@@ -282,6 +288,7 @@ def run_production_daily_research(
             target_trade_date=target_trade_date,
             repo_root=repo_root,
             edge_data_dir=data_dir,
+            panel=panel,
         )
     finally:
         if lock_fh is not None:

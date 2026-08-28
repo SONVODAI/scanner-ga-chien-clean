@@ -53,6 +53,7 @@ def run_closed_loop_edge_after_daily(
     daily_result: Dict[str, Any],
     repo_root: Path,
     data_dir: Optional[Path] = None,
+    panel: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Run Phase A → C → B only after canonical T0 for target_trade_date is present.
@@ -88,6 +89,7 @@ def run_closed_loop_edge_after_daily(
             trade_date=td,
             data_dir=data_dir,
             freeze_df=freeze_df,
+            panel=panel,
         )
         result["ran_science"] = True
         result["skip_reason"] = ""
