@@ -160,6 +160,7 @@ def mature_shadow_observations(
     shadows = read_ledger("edge_shadow_observations.csv", data_dir=root)
     if shadows.empty:
         return {"updated": 0}
+    shadows = shadows.astype(object)
     sessions = resolve_session_calendar(
         session_calendar=session_calendar, freeze_df=freeze_df, ohlcv_by_symbol=ohlcv_by_symbol
     )

@@ -149,6 +149,7 @@ def persist_maturity_updates(
     ledger = read_ledger("edge_forward_ledger.csv", data_dir=root)
     if ledger.empty:
         return 0
+    ledger = ledger.astype(object)
     immutable = set(IMMUTABLE_BIRTH_FIELDS)
     applied = 0
     for patch in updates:
@@ -159,13 +160,14 @@ def persist_maturity_updates(
         if not mask.any():
             continue
         idx = ledger.index[mask][0]
+        original = ledger.loc[idx].copy()
         for key, value in patch.items():
             if key in immutable or key == "ledger_id":
                 continue
-            existing_status = str(ledger.at[idx, key]) if key.endswith("_status") and key in ledger.columns else ""
+            existing_status = str(original.get(key) or "") if key.endswith("_status") else ""
             if key.endswith("_return") or key.endswith("_close_t0") or key.endswith("_close_tn") or key.endswith("_matured_at") or key.endswith("_source"):
                 status_key = key.split("_", 1)[0] + "_status"
-                if status_key in ledger.columns and str(ledger.at[idx, status_key]) == "MATURE" and key != "outcome_status":
+                if str(original.get(status_key) or "") == "MATURE" and key != "outcome_status":
                     continue
             if key.endswith("_status") and existing_status == "MATURE" and key != "outcome_status":
                 continue

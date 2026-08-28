@@ -453,14 +453,14 @@ def test_deterioration_decay_invalidation_recovery_and_matcher(edge_data_dir, tm
     orig_ledger = read_ledger("edge_forward_ledger.csv", rec2)
     orig_ledger["born_at"] = "2026-01-15T00:00:00Z"
     orig_ledger.to_csv(rec2 / "edge_forward_ledger.csv", index=False)
-    mem2 = read_ledger("edge_memory.csv", rec2)
+    mem2 = read_ledger("edge_memory.csv", rec2).astype(object)
     mem2.loc[0, "status"] = EDGE_MEMORY_STATUS_ACTIVE
     mem2.loc[0, "decayed_at"] = ""
     mem2.to_csv(rec2 / "edge_memory.csv", index=False)
     cal2, freeze2, ohlcv2, t0s2 = _multi_session_fixture(
         rec2, spec, n_births=4, new1_t5=112.0, base_t5=101.0, start="2026-07-01"
     )
-    mem2 = read_ledger("edge_memory.csv", rec2)
+    mem2 = read_ledger("edge_memory.csv", rec2).astype(object)
     mem2.loc[0, "status"] = EDGE_MEMORY_STATUS_DECAYING
     mem2.loc[0, "decayed_at"] = "2026-03-01T00:00:00Z"
     mem2.to_csv(rec2 / "edge_memory.csv", index=False)
@@ -642,7 +642,9 @@ def test_daily_duty_after_phase_c(edge_data_dir, tmp_path):
     )
     assert eod["order"] == ["qualification", "continuous_learning", "recognition", "shadow"]
     assert eod["recognition"]["assessment_state"] == ASSESSMENT_QUALIFIED_MATCH_FOUND
-    none = _run_fr(edge_data_dir, _freeze_df([_t0_row("OUT", clauses=clauses_from_frozen_spec(spec), satisfy=False)]), COMPATIBLE_MARKET, trade_date=calendar[0])
+    none_freeze = _freeze_df([_t0_row("OUT", clauses=clauses_from_frozen_spec(spec), satisfy=False)])
+    none_freeze["trade_date"] = calendar[0]
+    none = _run_fr(edge_data_dir, none_freeze, COMPATIBLE_MARKET, trade_date=calendar[0])
     assert none["assessment_state"] == ASSESSMENT_NO_QUALIFIED_MATCH
     unable = _run_fr(edge_data_dir, freeze, COMPATIBLE_MARKET, freeze_df=None, freeze_path=tmp_path / "no.csv", trade_date=calendar[0])
     assert unable["assessment_state"] == ASSESSMENT_UNABLE_TO_ASSESS
