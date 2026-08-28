@@ -1,0 +1,393 @@
+{
+  "audit_version": "bb_capability_gap_audit_process_integrity_delta_v1_3j14",
+  "case_count": 12,
+  "avg_original_process_integrity": 1.0,
+  "avg_new_process_integrity": 0.917,
+  "avg_delta": -0.083,
+  "changed_case_count": 2,
+  "per_case": [
+    {
+      "seed": 101,
+      "anonymous_id": "CASE-0101",
+      "blind_class": "BLIND-A",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "SUPPORTED",
+      "new_findings": [
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 102,
+      "anonymous_id": "CASE-0102",
+      "blind_class": "BLIND-A",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "SUPPORTED",
+      "new_findings": [
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 201,
+      "anonymous_id": "CASE-0201",
+      "blind_class": "BLIND-B",
+      "original_score": 1.0,
+      "new_score": 0.5,
+      "delta": -0.5,
+      "lost_dimensions": [
+        "risky_calibration_penalty",
+        "artifact_overgeneralization_penalty"
+      ],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "EXPECTED_LONGER_JOURNEY_COST",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "SUPPORTED",
+      "new_findings": [
+        "risky_calibration:final_state=SUPPORTED",
+        "possible_artifact_or_confound_overgeneralization",
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 202,
+      "anonymous_id": "CASE-0202",
+      "blind_class": "BLIND-B",
+      "original_score": 1.0,
+      "new_score": 0.5,
+      "delta": -0.5,
+      "lost_dimensions": [
+        "risky_calibration_penalty",
+        "artifact_overgeneralization_penalty"
+      ],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "EXPECTED_LONGER_JOURNEY_COST",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "SUPPORTED",
+      "new_findings": [
+        "risky_calibration:final_state=SUPPORTED",
+        "possible_artifact_or_confound_overgeneralization",
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 301,
+      "anonymous_id": "CASE-0301",
+      "blind_class": "BLIND-C",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "WEAKENED",
+      "new_findings": [
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 302,
+      "anonymous_id": "CASE-0302",
+      "blind_class": "BLIND-C",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "WEAKENED",
+      "new_findings": [
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 401,
+      "anonymous_id": "CASE-0401",
+      "blind_class": "BLIND-D",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "WEAKENED",
+      "new_findings": [
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 402,
+      "anonymous_id": "CASE-0402",
+      "blind_class": "BLIND-D",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "WEAKENED",
+      "new_findings": [
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 501,
+      "anonymous_id": "CASE-0501",
+      "blind_class": "BLIND-E",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "FAILED_CLOSED",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "FAILED_CLOSED",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "INSUFFICIENT_EVIDENCE",
+      "new_findings": [
+        "fail_closed_termination"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 502,
+      "anonymous_id": "CASE-0502",
+      "blind_class": "BLIND-E",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "FAILED_CLOSED",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "FAILED_CLOSED",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "INSUFFICIENT_EVIDENCE",
+      "new_findings": [
+        "fail_closed_termination"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 601,
+      "anonymous_id": "CASE-0601",
+      "blind_class": "BLIND-F",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "FAILED_CLOSED",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "FAILED_CLOSED",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "INSUFFICIENT_EVIDENCE",
+      "new_findings": [
+        "fail_closed_termination"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 602,
+      "anonymous_id": "CASE-0602",
+      "blind_class": "BLIND-F",
+      "original_score": 1.0,
+      "new_score": 1.0,
+      "delta": 0.0,
+      "lost_dimensions": [],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "FAILED_CLOSED",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "NO_LOSS",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "FAILED_CLOSED",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "INSUFFICIENT_EVIDENCE",
+      "new_findings": [
+        "fail_closed_termination"
+      ],
+      "baseline_findings": []
+    }
+  ],
+  "changed_cases": [
+    {
+      "seed": 201,
+      "anonymous_id": "CASE-0201",
+      "blind_class": "BLIND-B",
+      "original_score": 1.0,
+      "new_score": 0.5,
+      "delta": -0.5,
+      "lost_dimensions": [
+        "risky_calibration_penalty",
+        "artifact_overgeneralization_penalty"
+      ],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "EXPECTED_LONGER_JOURNEY_COST",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "SUPPORTED",
+      "new_findings": [
+        "risky_calibration:final_state=SUPPORTED",
+        "possible_artifact_or_confound_overgeneralization",
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    },
+    {
+      "seed": 202,
+      "anonymous_id": "CASE-0202",
+      "blind_class": "BLIND-B",
+      "original_score": 1.0,
+      "new_score": 0.5,
+      "delta": -0.5,
+      "lost_dimensions": [
+        "risky_calibration_penalty",
+        "artifact_overgeneralization_penalty"
+      ],
+      "localization": {
+        "divergence_ordinal": 2,
+        "divergence_stage": "lifecycle_outcome",
+        "baseline_outcome": "BUDGET_EXHAUSTED",
+        "new_outcome": "SCIENTIFIC_STOP",
+        "divergence_field": "decision_leaving"
+      },
+      "loss_classification": "EXPECTED_LONGER_JOURNEY_COST",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "baseline_final_epistemic": null,
+      "new_final_epistemic": "SUPPORTED",
+      "new_findings": [
+        "risky_calibration:final_state=SUPPORTED",
+        "possible_artifact_or_confound_overgeneralization",
+        "scientific_stop:STOP_LOW_INCREMENTAL",
+        "appropriate_uncertainty_stop"
+      ],
+      "baseline_findings": []
+    }
+  ],
+  "explanation_0917": "Average process integrity dropped from 1.000 to 0.917 (-0.083) due to 2 case(s) with score changes. Seed 201 (BLIND-B): 1.0\u21920.5 at ordinal 2 (EXPECTED_LONGER_JOURNEY_COST): risky_calibration_penalty, artifact_overgeneralization_penalty Seed 202 (BLIND-B): 1.0\u21920.5 at ordinal 2 (EXPECTED_LONGER_JOURNEY_COST): risky_calibration_penalty, artifact_overgeneralization_penalty"
+}

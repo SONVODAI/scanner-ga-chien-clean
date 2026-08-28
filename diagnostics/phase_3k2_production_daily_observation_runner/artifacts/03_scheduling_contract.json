@@ -1,0 +1,56 @@
+{
+  "version": "daily_run_scheduling_contract_v1_3k2",
+  "entrypoint": "python -m modules.edge_research.opr_bridge.production_daily_run_entrypoint",
+  "expected_environment": {
+    "python": ">=3.10",
+    "data_dir": "data/edge_research/",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "required_env": []
+  },
+  "target_time_window": {
+    "description": "Post-EOD after canonical T0 freeze (>= 18:00 VN)",
+    "earliest_local": "18:00",
+    "latest_local": "23:59",
+    "timezone": "Asia/Ho_Chi_Minh"
+  },
+  "concurrency": {
+    "lock_file": "data/edge_research/production_observations/daily_run.lock",
+    "behavior": "exclusive_non_blocking",
+    "duplicate_same_day": "idempotent_replay"
+  },
+  "retry": {
+    "safe_retry": true,
+    "resume_from_phase_markers": true,
+    "max_retries": 3,
+    "backoff_seconds": [
+      60,
+      300,
+      900
+    ]
+  },
+  "data_readiness": {
+    "require_panel_through_target_date": true,
+    "fail_closed_on_provenance_ambiguity": true,
+    "weekend_behavior": "SKIP_NON_TRADING_DAY"
+  },
+  "exit_codes": {
+    "0": "SUCCESS or idempotent replay",
+    "1": "FAILED_CLOSED",
+    "2": "WAITING_FOR_DATA",
+    "3": "SKIPPED_NON_TRADING_DAY",
+    "4": "PARTIAL_RECOVERABLE",
+    "10": "LOCK_HELD"
+  },
+  "health_output": {
+    "manifest_path": "data/edge_research/production_observations/daily_manifests/{run_id}.json",
+    "status_fields": [
+      "run_status",
+      "bot_spoke_today",
+      "summary_id"
+    ]
+  },
+  "activated": false,
+  "cron_installed": false,
+  "systemd_timer_installed": false,
+  "stop_boundary": "STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY"
+}

@@ -1,0 +1,26 @@
+{
+  "EvidenceLedgerEntry": "Index EpistemicUpdateRecord + experiment metadata; no duplicate metrics",
+  "EvidenceSynthesisRecord": {
+    "immutable_snapshot": true,
+    "contains": [
+      "evidence_considered",
+      "relationships",
+      "independence_structure",
+      "contradictions",
+      "uncertainty_coverage",
+      "saturation_assessment",
+      "resulting_epistemic_state",
+      "synthesis_hash"
+    ]
+  },
+  "ResearchPriorityDecision": {
+    "separate_from": "ResearchDecisionRecord (single-evidence)",
+    "contains": [
+      "epistemic_state",
+      "saturation",
+      "marginal_information",
+      "chosen_priority_action",
+      "frontier_rationale"
+    ]
+  }
+}

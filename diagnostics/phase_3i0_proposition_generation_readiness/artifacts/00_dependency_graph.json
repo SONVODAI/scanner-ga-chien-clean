@@ -1,0 +1,155 @@
+{
+  "commit": "a9b87b11f4bb1ea5f93f3cca70ea33674b4fdf13",
+  "missing_link": {
+    "also_missing": "No stage synthesizes new uncertainty/question text outside template catalog",
+    "description": "No stage converts market/panel structural observations into novel scientific propositions",
+    "gap_between": [
+      "market_panel",
+      "bootstrap_seed"
+    ]
+  },
+  "stages": [
+    {
+      "autonomous": false,
+      "inputs": [
+        "frozen_panel_snapshot.csv",
+        "data_cutoff_date"
+      ],
+      "modules": [
+        "adapters.py",
+        "research_panel_preflight.py",
+        "market_state.py"
+      ],
+      "outputs": [
+        "eligible_explanatory features",
+        "panel_preflight"
+      ],
+      "source": "human_frozen_benchmark_config",
+      "stage": "market_panel"
+    },
+    {
+      "autonomous": false,
+      "inputs": [
+        "AutonomousResearchConfig / ROOT_CONFIG"
+      ],
+      "modules": [
+        "autonomous_research.py",
+        "bb07_run_benchmark.py"
+      ],
+      "note": "trigger_kind=AUTONOMOUS_SEED not ANOMALY",
+      "outputs": [
+        "root OBSERVATION",
+        "root QUESTION",
+        "initial ExperimentSpec"
+      ],
+      "source": "human_seeded",
+      "stage": "bootstrap_seed"
+    },
+    {
+      "autonomous": true,
+      "inputs": [
+        "ExperimentSpec"
+      ],
+      "modules": [
+        "research_tools.py",
+        "research_adaptive_tools.py",
+        "research_shape.py"
+      ],
+      "outputs": [
+        "ToolResult",
+        "OBS_* codes"
+      ],
+      "source": "deterministic_tools",
+      "stage": "experiment_execution"
+    },
+    {
+      "autonomous": true,
+      "inputs": [
+        "ToolResult",
+        "branch history"
+      ],
+      "modules": [
+        "research_interpreter.py",
+        "research_observation_kind.py"
+      ],
+      "outputs": [
+        "ResearchAssessment",
+        "information_gaps",
+        "falsification_targets"
+      ],
+      "source": "rule_based_interpreter",
+      "stage": "interpretation"
+    },
+    {
+      "autonomous": false,
+      "inputs": [
+        "ResearchAssessment",
+        "information_gaps"
+      ],
+      "modules": [
+        "research_actions.py",
+        "research_grammar.py",
+        "research_frame.py"
+      ],
+      "outputs": [
+        "ResearchActionCandidate[]",
+        "question_text",
+        "draft_spec"
+      ],
+      "source": "fixed_template_catalog + grammar_combinatorics",
+      "stage": "candidate_generation"
+    },
+    {
+      "autonomous": true,
+      "inputs": [
+        "draft_spec",
+        "uncertainty_addressed"
+      ],
+      "modules": [
+        "research_proposition_core.py",
+        "research_line_identity.py"
+      ],
+      "outputs": [
+        "CanonicalPropositionCore",
+        "scientific_question_key"
+      ],
+      "source": "derived_hash",
+      "stage": "proposition_identity"
+    },
+    {
+      "autonomous": true,
+      "inputs": [
+        "candidates",
+        "assessment",
+        "graph"
+      ],
+      "modules": [
+        "research_planner.py",
+        "research_portfolio.py",
+        "research_global_allocator.py"
+      ],
+      "outputs": [
+        "selected candidate"
+      ],
+      "source": "deterministic_scoring",
+      "stage": "ranking_selection"
+    },
+    {
+      "autonomous": true,
+      "inputs": [
+        "selected candidate"
+      ],
+      "modules": [
+        "research_controller.py",
+        "research_graph.py"
+      ],
+      "outputs": [
+        "child QUESTION node",
+        "EXPERIMENT node"
+      ],
+      "source": "graph_update",
+      "stage": "spawn_execution"
+    }
+  ],
+  "version": "phase_3i0_v1"
+}
