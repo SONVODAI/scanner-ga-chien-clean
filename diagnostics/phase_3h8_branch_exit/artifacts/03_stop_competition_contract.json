@@ -1,0 +1,5 @@
+{
+  "architecture": "global_allocator compares revalued experiments vs exit_value",
+  "stop_session_selected_when": "exit_value > best_experiment_erv",
+  "historical_frontier_not_controlling_when": "current_best_revalued_score provided"
+}

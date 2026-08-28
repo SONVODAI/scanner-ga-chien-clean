@@ -1,0 +1,83 @@
+{
+  "transitions": [
+    {
+      "decision_index": 1,
+      "pre": "1546513c8254481f",
+      "post": "1546513c8254481f",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 2,
+      "pre": "ea37630b08516f35",
+      "post": "ea37630b08516f35",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 3,
+      "pre": "49022f03695315b8",
+      "post": "49022f03695315b8",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 4,
+      "pre": "1cd8543301912be7",
+      "post": "1cd8543301912be7",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 5,
+      "pre": "b9d2cb9334755ac8",
+      "post": "b9d2cb9334755ac8",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 6,
+      "pre": "288ef208675e4c25",
+      "post": "288ef208675e4c25",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 7,
+      "pre": "984f7b9a3a54527e",
+      "post": "984f7b9a3a54527e",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 8,
+      "pre": "3a9a3206829541b2",
+      "post": "3a9a3206829541b2",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 9,
+      "pre": "5001c4d3def13df5",
+      "post": "STOP_SESSION",
+      "changed": true,
+      "stop_would_win": true
+    },
+    {
+      "decision_index": 10,
+      "pre": "a88b152867f4eb26",
+      "post": "a88b152867f4eb26",
+      "changed": false,
+      "stop_would_win": false
+    },
+    {
+      "decision_index": 11,
+      "pre": "9f863f39276d3025",
+      "post": "STOP_SESSION",
+      "changed": true,
+      "stop_would_win": true
+    }
+  ],
+  "selection_changes": 2,
+  "early_unchanged": 7
+}

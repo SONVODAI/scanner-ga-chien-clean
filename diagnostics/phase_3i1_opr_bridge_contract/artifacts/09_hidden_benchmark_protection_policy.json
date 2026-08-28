@@ -1,0 +1,65 @@
+{
+  "artifact_id": "09_hidden_benchmark_protection_policy",
+  "phase": "3I.1",
+  "status": "FROZEN_POLICY",
+  "core_invariant": "A failed hidden benchmark must NOT reveal enough information to teach the generator the hidden answer in the next iteration.",
+  "never_in_generator_scope": [
+    "Hidden phenomenon definitions (zone C)",
+    "Human/ChatGPT discovery writeups tied to zone C",
+    "Preferred features/populations/horizons derived from zone C performance",
+    "Per-phenomenon match scores from blind eval",
+    "Near-miss proposition text that aligned with hidden phenomenon",
+    "Embedding neighbors of hidden phenomena"
+  ],
+  "never_in_prompts_configs_templates": [
+    "Example propositions that mirror zone C",
+    "Few-shot seeds from hidden discoveries",
+    "Threshold values tuned from zone C convergence rate"
+  ],
+  "implementation_discipline": [
+    "Never store hidden answer definitions in generator modules",
+    "Never inspect hidden convergence during implementation",
+    "One frozen evaluation after commit",
+    "Failures become capability diagnoses, not hints about the answer"
+  ],
+  "diagnostic_feedback_abstraction": {
+    "allowed_aggregate_reports": [
+      "observational_grounding_rate: 0.72",
+      "scientifically_novel_rate: 0.08",
+      "template_instance_rate: 0.41",
+      "hidden_convergence_class: PARTIAL — 2/12 phenomena matched at semantic threshold",
+      "laundering_failure_count: 3",
+      "pathological_spam: false"
+    ],
+    "forbidden_detailed_reports": [
+      "Phenomenon PHEN_07 matched proposition PROP_abc123",
+      "Hidden edge involves dispersion in small-cap — your proposition was close",
+      "Try horizon 10d for phenomenon class X",
+      "Population high_vol was 0.03 similarity from hidden target"
+    ],
+    "convergence_class_enum": [
+      "NONE",
+      "PARTIAL",
+      "MODERATE",
+      "HIGH",
+      "INDETERMINATE"
+    ],
+    "convergence_definition": "Report bucket only — evaluator computes internally, never exports mapping"
+  },
+  "failure_as_diagnosis_not_hint": {
+    "example_fail_grounding": "Capability gap: observational grounding — improve evidence payload linkage",
+    "example_fail_novelty": "Capability gap: template independence — reduce ontology-primary inputs",
+    "example_fail_convergence": "Capability gap: hidden phenomenon alignment — no phenomenon-specific guidance",
+    "never_say": "You missed the liquidity-dispersion interaction in week 34"
+  },
+  "iteration_firewall": {
+    "after_blind_fail": "Developers may only act on aggregate capability buckets",
+    "before_next_blind": "Must document changes addressing capability bucket — not specific phenomenon",
+    "audit": "PR template requires attestation: no zone C exposure in diff"
+  },
+  "secret_handling": {
+    "zone_c_location": "Protected store; separate from generator clone",
+    "evaluator_runs_on": "Isolated runner with no artifact export to dev machines except abstract JSON",
+    "log_redaction": "Strip any proposition text matching zone C embedding threshold from CI logs"
+  }
+}

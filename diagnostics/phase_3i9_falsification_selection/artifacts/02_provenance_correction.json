@@ -1,0 +1,42 @@
+{
+  "artifact_03_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "lineage_runtime_hash": "6cde6297c37276cdc22b6f06975e7eff5c928223095ac63aa10e864e809ff9e7",
+  "historical_mismatch_preserved": true,
+  "forward_fix": "interpretation_contract_from_dict + hash excludes frozen_at",
+  "rule_content_regression": {
+    "contract_version": "interpretation_contract_v1_3i7",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "contrast_direction": "positive",
+    "partition_column": "rs_spread",
+    "outcome_field": "t5_return",
+    "min_sample": 58,
+    "spread_support_floor": 0.5,
+    "spread_disconfirm_ceiling": 0.0,
+    "expected_direction_rule": "high_quintile_mean > low_quintile_mean",
+    "supporting_rule": "high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5",
+    "disconfirming_rule": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0",
+    "falsify_strong_rule": "direction_violation AND quintile_mean_spread >= 0.5",
+    "non_informative_rule": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0",
+    "contradictory_rule": "direction_matches_quintile BUT outcome_spread_sign conflicts with quintile_delta_sign",
+    "invalid_rule": "tool_status != OK OR sample_size < min_sample OR cutoff_mismatch OR missing_quintile_metrics",
+    "transition_mapping": {
+      "SUPPORTING": "SUPPORTED",
+      "DISCONFIRMING": "WEAKENED",
+      "DISCONFIRMING_STRONG": "FALSIFIED",
+      "CONTRADICTORY": "WEAKENED",
+      "NON_INFORMATIVE": "INSUFFICIENT_EVIDENCE",
+      "INVALID": "UNCHANGED"
+    },
+    "decision_mapping": {
+      "SUPPORTING": "SEEK_FALSIFICATION",
+      "DISCONFIRMING": "SEEK_REPLICATION",
+      "DISCONFIRMING_STRONG": "ABANDON",
+      "CONTRADICTORY": "SEEK_FALSIFICATION",
+      "NON_INFORMATIVE": "HOLD_UNRESOLVED",
+      "INVALID": "HOLD_UNRESOLVED"
+    },
+    "abandon_requires": "DISCONFIRMING_STRONG \u2192 FALSIFIED"
+  },
+  "new_build_matches_artifact_rules": true
+}

@@ -1,0 +1,14 @@
+{
+  "phase": "3I.4",
+  "git_head": "075ff0fcd4d1acbceadfc9ea69f5d37e3eea61bf",
+  "generator_version": "opr_generator_v1_3i2",
+  "audit_mode": "DIAGNOSTICS_ONLY",
+  "decision": "PARTIAL_VALIDATION",
+  "unique_scientific_ideas": 1,
+  "research_worthy_unique": 1,
+  "selectivity_classification": "OVERTRIGGERING",
+  "executability_fidelity": "PRESERVES_MEANING",
+  "template_reaudit_disagreement_count": 0,
+  "highest_leverage_missing_capability": "PRIORITIZE",
+  "proposed_next_phase": "Phase 3I.5 \u2014 Observation prioritization and scientific-identity deduplication before proposition emission (proposal only)"
+}
