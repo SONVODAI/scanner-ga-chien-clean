@@ -1,10 +1,12 @@
 """
-VPS Camera money-flow evidence from 5-minute OHLCV.
+VPS Camera activity evidence from 5-minute OHLCV.
 
 Camera schema is price+volume only. No foreign buy/sell. No stored value column.
-Session value is derived as close * volume and labeled as derived.
+Session traded value is derived as sum(close * volume) and labeled as derived
+activity / trading value — NEVER as directional money inflow/outflow.
+
 PIT: bars with timestamp > cutoff are ignored.
-Missing feed / missing symbol → UNKNOWN, never WEAK/NORMAL.
+Missing feed / missing symbol → UNKNOWN, never LOW/NORMAL.
 """
 
 from __future__ import annotations
@@ -16,26 +18,46 @@ import pandas as pd
 
 from modules.actionable_research.contracts import (
     ACCEL_BARS,
+    ACTIVITY_HIGH_PERCENTILE,
+    ACTIVITY_LOW_PERCENTILE,
     CAMERA_DATA_FEED_MISSING,
     CAMERA_DATA_INSUFFICIENT,
     CAMERA_DATA_MISSING_SYMBOL,
     CAMERA_DATA_OK,
     CAMERA_DATA_PARTIAL,
+    CLOSE_LOCATION_UNKNOWN,
+    CLOSE_MID,
+    CLOSE_NEAR_HIGH,
+    CLOSE_NEAR_HIGH_THRESHOLD,
+    CLOSE_NEAR_LOW,
+    CLOSE_NEAR_LOW_THRESHOLD,
+    INTRADAY_ACTIVITY_HIGH,
+    INTRADAY_ACTIVITY_LOW,
+    INTRADAY_ACTIVITY_NORMAL,
+    INTRADAY_ACTIVITY_UNKNOWN,
     MIN_CROSS_SECTION,
-    MONEY_FLOW_DIR_FLAT,
-    MONEY_FLOW_DIR_INFLOW,
-    MONEY_FLOW_DIR_OUTFLOW,
-    MONEY_FLOW_DIR_UNKNOWN,
-    MONEY_FLOW_NORMAL,
-    MONEY_FLOW_STRONG,
-    MONEY_FLOW_STRONG_PERCENTILE,
-    MONEY_FLOW_UNKNOWN,
-    MONEY_FLOW_WEAK,
-    MONEY_FLOW_WEAK_PERCENTILE,
+    PRICE_DIRECTION_DOWN,
+    PRICE_DIRECTION_FLAT,
+    PRICE_DIRECTION_UNKNOWN,
+    PRICE_DIRECTION_UP,
+    TRADING_VALUE_NORMAL,
+    TRADING_VALUE_UNKNOWN,
+    TRADING_VALUE_UNUSUALLY_HIGH,
+    VOLUME_ACCEL_HIGH_RATIO,
+    VOLUME_ACCELERATION_HIGH,
+    VOLUME_ACCELERATION_NORMAL,
+    VOLUME_ACCELERATION_UNKNOWN,
 )
 from modules.actionable_research.paths import FusionPaths
 from modules.intraday_memory.storage import load_session
 from modules.intraday_memory.timezone_policy import VN_TZ
+
+ACTIVITY_PROVENANCE = (
+    "VPS Camera 5-minute OHLCV (vnstock4_kbs). "
+    "Derived session traded value = sum(close * volume). "
+    "This measures approximate traded activity/value, not buy-flow or sell-flow. "
+    "No foreign fields."
+)
 
 
 def _parse_cutoff(cutoff: Optional[datetime | str], trade_date: str) -> Optional[datetime]:
@@ -131,6 +153,27 @@ def load_camera_session(
     }
 
 
+def _close_location(first_open: Optional[float], last_close: Optional[float], high: Optional[float], low: Optional[float]) -> str:
+    if last_close is None:
+        return CLOSE_LOCATION_UNKNOWN
+    session_high = high
+    session_low = low
+    if session_high is None or session_low is None:
+        if first_open is None:
+            return CLOSE_LOCATION_UNKNOWN
+        session_high = max(first_open, last_close)
+        session_low = min(first_open, last_close)
+    span = float(session_high) - float(session_low)
+    if span <= 0:
+        return CLOSE_MID
+    loc = (float(last_close) - float(session_low)) / span
+    if loc >= CLOSE_NEAR_HIGH_THRESHOLD:
+        return CLOSE_NEAR_HIGH
+    if loc <= CLOSE_NEAR_LOW_THRESHOLD:
+        return CLOSE_NEAR_LOW
+    return CLOSE_MID
+
+
 def _symbol_metrics(sym_bars: pd.DataFrame) -> Dict[str, Any]:
     if sym_bars.empty:
         return {}
@@ -152,34 +195,83 @@ def _symbol_metrics(sym_bars: pd.DataFrame) -> Dict[str, Any]:
             first_open = float(opens.iloc[0])
     if first_open is None and close.notna().any():
         first_open = float(close.iloc[0])
+    high = None
+    low = None
+    if "high" in ordered.columns:
+        highs = pd.to_numeric(ordered["high"], errors="coerce")
+        if highs.notna().any():
+            high = float(highs.max())
+    if "low" in ordered.columns:
+        lows = pd.to_numeric(ordered["low"], errors="coerce")
+        if lows.notna().any():
+            low = float(lows.min())
     session_return_pct = None
-    direction = MONEY_FLOW_DIR_UNKNOWN
+    direction = PRICE_DIRECTION_UNKNOWN
     if first_open is not None and last_close is not None and first_open != 0:
         session_return_pct = (last_close / first_open - 1.0) * 100.0
         if last_close > first_open:
-            direction = MONEY_FLOW_DIR_INFLOW
+            direction = PRICE_DIRECTION_UP
         elif last_close < first_open:
-            direction = MONEY_FLOW_DIR_OUTFLOW
+            direction = PRICE_DIRECTION_DOWN
         else:
-            direction = MONEY_FLOW_DIR_FLAT
+            direction = PRICE_DIRECTION_FLAT
     last_ts = ordered["timestamp"].iloc[-1]
     last_ts_s = last_ts.isoformat() if hasattr(last_ts, "isoformat") else str(last_ts)
+    accel_status = VOLUME_ACCELERATION_UNKNOWN
+    if accel is None:
+        accel_status = VOLUME_ACCELERATION_UNKNOWN
+    elif accel >= VOLUME_ACCEL_HIGH_RATIO:
+        accel_status = VOLUME_ACCELERATION_HIGH
+    else:
+        accel_status = VOLUME_ACCELERATION_NORMAL
     return {
         "bar_count": n,
         "session_volume": float(volume.sum()),
         "session_value_derived": float(derived_value.sum()),
         "first_open": first_open,
         "last_close": last_close,
+        "session_high": high,
+        "session_low": low,
         "session_return_pct": session_return_pct,
-        "money_flow_direction": direction,
+        "price_direction": direction,
+        "close_location": _close_location(first_open, last_close, high, low),
         "volume_acceleration_ratio": accel,
+        "volume_acceleration_status": accel_status,
         "last_bar_timestamp": last_ts_s,
-        "value_derivation": "sum(close * volume) from Camera OHLCV; value is not a stored Camera field",
-        "direction_note": "Direction from session open→close on Camera OHLCV. Observation, not BUY/SELL.",
+        "value_derivation": (
+            "sum(close * volume) from Camera OHLCV; approximate traded value/activity. "
+            "Not directional money inflow or outflow. Value is not a stored Camera field."
+        ),
+        "direction_note": (
+            "price_direction is session open→close on Camera OHLCV. "
+            "Conservative price-path observation, not buy-flow/sell-flow."
+        ),
     }
 
 
-def classify_money_flow(
+def _missing_symbol_payload(cutoff_iso: str, source: str, *, feed_missing: bool) -> Dict[str, Any]:
+    status = CAMERA_DATA_FEED_MISSING if feed_missing else CAMERA_DATA_MISSING_SYMBOL
+    note = (
+        "CAMERA_DATA_MISSING — not INTRADAY_ACTIVITY_LOW / NORMAL."
+        if feed_missing
+        else "CAMERA_DATA_MISSING — symbol has no bars <= cutoff. Not INTRADAY_ACTIVITY_LOW / NORMAL."
+    )
+    return {
+        "camera_data_status": status,
+        "camera_cutoff_timestamp": cutoff_iso,
+        "activity_status": INTRADAY_ACTIVITY_UNKNOWN,
+        "trading_value_status": TRADING_VALUE_UNKNOWN,
+        "volume_acceleration_status": VOLUME_ACCELERATION_UNKNOWN,
+        "price_direction": PRICE_DIRECTION_UNKNOWN,
+        "close_location": CLOSE_LOCATION_UNKNOWN,
+        "metrics": {},
+        "source": source,
+        "provenance": ACTIVITY_PROVENANCE,
+        "note": note,
+    }
+
+
+def classify_intraday_activity(
     trade_date: str,
     symbols: Sequence[str],
     *,
@@ -198,16 +290,7 @@ def classify_money_flow(
     if feed == CAMERA_DATA_FEED_MISSING or bars is None or bars.empty:
         for raw in symbols:
             symbol = str(raw).upper()
-            per_symbol[symbol] = {
-                "camera_data_status": CAMERA_DATA_FEED_MISSING,
-                "camera_cutoff_timestamp": cutoff_iso,
-                "money_flow_status": MONEY_FLOW_UNKNOWN,
-                "metrics": {},
-                "money_flow_direction": MONEY_FLOW_DIR_UNKNOWN,
-                "source": source,
-                "provenance": "VPS Camera 5-minute OHLCV (vnstock4_kbs). No foreign fields.",
-                "note": "CAMERA_DATA_MISSING — not MONEY_FLOW_WEAK / NORMAL.",
-            }
+            per_symbol[symbol] = _missing_symbol_payload(cutoff_iso, source, feed_missing=True)
         return {
             "feed_status": CAMERA_DATA_FEED_MISSING,
             "cutoff": cutoff_iso,
@@ -243,48 +326,54 @@ def classify_money_flow(
         symbol = str(raw).upper()
         m = metrics_map.get(symbol) or {}
         if not m:
-            per_symbol[symbol] = {
-                "camera_data_status": CAMERA_DATA_MISSING_SYMBOL,
-                "camera_cutoff_timestamp": cutoff_iso,
-                "money_flow_status": MONEY_FLOW_UNKNOWN,
-                "metrics": {},
-                "money_flow_direction": MONEY_FLOW_DIR_UNKNOWN,
-                "source": source,
-                "provenance": "VPS Camera 5-minute OHLCV. Symbol has no bars <= cutoff.",
-                "note": "CAMERA_DATA_MISSING — not MONEY_FLOW_WEAK / NORMAL.",
-            }
+            per_symbol[symbol] = _missing_symbol_payload(cutoff_iso, source, feed_missing=False)
             continue
         if cross_n < MIN_CROSS_SECTION:
-            status = MONEY_FLOW_UNKNOWN
+            activity = INTRADAY_ACTIVITY_UNKNOWN
+            trading_value = TRADING_VALUE_UNKNOWN
             cam_status = CAMERA_DATA_INSUFFICIENT
-            note = "INSUFFICIENT_CROSS_SECTION — not converted to WEAK/NORMAL."
+            note = "INSUFFICIENT_CROSS_SECTION — not converted to LOW/NORMAL."
         else:
             pct = percentiles.get(symbol)
             m["session_value_percentile"] = pct
             if pct is None:
-                status = MONEY_FLOW_UNKNOWN
+                activity = INTRADAY_ACTIVITY_UNKNOWN
+                trading_value = TRADING_VALUE_UNKNOWN
                 cam_status = CAMERA_DATA_PARTIAL
                 note = "Percentile unavailable."
-            elif pct >= MONEY_FLOW_STRONG_PERCENTILE:
-                status = MONEY_FLOW_STRONG
+            elif pct >= ACTIVITY_HIGH_PERCENTILE:
+                activity = INTRADAY_ACTIVITY_HIGH
+                trading_value = TRADING_VALUE_UNUSUALLY_HIGH
                 cam_status = CAMERA_DATA_OK
-                note = "Universe-relative session value (derived close*volume)."
-            elif pct <= MONEY_FLOW_WEAK_PERCENTILE:
-                status = MONEY_FLOW_WEAK
+                note = (
+                    "Universe-relative derived session traded value (close*volume). "
+                    "Activity/value observation — not money inflow."
+                )
+            elif pct <= ACTIVITY_LOW_PERCENTILE:
+                activity = INTRADAY_ACTIVITY_LOW
+                trading_value = TRADING_VALUE_NORMAL
                 cam_status = CAMERA_DATA_OK
-                note = "Universe-relative session value (derived close*volume)."
+                note = (
+                    "Universe-relative derived session traded value (close*volume). "
+                    "Low activity — not money outflow."
+                )
             else:
-                status = MONEY_FLOW_NORMAL
+                activity = INTRADAY_ACTIVITY_NORMAL
+                trading_value = TRADING_VALUE_NORMAL
                 cam_status = CAMERA_DATA_OK
-                note = "Universe-relative session value (derived close*volume)."
+                note = "Universe-relative derived session traded value (close*volume)."
         per_symbol[symbol] = {
             "camera_data_status": cam_status,
             "camera_cutoff_timestamp": cutoff_iso,
-            "money_flow_status": status,
-            "money_flow_direction": m.get("money_flow_direction") or MONEY_FLOW_DIR_UNKNOWN,
+            "activity_status": activity,
+            "trading_value_status": trading_value,
+            "volume_acceleration_status": m.get("volume_acceleration_status")
+            or VOLUME_ACCELERATION_UNKNOWN,
+            "price_direction": m.get("price_direction") or PRICE_DIRECTION_UNKNOWN,
+            "close_location": m.get("close_location") or CLOSE_LOCATION_UNKNOWN,
             "metrics": m,
             "source": source,
-            "provenance": "VPS Camera 5-minute OHLCV (price, volume). Value derived. No foreign. Observation, not BUY.",
+            "provenance": ACTIVITY_PROVENANCE,
             "note": note,
         }
 
@@ -296,3 +385,7 @@ def classify_money_flow(
         "by_symbol": per_symbol,
         "look_ahead_bars_dropped": int(bundle.get("look_ahead_bars_dropped") or 0),
     }
+
+
+# Back-compat alias for older call sites / tests that imported the previous name.
+classify_money_flow = classify_intraday_activity

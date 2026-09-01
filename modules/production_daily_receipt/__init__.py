@@ -88,8 +88,49 @@ def _count_date_rows(
     out["rows"] = n
     if "symbol" in df.columns:
         out["unique_symbols"] = int(df.loc[mask, "symbol"].nunique())
-    out["status"] = "PRESENT" if n > 0 else "ABSENT_FOR_DATE"
+        out["status"] = "PRESENT" if n > 0 else "ABSENT_FOR_DATE"
     return out
+
+
+def _fusion_receipt_block(edge: Dict[str, Any]) -> Dict[str, Any]:
+    """Nested Fusion observability. Never changes overall PASS/FAIL meaning."""
+    ar = edge.get("actionable_research") if isinstance(edge.get("actionable_research"), dict) else {}
+    if not ar:
+        return {
+            "ran": False,
+            "status": "NOT_RUN",
+            "universe_evaluated": None,
+            "noteworthy_count": None,
+            "artifact_path": None,
+            "observation_births": None,
+            "observation_duplicate_skips": None,
+            "missing_camera_count": None,
+            "missing_foreign_count": None,
+            "generated_at": None,
+        }
+    result = ar.get("result") if isinstance(ar.get("result"), dict) else {}
+    scan = result.get("scan") if isinstance(result.get("scan"), dict) else {}
+    return {
+        "ran": bool(ar.get("ran_fusion") if "ran_fusion" in ar else ar.get("ran")),
+        "status": ar.get("status") or ar.get("session_status") or result.get("session_status") or "UNKNOWN",
+        "universe_evaluated": ar.get("universe_evaluated")
+        if ar.get("universe_evaluated") is not None
+        else (result.get("universe_count") or scan.get("scanned_count")),
+        "noteworthy_count": ar.get("noteworthy_count")
+        if ar.get("noteworthy_count") is not None
+        else ar.get("notable_count"),
+        "artifact_path": ar.get("artifact_path") or ar.get("artifact_daily_path"),
+        "observation_births": ar.get("observation_births"),
+        "observation_duplicate_skips": ar.get("observation_duplicate_skips"),
+        "missing_camera_count": ar.get("missing_camera_count")
+        if ar.get("missing_camera_count") is not None
+        else scan.get("camera_unknown_count"),
+        "missing_foreign_count": ar.get("missing_foreign_count")
+        if ar.get("missing_foreign_count") is not None
+        else scan.get("foreign_unknown_count"),
+        "generated_at": ar.get("generated_at") or result.get("generated_at"),
+        "failure_detail": ar.get("failure_detail"),
+    }
 
 
 def _session_voice_info(trade_date: str, *, edge_data_dir: Optional[Path] = None) -> Dict[str, Any]:
@@ -297,6 +338,7 @@ def build_daily_pipeline_receipt(
         },
         "closed_loop_complete": closed_loop_complete,
         "closed_loop_status": closed_loop_status,
+        "fusion": _fusion_receipt_block(edge),
         "pipeline_complete": bool(
             not pipeline_terminated and closed_loop_complete and overall in (OVERALL_PASS, OVERALL_SKIPPED, OVERALL_WAITING)
         ),
@@ -482,6 +524,14 @@ def write_incomplete_pipeline_receipt(
                 "assessment_reason": "",
                 "skip_reason": CLOSED_LOOP_NOT_RUN,
                 "order": ["qualification", "continuous_learning", "recognition", "shadow"],
+            }
+        if not terminated.get("actionable_research"):
+            terminated["actionable_research"] = {
+                "ran_fusion": False,
+                "ran": False,
+                "status": "NOT_RUN",
+                "session_status": "NOT_RUN",
+                "skip_reason": "PIPELINE_TERMINATED_BEFORE_FUSION",
             }
         return write_receipt_from_run(
             trade_date,

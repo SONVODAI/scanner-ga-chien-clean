@@ -18,13 +18,16 @@ from modules.actionable_research.contracts import (
     EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE,
     FOREIGN_STRONG_BUY,
     FOREIGN_STRONG_SELL,
-    MONEY_FLOW_DIR_OUTFLOW,
-    MONEY_FLOW_STRONG,
-    MONEY_FLOW_UNKNOWN,
+    INTRADAY_ACTIVITY_HIGH,
+    INTRADAY_ACTIVITY_UNKNOWN,
     NO_INTEREST_VI,
     OBSERVATION_CONFLICT,
+    PRICE_DIRECTION_DOWN,
     SESSION_ELIGIBLE,
     SESSION_SKIPPED_NON_TRADING,
+    SKIPPED_NON_TRADING_VI,
+    TRADING_VALUE_UNUSUALLY_HIGH,
+    UNABLE_VI,
 )
 from modules.actionable_research.engine import fuse_session
 from modules.actionable_research.foreign import CAMERA_HAS_INTRADAY_FOREIGN
@@ -228,7 +231,8 @@ def test_2_zero_active_one_strong_money_flow_still_surfaced(fusion_paths):
     payload = fuse_session(TRADE_DATE, paths=fusion_paths)
     rec = _by_symbol(payload, strong)
     assert rec["edge_status"] == EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE
-    assert rec["money_flow_status"] == MONEY_FLOW_STRONG
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_HIGH
+    assert rec["trading_value_status"] == TRADING_VALUE_UNUSUALLY_HIGH
     assert rec["notable"] is True
     assert strong in payload["surfaced_symbols"]
     assert payload["notable_count"] >= 1
@@ -237,6 +241,9 @@ def test_2_zero_active_one_strong_money_flow_still_surfaced(fusion_paths):
     assert len(payload["observations"]) < 142
     assert "NO_OPPORTUNITY" not in json.dumps(payload)
     assert "Không có ACTIVE edge" in rec["evidence_summary"]
+    assert "Hoạt động giao dịch intraday cao bất thường" in rec["evidence_summary"]
+    assert "dòng tiền vào mạnh" not in rec["evidence_summary"].lower()
+    assert "tiền vào mạnh" not in rec["evidence_summary"].lower()
 
 
 def test_3_active_edge_missing_camera_stays_visible_unknown(fusion_paths):
@@ -254,11 +261,11 @@ def test_3_active_edge_missing_camera_stays_visible_unknown(fusion_paths):
     payload = fuse_session(TRADE_DATE, paths=fusion_paths)
     rec = _by_symbol(payload, matched)
     assert rec["edge_status"] == EDGE_STATUS_ACTIVE_MATCH
-    assert rec["money_flow_status"] == MONEY_FLOW_UNKNOWN
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_UNKNOWN
     assert rec["camera_data_status"] == CAMERA_DATA_FEED_MISSING
     assert rec["notable"] is True
-    assert "UNKNOWN" == rec["money_flow_status"]
-    assert rec["money_flow_status"] not in {"MONEY_FLOW_NORMAL", "MONEY_FLOW_WEAK"}
+    assert "UNKNOWN" == rec["activity_status"]
+    assert rec["activity_status"] not in {"INTRADAY_ACTIVITY_NORMAL", "INTRADAY_ACTIVITY_LOW"}
     assert "khớp ACTIVE edge" in rec["evidence_summary"]
 
 
@@ -280,10 +287,11 @@ def test_4_active_edge_and_strong_money_flow_both_shown(fusion_paths):
     payload = fuse_session(TRADE_DATE, paths=fusion_paths)
     rec = _by_symbol(payload, matched)
     assert rec["edge_status"] == EDGE_STATUS_ACTIVE_MATCH
-    assert rec["money_flow_status"] == MONEY_FLOW_STRONG
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_HIGH
     assert rec["research_label"] == AUTHORITY_LABEL
     assert "ACTIVE edge" in rec["evidence_summary"]
-    assert "dòng tiền" in rec["evidence_summary"]
+    assert "Hoạt động giao dịch" in rec["evidence_summary"]
+    assert "dòng tiền vào mạnh" not in rec["evidence_summary"].lower()
 
 
 def test_5_strong_flow_and_foreign_without_active_edge(fusion_paths):
@@ -299,7 +307,7 @@ def test_5_strong_flow_and_foreign_without_active_edge(fusion_paths):
     payload = fuse_session(TRADE_DATE, paths=fusion_paths)
     rec = _by_symbol(payload, hot)
     assert rec["edge_status"] == EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE
-    assert rec["money_flow_status"] == MONEY_FLOW_STRONG
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_HIGH
     assert rec["foreign_flow_status"] == FOREIGN_STRONG_BUY
     assert rec["foreign_timing"] == "EOD"
     assert rec["interest_level"] == "HIGH"
@@ -325,7 +333,7 @@ def test_6_triple_evidence_strongest_still_research_only(fusion_paths):
     payload = fuse_session(TRADE_DATE, paths=fusion_paths)
     rec = _by_symbol(payload, hot)
     assert rec["edge_status"] == EDGE_STATUS_ACTIVE_MATCH
-    assert rec["money_flow_status"] == MONEY_FLOW_STRONG
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_HIGH
     assert rec["foreign_flow_status"] == FOREIGN_STRONG_BUY
     assert rec["presentation_rank"] == 0
     assert rec["research_label"] == AUTHORITY_LABEL
@@ -383,9 +391,16 @@ def test_10_non_trading_day_skipped_no_scientific_records(fusion_paths):
     assert payload["session_status"] == SESSION_SKIPPED_NON_TRADING
     assert payload["records"] == []
     assert payload["scientific_writes"] == []
+    assert payload["headline_vi"] == SKIPPED_NON_TRADING_VI
+    assert payload["headline_vi"] != NO_INTEREST_VI
     weekend_natural = fuse_session(WEEKEND, paths=fusion_paths)
     assert weekend_natural["session_status"] == SESSION_SKIPPED_NON_TRADING
     assert weekend_natural["records"] == []
+    assert weekend_natural["headline_vi"] != NO_INTEREST_VI
+    ledger = fusion_paths.observation_ledger_path()
+    if ledger.exists():
+        lines = [ln for ln in ledger.read_text().splitlines() if ln.strip()]
+        assert lines == []
 
 
 def test_11_same_date_replay_no_duplicate_records(fusion_paths):
@@ -456,7 +471,7 @@ def test_14_camera_runner_failure_does_not_break_collect(tmp_path):
     ), patch(
         "modules.intraday_memory.runner.IntradayCollector"
     ) as collector_cls, patch(
-        "modules.actionable_research.production_hook.run_actionable_research_after_daily",
+        "modules.actionable_research.production_hook.maybe_run_fusion_after_camera",
         side_effect=RuntimeError("fusion boom"),
     ):
         collector_cls.return_value.collect_session.return_value = mock_manifest
@@ -528,7 +543,7 @@ def test_strong_foreign_sell_is_noteworthy_not_bullish_only(fusion_paths):
     assert "bán mạnh" in rec["evidence_summary"]
 
 
-def test_abnormal_outflow_is_observation_not_buy(fusion_paths):
+def test_abnormal_activity_during_price_decline_is_not_money_inflow(fusion_paths):
     hot = UNIVERSE[7]
     _write_freeze(fusion_paths, TRADE_DATE)
     _write_edge_memory(fusion_paths, [])
@@ -539,10 +554,21 @@ def test_abnormal_outflow_is_observation_not_buy(fusion_paths):
     _write_camera(fusion_paths, TRADE_DATE, volumes, opens=opens, closes=closes)
     payload = fuse_session(TRADE_DATE, paths=fusion_paths)
     rec = _by_symbol(payload, hot)
-    assert rec["money_flow_status"] == MONEY_FLOW_STRONG
-    assert rec["money_flow_direction"] == MONEY_FLOW_DIR_OUTFLOW
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_HIGH
+    assert rec["price_direction"] == PRICE_DIRECTION_DOWN
     assert rec["notable"] is True
-    assert "MONEY_FLOW_IS_OBSERVATION_NOT_BUY" in rec["reasons"]
+    assert rec.get("money_flow_status") not in {
+        "MONEY_FLOW_STRONG",
+        "MONEY_INFLOW_STRONG",
+        "MONEY_OUTFLOW_STRONG",
+    }
+    assert rec.get("money_flow_direction") not in {"INFLOW", "OUTFLOW"}
+    summary = rec["evidence_summary"].lower()
+    assert "dòng tiền vào mạnh" not in summary
+    assert "tiền vào mạnh" not in summary
+    assert "hoạt động giao dịch" in summary
+    assert "giá giảm" in summary
+    assert "ACTIVITY_IS_NOT_MONEY_INFLOW" in rec["reasons"]
     assert rec["research_label"] == AUTHORITY_LABEL
 
 
@@ -605,4 +631,175 @@ def test_observation_ledger_first_write_wins(fusion_paths):
     assert row["t5_return_pct"] is None
     assert row["t10_return_pct"] is None
     assert row["authority"] == "RESEARCH ONLY"
+    assert row["activity_status"] == INTRADAY_ACTIVITY_HIGH
+    assert row["maturity_basis"] == "vn_trading_sessions"
+
+
+def _append_freeze_prices(paths: FusionPaths, extra_rows: list[dict]) -> None:
+    existing = pd.read_csv(paths.t0_freeze_path())
+    pd.concat([existing, pd.DataFrame(extra_rows)], ignore_index=True).to_csv(
+        paths.t0_freeze_path(), index=False
+    )
+
+
+def test_national_day_creates_no_observation_or_maturity(fusion_paths):
+    """N. Non-trading holiday must not birth T0 or advance T3/T5/T10."""
+    from modules.actionable_research.observation_maturity import load_observation_ledger, target_session_for_horizon
+
+    strong = UNIVERSE[0]
+    t0 = TRADE_DATE
+    holiday = "2026-09-02"
+    _write_freeze(fusion_paths, t0)
+    _write_edge_memory(fusion_paths, [])
+    volumes = {sym: 1_000 for sym in UNIVERSE}
+    volumes[strong] = 50_000_000
+    _write_camera(fusion_paths, t0, volumes)
+    born = fuse_session(t0, paths=fusion_paths)
+    assert born["observation_births"] == 1
+    before = load_observation_ledger(fusion_paths)
+    assert before[0]["t3_return_pct"] is None
+
+    holiday_run = fuse_session(holiday, paths=fusion_paths)
+    assert holiday_run["session_status"] == SESSION_SKIPPED_NON_TRADING
+    assert holiday_run["observations"] == []
+    assert holiday_run["headline_vi"] != NO_INTEREST_VI
+    after = load_observation_ledger(fusion_paths)
+    assert len(after) == 1
+    assert after[0]["t3_return_pct"] is None
+    assert after[0]["outcome_status"] == "PENDING"
+    assert holiday_run["observation_maturity"]["skipped"] is True
+    assert target_session_for_horizon("2026-09-01", "T3") == "2026-09-07"
+
+
+def test_observation_maturity_uses_trading_sessions_not_calendar_days(fusion_paths):
+    """O. T3 skips weekend; Saturday run does not mature."""
+    from modules.actionable_research.observation_maturity import target_session_for_horizon
+
+    strong = UNIVERSE[0]
+    t0 = TRADE_DATE  # Friday 2026-08-14
+    t3 = "2026-08-19"
+    t5 = "2026-08-21"
+    t10 = "2026-08-28"
+    assert target_session_for_horizon(t0, "T3") == t3
+    assert target_session_for_horizon(t0, "T5") == t5
+    assert target_session_for_horizon(t0, "T10") == t10
+
+    _write_freeze(fusion_paths, t0)
+    t0_price = float(pd.read_csv(fusion_paths.t0_freeze_path()).query("symbol == @strong").iloc[0]["price"])
+    _append_freeze_prices(
+        fusion_paths,
+        [
+            {
+                "trade_date": t3,
+                "symbol": strong,
+                "health_group": "TRUNG TINH",
+                "group": "THEO DOI",
+                "pattern_key_v2_frozen": "CTX::DNA",
+                "price": t0_price * 1.10,
+            },
+            {
+                "trade_date": t5,
+                "symbol": strong,
+                "health_group": "TRUNG TINH",
+                "group": "THEO DOI",
+                "pattern_key_v2_frozen": "CTX::DNA",
+                "price": t0_price * 1.20,
+            },
+            {
+                "trade_date": t10,
+                "symbol": strong,
+                "health_group": "TRUNG TINH",
+                "group": "THEO DOI",
+                "pattern_key_v2_frozen": "CTX::DNA",
+                "price": t0_price * 0.95,
+            },
+        ],
+    )
+    _write_edge_memory(fusion_paths, [])
+    volumes = {sym: 1_000 for sym in UNIVERSE}
+    volumes[strong] = 50_000_000
+    _write_camera(fusion_paths, t0, volumes)
+    fuse_session(t0, paths=fusion_paths)
+
+    saturday = fuse_session(WEEKEND, paths=fusion_paths)
+    assert saturday["session_status"] == SESSION_SKIPPED_NON_TRADING
+    ledger = [json.loads(ln) for ln in fusion_paths.observation_ledger_path().read_text().splitlines() if ln.strip()]
+    assert ledger[0]["t3_return_pct"] is None
+
+    t3_run = fuse_session(t3, paths=fusion_paths)
+    assert t3_run["session_status"] == SESSION_ELIGIBLE
+    ledger = [json.loads(ln) for ln in fusion_paths.observation_ledger_path().read_text().splitlines() if ln.strip()]
+    row = ledger[0]
+    assert abs(float(row["t3_return_pct"]) - 10.0) < 1e-6
+    assert row["t3_status"] == "MATURE"
+    assert row["t5_return_pct"] is None
+    assert row["t10_return_pct"] is None
+    assert row["t3_target_session"] == t3
+    assert row["outcome_status"] == "PARTIAL"
+
+    t5_run = fuse_session(t5, paths=fusion_paths)
+    ledger = [json.loads(ln) for ln in fusion_paths.observation_ledger_path().read_text().splitlines() if ln.strip()]
+    row = ledger[0]
+    assert abs(float(row["t5_return_pct"]) - 20.0) < 1e-6
+    assert row["t10_return_pct"] is None
+    replay = fuse_session(t5, paths=fusion_paths)
+    assert replay["idempotent_replay"] is True
+    ledger2 = [json.loads(ln) for ln in fusion_paths.observation_ledger_path().read_text().splitlines() if ln.strip()]
+    assert abs(float(ledger2[0]["t5_return_pct"]) - 20.0) < 1e-6
+    assert len(ledger2) == 1
+
+
+def test_t0_not_ready_is_unable_not_nothing_noteworthy(fusion_paths):
+    payload = fuse_session(
+        TRADE_DATE,
+        paths=fusion_paths,
+        daily_result={"run": {"run_disposition": "SUCCESS"}, "closed_loop_edge": {"skip_reason": "SKIPPED_T0_NOT_READY"}},
+    )
+    assert payload["session_status"] == "UNABLE_TO_ASSESS"
+    assert payload["headline_vi"] == UNABLE_VI
+    assert payload["headline_vi"] != NO_INTEREST_VI
+    assert payload["observations"] == []
+
+
+def test_fusion_creates_zero_scientific_live_forward_births(fusion_paths):
+    strong = UNIVERSE[0]
+    _write_freeze(fusion_paths, TRADE_DATE)
+    _write_edge_memory(
+        fusion_paths,
+        [{"edge_id": "E1", "hypothesis_id": "H1", "status": "ACTIVE", "best_horizon": "T5"}],
+    )
+    _write_recognition(
+        fusion_paths,
+        TRADE_DATE,
+        [{"symbol": strong, "edge_id": "E1", "best_horizon": "T5"}],
+    )
+    volumes = {sym: 1_000 for sym in UNIVERSE}
+    volumes[strong] = 50_000_000
+    _write_camera(fusion_paths, TRADE_DATE, volumes)
+    payload = fuse_session(TRADE_DATE, paths=fusion_paths)
+    assert payload["scientific_writes"] == []
+    ledger = fusion_paths.edge_root() / "edge_forward_ledger.csv"
+    assert not ledger.exists()
+    dumped = json.dumps(payload)
+    assert "LIVE_FORWARD" not in dumped or payload["authority"] == AUTHORITY_LABEL
+    assert "BUY" not in (payload.get("observations") or [{}])[0].get("reasons", [])
+
+
+def test_forbidden_money_flow_labels_never_emitted(fusion_paths):
+    from modules.actionable_research.contracts import FORBIDDEN_MONEY_FLOW_LABELS
+
+    strong = UNIVERSE[0]
+    _write_freeze(fusion_paths, TRADE_DATE)
+    _write_edge_memory(fusion_paths, [])
+    volumes = {sym: 1_000 for sym in UNIVERSE}
+    volumes[strong] = 90_000_000
+    _write_camera(fusion_paths, TRADE_DATE, volumes, opens={strong: 25000}, closes={strong: 15000})
+    payload = fuse_session(TRADE_DATE, paths=fusion_paths)
+    blob = json.dumps(payload)
+    for label in FORBIDDEN_MONEY_FLOW_LABELS:
+        assert f'"{label}"' not in blob
+    rec = _by_symbol(payload, strong)
+    assert rec["activity_status"] == INTRADAY_ACTIVITY_HIGH
+    assert rec["price_direction"] == PRICE_DIRECTION_DOWN
+
 

@@ -8,12 +8,12 @@ edge_forward_ledger, T0 freeze, Camera, or foreign scientific stores.
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
-from modules.actionable_research.camera import classify_money_flow, default_session_cutoff
+from modules.actionable_research.camera import classify_intraday_activity, default_session_cutoff
 from modules.actionable_research.contracts import (
     AUTHORITY_LABEL,
     FUSION_SCHEMA_VERSION,
@@ -21,7 +21,9 @@ from modules.actionable_research.contracts import (
     SESSION_ELIGIBLE,
     SESSION_SKIPPED_NON_TRADING,
     SESSION_UNABLE,
+    SKIPPED_NON_TRADING_VI,
     SPEAK_POLICY,
+    UNABLE_VI,
 )
 from modules.actionable_research.edge import (
     assess_edge_for_symbols,
@@ -34,7 +36,6 @@ from modules.actionable_research.market import load_market_context
 from modules.actionable_research.paths import FusionPaths, utc_now_iso
 from modules.actionable_research.persist import persist_fusion_artifact
 from modules.actionable_research.stock_state import (
-    freeze_has_session,
     load_canonical_universe,
     load_t0_freeze,
     session_stock_rows,
@@ -48,13 +49,37 @@ SKIP_DISPOSITIONS = {
     SESSION_SKIPPED_NON_TRADING,
 }
 
+UNABLE_DISPOSITIONS = {
+    "SKIPPED_T0_NOT_READY",
+    "WAITING_FOR_DATA",
+    "SKIPPED_WAITING_FOR_DATA",
+    "LOCK_HELD",
+    "SKIPPED_LOCK_HELD",
+}
 
-def _trade_date_obj(trade_date: str) -> date:
-    return date.fromisoformat(str(trade_date)[:10])
 
+def _calendar_eligibility(trade_date: str) -> Dict[str, Any]:
+    try:
+        from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+            evaluate_calendar_session_eligibility,
+        )
 
-def _is_weekend(trade_date: str) -> bool:
-    return _trade_date_obj(trade_date).weekday() >= 5
+        result = evaluate_calendar_session_eligibility(str(trade_date)[:10])
+        return {
+            "eligible": bool(result.eligible),
+            "disposition": str(result.disposition),
+            "reason": str(result.reason),
+            "is_holiday": bool(result.is_holiday),
+            "is_weekend": bool(result.is_weekend),
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "eligible": False,
+            "disposition": SESSION_UNABLE,
+            "reason": f"calendar_error:{type(exc).__name__}",
+            "is_holiday": False,
+            "is_weekend": False,
+        }
 
 
 def resolve_session_eligibility(
@@ -81,43 +106,57 @@ def resolve_session_eligibility(
             or ""
         )
         skip_reason = str(daily_result.get("skip_reason") or (run or {}).get("failure_or_skip_reason") or "")
+        if daily_result.get("lock_held") or disp in {"LOCK_HELD", "SKIPPED_LOCK_HELD"}:
+            return {
+                "session_status": SESSION_UNABLE,
+                "reason": "SKIPPED_LOCK_HELD",
+                "eligible": False,
+            }
         if disp in SKIP_DISPOSITIONS or skip_reason in SKIP_DISPOSITIONS:
             return {
                 "session_status": SESSION_SKIPPED_NON_TRADING,
                 "reason": disp or skip_reason or SESSION_SKIPPED_NON_TRADING,
                 "eligible": False,
             }
+        if disp in UNABLE_DISPOSITIONS or skip_reason in UNABLE_DISPOSITIONS:
+            return {
+                "session_status": SESSION_UNABLE,
+                "reason": disp or skip_reason or SESSION_UNABLE,
+                "eligible": False,
+            }
+        cle = daily_result.get("closed_loop_edge") if isinstance(daily_result.get("closed_loop_edge"), dict) else {}
+        cle_skip = str((cle or {}).get("skip_reason") or "")
+        if cle_skip in SKIP_DISPOSITIONS:
+            return {
+                "session_status": SESSION_SKIPPED_NON_TRADING,
+                "reason": cle_skip,
+                "eligible": False,
+            }
+        if cle_skip in UNABLE_DISPOSITIONS:
+            return {
+                "session_status": SESSION_UNABLE,
+                "reason": cle_skip,
+                "eligible": False,
+            }
     if force_eligible is True:
         return {"session_status": SESSION_ELIGIBLE, "reason": "CALLER_FORCE_ELIGIBLE", "eligible": True}
 
-    freeze = freeze if freeze is not None else load_t0_freeze(paths)
-    has_freeze = freeze_has_session(freeze, td)
-    camera_partition = (
-        paths.camera_data_root()
-        / "canonical"
-        / f"year={td[:4]}"
-        / f"month={td[5:7]}"
-        / f"session_date={td}"
-        / "bars.parquet"
-    )
-    has_camera = camera_partition.exists()
-    if _is_weekend(td) and not has_freeze and not has_camera:
+    cal = _calendar_eligibility(td)
+    if not cal["eligible"]:
+        status = (
+            SESSION_SKIPPED_NON_TRADING
+            if cal["disposition"] in SKIP_DISPOSITIONS or cal["is_holiday"] or cal["is_weekend"]
+            else SESSION_UNABLE
+        )
         return {
-            "session_status": SESSION_SKIPPED_NON_TRADING,
-            "reason": "WEEKEND_WITHOUT_SESSION_EVIDENCE",
+            "session_status": status,
+            "reason": cal["reason"] or cal["disposition"],
             "eligible": False,
         }
-    if has_freeze or has_camera or not _is_weekend(td):
-        # Weekday without freeze/camera is still eligible: emit UNKNOWN families, not SKIPPED.
-        return {
-            "session_status": SESSION_ELIGIBLE,
-            "reason": "WEEKDAY_OR_SESSION_EVIDENCE",
-            "eligible": True,
-        }
     return {
-        "session_status": SESSION_UNABLE,
-        "reason": "UNABLE_TO_ASSESS_ELIGIBILITY",
-        "eligible": False,
+        "session_status": SESSION_ELIGIBLE,
+        "reason": cal.get("reason") or "calendar_trading_session",
+        "eligible": True,
     }
 
 
@@ -164,6 +203,7 @@ def fuse_session(
     generated_at = utc_now_iso(now)
 
     if not eligibility["eligible"]:
+        unable = eligibility["session_status"] == SESSION_UNABLE
         payload = {
             "trade_date": td,
             "session_status": eligibility["session_status"],
@@ -178,11 +218,16 @@ def fuse_session(
             "speak_policy": SPEAK_POLICY,
             "notable_count": 0,
             "surfaced_symbols": [],
-            "headline_vi": "",
+            "headline_vi": UNABLE_VI if unable else SKIPPED_NON_TRADING_VI,
+            "no_interest": False,
             "scientific_writes": [],
             "generated_at": generated_at,
             "camera_cutoff_timestamp": None,
-            "note": "SKIPPED; no new trading-session scientific evidence.",
+            "note": (
+                "UNABLE; missing required canonical T0 — not 'nothing noteworthy'."
+                if unable
+                else "SKIPPED_NON_TRADING_DAY; no new T0 observation and no calendar-day maturity."
+            ),
         }
         if persist:
             payload = persist_fusion_artifact(payload, paths=paths, now=now)
@@ -196,7 +241,7 @@ def fuse_session(
     recognition = load_recognition(td, paths=paths)
     edge_by_symbol = assess_edge_for_symbols(symbols, active=active, recognition=recognition)
     sweet_by_symbol = load_sweetspot_auxiliary(td, symbols, paths=paths)
-    camera = classify_money_flow(td, symbols, paths=paths, cutoff=cutoff)
+    camera = classify_intraday_activity(td, symbols, paths=paths, cutoff=cutoff)
     foreign = classify_foreign_flow(td, symbols, paths=paths, injected=foreign_frame)
     cutoff_iso = camera.get("cutoff") or _cutoff_iso(cutoff, td)
 
@@ -221,9 +266,14 @@ def fuse_session(
         cam = (camera.get("by_symbol") or {}).get(symbol) or {}
         rec["camera_data_status"] = cam.get("camera_data_status")
         rec["camera_cutoff_timestamp"] = cam.get("camera_cutoff_timestamp") or cutoff_iso
-        rec["money_flow_status"] = cam.get("money_flow_status")
-        rec["money_flow_direction"] = cam.get("money_flow_direction") or (cam.get("metrics") or {}).get(
-            "money_flow_direction"
+        rec["activity_status"] = cam.get("activity_status")
+        rec["trading_value_status"] = cam.get("trading_value_status")
+        rec["volume_acceleration_status"] = cam.get("volume_acceleration_status")
+        rec["price_direction"] = cam.get("price_direction") or (cam.get("metrics") or {}).get(
+            "price_direction"
+        )
+        rec["close_location"] = cam.get("close_location") or (cam.get("metrics") or {}).get(
+            "close_location"
         )
         rec["camera_metrics"] = cam.get("metrics") or {}
         rec["camera_source"] = cam.get("source")
@@ -276,7 +326,10 @@ def fuse_session(
             "source": camera.get("source"),
             "cross_section_n": camera.get("cross_section_n"),
             "look_ahead_bars_dropped": camera.get("look_ahead_bars_dropped"),
-            "note": "OHLCV only. No Camera foreign flow.",
+            "note": (
+                "OHLCV only. Derived activity = sum(close*volume). "
+                "Not directional money inflow/outflow. No Camera foreign flow."
+            ),
         },
         "foreign": {
             "available": foreign.get("available"),

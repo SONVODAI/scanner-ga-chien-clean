@@ -43,13 +43,33 @@ def load_latest_fusion_view(*, paths: Optional[FusionPaths] = None) -> Dict[str,
     }
 
 
+def _family_line(rec: Dict[str, Any]) -> str:
+    edge = rec.get("edge_status") or "UNKNOWN"
+    activity = rec.get("activity_status") or "UNKNOWN"
+    ff = rec.get("foreign_flow_status") or "UNKNOWN"
+    ff_timing = rec.get("foreign_timing") or "UNKNOWN"
+    sweet = rec.get("sweetspot_status") or "NONE"
+    missing = rec.get("missing_evidence") or []
+    parts = [
+        f"ACTIVE EDGE=`{edge}`",
+        f"INTRADAY ACTIVITY=`{activity}`",
+        f"FOREIGN FLOW EOD=`{ff}` (timing=`{ff_timing}`)",
+    ]
+    if sweet and sweet not in {"NONE", "UNAVAILABLE"}:
+        parts.append(f"LEGACY AUXILIARY=`{sweet}`")
+    if missing:
+        parts.append("UNKNOWN=`" + ",".join(str(m) for m in missing) + "`")
+    return " · ".join(parts)
+
+
 def render_actionable_research_panel(st: Any, *, paths: Optional[FusionPaths] = None) -> Dict[str, Any]:
     view = load_latest_fusion_view(paths=paths)
     st.markdown("### ACTIONABLE RESEARCH FUSION")
     st.caption(
-        "SCAN BROADLY → SPEAK SELECTIVELY. RESEARCH ONLY. "
+        "SCAN BROADLY → SPEAK SELECTIVELY. RESEARCH ONLY — không có thẩm quyền BUY. "
         "Quét toàn bộ universe; chỉ nói khi có quan sát đáng chú ý. "
-        "Dòng tiền là quan sát, không phải lệnh BUY. Thiếu dữ liệu = UNKNOWN."
+        "Camera đo hoạt động/giá trị giao dịch ước tính (close×volume), không phải dòng tiền vào/ra. "
+        "Foreign flow hiện tại là EOD. Thiếu dữ liệu = UNKNOWN."
     )
     if not view.get("available"):
         st.info(view.get("headline_vi"))
@@ -70,10 +90,8 @@ def render_actionable_research_panel(st: Any, *, paths: Optional[FusionPaths] = 
     for rec in observations:
         st.markdown(
             f"**{rec.get('symbol')}** · {rec.get('interest_level')} · "
-            f"{rec.get('observation_relation')} · "
-            f"edge=`{rec.get('edge_status')}` · mf=`{rec.get('money_flow_status')}` "
-            f"`{rec.get('money_flow_direction') or ''}` · "
-            f"ff=`{rec.get('foreign_flow_status')}`  \n"
+            f"{rec.get('observation_relation')}  \n"
+            f"{_family_line(rec)}  \n"
             f"{rec.get('evidence_summary')}"
         )
     return view

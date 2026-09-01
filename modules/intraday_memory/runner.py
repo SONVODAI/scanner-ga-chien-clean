@@ -97,23 +97,15 @@ def _write_skip_manifest(
 
 def _safe_fusion_after_camera(session_date, config: IntradayConfig, *, stage: str) -> None:
     """
-    Consume Camera output into Actionable Research Fusion.
+    Fusion is owned by the daily A→C→B orchestrator, not Camera collect.
 
-    Fail-safe: never changes collector exit codes or Camera/scientific stores.
-    Artifacts land under camera data_root unless MRBOT_ACTIONABLE_RESEARCH_DIR is set.
+    Kept as a fail-safe no-op so a Camera exception path cannot birth
+    observations before scientific recognition.
     """
     try:
-        from modules.actionable_research.production_hook import run_actionable_research_after_daily
+        from modules.actionable_research.production_hook import maybe_run_fusion_after_camera
 
-        repo_root = Path(__file__).resolve().parents[2]
-        env_root = os.getenv("MRBOT_ACTIONABLE_RESEARCH_DIR", "").strip()
-        artifact_root = Path(env_root) if env_root else (Path(config.data_root) / "actionable_research")
-        run_actionable_research_after_daily(
-            target_trade_date=session_date.isoformat(),
-            repo_root=repo_root,
-            camera_root=Path(config.data_root),
-            artifact_root=artifact_root,
-        )
+        maybe_run_fusion_after_camera(session_date, camera_root=Path(config.data_root), stage=stage)
     except Exception:  # noqa: BLE001
         logger.exception("Actionable research fusion after %s failed (camera run continues)", stage)
 

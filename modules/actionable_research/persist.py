@@ -10,7 +10,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from modules.actionable_research.contracts import FUSION_SCHEMA_VERSION, FUSION_VERSION
+from modules.actionable_research.contracts import FUSION_SCHEMA_VERSION, FUSION_VERSION, SESSION_ELIGIBLE
+from modules.actionable_research.observation_maturity import mature_observation_ledger
 from modules.actionable_research.paths import FusionPaths, read_json, utc_now_iso
 
 
@@ -64,8 +65,10 @@ def observation_id(rec: Dict[str, Any]) -> str:
         "symbol": rec.get("symbol"),
         "edge_status": rec.get("edge_status"),
         "matched_edge_ids": rec.get("matched_edge_ids"),
-        "money_flow_status": rec.get("money_flow_status"),
-        "money_flow_direction": rec.get("money_flow_direction"),
+        "activity_status": rec.get("activity_status"),
+        "trading_value_status": rec.get("trading_value_status"),
+        "volume_acceleration_status": rec.get("volume_acceleration_status"),
+        "price_direction": rec.get("price_direction"),
         "foreign_flow_status": rec.get("foreign_flow_status"),
         "observation_relation": rec.get("observation_relation"),
         "camera_cutoff_timestamp": rec.get("camera_cutoff_timestamp"),
@@ -78,7 +81,7 @@ def persist_observation_ledger(
     *,
     paths: FusionPaths,
     replay: bool = False,
-) -> None:
+) -> Dict[str, int]:
     """
     First-write-wins ledger of noteworthy observations only.
 
@@ -95,6 +98,7 @@ def persist_observation_ledger(
         "observations": observations,
         "outcome_horizon_slots": ["T3", "T5", "T10"],
         "outcome_status": "PENDING",
+        "maturity_basis": "vn_trading_sessions",
     }
     atomic_write_json(paths.daily_observations_path(trade_date), daily_obs)
 
@@ -115,8 +119,10 @@ def persist_observation_ledger(
                     if oid:
                         existing_ids.add(oid)
 
+    stats = {"observation_births": 0, "observation_duplicate_skips": 0}
     if replay:
-        return
+        stats["observation_duplicate_skips"] = len(observations)
+        return stats
 
     new_lines = []
     for rec in observations:
@@ -124,7 +130,9 @@ def persist_observation_ledger(
             continue
         oid = observation_id(rec)
         if oid in existing_ids:
+            stats["observation_duplicate_skips"] += 1
             continue
+        metrics = rec.get("camera_metrics") or {}
         row = {
             "observation_id": oid,
             "trade_date": rec.get("trade_date") or trade_date,
@@ -133,30 +141,52 @@ def persist_observation_ledger(
             "observation_relation": rec.get("observation_relation"),
             "edge_status": rec.get("edge_status"),
             "matched_edge_ids": rec.get("matched_edge_ids"),
-            "money_flow_status": rec.get("money_flow_status"),
-            "money_flow_direction": rec.get("money_flow_direction"),
+            "activity_status": rec.get("activity_status"),
+            "trading_value_status": rec.get("trading_value_status"),
+            "volume_acceleration_status": rec.get("volume_acceleration_status"),
+            "price_direction": rec.get("price_direction"),
+            "close_location": rec.get("close_location"),
             "foreign_flow_status": rec.get("foreign_flow_status"),
+            "foreign_timing": rec.get("foreign_timing"),
             "market_state": rec.get("market_state"),
             "market_transition": rec.get("market_transition"),
             "stock_state": rec.get("stock_state"),
             "camera_cutoff_timestamp": rec.get("camera_cutoff_timestamp"),
+            "session_value_derived": metrics.get("session_value_derived"),
+            "session_return_pct": metrics.get("session_return_pct"),
             "evidence_summary": rec.get("evidence_summary"),
             "reasons": rec.get("reasons"),
+            "original_evidence_labels": {
+                "edge_status": rec.get("edge_status"),
+                "activity_status": rec.get("activity_status"),
+                "trading_value_status": rec.get("trading_value_status"),
+                "volume_acceleration_status": rec.get("volume_acceleration_status"),
+                "price_direction": rec.get("price_direction"),
+                "foreign_flow_status": rec.get("foreign_flow_status"),
+                "foreign_timing": rec.get("foreign_timing"),
+            },
+            "provenance": rec.get("camera_provenance") or "actionable_research_fusion",
             "outcome_status": "PENDING",
+            "maturity_basis": "vn_trading_sessions",
             "t3_return_pct": None,
             "t5_return_pct": None,
             "t10_return_pct": None,
+            "t3_status": "PENDING",
+            "t5_status": "PENDING",
+            "t10_status": "PENDING",
             "generated_at": rec.get("generated_at") or payload.get("generated_at"),
         }
         new_lines.append(json.dumps(row, ensure_ascii=False, sort_keys=True, default=str))
         existing_ids.add(oid)
+        stats["observation_births"] += 1
 
     if not new_lines:
-        return
+        return stats
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
     with ledger_path.open("a", encoding="utf-8") as fh:
         for line in new_lines:
             fh.write(line + "\n")
+    return stats
 
 
 def persist_fusion_artifact(
@@ -199,7 +229,22 @@ def persist_fusion_artifact(
         if isinstance(rec, dict):
             rec["generated_at"] = generated_at
 
-    persist_observation_ledger(out, paths=paths, replay=replay)
+    ledger_stats = persist_observation_ledger(out, paths=paths, replay=replay)
+    out["observation_births"] = int(ledger_stats.get("observation_births") or 0)
+    out["observation_duplicate_skips"] = int(ledger_stats.get("observation_duplicate_skips") or 0)
+    if str(out.get("session_status") or "") == SESSION_ELIGIBLE:
+        out["observation_maturity"] = mature_observation_ledger(
+            as_of_trade_date=trade_date,
+            paths=paths,
+        )
+    else:
+        out["observation_maturity"] = {
+            "ran": False,
+            "skipped": True,
+            "reason": "SESSION_NOT_ELIGIBLE_NO_MATURITY",
+            "as_of": trade_date,
+            "matured_horizons": 0,
+        }
 
     daily_path = paths.daily_path(trade_date)
     atomic_write_json(daily_path, out)
