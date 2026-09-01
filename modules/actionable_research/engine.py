@@ -21,6 +21,7 @@ from modules.actionable_research.contracts import (
     SESSION_ELIGIBLE,
     SESSION_SKIPPED_NON_TRADING,
     SESSION_UNABLE,
+    SPEAK_POLICY,
 )
 from modules.actionable_research.edge import (
     assess_edge_for_symbols,
@@ -28,7 +29,7 @@ from modules.actionable_research.edge import (
     load_recognition,
 )
 from modules.actionable_research.foreign import classify_foreign_flow
-from modules.actionable_research.interpret import finalize_record, session_surface
+from modules.actionable_research.interpret import finalize_record, scan_summary, session_surface
 from modules.actionable_research.market import load_market_context
 from modules.actionable_research.paths import FusionPaths, utc_now_iso
 from modules.actionable_research.persist import persist_fusion_artifact
@@ -172,6 +173,9 @@ def fuse_session(
             "fusion_version": FUSION_VERSION,
             "schema_version": FUSION_SCHEMA_VERSION,
             "records": [],
+            "observations": [],
+            "scan": {"scanned_count": 0, "notable_count": 0},
+            "speak_policy": SPEAK_POLICY,
             "notable_count": 0,
             "surfaced_symbols": [],
             "headline_vi": "",
@@ -218,6 +222,9 @@ def fuse_session(
         rec["camera_data_status"] = cam.get("camera_data_status")
         rec["camera_cutoff_timestamp"] = cam.get("camera_cutoff_timestamp") or cutoff_iso
         rec["money_flow_status"] = cam.get("money_flow_status")
+        rec["money_flow_direction"] = cam.get("money_flow_direction") or (cam.get("metrics") or {}).get(
+            "money_flow_direction"
+        )
         rec["camera_metrics"] = cam.get("metrics") or {}
         rec["camera_source"] = cam.get("source")
         rec["camera_provenance"] = cam.get("provenance")
@@ -237,16 +244,20 @@ def fuse_session(
         records.append(finalize_record(rec))
 
     surface = session_surface(records)
+    observations = list(surface.get("observations") or [])
+    scan = scan_summary(records)
     payload = {
         "trade_date": td,
         "session_status": SESSION_ELIGIBLE,
         "skip_reason": "",
         "authority": AUTHORITY_LABEL,
         "research_label": AUTHORITY_LABEL,
+        "speak_policy": SPEAK_POLICY,
         "fusion_version": FUSION_VERSION,
         "schema_version": FUSION_SCHEMA_VERSION,
         "universe_count": len(symbols),
-        "record_count": len(records),
+        "scanned_count": scan["scanned_count"],
+        "record_count": len(observations),
         "market": market,
         "edge_memory": {
             "source": active.get("source"),
@@ -277,7 +288,9 @@ def fuse_session(
             "camera_audit": foreign.get("camera_audit"),
         },
         "camera_cutoff_timestamp": cutoff_iso,
-        "records": records,
+        "scan": scan,
+        "observations": observations,
+        "records": observations,
         "scientific_writes": [],
         "generated_at": generated_at,
         **surface,

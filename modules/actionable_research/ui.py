@@ -1,10 +1,10 @@
-"""Read-only Streamlit view of fusion artifacts. Does not produce scientific data."""
+"""Read-only Streamlit view of fusion artifacts. Speaks selectively."""
 
 from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from modules.actionable_research.contracts import AUTHORITY_LABEL, NO_INTEREST_VI
+from modules.actionable_research.contracts import AUTHORITY_LABEL, NO_INTEREST_VI, SPEAK_POLICY
 from modules.actionable_research.paths import FusionPaths, read_json
 
 
@@ -18,15 +18,24 @@ def load_latest_fusion_view(*, paths: Optional[FusionPaths] = None) -> Dict[str,
             "headline_vi": "Chưa có artifact Actionable Research Fusion.",
         }
     artifact = latest.get("artifact") if isinstance(latest.get("artifact"), dict) else latest
+    observations = artifact.get("observations") or [
+        r for r in (artifact.get("records") or []) if isinstance(r, dict) and r.get("notable")
+    ]
     return {
         "available": True,
         "authority": AUTHORITY_LABEL,
+        "speak_policy": artifact.get("speak_policy") or latest.get("speak_policy") or SPEAK_POLICY,
         "trade_date": latest.get("trade_date") or artifact.get("trade_date"),
         "session_status": latest.get("session_status") or artifact.get("session_status"),
         "headline_vi": artifact.get("headline_vi") or latest.get("headline_vi") or NO_INTEREST_VI,
         "notable_count": artifact.get("notable_count") or latest.get("notable_count") or 0,
+        "scanned_count": (artifact.get("scan") or {}).get("scanned_count")
+        or latest.get("scanned_count")
+        or 0,
         "surfaced_symbols": artifact.get("surfaced_symbols") or [],
-        "records": artifact.get("records") or [],
+        "observations": observations,
+        "records": observations,
+        "scan": artifact.get("scan") or {},
         "camera_cutoff_timestamp": latest.get("camera_cutoff_timestamp")
         or artifact.get("camera_cutoff_timestamp"),
         "idempotent_replay": latest.get("idempotent_replay"),
@@ -38,29 +47,32 @@ def render_actionable_research_panel(st: Any, *, paths: Optional[FusionPaths] = 
     view = load_latest_fusion_view(paths=paths)
     st.markdown("### ACTIONABLE RESEARCH FUSION")
     st.caption(
-        "RESEARCH ONLY — dung hợp bằng chứng Market / Stock / ACTIVE edge / Camera / Foreign. "
-        "Không phải lệnh BUY. Thiếu dữ liệu = UNKNOWN, không phải yếu."
+        "SCAN BROADLY → SPEAK SELECTIVELY. RESEARCH ONLY. "
+        "Quét toàn bộ universe; chỉ nói khi có quan sát đáng chú ý. "
+        "Dòng tiền là quan sát, không phải lệnh BUY. Thiếu dữ liệu = UNKNOWN."
     )
     if not view.get("available"):
         st.info(view.get("headline_vi"))
         return view
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("Session", view.get("trade_date") or "—")
     c2.metric("Status", view.get("session_status") or "—")
-    c3.metric("Notable", view.get("notable_count") or 0)
+    c3.metric("Đã quét", view.get("scanned_count") or 0)
+    c4.metric("Nói", view.get("notable_count") or 0)
     if view.get("camera_cutoff_timestamp"):
         st.caption(f"Camera PIT cutoff: `{view['camera_cutoff_timestamp']}`")
-    st.markdown(view.get("headline_vi") or NO_INTEREST_VI)
-    notable = [
-        r
-        for r in (view.get("records") or [])
-        if isinstance(r, dict) and r.get("notable")
-    ]
-    notable.sort(key=lambda r: (r.get("presentation_rank", 99), r.get("symbol") or ""))
-    for rec in notable[:20]:
+    observations = [r for r in (view.get("observations") or []) if isinstance(r, dict)]
+    if not observations:
+        st.info(view.get("headline_vi") or NO_INTEREST_VI)
+        return view
+    st.markdown(view.get("headline_vi") or "")
+    observations.sort(key=lambda r: (r.get("presentation_rank", 99), r.get("symbol") or ""))
+    for rec in observations:
         st.markdown(
             f"**{rec.get('symbol')}** · {rec.get('interest_level')} · "
-            f"edge=`{rec.get('edge_status')}` · mf=`{rec.get('money_flow_status')}` · "
+            f"{rec.get('observation_relation')} · "
+            f"edge=`{rec.get('edge_status')}` · mf=`{rec.get('money_flow_status')}` "
+            f"`{rec.get('money_flow_direction') or ''}` · "
             f"ff=`{rec.get('foreign_flow_status')}`  \n"
             f"{rec.get('evidence_summary')}"
         )

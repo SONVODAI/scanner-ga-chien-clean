@@ -22,6 +22,10 @@ from modules.actionable_research.contracts import (
     CAMERA_DATA_OK,
     CAMERA_DATA_PARTIAL,
     MIN_CROSS_SECTION,
+    MONEY_FLOW_DIR_FLAT,
+    MONEY_FLOW_DIR_INFLOW,
+    MONEY_FLOW_DIR_OUTFLOW,
+    MONEY_FLOW_DIR_UNKNOWN,
     MONEY_FLOW_NORMAL,
     MONEY_FLOW_STRONG,
     MONEY_FLOW_STRONG_PERCENTILE,
@@ -141,16 +145,37 @@ def _symbol_metrics(sym_bars: pd.DataFrame) -> Dict[str, Any]:
     prior_sum = float(prior_n.sum()) if len(prior_n) else 0.0
     accel = (last_sum / prior_sum) if prior_sum > 0 else None
     last_close = float(close.iloc[-1]) if close.notna().any() else None
+    first_open = None
+    if "open" in ordered.columns:
+        opens = pd.to_numeric(ordered["open"], errors="coerce")
+        if opens.notna().any():
+            first_open = float(opens.iloc[0])
+    if first_open is None and close.notna().any():
+        first_open = float(close.iloc[0])
+    session_return_pct = None
+    direction = MONEY_FLOW_DIR_UNKNOWN
+    if first_open is not None and last_close is not None and first_open != 0:
+        session_return_pct = (last_close / first_open - 1.0) * 100.0
+        if last_close > first_open:
+            direction = MONEY_FLOW_DIR_INFLOW
+        elif last_close < first_open:
+            direction = MONEY_FLOW_DIR_OUTFLOW
+        else:
+            direction = MONEY_FLOW_DIR_FLAT
     last_ts = ordered["timestamp"].iloc[-1]
     last_ts_s = last_ts.isoformat() if hasattr(last_ts, "isoformat") else str(last_ts)
     return {
         "bar_count": n,
         "session_volume": float(volume.sum()),
         "session_value_derived": float(derived_value.sum()),
+        "first_open": first_open,
         "last_close": last_close,
+        "session_return_pct": session_return_pct,
+        "money_flow_direction": direction,
         "volume_acceleration_ratio": accel,
         "last_bar_timestamp": last_ts_s,
         "value_derivation": "sum(close * volume) from Camera OHLCV; value is not a stored Camera field",
+        "direction_note": "Direction from session open→close on Camera OHLCV. Observation, not BUY/SELL.",
     }
 
 
@@ -178,6 +203,7 @@ def classify_money_flow(
                 "camera_cutoff_timestamp": cutoff_iso,
                 "money_flow_status": MONEY_FLOW_UNKNOWN,
                 "metrics": {},
+                "money_flow_direction": MONEY_FLOW_DIR_UNKNOWN,
                 "source": source,
                 "provenance": "VPS Camera 5-minute OHLCV (vnstock4_kbs). No foreign fields.",
                 "note": "CAMERA_DATA_MISSING — not MONEY_FLOW_WEAK / NORMAL.",
@@ -222,6 +248,7 @@ def classify_money_flow(
                 "camera_cutoff_timestamp": cutoff_iso,
                 "money_flow_status": MONEY_FLOW_UNKNOWN,
                 "metrics": {},
+                "money_flow_direction": MONEY_FLOW_DIR_UNKNOWN,
                 "source": source,
                 "provenance": "VPS Camera 5-minute OHLCV. Symbol has no bars <= cutoff.",
                 "note": "CAMERA_DATA_MISSING — not MONEY_FLOW_WEAK / NORMAL.",
@@ -254,9 +281,10 @@ def classify_money_flow(
             "camera_data_status": cam_status,
             "camera_cutoff_timestamp": cutoff_iso,
             "money_flow_status": status,
+            "money_flow_direction": m.get("money_flow_direction") or MONEY_FLOW_DIR_UNKNOWN,
             "metrics": m,
             "source": source,
-            "provenance": "VPS Camera 5-minute OHLCV (price, volume). Value derived. No foreign.",
+            "provenance": "VPS Camera 5-minute OHLCV (price, volume). Value derived. No foreign. Observation, not BUY.",
             "note": note,
         }
 
