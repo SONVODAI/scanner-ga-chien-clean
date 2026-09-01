@@ -1,8 +1,8 @@
 {
-  "version": "vn_trading_calendar_v1_2026",
-  "calendar_id": "vn_hose_hnx_v1",
-  "provenance": "Repository-maintained Vietnam exchange holiday calendar (HOSE/HNX). No runtime network fetch.",
-  "update_procedure": "Edit config/vn_trading_calendar.json, bump version and calendar_id suffix, run tests/test_edge_research_opr_phase_3k5a.py calendar tests, commit with release note.",
+  "version": "vn_trading_calendar_v1_2026_nd",
+  "calendar_id": "vn_hose_hnx_v1_nd2026",
+  "provenance": "Repository-maintained Vietnam exchange holiday calendar (HOSE/HNX). No runtime network fetch. 2026 National Day: exchanges closed 2026-08-31 through 2026-09-02 (HOSE notice; Mon 2026-08-31 rescheduled administratively to Sat 2026-08-22, on which HOSE/HNX did not implement trading). Resume 2026-09-03.",
+  "update_procedure": "Edit config/vn_trading_calendar.json, bump version and calendar_id suffix, run tests/test_vn_trading_calendar_clock.py and tests/test_edge_research_opr_phase_3k5a.py calendar tests, commit with release note.",
   "timezone": "Asia/Ho_Chi_Minh",
   "holidays": [
     "2026-01-01",
@@ -14,8 +14,15 @@
     "2026-04-27",
     "2026-04-30",
     "2026-05-01",
+    "2026-08-31",
+    "2026-09-01",
     "2026-09-02",
     "2026-12-25"
   ],
-  "closure_overrides": {}
+  "closure_overrides": {
+    "2026-08-22": {
+      "closed": true,
+      "reason": "HOSE/HNX makeup-work Saturday (Mon 2026-08-31 rescheduled). Exchanges did not implement trading."
+    }
+  }
 }

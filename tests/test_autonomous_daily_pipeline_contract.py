@@ -148,7 +148,7 @@ def _full_autonomous_day(tmp: Path, td: str, *, prior: list[str] | None = None) 
     edge_dir = tmp / "data" / "edge_research"
     edge_dir.mkdir(parents=True, exist_ok=True)
     # Genesis first_eligible must be a VN trading session on/before target.
-    _plant_live_forward_genesis(tmp, edge_dir, "2026-09-01")
+    _plant_live_forward_genesis(tmp, edge_dir, "2026-08-28")
 
     result = run_production_daily_research(
         panel,
@@ -218,7 +218,7 @@ def test_case3_missing_t0_waiting(tmp_path: Path):
     assert td not in set(panel["trade_date"].astype(str))
     edge_dir = tmp_path / "data" / "edge_research"
     edge_dir.mkdir(parents=True, exist_ok=True)
-    _plant_live_forward_genesis(tmp_path, edge_dir, "2026-09-01")
+    _plant_live_forward_genesis(tmp_path, edge_dir, "2026-08-28")
     result = run_production_daily_research(
         panel,
         target_trade_date=td,
@@ -260,7 +260,7 @@ def test_case4_genuine_non_trading_day_skipped(tmp_path: Path):
     panel = build_research_panel(repo_root=tmp_path)
     edge_dir = tmp_path / "data" / "edge_research"
     edge_dir.mkdir(parents=True, exist_ok=True)
-    _plant_live_forward_genesis(tmp_path, edge_dir, "2026-09-01")
+    _plant_live_forward_genesis(tmp_path, edge_dir, "2026-08-28")
     # Edge calendar may also skip weekends
     result = run_production_daily_research(
         panel if not panel.empty else pd.DataFrame({"trade_date": ["2026-09-11"], "symbol": ["AAA"], "rs_spread": [1.0]}),

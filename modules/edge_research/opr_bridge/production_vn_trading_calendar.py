@@ -1,7 +1,22 @@
 """
 Phase 3K.5A — Deterministic Vietnam-market trading session calendar.
 
-Weekends and configured exchange holidays excluded. No runtime network dependency.
+Weekends and configured exchange holidays excluded. No runtime network fetch.
+
+CANONICAL TRADING-SESSION CLOCK (source of truth for T3/T5/T10 eligibility)
+---------------------------------------------------------------------------
+Do not add a parallel calendar. Callers that need future horizon dates must
+use these primitives from this module:
+
+1. evaluate_calendar_session_eligibility(date)
+   Session yes/no (weekend, JSON holidays, closure_overrides).
+2. offset_trading_sessions(anchor, n)
+   Move ±N eligible VN sessions. Integer session arithmetic.
+3. compute_horizon_eligible_date_vn(birth, "T3"|"T5"|"T10")
+   CANONICAL T3/T5/T10 eligibility date. Always session offsets; never
+   pandas BDay / weekday-only arithmetic.
+
+Data file: config/vn_trading_calendar.json
 """
 
 from __future__ import annotations
@@ -15,8 +30,9 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from modules.intraday_memory.scheduler import is_vn_weekend
 from modules.intraday_memory.timezone_policy import VN_TZ
 
-CALENDAR_VERSION = "vn_trading_calendar_contract_v1_3k5a"
+CALENDAR_VERSION = "vn_trading_calendar_contract_v1_3k5a_nd"
 DEFAULT_CALENDAR_PATH = Path(__file__).resolve().parents[3] / "config" / "vn_trading_calendar.json"
+HORIZON_SESSION_OFFSETS = {"T3": 3, "T5": 5, "T10": 10}
 
 
 @dataclass(frozen=True)
@@ -270,21 +286,24 @@ def compute_horizon_eligible_date_vn(
     panel_sessions: Optional[List[str]] = None,
 ) -> str:
     """
-    T3/T5/T10 using VN trading calendar. Panel sessions used only when calendar
-    confirms the birth date is a valid session (compatibility bridge).
+    CANONICAL T3/T5/T10 eligibility date.
+
+    Counts N subsequent Vietnam trading sessions from birth_trade_date.
+    Never uses pandas BDay / weekday-only arithmetic.
+
+    panel_sessions is a compatibility fallback only when the calendar file
+    cannot be loaded. It is not a second calendar.
     """
-    offsets = {"T3": 3, "T5": 5, "T10": 10}
-    offset = offsets.get(horizon, 0)
+    offset = HORIZON_SESSION_OFFSETS.get(horizon, 0)
     birth = str(birth_trade_date)[:10]
-    cal_elig = evaluate_calendar_session_eligibility(birth, calendar_path=calendar_path)
-    if cal_elig.eligible:
+    cal = load_trading_calendar(calendar_path)
+    if is_calendar_loaded(cal):
         result = offset_trading_sessions(birth, offset, calendar_path=calendar_path)
         if result:
             return result
     if panel_sessions and birth in panel_sessions:
         idx = panel_sessions.index(birth)
         target_idx = idx + offset
-        if target_idx < len(panel_sessions):
+        if 0 <= target_idx < len(panel_sessions):
             return panel_sessions[target_idx]
-    import pandas as pd
-    return (pd.Timestamp(birth) + pd.tseries.offsets.BDay(offset)).strftime("%Y-%m-%d")
+    return ""

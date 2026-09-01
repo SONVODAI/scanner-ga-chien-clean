@@ -668,7 +668,11 @@ def test_national_day_creates_no_observation_or_maturity(fusion_paths):
     assert after[0]["t3_return_pct"] is None
     assert after[0]["outcome_status"] == "PENDING"
     assert holiday_run["observation_maturity"]["skipped"] is True
-    assert target_session_for_horizon("2026-09-01", "T3") == "2026-09-07"
+    assert target_session_for_horizon("2026-08-28", "T3") == "2026-09-07"
+    for closed in ("2026-08-31", "2026-09-01", "2026-09-02"):
+        skipped = fuse_session(closed, paths=fusion_paths)
+        assert skipped["session_status"] == SESSION_SKIPPED_NON_TRADING
+        assert skipped["observations"] == []
 
 
 def test_observation_maturity_uses_trading_sessions_not_calendar_days(fusion_paths):

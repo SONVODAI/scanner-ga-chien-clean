@@ -19,8 +19,8 @@ import pandas as pd
 
 from modules.actionable_research.paths import FusionPaths
 from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+    compute_horizon_eligible_date_vn,
     evaluate_calendar_session_eligibility,
-    offset_trading_sessions,
 )
 
 HORIZON_N = {"T3": 3, "T5": 5, "T10": 10}
@@ -63,10 +63,10 @@ def _norm_date(value: Any) -> str:
 
 
 def target_session_for_horizon(t0_date: str, horizon: str) -> Optional[str]:
-    offset = HORIZON_N.get(horizon)
-    if not offset:
+    if horizon not in HORIZON_N:
         return None
-    return offset_trading_sessions(str(t0_date)[:10], int(offset))
+    result = compute_horizon_eligible_date_vn(str(t0_date)[:10], horizon)
+    return result or None
 
 
 def current_session_is_eligible(trade_date: str) -> bool:
