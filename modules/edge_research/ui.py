@@ -506,6 +506,15 @@ def render_edge_research_panel(
     except Exception as fr_exc:  # noqa: BLE001
         st.warning(f"UNABLE TO ASSESS — future recognition surface unavailable: {fr_exc}")
 
+    # --- Actionable research fusion (canonical artifact, view-only) ---
+    try:
+        from modules.actionable_research.ui import render_actionable_research_panel
+
+        st.markdown("---")
+        render_actionable_research_panel(st)
+    except Exception as fusion_exc:  # noqa: BLE001
+        st.warning(f"Actionable research fusion view unavailable: {fusion_exc}")
+
     st.markdown("---")
     st.markdown(f"### {HISTORICAL_CHALLENGER_SECTION.replace('_', ' ')}")
     st.caption(

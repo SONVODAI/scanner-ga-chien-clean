@@ -18,6 +18,10 @@ from modules.edge_research.opr_bridge.production_observation_records import (
     ResearchObservationBirthRecord,
     ResearchObservationOutcomeRecord,
 )
+from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+    HORIZON_SESSION_OFFSETS,
+    compute_horizon_eligible_date_vn,
+)
 
 HORIZON_RETURN_FIELDS = {
     ForwardHorizon.T3.value: "t3_return",
@@ -25,17 +29,15 @@ HORIZON_RETURN_FIELDS = {
     ForwardHorizon.T10.value: "t10_return",
 }
 
-HORIZON_OFFSETS = {"T3": 3, "T5": 5, "T10": 10}
+HORIZON_OFFSETS = HORIZON_SESSION_OFFSETS
 
 
 def horizon_eligible_on_date(horizon: str, birth_trade_date: str, assessment_trade_date: str) -> bool:
-    """Return True iff assessment_trade_date is on or after the eligible evaluation date."""
-    import pandas as pd
-
-    base = pd.Timestamp(birth_trade_date)
-    offset = HORIZON_OFFSETS.get(horizon, 0)
-    eligible = (base + pd.tseries.offsets.BDay(offset)).strftime("%Y-%m-%d")
-    return str(assessment_trade_date) >= eligible
+    """Return True iff assessment_trade_date is on or after the canonical VN T3/T5/T10 date."""
+    eligible = compute_horizon_eligible_date_vn(birth_trade_date, horizon)
+    if not eligible:
+        return False
+    return str(assessment_trade_date)[:10] >= eligible
 
 
 def reject_early_outcome(horizon: str, birth_trade_date: str, assessment_trade_date: str) -> bool:

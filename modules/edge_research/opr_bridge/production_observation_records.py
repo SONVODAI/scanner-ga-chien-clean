@@ -512,13 +512,14 @@ def build_forward_evaluation_contract(observation_id: str) -> ForwardEvaluationC
 
 
 def build_forward_horizon_placeholders(trade_date: str) -> Tuple[ForwardHorizonPlaceholder, ...]:
-    import pandas as pd
+    from modules.edge_research.opr_bridge.production_vn_trading_calendar import (
+        HORIZON_SESSION_OFFSETS,
+        compute_horizon_eligible_date_vn,
+    )
 
-    base = pd.Timestamp(trade_date)
-    offsets = {"T3": 3, "T5": 5, "T10": 10}
     out = []
-    for h, off in offsets.items():
-        eligible = (base + pd.tseries.offsets.BDay(off)).strftime("%Y-%m-%d")
+    for h in HORIZON_SESSION_OFFSETS:
+        eligible = compute_horizon_eligible_date_vn(trade_date, h)
         out.append(
             ForwardHorizonPlaceholder(
                 horizon=h,

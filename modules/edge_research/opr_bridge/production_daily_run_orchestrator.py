@@ -80,9 +80,9 @@ def _finish_daily_run(
     panel: Optional[pd.DataFrame] = None,
     reuse_forecast_memory: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Append isolated Forecast Memory then closed-loop A→C→B.
+    """Append isolated Forecast Memory, then closed-loop A→C→B, then Fusion.
 
-    Never mutates Edge/OPR run disposition. Closed-loop failures stay nested.
+    Never mutates Edge/OPR run disposition. Closed-loop and Fusion failures stay nested.
     Headless EOD already runs Forecast Memory (P0 HSX + FF). Reuse that payload
     in the same process so api.hsx.vn is not walked twice.
     """
@@ -98,7 +98,12 @@ def _finish_daily_run(
             data_dir=edge_data_dir,
             panel=panel,
         )
-        return out
+        return _attach_actionable_research_fusion(
+            out,
+            target_trade_date=target_trade_date,
+            repo_root=repo_root,
+            edge_data_dir=edge_data_dir,
+        )
     out = attach_forecast_memory_to_daily_run_result(
         result,
         target_trade_date=target_trade_date,
@@ -123,6 +128,41 @@ def _finish_daily_run(
             "assessment_state": "UNABLE_TO_ASSESS",
             "assessment_reason": "MATCHER_EXCEPTION",
             "failure_detail": f"{type(exc).__name__}: {exc}",
+        }
+    return _attach_actionable_research_fusion(
+        out,
+        target_trade_date=target_trade_date,
+        repo_root=repo_root,
+        edge_data_dir=edge_data_dir,
+    )
+
+
+def _attach_actionable_research_fusion(
+    daily_result: Dict[str, Any],
+    *,
+    target_trade_date: str,
+    repo_root: Path,
+    edge_data_dir: Optional[Path],
+) -> Dict[str, Any]:
+    """Fusion after closed-loop A→C→B. Nested only; never mutates run_disposition."""
+    out = daily_result
+    try:
+        from modules.actionable_research.production_hook import run_actionable_research_after_daily
+
+        out["actionable_research"] = run_actionable_research_after_daily(
+            target_trade_date=target_trade_date,
+            daily_result=out,
+            repo_root=repo_root,
+            data_dir=edge_data_dir,
+        )
+    except Exception as exc:  # noqa: BLE001
+        out["actionable_research"] = {
+            "ran_fusion": False,
+            "ran": False,
+            "status": "FAILED",
+            "session_status": "FAILED",
+            "failure_detail": f"{type(exc).__name__}: {exc}",
+            "scientific_writes": [],
         }
     return out
 

@@ -95,6 +95,21 @@ def _write_skip_manifest(
     return manifest
 
 
+def _safe_fusion_after_camera(session_date, config: IntradayConfig, *, stage: str) -> None:
+    """
+    Fusion is owned by the daily A→C→B orchestrator, not Camera collect.
+
+    Kept as a fail-safe no-op so a Camera exception path cannot birth
+    observations before scientific recognition.
+    """
+    try:
+        from modules.actionable_research.production_hook import maybe_run_fusion_after_camera
+
+        maybe_run_fusion_after_camera(session_date, camera_root=Path(config.data_root), stage=stage)
+    except Exception:  # noqa: BLE001
+        logger.exception("Actionable research fusion after %s failed (camera run continues)", stage)
+
+
 def run_scheduled_collect(config: IntradayConfig) -> int:
     session_date, skip_reason = resolve_collect_session_date()
     if skip_reason:
@@ -107,6 +122,7 @@ def run_scheduled_collect(config: IntradayConfig) -> int:
     print(manifest.summary_text())
     if manifest.final_status == STATUS_NO_TRADING_DAY:
         return EXIT_SUCCESS
+    _safe_fusion_after_camera(session_date, config, stage="camera_collect")
     return EXIT_COLLECTOR_FAILURE if manifest.symbols_failed else EXIT_SUCCESS
 
 
@@ -121,6 +137,7 @@ def run_scheduled_reconcile(config: IntradayConfig) -> int:
     manifest, report = collector.reconcile(session_date)
     print(manifest.summary_text())
     logger.info("Reconcile comparison: %s", report.get("comparison"))
+    _safe_fusion_after_camera(session_date, config, stage="camera_reconcile")
     return EXIT_COLLECTOR_FAILURE if manifest.symbols_failed else EXIT_SUCCESS
 
 

@@ -239,6 +239,7 @@ def build_daily_assessment(
     )
 
     next_horizon, next_date = _next_pending_horizon(birth, assessment_trade_date)
+    # q9 uses frozen birth placeholders (canonical VN clock at birth). Do not rewrite.
     waiting = (
         f"Waiting for {next_horizon} eligible on {next_date}"
         if next_horizon
