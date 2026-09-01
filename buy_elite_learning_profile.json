@@ -2,21 +2,21 @@
   "version": "BUY_ELITE_LEARNING_V3",
   "mode": "ACTIVE_LEARNING",
   "created_at": "2026-06-25 16:55:06",
-  "updated_at": "2026-09-01 21:27:35",
+  "updated_at": "2026-09-01 21:30:07",
   "completed_t5": 707,
   "baseline_winrate": 0.4158,
   "min_completed_to_learn": 80,
   "min_feature_samples": 20,
   "note": "Đủ dữ liệu tối thiểu. Learning Engine đã bắt đầu tự chỉnh trọng số rất chậm.",
   "multipliers": {
-    "market": 0.998,
+    "market": 0.997,
     "action": 0.999,
     "storm": 0.995,
     "evo": 1.0,
     "zone": 0.999,
     "obv": 1.0,
     "rsi_penalty": 1.0,
-    "dist_penalty": 0.989
+    "dist_penalty": 0.98
   },
   "regime_multipliers": {
     "WINTER": {
@@ -35,13 +35,13 @@
     "Completed T+5: 707",
     "Baseline WinRate: 41.6%",
     "Average T+5: -0.44%",
-    "market: good: n=454, winrate=40.5%, baseline=41.6%, mult=0.995, blended=0.998",
+    "market: good: n=454, winrate=40.5%, baseline=41.6%, mult=0.995, blended=0.997",
     "action: good: n=705, winrate=41.4%, baseline=41.6%, mult=0.999, blended=0.999",
     "storm: good: n=239, winrate=40.2%, baseline=41.6%, mult=0.994, blended=0.995",
     "evo: good: n=472, winrate=41.3%, baseline=41.6%, mult=0.999, blended=1.0",
     "zone: good: n=657, winrate=41.7%, baseline=41.6%, mult=1.001, blended=0.999",
     "obv: good: n=707, winrate=41.6%, baseline=41.6%, mult=1.0, blended=1.0",
-    "dist_penalty: risk: n=20, winrate=50.0%, baseline=41.6%, mult=0.945, blended=0.989",
+    "dist_penalty: risk: n=20, winrate=50.0%, baseline=41.6%, mult=0.945, blended=0.98",
     "Regime WINTER: n=253, winrate=43.5%, seasonal=1.005",
     "Regime NEUTRAL: n=454, winrate=40.5%, seasonal=0.997"
   ],
