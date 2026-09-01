@@ -1,44 +1,125 @@
-"""Vietnamese research interpretation. Never emits BUY authority."""
+"""Vietnamese research interpretation. Speak selectively. Never emits BUY authority."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 from modules.actionable_research.contracts import (
     AUTHORITY_LABEL,
+    CAMERA_DATA_FEED_MISSING,
+    CAMERA_DATA_MISSING_SYMBOL,
     EDGE_STATUS_ACTIVE_MATCH,
     EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE,
     EDGE_STATUS_NO_ACTIVE_MATCH,
     EDGE_STATUS_UNKNOWN,
     FOREIGN_STRONG_BUY,
+    FOREIGN_STRONG_SELL,
+    FOREIGN_UNKNOWN,
     INTEREST_HIGH,
     INTEREST_LOW,
     INTEREST_MEDIUM,
     INTEREST_NONE,
-    INTEREST_UNABLE,
+    MONEY_FLOW_DIR_INFLOW,
+    MONEY_FLOW_DIR_OUTFLOW,
     MONEY_FLOW_STRONG,
     MONEY_FLOW_UNKNOWN,
     NO_INTEREST_VI,
+    OBSERVATION_AGREEMENT,
+    OBSERVATION_CONFLICT,
+    OBSERVATION_STANDALONE,
     RANK_ACTIVE_FF,
     RANK_ACTIVE_MF,
-    RANK_ACTIVE_MF_FF,
     RANK_ACTIVE_ONLY,
+    RANK_AGREEMENT_TRIPLE,
+    RANK_CONFLICT,
     RANK_FF_STANDALONE,
+    RANK_LEARNED_SWEETSPOT,
     RANK_MF_FF,
     RANK_MF_STANDALONE,
     RANK_NOT_NOTABLE,
-    CAMERA_DATA_FEED_MISSING,
-    CAMERA_DATA_MISSING_SYMBOL,
-    FOREIGN_UNKNOWN,
+    SPEAK_POLICY,
+    SWEETSPOT_AUTHORITY_EVIDENCE_DERIVED,
+    SWEETSPOT_STATUS_LEARNED,
 )
 
 
+def _learned_sweetspot(rec: Dict[str, Any]) -> bool:
+    if rec.get("sweetspot_status") == SWEETSPOT_STATUS_LEARNED:
+        return True
+    return rec.get("authority_level") == SWEETSPOT_AUTHORITY_EVIDENCE_DERIVED
+
+
+def _mf_abnormal(rec: Dict[str, Any]) -> bool:
+    return rec.get("money_flow_status") == MONEY_FLOW_STRONG
+
+
+def _ff_abnormal(rec: Dict[str, Any]) -> bool:
+    return rec.get("foreign_flow_status") in {FOREIGN_STRONG_BUY, FOREIGN_STRONG_SELL}
+
+
+def family_polarities(rec: Dict[str, Any]) -> Set[int]:
+    """
+    +1 constructive / accumulation-ish, -1 distribution / selling-ish.
+    Unsigned abnormal money (FLAT strong) does not vote.
+    """
+    votes: Set[int] = set()
+    if rec.get("edge_status") == EDGE_STATUS_ACTIVE_MATCH:
+        votes.add(1)
+    if _learned_sweetspot(rec):
+        votes.add(1)
+    if _mf_abnormal(rec):
+        direction = rec.get("money_flow_direction")
+        if direction == MONEY_FLOW_DIR_INFLOW:
+            votes.add(1)
+        elif direction == MONEY_FLOW_DIR_OUTFLOW:
+            votes.add(-1)
+    if rec.get("foreign_flow_status") == FOREIGN_STRONG_BUY:
+        votes.add(1)
+    elif rec.get("foreign_flow_status") == FOREIGN_STRONG_SELL:
+        votes.add(-1)
+    return votes
+
+
+def noteworthy_family_count(rec: Dict[str, Any]) -> int:
+    n = 0
+    if rec.get("edge_status") == EDGE_STATUS_ACTIVE_MATCH:
+        n += 1
+    if _learned_sweetspot(rec):
+        n += 1
+    if _mf_abnormal(rec):
+        n += 1
+    if _ff_abnormal(rec):
+        n += 1
+    return n
+
+
+def observation_relation(rec: Dict[str, Any]) -> str:
+    votes = family_polarities(rec)
+    families = noteworthy_family_count(rec)
+    if 1 in votes and -1 in votes:
+        return OBSERVATION_CONFLICT
+    if families >= 2:
+        return OBSERVATION_AGREEMENT
+    return OBSERVATION_STANDALONE
+
+
+def is_notable(rec: Dict[str, Any]) -> bool:
+    """Speak only when something unusual was actually observed. Never fill a report."""
+    return noteworthy_family_count(rec) >= 1
+
+
 def rank_key(rec: Dict[str, Any]) -> Tuple[int, str]:
+    if not is_notable(rec):
+        return RANK_NOT_NOTABLE, rec.get("symbol") or ""
     active = rec.get("edge_status") == EDGE_STATUS_ACTIVE_MATCH
-    mf = rec.get("money_flow_status") == MONEY_FLOW_STRONG
-    ff = rec.get("foreign_flow_status") == FOREIGN_STRONG_BUY
+    mf = _mf_abnormal(rec)
+    ff = _ff_abnormal(rec)
+    learned = _learned_sweetspot(rec)
+    relation = observation_relation(rec)
+    if relation == OBSERVATION_CONFLICT:
+        return RANK_CONFLICT, rec.get("symbol") or ""
     if active and mf and ff:
-        return RANK_ACTIVE_MF_FF, rec.get("symbol") or ""
+        return RANK_AGREEMENT_TRIPLE, rec.get("symbol") or ""
     if active and mf:
         return RANK_ACTIVE_MF, rec.get("symbol") or ""
     if active and ff:
@@ -49,36 +130,25 @@ def rank_key(rec: Dict[str, Any]) -> Tuple[int, str]:
         return RANK_MF_STANDALONE, rec.get("symbol") or ""
     if ff:
         return RANK_FF_STANDALONE, rec.get("symbol") or ""
+    if learned:
+        return RANK_LEARNED_SWEETSPOT, rec.get("symbol") or ""
     if active:
         return RANK_ACTIVE_ONLY, rec.get("symbol") or ""
     return RANK_NOT_NOTABLE, rec.get("symbol") or ""
 
 
-def is_notable(rec: Dict[str, Any]) -> bool:
-    return rank_key(rec)[0] < RANK_NOT_NOTABLE
-
-
 def interest_level(rec: Dict[str, Any]) -> str:
+    if not is_notable(rec):
+        return INTEREST_NONE
     rank, _ = rank_key(rec)
-    if rank == RANK_ACTIVE_MF_FF:
+    if rank in {RANK_AGREEMENT_TRIPLE, RANK_CONFLICT, RANK_MF_FF}:
         return INTEREST_HIGH
-    if rank in {RANK_ACTIVE_MF, RANK_ACTIVE_FF, RANK_MF_FF}:
-        return INTEREST_HIGH if rank == RANK_MF_FF else INTEREST_MEDIUM
-    if rank in {RANK_MF_STANDALONE, RANK_FF_STANDALONE}:
+    if rank in {RANK_ACTIVE_MF, RANK_ACTIVE_FF}:
+        return INTEREST_MEDIUM
+    if rank in {RANK_MF_STANDALONE, RANK_FF_STANDALONE, RANK_LEARNED_SWEETSPOT}:
         return INTEREST_MEDIUM
     if rank == RANK_ACTIVE_ONLY:
         return INTEREST_LOW
-    cam = rec.get("camera_data_status")
-    edge = rec.get("edge_status")
-    foreign = rec.get("foreign_flow_status")
-    if (
-        edge == EDGE_STATUS_UNKNOWN
-        and rec.get("money_flow_status") == MONEY_FLOW_UNKNOWN
-        and foreign == FOREIGN_UNKNOWN
-        and cam in {CAMERA_DATA_FEED_MISSING, CAMERA_DATA_MISSING_SYMBOL}
-    ):
-        # Still a valid research record; not UNABLE unless the whole session is.
-        return INTEREST_NONE
     return INTEREST_NONE
 
 
@@ -117,61 +187,102 @@ def reasons(rec: Dict[str, Any]) -> List[str]:
         out.append("NO_ACTIVE_MATCH")
     elif edge == EDGE_STATUS_UNKNOWN:
         out.append("EDGE_UNKNOWN")
-    mf = rec.get("money_flow_status")
-    if mf == MONEY_FLOW_STRONG:
-        out.append("MONEY_FLOW_STRONG")
-    elif mf == MONEY_FLOW_UNKNOWN:
+    if _mf_abnormal(rec):
+        direction = rec.get("money_flow_direction") or "UNSIGNED"
+        out.append(f"MONEY_FLOW_ABNORMAL:{direction}")
+        out.append("MONEY_FLOW_IS_OBSERVATION_NOT_BUY")
+    elif rec.get("money_flow_status") == MONEY_FLOW_UNKNOWN:
         out.append("CAMERA_UNKNOWN_NOT_WEAK")
     ff = rec.get("foreign_flow_status")
     if ff == FOREIGN_STRONG_BUY:
         out.append("FOREIGN_STRONG_BUY")
+    elif ff == FOREIGN_STRONG_SELL:
+        out.append("FOREIGN_STRONG_SELL")
     elif ff == FOREIGN_UNKNOWN:
         out.append("FOREIGN_UNKNOWN_NOT_ZERO")
-    ss = rec.get("sweetspot_status")
-    if ss == "LEGACY_HEURISTIC_AUXILIARY":
+    if _learned_sweetspot(rec):
+        out.append("LEARNED_SWEETSPOT")
+    elif rec.get("sweetspot_status") == "LEGACY_HEURISTIC_AUXILIARY":
         out.append("SWEETSPOT_AUXILIARY_NON_AUTHORITATIVE")
+    relation = rec.get("observation_relation") or observation_relation(rec)
+    out.append(f"RELATION:{relation}")
     out.append("AUTHORITY_RESEARCH_ONLY")
+    out.append(SPEAK_POLICY)
     return out
+
+
+def _mf_phrase(rec: Dict[str, Any]) -> str:
+    direction = rec.get("money_flow_direction")
+    if direction == MONEY_FLOW_DIR_OUTFLOW:
+        return "dòng tiền intraday bất thường theo hướng giảm (quan sát Camera, không phải lệnh bán)"
+    if direction == MONEY_FLOW_DIR_INFLOW:
+        return "dòng tiền intraday vào đang mạnh (quan sát, không phải lệnh mua)"
+    return "dòng tiền intraday bất thường (quan sát Camera, không phải tín hiệu BUY)"
+
+
+def _ff_phrase(rec: Dict[str, Any]) -> str:
+    ff = rec.get("foreign_flow_status")
+    if ff == FOREIGN_STRONG_SELL:
+        return "nước ngoài bán mạnh (EOD, không phải Camera realtime; không phải lệnh bán)"
+    return "nước ngoài mua mạnh (EOD, không phải Camera realtime; không phải lệnh mua)"
 
 
 def evidence_summary_vi(rec: Dict[str, Any]) -> str:
     edge = rec.get("edge_status")
-    mf = rec.get("money_flow_status")
-    ff = rec.get("foreign_flow_status")
     cam = rec.get("camera_data_status")
-
     active = edge == EDGE_STATUS_ACTIVE_MATCH
-    mf_strong = mf == MONEY_FLOW_STRONG
-    ff_strong = ff == FOREIGN_STRONG_BUY
-    camera_missing = cam in {CAMERA_DATA_FEED_MISSING, CAMERA_DATA_MISSING_SYMBOL} or mf == MONEY_FLOW_UNKNOWN
+    mf = _mf_abnormal(rec)
+    ff = _ff_abnormal(rec)
+    learned = _learned_sweetspot(rec)
+    relation = observation_relation(rec)
+    camera_missing = cam in {CAMERA_DATA_FEED_MISSING, CAMERA_DATA_MISSING_SYMBOL} or rec.get(
+        "money_flow_status"
+    ) == MONEY_FLOW_UNKNOWN
 
-    if active and mf_strong and ff_strong:
-        return "Cổ phiếu khớp ACTIVE edge + dòng tiền vào mạnh + nước ngoài mua mạnh."
-    if active and mf_strong:
-        return "Cổ phiếu khớp ACTIVE edge; Camera xác nhận dòng tiền vào mạnh."
-    if active and ff_strong:
-        return "Cổ phiếu khớp ACTIVE edge; nước ngoài mua mạnh (EOD, không phải Camera realtime)."
+    if not is_notable(rec):
+        if camera_missing and cam in {CAMERA_DATA_FEED_MISSING, CAMERA_DATA_MISSING_SYMBOL}:
+            return "Không thể đánh giá Camera do thiếu dữ liệu intraday."
+        return "Không có bằng chứng đáng chú ý."
+
+    if relation == OBSERVATION_CONFLICT:
+        bits = []
+        if active:
+            bits.append("khớp ACTIVE edge")
+        if mf:
+            bits.append(_mf_phrase(rec))
+        if ff:
+            bits.append(_ff_phrase(rec))
+        if learned:
+            bits.append("Sweetspot learned/evidence-derived")
+        return "Xung đột bằng chứng: " + "; ".join(bits) + ". RESEARCH ONLY — không phải lệnh."
+
+    if active and mf and ff:
+        return f"Cổ phiếu khớp ACTIVE edge + {_mf_phrase(rec)} + {_ff_phrase(rec)}."
+    if active and mf:
+        return f"Cổ phiếu khớp ACTIVE edge; Camera: {_mf_phrase(rec)}."
+    if active and ff:
+        return f"Cổ phiếu khớp ACTIVE edge; {_ff_phrase(rec)}."
     if active and camera_missing:
-        return "Cổ phiếu khớp ACTIVE edge; Camera chưa xác nhận dòng tiền mạnh."
+        return "Cổ phiếu khớp ACTIVE edge; Camera chưa xác nhận dòng tiền bất thường."
     if active:
-        return "Cổ phiếu khớp ACTIVE edge; Camera chưa xác nhận dòng tiền mạnh."
-    if mf_strong and ff_strong:
-        return "Không có ACTIVE edge đã được xác nhận, nhưng dòng tiền intraday vào cổ phiếu đang mạnh và nước ngoài mua mạnh."
-    if mf_strong:
-        return "Không có ACTIVE edge đã được xác nhận, nhưng dòng tiền intraday vào cổ phiếu đang mạnh."
-    if ff_strong:
-        return "Không có ACTIVE edge đã được xác nhận, nhưng nước ngoài mua mạnh (nguồn EOD, không phải Camera realtime)."
-    if camera_missing and cam in {CAMERA_DATA_FEED_MISSING, CAMERA_DATA_MISSING_SYMBOL}:
-        return "Không thể đánh giá Camera do thiếu dữ liệu intraday."
-    if edge in {EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE, EDGE_STATUS_NO_ACTIVE_MATCH} and not mf_strong and not ff_strong:
-        return "Không có edge đáng tin cậy và không có dòng tiền bất thường."
-    return "Bằng chứng không nổi bật trong phiên này."
+        return "Cổ phiếu khớp ACTIVE edge; Camera chưa xác nhận dòng tiền bất thường."
+    if mf and ff:
+        prefix = "Không có ACTIVE edge đã được xác nhận, nhưng "
+        return prefix + f"{_mf_phrase(rec)} và {_ff_phrase(rec)}."
+    if mf:
+        return "Không có ACTIVE edge đã được xác nhận, nhưng " + _mf_phrase(rec) + "."
+    if ff:
+        return "Không có ACTIVE edge đã được xác nhận, nhưng " + _ff_phrase(rec) + "."
+    if learned:
+        return "Có Sweetspot learned/evidence-derived (không phải heuristic legacy; không phải ACTIVE edge)."
+    return "Bằng chứng đáng chú ý trong phiên này."
 
 
 def finalize_record(rec: Dict[str, Any]) -> Dict[str, Any]:
     out = dict(rec)
     out["authority"] = AUTHORITY_LABEL
     out["research_label"] = AUTHORITY_LABEL
+    out["observation_relation"] = observation_relation(out)
     out["interest_level"] = interest_level(out)
     out["evidence_summary"] = evidence_summary_vi(out)
     out["reasons"] = reasons(out)
@@ -189,11 +300,37 @@ def session_surface(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         headline = NO_INTEREST_VI
     else:
         top = notable[0]
-        headline = f"{len(notable)} cổ phiếu có bằng chứng đáng chú ý. {top.get('evidence_summary')}"
+        headline = (
+            f"Đã quét {len(records)} cổ phiếu, nói {len(notable)} quan sát đáng chú ý. "
+            f"{top.get('evidence_summary')}"
+        )
     return {
+        "speak_policy": SPEAK_POLICY,
         "notable_count": len(notable),
         "surfaced_symbols": [r.get("symbol") for r in notable],
+        "observations": notable,
         "headline_vi": headline,
         "authority": AUTHORITY_LABEL,
         "no_interest": len(notable) == 0,
+    }
+
+
+def scan_summary(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _count(pred) -> int:
+        return sum(1 for r in records if pred(r))
+
+    return {
+        "scanned_count": len(records),
+        "notable_count": _count(lambda r: r.get("notable")),
+        "active_match_count": _count(lambda r: r.get("edge_status") == EDGE_STATUS_ACTIVE_MATCH),
+        "money_flow_abnormal_count": _count(_mf_abnormal),
+        "foreign_abnormal_count": _count(_ff_abnormal),
+        "conflict_count": _count(lambda r: r.get("observation_relation") == OBSERVATION_CONFLICT),
+        "agreement_count": _count(lambda r: r.get("observation_relation") == OBSERVATION_AGREEMENT),
+        "camera_unknown_count": _count(lambda r: r.get("money_flow_status") == MONEY_FLOW_UNKNOWN),
+        "foreign_unknown_count": _count(lambda r: r.get("foreign_flow_status") == FOREIGN_UNKNOWN),
+        "learned_sweetspot_count": _count(_learned_sweetspot),
+        "legacy_sweetspot_not_spoken": _count(
+            lambda r: r.get("sweetspot_status") == "LEGACY_HEURISTIC_AUXILIARY" and not r.get("notable")
+        ),
     }

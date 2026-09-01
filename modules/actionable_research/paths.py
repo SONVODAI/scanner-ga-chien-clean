@@ -13,8 +13,10 @@ from modules.actionable_research.contracts import (
     DEFAULT_ARTIFACT_DIRNAME,
     DEFAULT_DAILY_SUBDIR,
     DEFAULT_HISTORY_SUBDIR,
+    DEFAULT_OBSERVATIONS_SUBDIR,
     INDEX_FILENAME,
     LATEST_FILENAME,
+    OBSERVATION_LEDGER_FILENAME,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -58,6 +60,15 @@ class FusionPaths:
 
     def history_dir(self) -> Path:
         return self.artifacts() / DEFAULT_HISTORY_SUBDIR
+
+    def observations_dir(self) -> Path:
+        return self.artifacts() / DEFAULT_OBSERVATIONS_SUBDIR
+
+    def observation_ledger_path(self) -> Path:
+        return self.observations_dir() / OBSERVATION_LEDGER_FILENAME
+
+    def daily_observations_path(self, trade_date: str) -> Path:
+        return self.observations_dir() / f"{trade_date}.json"
 
     def latest_path(self) -> Path:
         return self.artifacts() / LATEST_FILENAME
