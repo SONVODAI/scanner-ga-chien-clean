@@ -1,0 +1,134 @@
+"""
+Canonical contract for Actionable Research Fusion.
+
+Presentation / research evidence only. Never a BUY engine.
+Never mutates Phase A/B/C scientific stores.
+"""
+
+from __future__ import annotations
+
+from typing import FrozenSet
+
+FUSION_VERSION = "actionable_research_fusion_v1"
+FUSION_SCHEMA_VERSION = "1.0.0"
+AUTHORITY_LABEL = "RESEARCH ONLY"
+
+# --- Edge (scientific, read-only) ---
+EDGE_STATUS_ACTIVE_MATCH = "ACTIVE_MATCH"
+EDGE_STATUS_NO_ACTIVE_MATCH = "NO_ACTIVE_MATCH"
+EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE = "NO_ACTIVE_EDGE_AVAILABLE"
+EDGE_STATUS_UNKNOWN = "UNKNOWN"
+
+EDGE_STATUSES: FrozenSet[str] = frozenset(
+    {
+        EDGE_STATUS_ACTIVE_MATCH,
+        EDGE_STATUS_NO_ACTIVE_MATCH,
+        EDGE_STATUS_NO_ACTIVE_EDGE_AVAILABLE,
+        EDGE_STATUS_UNKNOWN,
+    }
+)
+
+# --- Sweetspot (never silently scientific) ---
+SWEETSPOT_STATUS_NONE = "NONE"
+SWEETSPOT_STATUS_UNAVAILABLE = "UNAVAILABLE"
+SWEETSPOT_STATUS_LEGACY_HEURISTIC = "LEGACY_HEURISTIC_AUXILIARY"
+SWEETSPOT_AUTHORITY_NON_AUTHORITATIVE = "NON_AUTHORITATIVE_HEURISTIC"
+SWEETSPOT_AUTHORITY_NONE = "NONE"
+
+# --- Camera / money flow ---
+CAMERA_DATA_OK = "OK"
+CAMERA_DATA_PARTIAL = "PARTIAL"
+CAMERA_DATA_MISSING_SYMBOL = "SYMBOL_MISSING"
+CAMERA_DATA_FEED_MISSING = "FEED_MISSING"
+CAMERA_DATA_INSUFFICIENT = "INSUFFICIENT_CROSS_SECTION"
+
+MONEY_FLOW_STRONG = "MONEY_FLOW_STRONG"
+MONEY_FLOW_NORMAL = "MONEY_FLOW_NORMAL"
+MONEY_FLOW_WEAK = "MONEY_FLOW_WEAK"
+MONEY_FLOW_UNKNOWN = "UNKNOWN"
+
+# --- Foreign flow ---
+FOREIGN_STRONG_BUY = "FOREIGN_STRONG_BUY"
+FOREIGN_BUY = "FOREIGN_BUY"
+FOREIGN_NEUTRAL = "FOREIGN_NEUTRAL"
+FOREIGN_SELL = "FOREIGN_SELL"
+FOREIGN_STRONG_SELL = "FOREIGN_STRONG_SELL"
+FOREIGN_UNKNOWN = "UNKNOWN"
+
+FOREIGN_TIMING_INTRADAY = "INTRADAY"
+FOREIGN_TIMING_EOD = "EOD"
+FOREIGN_TIMING_UNKNOWN = "UNKNOWN"
+
+FOREIGN_COMPLETENESS_COMPLETE = "COMPLETE"
+FOREIGN_COMPLETENESS_PARTIAL = "PARTIAL"
+FOREIGN_COMPLETENESS_UNAVAILABLE = "UNAVAILABLE"
+FOREIGN_COMPLETENESS_UNKNOWN = "UNKNOWN"
+
+# --- Session / interest ---
+SESSION_ELIGIBLE = "ELIGIBLE"
+SESSION_SKIPPED_NON_TRADING = "SKIPPED_NON_TRADING_DAY"
+SESSION_UNABLE = "UNABLE_TO_ASSESS"
+
+INTEREST_HIGH = "HIGH"
+INTEREST_MEDIUM = "MEDIUM"
+INTEREST_LOW = "LOW"
+INTEREST_NONE = "NONE"
+INTEREST_UNABLE = "UNABLE"
+
+# Presentation ranks (lower is stronger). Not a BUY rule.
+RANK_ACTIVE_MF_FF = 0
+RANK_ACTIVE_MF = 1
+RANK_ACTIVE_FF = 2
+RANK_MF_FF = 3
+RANK_MF_STANDALONE = 4
+RANK_FF_STANDALONE = 5
+RANK_ACTIVE_ONLY = 6
+RANK_NOT_NOTABLE = 99
+
+NO_INTEREST_VI = "Không có cổ phiếu nào có bằng chứng đáng chú ý hôm nay."
+
+PIT_FEATURE_KEYS = (
+    "health_group",
+    "group",
+    "pattern_key_v2_frozen",
+    "stock_pattern_key",
+    "rs5",
+    "rs10",
+    "rsi14",
+    "rs_spread",
+    "volume_ratio",
+    "rsi_slope",
+    "price",
+    "obv_status",
+    "action",
+)
+
+# Cross-sectional presentation heuristics (universe-relative, not absolute VND cuts).
+# Documented as presentation evidence — not scientifically validated edges.
+MONEY_FLOW_STRONG_PERCENTILE = 90.0
+MONEY_FLOW_WEAK_PERCENTILE = 10.0
+FOREIGN_STRONG_PERCENTILE = 90.0
+FOREIGN_BUY_PERCENTILE = 70.0
+FOREIGN_SELL_PERCENTILE = 30.0
+FOREIGN_STRONG_SELL_PERCENTILE = 10.0
+MIN_CROSS_SECTION = 8
+ACCEL_BARS = 6
+
+DEFAULT_ARTIFACT_DIRNAME = "actionable_research"
+DEFAULT_DAILY_SUBDIR = "daily"
+DEFAULT_HISTORY_SUBDIR = "history"
+LATEST_FILENAME = "latest.json"
+INDEX_FILENAME = "index.json"
+
+# Trading-authority tokens that must never appear as the fusion decision.
+# Foreign-flow *status* names (FOREIGN_STRONG_BUY, etc.) are evidence labels, not orders.
+FORBIDDEN_DECISION_LABELS = frozenset(
+    {
+        "BUY",
+        "SELL",
+        "STRONG_BUY",
+        "STRONG_SELL",
+        "MUA",
+        "BÁN",
+    }
+)
