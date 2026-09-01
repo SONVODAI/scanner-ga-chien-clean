@@ -472,8 +472,8 @@ class ObserverOnlyTests(unittest.TestCase):
                 return True
             rel = path.relative_to(root)
             if len(rel.parts) >= 2 and rel.parts[0] == "modules":
-                # Approved read-only observers: Forecast Memory + Edge EOD gate.
-                if rel.parts[1] in ("forecast_research", "edge_research"):
+                # Approved read-only observers: Forecast Memory + Edge EOD gate + fusion.
+                if rel.parts[1] in ("forecast_research", "edge_research", "actionable_research"):
                     return True
             return False
 
