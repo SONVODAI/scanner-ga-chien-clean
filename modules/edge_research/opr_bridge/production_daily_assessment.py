@@ -45,6 +45,7 @@ from modules.edge_research.opr_bridge.production_observation_cutoff import (
 )
 from modules.edge_research.opr_bridge.production_observation_persistence import lookup_birth_record
 from modules.edge_research.opr_bridge.production_observation_records import (
+    ForwardEvaluationStatus,
     ResearchObservationBirthRecord,
 )
 from modules.edge_research.opr_bridge.production_observation_lifecycle import (
@@ -56,10 +57,42 @@ from modules.edge_research.opr_bridge.production_observation_lifecycle import (
 )
 
 
-def _next_pending_horizon(birth: ResearchObservationBirthRecord, assessment_date: str) -> Tuple[Optional[str], Optional[str]]:
+def _released_horizons(outcomes: Optional[List[Any]]) -> set:
+    """Horizons that already have a living EVALUATED/released outcome.
+
+    Birth placeholders stay frozen (realized_outcome remains None). Waiting
+    text must consult the living outcome ledger, not only those placeholders.
+    """
+    released = set()
+    for outcome in outcomes or ():
+        status = getattr(outcome, "evaluation_status", None)
+        if status in (
+            ForwardEvaluationStatus.EVALUATED.value,
+            ForwardEvaluationStatus.EVALUATED,
+        ):
+            horizon = getattr(outcome, "horizon", None)
+            if horizon:
+                released.add(horizon)
+    return released
+
+
+def _next_pending_horizon(
+    birth: ResearchObservationBirthRecord,
+    assessment_date: str,
+    outcomes: Optional[List[Any]] = None,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Next unreleased birth-placeholder horizon for waiting narrative only.
+
+    assessment_date is kept for call-site compatibility; eligibility dates stay
+    the frozen birth placeholders (canonical VN clock at birth). Do not rewrite
+    those dates here. Released living outcomes clear that horizon from waiting.
+    """
+    released = _released_horizons(outcomes)
     pending = [
         h for h in birth.forward_horizons
-        if h.status in ("PENDING_FUTURE", "ELIGIBLE") and h.realized_outcome is None
+        if h.status in ("PENDING_FUTURE", "ELIGIBLE")
+        and h.realized_outcome is None
+        and h.horizon not in released
     ]
     if not pending:
         return None, None
@@ -238,8 +271,11 @@ def build_daily_assessment(
         belief_unchanged=not belief_changed,
     )
 
-    next_horizon, next_date = _next_pending_horizon(birth, assessment_trade_date)
-    # q9 uses frozen birth placeholders (canonical VN clock at birth). Do not rewrite.
+    next_horizon, next_date = _next_pending_horizon(
+        birth, assessment_trade_date, all_outcomes
+    )
+    # q9 uses frozen birth placeholder dates (canonical VN clock at birth).
+    # Do not rewrite those dates. Clear horizons that already have released outcomes.
     waiting = (
         f"Waiting for {next_horizon} eligible on {next_date}"
         if next_horizon
