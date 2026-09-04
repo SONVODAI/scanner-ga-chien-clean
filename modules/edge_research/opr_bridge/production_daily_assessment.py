@@ -12,8 +12,13 @@ import pandas as pd
 from modules.edge_research.opr_bridge.evidence_synthesis_records import stable_hash, utc_now_iso
 from modules.edge_research.opr_bridge.production_daily_voice import render_daily_voice
 from modules.edge_research.opr_bridge.production_forward_outcome_evaluator import (
+    ForwardEvaluationStatus,
     evaluate_eligible_outcomes,
     interpret_outcome_evidence,
+)
+from modules.edge_research.opr_bridge.research_memory import (
+    load_research_memory,
+    record_forward_adjudication,
 )
 from modules.edge_research.opr_bridge.production_living_observation_persistence import (
     assessment_exists,
@@ -56,10 +61,42 @@ from modules.edge_research.opr_bridge.production_observation_lifecycle import (
 )
 
 
-def _next_pending_horizon(birth: ResearchObservationBirthRecord, assessment_date: str) -> Tuple[Optional[str], Optional[str]]:
+def _released_horizons(outcomes: Optional[List[Any]]) -> set:
+    """Horizons that already have a living EVALUATED/released outcome.
+
+    Birth placeholders stay frozen (realized_outcome remains None). Waiting
+    text must consult the living outcome ledger, not only those placeholders.
+    """
+    released = set()
+    for outcome in outcomes or ():
+        status = getattr(outcome, "evaluation_status", None)
+        if status in (
+            ForwardEvaluationStatus.EVALUATED.value,
+            ForwardEvaluationStatus.EVALUATED,
+        ):
+            horizon = getattr(outcome, "horizon", None)
+            if horizon:
+                released.add(horizon)
+    return released
+
+
+def _next_pending_horizon(
+    birth: ResearchObservationBirthRecord,
+    assessment_date: str,
+    outcomes: Optional[List[Any]] = None,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Next unreleased birth-placeholder horizon for waiting narrative only.
+
+    assessment_date is kept for call-site compatibility; eligibility dates stay
+    the frozen birth placeholders (canonical VN clock at birth). Do not rewrite
+    those dates here. Released living outcomes clear that horizon from waiting.
+    """
+    released = _released_horizons(outcomes)
     pending = [
         h for h in birth.forward_horizons
-        if h.status in ("PENDING_FUTURE", "ELIGIBLE") and h.realized_outcome is None
+        if h.status in ("PENDING_FUTURE", "ELIGIBLE")
+        and h.realized_outcome is None
+        and h.horizon not in released
     ]
     if not pending:
         return None, None
@@ -150,6 +187,33 @@ def build_daily_assessment(
     new_evidence_keys = tuple(
         f"forward_outcome:{o.horizon}:{o.outcome_record_id}" for o in new_outcomes
     )
+    if persist and new_outcomes:
+        try:
+            memory = load_research_memory(data_dir)
+            family_key = None
+            spec = getattr(birth.forward_evaluation_contract, "claim_spec", None) or {}
+            if spec.get("feature") and spec.get("outcome_field"):
+                from modules.edge_research.opr_bridge.research_memory import proposition_family_key
+
+                family_key = proposition_family_key(
+                    feature=str(spec.get("feature") or ""),
+                    outcome=str(spec.get("outcome_field") or ""),
+                    horizon=spec.get("observation_horizon"),
+                    population_kind=str(spec.get("population_kind") or "all"),
+                    claim_family=str(spec.get("claim_family") or ""),
+                )
+            if family_key:
+                for outcome, interp in zip(new_outcomes, interpretations):
+                    record_forward_adjudication(
+                        memory,
+                        family_key=family_key,
+                        observation_id=birth.observation_id,
+                        horizon=outcome.horizon,
+                        adjudication=str(interp.get("claim_adjudication") or "CONTEXT_ONLY"),
+                        data_dir=data_dir,
+                    )
+        except Exception:
+            pass
 
     prev_ep = (
         prev_assessment.current_epistemic_state
@@ -238,8 +302,11 @@ def build_daily_assessment(
         belief_unchanged=not belief_changed,
     )
 
-    next_horizon, next_date = _next_pending_horizon(birth, assessment_trade_date)
-    # q9 uses frozen birth placeholders (canonical VN clock at birth). Do not rewrite.
+    next_horizon, next_date = _next_pending_horizon(
+        birth, assessment_trade_date, all_outcomes
+    )
+    # q9 uses frozen birth placeholder dates (canonical VN clock at birth).
+    # Do not rewrite those dates. Clear horizons that already have released outcomes.
     waiting = (
         f"Waiting for {next_horizon} eligible on {next_date}"
         if next_horizon

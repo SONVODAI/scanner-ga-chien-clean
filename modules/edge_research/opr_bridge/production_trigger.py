@@ -11,6 +11,8 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
+from pathlib import Path
+
 from modules.edge_research.opr_bridge.evidence_synthesis_records import new_id, stable_hash
 from modules.edge_research.opr_bridge.interpretation_contract import proposition_content_hash
 from modules.edge_research.opr_bridge.prioritized_pipeline import (
@@ -18,8 +20,14 @@ from modules.edge_research.opr_bridge.prioritized_pipeline import (
     run_opr_pipeline_prioritized,
 )
 from modules.edge_research.opr_bridge.proposition_record import PropositionRecord
+from modules.edge_research.opr_bridge.proposition_selection import (
+    candidate_from_record,
+    collect_alternative_candidates,
+    select_proposition_with_memory,
+)
+from modules.edge_research.opr_bridge.research_memory import load_research_memory
 
-TRIGGER_VERSION = "production_opr_trigger_v1_3j0"
+TRIGGER_VERSION = "production_opr_trigger_v1_3k6_memory"
 
 
 @dataclass
@@ -37,6 +45,7 @@ class ProductionOpportunityDetection:
     pipeline_result: Optional[PrioritizedOprPipelineResult] = None
     silences: List[Dict[str, Any]] = field(default_factory=list)
     focal_dates_scanned: List[str] = field(default_factory=list)
+    selection_provenance: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -50,6 +59,7 @@ class ProductionOpportunityDetection:
             "silences": self.silences,
             "focal_dates_scanned": self.focal_dates_scanned,
             "propositions_emitted": 1 if self.proposition_record else 0,
+            "selection_provenance": self.selection_provenance,
         }
 
 
@@ -96,11 +106,15 @@ def detect_production_opportunity(
     *,
     data_cutoff_date: str,
     max_unique_propositions: int = 1,
+    data_dir: Optional[Path] = None,
+    research_memory: Optional[Any] = None,
 ) -> ProductionOpportunityDetection:
     """
-    Smallest general production trigger: frozen prioritized OPR pipeline.
+    Production trigger: frozen prioritized OPR pipeline, then research-memory
+    selection among admissible surprising families.
 
-    No human invocation, no hidden benchmark, no known-edge encoding.
+    Empty memory preserves the existing pipeline pick. Memory then penalizes
+    redundant repetition without a new scientific reason.
     """
     result = ProductionOpportunityDetection()
     pipeline = run_opr_pipeline_prioritized(
@@ -120,7 +134,25 @@ def detect_production_opportunity(
             result.outcome = "SILENT"
         return result
 
-    record: PropositionRecord = pipeline.records[0]
+    default_record: PropositionRecord = pipeline.records[0]
+    memory = research_memory if research_memory is not None else load_research_memory(data_dir)
+    default_cand = candidate_from_record(
+        default_record,
+        surprise_strength=0.0,
+        focal_date=data_cutoff_date,
+        source="default_pipeline",
+    )
+    alternatives = collect_alternative_candidates(
+        panel,
+        data_cutoff_date=data_cutoff_date,
+    )
+    selected, provenance = select_proposition_with_memory(
+        default_candidate=default_cand,
+        alternatives=alternatives,
+        memory=memory,
+        cutoff_date=data_cutoff_date,
+    )
+    record = selected.record
     prop_dict = record.to_dict()
     prop_hash = proposition_content_hash(prop_dict)
     evidence_hash = compute_evidence_cutoff_hash(
@@ -134,6 +166,7 @@ def detect_production_opportunity(
     result.proposition_hash = prop_hash
     result.evidence_cutoff_hash = evidence_hash
     result.opportunity_identity = opp_id
+    result.selection_provenance = provenance.to_dict()
     return result
 
 

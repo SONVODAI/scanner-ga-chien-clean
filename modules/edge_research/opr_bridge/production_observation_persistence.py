@@ -215,14 +215,24 @@ def _birth_from_dict(payload: Dict[str, Any]) -> ResearchObservationBirthRecord:
         cohort_hash=cohort_d.get("cohort_hash", ""),
     )
     fw_d = payload.get("forward_evaluation_contract") or {}
+    criteria = dict(fw_d.get("evaluation_criteria") or {})
+    nested_spec = dict(fw_d.get("claim_spec") or criteria.get("claim_spec") or {})
     fw = ForwardEvaluationContract(
         contract_id=fw_d["contract_id"],
         observation_id=fw_d["observation_id"],
         horizons=tuple(fw_d.get("horizons") or []),
-        evaluation_criteria=dict(fw_d.get("evaluation_criteria") or {}),
+        evaluation_criteria=criteria,
         cohort_evaluation_rules=dict(fw_d.get("cohort_evaluation_rules") or {}),
         missing_data_policy=fw_d.get("missing_data_policy", ""),
         contract_hash=fw_d.get("contract_hash", ""),
+        record_version=fw_d.get("record_version", "forward_evaluation_contract_v1_3k0"),
+        claim_family=fw_d.get("claim_family") or criteria.get("claim_family") or "LEGACY_UNSPECIFIED",
+        claim_spec=nested_spec,
+        claim_contract_status=(
+            fw_d.get("claim_contract_status")
+            or criteria.get("claim_contract_status")
+            or "LEGACY_INSUFFICIENT_CLAIM_SPEC"
+        ),
     )
     horizons = tuple(
         ForwardHorizonPlaceholder(

@@ -43,7 +43,12 @@ from modules.edge_research.opr_bridge.production_observation_records import (
     build_forward_evaluation_contract,
     build_forward_horizon_placeholders,
 )
+from modules.edge_research.opr_bridge.claim_aligned_forward import build_claim_spec
 from modules.edge_research.opr_bridge.production_trigger import detect_production_opportunity
+from modules.edge_research.opr_bridge.research_memory import (
+    load_research_memory,
+    record_family_from_birth,
+)
 
 
 def _extract_cohort_attribution(
@@ -249,7 +254,22 @@ def build_birth_record(
     history = build_experiment_history(session_record) if session_record else []
     experiment_count = len([e for e in history if e.execution])
 
-    forward_contract = build_forward_evaluation_contract(cutoff.observation_id)
+    frozen_contract = None
+    if history:
+        frozen_contract = history[0].frozen_contract
+    elif session_record:
+        frozen_contract = session_record.frozen_interpretation_contract
+    claim_spec = build_claim_spec(
+        prop=prop,
+        panel=panel,
+        trade_date=cutoff.trade_date,
+        symbols=cohort.symbols_at_birth,
+        frozen_contract=frozen_contract,
+    )
+    forward_contract = build_forward_evaluation_contract(
+        cutoff.observation_id,
+        claim_spec=claim_spec,
+    )
     forward_horizons = build_forward_horizon_placeholders(cutoff.trade_date)
 
     session_identity = stable_hash(
@@ -351,7 +371,12 @@ def run_production_research_observation(
             observation_mode=observation_mode,
         )
 
-    det = detect_production_opportunity(truncated, data_cutoff_date=data_cutoff_date)
+    det = detect_production_opportunity(
+        truncated,
+        data_cutoff_date=data_cutoff_date,
+        data_dir=data_dir,
+    )
+    selection_provenance = det.selection_provenance
     session_result = None
 
     if det.outcome == "OPPORTUNITY_DETECTED" and det.proposition_record:
@@ -376,6 +401,15 @@ def run_production_research_observation(
     if persist:
         persist_birth_record(birth, data_dir=data_dir)
         append_ledger_entry(build_ledger_entry_from_birth(birth), data_dir=data_dir)
+        if birth.research_question:
+            memory = load_research_memory(data_dir)
+            record_family_from_birth(
+                memory,
+                birth,
+                persist=True,
+                data_dir=data_dir,
+                selection_provenance=selection_provenance,
+            )
 
     return ProductionResearchObservationSession(
         observation_id=cutoff.observation_id,
@@ -390,6 +424,7 @@ def run_production_research_observation(
         birth_record=birth,
         idempotent_replay=False,
         observation_mode=observation_mode,
+        selection_provenance=selection_provenance,
     )
 
 
