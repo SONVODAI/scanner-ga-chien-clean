@@ -349,6 +349,11 @@ def _candidate(feature: str, outcome: str, surprise: float, source: str = "alter
     rec = SimpleNamespace(
         scientific_question=f"Does {feature} tier predict {outcome}?",
         proposition_id=f"prop-{feature}-{outcome}",
+        executability_status="EXECUTABLE",
+        experiment_spec_draft={
+            "tool_name": "partition_group_compare",
+            "inputs": {"partition_column": feature, "n_groups": 5},
+        },
     )
     ident = {
         "feature": feature,
@@ -554,3 +559,367 @@ def test_legacy_contract_does_not_fabricate_claim_fields():
     assert generic is not None
     assert claim["adjudication"] == ADJUDICATION_LEGACY
     assert claim["metrics"] == {}
+
+
+def _redundant_memory_for_prop(prop: dict, cutoff: str) -> ResearchMemoryStore:
+    from modules.edge_research.opr_bridge.research_memory import (
+        family_identity_fields,
+        family_key_from_proposition,
+    )
+
+    ident = family_identity_fields(prop)
+    store = ResearchMemoryStore()
+    store.upsert(
+        PropositionFamilyMemory(
+            family_key=family_key_from_proposition(prop),
+            feature=ident["feature"],
+            outcome=ident["outcome"],
+            horizon=ident["horizon"],
+            population_kind=ident["population_kind"],
+            claim_family=ident["claim_family"],
+            episode_count=2,
+            tested_episode_dates=["2026-08-20", cutoff],
+            support_count=2,
+            unresolved_count=0,
+            contradiction_count=0,
+            surviving_nulls=[],
+            last_epistemic_state="SUPPORTED",
+            forward_validation_history=[{"adjudication": "CLAIM_SUPPORTING", "horizon": "T5"}],
+            observation_ids=["obs-n", "obs-prior"],
+        )
+    )
+    return store
+
+
+def test_real_partition_fallback_columns_unchanged_without_panel():
+    """Callers without a panel keep the historical default column set."""
+    from modules.edge_research.opr_bridge.scientific_action_context import ExecutabilityContext
+
+    fallback = ExecutabilityContext.real_partition_default(data_cutoff="2026-08-28")
+    assert fallback.panel_columns == {
+        "trade_date",
+        "rs_spread",
+        "t5_return",
+        "research_market_state",
+        "symbol",
+    }
+    frame = pd.DataFrame({"trade_date": ["2026-08-28"], "rsi14": [50.0], "t5_return": [0.1]})
+    bound = ExecutabilityContext.real_partition_for_panel(data_cutoff="2026-08-28", panel=frame)
+    assert "rsi14" in bound.panel_columns
+    assert "t5_return" in bound.panel_columns
+    assert "rs_spread" not in bound.panel_columns
+
+
+def test_a1_alternative_executes():
+    """TEST A1 — N+1 selected alternative is executable and starts experiments."""
+    import tempfile
+
+    from modules.edge_research.adapters import build_research_panel
+    from modules.edge_research.opr_bridge.first_experiment_pipeline import run_first_experiment_pipeline
+    from modules.edge_research.opr_bridge.production_bounded_lifecycle import (
+        run_bounded_autonomous_research,
+    )
+    from modules.edge_research.opr_bridge.production_trigger import detect_production_opportunity
+    from modules.edge_research.opr_bridge.proposition_selection import (
+        candidate_is_selectable_for_execution,
+        candidate_from_prop_dict,
+    )
+    from modules.edge_research.opr_bridge.scientific_action_context import ExecutabilityContext
+
+    panel = build_research_panel()
+    if panel is None or panel.empty:
+        pytest.skip("No research panel")
+    cutoff = sorted(panel["trade_date"].astype(str).unique())[-1]
+    det = detect_production_opportunity(panel, data_cutoff_date=cutoff)
+    if det.outcome != "OPPORTUNITY_DETECTED" or not det.proposition_record:
+        pytest.skip("No default opportunity")
+    default_prop = det.proposition_record
+    empty = ResearchMemoryStore()
+    refined_n, prov_n = refine_detected_proposition(
+        default_prop,
+        panel,
+        data_cutoff_date=cutoff,
+        memory=empty,
+        observation_mode="PRODUCTION_SHADOW",
+    )
+    assert refined_n is default_prop
+    assert "EMPTY_MEMORY_DEFAULT_PIPELINE" in prov_n.scientific_reasons
+
+    store = _redundant_memory_for_prop(default_prop, cutoff)
+    refined_n1, prov_n1 = refine_detected_proposition(
+        default_prop,
+        panel,
+        data_cutoff_date=cutoff,
+        memory=store,
+        observation_mode="PRODUCTION_SHADOW",
+    )
+    assert prov_n1.scientific_reasons
+    selected = candidate_from_prop_dict(refined_n1, source="selected")
+    assert candidate_is_selectable_for_execution(selected)
+    assert refined_n1.get("executability_status") == "EXECUTABLE"
+    assert isinstance(refined_n1.get("experiment_spec_draft"), dict)
+    assert refined_n1["experiment_spec_draft"].get("tool_name")
+    assert refined_n1["experiment_spec_draft"].get("inputs")
+    if refined_n1 is default_prop:
+        pytest.skip("No surprising executable alternative on this panel")
+    selected_feature = str(
+        (refined_n1.get("explanatory_relation") or {}).get("feature_or_contrast")
+        or selected.feature
+    )
+    exec_ctx = ExecutabilityContext.real_partition_for_panel(data_cutoff=cutoff, panel=panel)
+    assert selected_feature in exec_ctx.panel_columns
+    package = run_first_experiment_pipeline(refined_n1, panel, executability=exec_ctx)
+    assert package.selected_experiment_spec is not None
+    assert package.disposition == "SELECTED"
+    with tempfile.TemporaryDirectory() as tmp:
+        result = run_bounded_autonomous_research(
+            refined_n1,
+            panel,
+            data_cutoff_date=cutoff,
+            data_dir=Path(tmp),
+            bootstrap_new_session=True,
+        )
+    lc = result.lifecycle
+    assert lc is not None
+    assert lc.termination_reason != "first_experiment_execution_failed"
+    assert getattr(lc, "experiments_completed", 0) >= 1
+    assert lc.outcome != "FAILED_CLOSED" or lc.termination_reason != "first_experiment_execution_failed"
+
+
+def test_a2_non_executable_alternative_cannot_displace_default():
+    """TEST A2 — failed executability is rejected; working default is preserved if needed."""
+    default = _candidate("feat_a", "t5_return", surprise=1.0, source="default_pipeline")
+    broken = _candidate("feat_broken", "t5_return", surprise=9.0)
+    broken.record.executability_status = "NOT_ATTEMPTED"
+    broken.record.experiment_spec_draft = None
+    good = _candidate("feat_b", "t5_return", surprise=2.5)
+    memory = ResearchMemoryStore()
+    memory.upsert(
+        PropositionFamilyMemory(
+            family_key=default.family_key,
+            feature="feat_a",
+            outcome="t5_return",
+            horizon=0,
+            population_kind="all",
+            claim_family=CLAIM_FAMILY_CROSS_SECTIONAL_TIER,
+            episode_count=2,
+            tested_episode_dates=["2026-08-24", "2026-08-27"],
+            support_count=2,
+            last_epistemic_state="SUPPORTED",
+            forward_validation_history=[{"adjudication": "CLAIM_SUPPORTING"}],
+        )
+    )
+    selected, provenance = select_proposition_with_memory(
+        default_candidate=default,
+        alternatives=[broken, good],
+        memory=memory,
+        cutoff_date="2026-08-27",
+    )
+    assert selected.family_key == good.family_key
+    assert any(
+        r.get("rejected_reason") == "not_selectable_for_execution"
+        and r.get("feature") == "feat_broken"
+        for r in provenance.rejected
+    )
+
+    selected_only_broken, prov2 = select_proposition_with_memory(
+        default_candidate=default,
+        alternatives=[broken],
+        memory=memory,
+        cutoff_date="2026-08-27",
+    )
+    assert selected_only_broken.family_key == default.family_key
+    assert any(
+        r.get("rejected_reason") == "not_selectable_for_execution"
+        for r in prov2.rejected
+    )
+
+
+def test_a2_adapt_candidate_records_rejection_provenance(monkeypatch):
+    """Failed canonical adaptation is recorded and the candidate is not selectable."""
+    from modules.edge_research.opr_bridge.executability_adapter import ExecutabilityResult
+    from modules.edge_research.opr_bridge.proposition_record import (
+        ExecutabilityStatus,
+        PropositionRecord,
+    )
+    from modules.edge_research.opr_bridge.proposition_selection import (
+        adapt_candidate_for_execution,
+    )
+    from modules.edge_research.opr_bridge import proposition_selection as psel
+
+    record = object.__new__(PropositionRecord)
+    record.scientific_question = "Does rsi14 tier predict t5_return?"
+    record.proposition_id = "prop-rsi14-t5_return"
+    record.executability_status = ExecutabilityStatus.NOT_ATTEMPTED
+    record.experiment_spec_draft = None
+    cand = _candidate("rsi14", "t5_return", surprise=9.0)
+    cand.record = record
+
+    def _fail_adapt(rec, panel):
+        rec.executability_status = ExecutabilityStatus.NOT_EXECUTABLE
+        rec.experiment_spec_draft = None
+        return ExecutabilityResult(
+            status=ExecutabilityStatus.NOT_EXECUTABLE,
+            experiment_spec=None,
+            detail="forced_missing_experiment_spec",
+            adaptation_notes=("test",),
+        )
+
+    monkeypatch.setattr(psel, "adapt_executability", _fail_adapt)
+    adapted, info = adapt_candidate_for_execution(
+        cand, pd.DataFrame({"trade_date": ["2026-08-27"]})
+    )
+    assert adapted is None
+    assert info["rejected_reason"] == "executability_adaptation_failed"
+    assert info["executability_status"] == ExecutabilityStatus.NOT_EXECUTABLE.value
+    assert info["adapted"] is True
+    assert info["detail"] == "forced_missing_experiment_spec"
+
+
+def _inc(*, strength: str = "STRONG", conflict: bool = True, blocked: bool = False):
+    from modules.edge_research.opr_bridge.multi_evidence_accounting import IncrementalEvidenceContribution
+
+    return IncrementalEvidenceContribution(
+        raw_evidence_strength=strength,
+        incremental_strength=strength,
+        incremental_direction="DISCONFIRMING",
+        double_counting_blocked=blocked,
+        conflict_detected=conflict,
+        conflict_description="test",
+        rationale=("test",),
+    )
+
+
+def test_b1_strong_authoritative_falsification():
+    """TEST B1 — strong later-experiment falsification can move SUPPORTED → FALSIFIED."""
+    from modules.edge_research.opr_bridge.multi_evidence_accounting import (
+        AUTHORITATIVE_FALSIFICATION_KEY,
+        apply_incremental_epistemic_transition,
+    )
+
+    rationale: dict = {}
+    resulting, key = apply_incremental_epistemic_transition(
+        "SUPPORTED",
+        {
+            "evidence_class": "DISCONFIRMING",
+            "metrics_used": {"falsify_strength": "STRONG", "quintile_mean_spread": 4.0},
+            "condition_matched": "direction_violation AND quintile_mean_spread >= 0.5",
+            "validity_passed": True,
+            "evidence_relevance": "HIGH",
+            "targeted_null_addressed": True,
+        },
+        _inc(strength="STRONG", conflict=True),
+        tested_null_key="directional_reversal",
+        experiment_completed=True,
+        falsification_capable=True,
+        evidence_relevant=True,
+        frozen_falsify_matched=True,
+        targeted_null_addressed=True,
+        integrity_failure=False,
+        rationale_out=rationale,
+    )
+    assert resulting == "FALSIFIED"
+    assert key == AUTHORITATIVE_FALSIFICATION_KEY
+    assert rationale["warranted"] is True
+    assert rationale["driven_by"] == "evidence_and_frozen_contract"
+    assert rationale["action_label_ignored"] is True
+
+    weakened, key2 = apply_incremental_epistemic_transition(
+        "WEAKENED",
+        {
+            "evidence_class": "DISCONFIRMING",
+            "metrics_used": {"falsify_strength": "STRONG"},
+            "validity_passed": True,
+        },
+        _inc(strength="STRONG", conflict=False),
+        tested_null_key="directional_reversal",
+        experiment_completed=True,
+        falsification_capable=True,
+        evidence_relevant=True,
+        frozen_falsify_matched=True,
+        targeted_null_addressed=True,
+        integrity_failure=False,
+    )
+    assert weakened == "FALSIFIED"
+    assert key2 == AUTHORITATIVE_FALSIFICATION_KEY
+
+
+def test_b2_weak_disconfirm_does_not_over_falsify():
+    """TEST B2 — weak/ambiguous disconfirm stays conservative."""
+    from modules.edge_research.opr_bridge.multi_evidence_accounting import (
+        apply_incremental_epistemic_transition,
+    )
+
+    resulting, key = apply_incremental_epistemic_transition(
+        "SUPPORTED",
+        {
+            "evidence_class": "DISCONFIRMING",
+            "metrics_used": {"falsify_strength": "WEAK", "quintile_mean_spread": 0.2},
+            "validity_passed": True,
+        },
+        _inc(strength="WEAK", conflict=True),
+        tested_null_key="directional_reversal",
+        experiment_completed=True,
+        falsification_capable=True,
+        evidence_relevant=True,
+        frozen_falsify_matched=False,
+        targeted_null_addressed=False,
+        integrity_failure=False,
+    )
+    assert resulting != "FALSIFIED"
+    assert resulting in ("WEAKENED", "SUPPORTED")
+    assert "AUTHORITATIVE_FALSIFICATION" != key
+
+
+def test_b3_irrelevant_strong_evidence_does_not_falsify():
+    """TEST B3 — strong evidence that does not adjudicate the frozen null/proposition."""
+    from modules.edge_research.opr_bridge.multi_evidence_accounting import (
+        apply_incremental_epistemic_transition,
+    )
+
+    resulting, key = apply_incremental_epistemic_transition(
+        "SUPPORTED",
+        {
+            "evidence_class": "DISCONFIRMING",
+            "metrics_used": {"falsify_strength": "STRONG"},
+            "validity_passed": True,
+            "evidence_relevance": "LOW",
+        },
+        _inc(strength="STRONG", conflict=True),
+        tested_null_key="directional_reversal",
+        experiment_completed=True,
+        falsification_capable=True,
+        evidence_relevant=False,
+        frozen_falsify_matched=True,
+        targeted_null_addressed=False,
+        integrity_failure=False,
+    )
+    assert resulting != "FALSIFIED"
+    assert key != "AUTHORITATIVE_FALSIFICATION"
+
+
+def test_b4_abandon_action_does_not_define_epistemic_state():
+    """TEST B4 — ABANDON label alone cannot produce FALSIFIED."""
+    from modules.edge_research.opr_bridge.multi_evidence_accounting import (
+        apply_incremental_epistemic_transition,
+    )
+
+    resulting, key = apply_incremental_epistemic_transition(
+        "SUPPORTED",
+        {
+            "evidence_class": "SUPPORTING",
+            "metrics_used": {"falsify_strength": "WEAK"},
+            "validity_passed": True,
+            "chosen_next_action": "ABANDON",
+        },
+        _inc(strength="MODERATE", conflict=False),
+        tested_null_key="directional_reversal",
+        experiment_completed=True,
+        falsification_capable=True,
+        evidence_relevant=False,
+        frozen_falsify_matched=False,
+        targeted_null_addressed=False,
+        integrity_failure=False,
+    )
+    assert resulting != "FALSIFIED"
+    assert "ABANDON" not in key

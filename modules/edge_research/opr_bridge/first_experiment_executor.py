@@ -115,7 +115,9 @@ def execute_first_experiment(
     """
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
     if executability is None:
-        executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff or "2099-01-01")
+        executability = ExecutabilityContext.real_partition_for_panel(
+            data_cutoff=cutoff or "2099-01-01", panel=panel
+        )
 
     eligibility = validate_execution_eligibility(
         package,

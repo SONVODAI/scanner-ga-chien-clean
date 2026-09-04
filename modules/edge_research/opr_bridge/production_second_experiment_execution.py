@@ -72,7 +72,9 @@ def run_production_second_experiment_execution(
                 break
 
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
-    executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff)
+    executability = ExecutabilityContext.real_partition_for_panel(
+        data_cutoff=cutoff, panel=panel
+    )
 
     from modules.edge_research.opr_bridge.first_experiment_execution_gate import (
         compute_execution_identity_hash,

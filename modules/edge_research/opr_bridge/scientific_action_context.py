@@ -39,17 +39,46 @@ class ExecutabilityContext:
         )
 
     @classmethod
-    def real_partition_default(cls, *, data_cutoff: str) -> "ExecutabilityContext":
+    def real_partition_default(
+        cls,
+        *,
+        data_cutoff: str,
+        panel_columns: Optional[Set[str]] = None,
+    ) -> "ExecutabilityContext":
+        cols = set(panel_columns) if panel_columns else {
+            "trade_date",
+            "rs_spread",
+            "t5_return",
+            "research_market_state",
+            "symbol",
+        }
         return cls(
             available_tools={"partition_group_compare", "date_decomposition"},
             has_regime_column=True,
             has_symbol_level=True,
             has_date_decomposition=True,
-            panel_columns={"trade_date", "rs_spread", "t5_return", "research_market_state", "symbol"},
+            panel_columns=cols,
             min_sample=58,
             data_cutoff=data_cutoff,
             abstract_mode=False,
         )
+
+    @classmethod
+    def real_partition_for_panel(
+        cls,
+        *,
+        data_cutoff: str,
+        panel: Any,
+    ) -> "ExecutabilityContext":
+        """Bind real-partition executability to the columns actually on this panel.
+
+        Does not encode a preferred feature. Callers without a panel keep
+        real_partition_default()'s historical fallback set.
+        """
+        columns = None
+        if panel is not None and getattr(panel, "columns", None) is not None:
+            columns = set(map(str, panel.columns))
+        return cls.real_partition_default(data_cutoff=data_cutoff, panel_columns=columns)
 
 
 @dataclass

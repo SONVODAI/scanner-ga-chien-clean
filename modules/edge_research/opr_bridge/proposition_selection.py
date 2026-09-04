@@ -19,7 +19,11 @@ from modules.edge_research.opr_bridge.evidence_ingest import (
     find_eligible_focal_dates,
     ingest_dispersion_evidence,
 )
-from modules.edge_research.opr_bridge.proposition_record import PropositionRecord
+from modules.edge_research.opr_bridge.executability_adapter import adapt_executability
+from modules.edge_research.opr_bridge.proposition_record import (
+    ExecutabilityStatus,
+    PropositionRecord,
+)
 from modules.edge_research.opr_bridge.proposition_synthesizer import synthesize_contrast_to_proposition
 from modules.edge_research.opr_bridge.research_memory import (
     ResearchMemoryStore,
@@ -69,6 +73,8 @@ class PropositionCandidate:
             "proposition_id": self.record.proposition_id,
             "source": self.source,
             "identity_fields": dict(self.identity_fields),
+            "executability_status": _exec_status_and_draft(self.record)[0],
+            "selectable_for_execution": candidate_is_selectable_for_execution(self),
         }
 
 
@@ -110,6 +116,82 @@ def admissible_feature_outcome_pairs(panel: pd.DataFrame) -> List[Tuple[str, str
     return [(f, o) for f in features for o in outcomes]
 
 
+def _exec_status_and_draft(record: Any) -> Tuple[Optional[str], Any]:
+    status = getattr(record, "executability_status", None)
+    draft = getattr(record, "experiment_spec_draft", None)
+    if status is None and hasattr(record, "to_dict"):
+        payload = record.to_dict()
+        status = payload.get("executability_status")
+        draft = payload.get("experiment_spec_draft") if draft is None else draft
+    if hasattr(status, "value"):
+        status = status.value
+    return (str(status) if status is not None else None), draft
+
+
+def experiment_spec_draft_is_valid(draft: Any) -> bool:
+    if not isinstance(draft, dict):
+        return False
+    inputs = draft.get("inputs")
+    return bool(draft.get("tool_name") and isinstance(inputs, dict) and inputs)
+
+
+def candidate_is_selectable_for_execution(candidate: "PropositionCandidate") -> bool:
+    """SELECTABLE_FOR_EXECUTION => EXECUTABLE and a valid experiment_spec_draft."""
+    status, draft = _exec_status_and_draft(candidate.record)
+    return status == ExecutabilityStatus.EXECUTABLE.value and experiment_spec_draft_is_valid(draft)
+
+
+def adapt_candidate_for_execution(
+    candidate: PropositionCandidate,
+    panel: pd.DataFrame,
+) -> Tuple[Optional[PropositionCandidate], Dict[str, Any]]:
+    """
+    Run the canonical pipeline executability adapter.
+
+    Returns (candidate, info) if selectable, else (None, rejection provenance).
+    """
+    record = candidate.record
+    if isinstance(record, PropositionRecord):
+        result = adapt_executability(record, panel)
+        info = {
+            "family_key": candidate.family_key,
+            "feature": candidate.feature,
+            "outcome": candidate.outcome,
+            "scientific_question": candidate.record.scientific_question,
+            "executability_status": result.status.value,
+            "detail": result.detail,
+            "adapted": True,
+        }
+        if (
+            result.status == ExecutabilityStatus.EXECUTABLE
+            and experiment_spec_draft_is_valid(record.experiment_spec_draft)
+        ):
+            return candidate, info
+        info["rejected_reason"] = "executability_adaptation_failed"
+        return None, info
+    if candidate_is_selectable_for_execution(candidate):
+        return candidate, {
+            "family_key": candidate.family_key,
+            "feature": candidate.feature,
+            "outcome": candidate.outcome,
+            "executability_status": ExecutabilityStatus.EXECUTABLE.value,
+            "adapted": False,
+            "detail": "already_executable",
+        }
+    status, draft = _exec_status_and_draft(record)
+    return None, {
+        "family_key": candidate.family_key,
+        "feature": candidate.feature,
+        "outcome": candidate.outcome,
+        "scientific_question": getattr(record, "scientific_question", ""),
+        "executability_status": status,
+        "detail": "record_is_not_selectable_for_execution",
+        "has_valid_experiment_spec_draft": experiment_spec_draft_is_valid(draft),
+        "rejected_reason": "not_selectable_for_execution",
+        "adapted": False,
+    }
+
+
 def candidate_from_record(
     record: PropositionRecord,
     *,
@@ -137,6 +219,7 @@ def _best_candidate_for_anchor(
     feature: str,
     outcome: str,
     dates: Sequence[str],
+    executability_rejections: Optional[List[Dict[str, Any]]] = None,
 ) -> Optional[PropositionCandidate]:
     best: Optional[PropositionCandidate] = None
     for date in dates:
@@ -162,8 +245,15 @@ def _best_candidate_for_anchor(
             focal_date=date,
             source="alternative_anchor",
         )
-        if best is None or cand.surprise_strength > best.surprise_strength:
-            best = cand
+        adapted, info = adapt_candidate_for_execution(cand, panel)
+        if adapted is None:
+            if executability_rejections is not None:
+                executability_rejections.append(
+                    {**info, "focal_date": date, "source": "alternative_anchor"}
+                )
+            continue
+        if best is None or adapted.surprise_strength > best.surprise_strength:
+            best = adapted
     return best
 
 
@@ -172,6 +262,7 @@ def collect_alternative_candidates(
     *,
     data_cutoff_date: str,
     exclude_pair: Optional[Tuple[str, str]] = None,
+    executability_rejections: Optional[List[Dict[str, Any]]] = None,
 ) -> List[PropositionCandidate]:
     """
     Scan admissible feature/outcome pairs for surprising contrasts.
@@ -179,6 +270,7 @@ def collect_alternative_candidates(
     Bounded: registry search features × return columns, recent dates only.
     Other outcomes are probed only on the latest eligible date.
     Deterministic. Does not randomly spam hypotheses.
+    Only candidates that pass adapt_executability are returned.
     """
     exclude_pair = exclude_pair or (DISPERSION_FEATURE, OUTCOME_FIELD)
     default_feature, default_outcome = exclude_pair
@@ -205,6 +297,7 @@ def collect_alternative_candidates(
             feature=feature,
             outcome=outcome,
             dates=scan_dates,
+            executability_rejections=executability_rejections,
         )
         if best is not None:
             out.append(best)
@@ -262,6 +355,21 @@ def select_proposition_with_memory(
         if prev is None or cand.surprise_strength > prev.surprise_strength:
             by_family[cand.family_key] = cand
     unique = list(by_family.values())
+    executable: List[PropositionCandidate] = []
+    exec_rejected: List[Dict[str, Any]] = []
+    for cand in unique:
+        if cand.family_key == default_candidate.family_key or candidate_is_selectable_for_execution(cand):
+            executable.append(cand)
+        else:
+            status, draft = _exec_status_and_draft(cand.record)
+            exec_rejected.append(
+                {
+                    **cand.to_dict(),
+                    "rejected_reason": "not_selectable_for_execution",
+                    "executability_status": status,
+                    "has_valid_experiment_spec_draft": experiment_spec_draft_is_valid(draft),
+                }
+            )
 
     if empty:
         provenance = SelectionProvenance(
@@ -280,22 +388,46 @@ def select_proposition_with_memory(
                 {**c.to_dict(), "rejected_reason": "empty_memory_preserve_default_pipeline"}
                 for c in unique
                 if c.family_key != default_candidate.family_key
-            ],
+            ]
+            + exec_rejected,
             memory_consulted=True,
             empty_memory=True,
         )
         return default_candidate, provenance
 
     scored: List[Tuple[float, Tuple[str, ...], PropositionCandidate]] = []
-    for cand in unique:
+    for cand in executable:
         score, reasons = _score_candidate(cand, memory, cutoff_date=cutoff_date)
         scored.append((score, reasons, cand))
+    if not scored:
+        # No executable alternative outranked or survived. Keep the working default.
+        provenance = SelectionProvenance(
+            selected_family_key=default_candidate.family_key,
+            selected_question=default_candidate.record.scientific_question,
+            selected_feature=default_candidate.feature,
+            selected_outcome=default_candidate.outcome,
+            scientific_reasons=("PRESERVE_EXECUTABLE_DEFAULT",),
+            why_selected=(
+                "No alternative passed canonical executability adaptation. "
+                "The working default proposition was preserved."
+            ),
+            considered=[c.to_dict() for c in unique],
+            rejected=exec_rejected
+            + [
+                {**c.to_dict(), "rejected_reason": "no_executable_alternative"}
+                for c in unique
+                if c.family_key != default_candidate.family_key
+            ],
+            memory_consulted=True,
+            empty_memory=False,
+        )
+        return default_candidate, provenance
     scored.sort(
         key=lambda row: (-row[0], -row[2].surprise_strength, row[2].family_key)
     )
     best_score, best_reasons, selected = scored[0]
 
-    rejected = []
+    rejected = list(exec_rejected)
     for score, reasons, cand in scored[1:]:
         rejected.append(
             {
@@ -308,6 +440,31 @@ def select_proposition_with_memory(
                     else "duplicate_family"
                 ),
             }
+        )
+    if selected.family_key != default_candidate.family_key and not candidate_is_selectable_for_execution(
+        selected
+    ):
+        # Defense in depth: never displace a working default with a non-executable alt.
+        return default_candidate, SelectionProvenance(
+            selected_family_key=default_candidate.family_key,
+            selected_question=default_candidate.record.scientific_question,
+            selected_feature=default_candidate.feature,
+            selected_outcome=default_candidate.outcome,
+            scientific_reasons=("PRESERVE_EXECUTABLE_DEFAULT",),
+            why_selected=(
+                "Selected alternative was not selectable for execution; "
+                "the working default proposition was preserved."
+            ),
+            considered=[c.to_dict() for c in unique],
+            rejected=rejected
+            + [
+                {
+                    **selected.to_dict(),
+                    "rejected_reason": "not_selectable_for_execution",
+                }
+            ],
+            memory_consulted=True,
+            empty_memory=False,
         )
 
     why = (
@@ -348,6 +505,8 @@ def candidate_from_prop_dict(
         def __init__(self, payload: Dict[str, Any]) -> None:
             self.scientific_question = str(payload.get("scientific_question") or "")
             self.proposition_id = payload.get("proposition_id")
+            self.executability_status = payload.get("executability_status")
+            self.experiment_spec_draft = payload.get("experiment_spec_draft")
             self._payload = payload
 
         def to_dict(self) -> Dict[str, Any]:
@@ -411,6 +570,7 @@ def refine_detected_proposition(
         return proposition_record, provenance
 
     alternatives: List[PropositionCandidate] = []
+    exec_rejections: List[Dict[str, Any]] = []
     # Scan alternatives only when this family is already in memory (redundancy
     # is possible). First-seen families keep the frozen trigger pick.
     if store.lookup(default.family_key) is not None:
@@ -419,6 +579,7 @@ def refine_detected_proposition(
             panel,
             data_cutoff_date=data_cutoff_date,
             exclude_pair=exclude,
+            executability_rejections=exec_rejections,
         )
     selected, provenance = select_proposition_with_memory(
         default_candidate=default,
@@ -426,7 +587,22 @@ def refine_detected_proposition(
         memory=store,
         cutoff_date=data_cutoff_date,
     )
+    if exec_rejections:
+        provenance.rejected.extend(exec_rejections)
     if selected.source == "default_pipeline" or selected.family_key == default.family_key:
+        return proposition_record, provenance
+    if not candidate_is_selectable_for_execution(selected):
+        provenance.scientific_reasons = ("PRESERVE_EXECUTABLE_DEFAULT",)
+        provenance.why_selected = (
+            "Alternative was not selectable for execution after canonical "
+            "adapt_executability; the working default proposition was preserved."
+        )
+        provenance.rejected.append(
+            {
+                **selected.to_dict(),
+                "rejected_reason": "not_selectable_for_execution",
+            }
+        )
         return proposition_record, provenance
     record = selected.record
     if hasattr(record, "to_dict"):

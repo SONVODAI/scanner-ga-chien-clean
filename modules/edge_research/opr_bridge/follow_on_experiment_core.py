@@ -157,7 +157,9 @@ def run_follow_on_design(
         first_execution=first_execution,
         interpretation_envelope=prior_interp,
         decision_envelope=decision_view,
-        executability=ExecutabilityContext.real_partition_default(data_cutoff=cutoff),
+        executability=ExecutabilityContext.real_partition_for_panel(
+            data_cutoff=cutoff, panel=panel
+        ),
         existing_package=None,
         experiment_ordinal=experiment_ordinal,
         history=history,
@@ -190,7 +192,9 @@ def run_follow_on_execute(
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
     from modules.edge_research.opr_bridge.scientific_action_context import ExecutabilityContext
 
-    executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff)
+    executability = ExecutabilityContext.real_partition_for_panel(
+        data_cutoff=cutoff, panel=panel
+    )
 
     result = execute_second_experiment(
         package,

@@ -117,7 +117,9 @@ def run_production_second_experiment_design(
         )
 
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
-    executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff)
+    executability = ExecutabilityContext.real_partition_for_panel(
+        data_cutoff=cutoff, panel=panel
+    )
 
     result = run_second_experiment_design_pipeline(
         prop,

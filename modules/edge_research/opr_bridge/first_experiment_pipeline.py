@@ -48,7 +48,9 @@ def run_first_experiment_pipeline(
     """
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
     if executability is None:
-        executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff)
+        executability = ExecutabilityContext.real_partition_for_panel(
+            data_cutoff=cutoff, panel=panel
+        )
 
     panel_index = build_panel_index(panel, cutoff=cutoff or executability.data_cutoff)
 

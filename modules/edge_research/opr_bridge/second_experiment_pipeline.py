@@ -195,7 +195,9 @@ def run_second_experiment_design_pipeline(
 
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", "")
     if executability is None:
-        executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff)
+        executability = ExecutabilityContext.real_partition_for_panel(
+            data_cutoff=cutoff, panel=panel
+        )
 
     panel_index = PanelMetadataIndex.from_dataframe(panel, cutoff=cutoff or executability.data_cutoff)
     cohort = _cohort_strategy_from_package(first_package)
