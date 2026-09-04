@@ -88,7 +88,7 @@ def _count_date_rows(
     out["rows"] = n
     if "symbol" in df.columns:
         out["unique_symbols"] = int(df.loc[mask, "symbol"].nunique())
-        out["status"] = "PRESENT" if n > 0 else "ABSENT_FOR_DATE"
+    out["status"] = "PRESENT" if n > 0 else "ABSENT_FOR_DATE"
     return out
 
 
