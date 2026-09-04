@@ -753,7 +753,16 @@ def test_a2_adapt_candidate_records_rejection_provenance(monkeypatch):
     record.executability_status = ExecutabilityStatus.NOT_ATTEMPTED
     record.experiment_spec_draft = None
     cand = _candidate("rsi14", "t5_return", surprise=9.0)
-    cand.record = record
+    cand = PropositionCandidate(
+        record=record,
+        family_key=cand.family_key,
+        feature=cand.feature,
+        outcome=cand.outcome,
+        focal_date=cand.focal_date,
+        surprise_strength=cand.surprise_strength,
+        identity_fields=cand.identity_fields,
+        source=cand.source,
+    )
 
     def _fail_adapt(rec, panel):
         rec.executability_status = ExecutabilityStatus.NOT_EXECUTABLE
