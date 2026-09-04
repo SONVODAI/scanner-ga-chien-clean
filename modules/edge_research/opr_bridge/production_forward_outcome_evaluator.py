@@ -11,6 +11,13 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from modules.edge_research.opr_bridge.claim_aligned_forward import (
+    ADJUDICATION_CONTEXT_ONLY,
+    ADJUDICATION_DISCONFIRMING,
+    ADJUDICATION_SUPPORTING,
+    evaluate_claim_aligned_metrics,
+    interpret_claim_aligned_evidence,
+)
 from modules.edge_research.opr_bridge.evidence_synthesis_records import new_id, stable_hash, utc_now_iso
 from modules.edge_research.opr_bridge.production_observation_records import (
     ForwardEvaluationStatus,
@@ -86,16 +93,23 @@ def _cohort_returns(
     if vals.empty:
         return None, ForwardEvaluationStatus.MISSING_DATA.value
 
-    outcomes = {
-        "horizon": horizon,
-        "return_field": ret_col,
-        "cohort_mean_return": float(vals.mean()),
-        "cohort_median_return": float(vals.median()),
-        "cohort_size": int(len(vals)),
-        "positive_fraction": float((vals > 0).mean()),
-        "symbols_evaluated": sorted(sub.loc[vals.index, "symbol"].astype(str).unique().tolist())[:50],
-    }
-    return outcomes, ForwardEvaluationStatus.EVALUATED.value
+    generic, claim_aligned, status = evaluate_claim_aligned_metrics(
+        panel=panel,
+        birth_trade_date=birth_date,
+        symbols=tuple(symbols),
+        horizon=horizon,
+        return_field=ret_col,
+        contract=birth.forward_evaluation_contract,
+    )
+    if generic is None:
+        return None, status
+    outcomes = dict(generic)
+    if "symbols_evaluated" not in outcomes:
+        outcomes["symbols_evaluated"] = sorted(
+            sub.loc[vals.index, "symbol"].astype(str).unique().tolist()
+        )[:50]
+    outcomes["claim_aligned"] = claim_aligned
+    return outcomes, status
 
 
 def interpret_outcome_evidence(
@@ -110,8 +124,7 @@ def interpret_outcome_evidence(
     realized = outcome.realized_outcomes or {}
     mean_ret = realized.get("cohort_mean_return")
     birth_state = birth.final_epistemic_state or "UNRESOLVED"
-    strongest = birth.strongest_evidence or {}
-    birth_direction = strongest.get("direction")
+    claim_aligned = realized.get("claim_aligned") or {}
 
     interpretation: Dict[str, Any] = {
         "horizon": outcome.horizon,
@@ -123,30 +136,42 @@ def interpret_outcome_evidence(
         "suggested_lifecycle_signal": None,
         "automatic_belief_change": False,
         "rationale_keys": [],
+        "claim_adjudication": claim_aligned.get("adjudication"),
+        "adjudicates_proposition": False,
+        "generic_cohort_role": ADJUDICATION_CONTEXT_ONLY,
     }
 
-    if mean_ret is None or outcome.evaluation_status != ForwardEvaluationStatus.EVALUATED.value:
+    if mean_ret is None and not claim_aligned:
         interpretation["rationale_keys"].append("outcome:missing_or_incomplete")
+        interpretation["claim_adjudication"] = "MISSING_DATA"
         return interpretation
 
-    if birth_direction == "SUPPORTING" and mean_ret > 0:
-        interpretation["supports_birth_expectation"] = True
-        interpretation["suggested_lifecycle_signal"] = "FORWARD_EVIDENCE_SUPPORTING"
-        interpretation["rationale_keys"].append("return:positive_vs_supporting_direction")
-    elif birth_direction == "SUPPORTING" and mean_ret < 0:
-        interpretation["contradicts_birth_expectation"] = True
-        interpretation["suggested_lifecycle_signal"] = "FORWARD_EVIDENCE_CHALLENGING"
-        interpretation["rationale_keys"].append("return:negative_vs_supporting_direction")
-    elif birth_direction == "CONTRADICTING" and mean_ret < 0:
-        interpretation["supports_birth_expectation"] = True
-        interpretation["suggested_lifecycle_signal"] = "FORWARD_EVIDENCE_CONSISTENT_WITH_CONTRADICTION"
-        interpretation["rationale_keys"].append("return:negative_vs_contradicting_direction")
-    else:
-        interpretation["rationale_keys"].append("return:ambiguous_relative_to_birth_direction")
-        interpretation["suggested_lifecycle_signal"] = "FORWARD_EVIDENCE_AMBIGUOUS"
-
-    interpretation["rationale_keys"].append(f"birth_epistemic:{birth_state}")
-    interpretation["automatic_belief_change"] = False
+    claim_interp = interpret_claim_aligned_evidence(
+        claim_aligned=claim_aligned or {"adjudication": ADJUDICATION_CONTEXT_ONLY, "reason": "no_claim_block"},
+        generic=realized if realized else None,
+    )
+    interpretation.update(
+        {
+            "supports_birth_expectation": claim_interp["supports_birth_expectation"],
+            "contradicts_birth_expectation": claim_interp["contradicts_birth_expectation"],
+            "suggested_lifecycle_signal": claim_interp["suggested_lifecycle_signal"],
+            "automatic_belief_change": False,
+            "claim_adjudication": claim_interp["claim_adjudication"],
+            "adjudicates_proposition": claim_interp["adjudicates_proposition"],
+            "generic_cohort_role": claim_interp["generic_cohort_role"],
+            "claim_metrics": claim_interp["claim_metrics"],
+            "rationale_keys": list(claim_interp["rationale_keys"]) + [f"birth_epistemic:{birth_state}"],
+        }
+    )
+    # Whole-cohort mean is contextual only. It must not adjudicate a relative claim.
+    if not claim_interp["adjudicates_proposition"]:
+        interpretation["supports_birth_expectation"] = None
+        interpretation["contradicts_birth_expectation"] = None
+        if claim_interp["claim_adjudication"] not in (
+            ADJUDICATION_SUPPORTING,
+            ADJUDICATION_DISCONFIRMING,
+        ):
+            interpretation["rationale_keys"].append("generic_cohort_return_context_only")
     return interpretation
 
 

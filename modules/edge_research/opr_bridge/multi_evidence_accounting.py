@@ -533,50 +533,263 @@ def build_rolling_cumulative_assessment(
     )
 
 
+AUTHORITATIVE_FALSIFICATION_KEY = "AUTHORITATIVE_FALSIFICATION"
+AUTHORITATIVE_FALSIFICATION_PRIORS = frozenset({"SUPPORTED", "WEAKENED", "HYPOTHESIS"})
+
+
+def _enum_value(value: Any) -> Any:
+    return value.value if hasattr(value, "value") else value
+
+
+def evaluate_authoritative_falsification(
+    *,
+    prior_state: str,
+    base_interpretation: Dict[str, Any],
+    incremental: IncrementalEvidenceContribution,
+    tested_null_key: str,
+    experiment_completed: bool = True,
+    falsification_capable: Optional[bool] = None,
+    evidence_relevant: Optional[bool] = None,
+    frozen_falsify_matched: Optional[bool] = None,
+    targeted_null_addressed: Optional[bool] = None,
+    integrity_failure: Optional[bool] = None,
+) -> Tuple[bool, Dict[str, Any]]:
+    """
+    Generic contract for later-experiment authoritative falsification.
+
+    Evidence + frozen scientific conditions drive FALSIFIED.
+    Action labels such as ABANDON are not consulted.
+    """
+    ec = str(base_interpretation.get("evidence_class", "INVALID"))
+    metrics = base_interpretation.get("metrics_used") or {}
+    strength = str(metrics.get("falsify_strength") or "WEAK")
+    validity_passed = base_interpretation.get("validity_passed")
+    if validity_passed is None:
+        validity_passed = not bool(base_interpretation.get("validity_failures"))
+    if integrity_failure is None:
+        integrity_failure = (
+            not bool(validity_passed)
+            or incremental.double_counting_blocked
+            or incremental.incremental_strength == EvidenceStrength.INSUFFICIENT.value
+        )
+    if falsification_capable is None:
+        falsification_capable = bool(tested_null_key)
+    if evidence_relevant is None:
+        raw_rel = _enum_value(base_interpretation.get("evidence_relevance"))
+        if raw_rel in (None, ""):
+            evidence_relevant = ec == EvidenceClass.DISCONFIRMING.value
+        else:
+            evidence_relevant = (
+                ec == EvidenceClass.DISCONFIRMING.value
+                and str(raw_rel) == EvidenceRelevance.HIGH.value
+            )
+    if frozen_falsify_matched is None:
+        frozen_falsify_matched = (
+            ec == EvidenceClass.DISCONFIRMING.value
+            and strength == "STRONG"
+            and bool(validity_passed)
+        )
+    if targeted_null_addressed is None:
+        explicit = base_interpretation.get("targeted_null_addressed")
+        null_after = str(_enum_value(base_interpretation.get("null_state_after")) or "")
+        if explicit is not None:
+            targeted_null_addressed = bool(explicit)
+        elif null_after:
+            targeted_null_addressed = null_after == NullExplanationState.ADDRESSED.value
+        else:
+            targeted_null_addressed = (
+                ec == EvidenceClass.DISCONFIRMING.value
+                and strength == "STRONG"
+                and bool(tested_null_key)
+                and bool(validity_passed)
+            )
+
+    checks = {
+        "prior_state_eligible": prior_state in AUTHORITATIVE_FALSIFICATION_PRIORS,
+        "experiment_completed": bool(experiment_completed),
+        "falsification_capable": bool(falsification_capable),
+        "evidence_relevant": bool(evidence_relevant),
+        "evidence_class_disconfirming": ec == EvidenceClass.DISCONFIRMING.value,
+        "falsify_strength_strong": strength == "STRONG",
+        "frozen_falsify_matched": bool(frozen_falsify_matched),
+        "targeted_null_addressed": bool(targeted_null_addressed),
+        "no_integrity_failure": not bool(integrity_failure),
+        "no_double_counting": not incremental.double_counting_blocked,
+        "incremental_not_insufficient": incremental.incremental_strength
+        != EvidenceStrength.INSUFFICIENT.value,
+    }
+    warranted = all(checks.values())
+    rationale = {
+        "key": AUTHORITATIVE_FALSIFICATION_KEY if warranted else "AUTHORITATIVE_FALSIFICATION_NOT_WARRANTED",
+        "warranted": warranted,
+        "prior_state": prior_state,
+        "tested_null_key": tested_null_key,
+        "evidence_class": ec,
+        "falsify_strength": strength,
+        "checks": checks,
+        "driven_by": "evidence_and_frozen_contract",
+        "action_label_ignored": True,
+    }
+    return warranted, rationale
+
+
 def apply_incremental_epistemic_transition(
     prior_state: str,
     base_interpretation: Dict[str, Any],
     incremental: IncrementalEvidenceContribution,
     *,
     tested_null_key: str,
+    experiment_completed: bool = True,
+    falsification_capable: Optional[bool] = None,
+    evidence_relevant: Optional[bool] = None,
+    frozen_falsify_matched: Optional[bool] = None,
+    targeted_null_addressed: Optional[bool] = None,
+    integrity_failure: Optional[bool] = None,
+    rationale_out: Optional[Dict[str, Any]] = None,
 ) -> Tuple[str, str]:
-    """Apply epistemic transition reflecting incremental — not doubled — evidence."""
+    """Apply epistemic transition reflecting incremental — not doubled — evidence.
+
+    A later experiment may move SUPPORTED/WEAKENED → FALSIFIED only when
+    evaluate_authoritative_falsification is warranted. Weaker disconfirming
+    evidence still yields WEAKENED. ABANDON is not consulted.
+    """
     ec = str(base_interpretation.get("evidence_class", "INVALID"))
+    warranted, auth_rationale = evaluate_authoritative_falsification(
+        prior_state=prior_state,
+        base_interpretation=base_interpretation,
+        incremental=incremental,
+        tested_null_key=tested_null_key,
+        experiment_completed=experiment_completed,
+        falsification_capable=falsification_capable,
+        evidence_relevant=evidence_relevant,
+        frozen_falsify_matched=frozen_falsify_matched,
+        targeted_null_addressed=targeted_null_addressed,
+        integrity_failure=integrity_failure,
+    )
     if incremental.double_counting_blocked:
-        return prior_state, f"{ec}_DOUBLE_COUNT_BLOCKED"
+        key = f"{ec}_DOUBLE_COUNT_BLOCKED"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": prior_state})
+        return prior_state, key
 
     if incremental.incremental_strength == EvidenceStrength.INSUFFICIENT.value:
-        return prior_state, f"{ec}_INSUFFICIENT_INCREMENTAL"
+        key = f"{ec}_INSUFFICIENT_INCREMENTAL"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": prior_state})
+        return prior_state, key
+
+    if warranted:
+        if rationale_out is not None:
+            rationale_out.update(
+                {
+                    **auth_rationale,
+                    "key": AUTHORITATIVE_FALSIFICATION_KEY,
+                    "resulting": "FALSIFIED",
+                    "reason": (
+                        "Later experiment met the frozen authoritative falsification "
+                        "contract; belief updated from evidence, not from action label."
+                    ),
+                }
+            )
+        return "FALSIFIED", AUTHORITATIVE_FALSIFICATION_KEY
 
     if incremental.conflict_detected:
         if incremental.incremental_strength in (EvidenceStrength.STRONG.value, EvidenceStrength.MODERATE.value):
-            if prior_state == "SUPPORTED":
-                return "WEAKENED", f"{ec}_CONFLICT"
-            return "WEAKENED", f"{ec}_CONFLICT"
+            key = f"{ec}_CONFLICT"
+            if rationale_out is not None:
+                rationale_out.update({**auth_rationale, "key": key, "resulting": "WEAKENED"})
+            return "WEAKENED", key
         if prior_state == "SUPPORTED":
-            return "SUPPORTED", f"{ec}_DEPENDENT_CONFLICT"
-        return prior_state, f"{ec}_DEPENDENT_CONFLICT"
+            key = f"{ec}_DEPENDENT_CONFLICT"
+            if rationale_out is not None:
+                rationale_out.update({**auth_rationale, "key": key, "resulting": "SUPPORTED"})
+            return "SUPPORTED", key
+        key = f"{ec}_DEPENDENT_CONFLICT"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": prior_state})
+        return prior_state, key
 
     if ec == EvidenceClass.SUPPORTING.value:
         if prior_state == "SUPPORTED" and incremental.incremental_strength in (
             EvidenceStrength.WEAK.value,
             EvidenceStrength.MODERATE.value,
         ):
-            return "SUPPORTED", "SUPPORTING_INCREMENTAL_MODEST"
+            key = "SUPPORTING_INCREMENTAL_MODEST"
+            if rationale_out is not None:
+                rationale_out.update({**auth_rationale, "key": key, "resulting": "SUPPORTED"})
+            return "SUPPORTED", key
         if prior_state in ("HYPOTHESIS", "INSUFFICIENT_EVIDENCE"):
-            return "SUPPORTED", "SUPPORTING"
-        return prior_state, "SUPPORTING_NO_ESCALATION"
+            key = "SUPPORTING"
+            if rationale_out is not None:
+                rationale_out.update({**auth_rationale, "key": key, "resulting": "SUPPORTED"})
+            return "SUPPORTED", key
+        key = "SUPPORTING_NO_ESCALATION"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": prior_state})
+        return prior_state, key
 
     if ec == EvidenceClass.DISCONFIRMING.value:
         strength = base_interpretation.get("metrics_used", {}).get("falsify_strength", "WEAK")
-        if strength == "STRONG" and tested_null_key == "directional_reversal":
-            return "WEAKENED", "DISCONFIRMING_STRONG"
-        return "WEAKENED", "DISCONFIRMING"
+        if strength == "STRONG":
+            key = "DISCONFIRMING_STRONG"
+            if rationale_out is not None:
+                rationale_out.update({**auth_rationale, "key": key, "resulting": "WEAKENED"})
+            return "WEAKENED", key
+        key = "DISCONFIRMING"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": "WEAKENED"})
+        return "WEAKENED", key
 
     if ec == EvidenceClass.CONTRADICTORY.value:
-        return "WEAKENED", "CONTRADICTORY"
+        key = "CONTRADICTORY"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": "WEAKENED"})
+        return "WEAKENED", key
 
     if ec == EvidenceClass.NON_INFORMATIVE.value:
-        return prior_state, "NON_INFORMATIVE"
+        key = "NON_INFORMATIVE"
+        if rationale_out is not None:
+            rationale_out.update({**auth_rationale, "key": key, "resulting": prior_state})
+        return prior_state, key
 
+    if rationale_out is not None:
+        rationale_out.update({**auth_rationale, "key": ec, "resulting": prior_state})
     return prior_state, ec
+
+
+def incremental_transition_kwargs_from_assessment(
+    *,
+    interpretation: Dict[str, Any],
+    assessment: Any,
+    execution_outcome: str,
+    tested_null_key: str,
+) -> Dict[str, Any]:
+    """Map interpreter assessment + execution onto the generic falsification contract."""
+    relevance = getattr(assessment, "evidence_relevance", None)
+    relevance_val = _enum_value(relevance)
+    null_addressed = False
+    for entry in getattr(assessment, "null_accounting", ()) or ():
+        key = getattr(entry, "null_key", None)
+        after = _enum_value(getattr(entry, "state_after", None))
+        if key == tested_null_key and after == NullExplanationState.ADDRESSED.value:
+            null_addressed = True
+            break
+    validity_passed = interpretation.get("validity_passed")
+    if validity_passed is None:
+        validity_passed = not bool(interpretation.get("validity_failures"))
+    completed = str(execution_outcome).upper() == "SUCCESS"
+    return {
+        "experiment_completed": completed,
+        "falsification_capable": bool(tested_null_key),
+        "evidence_relevant": (
+            str(interpretation.get("evidence_class")) == EvidenceClass.DISCONFIRMING.value
+            and relevance_val == EvidenceRelevance.HIGH.value
+        ),
+        "frozen_falsify_matched": (
+            str(interpretation.get("evidence_class")) == EvidenceClass.DISCONFIRMING.value
+            and str((interpretation.get("metrics_used") or {}).get("falsify_strength") or "") == "STRONG"
+            and bool(validity_passed)
+        ),
+        "targeted_null_addressed": null_addressed,
+        "integrity_failure": (not completed) or (not bool(validity_passed)),
+    }

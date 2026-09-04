@@ -32,8 +32,10 @@ from modules.edge_research.opr_bridge.bounded_lifecycle_state import (
     budget_exhausted,
     latest_cumulative_null_ledger,
     resolve_lifecycle_phase,
+    scientific_consumption_complete,
     stop_boundary_for_stage,
     sync_legacy_fields,
+    unconsumed_successful_experiments,
 )
 from modules.edge_research.opr_bridge.production_persistence import (
     OprProductionSessionRecord,
@@ -518,7 +520,14 @@ def _build_audit(
         budget_initial=budget.to_dict(),
         budget_used={
             "experiments_completed": len([e for e in history if e.execution]),
+            "experiments_scientifically_consumed": len(
+                [e for e in history if e.execution and scientific_consumption_complete(e)]
+            ),
+            "unconsumed_successful_executions": [
+                e.ordinal for e in unconsumed_successful_experiments(history)
+            ],
             "max_iterations": budget.max_experiment_iterations,
+            "start_budget_semantics": "max_experiment_iterations_limits_starts_only",
         },
         experiment_count=len([e for e in history if e.execution]),
         experiment_identities=[x for x in package_ids if x],

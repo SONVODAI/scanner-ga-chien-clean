@@ -16,6 +16,7 @@ OBSERVATION_VERSION = "production_research_observation_v1_3k0"
 BIRTH_RECORD_VERSION = "research_observation_birth_v1_3k0"
 LEDGER_VERSION = "production_research_observation_ledger_v1_3k0"
 FORWARD_CONTRACT_VERSION = "forward_evaluation_contract_v1_3k0"
+FORWARD_CONTRACT_VERSION_V2 = "forward_evaluation_contract_v2_claim_aligned"
 OUTCOME_RECORD_VERSION = "research_observation_outcome_v1_3k0"
 NARRATIVE_CONTRACT_VERSION = "observation_narrative_contract_v1_3k0"
 UI_CONTRACT_VERSION = "observation_ui_contract_v1_3k0"
@@ -155,6 +156,9 @@ class ForwardEvaluationContract:
     missing_data_policy: str
     contract_hash: str
     record_version: str = FORWARD_CONTRACT_VERSION
+    claim_family: str = "LEGACY_UNSPECIFIED"
+    claim_spec: Dict[str, Any] = field(default_factory=dict)
+    claim_contract_status: str = "LEGACY_INSUFFICIENT_CLAIM_SPEC"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -166,6 +170,9 @@ class ForwardEvaluationContract:
             "missing_data_policy": self.missing_data_policy,
             "contract_hash": self.contract_hash,
             "record_version": self.record_version,
+            "claim_family": self.claim_family,
+            "claim_spec": dict(self.claim_spec),
+            "claim_contract_status": self.claim_contract_status,
         }
 
 
@@ -331,6 +338,7 @@ class ProductionResearchObservationSession:
     errors: Tuple[str, ...] = ()
     observation_mode: str = "PRODUCTION_SHADOW"
     record_version: str = OBSERVATION_VERSION
+    selection_provenance: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -345,6 +353,7 @@ class ProductionResearchObservationSession:
             "errors": list(self.errors),
             "observation_mode": self.observation_mode,
             "record_version": self.record_version,
+            "selection_provenance": self.selection_provenance,
         }
 
 
@@ -480,7 +489,18 @@ def new_observation_id(identity_hash: str) -> str:
     return f"obs-{identity_hash[:16]}"
 
 
-def build_forward_evaluation_contract(observation_id: str) -> ForwardEvaluationContract:
+def build_forward_evaluation_contract(
+    observation_id: str,
+    *,
+    claim_spec: Optional[Dict[str, Any]] = None,
+) -> ForwardEvaluationContract:
+    """
+    Frozen forward contract. claim_spec is additive/versioned.
+
+    Legacy callers (no claim_spec) keep v1 semantics and are marked
+    LEGACY_INSUFFICIENT_CLAIM_SPEC so old generic outcomes are never
+    reinterpreted as claim-aligned evidence.
+    """
     criteria = {
         "horizons": [ForwardHorizon.T3.value, ForwardHorizon.T5.value, ForwardHorizon.T10.value],
         "return_field_by_horizon": {"T3": "t3_return_pct", "T5": "t5_return_pct", "T10": "t10_return_pct"},
@@ -490,14 +510,33 @@ def build_forward_evaluation_contract(observation_id: str) -> ForwardEvaluationC
     cohort_rules = {
         "preserve_birth_cohort_membership": True,
         "no_retrospective_symbol_changes": True,
+        "no_hindsight_regrouping": True,
+        "membership_source": "frozen_t0_group_membership_or_legacy_unspecified",
     }
+    spec = dict(claim_spec or {})
+    aligned = bool(spec.get("sufficient_for_claim_replay"))
+    claim_family = str(spec.get("claim_family") or "LEGACY_UNSPECIFIED")
+    claim_status = str(
+        spec.get("claim_contract_status")
+        or ("CLAIM_ALIGNED" if aligned else "LEGACY_INSUFFICIENT_CLAIM_SPEC")
+    )
+    version = FORWARD_CONTRACT_VERSION_V2 if spec else FORWARD_CONTRACT_VERSION
+    if spec:
+        criteria["claim_spec"] = spec
+        criteria["claim_family"] = claim_family
+        criteria["claim_contract_status"] = claim_status
+        criteria["required_contrast"] = list(spec.get("required_contrast") or [])
+        criteria["success_metric"] = spec.get("success_metric")
     contract_id = new_id("fwdc")
     payload = {
         "contract_id": contract_id,
         "observation_id": observation_id,
         "criteria": criteria,
         "cohort_rules": cohort_rules,
-        "version": FORWARD_CONTRACT_VERSION,
+        "version": version,
+        "claim_family": claim_family,
+        "claim_spec": spec,
+        "claim_contract_status": claim_status,
     }
     contract_hash = stable_hash(payload)
     return ForwardEvaluationContract(
@@ -508,6 +547,10 @@ def build_forward_evaluation_contract(observation_id: str) -> ForwardEvaluationC
         cohort_evaluation_rules=cohort_rules,
         missing_data_policy="MARK_MISSING_DO_NOT_IMPUTE",
         contract_hash=contract_hash,
+        record_version=version,
+        claim_family=claim_family,
+        claim_spec=spec,
+        claim_contract_status=claim_status,
     )
 
 

@@ -66,7 +66,9 @@ def run_production_first_experiment_execution(
     Derive/freeze package (3J.2) → eligibility → execute → persist envelope → STOP.
     """
     cutoff = prop.get("observation_provenance", {}).get("evidence_anchor", {}).get("data_cutoff_date", data_cutoff_date)
-    executability = ExecutabilityContext.real_partition_default(data_cutoff=cutoff)
+    executability = ExecutabilityContext.real_partition_for_panel(
+        data_cutoff=cutoff, panel=panel
+    )
 
     if existing_package_dict:
         from modules.edge_research.opr_bridge.first_experiment_execution_persistence import package_from_dict

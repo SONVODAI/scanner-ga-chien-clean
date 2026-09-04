@@ -153,10 +153,71 @@ def resolve_lifecycle_phase(
     return LifecyclePhase.PROPOSITION_PERSISTED, ordinal, current
 
 
+def execution_succeeded(execution: Optional[Dict[str, Any]]) -> bool:
+    """True iff an experiment execution completed successfully enough to require consumption."""
+    if not execution:
+        return False
+    outcome = str(execution.get("execution_outcome") or "").upper()
+    if outcome in {"FAILED", "FAIL", "ERROR", "NOT_ATTEMPTED"}:
+        return False
+    return True
+
+
+def experiment_started(entry: ExperimentHistoryEntry) -> bool:
+    """An experiment has started once it is designed or executed."""
+    return bool(entry.package or entry.execution)
+
+
+def scientific_consumption_complete(entry: ExperimentHistoryEntry) -> bool:
+    """Interpretation + epistemic update + research decision all persisted."""
+    return bool(entry.interpretation and entry.epistemic_update and entry.decision)
+
+
+def unconsumed_successful_experiments(
+    history: List[ExperimentHistoryEntry],
+) -> List[ExperimentHistoryEntry]:
+    """Successfully executed experiments still missing interpretation/update/decision."""
+    return [
+        e
+        for e in history
+        if execution_succeeded(e.execution) and not scientific_consumption_complete(e)
+    ]
+
+
+def in_flight_started_experiments(
+    history: List[ExperimentHistoryEntry],
+) -> List[ExperimentHistoryEntry]:
+    """Started experiments that have not finished scientific consumption or typed failure."""
+    inflight: List[ExperimentHistoryEntry] = []
+    for entry in history:
+        if not experiment_started(entry):
+            continue
+        if scientific_consumption_complete(entry):
+            continue
+        if entry.execution and not execution_succeeded(entry.execution):
+            continue
+        inflight.append(entry)
+    return inflight
+
+
+def start_budget_reached(budget: ResearchBudget, history: List[ExperimentHistoryEntry]) -> bool:
+    """max_experiment_iterations limits how many experiments may START, not consumption."""
+    started = len([e for e in history if experiment_started(e)])
+    return started >= budget.max_experiment_iterations
+
+
 def budget_exhausted(budget: ResearchBudget, record: OprProductionSessionRecord) -> bool:
+    """
+    True only when another experiment may not START and no in-flight experiment
+    still requires scientific consumption.
+
+    Start-budget exhaustion must not skip interpretation / epistemic update /
+    research decision for an experiment that already executed successfully.
+    """
     history = build_experiment_history(record)
-    completed_experiments = len([e for e in history if e.execution])
-    if completed_experiments >= budget.max_experiment_iterations:
+    if in_flight_started_experiments(history):
+        return False
+    if start_budget_reached(budget, history):
         return True
     failures = sum(1 for e in history if e.execution and e.execution.get("execution_outcome") == "FAILED")
     if failures > budget.max_execution_failures:

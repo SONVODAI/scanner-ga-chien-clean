@@ -40,9 +40,14 @@ def derive_lifecycle_state(
     if current_epistemic_state == "RESOLVED":
         return ObservationLifecycleState.RESOLVED.value
 
+    released = {
+        o.horizon for o in outcomes if getattr(o, "evaluation_status", None) == "EVALUATED"
+    }
     pending = [
         h for h in birth.forward_horizons
-        if h.status in ("PENDING_FUTURE", "ELIGIBLE") and h.realized_outcome is None
+        if h.status in ("PENDING_FUTURE", "ELIGIBLE")
+        and h.realized_outcome is None
+        and h.horizon not in released
     ]
     evaluated_outcomes = [o for o in outcomes if o.evaluation_status == "EVALUATED"]
 
@@ -55,9 +60,13 @@ def derive_lifecycle_state(
 
     if has_new_forward_evidence and evaluated_outcomes:
         interpretations = [interpret_outcome_evidence(birth=birth, outcome=o) for o in evaluated_outcomes]
-        if any(i.get("contradicts_birth_expectation") for i in interpretations):
+        # Only claim-adjudicating evidence may move presentation lifecycle.
+        claim_level = [
+            i for i in interpretations if i.get("adjudicates_proposition")
+        ]
+        if any(i.get("contradicts_birth_expectation") for i in claim_level):
             return ObservationLifecycleState.CHALLENGED.value
-        if any(i.get("supports_birth_expectation") for i in interpretations):
+        if any(i.get("supports_birth_expectation") for i in claim_level):
             return ObservationLifecycleState.STRENGTHENED.value
 
     if observation_age_trading_days == 0:

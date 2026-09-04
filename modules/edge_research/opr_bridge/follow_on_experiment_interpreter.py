@@ -20,6 +20,7 @@ from modules.edge_research.opr_bridge.first_experiment_interpretation_records im
 from modules.edge_research.opr_bridge.multi_evidence_accounting import (
     apply_incremental_epistemic_transition,
     build_rolling_cumulative_assessment,
+    incremental_transition_kwargs_from_assessment,
 )
 from modules.edge_research.opr_bridge.proposition_experiment_interpreter import (
     build_epistemic_update,
@@ -143,11 +144,20 @@ def interpret_follow_on_experiment_evidence(
     )
 
     prior_state = immediate_prior_interpretation.resulting_epistemic_state
-    resulting, _transition_key = apply_incremental_epistemic_transition(
+    interp_dict = interpretation.to_dict()
+    transition_rationale: Dict[str, Any] = {}
+    resulting, transition_key = apply_incremental_epistemic_transition(
         prior_state,
-        interpretation.to_dict(),
+        interp_dict,
         cumulative.incremental_contribution,
         tested_null_key=target_null,
+        rationale_out=transition_rationale,
+        **incremental_transition_kwargs_from_assessment(
+            interpretation=interp_dict,
+            assessment=latest_assessment,
+            execution_outcome=execution_envelope.execution_outcome,
+            tested_null_key=target_null,
+        ),
     )
 
     unresolved = "; ".join(latest_assessment.remaining_uncertainty[:3])
@@ -163,6 +173,8 @@ def interpret_follow_on_experiment_evidence(
     update_dict = update.to_dict()
     update_dict["unresolved_uncertainty"] = unresolved
     update_dict["experiment_ordinal"] = experiment_ordinal
+    update_dict["transition_key"] = transition_key
+    update_dict["transition_rationale"] = transition_rationale
     update_dict["multi_evidence"] = {
         "dependence": cumulative.dependence_accounting.to_dict(),
         "incremental": cumulative.incremental_contribution.to_dict(),

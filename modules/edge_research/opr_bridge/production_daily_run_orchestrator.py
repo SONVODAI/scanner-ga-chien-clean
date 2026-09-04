@@ -204,6 +204,7 @@ def _finalize_skip_run(
         "notifications": [n.to_dict() for n in notifications],
         "observability": obs.to_dict(),
         "idempotent_replay": False,
+        "counts_as_forward_evidence": run.counts_as_forward_evidence,
         "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
     }
 
@@ -288,6 +289,7 @@ def run_production_daily_research(
                     "run": existing.to_dict(),
                     "idempotent_replay": True,
                     "idempotent_reason": replay_kind,
+                    "counts_as_forward_evidence": existing.counts_as_forward_evidence,
                     "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
                 },
                 target_trade_date=target_trade_date,
@@ -378,6 +380,7 @@ def _run_production_daily_research_inner(
                 "run": existing.to_dict(),
                 "idempotent_replay": True,
                 "idempotent_reason": replay_kind,
+                "counts_as_forward_evidence": existing.counts_as_forward_evidence,
                 "stop_boundary": STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY,
             }
 
