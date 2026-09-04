@@ -39,7 +39,12 @@ SCORE_NEW_EPISODE = 10.0
 PENALTY_REDUNDANT = 50.0
 
 ADMISSIBLE_OUTCOMES: Tuple[str, ...] = ("t3_return", "t5_return", "t10_return")
-MAX_DATES_PER_ALTERNATIVE_ANCHOR = 20
+MAX_DATES_PER_ALTERNATIVE_ANCHOR = 5
+
+# Memory may switch the day's proposition only in live/shadow research modes.
+# Replay, backfill, smoke, and dry-run keep the frozen trigger pick so
+# historical artifacts and regression identities stay stable.
+MEMORY_SWITCH_MODES = frozenset({"LIVE_FORWARD", "PRODUCTION_SHADOW"})
 
 
 @dataclass(frozen=True)
@@ -125,6 +130,43 @@ def candidate_from_record(
     )
 
 
+def _best_candidate_for_anchor(
+    panel: pd.DataFrame,
+    *,
+    data_cutoff_date: str,
+    feature: str,
+    outcome: str,
+    dates: Sequence[str],
+) -> Optional[PropositionCandidate]:
+    best: Optional[PropositionCandidate] = None
+    for date in dates:
+        evidence = ingest_dispersion_evidence(
+            panel,
+            focal_date=date,
+            data_cutoff_date=data_cutoff_date,
+            dispersion_feature=feature,
+            outcome_field=outcome,
+        )
+        if evidence is None:
+            continue
+        surprise = assess_dispersion_surprise(evidence)
+        if not surprise.is_surprising:
+            continue
+        record = synthesize_contrast_to_proposition(evidence, surprise)
+        strength = abs(float(surprise.zscore_vs_baseline or 0.0)) + float(
+            evidence.quintile_return_spread or 0.0
+        )
+        cand = candidate_from_record(
+            record,
+            surprise_strength=strength,
+            focal_date=date,
+            source="alternative_anchor",
+        )
+        if best is None or cand.surprise_strength > best.surprise_strength:
+            best = cand
+    return best
+
+
 def collect_alternative_candidates(
     panel: pd.DataFrame,
     *,
@@ -134,12 +176,15 @@ def collect_alternative_candidates(
     """
     Scan admissible feature/outcome pairs for surprising contrasts.
 
-    Bounded: only registry search features × existing return columns.
-    Deterministic date order. Does not randomly spam hypotheses.
+    Bounded: registry search features × return columns, recent dates only.
+    Other outcomes are probed only on the latest eligible date.
+    Deterministic. Does not randomly spam hypotheses.
     """
     exclude_pair = exclude_pair or (DISPERSION_FEATURE, OUTCOME_FIELD)
+    default_feature, default_outcome = exclude_pair
     out: List[PropositionCandidate] = []
-    for feature, outcome in admissible_feature_outcome_pairs(panel):
+    pairs = admissible_feature_outcome_pairs(panel)
+    for feature, outcome in pairs:
         if (feature, outcome) == exclude_pair:
             continue
         dates = find_eligible_focal_dates(
@@ -148,34 +193,19 @@ def collect_alternative_candidates(
             dispersion_feature=feature,
             outcome_field=outcome,
         )
-        if len(dates) > MAX_DATES_PER_ALTERNATIVE_ANCHOR:
-            dates = dates[-MAX_DATES_PER_ALTERNATIVE_ANCHOR:]
-        best: Optional[PropositionCandidate] = None
-        for date in dates:
-            evidence = ingest_dispersion_evidence(
-                panel,
-                focal_date=date,
-                data_cutoff_date=data_cutoff_date,
-                dispersion_feature=feature,
-                outcome_field=outcome,
-            )
-            if evidence is None:
-                continue
-            surprise = assess_dispersion_surprise(evidence)
-            if not surprise.is_surprising:
-                continue
-            record = synthesize_contrast_to_proposition(evidence, surprise)
-            strength = abs(float(surprise.zscore_vs_baseline or 0.0)) + float(
-                evidence.quintile_return_spread or 0.0
-            )
-            cand = candidate_from_record(
-                record,
-                surprise_strength=strength,
-                focal_date=date,
-                source="alternative_anchor",
-            )
-            if best is None or cand.surprise_strength > best.surprise_strength:
-                best = cand
+        if not dates:
+            continue
+        if outcome == default_outcome:
+            scan_dates = dates[-MAX_DATES_PER_ALTERNATIVE_ANCHOR:]
+        else:
+            scan_dates = dates[-1:]
+        best = _best_candidate_for_anchor(
+            panel,
+            data_cutoff_date=data_cutoff_date,
+            feature=feature,
+            outcome=outcome,
+            dates=scan_dates,
+        )
         if best is not None:
             out.append(best)
     return out
@@ -303,3 +333,102 @@ def select_proposition_with_memory(
         empty_memory=False,
     )
     return selected, provenance
+
+
+def candidate_from_prop_dict(
+    prop: Dict[str, Any],
+    *,
+    surprise_strength: float = 0.0,
+    focal_date: str = "",
+    source: str = "default_pipeline",
+) -> PropositionCandidate:
+    ident = family_identity_fields(prop)
+
+    class _RecordView:
+        def __init__(self, payload: Dict[str, Any]) -> None:
+            self.scientific_question = str(payload.get("scientific_question") or "")
+            self.proposition_id = payload.get("proposition_id")
+            self._payload = payload
+
+        def to_dict(self) -> Dict[str, Any]:
+            return dict(self._payload)
+
+    return PropositionCandidate(
+        record=_RecordView(prop),  # type: ignore[arg-type]
+        family_key=family_key_from_proposition(prop),
+        feature=str(ident.get("feature") or ""),
+        outcome=str(ident.get("outcome") or ""),
+        focal_date=focal_date,
+        surprise_strength=float(surprise_strength),
+        identity_fields=ident,
+        source=source,
+    )
+
+
+def refine_detected_proposition(
+    proposition_record: Dict[str, Any],
+    panel: pd.DataFrame,
+    *,
+    data_cutoff_date: str,
+    memory: Optional[ResearchMemoryStore] = None,
+    data_dir: Optional[Any] = None,
+    observation_mode: str = "PRODUCTION_SHADOW",
+) -> Tuple[Dict[str, Any], SelectionProvenance]:
+    """
+    Consult research memory after the frozen production trigger.
+
+    Does not modify detect_production_opportunity (3J.14 frozen policy file).
+    Empty memory returns the trigger pick unchanged.
+    Non-forward replay/backfill/smoke modes consult memory for provenance
+    but do not switch the frozen trigger proposition.
+    """
+    from modules.edge_research.opr_bridge.research_memory import load_research_memory
+
+    store = memory if memory is not None else load_research_memory(data_dir)
+    default = candidate_from_prop_dict(
+        proposition_record,
+        focal_date=data_cutoff_date,
+        source="default_pipeline",
+    )
+    allow_switch = str(observation_mode) in MEMORY_SWITCH_MODES
+    if not allow_switch:
+        provenance = SelectionProvenance(
+            selected_family_key=default.family_key,
+            selected_question=default.record.scientific_question,
+            selected_feature=default.feature,
+            selected_outcome=default.outcome,
+            scientific_reasons=("NON_FORWARD_PRESERVE_FROZEN_TRIGGER",),
+            why_selected=(
+                f"Observation mode {observation_mode} preserves the frozen "
+                "prioritized-pipeline pick. Memory was consulted for the family "
+                "record but alternatives were not promoted."
+            ),
+            considered=[default.to_dict()],
+            rejected=[],
+            memory_consulted=True,
+            empty_memory=not store.families,
+        )
+        return proposition_record, provenance
+
+    alternatives: List[PropositionCandidate] = []
+    # Scan alternatives only when this family is already in memory (redundancy
+    # is possible). First-seen families keep the frozen trigger pick.
+    if store.lookup(default.family_key) is not None:
+        exclude = (default.feature, default.outcome) if default.feature and default.outcome else None
+        alternatives = collect_alternative_candidates(
+            panel,
+            data_cutoff_date=data_cutoff_date,
+            exclude_pair=exclude,
+        )
+    selected, provenance = select_proposition_with_memory(
+        default_candidate=default,
+        alternatives=alternatives,
+        memory=store,
+        cutoff_date=data_cutoff_date,
+    )
+    if selected.source == "default_pipeline" or selected.family_key == default.family_key:
+        return proposition_record, provenance
+    record = selected.record
+    if hasattr(record, "to_dict"):
+        return record.to_dict(), provenance
+    return proposition_record, provenance

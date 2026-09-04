@@ -39,6 +39,7 @@ from modules.edge_research.opr_bridge.production_observation_records import (
 from modules.edge_research.opr_bridge.production_persistence import OprProductionSessionRecord
 from modules.edge_research.opr_bridge.proposition_selection import (
     PropositionCandidate,
+    refine_detected_proposition,
     select_proposition_with_memory,
 )
 from modules.edge_research.opr_bridge.research_memory import (
@@ -503,6 +504,37 @@ def test_9_research_only_safety():
                 root = node.module.split(".")[0]
                 assert root not in forbidden_imports
                 assert "BUY" not in node.module and "SELL" not in node.module
+
+
+def test_replay_mode_preserves_frozen_trigger_pick():
+    """Historical replay consults memory but does not switch the frozen pick."""
+    prop = _tier_prop()
+    panel = _tier_panel(-1.0, -5.0)
+    memory = ResearchMemoryStore()
+    default = _candidate("rs_spread", "t5_return", surprise=3.0)
+    memory.upsert(
+        PropositionFamilyMemory(
+            family_key=default.family_key,
+            feature="rs_spread",
+            outcome="t5_return",
+            horizon=0,
+            population_kind="all",
+            claim_family=CLAIM_FAMILY_CROSS_SECTIONAL_TIER,
+            episode_count=2,
+            tested_episode_dates=["2026-08-24", "2026-08-27"],
+            support_count=1,
+            last_epistemic_state="SUPPORTED",
+        )
+    )
+    refined, provenance = refine_detected_proposition(
+        prop,
+        panel,
+        data_cutoff_date="2026-08-27",
+        memory=memory,
+        observation_mode="HISTORICAL_REPLAY_TEST",
+    )
+    assert refined is prop
+    assert "NON_FORWARD_PRESERVE_FROZEN_TRIGGER" in provenance.scientific_reasons
 
 
 def test_legacy_contract_does_not_fabricate_claim_fields():

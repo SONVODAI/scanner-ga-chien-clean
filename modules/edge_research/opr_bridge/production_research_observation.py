@@ -45,6 +45,7 @@ from modules.edge_research.opr_bridge.production_observation_records import (
 )
 from modules.edge_research.opr_bridge.claim_aligned_forward import build_claim_spec
 from modules.edge_research.opr_bridge.production_trigger import detect_production_opportunity
+from modules.edge_research.opr_bridge.proposition_selection import refine_detected_proposition
 from modules.edge_research.opr_bridge.research_memory import (
     load_research_memory,
     record_family_from_birth,
@@ -371,12 +372,19 @@ def run_production_research_observation(
             observation_mode=observation_mode,
         )
 
-    det = detect_production_opportunity(
-        truncated,
-        data_cutoff_date=data_cutoff_date,
-        data_dir=data_dir,
-    )
-    selection_provenance = det.selection_provenance
+    det = detect_production_opportunity(truncated, data_cutoff_date=data_cutoff_date)
+    selection_provenance = None
+    if det.outcome == "OPPORTUNITY_DETECTED" and det.proposition_record:
+        refined, provenance = refine_detected_proposition(
+            det.proposition_record,
+            truncated,
+            data_cutoff_date=data_cutoff_date,
+            data_dir=data_dir,
+            observation_mode=observation_mode,
+        )
+        det.proposition_record = refined
+        det.proposition_id = refined.get("proposition_id")
+        selection_provenance = provenance.to_dict()
     session_result = None
 
     if det.outcome == "OPPORTUNITY_DETECTED" and det.proposition_record:
