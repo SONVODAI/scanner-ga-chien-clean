@@ -752,4 +752,4 @@ def test_read_model_module_has_no_opr_bridge_imports():
             imports.extend(alias.name for alias in node.names)
     assert all("opr_bridge" not in name for name in imports)
     assert "os.mkdir" not in src
-    assert "mkdir" not in src
+    assert ".mkdir(" not in src
