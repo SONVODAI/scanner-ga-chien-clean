@@ -15,6 +15,11 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from modules.edge_research.research_brain_daily_ui import (
+    build_research_brain_daily_view,
+    render_research_brain_expander,
+    render_research_brain_text_snapshot,
+)
 from modules.edge_research.storage import resolve_data_dir, resolve_production_runs_root
 
 AUTONOMOUS_DAILY_SECTION = "AUTONOMOUS_DAILY_RESEARCH"
@@ -210,6 +215,12 @@ def render_autonomous_daily_edge_text_snapshot(view: Dict[str, Any]) -> str:
             lines.append(str(view["narrative_vi"]))
     else:
         lines.append("Session Market Voice: ABSENT")
+    edge_dir = view.get("edge_data_dir")
+    brain = build_research_brain_daily_view(
+        trade_date=view.get("session_date"),
+        data_dir=Path(edge_dir) if edge_dir else None,
+    )
+    lines.append(render_research_brain_text_snapshot(brain))
     lines.append(f"Canonical root: {view.get('canonical_root')}")
     lines.append(HISTORICAL_CHALLENGER_SECTION)
     return "\n".join(lines)
@@ -255,3 +266,10 @@ def render_autonomous_daily_edge_block(st: Any, view: Dict[str, Any]) -> None:
             st.markdown(view["narrative_vi"])
     else:
         st.warning("SESSION_MARKET_VOICE chưa có cho session này.")
+
+    edge_dir = view.get("edge_data_dir")
+    brain = build_research_brain_daily_view(
+        trade_date=view.get("session_date"),
+        data_dir=Path(edge_dir) if edge_dir else None,
+    )
+    render_research_brain_expander(st, brain)
