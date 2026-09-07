@@ -1,0 +1,2062 @@
+{
+  "T07": {
+    "name": "rs5_turn_up_from_neg",
+    "n": 309,
+    "n_fail_t5": 60,
+    "fail_rate_t5": 0.1941747572815534,
+    "fail_rate_t10": 0.12944983818770225,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 46,
+      "E2_EARLY_AUG_CONTINUATION": 8,
+      "E3_MID_AUG": 6
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 210,
+      "E2_EARLY_AUG_CONTINUATION": 18
+    },
+    "july_share_fail": 0.36666666666666664,
+    "july_share_win": 0.8201754385964912,
+    "rsi14": {
+      "fail_median": 31.994999999999997,
+      "win_median": 27.990000000000002
+    },
+    "rsi_slope": {
+      "fail_median": 1.9249999999999998,
+      "win_median": 1.4
+    },
+    "rs10": {
+      "fail_median": -7.02,
+      "win_median": -10.41
+    },
+    "volume_ratio20": {
+      "fail_median": 0.7628817465106461,
+      "win_median": 0.8297319921065431
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -3.88,
+      "win_median": -5.47
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 1.6099999999999999,
+      "win_median": 1.625
+    },
+    "dist_high20": {
+      "fail_median": -12.525,
+      "win_median": -17.27
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.5492957746478874,
+      "win_median": 0.5492957746478874
+    },
+    "market_real_hist": {
+      "fail_median": 1.2,
+      "win_median": 1.2
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "C4G",
+      "CEO",
+      "CII",
+      "CMG",
+      "CSV",
+      "DPM",
+      "DXS",
+      "FCN",
+      "GEG",
+      "GIL",
+      "HAG",
+      "HDG",
+      "HHS",
+      "HUT",
+      "IDC",
+      "KBC",
+      "KSB",
+      "LAS",
+      "NAB",
+      "NTL",
+      "OIL",
+      "PDR",
+      "PLX",
+      "PVB"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-12",
+        "ret_t5": -8.45588235294118,
+        "ret_t10": null,
+        "rsi14": 26.26,
+        "rs10": -0.73,
+        "ema9_ma20_slope": -2.33,
+        "volume_ratio20": 0.7661646676887005,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-13",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": null,
+        "rsi14": 20.69,
+        "rs10": -8.78,
+        "ema9_ma20_slope": -4.14,
+        "volume_ratio20": 0.418499162630884,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "PDR",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.184100418410042,
+        "ret_t10": 1.2552301255230214,
+        "rsi14": 11.88,
+        "rs10": -14.95,
+        "ema9_ma20_slope": -7.22,
+        "volume_ratio20": 0.6492844108362382,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.676470588235292,
+        "ret_t10": 4.779411764705888,
+        "rsi14": 25.24,
+        "rs10": -15.78,
+        "ema9_ma20_slope": -8.17,
+        "volume_ratio20": 0.9056166023655124,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-11",
+        "ret_t5": -3.649635036496346,
+        "ret_t10": null,
+        "rsi14": 23.34,
+        "rs10": -7.43,
+        "ema9_ma20_slope": -4.21,
+        "volume_ratio20": 0.2955473539476269,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "HHS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.6437246963562764,
+        "ret_t10": 2.7327935222672073,
+        "rsi14": 34.48,
+        "rs10": -8.09,
+        "ema9_ma20_slope": -4.7,
+        "volume_ratio20": 0.7495120485575736,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "C4G",
+        "trade_date": "2026-07-30",
+        "ret_t5": -3.508771929824561,
+        "ret_t10": 0.0,
+        "rsi14": 28.69,
+        "rs10": -10.94,
+        "ema9_ma20_slope": -5.94,
+        "volume_ratio20": 1.1155650708331435,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "GIL",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.338171262699563,
+        "ret_t10": 18.867924528301884,
+        "rsi14": 8.12,
+        "rs10": -35.31,
+        "ema9_ma20_slope": -19.37,
+        "volume_ratio20": 0.3518356318938258,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T08": {
+    "name": "rs_spread_pos",
+    "n": 752,
+    "n_fail_t5": 170,
+    "fail_rate_t5": 0.22606382978723405,
+    "fail_rate_t10": 0.17154255319148937,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 126,
+      "E2_EARLY_AUG_CONTINUATION": 25,
+      "E3_MID_AUG": 19
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 465,
+      "E2_EARLY_AUG_CONTINUATION": 54,
+      "E3_MID_AUG": 10
+    },
+    "july_share_fail": 0.23529411764705882,
+    "july_share_win": 0.6767485822306238,
+    "rsi14": {
+      "fail_median": 31.3,
+      "win_median": 29.9
+    },
+    "rsi_slope": {
+      "fail_median": 1.165,
+      "win_median": 1.34
+    },
+    "rs10": {
+      "fail_median": -7.74,
+      "win_median": -9.69
+    },
+    "volume_ratio20": {
+      "fail_median": 0.8389161117173246,
+      "win_median": 0.9094947196465574
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -3.91,
+      "win_median": -4.9
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 1.27,
+      "win_median": 1.42
+    },
+    "dist_high20": {
+      "fail_median": -12.74,
+      "win_median": -15.79
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7253521126760564,
+      "win_median": 0.5492957746478874
+    },
+    "market_real_hist": {
+      "fail_median": 1.1,
+      "win_median": 1.2
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "AGR",
+      "BSI",
+      "BVS",
+      "C4G",
+      "CEO",
+      "CII",
+      "CMG",
+      "DDV",
+      "DIG",
+      "DPM",
+      "DXS",
+      "FCN",
+      "FTS",
+      "GEG",
+      "GIL",
+      "HAG",
+      "HAH",
+      "HDB",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "HUT",
+      "IDC"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-14",
+        "ret_t5": -6.343283582089554,
+        "ret_t10": null,
+        "rsi14": 22.76,
+        "rs10": -2.19,
+        "ema9_ma20_slope": -2.16,
+        "volume_ratio20": 1.2904239715024095,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.093189964157708,
+        "ret_t10": -0.35842293906810374,
+        "rsi14": 24.72,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -7.73,
+        "volume_ratio20": 1.1433370035080042,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "TVS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.862068965517242,
+        "ret_t10": -7.241379310344831,
+        "rsi14": 50.51,
+        "rs10": -10.21,
+        "ema9_ma20_slope": -1.55,
+        "volume_ratio20": 0.3391213001297658,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HDC",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.349794238683126,
+        "ret_t10": -3.292181069958844,
+        "rsi14": 18.24,
+        "rs10": -17.06,
+        "ema9_ma20_slope": -8.01,
+        "volume_ratio20": 1.792313110697708,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "MBS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.154639175257736,
+        "ret_t10": -5.670103092783507,
+        "rsi14": 43.75,
+        "rs10": -12.22,
+        "ema9_ma20_slope": -3.99,
+        "volume_ratio20": 1.0056081920028817,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-12",
+        "ret_t5": -5.147058823529416,
+        "ret_t10": null,
+        "rsi14": 21.98,
+        "rs10": -8.11,
+        "ema9_ma20_slope": -4.17,
+        "volume_ratio20": 1.102183670381764,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "GIL",
+        "trade_date": "2026-07-23",
+        "ret_t5": -4.694167852062591,
+        "ret_t10": 9.95732574679944,
+        "rsi14": 9.35,
+        "rs10": -38.33,
+        "ema9_ma20_slope": -18.84,
+        "volume_ratio20": 0.8087133696889794,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "FTS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": -2.8888888888888853,
+        "rsi14": 33.24,
+        "rs10": -18.48,
+        "ema9_ma20_slope": -7.59,
+        "volume_ratio20": 0.7344432321691045,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T10": {
+    "name": "rs10_weak_rs5_improving",
+    "n": 289,
+    "n_fail_t5": 54,
+    "fail_rate_t5": 0.18685121107266436,
+    "fail_rate_t10": 0.13494809688581316,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 42,
+      "E2_EARLY_AUG_CONTINUATION": 9,
+      "E3_MID_AUG": 3
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 209,
+      "E2_EARLY_AUG_CONTINUATION": 9
+    },
+    "july_share_fail": 0.3888888888888889,
+    "july_share_win": 0.8577981651376146,
+    "rsi14": {
+      "fail_median": 31.045,
+      "win_median": 27.585
+    },
+    "rsi_slope": {
+      "fail_median": 1.845,
+      "win_median": 1.39
+    },
+    "rs10": {
+      "fail_median": -7.6850000000000005,
+      "win_median": -10.535
+    },
+    "volume_ratio20": {
+      "fail_median": 0.7545554369450826,
+      "win_median": 0.819714389492795
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -4.26,
+      "win_median": -5.68
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 1.605,
+      "win_median": 1.505
+    },
+    "dist_high20": {
+      "fail_median": -13.33,
+      "win_median": -17.47
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.5492957746478874,
+      "win_median": 0.5492957746478874
+    },
+    "market_real_hist": {
+      "fail_median": 1.2,
+      "win_median": 1.2
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "C4G",
+      "CEO",
+      "CII",
+      "CMG",
+      "CSV",
+      "DPM",
+      "DXS",
+      "FCN",
+      "GEG",
+      "GIL",
+      "HAG",
+      "HDG",
+      "HHS",
+      "HUT",
+      "LAS",
+      "NAB",
+      "NTL",
+      "OIL",
+      "PDR",
+      "PLX",
+      "PVB",
+      "PVC",
+      "SHB",
+      "TCM"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-13",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": null,
+        "rsi14": 20.69,
+        "rs10": -8.78,
+        "ema9_ma20_slope": -4.14,
+        "volume_ratio20": 0.418499162630884,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "PDR",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.184100418410042,
+        "ret_t10": 1.2552301255230214,
+        "rsi14": 11.88,
+        "rs10": -14.95,
+        "ema9_ma20_slope": -7.22,
+        "volume_ratio20": 0.6492844108362382,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.676470588235292,
+        "ret_t10": 4.779411764705888,
+        "rsi14": 25.24,
+        "rs10": -15.78,
+        "ema9_ma20_slope": -8.17,
+        "volume_ratio20": 0.9056166023655124,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-11",
+        "ret_t5": -3.649635036496346,
+        "ret_t10": null,
+        "rsi14": 23.34,
+        "rs10": -7.43,
+        "ema9_ma20_slope": -4.21,
+        "volume_ratio20": 0.2955473539476269,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "HHS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.6437246963562764,
+        "ret_t10": 2.7327935222672073,
+        "rsi14": 34.48,
+        "rs10": -8.09,
+        "ema9_ma20_slope": -4.7,
+        "volume_ratio20": 0.7495120485575736,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "C4G",
+        "trade_date": "2026-07-30",
+        "ret_t5": -3.508771929824561,
+        "ret_t10": 0.0,
+        "rsi14": 28.69,
+        "rs10": -10.94,
+        "ema9_ma20_slope": -5.94,
+        "volume_ratio20": 1.1155650708331435,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "GIL",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.338171262699563,
+        "ret_t10": 18.867924528301884,
+        "rsi14": 8.12,
+        "rs10": -35.31,
+        "ema9_ma20_slope": -19.37,
+        "volume_ratio20": 0.3518356318938258,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "VHC",
+        "trade_date": "2026-07-29",
+        "ret_t5": -3.314917127071826,
+        "ret_t10": -2.209944751381221,
+        "rsi14": 38.65,
+        "rs10": -4.4,
+        "ema9_ma20_slope": -3.17,
+        "volume_ratio20": 0.2303844471536392,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T18": {
+    "name": "at_20d_low",
+    "n": 391,
+    "n_fail_t5": 89,
+    "fail_rate_t5": 0.22762148337595908,
+    "fail_rate_t10": 0.11508951406649616,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 68,
+      "E3_MID_AUG": 13,
+      "E2_EARLY_AUG_CONTINUATION": 8
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 246,
+      "E2_EARLY_AUG_CONTINUATION": 12,
+      "E3_MID_AUG": 3
+    },
+    "july_share_fail": 0.10112359550561797,
+    "july_share_win": 0.5977011494252874,
+    "rsi14": {
+      "fail_median": 24.72,
+      "win_median": 24.64
+    },
+    "rsi_slope": {
+      "fail_median": -2.29,
+      "win_median": -2.7
+    },
+    "rs10": {
+      "fail_median": -10.07,
+      "win_median": -10.9
+    },
+    "volume_ratio20": {
+      "fail_median": 0.7982896138117868,
+      "win_median": 0.9076131869933136
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -4.14,
+      "win_median": -4.89
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 0.0,
+      "win_median": 0.0
+    },
+    "dist_high20": {
+      "fail_median": -14.34,
+      "win_median": -16.46
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7253521126760564,
+      "win_median": 0.7464788732394366
+    },
+    "market_real_hist": {
+      "fail_median": 1.1,
+      "win_median": 0.7
+    },
+    "fail_symbols_sample": [
+      "AGR",
+      "BSI",
+      "BVS",
+      "C4G",
+      "CEO",
+      "CII",
+      "CSV",
+      "DDV",
+      "DIG",
+      "DXG",
+      "DXS",
+      "FCN",
+      "FTS",
+      "GIL",
+      "HAG",
+      "HAH",
+      "HDB",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "HUT",
+      "IDC",
+      "IJC",
+      "KDH"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-12",
+        "ret_t5": -8.45588235294118,
+        "ret_t10": null,
+        "rsi14": 26.26,
+        "rs10": -0.73,
+        "ema9_ma20_slope": -2.33,
+        "volume_ratio20": 0.7661646676887005,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-13",
+        "ret_t5": -7.063197026022305,
+        "ret_t10": null,
+        "rsi14": 23.59,
+        "rs10": -1.82,
+        "ema9_ma20_slope": -2.26,
+        "volume_ratio20": 0.7058092120901827,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "DIG",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.481481481481477,
+        "ret_t10": 0.0,
+        "rsi14": 30.31,
+        "rs10": -11.84,
+        "ema9_ma20_slope": -4.58,
+        "volume_ratio20": 1.9264911615007048,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-14",
+        "ret_t5": -6.343283582089554,
+        "ret_t10": null,
+        "rsi14": 22.76,
+        "rs10": -2.19,
+        "ema9_ma20_slope": -2.16,
+        "volume_ratio20": 1.2904239715024095,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.093189964157708,
+        "ret_t10": -0.35842293906810374,
+        "rsi14": 24.72,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -7.73,
+        "volume_ratio20": 1.1433370035080042,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-13",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": null,
+        "rsi14": 20.69,
+        "rs10": -8.78,
+        "ema9_ma20_slope": -4.14,
+        "volume_ratio20": 0.418499162630884,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "AGR",
+        "trade_date": "2026-07-23",
+        "ret_t5": -4.395604395604391,
+        "ret_t10": -3.296703296703296,
+        "rsi14": 38.04,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -4.55,
+        "volume_ratio20": 0.4586273252084669,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "TVS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.285714285714281,
+        "ret_t10": -1.4285714285714235,
+        "rsi14": 44.73,
+        "rs10": -9.68,
+        "ema9_ma20_slope": -2.19,
+        "volume_ratio20": 0.1416193049473586,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T19": {
+    "name": "leaving_20d_low",
+    "n": 75,
+    "n_fail_t5": 12,
+    "fail_rate_t5": 0.16,
+    "fail_rate_t10": 0.06666666666666667,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 11,
+      "E3_MID_AUG": 1
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 57,
+      "E2_EARLY_AUG_CONTINUATION": 5
+    },
+    "july_share_fail": 0.75,
+    "july_share_win": 0.9032258064516129,
+    "rsi14": {
+      "fail_median": 36.05500000000001,
+      "win_median": 33.85
+    },
+    "rsi_slope": {
+      "fail_median": 5.245,
+      "win_median": 4.445
+    },
+    "rs10": {
+      "fail_median": -6.824999999999999,
+      "win_median": -9.809999999999999
+    },
+    "volume_ratio20": {
+      "fail_median": 0.9414464309930819,
+      "win_median": 0.9212022664165909
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -4.175,
+      "win_median": -6.105
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 2.9050000000000002,
+      "win_median": 3.02
+    },
+    "dist_high20": {
+      "fail_median": -11.969999999999999,
+      "win_median": -17.68
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.21830985915492956,
+      "win_median": 0.5492957746478874
+    },
+    "market_real_hist": {
+      "fail_median": 2.1,
+      "win_median": 1.2
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "C4G",
+      "CMG",
+      "HUT",
+      "IDC",
+      "NAB",
+      "PVB",
+      "PVC",
+      "SHB",
+      "VIB",
+      "VJC",
+      "VPX"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-11",
+        "ret_t5": -3.649635036496346,
+        "ret_t10": null,
+        "rsi14": 23.34,
+        "rs10": -7.43,
+        "ema9_ma20_slope": -4.21,
+        "volume_ratio20": 0.2955473539476269,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "C4G",
+        "trade_date": "2026-07-30",
+        "ret_t5": -3.508771929824561,
+        "ret_t10": 0.0,
+        "rsi14": 28.69,
+        "rs10": -10.94,
+        "ema9_ma20_slope": -5.94,
+        "volume_ratio20": 1.1155650708331435,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "NAB",
+        "trade_date": "2026-07-30",
+        "ret_t5": -2.4590163934426257,
+        "ret_t10": -3.688524590163933,
+        "rsi14": 40.66,
+        "rs10": -6.51,
+        "ema9_ma20_slope": -3.29,
+        "volume_ratio20": 1.5634273344524183,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "IDC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.102102102102099,
+        "ret_t10": 0.9009009009008917,
+        "rsi14": 41.0,
+        "rs10": -2.89,
+        "ema9_ma20_slope": -3.07,
+        "volume_ratio20": 0.9834205933682374,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "PVB",
+        "trade_date": "2026-07-28",
+        "ret_t5": -1.8957345971563955,
+        "ret_t10": 0.9478672985782088,
+        "rsi14": 31.48,
+        "rs10": -11.72,
+        "ema9_ma20_slope": -5.62,
+        "volume_ratio20": 0.6416872335651783,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "CMG",
+        "trade_date": "2026-07-24",
+        "ret_t5": -1.619433198380571,
+        "ret_t10": 0.4048582995951344,
+        "rsi14": 32.22,
+        "rs10": -8.52,
+        "ema9_ma20_slope": -4.14,
+        "volume_ratio20": 0.7052527812984086,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "ACV",
+        "trade_date": "2026-07-30",
+        "ret_t5": -1.518987341772149,
+        "ret_t10": 3.797468354430378,
+        "rsi14": 34.34,
+        "rs10": -5.05,
+        "ema9_ma20_slope": -3.83,
+        "volume_ratio20": 0.8435678217143339,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "PVC",
+        "trade_date": "2026-07-29",
+        "ret_t5": -0.8474576271186418,
+        "ret_t10": 6.779661016949157,
+        "rsi14": 37.83,
+        "rs10": -12.59,
+        "ema9_ma20_slope": -3.93,
+        "volume_ratio20": 0.5196327865777163,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T21": {
+    "name": "sync_bottom_day",
+    "n": 454,
+    "n_fail_t5": 109,
+    "fail_rate_t5": 0.24008810572687225,
+    "fail_rate_t10": 0.13876651982378854,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 109
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 345
+    },
+    "july_share_fail": 0.10091743119266056,
+    "july_share_win": 0.6347826086956522,
+    "rsi14": {
+      "fail_median": 30.29,
+      "win_median": 25.54
+    },
+    "rsi_slope": {
+      "fail_median": 0.0,
+      "win_median": -1.48
+    },
+    "rs10": {
+      "fail_median": -11.72,
+      "win_median": -10.96
+    },
+    "volume_ratio20": {
+      "fail_median": 0.825045757657208,
+      "win_median": 0.9097696327824942
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -4.7,
+      "win_median": -5.24
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 0.56,
+      "win_median": 0.0
+    },
+    "dist_high20": {
+      "fail_median": -15.62,
+      "win_median": -16.75
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7253521126760564,
+      "win_median": 0.7464788732394366
+    },
+    "market_real_hist": {
+      "fail_median": 1.1,
+      "win_median": 0.7
+    },
+    "fail_symbols_sample": [
+      "AGR",
+      "BSI",
+      "BVS",
+      "C4G",
+      "CEO",
+      "CII",
+      "CMG",
+      "CSV",
+      "DDV",
+      "DIG",
+      "DPM",
+      "DXG",
+      "DXS",
+      "FCN",
+      "FTS",
+      "GEE",
+      "GIL",
+      "HAG",
+      "HAH",
+      "HDB",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "IDC"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "DIG",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.481481481481477,
+        "ret_t10": 0.0,
+        "rsi14": 30.31,
+        "rs10": -11.84,
+        "ema9_ma20_slope": -4.58,
+        "volume_ratio20": 1.9264911615007048,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.093189964157708,
+        "ret_t10": -0.35842293906810374,
+        "rsi14": 24.72,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -7.73,
+        "volume_ratio20": 1.1433370035080042,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "TVS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.862068965517242,
+        "ret_t10": -7.241379310344831,
+        "rsi14": 50.51,
+        "rs10": -10.21,
+        "ema9_ma20_slope": -1.55,
+        "volume_ratio20": 0.3391213001297658,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "GEE",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.579399141630903,
+        "ret_t10": -3.0042918454935674,
+        "rsi14": 28.85,
+        "rs10": -13.7,
+        "ema9_ma20_slope": -8.59,
+        "volume_ratio20": 1.0761881197540968,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HDC",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.349794238683126,
+        "ret_t10": -3.292181069958844,
+        "rsi14": 18.24,
+        "rs10": -17.06,
+        "ema9_ma20_slope": -8.01,
+        "volume_ratio20": 1.792313110697708,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "MBS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.154639175257736,
+        "ret_t10": -5.670103092783507,
+        "rsi14": 43.75,
+        "rs10": -12.22,
+        "ema9_ma20_slope": -3.99,
+        "volume_ratio20": 1.0056081920028817,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "GIL",
+        "trade_date": "2026-07-23",
+        "ret_t5": -4.694167852062591,
+        "ret_t10": 9.95732574679944,
+        "rsi14": 9.35,
+        "rs10": -38.33,
+        "ema9_ma20_slope": -18.84,
+        "volume_ratio20": 0.8087133696889794,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "FTS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": -2.8888888888888853,
+        "rsi14": 33.24,
+        "rs10": -18.48,
+        "ema9_ma20_slope": -7.59,
+        "volume_ratio20": 0.7344432321691045,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T22": {
+    "name": "sync_bottom_and_rsi_rising",
+    "n": 131,
+    "n_fail_t5": 22,
+    "fail_rate_t5": 0.16793893129770993,
+    "fail_rate_t10": 0.07633587786259542,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 22
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 109
+    },
+    "july_share_fail": 0.13636363636363635,
+    "july_share_win": 0.7706422018348624,
+    "rsi14": {
+      "fail_median": 31.235,
+      "win_median": 27.21
+    },
+    "rsi_slope": {
+      "fail_median": 2.54,
+      "win_median": 0.91
+    },
+    "rs10": {
+      "fail_median": -8.315,
+      "win_median": -10.6
+    },
+    "volume_ratio20": {
+      "fail_median": 0.7316993045246656,
+      "win_median": 0.9162031934797652
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -3.965,
+      "win_median": -5.47
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 1.3199999999999998,
+      "win_median": 1.69
+    },
+    "dist_high20": {
+      "fail_median": -13.14,
+      "win_median": -17.04
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7464788732394366,
+      "win_median": 0.5492957746478874
+    },
+    "market_real_hist": {
+      "fail_median": 0.7,
+      "win_median": 1.2
+    },
+    "fail_symbols_sample": [
+      "CII",
+      "CMG",
+      "DXS",
+      "FCN",
+      "HAG",
+      "HHS",
+      "IDC",
+      "KBC",
+      "KSB",
+      "LAS",
+      "OCB",
+      "OIL",
+      "PDR",
+      "PVB",
+      "PVC",
+      "SHB",
+      "SZC",
+      "TPB",
+      "VHC",
+      "VJC",
+      "VPB"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "PDR",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.184100418410042,
+        "ret_t10": 1.2552301255230214,
+        "rsi14": 11.88,
+        "rs10": -14.95,
+        "ema9_ma20_slope": -7.22,
+        "volume_ratio20": 0.6492844108362382,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "SZC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.07608695652174,
+        "ret_t10": 10.869565217391308,
+        "rsi14": 17.11,
+        "rs10": -12.38,
+        "ema9_ma20_slope": -6.32,
+        "volume_ratio20": 0.5000921545739387,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.676470588235292,
+        "ret_t10": 4.779411764705888,
+        "rsi14": 25.24,
+        "rs10": -15.78,
+        "ema9_ma20_slope": -8.17,
+        "volume_ratio20": 0.9056166023655124,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HHS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.6437246963562764,
+        "ret_t10": 2.7327935222672073,
+        "rsi14": 34.48,
+        "rs10": -8.09,
+        "ema9_ma20_slope": -4.7,
+        "volume_ratio20": 0.7495120485575736,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "KSB",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.6022304832713727,
+        "ret_t10": -0.743494423791824,
+        "rsi14": 30.99,
+        "rs10": -6.27,
+        "ema9_ma20_slope": -3.61,
+        "volume_ratio20": 0.7138865604917575,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "SHB",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.5423728813559365,
+        "ret_t10": 1.2711864406779627,
+        "rsi14": 26.15,
+        "rs10": -10.27,
+        "ema9_ma20_slope": -5.28,
+        "volume_ratio20": 0.89849457539277,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "PVC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.4793388429752095,
+        "ret_t10": 0.0,
+        "rsi14": 38.2,
+        "rs10": -4.72,
+        "ema9_ma20_slope": -2.48,
+        "volume_ratio20": 0.6907269901571403,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "IDC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.102102102102099,
+        "ret_t10": 0.9009009009008917,
+        "rsi14": 41.0,
+        "rs10": -2.89,
+        "ema9_ma20_slope": -3.07,
+        "volume_ratio20": 0.9834205933682374,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T39": {
+    "name": "early_confirm_at_low",
+    "n": 391,
+    "n_fail_t5": 89,
+    "fail_rate_t5": 0.22762148337595908,
+    "fail_rate_t10": 0.11508951406649616,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 68,
+      "E3_MID_AUG": 13,
+      "E2_EARLY_AUG_CONTINUATION": 8
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 246,
+      "E2_EARLY_AUG_CONTINUATION": 12,
+      "E3_MID_AUG": 3
+    },
+    "july_share_fail": 0.10112359550561797,
+    "july_share_win": 0.5977011494252874,
+    "rsi14": {
+      "fail_median": 24.72,
+      "win_median": 24.64
+    },
+    "rsi_slope": {
+      "fail_median": -2.29,
+      "win_median": -2.7
+    },
+    "rs10": {
+      "fail_median": -10.07,
+      "win_median": -10.9
+    },
+    "volume_ratio20": {
+      "fail_median": 0.7982896138117868,
+      "win_median": 0.9076131869933136
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -4.14,
+      "win_median": -4.89
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 0.0,
+      "win_median": 0.0
+    },
+    "dist_high20": {
+      "fail_median": -14.34,
+      "win_median": -16.46
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7253521126760564,
+      "win_median": 0.7464788732394366
+    },
+    "market_real_hist": {
+      "fail_median": 1.1,
+      "win_median": 0.7
+    },
+    "fail_symbols_sample": [
+      "AGR",
+      "BSI",
+      "BVS",
+      "C4G",
+      "CEO",
+      "CII",
+      "CSV",
+      "DDV",
+      "DIG",
+      "DXG",
+      "DXS",
+      "FCN",
+      "FTS",
+      "GIL",
+      "HAG",
+      "HAH",
+      "HDB",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "HUT",
+      "IDC",
+      "IJC",
+      "KDH"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-12",
+        "ret_t5": -8.45588235294118,
+        "ret_t10": null,
+        "rsi14": 26.26,
+        "rs10": -0.73,
+        "ema9_ma20_slope": -2.33,
+        "volume_ratio20": 0.7661646676887005,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-13",
+        "ret_t5": -7.063197026022305,
+        "ret_t10": null,
+        "rsi14": 23.59,
+        "rs10": -1.82,
+        "ema9_ma20_slope": -2.26,
+        "volume_ratio20": 0.7058092120901827,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "DIG",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.481481481481477,
+        "ret_t10": 0.0,
+        "rsi14": 30.31,
+        "rs10": -11.84,
+        "ema9_ma20_slope": -4.58,
+        "volume_ratio20": 1.9264911615007048,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-14",
+        "ret_t5": -6.343283582089554,
+        "ret_t10": null,
+        "rsi14": 22.76,
+        "rs10": -2.19,
+        "ema9_ma20_slope": -2.16,
+        "volume_ratio20": 1.2904239715024095,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.093189964157708,
+        "ret_t10": -0.35842293906810374,
+        "rsi14": 24.72,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -7.73,
+        "volume_ratio20": 1.1433370035080042,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-13",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": null,
+        "rsi14": 20.69,
+        "rs10": -8.78,
+        "ema9_ma20_slope": -4.14,
+        "volume_ratio20": 0.418499162630884,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "AGR",
+        "trade_date": "2026-07-23",
+        "ret_t5": -4.395604395604391,
+        "ret_t10": -3.296703296703296,
+        "rsi14": 38.04,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -4.55,
+        "volume_ratio20": 0.4586273252084669,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "TVS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.285714285714281,
+        "ret_t10": -1.4285714285714235,
+        "rsi14": 44.73,
+        "rs10": -9.68,
+        "ema9_ma20_slope": -2.19,
+        "volume_ratio20": 0.1416193049473586,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T11": {
+    "name": "reclaim_ema9",
+    "n": 30,
+    "n_fail_t5": 5,
+    "fail_rate_t5": 0.16666666666666666,
+    "fail_rate_t10": 0.3,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 5
+    },
+    "win_episode_counts": {
+      "E2_EARLY_AUG_CONTINUATION": 12,
+      "E1_JUL_BOTTOM_BOUNCE": 12
+    },
+    "july_share_fail": 0.6,
+    "july_share_win": 0.5,
+    "rsi14": {
+      "fail_median": 41.0,
+      "win_median": 41.365
+    },
+    "rsi_slope": {
+      "fail_median": 9.91,
+      "win_median": 10.705
+    },
+    "rs10": {
+      "fail_median": -2.89,
+      "win_median": -1.595
+    },
+    "volume_ratio20": {
+      "fail_median": 0.8435678217143339,
+      "win_median": 0.9780065098792061
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -2.74,
+      "win_median": -2.88
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 3.42,
+      "win_median": 4.24
+    },
+    "dist_high20": {
+      "fail_median": -8.92,
+      "win_median": -10.184999999999999
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.21830985915492956,
+      "win_median": 0.10211267605633803
+    },
+    "market_real_hist": {
+      "fail_median": 2.1,
+      "win_median": 5.05
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "IDC",
+      "KBC",
+      "POW"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "IDC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.102102102102099,
+        "ret_t10": 0.9009009009008917,
+        "rsi14": 41.0,
+        "rs10": -2.89,
+        "ema9_ma20_slope": -3.07,
+        "volume_ratio20": 0.9834205933682374,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "ACV",
+        "trade_date": "2026-07-30",
+        "ret_t5": -1.518987341772149,
+        "ret_t10": 3.797468354430378,
+        "rsi14": 34.34,
+        "rs10": -5.05,
+        "ema9_ma20_slope": -3.83,
+        "volume_ratio20": 0.8435678217143339,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "KBC",
+        "trade_date": "2026-07-29",
+        "ret_t5": -0.8928571428571397,
+        "ret_t10": 0.0,
+        "rsi14": 43.53,
+        "rs10": -2.1,
+        "ema9_ma20_slope": -1.34,
+        "volume_ratio20": 0.7835830513342638,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "KBC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -0.17953321364452268,
+        "ret_t10": 1.077199281867136,
+        "rsi14": 40.72,
+        "rs10": -2.62,
+        "ema9_ma20_slope": -2.66,
+        "volume_ratio20": 0.5556035450823212,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "POW",
+        "trade_date": "2026-07-30",
+        "ret_t5": 0.0,
+        "ret_t10": -1.098901098901095,
+        "rsi14": 46.79,
+        "rs10": -3.19,
+        "ema9_ma20_slope": -2.74,
+        "volume_ratio20": 1.512475074775673,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T01": {
+    "name": "slope_cross_up",
+    "n": 1,
+    "n_fail_t5": 1,
+    "fail_rate_t5": 1.0,
+    "fail_rate_t10": null,
+    "fail_episode_counts": {
+      "E3_MID_AUG": 1
+    },
+    "win_episode_counts": {},
+    "july_share_fail": 0.0,
+    "july_share_win": null,
+    "rsi14": {
+      "fail_median": 49.51,
+      "win_median": null
+    },
+    "rsi_slope": {
+      "fail_median": -3.33,
+      "win_median": null
+    },
+    "rs10": {
+      "fail_median": 1.52,
+      "win_median": null
+    },
+    "volume_ratio20": {
+      "fail_median": 0.9653067718696924,
+      "win_median": null
+    },
+    "ema9_ma20_slope": {
+      "fail_median": 0.01,
+      "win_median": null
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 3.88,
+      "win_median": null
+    },
+    "dist_high20": {
+      "fail_median": -10.67,
+      "win_median": null
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.04225352112676056,
+      "win_median": null
+    },
+    "market_real_hist": {
+      "fail_median": 9.0,
+      "win_median": null
+    },
+    "fail_symbols_sample": [
+      "OIL"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "OIL",
+        "trade_date": "2026-08-12",
+        "ret_t5": 0.0,
+        "ret_t10": null,
+        "rsi14": 49.51,
+        "rs10": 1.52,
+        "ema9_ma20_slope": 0.01,
+        "volume_ratio20": 0.9653067718696924,
+        "episode": "E3_MID_AUG"
+      }
+    ]
+  },
+  "T34": {
+    "name": "reclaim_ema9_after_nb20_low",
+    "n": 18,
+    "n_fail_t5": 3,
+    "fail_rate_t5": 0.16666666666666666,
+    "fail_rate_t10": 0.2777777777777778,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 3
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 11,
+      "E2_EARLY_AUG_CONTINUATION": 4
+    },
+    "july_share_fail": 0.6666666666666666,
+    "july_share_win": 0.7333333333333333,
+    "rsi14": {
+      "fail_median": 41.0,
+      "win_median": 39.92
+    },
+    "rsi_slope": {
+      "fail_median": 9.91,
+      "win_median": 13.76
+    },
+    "rs10": {
+      "fail_median": -3.19,
+      "win_median": -2.77
+    },
+    "volume_ratio20": {
+      "fail_median": 0.9834205933682374,
+      "win_median": 1.0162431210892366
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -3.07,
+      "win_median": -2.91
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 3.41,
+      "win_median": 4.24
+    },
+    "dist_high20": {
+      "fail_median": -9.9,
+      "win_median": -9.78
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.14084507042253522,
+      "win_median": 0.14084507042253522
+    },
+    "market_real_hist": {
+      "fail_median": 4.3,
+      "win_median": 4.3
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "IDC",
+      "POW"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "IDC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.102102102102099,
+        "ret_t10": 0.9009009009008917,
+        "rsi14": 41.0,
+        "rs10": -2.89,
+        "ema9_ma20_slope": -3.07,
+        "volume_ratio20": 0.9834205933682374,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "ACV",
+        "trade_date": "2026-07-30",
+        "ret_t5": -1.518987341772149,
+        "ret_t10": 3.797468354430378,
+        "rsi14": 34.34,
+        "rs10": -5.05,
+        "ema9_ma20_slope": -3.83,
+        "volume_ratio20": 0.8435678217143339,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "POW",
+        "trade_date": "2026-07-30",
+        "ret_t5": 0.0,
+        "ret_t10": -1.098901098901095,
+        "rsi14": 46.79,
+        "rs10": -3.19,
+        "ema9_ma20_slope": -2.74,
+        "volume_ratio20": 1.512475074775673,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T40": {
+    "name": "late_confirm_d1_3_reclaim_ema9",
+    "n": 25,
+    "n_fail_t5": 3,
+    "fail_rate_t5": 0.12,
+    "fail_rate_t10": 0.24,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 3
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 15,
+      "E2_EARLY_AUG_CONTINUATION": 4,
+      "E3_MID_AUG": 3
+    },
+    "july_share_fail": 0.6666666666666666,
+    "july_share_win": 0.6818181818181818,
+    "rsi14": {
+      "fail_median": 41.0,
+      "win_median": 41.510000000000005
+    },
+    "rsi_slope": {
+      "fail_median": 9.91,
+      "win_median": 13.6
+    },
+    "rs10": {
+      "fail_median": -3.19,
+      "win_median": -2.1100000000000003
+    },
+    "volume_ratio20": {
+      "fail_median": 0.9834205933682374,
+      "win_median": 1.1230479875402235
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -3.07,
+      "win_median": -2.8099999999999996
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 3.41,
+      "win_median": 4.205
+    },
+    "dist_high20": {
+      "fail_median": -9.9,
+      "win_median": -10.25
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.14084507042253522,
+      "win_median": 0.14084507042253522
+    },
+    "market_real_hist": {
+      "fail_median": 4.3,
+      "win_median": 4.3
+    },
+    "fail_symbols_sample": [
+      "ACV",
+      "IDC",
+      "POW"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "IDC",
+        "trade_date": "2026-07-24",
+        "ret_t5": -2.102102102102099,
+        "ret_t10": 0.9009009009008917,
+        "rsi14": 41.0,
+        "rs10": -2.89,
+        "ema9_ma20_slope": -3.07,
+        "volume_ratio20": 0.9834205933682374,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "ACV",
+        "trade_date": "2026-07-30",
+        "ret_t5": -1.518987341772149,
+        "ret_t10": 3.797468354430378,
+        "rsi14": 34.34,
+        "rs10": -5.05,
+        "ema9_ma20_slope": -3.83,
+        "volume_ratio20": 0.8435678217143339,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "POW",
+        "trade_date": "2026-07-30",
+        "ret_t5": 0.0,
+        "ret_t10": -1.098901098901095,
+        "rsi14": 46.79,
+        "rs10": -3.19,
+        "ema9_ma20_slope": -2.74,
+        "volume_ratio20": 1.512475074775673,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T27": {
+    "name": "green2_flag",
+    "n": 0
+  },
+  "T30": {
+    "name": "below_ema9_slope_still_steep_neg",
+    "n": 685,
+    "n_fail_t5": 163,
+    "fail_rate_t5": 0.23795620437956205,
+    "fail_rate_t10": 0.17372262773722627,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 125,
+      "E2_EARLY_AUG_CONTINUATION": 22,
+      "E3_MID_AUG": 16
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 462,
+      "E2_EARLY_AUG_CONTINUATION": 45,
+      "E3_MID_AUG": 1
+    },
+    "july_share_fail": 0.2147239263803681,
+    "july_share_win": 0.6712598425196851,
+    "rsi14": {
+      "fail_median": 30.29,
+      "win_median": 28.555
+    },
+    "rsi_slope": {
+      "fail_median": 1.18,
+      "win_median": 0.34
+    },
+    "rs10": {
+      "fail_median": -8.3,
+      "win_median": -10.085
+    },
+    "volume_ratio20": {
+      "fail_median": 0.825045757657208,
+      "win_median": 0.882281864581874
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -4.26,
+      "win_median": -5.03
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 0.99,
+      "win_median": 1.025
+    },
+    "dist_high20": {
+      "fail_median": -14.86,
+      "win_median": -16.515
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7253521126760564,
+      "win_median": 0.5492957746478874
+    },
+    "market_real_hist": {
+      "fail_median": 1.1,
+      "win_median": 1.2
+    },
+    "fail_symbols_sample": [
+      "AGR",
+      "BSI",
+      "BVS",
+      "C4G",
+      "CEO",
+      "CII",
+      "CMG",
+      "CSV",
+      "DDV",
+      "DIG",
+      "DXG",
+      "DXS",
+      "FCN",
+      "FTS",
+      "GEE",
+      "GEG",
+      "GIL",
+      "HAG",
+      "HAH",
+      "HDC",
+      "HDG",
+      "HHS",
+      "HHV",
+      "HUT",
+      "IDC"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-12",
+        "ret_t5": -8.45588235294118,
+        "ret_t10": null,
+        "rsi14": 26.26,
+        "rs10": -0.73,
+        "ema9_ma20_slope": -2.33,
+        "volume_ratio20": 0.7661646676887005,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-13",
+        "ret_t5": -7.063197026022305,
+        "ret_t10": null,
+        "rsi14": 23.59,
+        "rs10": -1.82,
+        "ema9_ma20_slope": -2.26,
+        "volume_ratio20": 0.7058092120901827,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "DIG",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.481481481481477,
+        "ret_t10": 0.0,
+        "rsi14": 30.31,
+        "rs10": -11.84,
+        "ema9_ma20_slope": -4.58,
+        "volume_ratio20": 1.9264911615007048,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-14",
+        "ret_t5": -6.343283582089554,
+        "ret_t10": null,
+        "rsi14": 22.76,
+        "rs10": -2.19,
+        "ema9_ma20_slope": -2.16,
+        "volume_ratio20": 1.2904239715024095,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "CII",
+        "trade_date": "2026-07-23",
+        "ret_t5": -6.093189964157708,
+        "ret_t10": -0.35842293906810374,
+        "rsi14": 24.72,
+        "rs10": -14.42,
+        "ema9_ma20_slope": -7.73,
+        "volume_ratio20": 1.1433370035080042,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "GEE",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.579399141630903,
+        "ret_t10": -3.0042918454935674,
+        "rsi14": 28.85,
+        "rs10": -13.7,
+        "ema9_ma20_slope": -8.59,
+        "volume_ratio20": 1.0761881197540968,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "HDC",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.349794238683126,
+        "ret_t10": -3.292181069958844,
+        "rsi14": 18.24,
+        "rs10": -17.06,
+        "ema9_ma20_slope": -8.01,
+        "volume_ratio20": 1.792313110697708,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "MBS",
+        "trade_date": "2026-07-23",
+        "ret_t5": -5.154639175257736,
+        "ret_t10": -5.670103092783507,
+        "rsi14": 43.75,
+        "rs10": -12.22,
+        "ema9_ma20_slope": -3.99,
+        "volume_ratio20": 1.0056081920028817,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  },
+  "T31": {
+    "name": "new_low_rsi_falling",
+    "n": 219,
+    "n_fail_t5": 40,
+    "fail_rate_t5": 0.182648401826484,
+    "fail_rate_t10": 0.0958904109589041,
+    "fail_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 26,
+      "E3_MID_AUG": 8,
+      "E2_EARLY_AUG_CONTINUATION": 6
+    },
+    "win_episode_counts": {
+      "E1_JUL_BOTTOM_BOUNCE": 141,
+      "E2_EARLY_AUG_CONTINUATION": 8,
+      "E3_MID_AUG": 3
+    },
+    "july_share_fail": 0.15,
+    "july_share_win": 0.7828947368421053,
+    "rsi14": {
+      "fail_median": 29.525,
+      "win_median": 24.715
+    },
+    "rsi_slope": {
+      "fail_median": -2.9,
+      "win_median": -2.71
+    },
+    "rs10": {
+      "fail_median": -9.055,
+      "win_median": -11.025
+    },
+    "volume_ratio20": {
+      "fail_median": 0.5706008871824432,
+      "win_median": 0.86824499247939
+    },
+    "ema9_ma20_slope": {
+      "fail_median": -3.705,
+      "win_median": -5.175
+    },
+    "near_bottom_20_pct": {
+      "fail_median": 0.0,
+      "win_median": 0.0
+    },
+    "dist_high20": {
+      "fail_median": -12.135,
+      "win_median": -17.42
+    },
+    "xs_pct_nb20_le2": {
+      "fail_median": 0.7464788732394366,
+      "win_median": 0.8380281690140845
+    },
+    "market_real_hist": {
+      "fail_median": 0.7,
+      "win_median": 0.5
+    },
+    "fail_symbols_sample": [
+      "AGR",
+      "BSI",
+      "BVS",
+      "C4G",
+      "CEO",
+      "CSV",
+      "DDV",
+      "DIG",
+      "FTS",
+      "GIL",
+      "HDC",
+      "HDG",
+      "HHV",
+      "HUT",
+      "MBS",
+      "NAB",
+      "NHA",
+      "NTL",
+      "PC1",
+      "TCH",
+      "TVS",
+      "VCG",
+      "VDS",
+      "VHC",
+      "VJC"
+    ],
+    "worst_t5": [
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-13",
+        "ret_t5": -7.063197026022305,
+        "ret_t10": null,
+        "rsi14": 23.59,
+        "rs10": -1.82,
+        "ema9_ma20_slope": -2.26,
+        "volume_ratio20": 0.7058092120901827,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "NTL",
+        "trade_date": "2026-08-14",
+        "ret_t5": -6.343283582089554,
+        "ret_t10": null,
+        "rsi14": 22.76,
+        "rs10": -2.19,
+        "ema9_ma20_slope": -2.16,
+        "volume_ratio20": 1.2904239715024095,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "HUT",
+        "trade_date": "2026-08-13",
+        "ret_t5": -4.444444444444439,
+        "ret_t10": null,
+        "rsi14": 20.69,
+        "rs10": -8.78,
+        "ema9_ma20_slope": -4.14,
+        "volume_ratio20": 0.418499162630884,
+        "episode": "E3_MID_AUG"
+      },
+      {
+        "symbol": "TVS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -4.285714285714281,
+        "ret_t10": -1.4285714285714235,
+        "rsi14": 44.73,
+        "rs10": -9.68,
+        "ema9_ma20_slope": -2.19,
+        "volume_ratio20": 0.1416193049473586,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "BVS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.831417624521072,
+        "ret_t10": 3.065134099616862,
+        "rsi14": 34.77,
+        "rs10": -27.3,
+        "ema9_ma20_slope": -5.83,
+        "volume_ratio20": 0.6593692910356194,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "DDV",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.7234042553191515,
+        "ret_t10": 0.0,
+        "rsi14": 20.15,
+        "rs10": -15.7,
+        "ema9_ma20_slope": -6.02,
+        "volume_ratio20": 1.0801795666495253,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "GIL",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.338171262699563,
+        "ret_t10": 18.867924528301884,
+        "rsi14": 8.12,
+        "rs10": -35.31,
+        "ema9_ma20_slope": -19.37,
+        "volume_ratio20": 0.3518356318938258,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      },
+      {
+        "symbol": "MBS",
+        "trade_date": "2026-07-24",
+        "ret_t5": -3.2258064516129004,
+        "ret_t10": -0.5376344086021501,
+        "rsi14": 38.58,
+        "rs10": -14.68,
+        "ema9_ma20_slope": -4.76,
+        "volume_ratio20": 0.4947987677169694,
+        "episode": "E1_JUL_BOTTOM_BOUNCE"
+      }
+    ]
+  }
+}

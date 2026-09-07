@@ -1,0 +1,77 @@
+{
+  "statement": "The operative invalidation is a new 20d low WITHOUT market-wide synchronization (mid-August isolated lows). \u201cStill falling / steeply below EMA9 / volume expansion on a new low\u201d is NOT a universal anti-edge: those states outperformed inside the July V-bottom and underperformed in E3.",
+  "sync_bottom_dates": [
+    "2026-07-23",
+    "2026-07-24",
+    "2026-07-27",
+    "2026-07-28"
+  ],
+  "failed_bottom_examples": [
+    {
+      "symbol": "NTL",
+      "trade_date": "2026-08-12",
+      "ret_t5": -8.45588235294118,
+      "ret_t10": null,
+      "rsi14": 26.26,
+      "rs10": -0.73,
+      "ema9_ma20_slope": -2.33,
+      "volume_ratio20": 0.7661646676887005,
+      "episode": "E3_MID_AUG"
+    },
+    {
+      "symbol": "NTL",
+      "trade_date": "2026-08-13",
+      "ret_t5": -7.063197026022305,
+      "ret_t10": null,
+      "rsi14": 23.59,
+      "rs10": -1.82,
+      "ema9_ma20_slope": -2.26,
+      "volume_ratio20": 0.7058092120901827,
+      "episode": "E3_MID_AUG"
+    },
+    {
+      "symbol": "DIG",
+      "trade_date": "2026-07-23",
+      "ret_t5": -6.481481481481477,
+      "ret_t10": 0.0,
+      "rsi14": 30.31,
+      "rs10": -11.84,
+      "ema9_ma20_slope": -4.58,
+      "volume_ratio20": 1.9264911615007048,
+      "episode": "E1_JUL_BOTTOM_BOUNCE"
+    },
+    {
+      "symbol": "NTL",
+      "trade_date": "2026-08-14",
+      "ret_t5": -6.343283582089554,
+      "ret_t10": null,
+      "rsi14": 22.76,
+      "rs10": -2.19,
+      "ema9_ma20_slope": -2.16,
+      "volume_ratio20": 1.2904239715024095,
+      "episode": "E3_MID_AUG"
+    },
+    {
+      "symbol": "CII",
+      "trade_date": "2026-07-23",
+      "ret_t5": -6.093189964157708,
+      "ret_t10": -0.35842293906810374,
+      "rsi14": 24.72,
+      "rs10": -14.42,
+      "ema9_ma20_slope": -7.73,
+      "volume_ratio20": 1.1433370035080042,
+      "episode": "E1_JUL_BOTTOM_BOUNCE"
+    },
+    {
+      "symbol": "HUT",
+      "trade_date": "2026-08-13",
+      "ret_t5": -4.444444444444439,
+      "ret_t10": null,
+      "rsi14": 20.69,
+      "rs10": -8.78,
+      "ema9_ma20_slope": -4.14,
+      "volume_ratio20": 0.418499162630884,
+      "episode": "E3_MID_AUG"
+    }
+  ]
+}

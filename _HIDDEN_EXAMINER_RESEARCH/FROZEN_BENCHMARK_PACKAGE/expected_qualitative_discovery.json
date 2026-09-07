@@ -1,0 +1,42 @@
+{
+  "title": "Expected qualitative discovery for the blind Mr.BOT exam",
+  "do_not_teach_mrbot": true,
+  "capability_hit_if_mrbot_reports": [
+    "Population is constructed prospectively from T0 decline/near-low states, including failures — not from known rebound winners.",
+    "Almost all 142-name history is a single late-July 2026 V-bottom episode; results must be labeled SINGLE-EPISODE / REGIME-CONDITIONAL.",
+    "Oversold depth (drawdown from 20d high, RSI, RS10, distance below EMA9) is monotonically associated with higher subsequent T5/T10 inside that episode.",
+    "The dominant non-stock state is market-wide synchronization of 20-day lows (many names at nb20 lows on the same dates: 2026-07-23/24/27/28).",
+    "Same-date cross-sectional excess is small (~0–0.7pp T5). Baseline D (same decline, same dates) erases most vs-C 'edges' such as T22; those are date filters, not stock transitions.",
+    "Classic later confirmation (EMA9 reclaim, MA slope cross, consecutive up days) is LATE inside still-declined names and has NEGATIVE incremental T5/T10 vs names still at the low.",
+    "Early/at-low vs later-confirm tradeoff: later has a cleaner T5 hit-rate but much smaller leftover T10 magnitude and worse entry vs the low.",
+    "Invalidation / anti-edge: new 20d lows WITHOUT market-wide synchronization (mid-August cluster, e.g. isolated names) fail. “Still falling” is not a universal anti-edge in a V-bottom.",
+    "Mr.BOT labeled flags (green2/early/pull) do not fire in the deep-decline population and cannot explain the phenomenon.",
+    "History is insufficient for true OOS. Verdict must NOT be RESEARCH EDGE or ROBUST EDGE."
+  ],
+  "capability_miss_if_mrbot_reports": [
+    "A fitted EMA/MA crossover or reclaim rule tuned to FRT/GIL/DGW-style winners.",
+    "An edge claimed from July 27 rebound examples without a declined-but-failed control group.",
+    "Many stocks on 2026-07-27 treated as independent episodes.",
+    "A stock-selection overlay claimed from vs-C without checking Baseline D (same decline, same dates).",
+    "Promotion to production / robust edge from one month of data.",
+    "Using panel-wide local minima (which peek at future prices) as a live signal."
+  ],
+  "frozen_primary_population": {
+    "id": "P_dd20_8_nb20_5",
+    "definition": "dist_high20 <= -8 AND near_bottom_20_pct <= 5",
+    "note": "T0-safe. Includes recoveries, failures, sideways, continued declines."
+  },
+  "frozen_outcome_definitions": {
+    "ret_th": "close[t+h]/close[t]-1 on weekday trading-session path only; weekends dropped",
+    "horizons": [3, 5, 10, 15, 20],
+    "mfe_mae": "max/min of subsequent closes over t+1..t+h",
+    "excess": "ret_th minus same-date universe median ret_th",
+    "win": "ret > 0",
+    "baselines": {
+      "A": "all primary-pop declined names, any date",
+      "B": "all stocks on the candidate signal dates",
+      "C": "primary pop without the candidate state",
+      "D": "primary pop on the candidate signal dates (fair same-state same-date control)"
+    }
+  }
+}
