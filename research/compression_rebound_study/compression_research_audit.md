@@ -447,3 +447,145 @@ Do not read any median gap as a tradable edge. Sample of market dates is small. 
 - Do not treat 142 names on one date as 142 independent trials.
 - Do not drop `t0_priority` / `is_weekend` / `universe_n` when studying breadth episodes.
 
+## 14. Clean trading-session T3/T5/T10 (examiner overlay)
+
+Appended at: `2026-09-08T15:28:23Z` (UTC).
+Status: **examiner overlay only**. Production `t3/t5/t10_*` columns are unchanged.
+No threshold was tuned. No hypothesis test. No trading rule. No production write.
+
+### 14.1 File
+
+- `/workspace/research/compression_rebound_study/compression_stock_research_clean_outcomes.csv`
+- Rows: **4970** (same identity as `compression_stock_research.csv`)
+- Added columns: `clean_T3_date`, `clean_T3_return`, `clean_T3_status`, and the T5/T10 analogues
+
+### 14.2 Definition
+
+- T0 = the row’s `trade_date` **only if** that date is an eligible HOSE/HNX session
+- T+n = the **nth eligible trading session after T0**
+- Raw return = `close(T+n) / close(T0) - 1`
+- `clean_T*_return` is stored as **percentage points** (`× 100`) so it sits beside production `t*_return`
+- If T0 is not an eligible session (weekend observation row): all clean horizons = `UNAVAILABLE`
+- If T+n session exists in the confirmed calendar but that ticker’s close is missing: `UNAVAILABLE` (no jump to another date)
+- If T+n falls after the last confirmed stored session (**2026-09-08**): `WAITING` (date may be a weekday projection; return is empty)
+
+### 14.3 Trading calendar source / derivation
+
+There is **no official HOSE calendar artifact** in the repo. The examiner calendar is derived, not inferred from observation rows alone.
+
+A date is an **eligible session** only if all of the following hold:
+
+1. It is Monday–Friday.
+2. It is **not** in the 2026 National Day non-trading window `2026-08-31`, `2026-09-01`, `2026-09-02`.
+3. It has **independent session evidence** from at least one stored price/market artifact:
+   - `group_evolution_history.csv` with a non-null `price`
+   - `data/earning_money_snapshots.csv`
+   - `data/earning_learning/market_daily_t0.csv`
+   - `data/earning_learning/market_t0_snapshot.csv` with a VNINDEX close
+   - weekday `observations.csv` rows that also store `volume` (weekend observation rows are ignored even if they exist)
+
+Observation-row presence **alone** is not enough. That is why `2026-07-26`, `2026-08-01`, `2026-08-02`, and `2026-08-08` are excluded.
+
+**National Day:** 2 Sep 2026 is Vietnam’s Quốc khánh. Across `observations`, freeze, snapshots, group-evolution, and market T0, those three weekdays have **zero** stored session prints. They are treated as the exchange holiday window. They are not synthesized as sessions.
+
+**2026-08-26** is kept. It is a Wednesday. `observations` / group-evolution missed it, but `earning_money_snapshots.csv` has 142 names whose prices/volumes differ from 2026-08-25 and 2026-08-27 (120/142 prices changed vs 25 Aug). That is treated as a real session, not a holiday.
+
+Confirmed eligible sessions used for MATURE closes:
+
+`2026-07-23, 2026-07-24, 2026-07-27, 2026-07-28, 2026-07-29, 2026-07-30, 2026-07-31, 2026-08-03, 2026-08-04, 2026-08-05, 2026-08-06, 2026-08-07, 2026-08-10, 2026-08-11, 2026-08-12, 2026-08-13, 2026-08-14, 2026-08-17, 2026-08-18, 2026-08-19, 2026-08-20, 2026-08-21, 2026-08-24, 2026-08-25, 2026-08-26, 2026-08-27, 2026-08-28, 2026-09-03, 2026-09-04, 2026-09-07, 2026-09-08`
+
+Evidence table for the study window:
+
+| date | wd | weekend | ND window | gev px | snap | mkt daily | VNINDEX sess | wd obs+vol | eligible |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-07-23 | Thu |  |  | Y |  |  |  | Y | YES |
+| 2026-07-24 | Fri |  |  | Y |  |  |  | Y | YES |
+| 2026-07-25 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-07-26 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-07-27 | Mon |  |  | Y |  |  |  | Y | YES |
+| 2026-07-28 | Tue |  |  | Y |  |  |  | Y | YES |
+| 2026-07-29 | Wed |  |  | Y |  |  |  | Y | YES |
+| 2026-07-30 | Thu |  |  | Y |  |  |  | Y | YES |
+| 2026-07-31 | Fri |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-01 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-08-02 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-08-03 | Mon |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-04 | Tue |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-05 | Wed |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-06 | Thu |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-07 | Fri |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-08 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-08-09 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-08-10 | Mon |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-11 | Tue |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-12 | Wed |  |  | Y | Y |  |  | Y | YES |
+| 2026-08-13 | Thu |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-14 | Fri |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-15 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-08-16 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-08-17 | Mon |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-18 | Tue |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-19 | Wed |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-20 | Thu |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-21 | Fri |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-22 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-08-23 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-08-24 | Mon |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-25 | Tue |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-26 | Wed |  |  |  | Y |  |  |  | YES |
+| 2026-08-27 | Thu |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-08-28 | Fri |  |  | Y | Y |  | Y | Y | YES |
+| 2026-08-29 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-08-30 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-08-31 | Mon |  | Y |  |  |  |  |  |  |
+| 2026-09-01 | Tue |  | Y |  |  |  |  |  |  |
+| 2026-09-02 | Wed |  | Y |  |  |  |  |  |  |
+| 2026-09-03 | Thu |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-09-04 | Fri |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-09-05 | Sat | Y |  |  |  |  |  |  |  |
+| 2026-09-06 | Sun | Y |  |  |  |  |  |  |  |
+| 2026-09-07 | Mon |  |  | Y | Y | Y | Y | Y | YES |
+| 2026-09-08 | Tue |  |  | Y | Y | Y | Y | Y | YES |
+
+Closes used for clean returns are the stored `close` values already on the examiner panel for that ticker × eligible session (freeze > observations > snapshot fill). No close was recomputed or interpolated.
+
+### 14.4 Production vs clean comparison
+
+Comparable row = production status `MATURE` **and** clean status `MATURE`. Date comparison uses production `t*_target_date` vs `clean_T*_date`. Return difference is absolute percentage-point gap.
+
+| horizon | prod MATURE | clean MATURE | prod WAITING | clean WAITING | prod UNAVAIL | clean UNAVAIL | comparable | target date differs | date-diff % | mean\|Δret\| | median\|Δret\| |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| T3 | 4264 | 3976 | 426 | 426 | 280 | 568 | 3696 | 1838 | 49.7 | 0.9531 | 0.0000 |
+| T5 | 3980 | 3692 | 710 | 710 | 280 | 568 | 3412 | 2414 | 70.8 | 1.3161 | 0.6711 |
+| T10 | 3270 | 2982 | 1420 | 1420 | 280 | 568 | 2702 | 2418 | 89.5 | 1.6841 | 1.0401 |
+
+Maturity-date differences (clean vs production):
+
+- T3: clean has -288 MATURE rows vs production (3976 vs 4264). Clean WAITING=426 (production 426); clean UNAVAILABLE=568 (production 280).
+- T5: clean has -288 MATURE rows vs production (3692 vs 3980). Clean WAITING=710 (production 710); clean UNAVAILABLE=568 (production 280).
+- T10: clean has -288 MATURE rows vs production (2982 vs 3270). Clean WAITING=1420 (production 1420); clean UNAVAILABLE=568 (production 280).
+
+T0 dates with the most production-vs-clean **target date** mismatches among comparable rows:
+
+- T3: 2026-07-23: 142 rows, 2026-07-24: 142 rows, 2026-07-29: 142 rows, 2026-07-30: 142 rows, 2026-07-31: 142 rows, 2026-08-05: 142 rows, 2026-08-06: 142 rows, 2026-08-07: 142 rows
+- T5: 2026-07-23: 142 rows, 2026-07-24: 142 rows, 2026-07-27: 142 rows, 2026-07-28: 142 rows, 2026-07-29: 142 rows, 2026-07-30: 142 rows, 2026-07-31: 142 rows, 2026-08-03: 142 rows
+- T10: 2026-07-23: 142 rows, 2026-07-24: 142 rows, 2026-07-27: 142 rows, 2026-07-28: 142 rows, 2026-07-29: 142 rows, 2026-07-30: 142 rows, 2026-07-31: 142 rows, 2026-08-03: 142 rows
+
+### 14.5 Dates most affected by weekend / holiday observation rows
+
+Weekend T0 rows (`is_weekend=true`) are **not** eligible sessions. Clean T3/T5/T10 on those rows are `UNAVAILABLE`. Production still treats them as observation-index T0.
+
+- Weekend T0 rows in the panel: **568** (4 dates × 142 names).
+- Weekend T0 dates: `2026-07-26`, `2026-08-01`, `2026-08-02`, `2026-08-08`.
+- National Day window skipped by the clean calendar: `2026-08-31`, `2026-09-01`, `2026-09-02`.
+- Capture hole that **is** a session: `2026-08-26` (in clean calendar via snapshots; absent from production observation index).
+- Capture hole that stretches production T+n: `2026-09-03` has only 4 observation rows, so production often jumps from `2026-08-28` to `2026-09-04` for the other 138 names. Clean T+1 after `2026-08-28` is `2026-09-03` for every name that has a stored close that day.
+
+Worked examples (not a rule):
+
+- ACB 2026-08-08: prod T3 MATURE date=2026-08-12 ret=1.562; clean T3 UNAVAILABLE date=nan ret=n/a  ← Saturday observation T0
+- ACB 2026-08-25: prod T3 MATURE date=2026-09-04 ret=0.000; clean T3 MATURE date=2026-08-28 ret=1.126  ← production skips 2026-08-26
+- ACB 2026-08-28: prod T3 MATURE date=2026-09-08 ret=0.450; clean T3 MATURE date=2026-09-07 ret=-0.891  ← National Day + 09-03 observation hole
+- ACB 2026-08-26: prod T3 UNAVAILABLE date=nan ret=n/a; clean T3 MATURE date=2026-09-03 ret=-0.225  ← snapshot-only session; production has no observation_id
+
+Use this overlay only to see how much the observation-row T+n clock differs from a session clock. Do not encode the difference as an edge.
