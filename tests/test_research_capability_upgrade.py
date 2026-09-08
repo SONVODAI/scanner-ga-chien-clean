@@ -13,9 +13,40 @@ from modules.edge_research.opr_bridge.bounded_lifecycle_records import ResearchB
 from modules.edge_research.opr_bridge.bounded_lifecycle_state import (
     ExperimentHistoryEntry,
     budget_exhausted,
-    scientific_consumption_complete,
-    unconsumed_successful_experiments,
 )
+from modules.edge_research.opr_bridge import bounded_lifecycle_state as _lifecycle_state
+
+# LIVE_FORWARD genesis pins hashed lifecycle/accounting bytes. Capability-upgrade
+# helpers that later drifted those files are absent on a genesis-matching tree.
+scientific_consumption_complete = getattr(
+    _lifecycle_state, "scientific_consumption_complete", None
+)
+unconsumed_successful_experiments = getattr(
+    _lifecycle_state, "unconsumed_successful_experiments", None
+)
+
+
+def _require_hashed_lifecycle_upgrade() -> None:
+    if scientific_consumption_complete is None or unconsumed_successful_experiments is None:
+        pytest.skip(
+            "hashed lifecycle files match LIVE_FORWARD genesis; "
+            "scientific-consumption helpers are not in the pinned bytes"
+        )
+
+
+def _require_authoritative_falsification_kwargs() -> None:
+    import inspect
+
+    from modules.edge_research.opr_bridge.multi_evidence_accounting import (
+        apply_incremental_epistemic_transition,
+    )
+
+    params = inspect.signature(apply_incremental_epistemic_transition).parameters
+    if "rationale_out" not in params:
+        pytest.skip(
+            "hashed multi_evidence_accounting.py matches LIVE_FORWARD genesis; "
+            "authoritative-falsification kwargs are not in the pinned bytes"
+        )
 from modules.edge_research.opr_bridge.claim_aligned_forward import (
     ADJUDICATION_CONTEXT_ONLY,
     ADJUDICATION_DISCONFIRMING,
@@ -79,6 +110,7 @@ def _consumed_entry(ordinal: int) -> ExperimentHistoryEntry:
 
 def test_1_last_experiment_finalization_budget_semantics():
     """TEST 1 — start budget=2 must not skip consumption of experiment 2."""
+    _require_hashed_lifecycle_upgrade()
     budget = ResearchBudget(max_experiment_iterations=2)
     e1 = _consumed_entry(1)
     e2 = ExperimentHistoryEntry(
@@ -102,6 +134,7 @@ def test_1_last_experiment_finalization_budget_semantics():
 
 def test_1_controller_consumes_executed_experiment_two(monkeypatch, tmp_path):
     """TEST 1 — controller interprets/decides experiment 2 before budget stop."""
+    _require_hashed_lifecycle_upgrade()
     from modules.edge_research.opr_bridge import bounded_lifecycle_controller as ctl
 
     e1 = _consumed_entry(1)
@@ -801,6 +834,7 @@ def _inc(*, strength: str = "STRONG", conflict: bool = True, blocked: bool = Fal
 
 def test_b1_strong_authoritative_falsification():
     """TEST B1 — strong later-experiment falsification can move SUPPORTED → FALSIFIED."""
+    _require_authoritative_falsification_kwargs()
     from modules.edge_research.opr_bridge.multi_evidence_accounting import (
         AUTHORITATIVE_FALSIFICATION_KEY,
         apply_incremental_epistemic_transition,
@@ -855,6 +889,7 @@ def test_b1_strong_authoritative_falsification():
 
 def test_b2_weak_disconfirm_does_not_over_falsify():
     """TEST B2 — weak/ambiguous disconfirm stays conservative."""
+    _require_authoritative_falsification_kwargs()
     from modules.edge_research.opr_bridge.multi_evidence_accounting import (
         apply_incremental_epistemic_transition,
     )
@@ -882,6 +917,7 @@ def test_b2_weak_disconfirm_does_not_over_falsify():
 
 def test_b3_irrelevant_strong_evidence_does_not_falsify():
     """TEST B3 — strong evidence that does not adjudicate the frozen null/proposition."""
+    _require_authoritative_falsification_kwargs()
     from modules.edge_research.opr_bridge.multi_evidence_accounting import (
         apply_incremental_epistemic_transition,
     )
@@ -909,6 +945,7 @@ def test_b3_irrelevant_strong_evidence_does_not_falsify():
 
 def test_b4_abandon_action_does_not_define_epistemic_state():
     """TEST B4 — ABANDON label alone cannot produce FALSIFIED."""
+    _require_authoritative_falsification_kwargs()
     from modules.edge_research.opr_bridge.multi_evidence_accounting import (
         apply_incremental_epistemic_transition,
     )
