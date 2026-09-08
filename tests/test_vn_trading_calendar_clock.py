@@ -185,7 +185,7 @@ def test_persisted_session_voice_q9_not_rewritten(tmp_path: Path):
         '"assessment_trade_date": "2026-08-28", "voice_kind": "SESSION_MARKET_VOICE"}' % frozen_q9,
         encoding="utf-8",
     )
-    view = build_autonomous_daily_edge_ui_view(data_dir=edge)
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, trade_date="2026-08-28")
     assert view["session_date"] == "2026-08-28"
     assert view["session_voice_questions"]["q9_waiting_for_vi"] == frozen_q9
 

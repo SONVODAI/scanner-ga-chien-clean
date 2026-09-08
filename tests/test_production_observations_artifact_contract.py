@@ -242,7 +242,7 @@ def test_streamlit_consumer_restore_no_double_nest_and_ui_view(
         assert (dest / "daily_run_index.json").is_file()
         assert not (dest / "production_observations").exists(), "double nesting detected"
 
-        view = build_autonomous_daily_edge_ui_view(data_dir=edge_dst)
+        view = build_autonomous_daily_edge_ui_view(data_dir=edge_dst, trade_date="2026-08-27")
         assert view.get("session_date") == "2026-08-27"
         assert view.get("run_disposition") == "SUCCESS"
         assert view.get("discovery_count") == 1

@@ -8,7 +8,9 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -18,9 +20,17 @@ sys.path.insert(0, str(REPO))
 from modules.edge_research.autonomous_daily_edge_ui import (
     AUTONOMOUS_DAILY_SECTION,
     HISTORICAL_CHALLENGER_SECTION,
+    WAITING_FOR_DATA,
     build_autonomous_daily_edge_ui_view,
     render_autonomous_daily_edge_text_snapshot,
 )
+
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+
+
+def _vn(date_str: str, hour: int = 11) -> datetime:
+    y, m, d = (int(p) for p in date_str.split("-"))
+    return datetime(y, m, d, hour, 0, tzinfo=VN_TZ)
 from modules.edge_research.opr_bridge.production_living_observation_persistence import (
     session_voice_path,
 )
@@ -160,7 +170,7 @@ def test_autonomous_daily_ui_surfaces_session_not_challenger(tmp_path: Path):
     _plant_stale_challenger(edge)
     before = _sha(voice_path)
 
-    view = build_autonomous_daily_edge_ui_view(data_dir=edge)
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, now=_vn("2026-08-27"))
     snap = render_autonomous_daily_edge_text_snapshot(view)
 
     # 1–5: latest autonomous session + voice + disposition + discovery
@@ -204,7 +214,7 @@ def test_zero_discovery_success_still_shows_market_voice(tmp_path: Path):
         discovery_count=0,
         q1="Hôm nay (2026-08-28) — không có stock edge / observation mới hôm nay.",
     )
-    view = build_autonomous_daily_edge_ui_view(data_dir=edge)
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, now=_vn("2026-08-28"))
     assert view["session_date"] == "2026-08-28"
     assert view["discovery_count"] == 0
     assert view["daily_market_voice_exists"] is True
@@ -228,7 +238,7 @@ def test_newer_successful_session_automatically_becomes_current(tmp_path: Path):
         discovery_count=2,
         q1="session 2026-08-28 voice — newer",
     )
-    view = build_autonomous_daily_edge_ui_view(data_dir=edge)
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, now=_vn("2026-08-28"))
     assert view["session_date"] == "2026-08-28"
     assert view["run_id"] == "pdrun-new"
     assert view["discovery_count"] == 2
@@ -267,3 +277,41 @@ def test_ui_py_precedence_labels_challenger_not_as_research_voice():
     assert "Challenger candidate voice (historical)" in src
     assert 'with st.expander("Research Voice"' not in src
     assert "HISTORICAL_CHALLENGER_SECTION" in src
+
+
+def test_ui_shows_waiting_for_current_vn_date_instead_of_prior_success(tmp_path: Path):
+    """Rollover must not silently keep the last SUCCESS when a newer VN date exists."""
+    edge = tmp_path / "data" / "edge_research"
+    _plant_session(
+        edge,
+        trade_date="2026-09-04",
+        run_id="pdrun-0904",
+        discovery_count=1,
+        q1="Hôm nay (2026-09-04) — stale if shown as current on 2026-09-08.",
+    )
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, now=_vn("2026-09-08", hour=11))
+    snap = render_autonomous_daily_edge_text_snapshot(view)
+
+    assert view["session_date"] == "2026-09-08"
+    assert view["expected_trade_date"] == "2026-09-08"
+    assert view["run_disposition"] == WAITING_FOR_DATA
+    assert view["last_successful_research_date"] == "2026-09-04"
+    assert view["daily_market_voice_exists"] is False
+    assert "WAITING_FOR_DATA — 2026-09-08" in snap
+    assert "Hôm nay (2026-09-04)" not in snap
+    assert view.get("session_voice_questions") == {}
+
+
+def test_ui_uses_success_when_expected_vn_date_has_completed_run(tmp_path: Path):
+    edge = tmp_path / "data" / "edge_research"
+    _plant_session(
+        edge,
+        trade_date="2026-09-07",
+        run_id="pdrun-0907",
+        discovery_count=1,
+        q1="Hôm nay (2026-09-07) — completed session.",
+    )
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, now=_vn("2026-09-07", hour=23))
+    assert view["session_date"] == "2026-09-07"
+    assert view["run_disposition"] == "SUCCESS"
+    assert view["daily_market_voice_exists"] is True

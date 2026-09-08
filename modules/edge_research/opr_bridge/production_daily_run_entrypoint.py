@@ -34,7 +34,9 @@ from modules.edge_research.opr_bridge.production_daily_run_records import (
 )
 from modules.edge_research.opr_bridge.production_run_lock import acquire_run_lock, release_run_lock
 from modules.edge_research.opr_bridge.production_scheduling_contract import build_scheduling_contract
-from modules.edge_research.opr_bridge.production_timezone_policy import resolve_target_trade_date
+from modules.edge_research.opr_bridge.production_research_rollover import (
+    resolve_research_rollover_target,
+)
 from modules.production_eod.headless_eod import (
     RUN_CLASS_AUTONOMOUS,
     RUN_CLASS_RECOVERY,
@@ -141,7 +143,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--derive-vn-date",
         action="store_true",
-        help="Explicitly derive target from Asia/Ho_Chi_Minh (default when --trade-date omitted)",
+        help=(
+            "Derive target from Asia/Ho_Chi_Minh, catching up the previous "
+            "eligible session when it has no terminal SUCCESS/SKIP"
+        ),
     )
     parser.add_argument(
         "--mode",
@@ -182,9 +187,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.mode == RECOVERY_MANUAL_REMEDIATION:
         args.recovery = True
 
-    trade_date = resolve_target_trade_date(args.trade_date)
     repo_root = Path(__file__).resolve().parents[3]
     data_dir: Optional[Path] = Path(args.data_dir) if args.data_dir else None
+    rollover = resolve_research_rollover_target(
+        args.trade_date,
+        data_dir=data_dir,
+        run_mode=args.mode,
+    )
+    trade_date = rollover.target_trade_date
     _LOCK_CTX.update(
         {
             "data_dir": data_dir,
@@ -192,6 +202,7 @@ def main(argv: list[str] | None = None) -> int:
             "trade_date": trade_date,
             "released": False,
             "fh": None,
+            "rollover": rollover.to_dict(),
         }
     )
 
@@ -408,6 +419,7 @@ def _run_pipeline(
                     "skip_reason": (result.get("closed_loop_edge") or {}).get("skip_reason"),
                 },
                 "panel_freshness": result.get("panel_freshness"),
+                "research_rollover": _LOCK_CTX.get("rollover"),
                 "daily_pipeline_receipt": {
                     "ok": receipt_info.get("ok"),
                     "path": receipt_info.get("path"),

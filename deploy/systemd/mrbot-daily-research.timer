@@ -5,9 +5,14 @@ Requires=mrbot-daily-research.service
 
 [Timer]
 # Conservative post-EOD window — data readiness gate remains authoritative.
+# 23:35 exists because canonical MDT0/T0 often lands after 23:00 VN
+# (observed 2026-09-03 23:03, 2026-09-04 23:21, 2026-09-07 23:10).
+# Without this slot, 22:35 exits WAITING_FOR_DATA and midnight
+# --derive-vn-date abandons that session.
 OnCalendar=Mon..Fri *-*-* 18:35:00 Asia/Ho_Chi_Minh
 OnCalendar=Mon..Fri *-*-* 20:05:00 Asia/Ho_Chi_Minh
 OnCalendar=Mon..Fri *-*-* 22:35:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 23:35:00 Asia/Ho_Chi_Minh
 Persistent=true
 Unit=mrbot-daily-research.service
 

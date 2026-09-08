@@ -17,7 +17,11 @@ from modules.edge_research.autonomous_daily_edge_ui import (
     render_autonomous_daily_edge_text_snapshot,
 )
 from modules.edge_research.ui import render_edge_research_panel
-from tests.test_edge_research_autonomous_daily_ui import _plant_session, _plant_stale_challenger
+from tests.test_edge_research_autonomous_daily_ui import (
+    _plant_session,
+    _plant_stale_challenger,
+    _vn,
+)
 
 
 def test_app_py_calls_render_edge_research_panel():
@@ -49,7 +53,7 @@ def test_app_render_path_snapshot_shows_autonomous_not_old_challenger_voice(tmp_
     )
     _plant_stale_challenger(edge)
 
-    view = build_autonomous_daily_edge_ui_view(data_dir=edge)
+    view = build_autonomous_daily_edge_ui_view(data_dir=edge, now=_vn("2026-08-27"))
     snap = render_autonomous_daily_edge_text_snapshot(view)
 
     # Exact public failure mode must fail this assertion if still present:

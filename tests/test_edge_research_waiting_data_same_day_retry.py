@@ -248,4 +248,6 @@ def test_scheduling_contract_documents_waiting_retry_policy():
     c = build_scheduling_contract()
     assert c["concurrency"]["waiting_for_data_policy"] == "retry_when_source_or_eod_advances"
     assert "unchanged_waiting" in c["concurrency"]["duplicate_same_day"]
-    assert len(c["retry"]["same_day_timer_attempts"]) == 3
+    assert len(c["retry"]["same_day_timer_attempts"]) == 4
+    assert any("23:35" in row for row in c["retry"]["same_day_timer_attempts"])
+    assert "previous eligible" in c["retry"]["next_day_catch_up"]

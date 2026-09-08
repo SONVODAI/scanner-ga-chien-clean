@@ -48,8 +48,13 @@ def build_scheduling_contract() -> Dict[str, Any]:
             "same_day_timer_attempts": [
                 "18:35 Asia/Ho_Chi_Minh — may WAITING_FOR_DATA if EOD incomplete",
                 "20:05 Asia/Ho_Chi_Minh — retry; must not freeze on prior WAITING",
-                "22:35 Asia/Ho_Chi_Minh — final same-day retry",
+                "22:35 Asia/Ho_Chi_Minh — retry; T0 may still be incomplete",
+                "23:35 Asia/Ho_Chi_Minh — post-T0 same-day retry after late MDT0",
             ],
+            "next_day_catch_up": (
+                "If the previous eligible VN session has no terminal SUCCESS/"
+                "SKIP, --derive-vn-date targets that session before today"
+            ),
         },
         "data_readiness": {
             "require_panel_through_target_date": True,
