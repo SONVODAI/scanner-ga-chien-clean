@@ -14,6 +14,15 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from modules.edge_research.research_assessment import ResearchAssessment
 from modules.edge_research.research_graph import ResearchGraph
+from modules.edge_research.research_grammar import (
+    OutcomeSpec,
+    PopulationSpec,
+    build_search_accounting,
+    population_spec_to_research_scope,
+    propose_outcome_reframes,
+    propose_population_refinements,
+    propose_population_widenings,
+)
 from modules.edge_research.research_interpreter import (
     FALSIFY_DATE_ARTIFACT,
     FALSIFY_EPISODE_FLUKE,
@@ -27,7 +36,13 @@ from modules.edge_research.research_interpreter import (
     GAP_TIME_DISTRIBUTION,
     GAP_TRAJECTORY_ROLE,
 )
-from modules.edge_research.research_state import ExperimentSpec, NextActionCandidate, compute_experiment_content_hash
+from modules.edge_research.research_state import (
+    ExperimentSpec,
+    NextActionCandidate,
+    NodeType,
+    ResearchQuestionContext,
+    compute_experiment_content_hash,
+)
 from modules.edge_research.research_tools import ToolRegistry
 
 DEFAULT_HORIZON = "T5"
@@ -45,6 +60,9 @@ class ActionIntent(str, Enum):
     REPLICATION = "REPLICATION"
     ROBUSTNESS = "ROBUSTNESS"
     FALSIFICATION = "FALSIFICATION"
+    REFRAME = "REFRAME"
+    REPOPULATE = "REPOPULATE"
+    REDESCRIBE_OUTCOME = "REDESCRIBE_OUTCOME"
     STOP = "STOP"
     ABANDON = "ABANDON"
 
@@ -207,12 +225,218 @@ def _check_candidate(
     )
 
 
+def _question_context_from_experiment(graph: ResearchGraph, experiment_node_id: str) -> Optional[ResearchQuestionContext]:
+    """Resolve parent question context for grammar-driven candidates."""
+    exp = graph.get_node(experiment_node_id)
+    for pid in exp.parent_node_ids:
+        parent = graph.get_node(pid)
+        if parent.node_type == NodeType.QUESTION and parent.question_context is not None:
+            return parent.question_context
+    return None
+
+
+def _parse_specs_from_context(ctx: ResearchQuestionContext) -> Tuple[PopulationSpec, OutcomeSpec]:
+    pop = PopulationSpec.from_dict(ctx.population_spec)
+    out = OutcomeSpec.from_dict(ctx.outcome_spec)
+    return pop, out
+
+
+def _grammar_scope(
+    population: PopulationSpec,
+    outcome: OutcomeSpec,
+    base_scope: Dict[str, Any],
+) -> Dict[str, Any]:
+    scope = _base_scope(base_scope)
+    scope.update(population_spec_to_research_scope(population))
+    scope["outcome_spec"] = outcome.to_dict()
+    scope["outcome_spec_hash"] = outcome.content_hash()
+    return scope
+
+
+def _add_grammar_candidates(
+    candidates: List[ResearchActionCandidate],
+    *,
+    assessment: ResearchAssessment,
+    graph: ResearchGraph,
+    registry: ToolRegistry,
+    scope: Dict[str, Any],
+    cutoff: str,
+    experiment_node_id: str,
+) -> None:
+    """Propose REFRAME / REPOPULATE / WIDEN candidates from question grammar."""
+    ctx = _question_context_from_experiment(graph, experiment_node_id)
+    if ctx is None:
+        return
+
+    population, outcome = _parse_specs_from_context(ctx)
+    depth = ctx.research_depth
+    parent_hash = population.content_hash()
+    evidence = {
+        "source_experiment": experiment_node_id,
+        "interesting": assessment.interesting,
+        "strength": assessment.descriptive_strength,
+    }
+
+    def add(**kwargs: Any) -> None:
+        candidates.append(_check_candidate(graph, registry=registry, **kwargs))
+
+    # REFRAME / REDESCRIBE OUTCOME — when branch shows signal worth reframing.
+    if assessment.interesting or assessment.descriptive_strength == "GROUP_DIFFERENCE":
+        for alt_outcome in propose_outcome_reframes(outcome):
+            new_depth = depth + 1
+            accounting = build_search_accounting(
+                population_spec=population,
+                outcome_spec=alt_outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(population, alt_outcome, scope)
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=population.to_dict(),
+                outcome_spec=alt_outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": evidence,
+                },
+            ).to_dict()
+            add(
+                action_code="REFRAME_OUTCOME",
+                intent=ActionIntent.REFRAME,
+                template_id="REFRAME_ALTERNATIVE_OUTCOME",
+                question=f"Does an alternative outcome specification ({alt_outcome.kind}) reveal a stable relationship?",
+                tool_name="horizon_comparison",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="horizon_comparison",
+                    tool_version="v1",
+                    inputs={"horizons": list(HORIZONS)},
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="OUTCOME_SPEC_ALTERNATIVE",
+                expected_info=ExpectedInformation.MEDIUM,
+                rationale_codes=("REFRAME", "ALTERNATIVE_OUTCOME"),
+                priority_hints={"information_gap": 2.5, "grammar_reframe": 2.0},
+            )
+
+    # REPOPULATE — refine population when signal warrants conditional cohort.
+    if assessment.additional_investigation_warranted and not assessment.fragility_evidence:
+        for refined in propose_population_refinements(
+            population,
+            reason_code="EVIDENCE_CONDITIONAL_COHORT",
+            triggering_evidence=evidence,
+        ):
+            new_depth = depth + 1
+            accounting = build_search_accounting(
+                population_spec=refined,
+                outcome_spec=outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(refined, outcome, scope)
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=refined.to_dict(),
+                outcome_spec=outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": "REPOPULATE_REFINE",
+                    "triggering_evidence": evidence,
+                },
+            ).to_dict()
+            add(
+                action_code="REPOPULATE_REFINE",
+                intent=ActionIntent.REPOPULATE,
+                template_id="REPOPULATE_REFINED_COHORT",
+                question="Does the relationship hold within a refined conditional population?",
+                tool_name="partition_group_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="partition_group_compare",
+                    tool_version="v1",
+                    inputs={
+                        "horizon": DEFAULT_HORIZON,
+                        "partition_column": "partition_group",
+                        "partition_type": "categorical",
+                    },
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="POPULATION_REFINEMENT",
+                expected_info=ExpectedInformation.HIGH,
+                rationale_codes=("REPOPULATE", "REFINED_COHORT"),
+                priority_hints={"information_gap": 3.0, "grammar_repopulate": 2.5},
+            )
+
+    # WIDEN — when population is already refined and sample may be too narrow.
+    if population.kind in ("refine", "and", "filter") and population.kind != "all":
+        for widened in propose_population_widenings(
+            population,
+            reason_code="EVIDENCE_SAMPLE_NARROW",
+            triggering_evidence=evidence,
+        ):
+            new_depth = max(0, depth)
+            accounting = build_search_accounting(
+                population_spec=widened,
+                outcome_spec=outcome,
+                research_depth=new_depth,
+                parent_branch_hash=parent_hash,
+            )
+            new_scope = _grammar_scope(widened, outcome, scope)
+            new_scope["pending_question_context"] = ResearchQuestionContext(
+                population_spec=widened.to_dict(),
+                outcome_spec=outcome.to_dict(),
+                research_depth=new_depth,
+                search_complexity=accounting.predicate_count,
+                search_accounting=accounting.to_dict(),
+                population_change={
+                    "parent_population_hash": parent_hash,
+                    "reason_code": "REPOPULATE_WIDEN",
+                    "triggering_evidence": evidence,
+                },
+            ).to_dict()
+            add(
+                action_code="REPOPULATE_WIDEN",
+                intent=ActionIntent.REPOPULATE,
+                template_id="REPOPULATE_WIDENED_COHORT",
+                question="Does widening the population preserve or weaken the observed relationship?",
+                tool_name="partition_group_compare",
+                tool_version="v1",
+                spec=_make_spec(
+                    tool_name="partition_group_compare",
+                    tool_version="v1",
+                    inputs={
+                        "horizon": DEFAULT_HORIZON,
+                        "partition_column": "partition_group",
+                        "partition_type": "categorical",
+                    },
+                    research_scope=new_scope,
+                    cutoff=cutoff,
+                ),
+                uncertainty="POPULATION_WIDENING",
+                expected_info=ExpectedInformation.MEDIUM,
+                rationale_codes=("REPOPULATE", "WIDEN_COHORT"),
+                priority_hints={"information_gap": 1.5, "grammar_widen": 2.0},
+            )
+
+
+DEFAULT_HORIZON_LIST = ["T3", "T5", "T10"]
+HORIZONS = DEFAULT_HORIZON_LIST  # alias for grammar candidates
+
+
 def generate_action_candidates(
     assessment: ResearchAssessment,
     graph: ResearchGraph,
     registry: ToolRegistry,
     *,
     research_scope: Optional[Dict[str, Any]] = None,
+    experiment_node_id: Optional[str] = None,
 ) -> Tuple[ResearchActionCandidate, ...]:
     """
     Generate multiple scientifically legitimate next actions from assessment.
@@ -422,6 +646,18 @@ def generate_action_candidates(
             expected_info=ExpectedInformation.MEDIUM,
             rationale_codes=("FALSIFY", "SYMBOL_DOMINANCE"),
             priority_hints={"falsification_threat": 3.0},
+        )
+
+    # Grammar-driven REFRAME / REPOPULATE candidates (Phase 3E).
+    if experiment_node_id:
+        _add_grammar_candidates(
+            candidates,
+            assessment=assessment,
+            graph=graph,
+            registry=registry,
+            scope=scope,
+            cutoff=cutoff,
+            experiment_node_id=experiment_node_id,
         )
 
     # Terminal candidates — always available; planner may select immediately.
