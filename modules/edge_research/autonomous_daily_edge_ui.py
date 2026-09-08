@@ -12,10 +12,16 @@ render this surface without requiring the full OPR stack on the deploy branch.
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
+from zoneinfo import ZoneInfo
 
 from modules.edge_research.storage import resolve_data_dir, resolve_production_runs_root
+
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+WAITING_FOR_DATA = "WAITING_FOR_DATA"
+SKIPPED_NON_TRADING_DAY = "SKIPPED_NON_TRADING_DAY"
 
 AUTONOMOUS_DAILY_SECTION = "AUTONOMOUS_DAILY_RESEARCH"
 HISTORICAL_CHALLENGER_SECTION = "HISTORICAL_CHALLENGER_RESEARCH"
@@ -44,22 +50,86 @@ def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     return payload if isinstance(payload, dict) else None
 
 
-def _latest_successful_run_meta(prod_root: Path) -> Optional[Dict[str, Any]]:
+def derive_vn_calendar_date(now: Optional[datetime] = None) -> str:
+    """Asia/Ho_Chi_Minh calendar date — never server-local / UTC date."""
+    now = now or datetime.now(VN_TZ)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=VN_TZ)
+    else:
+        now = now.astimezone(VN_TZ)
+    return now.strftime("%Y-%m-%d")
+
+
+def _load_holiday_set() -> set[str]:
+    path = Path(__file__).resolve().parents[2] / "config" / "vn_trading_calendar.json"
+    payload = _read_json(path) or {}
+    holidays = {str(h)[:10] for h in (payload.get("holidays") or [])}
+    for key, ov in (payload.get("closure_overrides") or {}).items():
+        if isinstance(ov, dict) and ov.get("closed"):
+            holidays.add(str(key)[:10])
+    return holidays
+
+
+def is_vn_trading_session(trade_date: str) -> bool:
+    td = str(trade_date)[:10]
+    try:
+        weekday = datetime.strptime(td, "%Y-%m-%d").weekday()
+    except ValueError:
+        return False
+    if weekday >= 5:
+        return False
+    return td not in _load_holiday_set()
+
+
+def _run_metas(prod_root: Path) -> List[Dict[str, Any]]:
     index = _read_json(prod_root / "daily_run_index.json") or {}
-    runs = index.get("runs") or {}
+    return [m for m in (index.get("runs") or {}).values() if isinstance(m, dict)]
+
+
+def _prefer_live(matches: Iterable[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    rows = list(matches)
+    if not rows:
+        return None
+    live = [m for m in rows if m.get("run_mode") == "LIVE_FORWARD"]
+    pool = live or rows
+
+    def _key(m: Dict[str, Any]) -> tuple:
+        return (
+            str(m.get("run_started_at") or ""),
+            str(m.get("run_id") or ""),
+        )
+
+    return max(pool, key=_key)
+
+
+def _latest_successful_run_meta(prod_root: Path) -> Optional[Dict[str, Any]]:
     candidates = [
         m
-        for m in runs.values()
-        if isinstance(m, dict) and m.get("run_disposition") == "SUCCESS" and m.get("target_trade_date")
+        for m in _run_metas(prod_root)
+        if m.get("run_disposition") == "SUCCESS" and m.get("target_trade_date")
     ]
     if not candidates:
         return None
-    # Prefer LIVE_FORWARD when dates tie; otherwise latest trade_date wins.
+
     def _key(m: Dict[str, Any]) -> tuple:
         mode_rank = 1 if m.get("run_mode") == "LIVE_FORWARD" else 0
         return (str(m.get("target_trade_date")), mode_rank, str(m.get("run_id") or ""))
 
     return max(candidates, key=_key)
+
+
+def _authoritative_meta_for_date(prod_root: Path, trade_date: str) -> Optional[Dict[str, Any]]:
+    matches = [
+        m
+        for m in _run_metas(prod_root)
+        if m.get("target_trade_date") == trade_date
+        and m.get("run_disposition") in ("SUCCESS", SKIPPED_NON_TRADING_DAY, WAITING_FOR_DATA)
+    ]
+    for disp in ("SUCCESS", SKIPPED_NON_TRADING_DAY):
+        picked = _prefer_live(m for m in matches if m.get("run_disposition") == disp)
+        if picked:
+            return picked
+    return _prefer_live(m for m in matches if m.get("run_disposition") == WAITING_FOR_DATA)
 
 
 def _load_run_payload(prod_root: Path, run_id: str) -> Dict[str, Any]:
@@ -83,11 +153,14 @@ def build_autonomous_daily_edge_ui_view(
     *,
     trade_date: Optional[str] = None,
     data_dir: Optional[Path] = None,
+    now: Optional[datetime] = None,
 ) -> Dict[str, Any]:
     """
     Build the view the Edge Research Streamlit panel must show first.
 
-    Latest successful autonomous session is selected when trade_date is omitted.
+    Default session is the current Asia/Ho_Chi_Minh calendar date (or an
+    explicit trade_date). A prior SUCCESS is never silently substituted for a
+    newer eligible date that is still WAITING_FOR_DATA or missing.
     """
     # Best-effort durable restore for Streamlit Cloud (no-op when backend absent).
     try:
@@ -101,27 +174,29 @@ def build_autonomous_daily_edge_ui_view(
 
     edge_root = resolve_data_dir(data_dir)
     canon = resolve_production_runs_root(edge_root)
-    meta = None
-    if trade_date:
-        index = _read_json(canon / "daily_run_index.json") or {}
-        matches = [
-            m
-            for m in (index.get("runs") or {}).values()
-            if isinstance(m, dict)
-            and m.get("target_trade_date") == trade_date
-            and m.get("run_disposition") == "SUCCESS"
-        ]
-        if matches:
-            live = [m for m in matches if m.get("run_mode") == "LIVE_FORWARD"]
-            meta = (live or matches)[0]
-    else:
-        meta = _latest_successful_run_meta(canon)
+    expected_date = str(trade_date)[:10] if trade_date else derive_vn_calendar_date(now)
+    last_success = _latest_successful_run_meta(canon)
+    meta = _authoritative_meta_for_date(canon, expected_date)
 
-    session_date = (meta or {}).get("target_trade_date")
-    run_id = (meta or {}).get("run_id")
+    if meta:
+        session_date = expected_date
+        disposition = str(meta.get("run_disposition") or WAITING_FOR_DATA)
+        run_id = meta.get("run_id")
+    elif is_vn_trading_session(expected_date):
+        session_date = expected_date
+        disposition = WAITING_FOR_DATA
+        run_id = None
+    else:
+        session_date = expected_date
+        disposition = SKIPPED_NON_TRADING_DAY
+        run_id = None
+
     run_payload = _load_run_payload(canon, str(run_id)) if run_id else {}
     manifest = _load_manifest(canon, str(run_id)) if run_id else {}
-    session_voice = _load_session_voice(canon, str(session_date)) if session_date else None
+    show_voice = disposition == "SUCCESS"
+    session_voice = (
+        _load_session_voice(canon, str(session_date)) if show_voice and session_date else None
+    )
 
     discovery_count = manifest.get("discovery_count")
     if discovery_count is None and run_payload:
@@ -136,13 +211,8 @@ def build_autonomous_daily_edge_ui_view(
                 session_questions[key] = session_voice.get(key)
 
     narrative = _compose_narrative(session_voice) if isinstance(session_voice, dict) else ""
-
-    disposition = (
-        (meta or {}).get("run_disposition")
-        or run_payload.get("run_disposition")
-        or ("NO_DATA" if not session_date else "UNKNOWN")
-    )
     run_mode = (meta or {}).get("run_mode") or run_payload.get("run_mode")
+    last_success_date = (last_success or {}).get("target_trade_date")
 
     return {
         "section": AUTONOMOUS_DAILY_SECTION,
@@ -152,6 +222,7 @@ def build_autonomous_daily_edge_ui_view(
         "double_nested": Path(canon).name == "production_observations"
         and Path(canon).parent.name == "production_observations",
         "session_date": session_date,
+        "expected_trade_date": expected_date,
         "run_id": run_id,
         "run_disposition": disposition,
         "run_mode": run_mode,
@@ -167,8 +238,10 @@ def build_autonomous_daily_edge_ui_view(
         "session_voice_questions": session_questions,
         "narrative_vi": narrative,
         "active_observations": [],
+        "last_successful_research_date": last_success_date,
         "health": {
-            "latest_successful_research_date": session_date,
+            "latest_successful_research_date": last_success_date,
+            "expected_trade_date": expected_date,
             "latest_run_id": run_id,
             "latest_run_mode": run_mode,
             "latest_run_disposition": disposition,
@@ -187,11 +260,18 @@ def render_autonomous_daily_edge_text_snapshot(view: Dict[str, Any]) -> str:
         AUTONOMOUS_DAILY_SECTION,
         f"Session: {view.get('session_date') or 'N/A'}",
         f"Run: {view.get('run_disposition') or 'N/A'}",
-        f"Run id: {view.get('run_id') or 'N/A'}",
-        f"Run mode: {view.get('run_mode') or 'N/A'}",
-        f"Discovery today: {view.get('discovery_count', 0)}",
-        "DAILY MARKET VOICE",
     ]
+    if view.get("run_disposition") == WAITING_FOR_DATA:
+        lines.append(f"WAITING_FOR_DATA — {view.get('session_date')}")
+    lines.extend(
+        [
+            f"Last successful session: {view.get('last_successful_research_date') or 'N/A'}",
+            f"Run id: {view.get('run_id') or 'N/A'}",
+            f"Run mode: {view.get('run_mode') or 'N/A'}",
+            f"Discovery today: {view.get('discovery_count', 0)}",
+            "DAILY MARKET VOICE",
+        ]
+    )
     if view.get("daily_market_voice_exists"):
         lines.append(f"Voice id: {view.get('session_voice_observation_id')}")
         qs = view.get("session_voice_questions") or {}
@@ -226,6 +306,15 @@ def render_autonomous_daily_edge_block(st: Any, view: Dict[str, Any]) -> None:
     if not view.get("session_date"):
         st.info("Chưa có autonomous daily research session trong production_observations.")
         return
+
+    disposition = view.get("run_disposition")
+    if disposition == WAITING_FOR_DATA:
+        st.warning(f"WAITING_FOR_DATA — {view.get('session_date')}")
+        last_ok = view.get("last_successful_research_date")
+        if last_ok and last_ok != view.get("session_date"):
+            st.caption(f"Last successful session: `{last_ok}`")
+    elif disposition == SKIPPED_NON_TRADING_DAY:
+        st.info(f"SKIPPED_NON_TRADING_DAY — {view.get('session_date')}")
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Session", view.get("session_date") or "—")
