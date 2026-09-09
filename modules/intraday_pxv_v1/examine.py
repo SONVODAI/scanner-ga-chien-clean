@@ -226,7 +226,11 @@ def simulate_alerts(sw_runs: list[dict[str, Any]], raw_would_be: int) -> dict[st
         ),
         "note": (
             "Rules are RESEARCH_DEFAULT simulations, not fitted to T+n. "
-            "R6 matches Slice 1 would-be intent (persist>=2, one per direction/session)."
+            "R0 is Slice 1 would_be_alert (already persist>=2 + one-per-direction + "
+            "skip LOW/UNUSABLE) and is NOT the same universe as R1–R13. "
+            "R1 counts persist>=2 runs; R7 is cooldown on those persist>=2 runs. "
+            "Use modules.intraday_pxv_v1.diagnose.normalized_suppression for an "
+            "apples-to-apples table from one SW-run-start baseline."
         ),
     }
 
