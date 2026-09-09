@@ -1,0 +1,111 @@
+{
+  "comparison_type": "architectural_behavior_only",
+  "no_human_edge_comparison": true,
+  "side_by_side_metrics": {
+    "experiments_executed": {
+      "bb01": 2,
+      "bb02": 12
+    },
+    "pct_budget_used": {
+      "bb01": 16.67,
+      "bb02": 100.0
+    },
+    "tools_used": {
+      "bb01": [
+        "horizon_comparison",
+        "sensitivity_analysis"
+      ],
+      "bb02": [
+        "adaptive_partition_compare",
+        "date_decomposition",
+        "horizon_comparison",
+        "sensitivity_analysis",
+        "symbol_decomposition",
+        "threshold_exploration"
+      ]
+    },
+    "features_touched": {
+      "bb01": [],
+      "bb02": [
+        "close",
+        "rs10",
+        "rs5",
+        "rs_spread"
+      ]
+    },
+    "pct_eligible_features_touched": {
+      "bb01": 0.0,
+      "bb02": 50.0
+    },
+    "falsification_runs": {
+      "bb01": 1,
+      "bb02": 3
+    },
+    "independent_branches": {
+      "bb01": 2,
+      "bb02": 1
+    },
+    "maximum_branch_depth": {
+      "bb01": 2,
+      "bb02": 4
+    },
+    "effective_hypotheses": {
+      "bb01": 27,
+      "bb02": 138
+    },
+    "terminal_session_status": {
+      "bb01": "ACTIVE",
+      "bb02": "BUDGET_EXHAUSTED"
+    },
+    "research_capability_score": {
+      "bb01": 51,
+      "bb02": 87
+    },
+    "frontier_items_created": {
+      "bb01": 0,
+      "bb02": 28
+    },
+    "frontier_items_executed": {
+      "bb01": 0,
+      "bb02": 0
+    },
+    "stop_session_reason": {
+      "bb01": null,
+      "bb02": {
+        "code": "BUDGET_EXHAUSTED",
+        "detail": "Experiment budget exhausted",
+        "remaining_budget": 0,
+        "unexplored_frontier_count": 12,
+        "features_touched": 4,
+        "eligible_features": 8
+      }
+    }
+  },
+  "bb01_architectural_failures_vs_bb02": {
+    "premature_global_stop": {
+      "bb01_failure": true,
+      "bb02_improved": true
+    },
+    "zero_feature_exploration": {
+      "bb01_failure": true,
+      "bb02_improved": true
+    },
+    "single_threaded_research": {
+      "bb01_failure": true,
+      "bb02_improved": true
+    },
+    "false_descriptive_candidate": {
+      "bb01_failure": true,
+      "bb02_improved": "Phase 3G.1 observation_kind prevents horizon-only CANDIDATE_DISCOVERED"
+    },
+    "invalid_field_handling": {
+      "bb01_failure": "panel/grammar mismatches caused blocked paths",
+      "bb02_improved": true
+    },
+    "session_closure": {
+      "bb01_failure": true,
+      "bb02_improved": true
+    }
+  },
+  "interpretation": "Compares research-control behavior only \u2014 not discovery quality vs human edges."
+}

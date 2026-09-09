@@ -1,0 +1,2165 @@
+{
+  "experiment_index": {
+    "39f918bd83930c43a328a2279ce7decf047e162bffd472d7789e18266a0c470a": "exp-0fff9aa5559b",
+    "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44": "exp-abcbff685466"
+  },
+  "nodes": {
+    "exp-0fff9aa5559b": {
+      "candidate_next_actions": [
+        {
+          "action_code": "DECOMPOSE_DATE",
+          "metadata": {
+            "action_id": "e8415614d364331f",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5"
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "date_decomposition",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "DECOMPOSITION",
+            "planner_score": 1.35,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "information_gap": 3.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "UNCERTAIN_TIME_DISTRIBUTION",
+            "question_text": "Is the observed relationship broadly distributed across dates or concentrated?",
+            "rationale_codes": [
+              "GAP_TIME",
+              "DECOMPOSITION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "TIME_DISTRIBUTION"
+          },
+          "rationale": "GAP_TIME,DECOMPOSITION",
+          "tool_name": "date_decomposition"
+        },
+        {
+          "action_code": "DECOMPOSE_SYMBOL",
+          "metadata": {
+            "action_id": "288ef208675e4c25",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5"
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "symbol_decomposition",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "DECOMPOSITION",
+            "planner_score": 1.35,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "information_gap": 3.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "UNCERTAIN_SYMBOL_DISTRIBUTION",
+            "question_text": "Is the observed relationship broadly distributed across symbols or dominated by few names?",
+            "rationale_codes": [
+              "GAP_SYMBOL",
+              "DECOMPOSITION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "SYMBOL_DISTRIBUTION"
+          },
+          "rationale": "GAP_SYMBOL,DECOMPOSITION",
+          "tool_name": "symbol_decomposition"
+        },
+        {
+          "action_code": "DECOMPOSE_EPISODE",
+          "metadata": {
+            "action_id": "0fbabdc2926b2f1b",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5"
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "episode_decomposition",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "REPLICATION",
+            "planner_score": 0.8500000000000001,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "information_gap": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "UNCERTAIN_EPISODE_REPLICATION",
+            "question_text": "Does the relationship replicate across independent market episodes?",
+            "rationale_codes": [
+              "GAP_EPISODE",
+              "REPLICATION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "EPISODE_REPLICATION"
+          },
+          "rationale": "GAP_EPISODE,REPLICATION",
+          "tool_name": "episode_decomposition"
+        },
+        {
+          "action_code": "CONDITION_MARKET",
+          "metadata": {
+            "action_id": "ee012fa331168e78",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5",
+                "partition_by": "research_market_state"
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "market_conditioning",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "CONDITIONING",
+            "planner_score": 1.85,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "information_gap": 3.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "UNCERTAIN_MARKET_DEPENDENCE",
+            "question_text": "How does the relationship differ across market states?",
+            "rationale_codes": [
+              "GAP_MARKET",
+              "CONDITIONING"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "MARKET_DEPENDENCE"
+          },
+          "rationale": "GAP_MARKET,CONDITIONING",
+          "tool_name": "market_conditioning"
+        },
+        {
+          "action_code": "FALSIFY_EXTREME",
+          "metadata": {
+            "action_id": "ea37630b08516f35",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5",
+                "tests": [
+                  "remove_largest_positive"
+                ]
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "sensitivity_analysis",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "FALSIFICATION",
+            "planner_score": 6.85,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "falsification_threat": 4.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "FALSIFY_EXTREME_WINNER",
+            "question_text": "Does the result survive removal of the largest positive outcome?",
+            "rationale_codes": [
+              "FALSIFY",
+              "EXTREME_WINNER"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "EXTREME_WINNER"
+          },
+          "rationale": "FALSIFY,EXTREME_WINNER",
+          "tool_name": "sensitivity_analysis"
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "metadata": {
+            "action_id": "5f37c26e67f6d527",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizons": [
+                  "T3",
+                  "T5",
+                  "T10"
+                ]
+              },
+              "research_scope": {
+                "outcome_spec": {
+                  "field": "t3_return",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "compare",
+                  "operator": ">",
+                  "value": 0.0
+                },
+                "outcome_spec_hash": "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "field": "t3_return",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "compare",
+                    "operator": ">",
+                    "value": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 1,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 0,
+                    "predicate_count": 1
+                  },
+                  "search_complexity": 1
+                },
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "horizon_comparison",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "REFRAME",
+            "planner_score": 1.4500000000000002,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "grammar_reframe": 2.0,
+              "information_gap": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REFRAME_ALTERNATIVE_OUTCOME",
+            "question_text": "Does an alternative outcome specification (compare) reveal a stable relationship?",
+            "rationale_codes": [
+              "REFRAME",
+              "ALTERNATIVE_OUTCOME"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "OUTCOME_SPEC_ALTERNATIVE"
+          },
+          "rationale": "REFRAME,ALTERNATIVE_OUTCOME",
+          "tool_name": "horizon_comparison"
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "metadata": {
+            "action_id": "a953b809a9aca19f",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizons": [
+                  "T3",
+                  "T5",
+                  "T10"
+                ]
+              },
+              "research_scope": {
+                "outcome_spec": {
+                  "field": "t10_return",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "compare",
+                  "operator": ">",
+                  "value": 0.0
+                },
+                "outcome_spec_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "field": "t10_return",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "compare",
+                    "operator": ">",
+                    "value": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 1,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 0,
+                    "predicate_count": 1
+                  },
+                  "search_complexity": 1
+                },
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "horizon_comparison",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "REFRAME",
+            "planner_score": 1.4500000000000002,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "grammar_reframe": 2.0,
+              "information_gap": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REFRAME_ALTERNATIVE_OUTCOME",
+            "question_text": "Does an alternative outcome specification (compare) reveal a stable relationship?",
+            "rationale_codes": [
+              "REFRAME",
+              "ALTERNATIVE_OUTCOME"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "OUTCOME_SPEC_ALTERNATIVE"
+          },
+          "rationale": "REFRAME,ALTERNATIVE_OUTCOME",
+          "tool_name": "horizon_comparison"
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "metadata": {
+            "action_id": "a63188f5ea403224",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizons": [
+                  "T3",
+                  "T5",
+                  "T10"
+                ]
+              },
+              "research_scope": {
+                "outcome_spec": {
+                  "field": "t5_return",
+                  "grammar_version": "research_grammar_v1",
+                  "horizons": [
+                    "T5",
+                    "T10"
+                  ],
+                  "kind": "persist",
+                  "operator": ">",
+                  "threshold": 0.0
+                },
+                "outcome_spec_hash": "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "field": "t5_return",
+                    "grammar_version": "research_grammar_v1",
+                    "horizons": [
+                      "T5",
+                      "T10"
+                    ],
+                    "kind": "persist",
+                    "operator": ">",
+                    "threshold": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 4,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 0,
+                    "predicate_count": 4
+                  },
+                  "search_complexity": 4
+                },
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "horizon_comparison",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "REFRAME",
+            "planner_score": -0.12499999999999967,
+            "priority_hints": {
+              "draft_complexity": 4.0,
+              "grammar_reframe": 2.0,
+              "information_gap": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REFRAME_ALTERNATIVE_OUTCOME",
+            "question_text": "Does an alternative outcome specification (persist) reveal a stable relationship?",
+            "rationale_codes": [
+              "REFRAME",
+              "ALTERNATIVE_OUTCOME"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "OUTCOME_SPEC_ALTERNATIVE"
+          },
+          "rationale": "REFRAME,ALTERNATIVE_OUTCOME",
+          "tool_name": "horizon_comparison"
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "metadata": {
+            "action_id": "afa13661e0168db7",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizons": [
+                  "T3",
+                  "T5",
+                  "T10"
+                ]
+              },
+              "research_scope": {
+                "outcome_spec": {
+                  "early_horizon": "T3",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "continuation",
+                  "late_horizon": "T5",
+                  "operator": ">",
+                  "threshold": 0.0
+                },
+                "outcome_spec_hash": "90a3e561442d95e6e3e5d265315ad0c9af69541e18c093700f40bae101052cb5",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "early_horizon": "T3",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "continuation",
+                    "late_horizon": "T5",
+                    "operator": ">",
+                    "threshold": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 2,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 0,
+                    "predicate_count": 2
+                  },
+                  "search_complexity": 2
+                },
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "horizon_comparison",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "REFRAME",
+            "planner_score": 0.9250000000000002,
+            "priority_hints": {
+              "draft_complexity": 2.0,
+              "grammar_reframe": 2.0,
+              "information_gap": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REFRAME_ALTERNATIVE_OUTCOME",
+            "question_text": "Does an alternative outcome specification (continuation) reveal a stable relationship?",
+            "rationale_codes": [
+              "REFRAME",
+              "ALTERNATIVE_OUTCOME"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "OUTCOME_SPEC_ALTERNATIVE"
+          },
+          "rationale": "REFRAME,ALTERNATIVE_OUTCOME",
+          "tool_name": "horizon_comparison"
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "metadata": {
+            "action_id": "1db733011b697414",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizons": [
+                  "T3",
+                  "T5",
+                  "T10"
+                ]
+              },
+              "research_scope": {
+                "outcome_spec": {
+                  "early_horizon": "T5",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "continuation",
+                  "late_horizon": "T10",
+                  "operator": ">",
+                  "threshold": 0.0
+                },
+                "outcome_spec_hash": "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "early_horizon": "T5",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "continuation",
+                    "late_horizon": "T10",
+                    "operator": ">",
+                    "threshold": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REFRAME_OUTCOME",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 2,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 0,
+                    "predicate_count": 2
+                  },
+                  "search_complexity": 2
+                },
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "horizon_comparison",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "REFRAME",
+            "planner_score": 0.9250000000000002,
+            "priority_hints": {
+              "draft_complexity": 2.0,
+              "grammar_reframe": 2.0,
+              "information_gap": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REFRAME_ALTERNATIVE_OUTCOME",
+            "question_text": "Does an alternative outcome specification (continuation) reveal a stable relationship?",
+            "rationale_codes": [
+              "REFRAME",
+              "ALTERNATIVE_OUTCOME"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "OUTCOME_SPEC_ALTERNATIVE"
+          },
+          "rationale": "REFRAME,ALTERNATIVE_OUTCOME",
+          "tool_name": "horizon_comparison"
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "metadata": {
+            "action_id": "e92e4af892e7cb48",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5",
+                "partition_column": "partition_group",
+                "partition_type": "categorical"
+              },
+              "research_scope": {
+                "condition_clauses": [
+                  {
+                    "bucket_id": "rs10_grammar",
+                    "feature": "rs10",
+                    "operator": "lt",
+                    "threshold_hi": null,
+                    "threshold_lo": 0.0
+                  }
+                ],
+                "outcome_spec": {
+                  "field": "t5_return",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "compare",
+                  "operator": ">",
+                  "value": 0.0
+                },
+                "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "field": "t5_return",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "compare",
+                    "operator": ">",
+                    "value": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REPOPULATE_REFINE",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "children": [
+                      {
+                        "field": "rs10",
+                        "grammar_version": "research_grammar_v1",
+                        "kind": "filter",
+                        "operator": ">",
+                        "value": 0.0
+                      }
+                    ],
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "refine",
+                    "parent": {
+                      "grammar_version": "research_grammar_v1",
+                      "kind": "all"
+                    },
+                    "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 1,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 2,
+                    "predicate_count": 3
+                  },
+                  "search_complexity": 3
+                },
+                "population_spec": {
+                  "children": [
+                    {
+                      "field": "rs10",
+                      "grammar_version": "research_grammar_v1",
+                      "kind": "filter",
+                      "operator": ">",
+                      "value": 0.0
+                    }
+                  ],
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "refine",
+                  "parent": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                  "triggering_evidence": {
+                    "interesting": true,
+                    "source_experiment": "exp-0fff9aa5559b",
+                    "strength": "NO_CLEAR_DIFFERENCE"
+                  }
+                },
+                "population_spec_hash": "f865282fcade08e8b829460c27f10d220702be03b8eee19ff1496ea88618f332"
+              },
+              "tool_name": "partition_group_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "REPOPULATE",
+            "planner_score": 2.8000000000000003,
+            "priority_hints": {
+              "draft_complexity": 3.0,
+              "grammar_repopulate": 2.5,
+              "information_gap": 3.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REPOPULATE_REFINED_COHORT",
+            "question_text": "Does the relationship hold within a refined conditional population?",
+            "rationale_codes": [
+              "REPOPULATE",
+              "REFINED_COHORT"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "POPULATION_REFINEMENT"
+          },
+          "rationale": "REPOPULATE,REFINED_COHORT",
+          "tool_name": "partition_group_compare"
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "metadata": {
+            "action_id": "634c206c4e7e1250",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5",
+                "partition_column": "partition_group",
+                "partition_type": "categorical"
+              },
+              "research_scope": {
+                "condition_clauses": [
+                  {
+                    "bucket_id": "rsi14_grammar",
+                    "feature": "rsi14",
+                    "operator": "lt",
+                    "threshold_hi": null,
+                    "threshold_lo": 0.0
+                  }
+                ],
+                "outcome_spec": {
+                  "field": "t5_return",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "compare",
+                  "operator": ">",
+                  "value": 0.0
+                },
+                "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "field": "t5_return",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "compare",
+                    "operator": ">",
+                    "value": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REPOPULATE_REFINE",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "children": [
+                      {
+                        "field": "rsi14",
+                        "grammar_version": "research_grammar_v1",
+                        "kind": "filter",
+                        "operator": ">",
+                        "value": 0.0
+                      }
+                    ],
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "refine",
+                    "parent": {
+                      "grammar_version": "research_grammar_v1",
+                      "kind": "all"
+                    },
+                    "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 1,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 2,
+                    "predicate_count": 3
+                  },
+                  "search_complexity": 3
+                },
+                "population_spec": {
+                  "children": [
+                    {
+                      "field": "rsi14",
+                      "grammar_version": "research_grammar_v1",
+                      "kind": "filter",
+                      "operator": ">",
+                      "value": 0.0
+                    }
+                  ],
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "refine",
+                  "parent": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                  "triggering_evidence": {
+                    "interesting": true,
+                    "source_experiment": "exp-0fff9aa5559b",
+                    "strength": "NO_CLEAR_DIFFERENCE"
+                  }
+                },
+                "population_spec_hash": "b3795cf3eccf30cab1ce3da3bc84dd8e070d2e7ec84891a40b611b8bde57c732"
+              },
+              "tool_name": "partition_group_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "REPOPULATE",
+            "planner_score": 2.8000000000000003,
+            "priority_hints": {
+              "draft_complexity": 3.0,
+              "grammar_repopulate": 2.5,
+              "information_gap": 3.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REPOPULATE_REFINED_COHORT",
+            "question_text": "Does the relationship hold within a refined conditional population?",
+            "rationale_codes": [
+              "REPOPULATE",
+              "REFINED_COHORT"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "POPULATION_REFINEMENT"
+          },
+          "rationale": "REPOPULATE,REFINED_COHORT",
+          "tool_name": "partition_group_compare"
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "metadata": {
+            "action_id": "cbd99c5baff40811",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "horizon": "T5",
+                "partition_column": "partition_group",
+                "partition_type": "categorical"
+              },
+              "research_scope": {
+                "condition_clauses": [
+                  {
+                    "bucket_id": "health_rank_grammar",
+                    "feature": "health_rank",
+                    "operator": "lt",
+                    "threshold_hi": null,
+                    "threshold_lo": 0.0
+                  }
+                ],
+                "outcome_spec": {
+                  "field": "t5_return",
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "compare",
+                  "operator": ">",
+                  "value": 0.0
+                },
+                "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+                "pending_question_context": {
+                  "outcome_spec": {
+                    "field": "t5_return",
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "compare",
+                    "operator": ">",
+                    "value": 0.0
+                  },
+                  "population_change": {
+                    "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "reason_code": "REPOPULATE_REFINE",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "population_n": null,
+                  "population_spec": {
+                    "children": [
+                      {
+                        "field": "health_rank",
+                        "grammar_version": "research_grammar_v1",
+                        "kind": "filter",
+                        "operator": ">",
+                        "value": 0.0
+                      }
+                    ],
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "refine",
+                    "parent": {
+                      "grammar_version": "research_grammar_v1",
+                      "kind": "all"
+                    },
+                    "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                    "triggering_evidence": {
+                      "interesting": true,
+                      "source_experiment": "exp-0fff9aa5559b",
+                      "strength": "NO_CLEAR_DIFFERENCE"
+                    }
+                  },
+                  "research_depth": 1,
+                  "search_accounting": {
+                    "alternatives_considered": 0,
+                    "branch_depth": 1,
+                    "outcome_complexity": 1,
+                    "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                    "population_complexity": 2,
+                    "predicate_count": 3
+                  },
+                  "search_complexity": 3
+                },
+                "population_spec": {
+                  "children": [
+                    {
+                      "field": "health_rank",
+                      "grammar_version": "research_grammar_v1",
+                      "kind": "filter",
+                      "operator": ">",
+                      "value": 0.0
+                    }
+                  ],
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "refine",
+                  "parent": {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "all"
+                  },
+                  "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                  "triggering_evidence": {
+                    "interesting": true,
+                    "source_experiment": "exp-0fff9aa5559b",
+                    "strength": "NO_CLEAR_DIFFERENCE"
+                  }
+                },
+                "population_spec_hash": "a5760c377d405e8b508686d774bb20c0754ab1ba5304b562400d2fd54c900f71"
+              },
+              "tool_name": "partition_group_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "REPOPULATE",
+            "planner_score": 2.8000000000000003,
+            "priority_hints": {
+              "draft_complexity": 3.0,
+              "grammar_repopulate": 2.5,
+              "information_gap": 3.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "REPOPULATE_REFINED_COHORT",
+            "question_text": "Does the relationship hold within a refined conditional population?",
+            "rationale_codes": [
+              "REPOPULATE",
+              "REFINED_COHORT"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "POPULATION_REFINEMENT"
+          },
+          "rationale": "REPOPULATE,REFINED_COHORT",
+          "tool_name": "partition_group_compare"
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_feature_x",
+          "metadata": {
+            "action_id": "48247ca56a964206",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "feature_column": "feature_x",
+                "max_bins": 4,
+                "min_bin_n": 5,
+                "min_total_n": 20
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "adaptive_partition_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "SLICING",
+            "planner_score": 0.3500000000000001,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124,
+              "slicing_explore": 2.0
+            },
+            "question_template_id": "ADAPTIVE_PARTITION",
+            "question_text": "Does partitioning feature_x by data-derived quantiles reveal outcome structure?",
+            "rationale_codes": [
+              "SLICING",
+              "ADAPTIVE_PARTITION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "ADAPTIVE_PARTITION"
+          },
+          "rationale": "SLICING,ADAPTIVE_PARTITION",
+          "tool_name": "adaptive_partition_compare"
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_feature_y",
+          "metadata": {
+            "action_id": "9b3b88626bf66907",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "feature_column": "feature_y",
+                "max_bins": 4,
+                "min_bin_n": 5,
+                "min_total_n": 20
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "adaptive_partition_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "SLICING",
+            "planner_score": 0.3500000000000001,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124,
+              "slicing_explore": 2.0
+            },
+            "question_template_id": "ADAPTIVE_PARTITION",
+            "question_text": "Does partitioning feature_y by data-derived quantiles reveal outcome structure?",
+            "rationale_codes": [
+              "SLICING",
+              "ADAPTIVE_PARTITION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "ADAPTIVE_PARTITION"
+          },
+          "rationale": "SLICING,ADAPTIVE_PARTITION",
+          "tool_name": "adaptive_partition_compare"
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs10",
+          "metadata": {
+            "action_id": "1cd8543301912be7",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "feature_column": "rs10",
+                "max_bins": 4,
+                "min_bin_n": 5,
+                "min_total_n": 20
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "adaptive_partition_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "SLICING",
+            "planner_score": 0.3500000000000001,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124,
+              "slicing_explore": 2.0
+            },
+            "question_template_id": "ADAPTIVE_PARTITION",
+            "question_text": "Does partitioning rs10 by data-derived quantiles reveal outcome structure?",
+            "rationale_codes": [
+              "SLICING",
+              "ADAPTIVE_PARTITION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "ADAPTIVE_PARTITION"
+          },
+          "rationale": "SLICING,ADAPTIVE_PARTITION",
+          "tool_name": "adaptive_partition_compare"
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_health_score",
+          "metadata": {
+            "action_id": "354f817a319e67ce",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "feature_column": "health_score",
+                "max_bins": 4,
+                "min_bin_n": 5,
+                "min_total_n": 20
+              },
+              "research_scope": {
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "adaptive_partition_compare",
+              "tool_version": "v1"
+            },
+            "expected_information": "HIGH",
+            "intent": "SLICING",
+            "planner_score": 0.3500000000000001,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124,
+              "slicing_explore": 2.0
+            },
+            "question_template_id": "ADAPTIVE_PARTITION",
+            "question_text": "Does partitioning health_score by data-derived quantiles reveal outcome structure?",
+            "rationale_codes": [
+              "SLICING",
+              "ADAPTIVE_PARTITION"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "ADAPTIVE_PARTITION"
+          },
+          "rationale": "SLICING,ADAPTIVE_PARTITION",
+          "tool_name": "adaptive_partition_compare"
+        },
+        {
+          "action_code": "TEST_MARKET_INTERACTION",
+          "metadata": {
+            "action_id": "91e3c14726008468",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 1,
+            "draft_spec": {
+              "data_cutoff_date": "2026-08-17",
+              "inputs": {
+                "primary_feature": "feature_x",
+                "secondary_feature": "research_market_state"
+              },
+              "research_scope": {
+                "complexity_increment": 2,
+                "population_spec": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              },
+              "tool_name": "interaction_partition",
+              "tool_version": "v1"
+            },
+            "expected_information": "MEDIUM",
+            "intent": "CONDITIONING",
+            "planner_score": 0.8500000000000001,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "interaction_followup": 2.5,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "INTERACTION_PARTITION",
+            "question_text": "Does market context interact with feature_x for outcomes?",
+            "rationale_codes": [
+              "INTERACTION",
+              "MARKET_CONTEXT"
+            ],
+            "tool_version": "v1",
+            "uncertainty_addressed": "INTERACTION_FOLLOWUP"
+          },
+          "rationale": "INTERACTION,MARKET_CONTEXT",
+          "tool_name": "interaction_partition"
+        },
+        {
+          "action_code": "STOP_BRANCH",
+          "metadata": {
+            "action_id": "fd0876343b97f1d0",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 0,
+            "expected_information": "LOW",
+            "intent": "STOP",
+            "planner_score": -3.65,
+            "priority_hints": {
+              "draft_complexity": 1.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124,
+              "stop_urgency": 0.0
+            },
+            "question_template_id": "STOP_NO_FURTHER_VALUE",
+            "question_text": "Stop this branch — no further investigation warranted.",
+            "rationale_codes": [
+              "STOP",
+              "NO_FURTHER_VALUE"
+            ],
+            "tool_version": "",
+            "uncertainty_addressed": "STOP"
+          },
+          "rationale": "STOP,NO_FURTHER_VALUE",
+          "tool_name": null
+        },
+        {
+          "action_code": "ABANDON_BRANCH",
+          "metadata": {
+            "action_id": "fe3ab55226b9633f",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 0,
+            "expected_information": "LOW",
+            "intent": "ABANDON",
+            "planner_score": -3.65,
+            "priority_hints": {
+              "abandon_urgency": 0.0,
+              "draft_complexity": 1.0,
+              "parent_complexity": 1.0,
+              "sample_size": 3124
+            },
+            "question_template_id": "ABANDON_FRAGILE",
+            "question_text": "Abandon this branch — fragility or contradiction undermines the hypothesis.",
+            "rationale_codes": [
+              "ABANDON",
+              "FRAGILITY"
+            ],
+            "tool_version": "",
+            "uncertainty_addressed": "ABANDON"
+          },
+          "rationale": "ABANDON,FRAGILITY",
+          "tool_name": null
+        }
+      ],
+      "candidate_summary": {
+        "candidate_id": "exp-0fff9aa5559b",
+        "complexity_score": {
+          "aggregate_score": 7.5,
+          "alternatives_considered": 0,
+          "branch_depth": 1,
+          "categorical_levels": 0,
+          "features_explored": 0,
+          "interaction_depth": 0,
+          "neighborhood_cuts": 0,
+          "outcome_complexity": 1,
+          "partitions_evaluated": 0,
+          "population_complexity": 1,
+          "predicate_count": 1,
+          "refinements": 0,
+          "thresholds_explored": 0
+        },
+        "concentration_evidence": {},
+        "conditions": {},
+        "confirmation_split": {
+          "confirmation_cutoff": null,
+          "confirmation_date_range": null,
+          "confirmation_independence_status": "NOT_AVAILABLE",
+          "confirmation_status": "NOT_AVAILABLE",
+          "discovery_cutoff": "2026-08-17",
+          "discovery_date_range": null,
+          "observations_overlap": null
+        },
+        "confirmation_status": "NOT_AVAILABLE",
+        "current_research_status": "CANDIDATE_DISCOVERED",
+        "dates": [],
+        "discovery_evidence_type": "DISCOVERY",
+        "effective_hypotheses_tested": 24,
+        "episodes": [],
+        "evidence_burden": {
+          "concentration_flags": [],
+          "evidence_search_assessment": "INSUFFICIENT",
+          "evidence_to_search_ratio": 0.0,
+          "incremental_effect": null,
+          "raw_effect": null,
+          "sample_size": null,
+          "search_cardinality_preceding": 24,
+          "search_complexity": 7.5,
+          "shape_strength": null,
+          "uncertainty": null
+        },
+        "fragility_flags": [],
+        "incremental_effect": null,
+        "lineage_discovery_vs_falsification": [
+          "DISCOVERY"
+        ],
+        "n": null,
+        "next_required_test": "Independent confirmation (not available in Phase 3G)",
+        "outcome_spec": {
+          "field": "t5_return",
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "operator": ">",
+          "value": 0.0
+        },
+        "parent_baseline": null,
+        "parent_comparison": null,
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "raw_outcome_metric": null,
+        "search_accounting": {
+          "branch": {
+            "abandoned_branches": 0,
+            "branch_depth_max": 1,
+            "candidate_actions_considered": 20,
+            "categorical_levels_evaluated": 0,
+            "duplicate_experiments_blocked": 0,
+            "experiments_executed": 1,
+            "explanatory_features_tested": [],
+            "falsification_experiments_executed": 0,
+            "interactions_attempted": 0,
+            "neighborhood_cuts_evaluated": 0,
+            "partitions_evaluated": 0,
+            "questions_generated": 1,
+            "refinements_reframes": 0,
+            "threshold_candidates_evaluated": 0,
+            "unique_outcome_specs": [
+              "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+            ],
+            "unique_population_specs": [
+              "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+            ]
+          },
+          "session": {
+            "abandoned_branches": 0,
+            "branch_depth_max": 1,
+            "candidate_actions_considered": 20,
+            "categorical_levels_evaluated": 0,
+            "duplicate_experiments_blocked": 0,
+            "experiments_executed": 1,
+            "explanatory_features_tested": [],
+            "falsification_experiments_executed": 0,
+            "interactions_attempted": 0,
+            "neighborhood_cuts_evaluated": 0,
+            "partitions_evaluated": 0,
+            "questions_generated": 1,
+            "refinements_reframes": 0,
+            "threshold_candidates_evaluated": 0,
+            "unique_outcome_specs": [
+              "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+            ],
+            "unique_population_specs": [
+              "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+            ]
+          }
+        },
+        "shape_evidence": {},
+        "threshold_neighborhood_evidence": {},
+        "why_interesting": "Descriptive group difference with effect=None",
+        "why_not_validated": "Research-only; validated=False always in Phase 3G."
+      },
+      "child_node_ids": [
+        "q-f3ee22a1c23d"
+      ],
+      "completed_at": "2026-08-21T11:24:29Z",
+      "created_at": "2026-08-21T11:24:29Z",
+      "evidence_against": [],
+      "evidence_for": [],
+      "experiment_content_hash": "39f918bd83930c43a328a2279ce7decf047e162bffd472d7789e18266a0c470a",
+      "experiment_result": {
+        "finalized": true,
+        "metrics": {
+          "diagnostics": {
+            "cohort_n": 3124,
+            "cutoff": {
+              "data_cutoff_date": "2026-08-17",
+              "rows_after_t0_cutoff": 3124,
+              "rows_before_cutoff_filter": 3124,
+              "rows_excluded_after_t0_cutoff": 0
+            }
+          },
+          "groups": {
+            "T10": {
+              "cohort_mean": 2.439927187752218,
+              "cohort_median": 2.189781021897818,
+              "cohort_n": 2130,
+              "cohort_rate_ge_3": 43.47417840375587,
+              "cohort_rate_ge_5": 28.544600938967136,
+              "cohort_rate_le_minus_3": 13.661971830985916,
+              "cohort_rate_le_minus_5": 6.197183098591549,
+              "cohort_win_rate": 66.43192488262912
+            },
+            "T3": {
+              "cohort_mean": 0.37484273737186385,
+              "cohort_median": 0.12989663938837154,
+              "cohort_n": 3124,
+              "cohort_rate_ge_3": 17.221510883482715,
+              "cohort_rate_ge_5": 8.386683738796414,
+              "cohort_rate_le_minus_3": 11.45966709346991,
+              "cohort_rate_le_minus_5": 3.585147247119078,
+              "cohort_win_rate": 50.256081946222785
+            },
+            "T5": {
+              "cohort_mean": 0.9299008188204332,
+              "cohort_median": 0.8701059917802234,
+              "cohort_n": 2840,
+              "cohort_rate_ge_3": 25.915492957746476,
+              "cohort_rate_ge_5": 13.133802816901408,
+              "cohort_rate_le_minus_3": 12.922535211267604,
+              "cohort_rate_le_minus_5": 4.929577464788732,
+              "cohort_win_rate": 58.90845070422536
+            }
+          },
+          "horizons_requested": [
+            "T3",
+            "T5",
+            "T10"
+          ],
+          "input_hash": "39f918bd83930c43",
+          "limitations": [],
+          "median_spread": 2.0598843825094466,
+          "sample_size": 3124,
+          "tool_status": "OK",
+          "toolbox_version": "research_toolbox_v1"
+        },
+        "observations": [
+          {
+            "code": "HORIZON_HETEROGENEOUS",
+            "evidence": {
+              "median_spread": 2.0598843825094466
+            },
+            "severity": "MEDIUM"
+          }
+        ],
+        "result_hash": "e47fa76bee1b70d2"
+      },
+      "experiment_spec": {
+        "data_cutoff_date": "2026-08-17",
+        "inputs": {
+          "horizons": [
+            "T3",
+            "T5",
+            "T10"
+          ]
+        },
+        "research_scope": {
+          "outcome_spec": {
+            "field": "t5_return",
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "operator": ">",
+            "value": 0.0
+          },
+          "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "tool_name": "horizon_comparison",
+        "tool_version": "v1"
+      },
+      "frozen_spec_ref": null,
+      "node_id": "exp-0fff9aa5559b",
+      "node_type": "EXPERIMENT",
+      "parent_node_ids": [
+        "q-8ee125ea3f9e"
+      ],
+      "question_context": null,
+      "question_text": "",
+      "rationale": null,
+      "research_status": "CANDIDATE_DISCOVERED",
+      "revisit_allowed": false,
+      "selected_next_action": {
+        "action_code": "FALSIFY_EXTREME",
+        "metadata": {
+          "action_id": "ea37630b08516f35",
+          "already_attempted": false,
+          "blocked": false,
+          "blocked_reason": null,
+          "budget_cost": 1,
+          "draft_spec": {
+            "data_cutoff_date": "2026-08-17",
+            "inputs": {
+              "horizon": "T5",
+              "tests": [
+                "remove_largest_positive"
+              ]
+            },
+            "research_scope": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+            },
+            "tool_name": "sensitivity_analysis",
+            "tool_version": "v1"
+          },
+          "expected_information": "HIGH",
+          "intent": "FALSIFICATION",
+          "planner_score": 6.85,
+          "priority_hints": {
+            "draft_complexity": 1.0,
+            "falsification_threat": 4.5,
+            "parent_complexity": 1.0,
+            "sample_size": 3124
+          },
+          "question_template_id": "FALSIFY_EXTREME_WINNER",
+          "question_text": "Does the result survive removal of the largest positive outcome?",
+          "rationale_codes": [
+            "FALSIFY",
+            "EXTREME_WINNER"
+          ],
+          "tool_version": "v1",
+          "uncertainty_addressed": "EXTREME_WINNER"
+        },
+        "rationale": "FALSIFY,EXTREME_WINNER",
+        "tool_name": "sensitivity_analysis"
+      },
+      "session_id": "bb01-autonomous-001",
+      "status": "RESOLVED",
+      "terminal_reason": "",
+      "trigger": null,
+      "uncertainties": [
+        "HORIZON_STABILITY"
+      ]
+    },
+    "exp-abcbff685466": {
+      "candidate_next_actions": [
+        {
+          "action_code": "STOP_BRANCH",
+          "metadata": {
+            "action_id": "fd0876343b97f1d0",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 0,
+            "expected_information": "LOW",
+            "intent": "STOP",
+            "planner_score": 10.15,
+            "priority_hints": {
+              "sample_size": 2840,
+              "stop_urgency": 5.0
+            },
+            "question_template_id": "STOP_NO_FURTHER_VALUE",
+            "question_text": "Stop this branch — no further investigation warranted.",
+            "rationale_codes": [
+              "STOP",
+              "NO_FURTHER_VALUE"
+            ],
+            "tool_version": "",
+            "uncertainty_addressed": "STOP"
+          },
+          "rationale": "STOP,NO_FURTHER_VALUE",
+          "tool_name": null
+        },
+        {
+          "action_code": "ABANDON_BRANCH",
+          "metadata": {
+            "action_id": "fe3ab55226b9633f",
+            "already_attempted": false,
+            "blocked": false,
+            "blocked_reason": null,
+            "budget_cost": 0,
+            "expected_information": "LOW",
+            "intent": "ABANDON",
+            "planner_score": -2.5999999999999996,
+            "priority_hints": {
+              "abandon_urgency": 0.0,
+              "sample_size": 2840
+            },
+            "question_template_id": "ABANDON_FRAGILE",
+            "question_text": "Abandon this branch — fragility or contradiction undermines the hypothesis.",
+            "rationale_codes": [
+              "ABANDON",
+              "FRAGILITY"
+            ],
+            "tool_version": "",
+            "uncertainty_addressed": "ABANDON"
+          },
+          "rationale": "ABANDON,FRAGILITY",
+          "tool_name": null
+        }
+      ],
+      "candidate_summary": null,
+      "child_node_ids": [],
+      "completed_at": "2026-08-21T11:24:29Z",
+      "created_at": "2026-08-21T11:24:29Z",
+      "evidence_against": [],
+      "evidence_for": [],
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "experiment_result": {
+        "finalized": true,
+        "metrics": {
+          "baseline_median": 0.8701059917802234,
+          "diagnostics": {
+            "cohort_n": 3124,
+            "cutoff": {
+              "data_cutoff_date": "2026-08-17",
+              "rows_after_t0_cutoff": 3124,
+              "rows_before_cutoff_filter": 3124,
+              "rows_excluded_after_t0_cutoff": 0
+            }
+          },
+          "fragile": false,
+          "groups": {
+            "remove_largest_positive": {
+              "baseline_median": 0.8701059917802234,
+              "survives_positive_median": true,
+              "trimmed_median": 0.8695652173912993
+            }
+          },
+          "horizon": "T5",
+          "input_hash": "e99da83b06c74a90",
+          "limitations": [],
+          "sample_size": 2840,
+          "tool_status": "OK",
+          "toolbox_version": "research_toolbox_v1"
+        },
+        "observations": [
+          {
+            "code": "EXTREME_WINNER_ROBUST",
+            "evidence": {
+              "fragile": false
+            },
+            "severity": "LOW"
+          }
+        ],
+        "result_hash": "6e3e8fe6435c5f7f"
+      },
+      "experiment_spec": {
+        "data_cutoff_date": "2026-08-17",
+        "inputs": {
+          "horizon": "T5",
+          "tests": [
+            "remove_largest_positive"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "tool_name": "sensitivity_analysis",
+        "tool_version": "v1"
+      },
+      "frozen_spec_ref": null,
+      "node_id": "exp-abcbff685466",
+      "node_type": "EXPERIMENT",
+      "parent_node_ids": [
+        "q-f3ee22a1c23d"
+      ],
+      "question_context": null,
+      "question_text": "",
+      "rationale": null,
+      "research_status": "",
+      "revisit_allowed": false,
+      "selected_next_action": {
+        "action_code": "STOP_BRANCH",
+        "metadata": {
+          "action_id": "fd0876343b97f1d0",
+          "already_attempted": false,
+          "blocked": false,
+          "blocked_reason": null,
+          "budget_cost": 0,
+          "expected_information": "LOW",
+          "intent": "STOP",
+          "planner_score": 10.15,
+          "priority_hints": {
+            "sample_size": 2840,
+            "stop_urgency": 5.0
+          },
+          "question_template_id": "STOP_NO_FURTHER_VALUE",
+          "question_text": "Stop this branch — no further investigation warranted.",
+          "rationale_codes": [
+            "STOP",
+            "NO_FURTHER_VALUE"
+          ],
+          "tool_version": "",
+          "uncertainty_addressed": "STOP"
+        },
+        "rationale": "STOP,NO_FURTHER_VALUE",
+        "tool_name": null
+      },
+      "session_id": "bb01-autonomous-001",
+      "status": "RESOLVED",
+      "terminal_reason": "STOP_BRANCH",
+      "trigger": null,
+      "uncertainties": []
+    },
+    "obs-792a7603f568": {
+      "candidate_next_actions": [],
+      "candidate_summary": null,
+      "child_node_ids": [
+        "q-8ee125ea3f9e"
+      ],
+      "completed_at": null,
+      "created_at": "2026-08-21T11:24:29Z",
+      "evidence_against": [],
+      "evidence_for": [],
+      "experiment_content_hash": null,
+      "experiment_result": null,
+      "experiment_spec": null,
+      "frozen_spec_ref": null,
+      "node_id": "obs-792a7603f568",
+      "node_type": "OBSERVATION",
+      "parent_node_ids": [],
+      "question_context": null,
+      "question_text": "",
+      "rationale": null,
+      "research_status": "",
+      "revisit_allowed": false,
+      "selected_next_action": null,
+      "session_id": "bb01-autonomous-001",
+      "status": "OPEN",
+      "terminal_reason": "",
+      "trigger": {
+        "description": "Autonomous benchmark seed: scan the canonical historical Edge Research universe for non-trivial relationships.",
+        "kind": "AUTONOMOUS_SEED",
+        "source_metrics": {},
+        "source_node_id": null
+      },
+      "uncertainties": []
+    },
+    "q-8ee125ea3f9e": {
+      "candidate_next_actions": [],
+      "candidate_summary": null,
+      "child_node_ids": [
+        "exp-0fff9aa5559b"
+      ],
+      "completed_at": null,
+      "created_at": "2026-08-21T11:24:29Z",
+      "evidence_against": [],
+      "evidence_for": [],
+      "experiment_content_hash": null,
+      "experiment_result": null,
+      "experiment_spec": null,
+      "frozen_spec_ref": null,
+      "node_id": "q-8ee125ea3f9e",
+      "node_type": "QUESTION",
+      "parent_node_ids": [
+        "obs-792a7603f568"
+      ],
+      "question_context": {
+        "outcome_spec": {
+          "field": "t5_return",
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "operator": ">",
+          "value": 0.0
+        },
+        "population_change": null,
+        "population_n": 3124,
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "research_depth": 0,
+        "search_accounting": {
+          "alternatives_considered": 0,
+          "branch_depth": 0,
+          "outcome_complexity": 1,
+          "parent_branch_hash": "",
+          "population_complexity": 0,
+          "predicate_count": 1
+        },
+        "search_complexity": 1
+      },
+      "question_text": "What non-trivial, statistically and economically interesting relationships can be discovered in the currently available historical data?",
+      "rationale": {
+        "evidence_summary": {
+          "seed": true
+        },
+        "prior_node_id": "obs-792a7603f568",
+        "reason_code": "AUTONOMOUS_INITIAL"
+      },
+      "research_status": "",
+      "revisit_allowed": false,
+      "selected_next_action": null,
+      "session_id": "bb01-autonomous-001",
+      "status": "OPEN",
+      "terminal_reason": "",
+      "trigger": null,
+      "uncertainties": []
+    },
+    "q-f3ee22a1c23d": {
+      "candidate_next_actions": [],
+      "candidate_summary": null,
+      "child_node_ids": [
+        "exp-abcbff685466"
+      ],
+      "completed_at": "2026-08-21T11:24:29Z",
+      "created_at": "2026-08-21T11:24:29Z",
+      "evidence_against": [],
+      "evidence_for": [],
+      "experiment_content_hash": null,
+      "experiment_result": null,
+      "experiment_spec": null,
+      "frozen_spec_ref": null,
+      "node_id": "q-f3ee22a1c23d",
+      "node_type": "QUESTION",
+      "parent_node_ids": [
+        "exp-0fff9aa5559b"
+      ],
+      "question_context": null,
+      "question_text": "Does the result survive removal of the largest positive outcome?",
+      "rationale": {
+        "evidence_summary": {
+          "intent": "FALSIFICATION",
+          "planner_rationale": [
+            "FALSIFY",
+            "EXTREME_WINNER"
+          ],
+          "uncertainty_addressed": "EXTREME_WINNER"
+        },
+        "prior_node_id": "exp-0fff9aa5559b",
+        "reason_code": "FALSIFY_EXTREME"
+      },
+      "research_status": "",
+      "revisit_allowed": false,
+      "selected_next_action": null,
+      "session_id": "bb01-autonomous-001",
+      "status": "RESOLVED",
+      "terminal_reason": "STOP_BRANCH",
+      "trigger": null,
+      "uncertainties": []
+    }
+  },
+  "schema_version": "research_graph_v1",
+  "session": {
+    "data_cutoff_date": "2026-08-17",
+    "experiment_budget": 12,
+    "experiments_used": 2,
+    "guardrails_config_version": "guardrails_v1",
+    "research_session_id": "bb01-autonomous-001",
+    "root_node_ids": [
+      "obs-792a7603f568"
+    ],
+    "schema_version": "research_graph_v1",
+    "search_accounting": {
+      "branch_ledgers": {
+        "obs-792a7603f568": {
+          "abandoned_branches": 0,
+          "branch_depth_max": 2,
+          "candidate_actions_considered": 22,
+          "categorical_levels_evaluated": 0,
+          "duplicate_experiments_blocked": 0,
+          "experiments_executed": 2,
+          "explanatory_features_tested": [],
+          "falsification_experiments_executed": 1,
+          "interactions_attempted": 0,
+          "neighborhood_cuts_evaluated": 0,
+          "partitions_evaluated": 0,
+          "questions_generated": 2,
+          "refinements_reframes": 0,
+          "threshold_candidates_evaluated": 0,
+          "unique_outcome_specs": [
+            "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+          ],
+          "unique_population_specs": [
+            "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          ]
+        }
+      },
+      "candidate_summaries": {
+        "exp-0fff9aa5559b": {
+          "candidate_id": "exp-0fff9aa5559b",
+          "complexity_score": {
+            "aggregate_score": 7.5,
+            "alternatives_considered": 0,
+            "branch_depth": 1,
+            "categorical_levels": 0,
+            "features_explored": 0,
+            "interaction_depth": 0,
+            "neighborhood_cuts": 0,
+            "outcome_complexity": 1,
+            "partitions_evaluated": 0,
+            "population_complexity": 1,
+            "predicate_count": 1,
+            "refinements": 0,
+            "thresholds_explored": 0
+          },
+          "concentration_evidence": {},
+          "conditions": {},
+          "confirmation_split": {
+            "confirmation_cutoff": null,
+            "confirmation_date_range": null,
+            "confirmation_independence_status": "NOT_AVAILABLE",
+            "confirmation_status": "NOT_AVAILABLE",
+            "discovery_cutoff": "2026-08-17",
+            "discovery_date_range": null,
+            "observations_overlap": null
+          },
+          "confirmation_status": "NOT_AVAILABLE",
+          "current_research_status": "CANDIDATE_DISCOVERED",
+          "dates": [],
+          "discovery_evidence_type": "DISCOVERY",
+          "effective_hypotheses_tested": 24,
+          "episodes": [],
+          "evidence_burden": {
+            "concentration_flags": [],
+            "evidence_search_assessment": "INSUFFICIENT",
+            "evidence_to_search_ratio": 0.0,
+            "incremental_effect": null,
+            "raw_effect": null,
+            "sample_size": null,
+            "search_cardinality_preceding": 24,
+            "search_complexity": 7.5,
+            "shape_strength": null,
+            "uncertainty": null
+          },
+          "fragility_flags": [],
+          "incremental_effect": null,
+          "lineage_discovery_vs_falsification": [
+            "DISCOVERY"
+          ],
+          "n": null,
+          "next_required_test": "Independent confirmation (not available in Phase 3G)",
+          "outcome_spec": {
+            "field": "t5_return",
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "operator": ">",
+            "value": 0.0
+          },
+          "parent_baseline": null,
+          "parent_comparison": null,
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "raw_outcome_metric": null,
+          "search_accounting": {
+            "branch": {
+              "abandoned_branches": 0,
+              "branch_depth_max": 1,
+              "candidate_actions_considered": 20,
+              "categorical_levels_evaluated": 0,
+              "duplicate_experiments_blocked": 0,
+              "experiments_executed": 1,
+              "explanatory_features_tested": [],
+              "falsification_experiments_executed": 0,
+              "interactions_attempted": 0,
+              "neighborhood_cuts_evaluated": 0,
+              "partitions_evaluated": 0,
+              "questions_generated": 1,
+              "refinements_reframes": 0,
+              "threshold_candidates_evaluated": 0,
+              "unique_outcome_specs": [
+                "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+              ],
+              "unique_population_specs": [
+                "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              ]
+            },
+            "session": {
+              "abandoned_branches": 0,
+              "branch_depth_max": 1,
+              "candidate_actions_considered": 20,
+              "categorical_levels_evaluated": 0,
+              "duplicate_experiments_blocked": 0,
+              "experiments_executed": 1,
+              "explanatory_features_tested": [],
+              "falsification_experiments_executed": 0,
+              "interactions_attempted": 0,
+              "neighborhood_cuts_evaluated": 0,
+              "partitions_evaluated": 0,
+              "questions_generated": 1,
+              "refinements_reframes": 0,
+              "threshold_candidates_evaluated": 0,
+              "unique_outcome_specs": [
+                "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+              ],
+              "unique_population_specs": [
+                "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+              ]
+            }
+          },
+          "shape_evidence": {},
+          "threshold_neighborhood_evidence": {},
+          "why_interesting": "Descriptive group difference with effect=None",
+          "why_not_validated": "Research-only; validated=False always in Phase 3G."
+        }
+      },
+      "session_ledger": {
+        "abandoned_branches": 0,
+        "branch_depth_max": 2,
+        "candidate_actions_considered": 22,
+        "categorical_levels_evaluated": 0,
+        "duplicate_experiments_blocked": 0,
+        "experiments_executed": 2,
+        "explanatory_features_tested": [],
+        "falsification_experiments_executed": 1,
+        "interactions_attempted": 0,
+        "neighborhood_cuts_evaluated": 0,
+        "partitions_evaluated": 0,
+        "questions_generated": 2,
+        "refinements_reframes": 0,
+        "threshold_candidates_evaluated": 0,
+        "unique_outcome_specs": [
+          "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        ],
+        "unique_population_specs": [
+          "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        ]
+      },
+      "version": "search_accounting_v1"
+    },
+    "started_at": "2026-08-21T11:24:29Z",
+    "status": "ACTIVE"
+  }
+}

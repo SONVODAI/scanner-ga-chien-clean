@@ -1,0 +1,22 @@
+{
+  "benchmark_id": "blind_benchmark_03",
+  "status": "BENCHMARK_RUN_FAILED",
+  "failed_at": "2026-08-21T12:18:44Z",
+  "git_commit": "f2d5d87d87366936a18d772f52e7c2a73811f888",
+  "error": "GrammarValidationError: Population field 't5_return' not allowed in _add_grammar_candidates",
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "experiments_completed_before_failure": 2,
+  "session_status": "ACTIVE",
+  "architectural_finding": "Autonomous OUTCOME_TO_POPULATION reframe was selected and executed, but session crashed during subsequent planning when grammar validation rejected horizon-advanced population fields in _add_grammar_candidates.",
+  "interpretation": "Partial artifacts generated from persisted session. Research logic NOT modified.",
+  "research_capability_score": 44,
+  "reframing_capability_score": 10,
+  "capability_gates": {
+    "gate_A_exploration": "FAIL",
+    "gate_B_reframing": "PASS",
+    "gate_C_evidence_driven_transition": "FAIL",
+    "gate_D_temporal_legality": "PASS",
+    "gate_E_scientific_discipline": "PASS",
+    "gate_F_discovery": "PASS"
+  }
+}
