@@ -1,0 +1,127 @@
+{
+  "verdict": {
+    "LIVE_5M_PROVIDER_READY": "YES",
+    "DYNAMIC_WATCHLIST_TO_CAMERA_READY": "YES",
+    "CAMERA_TO_PXV_SHADOW_READY": "YES",
+    "PRODUCTION_UNCHANGED": "YES"
+  },
+  "production_unchanged_means": [
+    "Elite scores / ranking / KẾT LUẬN unchanged",
+    "V1A Camera archive collect/reconcile/upsert unchanged",
+    "P×V features / 2.0 / 0.70 / 1.5 / RAW / 2-bar debounce / semantic gate unchanged",
+    "Candidate first-seen / watchlist contract unchanged",
+    "no deploy",
+    "no UI",
+    "no Telegram",
+    "no BUY/SELL",
+    "alert_eligible remains false"
+  ],
+  "provider_audit": {
+    "reused": "modules.intraday_memory.provider.KBSProvider.fetch_session",
+    "read_only": true,
+    "writes_parquet": false,
+    "throttle_rpm": 18,
+    "interval": "5m",
+    "transport_window": "start=session-1, end=session+1, filter to session",
+    "isolated_from": [
+      "modules.intraday_memory.collector.IntradayCollector",
+      "modules.intraday_memory.storage.upsert_session",
+      "modules.intraday_memory.reconciliation"
+    ],
+    "second_camera_system": false,
+    "v1a_replaced": false
+  },
+  "bar_contract": {
+    "bar_ts": "exchange slot open on VN 5m grid",
+    "completed_iff": "now >= bar_ts + 5 minutes",
+    "unfinished_ignored": true,
+    "observed_at_separate": true,
+    "dedup_key": ["symbol", "bar_ts"],
+    "no_backfill_into_earlier_candidate": true
+  },
+  "chronology": {
+    "asof_allowed": "asof >= candidate_first_seen_ts via resolve_legal_existence",
+    "eligible_from_floor": "asof >= eligible_from",
+    "example_1337": {
+      "candidate_at": "13:37",
+      "bar_1335": "illegal",
+      "bar_1340_at_1342": "unfinished, ignored",
+      "first_legal_completed": "13:40 after 13:45"
+    },
+    "live_interpreter": "interpret_asof + PublishedDebouncer per new legal completed bar",
+    "not_used": "interpret_candidate_session (frozen EVAL_START_BAR=8 would skip legal morning bars)",
+    "eval_start_bar_unchanged": 8
+  },
+  "universe": {
+    "source": "research Dynamic Watchlist only",
+    "rule": "now >= eligible_from",
+    "hard_cap": 50,
+    "extra_ranking": false,
+    "order": ["eligible_from", "symbol"],
+    "full_142_live": false
+  },
+  "rate": {
+    "rpm": 18,
+    "min_interval_sec": 3.3333333333333335,
+    "payload_sec_observed_v1a": 3.07,
+    "staggered": true,
+    "same_second_not_required": true,
+    "observation_latency_sec": {
+      "30": 100.0,
+      "40": 133.3,
+      "50": 166.7
+    },
+    "fits_5m_bar": {
+      "30": true,
+      "40": true,
+      "50": true,
+      "142": false
+    },
+    "max_safe_live_universe_under_18rpm": 90,
+    "hard_cap_this_slice": 50,
+    "note": "90 is the interval-bound maximum when request <= 3.33s. Slice still caps at 50."
+  },
+  "pxv": {
+    "raw_evidence": true,
+    "published_evidence": true,
+    "alert_eligible": false,
+    "would_be_alert": false,
+    "thresholds_unchanged": [2.0, 0.7, 1.5],
+    "debounce_unchanged": "2-bar PublishedDebouncer"
+  },
+  "shadow_output": {
+    "path": "data/intraday_pxv_live_shadow/",
+    "env": "MRBOT_LIVE_CAMERA_SHADOW_OUT",
+    "files": [
+      "live_bars.jsonl",
+      "live_evidence.jsonl",
+      "live_shadow_status.json",
+      "emitted_keys.json",
+      "debounce_state.json"
+    ]
+  },
+  "failure_statuses": [
+    "NO_DATA",
+    "STALE_BAR",
+    "RATE_LIMITED",
+    "PROVIDER_ERROR",
+    "NOT_YET_ELIGIBLE",
+    "UNUSABLE",
+    "WAITING_COMPLETED_BAR",
+    "SKIPPED_CAP"
+  ],
+  "tests": {
+    "file": "tests/test_live_camera_shadow.py",
+    "passed": 14,
+    "covers": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "cap50", "NO_DATA", "rate_30_40_50", "bar_complete_boundary"],
+    "related_still_green": [
+      "tests/test_live_candidate_first_seen.py",
+      "tests/test_intraday_pxv_v1_chronology.py"
+    ]
+  },
+  "remaining_blocker_before_ui": [
+    "Read-only UI surface that shows Dynamic Watchlist + live_evidence.jsonl (first_seen, completed bar, observed_at, RAW, PUBLISHED, chronology_legal)",
+    "A real live session via scripts/run_live_camera_shadow.py --live and vnstock 4.x",
+    "No alerts / Telegram / BUY/SELL until an explicit later slice; alert_eligible stays false"
+  ]
+}
