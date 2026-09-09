@@ -18,13 +18,17 @@ def render_message(
     gate: GateResult,
     features: dict[str, Any],
     evidence: EvidenceResult,
+    raw_evidence: str | None = None,
+    published_evidence: str | None = None,
 ) -> str:
-    if evidence.evidence == EV_UNUSABLE or not gate.usable_volume:
+    published = published_evidence or evidence.evidence
+    raw = raw_evidence or evidence.evidence
+    if published == EV_UNUSABLE or evidence.evidence == EV_UNUSABLE or not gate.usable_volume:
         return (
             f"{symbol}  {asof_hm}   P×V evidence (not a trade instruction)\n"
             f"BOT reason (pass-through): {candidate_reason}\n"
             f"Gate: {gate.data_state} · {gate.gate_reason} · {gate.n_bars} bars\n"
-            f"Evidence: UNUSABLE — {evidence.evidence_why}"
+            f"Evidence (published): UNUSABLE — {evidence.evidence_why}"
         )
 
     lines = [
@@ -55,5 +59,7 @@ def render_message(
         f"Gate: {gate.data_state} · {gate.gate_reason} · "
         f"{gate.n_bars}/{gate.expected_bars} bars · overlay={gate.overlay_applied}"
     )
-    lines.append(f"Evidence: {evidence.evidence} — {evidence.evidence_why}")
+    lines.append(f"Evidence (published): {published} — {evidence.evidence_why}")
+    if raw != published:
+        lines.append(f"Raw (1-bar): {raw}")
     return "\n".join(lines)

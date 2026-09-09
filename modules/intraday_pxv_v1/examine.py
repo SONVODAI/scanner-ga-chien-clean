@@ -64,6 +64,14 @@ def load_ledger(path: Path) -> pd.DataFrame:
         return df
     df["asof_ts"] = df["asof"].map(_parse_ts)
     df["evidence"] = df["evidence"].astype(str)
+    if "raw_evidence" not in df.columns:
+        df["raw_evidence"] = df["evidence"]
+    else:
+        df["raw_evidence"] = df["raw_evidence"].astype(str)
+    if "published_evidence" not in df.columns:
+        df["published_evidence"] = df["evidence"]
+    else:
+        df["published_evidence"] = df["published_evidence"].astype(str)
     df["data_state"] = df["data_state"].astype(str)
     df["tod_maturity"] = df.get("tod_maturity", pd.Series([""] * len(df))).astype(str)
     if "overlay_applied" in df.columns:
@@ -72,6 +80,8 @@ def load_ledger(path: Path) -> pd.DataFrame:
         df["overlay_applied"] = False
     if "would_be_alert" not in df.columns:
         df["would_be_alert"] = False
+    if "alert_eligible" not in df.columns:
+        df["alert_eligible"] = False
     return df.sort_values(["symbol", "session", "asof_ts"]).reset_index(drop=True)
 
 
@@ -134,7 +144,38 @@ def transition_counts(df: pd.DataFrame) -> dict[str, int]:
     return dict(c)
 
 
+def _with_col(df: pd.DataFrame, evidence_col: str) -> pd.DataFrame:
+    if evidence_col not in df.columns:
+        raise KeyError(f"ledger missing column {evidence_col}")
+    out = df.copy()
+    out["evidence"] = out[evidence_col].astype(str)
+    return out
+
+
 def persist_dist(sw_runs: list[dict[str, Any]]) -> dict[str, int]:
+    n = len(sw_runs)
+    return {
+        "sw_runs": n,
+        "1_bar": sum(1 for r in sw_runs if r["n_bars"] == 1),
+        "ge_2_bars": sum(1 for r in sw_runs if r["n_bars"] >= 2),
+        "ge_3_bars": sum(1 for r in sw_runs if r["n_bars"] >= 3),
+        "ge_15_min": sum(1 for r in sw_runs if r["elapsed_min"] >= 15),
+        "ge_30_min": sum(1 for r in sw_runs if r["elapsed_min"] >= 30),
+    }
+
+
+def persist_snapshot(sw_runs: list[dict[str, Any]]) -> dict[str, Any]:
+    dist = persist_dist(sw_runs)
+    med_bars = float(pd.Series([r["n_bars"] for r in sw_runs]).median()) if sw_runs else 0.0
+    med_min = float(pd.Series([r["elapsed_min"] for r in sw_runs]).median()) if sw_runs else 0.0
+    return {
+        **dist,
+        "median_persist_bars": med_bars,
+        "median_persist_min": med_min,
+        "returned_to_neutral": sum(1 for r in sw_runs if r["to_neutral"]),
+        "direct_opposite_reversals": sum(1 for r in sw_runs if r["to_opposite"]),
+        "ended_session_still_active": sum(1 for r in sw_runs if r["next"] == "END"),
+    }
     n = len(sw_runs)
     return {
         "sw_runs": n,
@@ -378,26 +419,40 @@ def verdict(dist: dict[str, int], sw_runs: list[dict[str, Any]], trans: dict[str
     return {"verdict": v, "why": why}
 
 
-def examine(ledger_path: Path, report_path: Path | None = None) -> dict[str, Any]:
+def examine(
+    ledger_path: Path,
+    report_path: Path | None = None,
+    *,
+    evidence_col: str = "evidence",
+) -> dict[str, Any]:
     df = load_ledger(ledger_path)
     meta = {}
     if report_path and report_path.exists():
         meta = json.loads(report_path.read_text(encoding="utf-8"))
-    runs = collect_runs(df)
+    return examine_frame(df, meta=meta, evidence_col=evidence_col, source_ledger=str(ledger_path))
+
+
+def examine_frame(
+    df: pd.DataFrame,
+    *,
+    meta: dict[str, Any] | None = None,
+    evidence_col: str = "evidence",
+    source_ledger: str = "",
+) -> dict[str, Any]:
+    meta = meta or {}
+    work = _with_col(df, evidence_col) if not df.empty else df
+    runs = collect_runs(work)
     sw_runs = [r for r in runs if r["evidence"] in SW]
     dist = persist_dist(sw_runs)
-    trans = transition_counts(df)
-    n_ss = int(df.groupby(["symbol", "session"]).ngroups) if len(df) else 0
-    raw_wb = int(df["would_be_alert"].sum()) if len(df) else 0
-    med_bars = float(pd.Series([r["n_bars"] for r in sw_runs]).median()) if sw_runs else 0.0
-    med_min = float(pd.Series([r["elapsed_min"] for r in sw_runs]).median()) if sw_runs else 0.0
-    opp = sum(1 for r in sw_runs if r["to_opposite"])
-    neu = sum(1 for r in sw_runs if r["to_neutral"])
-
+    trans = transition_counts(work)
+    n_ss = int(work.groupby(["symbol", "session"]).ngroups) if len(work) else 0
+    raw_wb = int(work["would_be_alert"].sum()) if len(work) else 0
+    persist = persist_snapshot(sw_runs)
     stable = [r for r in sw_runs if r["n_bars"] >= 2]
-    timing = Counter(_bucket(r["first_hm"]) for r in stable)
+    timing_ge2 = Counter(_bucket(r["first_hm"]) for r in stable)
+    timing_first = Counter(_bucket(r["first_hm"]) for r in sw_runs)
 
-    last = df.sort_values("asof_ts").groupby(["symbol", "session"], as_index=False).tail(1) if len(df) else df
+    last = work.sort_values("asof_ts").groupby(["symbol", "session"], as_index=False).tail(1) if len(work) else work
     dq = {
         "last_bar_data_state": dict(last["data_state"].value_counts()) if len(last) else {},
         "last_bar_tod": dict(last["tod_maturity"].value_counts()) if len(last) else {},
@@ -411,9 +466,10 @@ def examine(ledger_path: Path, report_path: Path | None = None) -> dict[str, Any
         ),
     }
 
-    out = {
-        "source_ledger": str(ledger_path),
-        "n_rows": int(len(df)),
+    return {
+        "source_ledger": source_ledger,
+        "evidence_col": evidence_col,
+        "n_rows": int(len(work)),
         "n_symbol_sessions": n_ss,
         "shadow_report_meta": {
             k: meta.get(k)
@@ -427,23 +483,182 @@ def examine(ledger_path: Path, report_path: Path | None = None) -> dict[str, Any
             )
             if meta
         },
-        "persistence": {
-            **dist,
-            "median_persist_bars": med_bars,
-            "median_persist_min": med_min,
-            "returned_to_neutral": neu,
-            "direct_opposite_reversals": opp,
-            "ended_session_still_active": sum(1 for r in sw_runs if r["next"] == "END"),
-        },
+        "persistence": persist,
         "transitions": trans,
         "raw_transition_arrows": sum(v for k, v in trans.items() if "->" in k),
-        "timing_stable_ge2_first_hm": dict(timing),
+        "timing_stable_ge2_first_hm": dict(timing_ge2),
+        "timing_first_sw": dict(timing_first),
         "alert_simulation": simulate_alerts(sw_runs, raw_wb),
-        "candidates": candidate_behavior(df, runs),
+        "candidates": candidate_behavior(work, runs),
         "data_quality": dq,
-        "examples": pick_examples(sw_runs, df),
+        "examples": pick_examples(sw_runs, work),
         "verdict_block": verdict(dist, sw_runs, trans, n_ss),
+        "alert_eligible_true_count": int(work["alert_eligible"].sum()) if len(work) and "alert_eligible" in work.columns else 0,
     }
+
+
+def debounce_verdict(raw_p: dict[str, Any], pub_p: dict[str, Any], pub_timing_first: dict[str, int]) -> dict[str, str]:
+    """Pre-declared, not T+n. Did 2-bar confirm convert 1-bar noise without killing timing?"""
+    raw_n = max(int(raw_p.get("sw_runs") or 0), 1)
+    pub_n = int(pub_p.get("sw_runs") or 0)
+    pub_1 = int(pub_p.get("1_bar") or 0) / max(pub_n, 1)
+    raw_opp = int(raw_p.get("direct_opposite_reversals") or 0) / raw_n
+    pub_opp = int(pub_p.get("direct_opposite_reversals") or 0) / max(pub_n, 1)
+    early = int(pub_timing_first.get("09:15-10:00") or 0) + int(pub_timing_first.get("10:00-11:30") or 0) + int(
+        pub_timing_first.get("13:00-14:00") or 0
+    )
+    early_frac = early / max(pub_n, 1)
+    reduction = 1.0 - (pub_n / raw_n)
+
+    if pub_n < 10:
+        return {
+            "verdict": "DEBOUNCE_INEFFECTIVE",
+            "why": "published S/W almost disappeared — confirmation destroyed the evidence stream",
+        }
+    if reduction < 0.25:
+        return {
+            "verdict": "DEBOUNCE_INEFFECTIVE",
+            "why": "published S/W run count is still close to RAW — 1-bar noise was not converted",
+        }
+    if early_frac < 0.15:
+        return {
+            "verdict": "DEBOUNCE_INEFFECTIVE",
+            "why": "published S/W exists but useful intraday timing before 14:00 was destroyed",
+        }
+    if reduction >= 0.50 and early_frac >= 0.20 and pub_opp <= max(raw_opp, 0.15) and pub_1 < 0.55:
+        return {
+            "verdict": "DEBOUNCE_EFFECTIVE",
+            "why": "1-bar RAW noise dropped out of published evidence; remaining S/W is more persistent and still prints before 14:00",
+        }
+    return {
+        "verdict": "DEBOUNCE_PARTIAL",
+        "why": (
+            "RAW 1-bar spikes are suppressed from published evidence, but remaining published "
+            "runs are still short (confirmed-then-fade) and/or opposite reversals remain. "
+            f"run reduction={reduction:.1%} published_1bar={pub_1:.1%} early_frac={early_frac:.1%}"
+        ),
+    }
+
+
+def compare_raw_published(df: pd.DataFrame, source_ledger: str = "") -> dict[str, Any]:
+    raw = examine_frame(df, evidence_col="raw_evidence", source_ledger=source_ledger)
+    pub = examine_frame(df, evidence_col="published_evidence", source_ledger=source_ledger)
+    keys = [
+        "sw_runs",
+        "1_bar",
+        "ge_2_bars",
+        "ge_3_bars",
+        "ge_15_min",
+        "ge_30_min",
+        "median_persist_bars",
+        "median_persist_min",
+        "returned_to_neutral",
+        "direct_opposite_reversals",
+    ]
+    table = []
+    for k in keys:
+        table.append({"metric": k, "raw": raw["persistence"][k], "published": pub["persistence"][k]})
+    dgc_pub = pub["examples"]["structural"]
+    gmd = dual_timeline(df, "GMD", "2026-08-28")
+    return {
+        "source_ledger": source_ledger,
+        "n_rows": int(len(df)),
+        "n_symbol_sessions": int(df.groupby(["symbol", "session"]).ngroups) if len(df) else 0,
+        "comparison_table": table,
+        "raw": {
+            "persistence": raw["persistence"],
+            "timing_first_sw": raw.get("timing_first_sw", {}),
+            "timing_stable_ge2": raw["timing_stable_ge2_first_hm"],
+            "candidates": {
+                k: raw["candidates"][k]
+                for k in (
+                    "noisy_flicker_n",
+                    "clean_persistent_n",
+                    "never_leave_neutral_n",
+                    "unusable_dominated_n",
+                )
+            },
+            "dgc": raw["examples"]["structural"],
+            "examiner_verdict": raw["verdict_block"],
+        },
+        "published": {
+            "persistence": pub["persistence"],
+            "timing_first_sw": pub.get("timing_first_sw", {}),
+            "timing_stable_ge2": pub["timing_stable_ge2_first_hm"],
+            "candidates": {
+                k: pub["candidates"][k]
+                for k in (
+                    "noisy_flicker_n",
+                    "clean_persistent_n",
+                    "never_leave_neutral_n",
+                    "unusable_dominated_n",
+                )
+            },
+            "noisy_examples": pub["candidates"].get("noisy_examples", [])[:8],
+            "dgc": dgc_pub,
+            "examiner_verdict": pub["verdict_block"],
+            "examples": {
+                "strengthen": pub["examples"]["clean_strengthen"],
+                "weaken": pub["examples"]["clean_weaken"],
+                "noisy": pub["examples"]["noisy"],
+            },
+        },
+        "checks": {
+            "alert_eligible_true_count": int(df["alert_eligible"].sum()) if "alert_eligible" in df.columns and len(df) else 0,
+            "dgc_published_sw": bool(dgc_pub.get("any_dgc_strengthen_weaken")),
+        },
+        "gmd_2026_08_28": gmd,
+        "debounce_verdict": debounce_verdict(
+            raw["persistence"],
+            pub["persistence"],
+            pub.get("timing_first_sw") or {},
+        ),
+    }
+
+
+def dual_timeline(df: pd.DataFrame, symbol: str, session: str, limit: int = 48) -> dict[str, Any]:
+    g = df[(df["symbol"] == symbol) & (df["session"].astype(str) == str(session))].copy()
+    if g.empty:
+        return {"symbol": symbol, "session": session, "n_bars": 0, "lines": [], "missing": True}
+    g = g.sort_values("asof_ts") if "asof_ts" in g.columns else g
+    lines = []
+    for _, row in g.iterrows():
+        raw = str(row.get("raw_evidence", row.get("evidence", "")))
+        pub = str(row.get("published_evidence", row.get("evidence", "")))
+        mark = " *" if raw != pub else ""
+        lines.append(f"{row['asof_hm']}  raw={raw:<11} published={pub:<11}{mark}  state={row.get('data_state','')}")
+        if len(lines) >= limit:
+            break
+    raw_col = g["raw_evidence"] if "raw_evidence" in g.columns else g["evidence"]
+    pub_col = g["published_evidence"] if "published_evidence" in g.columns else g["evidence"]
+    return {
+        "symbol": symbol,
+        "session": session,
+        "n_bars": int(len(g)),
+        "missing": False,
+        "lines": lines,
+        "raw_sw": int(raw_col.isin(["STRENGTHEN", "WEAKEN"]).sum()),
+        "published_sw": int(pub_col.isin(["STRENGTHEN", "WEAKEN"]).sum()),
+    }
+
+
+def apply_debounce_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Treat raw_evidence (or evidence) as RAW and fill published_evidence."""
+    from modules.intraday_pxv_v1.debounce import PublishedDebouncer
+
+    out = df.copy()
+    if out.empty:
+        return out
+    if "raw_evidence" not in out.columns:
+        out["raw_evidence"] = out["evidence"].astype(str)
+    out = out.sort_values(["symbol", "session", "asof_ts"]).reset_index(drop=True)
+    pubs: list[str] = []
+    for _, g in out.groupby(["symbol", "session"], sort=False):
+        deb = PublishedDebouncer()
+        for raw in g["raw_evidence"].astype(str).tolist():
+            pubs.append(deb.step(raw)[0])
+    out["published_evidence"] = pubs
+    out["evidence"] = out["published_evidence"]
     return out
 
 
@@ -485,4 +700,51 @@ def write_examiner(result: dict[str, Any], out_dir: Path) -> Path:
         "",
     ]
     md.write_text("\n".join(lines), encoding="utf-8")
+    return js
+
+
+def write_compare(result: dict[str, Any], out_dir: Path) -> Path:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    js = out_dir / "debounce_compare.json"
+    js.write_text(json.dumps(result, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    v = result["debounce_verdict"]
+    lines = [
+        "# Slice 1C published-evidence debounce — examiner compare",
+        "",
+        "Shadow only. RAW one-bar classification unchanged. No T+n. `alert_eligible` must be 0.",
+        "",
+        f"## VERDICT: {v['verdict']}",
+        v["why"],
+        "",
+        "## RAW vs PUBLISHED",
+        "",
+        "| metric | RAW | PUBLISHED |",
+        "|---|---:|---:|",
+    ]
+    for row in result["comparison_table"]:
+        lines.append(f"| {row['metric']} | {row['raw']} | {row['published']} |")
+    pub = result["published"]
+    raw = result["raw"]
+    lines += [
+        "",
+        "## Timing of first PUBLISHED S/W",
+        json.dumps(pub.get("timing_first_sw", {}), indent=2),
+        "",
+        "Timing of first RAW S/W:",
+        json.dumps(raw.get("timing_first_sw", {}), indent=2),
+        "",
+        "## Candidate / session impact (published examiner)",
+        json.dumps(pub.get("candidates"), indent=2),
+        "",
+        "## Checks",
+        json.dumps(result["checks"], indent=2),
+        "",
+        "## DGC published",
+        json.dumps(pub.get("dgc"), indent=2),
+        "",
+        "## GMD 2026-08-28",
+        json.dumps(result.get("gmd_2026_08_28"), indent=2, ensure_ascii=False),
+        "",
+    ]
+    (out_dir / "debounce_compare.md").write_text("\n".join(lines), encoding="utf-8")
     return js

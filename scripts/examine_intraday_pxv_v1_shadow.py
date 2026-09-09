@@ -16,7 +16,7 @@ REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from modules.intraday_pxv_v1.examine import examine, write_examiner
+from modules.intraday_pxv_v1.examine import examine, write_examiner, load_ledger, compare_raw_published, write_compare
 
 
 def main() -> int:
@@ -33,18 +33,36 @@ def main() -> int:
         "--out",
         default="/tmp/pxv-v1-slice1-examiner",
     )
+    p.add_argument(
+        "--evidence-col",
+        default="evidence",
+        help="Column to examine: evidence | raw_evidence | published_evidence",
+    )
+    p.add_argument("--compare", action="store_true", help="Write RAW vs PUBLISHED compare")
     args = p.parse_args()
     ledger = Path(args.ledger)
     if not ledger.exists():
         print(f"LEDGER_MISSING {ledger}", file=sys.stderr)
         return 2
-    result = examine(ledger, Path(args.report) if args.report else None)
+    df = load_ledger(ledger)
+    col = args.evidence_col
+    if col not in df.columns:
+        col = "evidence"
+    result = examine(ledger, Path(args.report) if args.report else None, evidence_col=col)
     out = Path(args.out)
     write_examiner(result, out)
+    if args.compare:
+        cmp = compare_raw_published(df, str(ledger))
+        write_compare(cmp, out)
+        print("======== DEBOUNCE COMPARE ========")
+        print(f"VERDICT: {cmp['debounce_verdict']['verdict']}")
+        print(cmp["debounce_verdict"]["why"])
+        print(json.dumps(cmp["comparison_table"], indent=2, default=str))
     v = result["verdict_block"]
     persist = result["persistence"]
     sim = result["alert_simulation"]
     print("======== SLICE 1B EXAMINER ========")
+    print(f"EVIDENCE_COL: {col}")
     print(f"VERDICT: {v['verdict']}")
     print(v["why"])
     print(
@@ -66,6 +84,7 @@ def main() -> int:
                         "returned_to_neutral",
                     )
                 },
+                "timing_first_sw": result.get("timing_first_sw"),
                 "timing_stable_ge2": result["timing_stable_ge2_first_hm"],
                 "alerts": {k: sim[k] for k in sim if k.startswith("R")},
                 "candidates": {
@@ -78,12 +97,7 @@ def main() -> int:
                     )
                 },
                 "dgc": result["examples"]["structural"],
-                "examples": {
-                    "strengthen": result["examples"]["clean_strengthen"],
-                    "weaken": result["examples"]["clean_weaken"],
-                    "noisy": result["examples"]["noisy"],
-                },
-                "data_quality": result["data_quality"],
+                "alert_eligible_true_count": result.get("alert_eligible_true_count"),
                 "artifacts": str(out),
             },
             indent=2,

@@ -15,17 +15,19 @@ from modules.intraday_pxv_v1.candidates import CandidateEvent, thesis_is_long
 from modules.intraday_pxv_v1.constants import (
     EV_STRENGTHEN,
     EV_WEAKEN,
+    LEDGER_VERSION_DEBOUNCE,
     MODE_SHADOW,
     RESEARCH_DEFAULT_EVAL_START_BAR,
     RESEARCH_DEFAULT_PERSISTENCE_BARS,
     TOD_PRELIMINARY,
 )
-from modules.intraday_pxv_v1.evidence import decide_evidence
+from modules.intraday_pxv_v1.debounce import PublishedDebouncer
+from modules.intraday_pxv_v1.evidence import EvidenceResult, decide_evidence
 from modules.intraday_pxv_v1.features import compute_features
 from modules.intraday_pxv_v1.gate import GATE_INTERVAL, GateResult, evaluate_gate
 from modules.intraday_pxv_v1.message import render_message
 
-LEDGER_VERSION = "pxv_v1_slice1"
+LEDGER_VERSION = LEDGER_VERSION_DEBOUNCE
 
 
 @dataclass
@@ -48,7 +50,10 @@ class LedgerRow:
     expected_bars: int
     features: dict[str, Any]
     evidence: str
+    raw_evidence: str
+    published_evidence: str
     evidence_why: str
+    published_why: str
     message: str
     alert_eligible: bool
     would_be_alert: bool
@@ -165,7 +170,10 @@ def interpret_asof(
         expected_bars=gate.expected_bars,
         features=features,
         evidence=ev.evidence,
+        raw_evidence=ev.evidence,
+        published_evidence=ev.evidence,
         evidence_why=ev.evidence_why,
+        published_why="",
         message=msg,
         alert_eligible=False,
         would_be_alert=False,
@@ -190,13 +198,19 @@ def interpret_candidate_session(
             tod_store=tod_store,
             tod_qualified_sessions=tod_qualified_sessions,
         )
+        pub, why = PublishedDebouncer().step(row.raw_evidence)
+        row.published_evidence = pub
+        row.published_why = why
+        row.evidence = pub
+        row.alert_eligible = False
         return [row]
 
     rows: list[LedgerRow] = []
     start = max(RESEARCH_DEFAULT_EVAL_START_BAR - 1, 0)
     persist = 0
-    last_ev = None
+    last_pub = None
     fired: set[str] = set()
+    debouncer = PublishedDebouncer()
     for i in range(start, len(bars)):
         asof = bars.iloc[i]["timestamp"].to_pydatetime()
         row = interpret_asof(
@@ -206,16 +220,33 @@ def interpret_candidate_session(
             tod_store=tod_store,
             tod_qualified_sessions=tod_qualified_sessions,
         )
-        if row.evidence == last_ev and row.evidence in {EV_STRENGTHEN, EV_WEAKEN}:
+        raw = row.raw_evidence
+        published, pub_why = debouncer.step(raw)
+        row.published_evidence = published
+        row.published_why = pub_why
+        row.evidence = published
+        if "PUBLISHED_DEBOUNCE_2BAR" not in row.research_default_flags:
+            row.research_default_flags.append("PUBLISHED_DEBOUNCE_2BAR")
+        row.message = render_message(
+            symbol=candidate.symbol,
+            asof_hm=row.asof_hm,
+            candidate_reason=candidate.candidate_reason,
+            gate=_gate_from_row(row),
+            features=row.features,
+            evidence=_published_result(row, published, pub_why),
+            raw_evidence=raw,
+            published_evidence=published,
+        )
+        if published == last_pub and published in {EV_STRENGTHEN, EV_WEAKEN}:
             persist += 1
         else:
-            persist = 1 if row.evidence in {EV_STRENGTHEN, EV_WEAKEN} else 0
-        last_ev = row.evidence
-        key = f"{row.evidence}"
+            persist = 1 if published in {EV_STRENGTHEN, EV_WEAKEN} else 0
+        last_pub = published
+        key = f"{published}"
         if (
             persist >= RESEARCH_DEFAULT_PERSISTENCE_BARS
             and key not in fired
-            and row.evidence in {EV_STRENGTHEN, EV_WEAKEN}
+            and published in {EV_STRENGTHEN, EV_WEAKEN}
             and row.data_state not in {"UNUSABLE", "LOW_CONFIDENCE"}
         ):
             row.would_be_alert = True
@@ -223,6 +254,32 @@ def interpret_candidate_session(
         row.alert_eligible = False
         rows.append(row)
     return rows
+
+
+def _gate_from_row(row: LedgerRow) -> GateResult:
+    return GateResult(
+        data_state=row.data_state,
+        gate_reason=row.gate_reason,
+        volume_kind=row.volume_kind,
+        tod_maturity=row.tod_maturity,
+        overlay_applied=row.overlay_applied,
+        n_bars=row.n_bars,
+        expected_bars=row.expected_bars,
+        doji_frac=0.0,
+        median_gap_sec=None,
+        last_over_sum=None,
+        max_over_sum=None,
+        notes=[],
+    )
+
+
+def _published_result(row: LedgerRow, published: str, pub_why: str) -> EvidenceResult:
+    return EvidenceResult(
+        published,
+        pub_why or row.evidence_why,
+        published == EV_STRENGTHEN,
+        published == EV_WEAKEN,
+    )
 
 
 def rows_to_frame(rows: list[LedgerRow]) -> pd.DataFrame:
