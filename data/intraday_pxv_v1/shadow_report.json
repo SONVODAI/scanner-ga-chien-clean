@@ -1,0 +1,12 @@
+{
+  "camera_root": "/workspace/intraday_memory",
+  "n_camera_sessions": 0,
+  "sessions": [],
+  "candidate_source": "buy_elite_learning_history.csv",
+  "candidate_filter": "conclusion in {BUY ELITE, MUA NHỎ / ƯU TIÊN}",
+  "n_candidate_events": 0,
+  "n_joined_events": 0,
+  "n_ledger_rows": 0,
+  "status": "CAMERA_ARCHIVE_NOT_MOUNTED",
+  "detail": "No bars.parquet under /workspace/intraday_memory. Set MRBOT_INTRADAY_DATA_ROOT to the live archive to produce real shadow results."
+}
