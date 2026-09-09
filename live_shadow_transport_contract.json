@@ -1,0 +1,63 @@
+{
+  "verdict": {
+    "A_CLOUD_TO_VPS_CANDIDATE_TRANSPORT_READY": "PARTIAL",
+    "B_VPS_TO_CLOUD_PXV_TRANSPORT_READY": "PARTIAL",
+    "C_SMALLEST_IMPLEMENTATION": "github_watchlist_plus_artifact_get_shadow",
+    "D_LIVE_SESSION_01_E2E_WITHOUT_MANUAL_COPY": "NO",
+    "E_MINIMAL_CHANGE_BEFORE_START": [
+      "persist_research_watchlist also _github_write_text data/live_candidate/dynamic_watchlist.json",
+      "VPS LiveShadowFeed GET that GitHub watchlist (fallback: rebuild from buy_elite_learning_history.csv)",
+      "after each sweep publish live_evidence.jsonl + live_shadow_status.json to /var/lib/mrbot/live_pxv_shadow",
+      "artifact_server GET /current/live_shadow/live_evidence.jsonl and live_shadow_status.json (same EDGE_RESEARCH_DURABLE_URL+TOKEN)",
+      "UI read.py fetches those GETs; still no KBS/interpret",
+      "Cloud must run a revision that includes first-seen + UI + this transport (main does not today)"
+    ]
+  },
+  "reuse": {
+    "cloud_to_git": "app.py _github_write_text / _github_read_text",
+    "already_on_github": ["buy_elite_learning_history.csv"],
+    "watchlist_today": "local only data/live_candidate/dynamic_watchlist.json",
+    "vps_to_cloud": "modules.edge_research.artifact_server + EDGE_RESEARCH_DURABLE_URL/TOKEN",
+    "artifact_allowed_today": [
+      "/current/bundle.tar.gz",
+      "/current/production_observations.tar.gz"
+    ]
+  },
+  "do_not_use": [
+    "manual scp of JSON as the live workflow",
+    "GitHub commit of 5m evidence every minute",
+    "Edge Research bundle.tar.gz for live P×V",
+    "Camera /var/lib/mrbot/intraday_memory",
+    "vnstock 4.x on Streamlit Cloud",
+    "new database"
+  ],
+  "identity": {
+    "episode_key": ["session", "symbol"],
+    "bar_key": ["symbol", "bar_ts"],
+    "immutable_on_wire": [
+      "candidate_first_seen_ts",
+      "eligible_from",
+      "bar_ts",
+      "chronology_legal"
+    ],
+    "fields": [
+      "session",
+      "symbol",
+      "candidate_first_seen_ts",
+      "eligible_from",
+      "candidate_updated_ts",
+      "bar_ts",
+      "observed_at",
+      "raw_evidence",
+      "published_evidence",
+      "data_state",
+      "data_quality",
+      "chronology_legal",
+      "runner_observed_at",
+      "runner_label"
+    ],
+    "runner_stale_after_sec": 600,
+    "alert_eligible": false
+  },
+  "live_session_01_started": false
+}
