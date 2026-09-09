@@ -1,0 +1,93 @@
+{
+  "schema": "live_session_01_report.v1",
+  "session_status": "NOT_STARTED",
+  "now": "2026-09-10T06:39:24.873371+07:00",
+  "verdict": {
+    "CANDIDATE_LIVE_HANDOFF_WORKED": "NO",
+    "CAMERA_5M_LIVE_WORKED": "NO",
+    "PXV_LIVE_INTERPRETATION_WORKED": "NO",
+    "UI_LIVE_REFRESH_WORKED": "NO",
+    "CHRONOLOGY_CLEAN": "NO",
+    "PRODUCTION_UNCHANGED": "YES"
+  },
+  "verdict_notes": {
+    "NO_means": "Not observed, or check failed. STRENGTHEN/WEAKEN is NOT required to PASS.",
+    "empty_or_neutral_valid": true,
+    "session_started": false,
+    "UI_LIVE_REFRESH_WORKED": "YES only means shadow files the UI reads were produced this session. Human still confirms the Streamlit expander refreshed."
+  },
+  "counts": {
+    "candidates": 0,
+    "evidence_rows": 0,
+    "legal_completed_bars": 0,
+    "illegal_evidence_rows": 0,
+    "raw": {},
+    "published": {},
+    "transitions": {}
+  },
+  "latency_sec": {
+    "after_bar_open_median": null,
+    "after_bar_open_max": null,
+    "after_bar_close_median": null,
+    "after_bar_close_max": null,
+    "n": 0,
+    "note": "observation latency = observed_at - bar_ts (open) and observed_at - (bar_ts+5m)"
+  },
+  "failures": [],
+  "stale_periods": [],
+  "runner": {
+    "observed_at": null,
+    "age_sec": null,
+    "stale_now": true,
+    "alert_eligible": false
+  },
+  "alert_eligible_all_false": true,
+  "candidates": [],
+  "first_legal_bar_by_symbol": {},
+  "preflight_blocker": "vnstock 4.x is not importable in this Python. Create isolated .venv-collector and pip install -r requirements-collector.txt. Do not install vnstock>=4 into the Streamlit/production env (app uses vnstock==0.2.9.2).",
+  "blocker": "LIVE SESSION 01 was not started. Run the operator start command during a VN cash session, then re-run this validator. Do not start it from CI/agent automatically.",
+  "production_unchanged": true,
+  "preflight": {
+    "all_ok": false,
+    "blocker": "vnstock 4.x is not importable in this Python. Create isolated .venv-collector and pip install -r requirements-collector.txt. Do not install vnstock>=4 into the Streamlit/production env (app uses vnstock==0.2.9.2).",
+    "paths": {
+      "watchlist_ui": "/workspace/data/live_candidate/dynamic_watchlist.json",
+      "watchlist_feed": "/workspace/data/live_candidate/dynamic_watchlist.json",
+      "watchlist_name": "dynamic_watchlist.json",
+      "watchlist_exists": false,
+      "shadow_ui": "/workspace/data/intraday_pxv_live_shadow",
+      "shadow_feed": "/workspace/data/intraday_pxv_live_shadow",
+      "evidence": "/workspace/data/intraday_pxv_live_shadow/live_evidence.jsonl",
+      "status": "/workspace/data/intraday_pxv_live_shadow/live_shadow_status.json",
+      "camera_archive": "/workspace/intraday_memory",
+      "watchlist_paths_match": true,
+      "shadow_paths_match": true,
+      "archive_isolated": true,
+      "candidate_root": "/workspace/data/live_candidate",
+      "checks": [
+        {
+          "check": "watchlist_paths_match",
+          "ok": true,
+          "detail": "/workspace/data/live_candidate/dynamic_watchlist.json == /workspace/data/live_candidate/dynamic_watchlist.json"
+        },
+        {
+          "check": "shadow_paths_match",
+          "ok": true,
+          "detail": "/workspace/data/intraday_pxv_live_shadow == /workspace/data/intraday_pxv_live_shadow"
+        },
+        {
+          "check": "camera_archive_isolated",
+          "ok": true,
+          "detail": "archive=/workspace/intraday_memory shadow=/workspace/data/intraday_pxv_live_shadow"
+        }
+      ]
+    },
+    "vnstock": {
+      "check": "vnstock_4x",
+      "ok": false,
+      "detail": "ModuleNotFoundError: No module named 'vnstock'"
+    },
+    "python": "/usr/bin/python3",
+    "repo": "/workspace"
+  }
+}

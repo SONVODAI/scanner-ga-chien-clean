@@ -10,3 +10,6 @@ __pycache__/
 
 # Intraday memory Parquet data (local/test — not committed to Git)
 /intraday_memory/
+
+# Isolated vnstock 4.x venv for live-shadow runner only — never Streamlit
+.venv-collector/
