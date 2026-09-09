@@ -1,0 +1,79 @@
+{
+  "verdict": {
+    "READ_ONLY_UI_READY": "YES",
+    "NEUTRAL_CANDIDATE_VISIBLE": "YES",
+    "LIVE_FRESHNESS_VISIBLE": "YES",
+    "PROVIDER_NOT_CALLED_BY_UI": "YES",
+    "PRODUCTION_UNCHANGED": "YES",
+    "READY_FOR_ONE_REAL_LIVE_SESSION": "YES"
+  },
+  "production_unchanged_means": [
+    "Elite scores / ranking / KẾT LUẬN unchanged",
+    "V1A Camera archive unchanged",
+    "P×V features / thresholds / RAW / 2-bar debounce unchanged",
+    "Candidate semantics unchanged",
+    "existing production expanders unchanged",
+    "app.py only adds an isolated try/except render hook",
+    "no deploy",
+    "no Telegram",
+    "no BUY/SELL",
+    "alert_eligible remains false"
+  ],
+  "panel": {
+    "title": "LIVE CANDIDATE × P×V",
+    "placement": "existing app.py, first expander after title",
+    "second_app": false,
+    "read_only": true
+  },
+  "sources": [
+    "data/live_candidate/dynamic_watchlist.json",
+    "data/intraday_pxv_live_shadow/live_evidence.jsonl",
+    "data/intraday_pxv_live_shadow/live_shadow_status.json"
+  ],
+  "ui_does_not": [
+    "call KBSProvider / fetch_session / IntradayCollector",
+    "recompute interpret_asof / decide_evidence",
+    "write watchlist or evidence files",
+    "set alert_eligible true"
+  ],
+  "visibility": {
+    "neutral_candidate_visible": true,
+    "signal_only_list": false,
+    "chronology_illegal_never_valid": true,
+    "empty": "No active BOT Candidate.",
+    "waiting": "Waiting for first eligible completed 5m bar."
+  },
+  "freshness": {
+    "stale_after_sec": 600,
+    "stale_banner": "Live-shadow runner STALE / stopped. Evidence below is NOT current."
+  },
+  "sort": [
+    "PUBLISHED STRENGTHEN/WEAKEN",
+    "RAW STRENGTHEN/WEAKEN",
+    "NEUTRAL",
+    "unavailable/unusable/waiting"
+  ],
+  "tests": {
+    "file": "tests/test_live_candidate_pxv_ui.py",
+    "passed": 15,
+    "covers": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "sort", "history"]
+  },
+  "real_session": {
+    "auto_started": false,
+    "production_deploy": false,
+    "prerequisites": [
+      "vnstock 4.x",
+      "optional VNSTOCK_API_KEY",
+      "Dynamic Watchlist with eligible_from <= now",
+      "VN cash session 09:15-14:45 Asia/Ho_Chi_Minh",
+      "isolated MRBOT_LIVE_CAMERA_SHADOW_OUT"
+    ],
+    "commands": {
+      "dry_run": "python3 scripts/run_live_camera_shadow.py",
+      "live_sweep": "python3 scripts/run_live_camera_shadow.py --live",
+      "live_loop": "watch -n 60 'python3 scripts/run_live_camera_shadow.py --live'",
+      "ui": "streamlit run app.py",
+      "html_preview": "python3 scripts/preview_live_candidate_pxv_ui.py --fixture --now 2026-08-14T14:13:00"
+    }
+  }
+}
