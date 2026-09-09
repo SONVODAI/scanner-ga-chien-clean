@@ -28,6 +28,7 @@ from modules.intraday_pxv_v1.candidates import load_candidate_events
 from modules.intraday_pxv_v1.examine import (
     apply_debounce_columns,
     compare_raw_published,
+    ensure_asof_ts,
     load_ledger,
     write_compare,
 )
@@ -86,6 +87,8 @@ def _camera_replay(cam: Path, out: Path) -> tuple[pd.DataFrame, dict]:
         joined += 1
         rows.extend(interpret_candidate_session(ov, ev, tod, qualified.get(ev.symbol, 0)))
     ledger = rows_to_frame(rows) if rows else pd.DataFrame()
+    if not ledger.empty:
+        ledger = ensure_asof_ts(ledger)
     write_ledger(ledger, out)
     extra = {
         "status": "CAMERA_REPLAY",
@@ -118,10 +121,9 @@ def main() -> int:
     cam = camera_data_root()
     ledger_path = Path(args.ledger)
     extra = {}
-    if list_session_dates(cam):
-        df, extra = _camera_replay(cam, out)
-        source = f"camera:{cam}"
-    elif ledger_path.exists():
+    # Prefer the official Slice 1 ledger when present so RAW is the recorded
+    # 1-bar series (asof/asof_hm), not a re-interpret frame missing asof_ts.
+    if ledger_path.exists():
         raw_df = load_ledger(ledger_path)
         # Old Slice 1 ledger: evidence == RAW. Preserve it, add published.
         if "raw_evidence" not in raw_df.columns or (
@@ -138,6 +140,9 @@ def main() -> int:
             "detail": "RAW taken from existing ledger evidence; published computed in isolation",
         }
         source = str(ledger_path)
+    elif list_session_dates(cam):
+        df, extra = _camera_replay(cam, out)
+        source = f"camera:{cam}"
     else:
         payload = {
             "status": "CAMERA_AND_LEDGER_MISSING",

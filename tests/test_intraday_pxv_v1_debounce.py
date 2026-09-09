@@ -225,6 +225,80 @@ def test_debounce_verdict_predeclared():
     assert good["verdict"] == "DEBOUNCE_EFFECTIVE"
 
 
+def test_slice1_ledger_schema_without_asof_ts_compare(tmp_path: Path):
+    """Real Slice 1 jsonl has `asof` + `asof_hm` only — no `asof_ts`."""
+    import pytest
+    from modules.intraday_pxv_v1.examine import collect_runs, ensure_asof_ts
+
+    day = "2026-08-28"
+    t0 = datetime(2026, 8, 28, 10, 0, tzinfo=VN_TZ)
+    t1 = t0 + timedelta(minutes=15)
+    recs = []
+    for t, ev in ((t0, "STRENGTHEN"), (t1, "STRENGTHEN"), (t1 + timedelta(minutes=5), "NEUTRAL")):
+        recs.append(
+            {
+                "symbol": "GMD",
+                "session": day,
+                "asof": t.isoformat(),
+                "asof_hm": t.strftime("%H:%M"),
+                "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+                "data_state": "QUALIFIED",
+                "gate_reason": "INTERVAL+TOD_IMMATURE",
+                "tod_maturity": "TOD_PRELIMINARY",
+                "overlay_applied": True,
+                "evidence": ev,
+                "would_be_alert": False,
+                "alert_eligible": False,
+                "features": {},
+            }
+        )
+    assert all("asof_ts" not in r for r in recs)
+    df = pd.DataFrame(recs)
+    assert "asof_ts" not in df.columns
+    out = apply_debounce_columns(df)
+    assert "asof_ts" in out.columns
+    assert list(out["asof"].astype(str)) == [r["asof"] for r in recs]
+    cmp = compare_raw_published(out, "slice1-schema")
+    assert cmp["checks"]["alert_eligible_true_count"] == 0
+    raw_runs = collect_runs(out.assign(evidence=out["raw_evidence"]))
+    sw = [r for r in raw_runs if r["evidence"] == "STRENGTHEN"]
+    assert sw and sw[0]["elapsed_min"] == 15.0
+    with pytest.raises(KeyError, match="asof"):
+        ensure_asof_ts(pd.DataFrame({"symbol": ["GMD"], "evidence": ["NEUTRAL"]}))
+
+
+def test_camera_rows_to_frame_schema_has_asof_not_asof_ts():
+    """Interpret/camera replay frames match LedgerRow: asof, no asof_ts."""
+    day = "2026-08-14"
+    t0 = datetime(2026, 8, 14, 13, 0, tzinfo=VN_TZ)
+    rows = []
+    for i, raw in enumerate(["STRENGTHEN", "STRENGTHEN", "NEUTRAL"]):
+        t = t0 + timedelta(minutes=5 * i)
+        rows.append(
+            {
+                "symbol": "HPG",
+                "session": day,
+                "asof": t.isoformat(),
+                "asof_hm": t.strftime("%H:%M"),
+                "raw_evidence": raw,
+                "published_evidence": "NEUTRAL" if i == 0 or raw == "NEUTRAL" else "STRENGTHEN",
+                "evidence": "NEUTRAL" if i == 0 or raw == "NEUTRAL" else "STRENGTHEN",
+                "data_state": "QUALIFIED",
+                "gate_reason": "INTERVAL",
+                "tod_maturity": "TOD_PRELIMINARY",
+                "overlay_applied": False,
+                "would_be_alert": False,
+                "alert_eligible": False,
+                "features": {},
+            }
+        )
+    df = pd.DataFrame(rows)
+    assert "asof_ts" not in df.columns
+    cmp = compare_raw_published(df, "camera-frame")
+    assert cmp["comparison_table"]
+    assert cmp["checks"]["alert_eligible_true_count"] == 0
+
+
 def test_examiner_default_uses_evidence_column(tmp_path: Path):
     day = "2026-08-14"
     t0 = datetime(2026, 8, 14, 9, 30, tzinfo=VN_TZ)

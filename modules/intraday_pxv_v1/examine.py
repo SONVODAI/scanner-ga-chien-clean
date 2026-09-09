@@ -32,6 +32,24 @@ def _parse_ts(val: Any) -> pd.Timestamp:
     return ts
 
 
+def ensure_asof_ts(df: pd.DataFrame) -> pd.DataFrame:
+    """Derive examiner `asof_ts` from ledger `asof`. Never invent from row order.
+
+    Slice 1 / interpret ledgers store ISO `asof` and clock `asof_hm` only.
+    `asof_ts` is an in-memory parse of `asof` for duration math.
+    """
+    if df is None or df.empty:
+        return df
+    if "asof" not in df.columns:
+        raise KeyError(
+            "Slice 1 ledger requires column 'asof' (ISO timestamp). "
+            "Refusing to invent timestamps from row order."
+        )
+    out = df.copy()
+    out["asof_ts"] = out["asof"].map(_parse_ts)
+    return out
+
+
 def _hm_min(hm: str) -> int:
     hh, mm = str(hm).split(":")[:2]
     return int(hh) * 60 + int(mm)
@@ -62,7 +80,7 @@ def load_ledger(path: Path) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     if df.empty:
         return df
-    df["asof_ts"] = df["asof"].map(_parse_ts)
+    df = ensure_asof_ts(df)
     df["evidence"] = df["evidence"].astype(str)
     if "raw_evidence" not in df.columns:
         df["raw_evidence"] = df["evidence"]
@@ -123,8 +141,9 @@ def _runs(g: pd.DataFrame) -> list[dict[str, Any]]:
 
 
 def collect_runs(df: pd.DataFrame) -> list[dict[str, Any]]:
+    work = ensure_asof_ts(df)
     out: list[dict[str, Any]] = []
-    for _, g in df.groupby(["symbol", "session"], sort=False):
+    for _, g in work.groupby(["symbol", "session"], sort=False):
         out.extend(_runs(g))
     return out
 
@@ -440,7 +459,8 @@ def examine_frame(
     source_ledger: str = "",
 ) -> dict[str, Any]:
     meta = meta or {}
-    work = _with_col(df, evidence_col) if not df.empty else df
+    work = ensure_asof_ts(df)
+    work = _with_col(work, evidence_col) if not work.empty else work
     runs = collect_runs(work)
     sw_runs = [r for r in runs if r["evidence"] in SW]
     dist = persist_dist(sw_runs)
@@ -541,6 +561,7 @@ def debounce_verdict(raw_p: dict[str, Any], pub_p: dict[str, Any], pub_timing_fi
 
 
 def compare_raw_published(df: pd.DataFrame, source_ledger: str = "") -> dict[str, Any]:
+    df = ensure_asof_ts(df)
     raw = examine_frame(df, evidence_col="raw_evidence", source_ledger=source_ledger)
     pub = examine_frame(df, evidence_col="published_evidence", source_ledger=source_ledger)
     keys = [
@@ -620,7 +641,7 @@ def dual_timeline(df: pd.DataFrame, symbol: str, session: str, limit: int = 48) 
     g = df[(df["symbol"] == symbol) & (df["session"].astype(str) == str(session))].copy()
     if g.empty:
         return {"symbol": symbol, "session": session, "n_bars": 0, "lines": [], "missing": True}
-    g = g.sort_values("asof_ts") if "asof_ts" in g.columns else g
+    g = ensure_asof_ts(g).sort_values("asof_ts")
     lines = []
     for _, row in g.iterrows():
         raw = str(row.get("raw_evidence", row.get("evidence", "")))
@@ -646,7 +667,7 @@ def apply_debounce_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Treat raw_evidence (or evidence) as RAW and fill published_evidence."""
     from modules.intraday_pxv_v1.debounce import PublishedDebouncer
 
-    out = df.copy()
+    out = ensure_asof_ts(df)
     if out.empty:
         return out
     if "raw_evidence" not in out.columns:

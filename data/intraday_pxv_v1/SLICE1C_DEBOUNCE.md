@@ -48,3 +48,11 @@ spikes are removed, but most remaining published events last one published bar
 (confirmed-then-fade). Timing before 14:00 should survive.
 
 Confirm on the VPS compare table. Do not use T+n to pick a verdict.
+
+## Replay compatibility (asof_ts)
+
+The official Slice 1 ledger stores `asof` (ISO) and `asof_hm` only. `asof_ts`
+is an examiner parse of `asof`, never a stored field and never invented from
+row order. Replay now derives `asof_ts` from `asof` on every compare path
+and prefers `--ledger` over Camera when the official ledger exists.
+
