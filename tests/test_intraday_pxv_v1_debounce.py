@@ -106,6 +106,7 @@ def _cand(symbol="HPG", day="2026-08-14"):
         candidate_reason="MUA NHỎ / ƯU TIÊN",
         candidate_ts=f"{day} 15:05:00",
         bot_context="PULL VỪA",
+        candidate_first_seen_ts=f"{day} 09:15:00",
     )
 
 
