@@ -1,0 +1,90 @@
+{
+  "verdict": {
+    "IMMUTABLE_FIRST_SEEN_READY": "YES",
+    "DYNAMIC_WATCHLIST_RESEARCH_READY": "YES",
+    "PRODUCTION_UNCHANGED": "YES"
+  },
+  "production_unchanged_means": [
+    "Elite scores / ranking / KẾT LUẬN unchanged",
+    "Camera unchanged",
+    "P×V / debounce / thresholds unchanged",
+    "no deploy",
+    "history may gain candidate_first_seen_ts and candidate_updated_ts on new saves"
+  ],
+  "episode_key": ["session_date", "symbol"],
+  "episode_rules": {
+    "actionable_to_actionable": "keep first_seen; update updated_ts",
+    "actionable_to_non_actionable": "keep first_seen; watchlist status HELD",
+    "non_actionable_to_actionable_no_first_seen": "stamp observed_at now",
+    "non_actionable_to_actionable_has_first_seen": "keep first_seen",
+    "next_session_same_symbol": "new episode, new first_seen",
+    "historical_missing": "never invent or backfill"
+  },
+  "eligible_from": {
+    "intraday": "candidate_first_seen_ts when first_seen <= 14:45 VN that session",
+    "after_close": "next weekday 09:15 VN",
+    "never_before_eligible_from": true,
+    "held_if_conclusion_leaves_actionable": true
+  },
+  "stamp_boundary": {
+    "file": "app.py",
+    "function": "append_today_buy_elite_signals",
+    "calls": [
+      "modules.live_candidate.persist.apply_immutable_first_seen",
+      "modules.live_candidate.watchlist.persist_research_watchlist"
+    ]
+  },
+  "watchlist": {
+    "path": "data/live_candidate/dynamic_watchlist.json",
+    "env": "MRBOT_LIVE_CANDIDATE_OUT",
+    "fields": [
+      "session",
+      "symbol",
+      "candidate_first_seen_ts",
+      "candidate_updated_ts",
+      "candidate_reason",
+      "source",
+      "status",
+      "eligible_from"
+    ],
+    "source": "buy_elite_learning_history",
+    "not_pxv_state": true,
+    "no_buy_sell_actions": true
+  },
+  "examples": [
+    {
+      "id": "intraday_rerun",
+      "symbol": "HPG",
+      "t0": "2026-08-14T10:05:00+07:00",
+      "t1": "2026-08-14T13:20:00+07:00",
+      "first_seen_stays": "2026-08-14T10:05:00+07:00",
+      "updated_becomes": "2026-08-14T13:20:00+07:00"
+    },
+    {
+      "id": "after_close_next_open",
+      "symbol": "VCB",
+      "first_seen": "2026-08-14T15:41:00+07:00",
+      "eligible_from": "2026-08-17T09:15:00+07:00",
+      "watchlist_friday_1541": false,
+      "watchlist_monday_0915": true
+    },
+    {
+      "id": "next_session_new_episode",
+      "symbol": "HPG",
+      "session_d": "2026-08-14T10:05:00+07:00",
+      "session_d1": "2026-08-17T09:20:00+07:00"
+    },
+    {
+      "id": "no_backfill",
+      "symbol": "ACB",
+      "session": "2026-06-29",
+      "first_seen": ""
+    }
+  ],
+  "tests": {
+    "file": "tests/test_live_candidate_first_seen.py",
+    "passed": 12,
+    "covers": ["A", "B", "C", "D", "E", "F", "G", "restart", "isolated_snapshot"]
+  },
+  "next_smallest_missing_link": "Live 5m Camera read of Dynamic Watchlist symbols at bar close, passing candidate_first_seen_ts/eligible_from into the already-gated interpret_candidate_session (asof >= eligible_from). V1A is still post-close collect — that live bar feed is the missing link."
+}
