@@ -332,6 +332,7 @@ def vn_time_str(fmt: str = "%d/%m/%Y %H:%M:%S") -> str:
 # =========================================================
 TEXT_GUARD_COLS = {
     "date", "time", "created_at", "updated_at", "last_outcome_update",
+    "candidate_first_seen_ts", "candidate_updated_ts",
     "symbol", "group", "regime", "learning_mode", "conclusion", "nav",
     "dna", "obv", "status", "personality", "message", "mode", "note",
     "current_thought", "source", "stage", "error", "name", "version",
@@ -4321,13 +4322,20 @@ def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.Da
         return history_df if history_df is not None else pd.DataFrame()
 
     history_df = guard_dataframe_dtypes(history_df) if history_df is not None else pd.DataFrame()
-    if history_df.empty:
-        hist = new_df
-    else:
-        hist = pd.concat([history_df, new_df], ignore_index=True)
+    try:
+        from modules.live_candidate.persist import apply_immutable_first_seen
+        from modules.live_candidate.watchlist import persist_research_watchlist
+
+        hist = apply_immutable_first_seen(history_df, new_df, observed_at=vn_now())
+        persist_research_watchlist(hist, observed_at=vn_now())
+    except Exception:
+        if history_df.empty:
+            hist = new_df
+        else:
+            hist = pd.concat([history_df, new_df], ignore_index=True)
+        hist = hist.drop_duplicates(subset=["date", "symbol"], keep="last")
 
     hist = guard_dataframe_dtypes(hist)
-    hist = hist.drop_duplicates(subset=["date", "symbol"], keep="last")
     return hist
 
 
