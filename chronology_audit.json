@@ -1,0 +1,333 @@
+{
+  "audit": "candidate_chronology_asof",
+  "question": "Can a candidate be interpreted by the Camera before that candidate actually existed in time?",
+  "answer": "YES",
+  "verdict": "FAIL",
+  "scope": {
+    "in": [
+      "candidate provenance",
+      "as-of integrity",
+      "historical replay",
+      "overlay provenance",
+      "shadow and replay paths"
+    ],
+    "out": [
+      "PxV Interpreter rules",
+      "2-bar published state machine",
+      "thresholds",
+      "debounce internals",
+      "DGC",
+      "Camera writes",
+      "UI",
+      "Telegram",
+      "alerts",
+      "BUY/SELL",
+      "Slice 2/3",
+      "production"
+    ],
+    "audited_ref": "origin/cursor/intraday-pxv-v1-3384",
+    "slice1c_pin": "120e2638d76061f6879d1f14141d486697f96277",
+    "research_only": true,
+    "production_changes": false
+  },
+  "root_causes": [
+    {
+      "id": "RC1_SESSION_NOT_ASOF",
+      "severity": "PRIMARY",
+      "summary": "Candidate eligibility is (symbol, session_date). interpret_candidate_session walks Camera bars from RESEARCH_DEFAULT_EVAL_START_BAR and never gates asof >= candidate_ts.",
+      "evidence": [
+        "modules/intraday_pxv_v1/interpret.py interpret_candidate_session for i in range(start, len(bars))",
+        "candidate_ts is copied onto LedgerRow only",
+        "grep: candidate_ts used in candidates.py construct, interpret.py copy, nowhere as a filter"
+      ]
+    },
+    {
+      "id": "RC2_EOD_LEARNING_FILE",
+      "severity": "PRIMARY",
+      "summary": "Exclusive candidate source is buy_elite_learning_history.csv, a learning-cycle last-wins snapshot. time is save-clock, not first-seen. 380/405 actionable last-wins are after 15:00.",
+      "evidence": [
+        "modules/intraday_pxv_v1/candidates.py CANDIDATE_SOURCE",
+        "app.py append_today_buy_elite_signals now_time=vn_time_str('%H:%M:%S') drop_duplicates(['date','symbol'], keep='last')",
+        "CSV has no created_at, first_seen, updated_at"
+      ]
+    },
+    {
+      "id": "RC3_TOD_FUTURE_SESSIONS",
+      "severity": "RELATED_ASOF",
+      "summary": "TOD baselines and qualified-session counts use the entire Camera archive, including sessions after the candidate session.",
+      "evidence": [
+        "interpret.build_tod_baselines(sessions=all overlays)",
+        "scripts/run_intraday_pxv_v1_slice1.py qualified[sym] over all overlays"
+      ]
+    },
+    {
+      "id": "RC4_OVERLAY_POST_SESSION_REVISION",
+      "severity": "RELATED_ASOF",
+      "summary": "overlay_session applies latest quarantine OHLCV to earlier bar identities and copies overlay_applied onto every row.",
+      "evidence": [
+        "archive.overlay_session merge + session-level overlay_applied",
+        "Camera reconcile writes quarantine next morning; collected_at not consulted"
+      ]
+    }
+  ],
+  "primary_question_proof": {
+    "can_interpret_before_existence": true,
+    "why": "Stored existence times are lunch or post-close; interpret starts at bar 8 (~09:50); official 1C census already has 9 first-published S/W in 09:15-10:00.",
+    "candidate_ts_filter_exists": false,
+    "watchlist_asof_filter_exists": false,
+    "dynamic_core_watchlist_implemented": false
+  },
+  "candidate_provenance": {
+    "source": "buy_elite_learning_history.csv",
+    "loader": "modules/intraday_pxv_v1/candidates.py:load_candidate_events",
+    "filter": "conclusion in {BUY ELITE, MUA NHỎ / ƯU TIÊN}",
+    "excluded": [
+      "WATCHLIST",
+      "WATCHLIST - MARKET YẾU",
+      "CHƯA ĐỦ ĐỒNG THUẬN",
+      "pattern_history.csv"
+    ],
+    "identity": ["symbol", "date"],
+    "dedup": "keep last file order",
+    "fields": {
+      "exact_source": "buy_elite_learning_history.csv via CandidateEvent.source",
+      "creation_timestamp": "CSV time at learning-cycle save → CandidateEvent.candidate_ts",
+      "first_seen_timestamp": null,
+      "first_seen_recoverable": false,
+      "update_timestamps": [
+        "last_outcome_update (T+n fill only, not birth)"
+      ],
+      "session_date_ownership": "CSV date → CandidateEvent.session"
+    },
+    "writer": {
+      "file": "app.py",
+      "functions": [
+        "append_today_buy_elite_signals",
+        "run_buy_elite_learning_cycle"
+      ]
+    },
+    "census_this_checkout": {
+      "actionable_last_wins": 405,
+      "session_dates": 20,
+      "date_min": "2026-06-29",
+      "date_max": "2026-09-04",
+      "time_before_0950": 0,
+      "time_am_session": 0,
+      "time_lunch": 25,
+      "time_pm_session": 0,
+      "time_ge_1500": 380,
+      "time_ge_1600": 360,
+      "lunch_all_same_stamp": "2026-08-28 12:45:55"
+    }
+  },
+  "asof_integrity": {
+    "same_session_bar_slice": {
+      "verdict": "PASS",
+      "functions": [
+        "archive.asof_slice",
+        "interpret.interpret_asof",
+        "features.compute_features",
+        "gate.evaluate_gate"
+      ],
+      "rule": "timestamp <= asof"
+    },
+    "candidate_selection": {
+      "verdict": "FAIL",
+      "reason": "session-date join only"
+    },
+    "candidate_promotion": {
+      "verdict": "FAIL",
+      "reason": "join to Camera symbols for that session; no as-of promotion"
+    },
+    "watchlist_construction": {
+      "verdict": "MISSING",
+      "reason": "Dynamic/Core Watchlist is prose only"
+    },
+    "replay_paths": {
+      "verdict": "FAIL",
+      "functions": [
+        "scripts/replay_intraday_pxv_v1_debounce.py:_camera_replay",
+        "examine.apply_debounce_columns inherits pre-existence rows from Slice 1 ledger"
+      ]
+    },
+    "shadow_paths": {
+      "verdict": "FAIL",
+      "functions": [
+        "scripts/run_intraday_pxv_v1_slice1.py:main"
+      ]
+    },
+    "historical_overlay_paths": {
+      "verdict": "FAIL",
+      "reason": "post-session quarantine values used at earlier as-of; session-level overlay_applied"
+    },
+    "tod_and_qualified": {
+      "verdict": "FAIL",
+      "reason": "full archive including future sessions"
+    }
+  },
+  "historical_replay": {
+    "candidate_at_1430_can_appear_at_0930": true,
+    "eod_candidate_files_leak_into_intraday": true,
+    "first_interpret_bar": {
+      "constant": "RESEARCH_DEFAULT_EVAL_START_BAR",
+      "value": 8,
+      "approx_clock_if_grid_0915": "09:50",
+      "empty_overlay_fallback_asof": "00:00 session date"
+    },
+    "official_1c_census_incompatible_with_candidate_clock": {
+      "source": "data/intraday_pxv_v1/HUMAN_CASE_REVIEW.md",
+      "first_published_sw_0915_1000": 9,
+      "earliest_stored_candidate_time": "12:45:55",
+      "note": "Those 9 morning published prints cannot be legal under stored existence times."
+    }
+  },
+  "overlay_provenance": {
+    "how_created": [
+      "load canonical bars.parquet for session_date",
+      "load all quarantine/*.parquet; last (symbol,timestamp) wins",
+      "replace matching OHLCV; bar_source=revised_quarantine",
+      "append quarantine-only timestamps",
+      "overlay_applied=True on every row if any replace or extra, else False on every row"
+    ],
+    "writer": "Camera reconcile (modules/intraday_memory/storage.py) — overlay itself is read-only",
+    "can_distort_chronology": true,
+    "distortions": [
+      {
+        "id": "value_lookahead",
+        "summary": "Revised OHLCV from later collected_at used at earlier as-of"
+      },
+      {
+        "id": "session_flag",
+        "summary": "overlay_applied copied onto every row; morning as-of sees STALE_FIRST_WRITE if any later bar was revised"
+      },
+      {
+        "id": "extra_timestamps",
+        "summary": "Appended keys still filtered by timestamp<=asof; not the 14:30→09:30 candidate bug"
+      }
+    ],
+    "timeline_example": {
+      "t0": "2026-09-04 09:30 bar identity",
+      "t1": "2026-09-04 18:30 V1A collect writes canonical",
+      "t2": "2026-09-05 07:30 reconcile quarantines changed OHLCV",
+      "replay_asof": "2026-09-04 09:30 uses t2 values; overlay_applied true on all rows"
+    }
+  },
+  "examples": [
+    {
+      "id": "ACB_2026-06-29",
+      "symbol": "ACB",
+      "session": "2026-06-29",
+      "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+      "candidate_ts": "2026-06-29 22:30:23",
+      "last_outcome_update": "2026-07-04 08:58:47",
+      "illegal_asof_window": "09:50–14:45",
+      "legal_asof_window": ">= 22:30:23 (after cash session)",
+      "class": "EOD file interpreted all session"
+    },
+    {
+      "id": "GMD_2026-08-28",
+      "symbol": "GMD",
+      "session": "2026-08-28",
+      "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+      "candidate_ts": "2026-08-28 12:45:55",
+      "last_outcome_update": "2026-09-09 15:52:12",
+      "illegal_asof_window": "09:50–12:45",
+      "legal_asof_window": ">= 12:45:55 (PM bars)",
+      "class": "lunch write; AM interpretation illegal",
+      "note": "Slice 1C noisy RAW example session"
+    },
+    {
+      "id": "VCB_2026-07-02",
+      "symbol": "VCB",
+      "session": "2026-07-02",
+      "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+      "candidate_ts": "2026-07-02 15:41:00",
+      "illegal_asof_window": "entire cash session",
+      "class": "post-close 15:xx"
+    },
+    {
+      "id": "TEST_FIXTURE_1505",
+      "file": "tests/test_intraday_pxv_v1.py",
+      "candidate_ts": "{day} 15:05:00",
+      "interpret_asof": "14:45",
+      "class": "unit test interprets before candidate_ts"
+    }
+  ],
+  "affected": {
+    "files": [
+      "modules/intraday_pxv_v1/candidates.py",
+      "modules/intraday_pxv_v1/interpret.py",
+      "modules/intraday_pxv_v1/archive.py",
+      "scripts/run_intraday_pxv_v1_slice1.py",
+      "scripts/replay_intraday_pxv_v1_debounce.py",
+      "app.py"
+    ],
+    "functions": [
+      "load_candidate_events",
+      "interpret_candidate_session",
+      "interpret_asof",
+      "build_tod_baselines",
+      "overlay_session",
+      "run_intraday_pxv_v1_slice1.main",
+      "_camera_replay",
+      "append_today_buy_elite_signals"
+    ]
+  },
+  "remediation": {
+    "applied_in_this_audit": false,
+    "smallest_possible": {
+      "where": "modules/intraday_pxv_v1/interpret.py:interpret_candidate_session",
+      "what": [
+        "Parse candidate.candidate_ts as VN-local; if missing/unparseable emit no rows",
+        "Skip bars where asof < candidate_ts",
+        "Apply the same gate to the empty-bars 00:00 fallback"
+      ],
+      "optional_same_class": "TOD baselines and qualified counts: sessions with session_date < candidate.session only",
+      "do_not": [
+        "change decide_evidence",
+        "change compute_features",
+        "change evaluate_gate internals",
+        "change PublishedDebouncer",
+        "retune thresholds",
+        "change DGC",
+        "write Camera",
+        "invent first-seen from row order",
+        "use last_outcome_update as birth"
+      ]
+    },
+    "proof_does_not_change_pxv_logic": {
+      "decide_evidence": "untouched",
+      "compute_features": "untouched",
+      "evaluate_gate": "untouched",
+      "PublishedDebouncer.step": "untouched",
+      "constants_thresholds": "untouched",
+      "camera_and_production_hash_paths": [
+        "app.py",
+        "modules/earning_learning.py",
+        "modules/intraday_memory/storage.py",
+        "modules/intraday_memory/collector.py",
+        "modules/intraday_memory/reconciliation.py",
+        "modules/intraday_memory/runner.py"
+      ],
+      "why_published_counts_will_drop": "Illegal pre-existence as-of rows are omitted. 2-bar rules unchanged; input sequence is truncated to legal time."
+    },
+    "proof_path_after_fix": [
+      "0 candidate_ts before 09:50 in loader census",
+      "GMD 2026-08-28 min(asof) >= 12:45:55",
+      "ACB 2026-06-29 no cash-session rows (existence 22:30:23)",
+      "fixture candidate_ts=15:05 asof=14:45 skipped",
+      "same post-existence bar: raw_evidence and published_evidence identical to pre-fix",
+      "production_hash_before == production_hash_after"
+    ]
+  },
+  "live_shadow_blocker": {
+    "this_csv_cannot_supply_first_seen": true,
+    "camera_v1a_is_post_close_collect": true,
+    "required_before_live_shadow": [
+      "asof >= candidate_ts gate",
+      "first-seen (not last learning save)",
+      "TOD/qualified from strictly prior sessions",
+      "overlay revisions gated by collected_at <= asof or canonical-only historical as-of"
+    ]
+  }
+}
