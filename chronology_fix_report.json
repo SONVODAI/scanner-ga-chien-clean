@@ -1,0 +1,167 @@
+{
+  "verdict": {
+    "HISTORICAL_LOOKAHEAD_FIXED": "YES",
+    "LIVE_CANDIDATE_FIRST_SEEN_READY": "NO"
+  },
+  "invariant": "A Candidate MUST NEVER be visible to Intraday P×V before the Candidate legally existed.",
+  "live_time_contract": {
+    "candidate_first_seen_ts": {
+      "meaning": "First moment BOT made that Candidate available",
+      "immutable": true
+    },
+    "candidate_updated_ts": {
+      "meaning": "Later update / re-evaluation",
+      "immutable": false
+    },
+    "session_date_ownership": {
+      "meaning": "Cash session that owns the episode",
+      "field": "CandidateEvent.session"
+    },
+    "provenance": [
+      "FIRST_SEEN_IMMUTABLE",
+      "SAVE_CLOCK_LAST_WINS",
+      "MISSING_UNUSABLE"
+    ],
+    "save_clock_is_not_first_seen": true,
+    "session_rule": {
+      "after_cash_close_1445_vn": "No same-day 5m interpretation. LIVE eligible from next trading session open. Historical Slice 1 does not invent D+1 rows.",
+      "during_session": "Interpret only asof >= gate_ts",
+      "before_session": "All owned-session bars are legal (asof >= first_seen)"
+    }
+  },
+  "production_capability": {
+    "can_compute_actionable_conclusion_intraday": true,
+    "condition": "Streamlit page load during the session runs build_buy_elite_decision_engine",
+    "evidence": "25 lunch writes 2026-08-28 12:45:55; 380/405 last-wins after 15:00",
+    "can_promote_legal_candidate_to_dynamic_watchlist": false,
+    "immutable_first_seen_exists": false,
+    "dynamic_watchlist_exists": false,
+    "stamp_point_if_added_later": {
+      "file": "app.py",
+      "function": "append_today_buy_elite_signals",
+      "rule": "First actionable (date, symbol) insert stamps candidate_first_seen_ts=now; later saves keep it and set candidate_updated_ts=now",
+      "implemented_in_this_pr": false
+    },
+    "smallest_architecture_not_built": [
+      "two columns on existing history row",
+      "stamp only in append_today_buy_elite_signals",
+      "research-only watchlist snapshot {symbol, session, first_seen, reason}",
+      "P×V already gates asof >= first_seen"
+    ]
+  },
+  "implementation": {
+    "files_added": [
+      "modules/intraday_pxv_v1/time_contract.py",
+      "modules/intraday_pxv_v1/chronology.py",
+      "scripts/replay_intraday_pxv_v1_chronology.py",
+      "tests/test_intraday_pxv_v1_chronology.py"
+    ],
+    "files_touched": [
+      "modules/intraday_pxv_v1/interpret.py",
+      "modules/intraday_pxv_v1/candidates.py",
+      "modules/intraday_pxv_v1/constants.py",
+      "tests/test_intraday_pxv_v1_debounce.py"
+    ],
+    "not_changed": [
+      "decide_evidence",
+      "compute_features",
+      "evaluate_gate internals",
+      "PublishedDebouncer.step",
+      "numeric thresholds",
+      "Camera collector/storage/reconcile",
+      "app.py trading logic"
+    ]
+  },
+  "overlay": {
+    "redesigned": false,
+    "label": "retrospective_reconciled when overlay_applied else canonical_first_write",
+    "live_asof_claim": false,
+    "note": "Chronology-clean historical replay does not reproduce exactly what Camera would have known live unless overlay was also available as-of."
+  },
+  "census": {
+    "tuned": false,
+    "official_1c_before": {
+      "raw_sw_runs": 967,
+      "published_sw_runs": 152,
+      "raw_1_bar": 814,
+      "published_1_bar": 108,
+      "raw_ge2": 153,
+      "published_ge2": 44,
+      "raw_ge3": 27,
+      "published_ge3": 11,
+      "raw_opposite": 122,
+      "published_opposite": 2,
+      "timing_first_published": {
+        "09:15-10:00": 9,
+        "10:00-11:30": 44,
+        "13:00-14:00": 74,
+        "14:00-close": 25
+      },
+      "candidates": {
+        "noisy_flicker": 6,
+        "clean_persistent": 9,
+        "never_leave_neutral": 39,
+        "unusable_dominated": 2
+      }
+    },
+    "this_host": {
+      "official_ledger_present": false,
+      "camera_present": false,
+      "status": "LEDGER_MISSING_EVENT_ELIGIBILITY_ONLY"
+    },
+    "event_eligibility_after": {
+      "n_events": 405,
+      "provenance_first_seen": 0,
+      "provenance_save_clock": 405,
+      "same_day_intraday_eligible": 25,
+      "after_close_no_same_day": 380,
+      "events_removed_as_illegal_lookahead": 380,
+      "event_removal_rate": 0.938
+    },
+    "structural_timing_implication": {
+      "first_published_0915_1130_must_be_zero": 53,
+      "afternoon_survives_only_for_2026_08_28_lunch_25_names": true,
+      "do_not_retune": true
+    },
+    "human_cases": [
+      {
+        "symbol": "GMD",
+        "session": "2026-08-28",
+        "stored_clock": "12:45:55",
+        "after": "AM illegal; PM legal; debounce starts at first PM RAW"
+      },
+      {
+        "symbol": "ACB",
+        "session": "2026-06-29",
+        "stored_clock": "22:30:23",
+        "after": "no same-day rows; next_session_open_eligible"
+      },
+      {
+        "symbol": "VCB",
+        "session": "2026-07-02",
+        "stored_clock": "15:41:00",
+        "after": "no same-day rows; next_session_open_eligible"
+      }
+    ],
+    "vps_replay": "python scripts/replay_intraday_pxv_v1_chronology.py --ledger /tmp/pxv-v1-slice1c-debounce/shadow_ledger.jsonl --out /tmp/pxv-v1-chronology-clean"
+  },
+  "safety": {
+    "alert_eligible": false,
+    "production_deploy": false,
+    "ui": false,
+    "telegram": false,
+    "slice3_live_polling": false,
+    "threshold_debounce_retune": false
+  },
+  "next_smallest_step": {
+    "do": "Stamp immutable candidate_first_seen_ts (and candidate_updated_ts) in append_today_buy_elite_signals; emit research-only Dynamic Watchlist snapshot.",
+    "do_not": [
+      "change Elite scores",
+      "change Camera collection",
+      "UI",
+      "Telegram",
+      "alerts"
+    ],
+    "then_blocked_by": "V1A Camera is post-close collect, not a live 5m poller"
+  }
+}

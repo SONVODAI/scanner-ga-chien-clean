@@ -17,10 +17,13 @@ from modules.intraday_pxv_v1.constants import (
     EV_WEAKEN,
     LEDGER_VERSION_DEBOUNCE,
     MODE_SHADOW,
+    OVERLAY_TRUTH_CANONICAL,
+    OVERLAY_TRUTH_RETROSPECTIVE,
     RESEARCH_DEFAULT_EVAL_START_BAR,
     RESEARCH_DEFAULT_PERSISTENCE_BARS,
     TOD_PRELIMINARY,
 )
+from modules.intraday_pxv_v1.time_contract import asof_allowed, resolve_legal_existence
 from modules.intraday_pxv_v1.debounce import PublishedDebouncer
 from modules.intraday_pxv_v1.evidence import EvidenceResult, decide_evidence
 from modules.intraday_pxv_v1.features import compute_features
@@ -60,6 +63,10 @@ class LedgerRow:
     research_default_flags: list[str]
     mode: str
     ledger_version: str
+    candidate_first_seen_ts: str = ""
+    candidate_updated_ts: str = ""
+    candidate_time_provenance: str = ""
+    overlay_truth_class: str = OVERLAY_TRUTH_CANONICAL
 
 
 def _hm(ts) -> str:
@@ -143,6 +150,10 @@ def interpret_asof(
         flags.append("TOD_PRELIMINARY")
     if gate.overlay_applied:
         flags.append("QUARANTINE_OVERLAY")
+    flags.append("CHRONOLOGY_GATE")
+    overlay_class = (
+        OVERLAY_TRUTH_RETROSPECTIVE if gate.overlay_applied else OVERLAY_TRUTH_CANONICAL
+    )
     msg = render_message(
         symbol=candidate.symbol,
         asof_hm=slot,
@@ -180,6 +191,10 @@ def interpret_asof(
         research_default_flags=flags,
         mode=MODE_SHADOW,
         ledger_version=LEDGER_VERSION,
+        candidate_first_seen_ts=getattr(candidate, "candidate_first_seen_ts", "") or "",
+        candidate_updated_ts=getattr(candidate, "candidate_updated_ts", "") or "",
+        candidate_time_provenance="",
+        overlay_truth_class=overlay_class,
     )
 
 
@@ -189,21 +204,15 @@ def interpret_candidate_session(
     tod_store: dict[str, dict[str, dict[str, list[float]]]] | None,
     tod_qualified_sessions: int,
 ) -> list[LedgerRow]:
+    legal = resolve_legal_existence(candidate)
+    # No legally usable timestamp → no intraday Candidate interpretation.
+    # After-close first existence → no same-day 5m rows (LIVE: next session open).
+    if not legal.usable:
+        return []
+
     bars = symbol_session_bars(overlay, candidate.symbol)
     if bars.empty:
-        row = interpret_asof(
-            bars,
-            asof=datetime.combine(candidate.session, datetime.min.time()).replace(tzinfo=VN_TZ),
-            candidate=candidate,
-            tod_store=tod_store,
-            tod_qualified_sessions=tod_qualified_sessions,
-        )
-        pub, why = PublishedDebouncer().step(row.raw_evidence)
-        row.published_evidence = pub
-        row.published_why = why
-        row.evidence = pub
-        row.alert_eligible = False
-        return [row]
+        return []
 
     rows: list[LedgerRow] = []
     start = max(RESEARCH_DEFAULT_EVAL_START_BAR - 1, 0)
@@ -213,6 +222,8 @@ def interpret_candidate_session(
     debouncer = PublishedDebouncer()
     for i in range(start, len(bars)):
         asof = bars.iloc[i]["timestamp"].to_pydatetime()
+        if not asof_allowed(asof, legal):
+            continue
         row = interpret_asof(
             bars,
             asof=asof,
@@ -252,6 +263,13 @@ def interpret_candidate_session(
             row.would_be_alert = True
             fired.add(key)
         row.alert_eligible = False
+        row.candidate_first_seen_ts = (
+            legal.first_seen_ts.isoformat() if legal.first_seen_ts else ""
+        )
+        row.candidate_updated_ts = (
+            legal.updated_ts.isoformat() if legal.updated_ts else ""
+        )
+        row.candidate_time_provenance = legal.provenance
         rows.append(row)
     return rows
 

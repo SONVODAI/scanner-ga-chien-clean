@@ -16,6 +16,7 @@ Excluded (not treated as Candidates — would silently become a scanner):
 
 Limitations:
   - One row per (symbol, date); last file order wins.
+  - CSV `time` is a save clock, NOT candidate_first_seen_ts.
   - `conclusion` / `group` / scores are pass-through context only.
   - Dates with no Camera session are skipped later (not invented).
   - If the CSV is missing, the event list is empty — no synthetic Candidates.
@@ -24,7 +25,7 @@ Limitations:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Iterable
 
@@ -45,6 +46,8 @@ class CandidateEvent:
     candidate_ts: str
     bot_context: str
     source: str = CANDIDATE_SOURCE
+    candidate_first_seen_ts: str = ""
+    candidate_updated_ts: str = ""
 
 
 def load_candidate_events(
@@ -80,6 +83,8 @@ def load_candidate_events(
         reason = str(row.get("conclusion", "")).strip()
         ts = str(row.get("time", "") or "")
         group = str(row.get("group", "") or "")
+        first_seen = str(row.get("candidate_first_seen_ts") or row.get("first_seen") or "").strip()
+        updated = str(row.get("candidate_updated_ts") or row.get("updated_at") or "").strip()
         events.append(
             CandidateEvent(
                 symbol=str(row["symbol"]),
@@ -87,6 +92,8 @@ def load_candidate_events(
                 candidate_reason=reason,
                 candidate_ts=f"{sess.isoformat()} {ts}".strip(),
                 bot_context=group,
+                candidate_first_seen_ts=first_seen,
+                candidate_updated_ts=updated,
             )
         )
     return events

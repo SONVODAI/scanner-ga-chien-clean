@@ -54,6 +54,15 @@ RESEARCH_DEFAULT_PUBLISH_CONFIRM_BARS = 2
 RESEARCH_DEFAULT_EVAL_START_BAR = 8
 LEDGER_VERSION_DEBOUNCE = "pxv_v1_slice1c_debounce"
 
+# LIVE Candidate time contract (chronology). Not a P×V threshold.
+PROVENANCE_FIRST_SEEN = "FIRST_SEEN_IMMUTABLE"
+PROVENANCE_SAVE_CLOCK = "SAVE_CLOCK_LAST_WINS"
+PROVENANCE_MISSING = "MISSING_UNUSABLE"
+
+# Historical overlay is retrospective/reconciled truth, not live as-of Camera knowledge.
+OVERLAY_TRUTH_RETROSPECTIVE = "retrospective_reconciled"
+OVERLAY_TRUTH_CANONICAL = "canonical_first_write"
+
 # Candidate reconstruction (documented in candidates.py).
 ACTIONABLE_CONCLUSIONS = frozenset(
     {
