@@ -19,6 +19,7 @@ from typing import Any, Callable, Optional
 from modules.live_candidate.watchlist import WATCHLIST_NAME, output_root
 from modules.live_shadow_transport.artifact_get import (
     EvidenceTransportError,
+    LiveShadowNotFound,
     get_live_evidence_text,
     get_live_status_text,
     remote_artifact_configured,
@@ -118,6 +119,8 @@ def load_panel_sources(
         try:
             ev_text = evidence_fetcher() if evidence_fetcher is not None else get_live_evidence_text()
             evidence = parse_evidence_text(ev_text)
+        except LiveShadowNotFound:
+            evidence = []
         except EvidenceTransportError as exc:
             transport["evidence"] = EVIDENCE_TRANSPORT_ERROR
             transport["error"] = EVIDENCE_TRANSPORT_ERROR
@@ -132,6 +135,8 @@ def load_panel_sources(
             st_text = status_fetcher() if status_fetcher is not None else get_live_status_text()
             parsed = json.loads(st_text)
             status = parsed if isinstance(parsed, dict) else {}
+        except LiveShadowNotFound:
+            status = {}
         except EvidenceTransportError as exc:
             transport["status"] = EVIDENCE_TRANSPORT_ERROR
             transport["error"] = EVIDENCE_TRANSPORT_ERROR
