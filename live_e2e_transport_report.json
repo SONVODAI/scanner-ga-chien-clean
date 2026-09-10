@@ -1,0 +1,142 @@
+{
+  "schema": "live_e2e_transport_report.v1",
+  "session_started": false,
+  "deployed": false,
+  "revision": "8d067e7857d39d40f706395e8662f5d5f0505892",
+  "branch": "cursor/live-e2e-transport-1dd0",
+  "base_branch": "cursor/live-shadow-transport-contract-1dd0",
+  "draft_pr": "https://github.com/SONVODAI/scanner-ga-chien-clean/pull/135",
+  "verdict": {
+    "A_CLOUD_TO_VPS_WATCHLIST_READY": "YES",
+    "B_VPS_TO_CLOUD_PXV_READY": "YES",
+    "C_CLOUD_UI_REMOTE_READ_READY": "YES",
+    "D_E2E_TIMESTAMP_IDENTITY_PRESERVED": "YES",
+    "E_MANUAL_COPY_REQUIRED": "NO",
+    "F_PRODUCTION_UNCHANGED": "YES",
+    "G_READY_FOR_DEPLOY_DECISION": "YES"
+  },
+  "architecture": [
+    "Streamlit Cloud / BOT",
+    "GitHub-published Dynamic Watchlist",
+    "Camera VPS",
+    "live 5m Camera",
+    "existing P×V Interpreter",
+    "/var/lib/mrbot/live_pxv_shadow",
+    "existing artifact service GET",
+    "Streamlit Cloud read-only LIVE CANDIDATE × P×V UI"
+  ],
+  "watchlist": {
+    "github_path": "data/live_candidate/dynamic_watchlist.json",
+    "publish_hook": "persist_and_publish_research_watchlist + app.py _github_write_text",
+    "vps_default_source": "github",
+    "on_fetch_failure": "WATCHLIST_TRANSPORT_ERROR",
+    "stale_local_fallback": false,
+    "invent_candidate": false,
+    "empty_list_is_valid": true,
+    "immutable": ["candidate_first_seen_ts", "eligible_from"]
+  },
+  "evidence": {
+    "store": "/var/lib/mrbot/live_pxv_shadow",
+    "store_env": "MRBOT_LIVE_PXV_SHADOW_STORE",
+    "files": ["live_evidence.jsonl", "live_shadow_status.json"],
+    "forbidden": [
+      "/var/lib/mrbot/intraday_memory",
+      "/current/bundle.tar.gz",
+      "GitHub 5m evidence commits"
+    ],
+    "artifact_get": [
+      "/current/live_shadow/live_evidence.jsonl",
+      "/current/live_shadow/live_shadow_status.json"
+    ],
+    "put": 405,
+    "auth": "EDGE_RESEARCH_DURABLE_URL + EDGE_RESEARCH_DURABLE_TOKEN"
+  },
+  "ui": {
+    "remote_when": "MRBOT_LIVE_PXV_UI_SOURCE=auto and EDGE_RESEARCH_DURABLE_URL set",
+    "calls_kbs": false,
+    "runs_interpreter": false,
+    "writes_vps": false,
+    "triggers_camera": false,
+    "triggers_buy_sell": false,
+    "triggers_telegram": false,
+    "on_get_failure": "EVIDENCE_TRANSPORT_ERROR",
+    "local_pxv_fallback_when_remote": false
+  },
+  "freshness": {
+    "live_if_observed_at_age_sec_lte": 600,
+    "otherwise": ["STALE", "STOPPED"],
+    "pass_through": [
+      "bar_ts",
+      "observed_at",
+      "candidate_first_seen_ts",
+      "eligible_from",
+      "chronology_legal",
+      "raw_evidence",
+      "published_evidence",
+      "data_quality"
+    ]
+  },
+  "failure_states": [
+    "WATCHLIST_TRANSPORT_ERROR",
+    "EVIDENCE_TRANSPORT_ERROR",
+    "STALE",
+    "STOPPED"
+  ],
+  "alert_eligible": false,
+  "tests": {
+    "command": "python3 -m pytest tests/test_live_e2e_transport.py tests/test_live_camera_shadow.py tests/test_live_candidate_pxv_ui.py tests/test_live_shadow_transport_contract.py tests/test_live_candidate_first_seen.py tests/test_edge_research_artifact_server.py tests/test_live_session_01.py",
+    "passed": 66,
+    "skipped": 7,
+    "failed": 0,
+    "cases": [
+      "e2e timestamp identity Cloud→GitHub→VPS→artifact GET→UI",
+      "empty Candidate",
+      "watchlist transport failure no stale fallback",
+      "stale evidence not LIVE",
+      "artifact GET failure no synthetic P×V",
+      "chronology_legal=false",
+      "alert_eligible remains false"
+    ]
+  },
+  "deploy_if_human_approves": {
+    "do_not_deploy_from_this_agent": true,
+    "streamlit_cloud": {
+      "revision": "8d067e7857d39d40f706395e8662f5d5f0505892 plus stacked parents through first-seen/UI/shadow",
+      "keep_vnstock": "0.2.9.2",
+      "secrets": [
+        "GITHUB_TOKEN",
+        "EDGE_RESEARCH_DURABLE_URL",
+        "EDGE_RESEARCH_DURABLE_TOKEN"
+      ]
+    },
+    "vps": {
+      "do_not_checkout_on": "/opt/mrbot-camera",
+      "use_isolated_clone": true,
+      "venv": "/opt/mrbot-camera-venv",
+      "mkdir": "/var/lib/mrbot/live_pxv_shadow",
+      "restart": ["mrbot-edge-artifacts.service"],
+      "do_not_restart_camera_collector_for_transport": true,
+      "env": {
+        "MRBOT_LIVE_PXV_SHADOW_STORE": "/var/lib/mrbot/live_pxv_shadow",
+        "MRBOT_WATCHLIST_SOURCE": "github"
+      },
+      "start_live_session_01": false
+    }
+  },
+  "rollback": [
+    "Pin Streamlit Cloud to previous main revision",
+    "Revert artifact_server.py and restart mrbot-edge-artifacts.service",
+    "Stop run_live_camera_shadow.py --live",
+    "Leave Camera archive untouched",
+    "Optional: delete GitHub data/live_candidate/dynamic_watchlist.json"
+  ],
+  "production_unchanged": {
+    "pxv_thresholds": true,
+    "debounce": true,
+    "candidate_scoring": true,
+    "camera_archive": true,
+    "vnstock_on_streamlit": true,
+    "telegram": true,
+    "buy_sell": true
+  }
+}

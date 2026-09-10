@@ -255,3 +255,48 @@ def test_health_unauthenticated(artifact_server):
     status, body = _request("GET", f"{base_url}/health", None)
     assert status == 200
     assert json.loads(body)["ok"] is True
+
+
+def test_live_shadow_get_from_isolated_store_not_edge_root(tmp_path):
+    from modules.edge_research.artifact_server import ArtifactServer, ArtifactServerConfig
+
+    storage = tmp_path / "durable_root"
+    shadow = tmp_path / "live_pxv_shadow"
+    shadow.mkdir()
+    shadow.joinpath("live_evidence.jsonl").write_text('{"ok":true}\n', encoding="utf-8")
+    shadow.joinpath("live_shadow_status.json").write_text('{"runner":"LIVE"}\n', encoding="utf-8")
+    (storage / "current").mkdir(parents=True)
+    (storage / "current" / "bundle.tar.gz").write_bytes(b"not-the-shadow")
+    port = _free_port()
+    config = ArtifactServerConfig(
+        storage_root=storage,
+        token=TEST_TOKEN,
+        host="127.0.0.1",
+        port=port,
+        live_shadow_root=shadow,
+    )
+    server = ArtifactServer(config)
+    server.start(blocking=False)
+    try:
+        status, body = _request(
+            "GET",
+            f"{server.base_url}/current/live_shadow/live_evidence.jsonl",
+            TEST_TOKEN,
+        )
+        assert status == 200
+        assert body == b'{"ok":true}\n'
+        status, _ = _request(
+            "PUT",
+            f"{server.base_url}/current/live_shadow/live_evidence.jsonl",
+            TEST_TOKEN,
+            b"x",
+        )
+        assert status == 405
+        status, _ = _request(
+            "GET",
+            f"{server.base_url}/current/live_shadow/live_evidence.jsonl",
+            None,
+        )
+        assert status == 401
+    finally:
+        server.stop()

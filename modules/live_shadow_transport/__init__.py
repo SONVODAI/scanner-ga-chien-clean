@@ -1,15 +1,19 @@
-"""Live shadow Cloud↔VPS transport contract. No runtime transport in this slice."""
+"""Live shadow Cloud↔VPS transport (GitHub watchlist + artifact GET)."""
 
 from modules.live_shadow_transport.contract import (
     ARTIFACT_EVIDENCE_PATH,
     ARTIFACT_STATUS_PATH,
+    EVIDENCE_TRANSPORT_ERROR,
     GITHUB_WATCHLIST_PATH,
     IDENTITY_FIELDS,
+    WATCHLIST_TRANSPORT_ERROR,
 )
 
 __all__ = [
     "ARTIFACT_EVIDENCE_PATH",
     "ARTIFACT_STATUS_PATH",
+    "EVIDENCE_TRANSPORT_ERROR",
     "GITHUB_WATCHLIST_PATH",
     "IDENTITY_FIELDS",
+    "WATCHLIST_TRANSPORT_ERROR",
 ]

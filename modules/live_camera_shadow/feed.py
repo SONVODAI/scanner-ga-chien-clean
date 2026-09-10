@@ -31,6 +31,16 @@ from modules.live_camera_shadow.bars import (
 )
 from modules.live_camera_shadow.rate import GUEST_RPM, LIVE_UNIVERSE_CAP, rate_report
 from modules.live_camera_shadow.universe import eligible_watchlist_symbols
+from modules.live_shadow_transport.contract import (
+    EVIDENCE_TRANSPORT_ERROR,
+    WATCHLIST_TRANSPORT_ERROR,
+)
+from modules.live_shadow_transport.freshness import classify_freshness
+from modules.live_shadow_transport.shadow_store import (
+    publish_shadow_artifacts,
+    resolve_shadow_store,
+)
+from modules.live_shadow_transport.watchlist_bus import fetch_published_watchlist
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +128,9 @@ class LiveShadowFeed:
     hard_cap: int = LIVE_UNIVERSE_CAP
     rpm: int = GUEST_RPM
     tod_qualified_sessions: int = 0
+    watchlist_source: str = "file"
+    watchlist_fetcher: Optional[Callable[[], Any]] = None
+    shadow_store_dir: Path | None = None
 
     statuses: list[dict[str, Any]] = field(default_factory=list)
     fetched_symbols: list[str] = field(default_factory=list)
@@ -126,19 +139,45 @@ class LiveShadowFeed:
     _last_overlay: dict[str, pd.DataFrame] = field(default_factory=dict)
     _emitted: set[str] = field(default_factory=set)
     _debounce: dict[str, dict[str, Any]] = field(default_factory=dict)
+    _watchlist_transport: str = field(default="OK", init=False)
+    _watchlist_transport_detail: str = field(default="", init=False)
+    _evidence_publish: str = field(default="OK", init=False)
+    _evidence_publish_detail: str = field(default="", init=False)
 
     def __post_init__(self) -> None:
         self.out_dir = Path(self.out_dir)
         self.out_dir.mkdir(parents=True, exist_ok=True)
         if self.archive_root is not None:
             self.archive_root = Path(self.archive_root)
+        if self.shadow_store_dir is not None:
+            self.shadow_store_dir = Path(self.shadow_store_dir)
         self._emitted = self._load_json_set(EMITTED_NAME)
         self._debounce = self._load_json(DEBOUNCE_NAME) or {}
+
+    def _resolve_watchlist(self, watchlist: Iterable[dict[str, Any]] | None) -> list[dict[str, Any]]:
+        """In-memory list wins. GitHub fetch never falls back to a stale local file."""
+        if watchlist is not None:
+            self._watchlist_transport = "OK"
+            self._watchlist_transport_detail = "injected"
+            return list(watchlist)
+        source = (self.watchlist_source or "file").strip().lower()
+        if source == "github":
+            fetched = fetch_published_watchlist(fetcher=self.watchlist_fetcher)
+            if not fetched.ok:
+                self._watchlist_transport = WATCHLIST_TRANSPORT_ERROR
+                self._watchlist_transport_detail = fetched.error or WATCHLIST_TRANSPORT_ERROR
+                return []
+            self._watchlist_transport = "OK"
+            self._watchlist_transport_detail = "github"
+            return list(fetched.rows)
+        self._watchlist_transport = "OK"
+        self._watchlist_transport_detail = "file"
+        return load_watchlist_rows(self.watchlist_path)
 
     def run_cycle(self, watchlist: Iterable[dict[str, Any]] | None = None) -> dict[str, Any]:
         now = as_vn(self.now_fn())
         session = now.date()
-        rows = list(watchlist) if watchlist is not None else load_watchlist_rows(self.watchlist_path)
+        rows = self._resolve_watchlist(watchlist)
         universe = eligible_watchlist_symbols(rows, now=now, cap=self.hard_cap)
 
         self.statuses = []
@@ -197,6 +236,7 @@ class LiveShadowFeed:
     def status_payload(self, *, now: datetime | None = None, session: date | None = None) -> dict[str, Any]:
         now = as_vn(now or self.now_fn())
         session = session or now.date()
+        fresh = classify_freshness(now, now)
         return {
             "schema": "live_camera_shadow_status.v1",
             "session": session.isoformat(),
@@ -211,6 +251,12 @@ class LiveShadowFeed:
             "archive_writes": 0,
             "alert_eligible": False,
             "production_unchanged": True,
+            "runner_label": fresh["label"],
+            "freshness": fresh["label"],
+            "watchlist_transport": self._watchlist_transport,
+            "watchlist_transport_detail": self._watchlist_transport_detail,
+            "evidence_publish": self._evidence_publish,
+            "evidence_publish_detail": self._evidence_publish_detail,
             "symbols": list(self.statuses),
         }
 
@@ -494,11 +540,26 @@ class LiveShadowFeed:
     def _flush(self, *, now: datetime, session: date) -> None:
         if self.new_bar_rows:
             self._append_jsonl(self.out_dir / BARS_NAME, self.new_bar_rows)
+        ev_path = self.out_dir / EVIDENCE_NAME
         if self.new_evidence_rows:
-            self._append_jsonl(self.out_dir / EVIDENCE_NAME, self.new_evidence_rows)
+            self._append_jsonl(ev_path, self.new_evidence_rows)
+        elif not ev_path.exists():
+            ev_path.write_text("", encoding="utf-8")
         self._write_json(self.out_dir / EMITTED_NAME, sorted(self._emitted))
         self._write_json(self.out_dir / DEBOUNCE_NAME, self._debounce)
         self._write_json(self.out_dir / STATUS_NAME, self.status_payload(now=now, session=session))
+        dest = resolve_shadow_store(self.shadow_store_dir)
+        if dest is None:
+            return
+        pub = publish_shadow_artifacts(self.out_dir, dest)
+        if pub.get("ok"):
+            self._evidence_publish = "OK"
+            self._evidence_publish_detail = str(pub.get("dest") or dest)
+            return
+        self._evidence_publish = EVIDENCE_TRANSPORT_ERROR
+        self._evidence_publish_detail = str(pub.get("detail") or EVIDENCE_TRANSPORT_ERROR)
+        self._write_json(self.out_dir / STATUS_NAME, self.status_payload(now=now, session=session))
+        publish_shadow_artifacts(self.out_dir, dest)
 
     def _load_json(self, name: str) -> Any:
         path = self.out_dir / name

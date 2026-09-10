@@ -4333,10 +4333,14 @@ def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.Da
     history_df = guard_dataframe_dtypes(history_df) if history_df is not None else pd.DataFrame()
     try:
         from modules.live_candidate.persist import apply_immutable_first_seen
-        from modules.live_candidate.watchlist import persist_research_watchlist
+        from modules.live_shadow_transport.watchlist_bus import persist_and_publish_research_watchlist
 
         hist = apply_immutable_first_seen(history_df, new_df, observed_at=vn_now())
-        persist_research_watchlist(hist, observed_at=vn_now())
+        persist_and_publish_research_watchlist(
+            hist,
+            observed_at=vn_now(),
+            publisher=_github_write_text,
+        )
     except Exception:
         if history_df.empty:
             hist = new_df
