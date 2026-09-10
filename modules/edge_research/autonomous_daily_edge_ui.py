@@ -90,14 +90,16 @@ def build_autonomous_daily_edge_ui_view(
     Latest successful autonomous session is selected when trade_date is omitted.
     """
     # Best-effort durable restore for Streamlit Cloud (no-op when backend absent).
+    # Capture the existing return value for TEMP diagnostics — do not restore twice.
+    restore_result: Optional[Dict[str, Any]] = None
     try:
         from modules.edge_research.production_observations_sync import (
             try_restore_production_observations_durable,
         )
 
-        try_restore_production_observations_durable(data_dir=data_dir)
+        restore_result = try_restore_production_observations_durable(data_dir=data_dir)
     except Exception:  # noqa: BLE001
-        pass
+        restore_result = {"ok": False, "error": "uncaught_restore_exception"}
 
     edge_root = resolve_data_dir(data_dir)
     canon = resolve_production_runs_root(edge_root)
@@ -177,6 +179,7 @@ def build_autonomous_daily_edge_ui_view(
         "view_only": True,
         "requires_streamlit_action": False,
         "challenger_voice_substituted": False,
+        "durable_restore": restore_result if isinstance(restore_result, dict) else {},
     }
 
 

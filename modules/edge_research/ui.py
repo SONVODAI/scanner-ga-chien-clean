@@ -348,6 +348,27 @@ def _render_research_run_status(st: Any, session_state: Mapping[str, Any]) -> No
         st.error(message)
 
 
+def _render_durable_restore_diagnostic(st: Any, autonomous_view: Mapping[str, Any]) -> None:
+    """Collapsed TEMP caption of already-produced restore results. No extra GET."""
+    from modules.edge_research.persistence import read_persistence_status
+    from modules.edge_research.restore_diagnostic import (
+        autonomous_diagnostic_from_restore_result,
+        challenger_diagnostic_from_status,
+        format_restore_diagnostic_text,
+    )
+
+    persist = read_persistence_status()
+    text = format_restore_diagnostic_text(
+        challenger=challenger_diagnostic_from_status(persist),
+        autonomous=autonomous_diagnostic_from_restore_result(
+            autonomous_view.get("durable_restore") if isinstance(autonomous_view, Mapping) else {}
+        ),
+    )
+    with st.expander("Durable Restore Diagnostic — TEMP", expanded=False):
+        st.caption("READ ONLY / TEMPORARY DIAGNOSTIC")
+        st.code(text, language=None)
+
+
 def render_edge_research_panel(
     current_market_state: Optional[str] = None,
     current_market_transition: Optional[str] = None,
@@ -385,6 +406,7 @@ def render_edge_research_panel(
             current_market_state=current_market_state,
             current_market_transition=current_market_transition,
         )
+        _render_durable_restore_diagnostic(st, autonomous_view)
         discovery = engine.get_last_discovery()
         challenger = engine.get_last_challenger()
         top_candidates = engine.get_top_candidates(limit=20)
