@@ -354,6 +354,7 @@ def _render_durable_restore_diagnostic(st: Any, autonomous_view: Mapping[str, An
     from modules.edge_research.restore_diagnostic import (
         autonomous_diagnostic_from_restore_result,
         challenger_diagnostic_from_status,
+        cloud_token_presence_diagnostic,
         format_restore_diagnostic_text,
     )
 
@@ -363,6 +364,7 @@ def _render_durable_restore_diagnostic(st: Any, autonomous_view: Mapping[str, An
         autonomous=autonomous_diagnostic_from_restore_result(
             autonomous_view.get("durable_restore") if isinstance(autonomous_view, Mapping) else {}
         ),
+        cloud_token=cloud_token_presence_diagnostic(),
     )
     with st.expander("Durable Restore Diagnostic — TEMP", expanded=False):
         st.caption("READ ONLY / TEMPORARY DIAGNOSTIC")

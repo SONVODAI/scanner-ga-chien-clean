@@ -7,6 +7,7 @@ Does not call restore, GET, PUT, Discovery, or Challenger.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from typing import Any, Dict, Mapping, Optional
 
@@ -237,12 +238,43 @@ def autonomous_diagnostic_from_restore_result(payload: Optional[Mapping[str, Any
     }
 
 
+def cloud_token_presence_diagnostic() -> Dict[str, str]:
+    """Presence + 8-hex fingerprint of already-loaded Cloud durable token.
+
+    Uses the same ``_secret_or_env("EDGE_RESEARCH_DURABLE_TOKEN")`` resolution
+    as durable restore. Never returns the token, full hash, or length.
+    """
+    from modules.edge_research.durable import _secret_or_env
+
+    raw = _secret_or_env("EDGE_RESEARCH_DURABLE_TOKEN")
+    token = "" if raw is None else str(raw).strip()
+    if not token:
+        return {"CLOUD_TOKEN_PRESENT": "NO"}
+    fingerprint = hashlib.sha256(token.encode("utf-8")).hexdigest()[:8]
+    return {
+        "CLOUD_TOKEN_PRESENT": "YES",
+        "CLOUD_TOKEN_FINGERPRINT": fingerprint,
+    }
+
+
+def _safe_fingerprint(value: str) -> str:
+    fp = (value or "").strip().lower()
+    if len(fp) == 8 and all(c in "0123456789abcdef" for c in fp):
+        return fp
+    return ""
+
+
 def format_restore_diagnostic_text(
     *,
     challenger: Mapping[str, str],
     autonomous: Mapping[str, str],
+    cloud_token: Optional[Mapping[str, str]] = None,
 ) -> str:
     """Machine-readable TEMP diagnostic. Values are already classified/safe."""
+    token_info = cloud_token or {}
+    present = str(token_info.get("CLOUD_TOKEN_PRESENT") or "NO")
+    if present not in ("YES", "NO"):
+        present = "NO"
     lines = [
         "READ ONLY / TEMPORARY DIAGNOSTIC",
         f"CHALLENGER_BACKEND_CONFIGURED={challenger.get('CHALLENGER_BACKEND_CONFIGURED', 'NO')}",
@@ -253,7 +285,12 @@ def format_restore_diagnostic_text(
         f"AUTONOMOUS_RESTORE_RESULT={autonomous.get('AUTONOMOUS_RESTORE_RESULT', 'none')}",
         f"AUTONOMOUS_RESTORE_REASON={autonomous.get('AUTONOMOUS_RESTORE_REASON', UNKNOWN_ERROR)}",
         f"AUTONOMOUS_HTTP_CLASS={autonomous.get('AUTONOMOUS_HTTP_CLASS', HTTP_NONE)}",
+        f"CLOUD_TOKEN_PRESENT={present}",
     ]
+    if present == "YES":
+        fingerprint = _safe_fingerprint(str(token_info.get("CLOUD_TOKEN_FINGERPRINT") or ""))
+        if fingerprint:
+            lines.append(f"CLOUD_TOKEN_FINGERPRINT={fingerprint}")
     text = "\n".join(lines)
     if contains_unsafe_material(text):
         return (
@@ -265,6 +302,7 @@ def format_restore_diagnostic_text(
             "AUTONOMOUS_BACKEND_CONFIGURED=NO\n"
             "AUTONOMOUS_RESTORE_RESULT=error\n"
             "AUTONOMOUS_RESTORE_REASON=UNKNOWN_ERROR\n"
-            "AUTONOMOUS_HTTP_CLASS=UNKNOWN_ERROR"
+            "AUTONOMOUS_HTTP_CLASS=UNKNOWN_ERROR\n"
+            "CLOUD_TOKEN_PRESENT=NO"
         )
     return text
