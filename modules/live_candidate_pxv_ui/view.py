@@ -6,7 +6,7 @@ does not recompute P×V, does not write files.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -18,6 +18,14 @@ from modules.intraday_pxv_v1.constants import (
 )
 from modules.live_candidate.calendar import as_vn
 from modules.live_candidate_pxv_ui.read import load_panel_sources
+from modules.live_shadow_transport.contract import (
+    EVIDENCE_TRANSPORT_ERROR,
+    RUNNER_STALE,
+    RUNNER_STALE_AFTER_SEC,
+    RUNNER_STOPPED,
+    WATCHLIST_TRANSPORT_ERROR,
+)
+from modules.live_shadow_transport.freshness import classify_freshness
 
 DIRECTIONAL = {EV_STRENGTHEN, EV_WEAKEN}
 FAILURE_STATUSES = {
@@ -28,14 +36,14 @@ FAILURE_STATUSES = {
     "UNUSABLE",
     "NOT_YET_ELIGIBLE",
 }
-RUNNER_STALE_AFTER = timedelta(minutes=10)
-
 EMPTY_MESSAGE = "No active BOT Candidate."
 WAITING_MESSAGE = "Waiting for first eligible completed 5m bar."
 WAITING_MESSAGE_VI = "Chờ nến 5m hoàn chỉnh đầu tiên đủ điều kiện."
 NEUTRAL_WATCH_VI = "Candidate vẫn đang được theo dõi."
 STALE_BANNER = "Live-shadow runner STALE / stopped. Evidence below is NOT current."
 NOT_LEGAL_NOTE = "chronology_legal=false — không trình bày như bằng chứng hợp lệ."
+EVIDENCE_TRANSPORT_BANNER = "EVIDENCE_TRANSPORT_ERROR — remote P×V GET failed. No synthetic evidence."
+WATCHLIST_TRANSPORT_BANNER = "WATCHLIST_TRANSPORT_ERROR — published watchlist fetch failed. No synthetic Candidate."
 
 # Thin Vietnamese frames around existing Interpreter why-strings. Not new reasons.
 WHY_VI = {
@@ -130,7 +138,36 @@ def _symbol_status(status: dict[str, Any], symbol: str) -> dict[str, Any]:
     return {}
 
 
-def _runner_freshness(status: dict[str, Any], now: datetime) -> dict[str, Any]:
+def _runner_freshness(
+    status: dict[str, Any],
+    now: datetime,
+    transport: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    transport = transport or {}
+    transport_err = transport.get("error") or ""
+    if transport_err == EVIDENCE_TRANSPORT_ERROR or status.get("error") == EVIDENCE_TRANSPORT_ERROR:
+        return {
+            "label": EVIDENCE_TRANSPORT_ERROR,
+            "detail": transport.get("detail") or status.get("detail") or EVIDENCE_TRANSPORT_ERROR,
+            "observed_at": "",
+            "age_sec": None,
+            "is_stale": True,
+            "is_live": False,
+            "banner": EVIDENCE_TRANSPORT_BANNER,
+            "failures": [EVIDENCE_TRANSPORT_ERROR],
+        }
+    wl_err = status.get("watchlist_transport") or transport_err
+    if wl_err == WATCHLIST_TRANSPORT_ERROR:
+        return {
+            "label": WATCHLIST_TRANSPORT_ERROR,
+            "detail": status.get("watchlist_transport_detail") or transport.get("detail") or WATCHLIST_TRANSPORT_ERROR,
+            "observed_at": str(status.get("observed_at") or ""),
+            "age_sec": None,
+            "is_stale": True,
+            "is_live": False,
+            "banner": WATCHLIST_TRANSPORT_BANNER,
+            "failures": [WATCHLIST_TRANSPORT_ERROR],
+        }
     observed = _parse_ts(status.get("observed_at"))
     symbols = list(status.get("symbols") or [])
     fail = [
@@ -140,7 +177,7 @@ def _runner_freshness(status: dict[str, Any], now: datetime) -> dict[str, Any]:
     ]
     if not status:
         return {
-            "label": "STOPPED",
+            "label": RUNNER_STOPPED,
             "detail": "Không có live_shadow_status.json",
             "observed_at": "",
             "age_sec": None,
@@ -148,19 +185,20 @@ def _runner_freshness(status: dict[str, Any], now: datetime) -> dict[str, Any]:
             "is_live": False,
             "banner": STALE_BANNER,
         }
-    age = (now - observed).total_seconds() if observed else None
+    fresh = classify_freshness(status.get("observed_at"), now, stale_after_sec=RUNNER_STALE_AFTER_SEC)
+    age = fresh["age_sec"]
     if fail:
         label = fail[0]
         stale = True
     elif observed is None:
-        label = "STOPPED"
+        label = RUNNER_STOPPED
         stale = True
-    elif age is not None and age > RUNNER_STALE_AFTER.total_seconds():
-        label = "STALE"
+    elif fresh["label"] == RUNNER_STALE:
+        label = RUNNER_STALE
         stale = True
     else:
-        label = "LIVE"
-        stale = False
+        label = fresh["label"]
+        stale = bool(fresh["is_stale"])
     banner = STALE_BANNER if stale else ""
     return {
         "label": label,
@@ -295,7 +333,10 @@ def build_panel(
     watchlist = list(src.get("watchlist") or [])
     evidence = list(src.get("evidence") or [])
     status = dict(src.get("status") or {})
-    runner = _runner_freshness(status, now)
+    transport = dict(src.get("transport") or {})
+    runner = _runner_freshness(status, now, transport)
+    if runner["label"] == EVIDENCE_TRANSPORT_ERROR:
+        evidence = []
     stale = bool(runner["is_stale"])
 
     by_symbol: dict[str, list[dict[str, Any]]] = {}
