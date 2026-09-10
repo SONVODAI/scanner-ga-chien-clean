@@ -29,6 +29,10 @@ class EvidenceTransportError(RuntimeError):
     """Remote live-shadow GET failed. Do not invent P×V."""
 
 
+class LiveShadowNotFound(Exception):
+    """Expected missing live-shadow object (HTTP 404). Not a transport failure."""
+
+
 def remote_artifact_configured() -> bool:
     return bool((_secret_or_env("EDGE_RESEARCH_DURABLE_URL") or "").strip())
 
@@ -57,7 +61,11 @@ def get_live_shadow_bytes(
         with open_fn(req, timeout=timeout) as resp:
             return resp.read()
     except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            raise LiveShadowNotFound(rel_path) from exc
         raise EvidenceTransportError(f"artifact HTTP {exc.code}") from exc
+    except LiveShadowNotFound:
+        raise
     except Exception as exc:  # noqa: BLE001
         raise EvidenceTransportError(f"artifact GET failed: {exc}") from exc
 
