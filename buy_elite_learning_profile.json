@@ -2,9 +2,9 @@
   "version": "BUY_ELITE_LEARNING_V3",
   "mode": "ACTIVE_LEARNING",
   "created_at": "2026-06-25 16:55:06",
-  "updated_at": "2026-09-09 21:07:01",
-  "completed_t5": 831,
-  "baseline_winrate": 0.3803,
+  "updated_at": "2026-09-10 07:55:26",
+  "completed_t5": 864,
+  "baseline_winrate": 0.3808,
   "min_completed_to_learn": 80,
   "min_feature_samples": 20,
   "note": "Đủ dữ liệu tối thiểu. Learning Engine đã bắt đầu tự chỉnh trọng số rất chậm.",
@@ -20,9 +20,9 @@
   },
   "regime_multipliers": {
     "WINTER": {
-      "action": 1.014,
-      "storm": 1.014,
-      "zone": 0.986
+      "action": 1.013,
+      "storm": 1.013,
+      "zone": 0.987
     },
     "NEUTRAL": {
       "action": 0.994,
@@ -32,18 +32,18 @@
     "SPRING": {}
   },
   "insights": [
-    "Completed T+5: 831",
-    "Baseline WinRate: 38.0%",
-    "Average T+5: -0.65%",
-    "market: good: n=578, winrate=35.6%, baseline=38.0%, mult=0.989, blended=0.991",
-    "action: good: n=827, winrate=38.0%, baseline=38.0%, mult=1.0, blended=0.999",
-    "storm: good: n=300, winrate=36.0%, baseline=38.0%, mult=0.991, blended=0.993",
-    "evo: good: n=575, winrate=37.2%, baseline=38.0%, mult=0.996, blended=0.996",
-    "zone: good: n=775, winrate=38.1%, baseline=38.0%, mult=1.0, blended=0.999",
-    "obv: good: n=831, winrate=38.0%, baseline=38.0%, mult=1.0, blended=1.0",
-    "dist_penalty: risk: n=21, winrate=47.6%, baseline=38.0%, mult=0.938, blended=0.94",
-    "Regime WINTER: n=253, winrate=43.5%, seasonal=1.014",
-    "Regime NEUTRAL: n=578, winrate=35.6%, seasonal=0.994"
+    "Completed T+5: 864",
+    "Baseline WinRate: 38.1%",
+    "Average T+5: -0.68%",
+    "market: good: n=611, winrate=35.8%, baseline=38.1%, mult=0.99, blended=0.991",
+    "action: good: n=860, winrate=38.0%, baseline=38.1%, mult=1.0, blended=0.999",
+    "storm: good: n=315, winrate=36.8%, baseline=38.1%, mult=0.994, blended=0.993",
+    "evo: good: n=596, winrate=37.6%, baseline=38.1%, mult=0.998, blended=0.996",
+    "zone: good: n=806, winrate=38.1%, baseline=38.1%, mult=1.0, blended=0.999",
+    "obv: good: n=864, winrate=38.1%, baseline=38.1%, mult=1.0, blended=1.0",
+    "dist_penalty: risk: n=21, winrate=47.6%, baseline=38.1%, mult=0.938, blended=0.94",
+    "Regime WINTER: n=253, winrate=43.5%, seasonal=1.013",
+    "Regime NEUTRAL: n=611, winrate=35.8%, seasonal=0.994"
   ],
-  "avg_t5_return": -0.655
+  "avg_t5_return": -0.683
 }
