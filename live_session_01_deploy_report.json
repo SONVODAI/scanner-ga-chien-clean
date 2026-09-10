@@ -1,0 +1,66 @@
+{
+  "schema": "live_session_01_deploy_proof.v1",
+  "session_started": false,
+  "secrets_present": {
+    "GITHUB_TOKEN": "ABSENT",
+    "EDGE_RESEARCH_DURABLE_URL": "ABSENT",
+    "EDGE_RESEARCH_DURABLE_TOKEN": "ABSENT"
+  },
+  "access": {
+    "streamlit_admin": false,
+    "vps_ssh": false,
+    "self_hosted_worker": false,
+    "durable_url": false,
+    "durable_token": false,
+    "github_token": false
+  },
+  "source": {
+    "vnstock_0292": true,
+    "production_panels_present": true,
+    "ui_no_kbs": true,
+    "alert_eligible_false": true,
+    "no_telegram_in_runner": true,
+    "no_orders_in_runner": true,
+    "empty_candidate_ui": true
+  },
+  "streamlit": {
+    "ok": false,
+    "status": 0,
+    "url_configured": false
+  },
+  "artifact": {
+    "health": {
+      "ok": false,
+      "status": 0,
+      "reachable": false
+    },
+    "bundle": {
+      "ok": false,
+      "status": 0
+    },
+    "live_shadow": {
+      "ok": false,
+      "status": 0
+    }
+  },
+  "camera_archive": {
+    "ok": true,
+    "exists": false,
+    "path": "/var/lib/mrbot/intraday_memory",
+    "n_files": 0,
+    "sha256": null
+  },
+  "runner": {
+    "ok": true,
+    "systemd": "inactive"
+  },
+  "verdict": {
+    "A_STREAMLIT_DEPLOYED_OK": "NO",
+    "B_VPS_ARTIFACT_DEPLOYED_OK": "NO",
+    "C_EXISTING_PRODUCTION_HEALTHY": "NO",
+    "D_CAMERA_ARCHIVE_UNCHANGED": "YES",
+    "E_LIVE_RUNNER_STILL_STOPPED": "YES",
+    "F_READY_TO_START_LIVE_SESSION_01": "NO"
+  },
+  "preflight_blocker": "This agent cannot deploy Streamlit Cloud (no Streamlit admin token; stacked revision is not on origin/main). This agent cannot deploy the Camera VPS (no SSH, no self-hosted worker, EDGE_RESEARCH_DURABLE_URL=ABSENT). Stopped before production mutation."
+}
