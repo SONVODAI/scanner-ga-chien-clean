@@ -18,6 +18,7 @@ from modules.edge_research.restore_diagnostic import (
     autonomous_diagnostic_from_restore_result,
     challenger_diagnostic_from_status,
     classify_restore_detail,
+    cloud_token_presence_diagnostic,
     contains_unsafe_material,
     format_restore_diagnostic_text,
 )
@@ -195,6 +196,68 @@ def test_research_execution_path_unchanged():
     assert "_render_durable_restore_diagnostic" in panel
     assert panel.index("build_autonomous_daily_edge_ui_view") < panel.index("engine.initialize")
     assert panel.index("engine.initialize") < panel.index("_render_durable_restore_diagnostic")
+
+
+def _empty_restore_maps():
+    return (
+        {
+            "CHALLENGER_BACKEND_CONFIGURED": "YES",
+            "CHALLENGER_RESTORE_RESULT": "skipped",
+            "CHALLENGER_RESTORE_REASON": "HTTP load failed: 401",
+            "CHALLENGER_HTTP_CLASS": "HTTP_401",
+        },
+        {
+            "AUTONOMOUS_BACKEND_CONFIGURED": "YES",
+            "AUTONOMOUS_RESTORE_RESULT": "error",
+            "AUTONOMOUS_RESTORE_REASON": "HTTP load failed: 401",
+            "AUTONOMOUS_HTTP_CLASS": "HTTP_401",
+        },
+    )
+
+
+def test_cloud_token_absent_or_blank_has_no_fingerprint(monkeypatch):
+    import hashlib
+
+    monkeypatch.setattr("modules.edge_research.durable._secret_or_env", lambda *_a, **_k: None)
+    absent = cloud_token_presence_diagnostic()
+    assert absent == {"CLOUD_TOKEN_PRESENT": "NO"}
+    monkeypatch.setattr("modules.edge_research.durable._secret_or_env", lambda *_a, **_k: "   ")
+    blank = cloud_token_presence_diagnostic()
+    assert blank == {"CLOUD_TOKEN_PRESENT": "NO"}
+    ch, au = _empty_restore_maps()
+    text = format_restore_diagnostic_text(challenger=ch, autonomous=au, cloud_token=blank)
+    assert "CLOUD_TOKEN_PRESENT=NO" in text
+    assert "CLOUD_TOKEN_FINGERPRINT" not in text
+    assert hashlib.sha256(b"   ").hexdigest()[:8] not in text
+
+
+def test_cloud_token_present_fingerprint_is_8_lowercase_hex(monkeypatch):
+    import hashlib
+
+    secret = "unit-test-only-not-a-production-token"
+    monkeypatch.setattr("modules.edge_research.durable._secret_or_env", lambda *_a, **_k: secret)
+    out = cloud_token_presence_diagnostic()
+    expect = hashlib.sha256(secret.encode("utf-8")).hexdigest()[:8]
+    assert out["CLOUD_TOKEN_PRESENT"] == "YES"
+    assert out["CLOUD_TOKEN_FINGERPRINT"] == expect
+    assert len(expect) == 8
+    assert expect == expect.lower()
+    assert all(c in "0123456789abcdef" for c in expect)
+    ch, au = _empty_restore_maps()
+    text = format_restore_diagnostic_text(challenger=ch, autonomous=au, cloud_token=out)
+    assert "CLOUD_TOKEN_PRESENT=YES" in text
+    assert f"CLOUD_TOKEN_FINGERPRINT={expect}" in text
+    assert secret not in text
+    assert hashlib.sha256(secret.encode("utf-8")).hexdigest() not in text
+    assert "Bearer" not in text
+    assert contains_unsafe_material(text) is False
+
+
+def test_token_presence_probe_does_not_add_http():
+    src = (REPO / "modules/edge_research/restore_diagnostic.py").read_text(encoding="utf-8")
+    assert "import urllib" not in src
+    assert "urllib.request" not in src
+    assert "cloud_token_presence_diagnostic" in src
 
 
 def test_ui_expander_does_not_change_metric_labels():
