@@ -22,6 +22,8 @@ from modules.live_candidate.contract import (
 from modules.live_candidate.persist import _norm_date, _norm_symbol
 
 WATCHLIST_NAME = "dynamic_watchlist.json"
+# Present empty document. Absence of this file is not a valid empty universe.
+CANONICAL_EMPTY_JSON = "[]\n"
 
 
 def output_root(base: Path | None = None) -> Path:
@@ -119,6 +121,15 @@ def persist_research_watchlist(
     root.mkdir(parents=True, exist_ok=True)
     wl = build_research_watchlist(history, now=observed_at)
     path = root / WATCHLIST_NAME
-    payload = json.loads(wl.to_json(orient="records", force_ascii=False))
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(encode_watchlist_text(wl), encoding="utf-8")
     return path
+
+
+def encode_watchlist_text(watchlist: pd.DataFrame | None) -> str:
+    """Canonical GitHub/local bytes. Zero rows → '[]', never a missing file."""
+    if watchlist is None or watchlist.empty:
+        return CANONICAL_EMPTY_JSON
+    payload = json.loads(watchlist.to_json(orient="records", force_ascii=False))
+    if not payload:
+        return CANONICAL_EMPTY_JSON
+    return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"

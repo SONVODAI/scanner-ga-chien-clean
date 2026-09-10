@@ -15,6 +15,7 @@ from typing import Any, Callable, Optional
 
 from modules.live_candidate.watchlist import persist_research_watchlist
 from modules.live_shadow_transport.contract import (
+    EMPTY_WATCHLIST_TEXT,
     GITHUB_WATCHLIST_PATH,
     WATCHLIST_PUBLISH_STATUS_NAME,
     WATCHLIST_TRANSPORT_ERROR,
@@ -128,8 +129,13 @@ def persist_and_publish_research_watchlist(
     observed_at: datetime,
     out_dir: Path | None = None,
     publisher: Optional[Writer] = None,
+    skip_if_unchanged: bool = True,
 ) -> tuple[Path, WatchlistPublishResult]:
-    """Persist locally, then publish the same file bytes. Persist always happens first."""
+    """Persist locally (including canonical []), then publish the same bytes.
+
+    An empty universe is a present `[]` document, never a missing GitHub object.
+    Unchanged remote bytes are not rewritten (avoids commit spam).
+    """
     path = persist_research_watchlist(history, observed_at=observed_at, out_dir=out_dir)
     text = path.read_text(encoding="utf-8")
     if publisher is None:
@@ -139,10 +145,38 @@ def persist_and_publish_research_watchlist(
             detail="no github publisher configured",
             bytes_len=len(text.encode("utf-8")),
         )
+    elif skip_if_unchanged and _remote_watchlist_matches(text):
+        result = WatchlistPublishResult(
+            ok=True,
+            status="GITHUB_OK",
+            detail="unchanged",
+            bytes_len=len(text.encode("utf-8")),
+        )
     else:
         result = publish_watchlist_bytes(text, publisher)
     write_publish_status(path.parent, result)
     return path, result
+
+
+def _normalize_watchlist_text(text: str) -> str:
+    rows = parse_watchlist_text(text)
+    if not rows:
+        return EMPTY_WATCHLIST_TEXT
+    return json.dumps(rows, ensure_ascii=False, separators=(",", ":"))
+
+
+def _remote_watchlist_matches(text: str) -> bool:
+    """True when GitHub already has the same snapshot (empty or non-empty)."""
+    try:
+        current = fetch_github_watchlist_text()
+    except WatchlistTransportError:
+        return False
+    except Exception:
+        return False
+    try:
+        return _normalize_watchlist_text(current) == _normalize_watchlist_text(text)
+    except Exception:
+        return False
 
 
 def fetch_github_watchlist_text(

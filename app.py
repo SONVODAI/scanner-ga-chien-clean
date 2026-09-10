@@ -4276,9 +4276,24 @@ def update_buy_elite_outcomes(history_df: pd.DataFrame, scan_df: pd.DataFrame) -
     return guard_dataframe_dtypes(hist)
 
 
+def _publish_research_watchlist_snapshot(history_df: pd.DataFrame | None) -> None:
+    """Publish current Dynamic Watchlist, including canonical empty []. Never invents rows."""
+    try:
+        from modules.live_shadow_transport.watchlist_bus import persist_and_publish_research_watchlist
+
+        persist_and_publish_research_watchlist(
+            history_df if history_df is not None else pd.DataFrame(),
+            observed_at=vn_now(),
+            publisher=_github_write_text,
+        )
+    except Exception:
+        pass
+
+
 def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.DataFrame, market_real: float, market_forecast: float, allow_save: bool = True) -> pd.DataFrame:
     """Ghi tín hiệu BUY ELITE trong ngày để vài phiên sau có dữ liệu học."""
     if not allow_save or buy_elite_df is None or buy_elite_df.empty:
+        _publish_research_watchlist_snapshot(history_df)
         return history_df if history_df is not None else pd.DataFrame()
 
     today = today_str()
@@ -4327,6 +4342,7 @@ def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.Da
 
     new_df = guard_dataframe_dtypes(pd.DataFrame(rows))
     if new_df.empty:
+        _publish_research_watchlist_snapshot(history_df)
         return history_df if history_df is not None else pd.DataFrame()
 
     history_df = guard_dataframe_dtypes(history_df) if history_df is not None else pd.DataFrame()

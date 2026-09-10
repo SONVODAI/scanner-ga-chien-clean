@@ -6,6 +6,9 @@ from __future__ import annotations
 
 # Existing Cloud → git bus (app.py _github_write_text / _github_read_text).
 GITHUB_WATCHLIST_PATH = "data/live_candidate/dynamic_watchlist.json"
+# Canonical no-candidate document. Missing object (HTTP 404) is a transport
+# error, not an empty universe. Never represent zero candidates by absence.
+EMPTY_WATCHLIST_TEXT = "[]"
 GITHUB_ELITE_HISTORY_PATH = "buy_elite_learning_history.csv"
 
 # Existing Cloud ← VPS bus (artifact server + Streamlit EDGE_RESEARCH_DURABLE_*).

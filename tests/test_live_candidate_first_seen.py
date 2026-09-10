@@ -10,7 +10,9 @@ import pandas as pd
 from modules.live_candidate.calendar import cash_session_end, next_trading_session_open
 from modules.live_candidate.persist import apply_immutable_first_seen
 from modules.live_candidate.watchlist import (
+    CANONICAL_EMPTY_JSON,
     build_research_watchlist,
+    encode_watchlist_text,
     persist_research_watchlist,
 )
 
@@ -231,6 +233,39 @@ def test_watchlist_required_fields_and_no_trade_verbs_as_actions():
     assert wl.iloc[0]["status"] == "ACTIVE"
     assert "buy_action" not in wl.columns
     assert "sell_action" not in wl.columns
+
+
+def test_empty_history_persists_canonical_empty_list(tmp_path, monkeypatch):
+    monkeypatch.setenv("MRBOT_LIVE_CANDIDATE_OUT", str(tmp_path))
+    path = persist_research_watchlist(pd.DataFrame(), observed_at=_ts("2026-08-14 10:05:00"))
+    raw = path.read_text(encoding="utf-8")
+    assert raw == CANONICAL_EMPTY_JSON
+    assert encode_watchlist_text(pd.DataFrame()) == CANONICAL_EMPTY_JSON
+    assert __import__("json").loads(raw) == []
+
+
+def test_persist_and_publish_empty_does_not_invent_rows(tmp_path):
+    from modules.live_shadow_transport.watchlist_bus import persist_and_publish_research_watchlist
+
+    published: list[str] = []
+
+    def writer(path: str, text: str, message: str) -> str:
+        published.append(text)
+        assert path == "data/live_candidate/dynamic_watchlist.json"
+        assert "HPG" not in text
+        return "GITHUB_OK"
+
+    path, result = persist_and_publish_research_watchlist(
+        pd.DataFrame(),
+        observed_at=_ts("2026-08-14 10:05:00"),
+        out_dir=tmp_path,
+        publisher=writer,
+        skip_if_unchanged=False,
+    )
+    assert result.ok is True
+    assert __import__("json").loads(path.read_text(encoding="utf-8")) == []
+    assert __import__("json").loads(published[0]) == []
+    assert published[0].strip() == "[]"
 
 
 def test_persist_watchlist_writes_only_research_out(tmp_path, monkeypatch):

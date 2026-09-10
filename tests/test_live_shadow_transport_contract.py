@@ -3,6 +3,7 @@
 from modules.live_shadow_transport.contract import (
     ALERT_ELIGIBLE,
     ARTIFACT_EVIDENCE_PATH,
+    EMPTY_WATCHLIST_TEXT,
     FORBIDDEN_CAMERA_ARCHIVE,
     GITHUB_WATCHLIST_PATH,
     IMMUTABLE_ON_TRANSPORT,
@@ -21,6 +22,11 @@ def test_artifact_shadow_paths_are_not_edge_bundle():
 
 def test_camera_archive_forbidden():
     assert FORBIDDEN_CAMERA_ARCHIVE == "/var/lib/mrbot/intraday_memory"
+
+
+def test_empty_universe_is_present_list_not_missing_object():
+    assert GITHUB_WATCHLIST_PATH == "data/live_candidate/dynamic_watchlist.json"
+    assert EMPTY_WATCHLIST_TEXT == "[]"
 
 
 def test_clocks_immutable_and_no_alerts():
