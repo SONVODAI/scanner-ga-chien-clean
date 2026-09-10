@@ -62,5 +62,14 @@
     "E_LIVE_RUNNER_STILL_STOPPED": "YES",
     "F_READY_TO_START_LIVE_SESSION_01": "NO"
   },
-  "preflight_blocker": "This agent cannot deploy Streamlit Cloud (no Streamlit admin token; stacked revision is not on origin/main). This agent cannot deploy the Camera VPS (no SSH, no self-hosted worker, EDGE_RESEARCH_DURABLE_URL=ABSENT). Stopped before production mutation."
+  "preflight_blocker": "This agent cannot deploy Streamlit Cloud (no Streamlit admin token; stacked revision is not on origin/main). This agent cannot deploy the Camera VPS (no SSH, no self-hosted worker, EDGE_RESEARCH_DURABLE_URL=ABSENT). Stopped before production mutation.",
+  "rollback_recorded_before_change": {
+    "origin_main": "1f68283bdc25d6d2ce14413d13b4e0661100bcad",
+    "approved_stack_not_deployed": "fedc7d53cb9a902bb7aa73760f00d402f913ed22",
+    "opt_mrbot_camera": "not_contacted",
+    "camera_archive": "not_contacted",
+    "artifact_service_restarted": false,
+    "live_runner_started": false
+  },
+  "production_mutation": false
 }
