@@ -104,6 +104,15 @@ st.set_page_config(
 st.title("🤖 Mr.BOT PRO V4.0 - Scanner Gà Chiến")
 st.caption("Observe • Learn • Think • Evolve. Market First → Mr.BOT PRO → Decision Engine → Learning Engine → Thinking Engine → Bot Evolution. Không dự đoán tương lai; chỉ học từ quá khứ để hỗ trợ quyết định hiện tại.")
 
+# LIVE CANDIDATE × P×V — isolated read-only observation panel.
+# Failure must not break production.
+try:
+    from modules.live_candidate_pxv_ui.render import render_live_candidate_pxv_panel
+
+    render_live_candidate_pxv_panel()
+except Exception:
+    pass
+
 # =========================================================
 # WATCHLIST
 # =========================================================
@@ -4321,13 +4330,24 @@ def append_today_buy_elite_signals(history_df: pd.DataFrame, buy_elite_df: pd.Da
         return history_df if history_df is not None else pd.DataFrame()
 
     history_df = guard_dataframe_dtypes(history_df) if history_df is not None else pd.DataFrame()
-    if history_df.empty:
-        hist = new_df
-    else:
-        hist = pd.concat([history_df, new_df], ignore_index=True)
+    try:
+        from modules.live_candidate.persist import apply_immutable_first_seen
+        from modules.live_shadow_transport.watchlist_bus import persist_and_publish_research_watchlist
+
+        hist = apply_immutable_first_seen(history_df, new_df, observed_at=vn_now())
+        persist_and_publish_research_watchlist(
+            hist,
+            observed_at=vn_now(),
+            publisher=_github_write_text,
+        )
+    except Exception:
+        if history_df.empty:
+            hist = new_df
+        else:
+            hist = pd.concat([history_df, new_df], ignore_index=True)
+        hist = hist.drop_duplicates(subset=["date", "symbol"], keep="last")
 
     hist = guard_dataframe_dtypes(hist)
-    hist = hist.drop_duplicates(subset=["date", "symbol"], keep="last")
     return hist
 
 
