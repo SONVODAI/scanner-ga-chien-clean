@@ -75,6 +75,22 @@ note() { echo "OK: $*"; }
 
 sha256_file() { sha256sum "$1" | awk '{print $1}'; }
 
+# vnstock 4.x has no __version__; use installed distribution metadata.
+vnstock_installed_version() {
+  "${VENV}/bin/python" - <<'PY'
+try:
+    from importlib.metadata import PackageNotFoundError, version
+except ImportError:  # pragma: no cover — 3.12 has importlib.metadata
+    from importlib_metadata import PackageNotFoundError, version
+try:
+    print(version("vnstock"), end="")
+except PackageNotFoundError:
+    raise SystemExit("not-installed")
+except Exception as exc:
+    raise SystemExit(f"lookup-failed:{type(exc).__name__}")
+PY
+}
+
 http_code() {
   local url="$1"
   curl -sS -o /tmp/mrbot-rotation-http.body -w '%{http_code}' --max-time 10 "$url" || true
@@ -151,7 +167,7 @@ step_A() {
   [[ ! -e "${STORE}" ]] && note "Rotation store does not exist yet (expected)" || echo "NOTE: ${STORE} already exists"
   local pyver vnver
   pyver="$("${VENV}/bin/python" -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])')"
-  vnver="$("${VENV}/bin/python" -c 'import vnstock; print(getattr(vnstock, "__version__", "unknown"))')"
+  vnver="$(vnstock_installed_version)" || die "vnstock metadata lookup failed (${vnver:-empty})"
   echo "CAMERA_PYTHON=${pyver}"
   echo "CAMERA_VNSTOCK=${vnver}"
   [[ "${pyver}" == "3.12.3" ]] || die "Python ${pyver} != 3.12.3"
@@ -416,7 +432,8 @@ assert wl.count("\n") <= 3
 print("WATCHLIST_TCH_ONLY_OK")
 PY
   local vnver
-  vnver="$("${VENV}/bin/python" -c 'import vnstock; print(getattr(vnstock, "__version__", "unknown"))')"
+  vnver="$(vnstock_installed_version)" || die "vnstock metadata lookup failed (${vnver:-empty})"
+  echo "CAMERA_VNSTOCK=${vnver}"
   [[ "${vnver}" == "4.0.5" ]] || die "vnstock changed to ${vnver}"
   [[ ! -d /opt/mrbot-streamlit-venv ]] || echo "NOTE: streamlit venv present — not modified"
   note "pre-restart validation passed — safe to run E"
@@ -448,7 +465,13 @@ step_E() {
     systemctl restart "${SERVICE}"
     die "rolled back artifact_server.py (health=${hc} candidate=${sc})"
   fi
-  [[ "${rc}" == "401" ]] || die "Rotation unauth GET is ${rc}, expected 401 (route/auth live). Rolling back not auto-run; Candidate is healthy."
+  if [[ "${rc}" == "500" ]]; then
+    echo "STOP: Rotation unauth GET 500 — rolling back overlay" >&2
+    cp -a "${BACKUP_SERVER}" "${SERVER_PY}"
+    systemctl restart "${SERVICE}"
+    die "rolled back artifact_server.py after Rotation HTTP 500"
+  fi
+  [[ "${rc}" == "401" ]] || die "Rotation unauth GET is ${rc}, expected 401. Candidate still 401 — overlay NOT auto-rolled back. Inspect, then H if needed."
   note "service active; /health 200; Candidate 401; Rotation 401"
 }
 
