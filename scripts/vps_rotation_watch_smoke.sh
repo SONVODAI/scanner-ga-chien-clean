@@ -26,6 +26,7 @@ ENV_FILE="/etc/mrbot/edge-artifacts.env"
 DEST="/opt/mrbot-rotation-watch"
 STORE="/var/lib/mrbot/rotation_watch"
 SERVICE="mrbot-edge-artifacts.service"
+READY_WAIT_SEC=15
 ISO="/tmp/mrbot-rotation-src-b230b1c90"
 STAMP_FILE="/tmp/mrbot-rotation-smoke.stamp"
 EXPECTED_SERVER_SHA="ba5c17f4521c2a0b95fbf46d7cb0927da66a68682874e9efe77dee085ef867d1"
@@ -93,7 +94,76 @@ PY
 
 http_code() {
   local url="$1"
-  curl -sS -o /tmp/mrbot-rotation-http.body -w '%{http_code}' --max-time 10 "$url" || true
+  local tmo="${2:-10}"
+  curl -sS -o /tmp/mrbot-rotation-http.body -w '%{http_code}' --max-time "${tmo}" "$url" || true
+}
+
+wait_artifact_ready() {
+  local i hc state
+  echo "WAIT_READY up to ${READY_WAIT_SEC}s for ${SERVICE} + /health=200"
+  echo "WAIT_READY note: transient curl 000 during this window is not a regression"
+  for ((i = 1; i <= READY_WAIT_SEC; i++)); do
+    state="$(systemctl is-active "${SERVICE}" 2>/dev/null || echo inactive)"
+    hc=000
+    if [[ "${state}" == "failed" ]]; then
+      echo "WAIT_READY i=${i} systemd=${state} health=skip"
+      return 1
+    fi
+    if [[ "${state}" == "active" ]]; then
+      hc="$(http_code "${HEALTH_URL}" 2)"
+      [[ "${hc}" =~ ^[0-9]{3}$ ]] || hc=000
+    fi
+    echo "WAIT_READY i=${i} systemd=${state} health=${hc}"
+    if [[ "${state}" == "active" && "${hc}" == "200" ]]; then
+      echo "READY: artifact service bound and /health=200"
+      return 0
+    fi
+    sleep 1
+  done
+  echo "WAIT_READY exhausted after ${READY_WAIT_SEC}s (last systemd=${state} health=${hc})"
+  return 1
+}
+
+rollback_overlay_and_restart() {
+  local reason="$1"
+  echo "STOP: ${reason} — rolling back overlay" >&2
+  cp -a "${BACKUP_SERVER}" "${SERVER_PY}"
+  systemctl restart "${SERVICE}"
+  if ! wait_artifact_ready; then
+    die "rolled back artifact_server.py but service never became ready (${reason})"
+  fi
+  local hc sc
+  hc="$(http_code "${HEALTH_URL}")"
+  sc="$(http_code "${SHADOW_EV_URL}")"
+  echo "ROLLBACK_HEALTH=${hc}"
+  echo "ROLLBACK_CANDIDATE_UNAUTH=${sc}"
+  die "rolled back artifact_server.py (${reason}; health=${hc} candidate=${sc})"
+}
+
+ensure_overlay_reconciled() {
+  [[ -f "${DEST}/scripts/run_rotation_watch.py" ]] || die "isolated sidecar missing — run C once"
+  [[ -d "${STORE}" ]] || die "Rotation store missing — run C once"
+  grep -q '^MRBOT_ROTATION_WATCH_STORE=/var/lib/mrbot/rotation_watch$' "${ENV_FILE}" \
+    || die "MRBOT_ROTATION_WATCH_STORE missing — run C once"
+  if grep -q 'ROTATION_WATCH_GET_PATHS' "${SERVER_PY}" \
+    && grep -q '/current/rotation_watch/board.json' "${SERVER_PY}"; then
+    note "overlay already has Rotation GET map"
+    return 0
+  fi
+  local sha
+  sha="$(sha256_file "${SERVER_PY}")"
+  [[ "${sha}" == "${EXPECTED_SERVER_SHA}" ]] \
+    || die "overlay SHA ${sha} is neither baseline nor Rotation-reconciled — refusing"
+  note "overlay is baseline SHA — re-applying Rotation reconcile only (no C clone)"
+  local tmp
+  tmp="${SERVER_PY}.rotation-reconcile.$$"
+  reconcile_overlay "${SERVER_PY}" "${tmp}"
+  "${VENV}/bin/python" -m py_compile "${tmp}"
+  cp -a "${tmp}" "${SERVER_PY}"
+  rm -f "${tmp}"
+  grep -q 'LIVE_SHADOW_GET_PATHS' "${SERVER_PY}" || die "resume reconcile lost Candidate routes"
+  grep -q 'ROTATION_WATCH_GET_PATHS' "${SERVER_PY}" || die "resume reconcile missing Rotation routes"
+  echo "RECONCILED_SERVER_SHA256=$(sha256_file "${SERVER_PY}")"
 }
 
 refuse_camera_git_mutate() {
@@ -129,7 +199,9 @@ Checkpoints:
   B  timestamped backup of overlay + env (env keys only in logs)
   C  isolated file copy + surgical Rotation reconcile of overlay
   D  compile/import/route validation — STOP before restart if fail
-  E  systemctl restart ${SERVICE} only + health/401 checks
+  E  restart ${SERVICE} only; wait ready; then health/401 checks
+     (D re-reconciles overlay if a prior E rolled back to baseline SHA;
+      do not rerun C when dest/store/env already exist)
   F  one --live TCH cycle (no --loop)
   G  authenticated localhost GET without printing the token
   H  rollback overlay / env line / isolated dest / store
@@ -348,6 +420,10 @@ step_C() {
   [[ "${INSTALL_CONFIRM:-}" == "YES" ]] || die "C requires INSTALL_CONFIRM=YES"
   refuse_camera_git_mutate
   load_stamp
+  if [[ -f "${DEST}/scripts/run_rotation_watch.py" && -d "${STORE}" ]] \
+    && grep -q '^MRBOT_ROTATION_WATCH_STORE=/var/lib/mrbot/rotation_watch$' "${ENV_FILE}"; then
+    die "C already applied (isolated dest, store, env key present). Resume with D then E — do not rerun C."
+  fi
   [[ -f "${BACKUP_SERVER}" ]] || die "backup missing"
   [[ "$(sha256_file "${SERVER_PY}")" == "${EXPECTED_SERVER_SHA}" ]] \
     || die "live overlay SHA changed since backup — refusing"
@@ -397,6 +473,7 @@ step_C() {
 step_D() {
   echo "=== D. VALIDATE BEFORE RESTART ==="
   load_stamp
+  ensure_overlay_reconciled
   "${VENV}/bin/python" -m py_compile "${SERVER_PY}"
   grep -q 'LIVE_SHADOW_GET_PATHS' "${SERVER_PY}" || die "Candidate LIVE_SHADOW_GET_PATHS missing"
   grep -q '/current/live_shadow/live_evidence.jsonl' "${SERVER_PY}" || die "Candidate evidence path missing"
@@ -445,13 +522,9 @@ step_E() {
   load_stamp
   step_D
   systemctl restart "${SERVICE}"
-  sleep 1
-  systemctl is-active "${SERVICE}" | grep -qx active || {
-    echo "STOP: service not active after restart — rolling back overlay" >&2
-    cp -a "${BACKUP_SERVER}" "${SERVER_PY}"
-    systemctl restart "${SERVICE}"
-    die "rolled back artifact_server.py after failed restart"
-  }
+  if ! wait_artifact_ready; then
+    rollback_overlay_and_restart "service never became ready after restart"
+  fi
   local hc sc rc
   hc="$(http_code "${HEALTH_URL}")"
   echo "HEALTH=${hc}"
@@ -460,16 +533,10 @@ step_E() {
   rc="$(http_code "${ROT_BOARD_URL}")"
   echo "ROTATION_UNAUTH_GET=${rc}"
   if [[ "${hc}" != "200" || "${sc}" != "401" ]]; then
-    echo "STOP: Candidate/health regression — rolling back overlay" >&2
-    cp -a "${BACKUP_SERVER}" "${SERVER_PY}"
-    systemctl restart "${SERVICE}"
-    die "rolled back artifact_server.py (health=${hc} candidate=${sc})"
+    rollback_overlay_and_restart "Candidate/health regression health=${hc} candidate=${sc}"
   fi
   if [[ "${rc}" == "500" ]]; then
-    echo "STOP: Rotation unauth GET 500 — rolling back overlay" >&2
-    cp -a "${BACKUP_SERVER}" "${SERVER_PY}"
-    systemctl restart "${SERVICE}"
-    die "rolled back artifact_server.py after Rotation HTTP 500"
+    rollback_overlay_and_restart "Rotation unauth GET 500"
   fi
   [[ "${rc}" == "401" ]] || die "Rotation unauth GET is ${rc}, expected 401. Candidate still 401 — overlay NOT auto-rolled back. Inspect, then H if needed."
   note "service active; /health 200; Candidate 401; Rotation 401"
@@ -592,6 +659,9 @@ step_H() {
     cp -a "${BACKUP_ENV}" "${ENV_FILE}"
   fi
   systemctl restart "${SERVICE}"
+  if ! wait_artifact_ready; then
+    die "rollback restart: service never became ready"
+  fi
   local hc sc
   hc="$(http_code "${HEALTH_URL}")"
   sc="$(http_code "${SHADOW_EV_URL}")"
