@@ -463,10 +463,30 @@ def test_range_position_can_exceed_100(tmp_path):
     assert row.range_position_pct > 100
 
 
-def test_load_repo_watchlist_has_only_tch():
+def test_load_repo_watchlist_is_human_top10():
     rows = load_watchlist(REPO / "data" / "rotation_watch" / "watchlist.csv")
-    assert [r.symbol for r in rows] == ["TCH"]
-    assert rows[0].note == "manual rotation watch"
+    assert [r.symbol for r in rows] == [
+        "CII",
+        "TCH",
+        "DXG",
+        "PHR",
+        "NLG",
+        "TCB",
+        "TVS",
+        "DGW",
+        "DRI",
+        "MSR",
+    ]
+    by_sym = {r.symbol: r for r in rows}
+    assert by_sym["TCH"].lower_min_vnd == 11600
+    assert by_sym["TCH"].lower_max_vnd == 11900
+    assert by_sym["TCH"].upper_min_vnd == 12200
+    assert by_sym["TCH"].upper_max_vnd == 12400
+    assert by_sym["CII"].lower_min_vnd == 13800
+    assert by_sym["MSR"].upper_max_vnd == 40000
+    assert all(r.enabled for r in rows)
+    assert all(r.entry_price_vnd is None for r in rows)
+    assert all(r.entry_date is None for r in rows)
 
 
 def _strengthen_recs():
