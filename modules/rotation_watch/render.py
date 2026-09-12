@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from modules.rotation_watch.view import build_panel, display_table
+from modules.rotation_watch.view import build_panel, display_table, format_range_position_pct
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
 
@@ -101,7 +101,7 @@ def render_rotation_watch_panel(
                 st.write(
                     f"Giá **{row.get('current_price')}** · Location **{row.get('location') or '—'}** · "
                     f"Lower **{row.get('lower_zone')}** · "
-                    f"Upper **{row.get('upper_zone')}** · Range **{row.get('range_position_pct')}**%"
+                    f"Upper **{row.get('upper_zone')}** · Range **{format_range_position_pct(row.get('range_position_pct')) or '—'}**"
                 )
                 st.write(
                     f"Raw P×V **{row.get('raw_pxv')}** · Published P×V **{row.get('published_pxv')}** · "

@@ -5,6 +5,8 @@ from __future__ import annotations
 from html import escape
 from typing import Any
 
+from modules.rotation_watch.view import format_range_position_pct
+
 CSS = """
 :root { color-scheme: light; }
 body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 16px; background: #f4f6f8; color: #1a1d23; }
@@ -43,8 +45,7 @@ def render_html(panel: dict[str, Any]) -> str:
             last = str(row.get("last_session_state") or row.get("rotation_state") or "")
             action = str(row.get("suggested_action") or "")
             ev = escape(" · ".join(row.get("rotation_evidence") or []))
-            rng = row.get("range_position_pct")
-            rng_s = "" if rng is None else f"{float(rng):.1f}"
+            rng_s = format_range_position_pct(row.get("range_position_pct"))
             pnl = row.get("pnl_pct")
             pnl_s = "" if pnl is None else f"{float(pnl):.2f}"
             price = row.get("current_price")

@@ -662,6 +662,7 @@ def test_vps_weekend_tch_artifact_renders_historical_wait_only():
             freshness="SESSION_CLOSED",
             last_session_action="WATCH LOWER",
             suggested_action="WATCH LOWER",
+            range_position_pct=12.500000,
         )
     )
     status = json.dumps(_status_payload(observed_at=observed))
@@ -678,7 +679,10 @@ def test_vps_weekend_tch_artifact_renders_historical_wait_only():
     assert row["session_phase"] == "WEEKEND"
     assert row["suggested_action"] == "WAIT"
     assert row["actionable"] is False
+    assert row["range_position_pct"] == 12.500000
     html = render_html(panel)
+    assert "12.5%" in html
+    assert "12.500000" not in html
     assert "TCH" in html
     assert "11.7" in html
     assert "LOWER" in html

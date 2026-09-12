@@ -96,3 +96,35 @@ def test_no_yahoo_or_daily_fallback_in_ui_or_session():
         assert "yfinance" not in src
         assert "fetch_live_price" not in src
         assert "stock_historical_data" not in src
+
+
+def test_range_position_display_is_one_decimal_percent():
+    from modules.rotation_watch.html import render_html
+    from modules.rotation_watch.view import display_table, format_range_position_pct
+
+    assert format_range_position_pct(12.500000) == "12.5%"
+    assert format_range_position_pct(50) == "50.0%"
+    assert format_range_position_pct(100) == "100.0%"
+    assert format_range_position_pct(-15) == "-15.0%"
+    assert format_range_position_pct(135) == "135.0%"
+    assert format_range_position_pct(None) == ""
+
+    raw = 12.500000
+    panel = {
+        "rows": [
+            {
+                "symbol": "TCH",
+                "current_price": 11.70,
+                "location": "LOWER",
+                "range_position_pct": raw,
+                "last_session_state": "LOWER_ZONE",
+                "suggested_action": "WAIT",
+            }
+        ]
+    }
+    table = display_table(panel)
+    assert table.loc[0, "Range Position %"] == "12.5%"
+    html = render_html(panel)
+    assert "12.5%" in html
+    assert "12.500000" not in html
+    assert panel["rows"][0]["range_position_pct"] == raw

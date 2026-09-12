@@ -16,6 +16,16 @@ from modules.rotation_watch.read import load_panel_sources
 from modules.rotation_watch.session import apply_actionability, session_phase
 
 
+def format_range_position_pct(value: Any) -> str:
+    """Display-only. One decimal plus %. No clamp; underlying value unchanged."""
+    if value is None or value == "":
+        return ""
+    try:
+        return f"{float(value):.1f}%"
+    except (TypeError, ValueError):
+        return ""
+
+
 def _uncertain_row(symbol: str, reason: str, *, now: datetime) -> dict[str, Any]:
     return apply_actionability(
         {
@@ -129,7 +139,7 @@ def display_table(panel: dict[str, Any]) -> Any:
                 "Location": row.get("location"),
                 "Lower Zone": row.get("lower_zone"),
                 "Upper Zone": row.get("upper_zone"),
-                "Range Position %": row.get("range_position_pct"),
+                "Range Position %": format_range_position_pct(row.get("range_position_pct")),
                 "Last-session State": row.get("last_session_state") or row.get("rotation_state"),
                 "Last-session Action": row.get("last_session_action"),
                 "Suggested Action": row.get("suggested_action"),
