@@ -2,11 +2,26 @@
 Minimal HTTPS-ready WSGI artifact server for Edge Research durable bundles (P1b).
 
 Serves only:
-  GET  /current/bundle.tar.gz
-  PUT  /current/bundle.tar.gz
+  GET/PUT  /current/bundle.tar.gz
+  GET/PUT  /current/production_observations.tar.gz
+  GET      /current/live_shadow/live_evidence.jsonl          (GET-only, isolated store)
+  GET      /current/live_shadow/live_shadow_status.json
+  GET      /current/rotation_watch/board.json               (GET-only, isolated store)
+  GET      /current/rotation_watch/status.json
 
-Storage is isolated under a dedicated root (default /var/lib/mrbot/edge_research_durable).
+Storage:
+  Edge bundle:     /var/lib/mrbot/edge_research_durable
+  Candidate live:  /var/lib/mrbot/live_pxv_shadow
+  Rotation Watch:  /var/lib/mrbot/rotation_watch
+
 No Camera/intraday_memory coupling. No arbitrary filesystem access.
+
+VPS overlay reconciliation (human SSH later, not this change):
+  The live-shadow GET overlay may already exist as a dirty file on
+  /opt/mrbot-camera/modules/edge_research/artifact_server.py. When landing
+  this revision, keep BOTH live-shadow and Rotation GET maps. Do not revert
+  to a bundle-only server. Restart mrbot-edge-artifacts.service only after
+  review. Do not checkout/reset the Camera collector tree.
 
 Run locally:
   EDGE_RESEARCH_ARTIFACT_TOKEN=<secret> \\
@@ -38,6 +53,8 @@ from modules.edge_research.bundle import (
 )
 
 DEFAULT_STORAGE_ROOT = Path("/var/lib/mrbot/edge_research_durable")
+DEFAULT_LIVE_SHADOW_ROOT = Path("/var/lib/mrbot/live_pxv_shadow")
+DEFAULT_ROTATION_WATCH_ROOT = Path("/var/lib/mrbot/rotation_watch")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 DEFAULT_MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -46,6 +63,15 @@ PRODUCTION_OBS_OBJECT_NAME = "production_observations.tar.gz"
 ALLOWED_METHODS = {"GET", "PUT"}
 ALLOWED_PATH = "/current/bundle.tar.gz"
 ALLOWED_PRODUCTION_OBS_PATH = "/current/production_observations.tar.gz"
+# Exact-match GET-only. Filenames are mapped here — never join request path.
+LIVE_SHADOW_GET_PATHS = {
+    "/current/live_shadow/live_evidence.jsonl": "live_evidence.jsonl",
+    "/current/live_shadow/live_shadow_status.json": "live_shadow_status.json",
+}
+ROTATION_WATCH_GET_PATHS = {
+    "/current/rotation_watch/board.json": "board.json",
+    "/current/rotation_watch/status.json": "status.json",
+}
 
 
 @dataclass(frozen=True)
@@ -55,6 +81,8 @@ class ArtifactServerConfig:
     host: str = DEFAULT_HOST
     port: int = DEFAULT_PORT
     max_upload_bytes: int = DEFAULT_MAX_UPLOAD_BYTES
+    live_shadow_root: Path = DEFAULT_LIVE_SHADOW_ROOT
+    rotation_watch_root: Path = DEFAULT_ROTATION_WATCH_ROOT
 
     @classmethod
     def from_env(cls) -> "ArtifactServerConfig":
@@ -67,12 +95,16 @@ class ArtifactServerConfig:
         max_upload = int(
             os.environ.get("EDGE_RESEARCH_ARTIFACT_MAX_UPLOAD_BYTES", str(DEFAULT_MAX_UPLOAD_BYTES))
         )
+        shadow = os.environ.get("MRBOT_LIVE_PXV_SHADOW_STORE", str(DEFAULT_LIVE_SHADOW_ROOT))
+        rotation = os.environ.get("MRBOT_ROTATION_WATCH_STORE", str(DEFAULT_ROTATION_WATCH_ROOT))
         return cls(
             storage_root=Path(storage),
             token=token,
             host=host,
             port=port,
             max_upload_bytes=max_upload,
+            live_shadow_root=Path(shadow),
+            rotation_watch_root=Path(rotation),
         )
 
 
@@ -95,6 +127,38 @@ def _bytes_response(start_response: Callable, status: int, body: bytes, content_
     ]
     start_response(f"{status} {HTTPStatus(status).phrase}", headers)
     return [body]
+
+
+def _serve_allowlisted_file_get(
+    environ: dict,
+    start_response: Callable,
+    *,
+    token: str,
+    method: str,
+    src: Path,
+    root: Path,
+    missing_error: str,
+) -> List[bytes]:
+    """GET exact allowlisted filename under an isolated root. No path join from URL."""
+    if not _authorize(environ, token):
+        return _json_response(start_response, 401, {"error": "unauthorized"})
+    if method != "GET":
+        return _json_response(start_response, 405, {"error": "method_not_allowed"})
+    try:
+        resolved = src.resolve()
+        root_resolved = Path(root).resolve()
+    except OSError:
+        return _json_response(start_response, 404, {"error": missing_error})
+    root_s = str(root_resolved)
+    resolved_s = str(resolved)
+    if resolved_s != root_s and not resolved_s.startswith(root_s + os.sep):
+        return _json_response(start_response, 404, {"error": missing_error})
+    if not resolved.is_file():
+        return _json_response(start_response, 404, {"error": missing_error})
+    body = resolved.read_bytes()
+    name = resolved.name
+    content_type = "application/json" if name.endswith(".json") else "application/x-ndjson"
+    return _bytes_response(start_response, 200, body, content_type)
 
 
 def _authorize(environ: dict, token: str) -> bool:
@@ -232,6 +296,30 @@ def create_wsgi_app(config: ArtifactServerConfig):
 
         if path == "/health" and method == "GET":
             return _json_response(start_response, 200, {"ok": True, "service": "edge_research_artifacts"})
+
+        if path in LIVE_SHADOW_GET_PATHS:
+            filename = LIVE_SHADOW_GET_PATHS[path]
+            return _serve_allowlisted_file_get(
+                environ,
+                start_response,
+                token=config.token,
+                method=method,
+                src=Path(config.live_shadow_root) / filename,
+                root=Path(config.live_shadow_root),
+                missing_error="live_shadow_not_found",
+            )
+
+        if path in ROTATION_WATCH_GET_PATHS:
+            filename = ROTATION_WATCH_GET_PATHS[path]
+            return _serve_allowlisted_file_get(
+                environ,
+                start_response,
+                token=config.token,
+                method=method,
+                src=Path(config.rotation_watch_root) / filename,
+                root=Path(config.rotation_watch_root),
+                missing_error="rotation_watch_not_found",
+            )
 
         if path == ALLOWED_PRODUCTION_OBS_PATH and method in ALLOWED_METHODS:
             if not _authorize(environ, config.token):

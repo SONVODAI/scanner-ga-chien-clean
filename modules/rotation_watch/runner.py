@@ -14,6 +14,7 @@ from modules.live_candidate.calendar import as_vn
 from modules.rotation_watch.artifact import board_from_rows, write_board, write_status
 from modules.rotation_watch.config import default_watchlist_path, load_watchlist
 from modules.rotation_watch.constants import ARTIFACT_STALE_AFTER_SEC, ST_DATA_UNCERTAIN
+from modules.rotation_watch.publish import publish_rotation_artifacts, resolve_rotation_store
 from modules.rotation_watch.data import SymbolSnapshot, fetch_symbol_snapshot
 from modules.rotation_watch.engine import RotationRow, evaluate_row
 from modules.rotation_watch.pxv import RotationPxV, interpret_completed_bars
@@ -82,6 +83,7 @@ def run_cycle(
     board_path: Path | None = None,
     status_path: Path | None = None,
     state_path: Path | None = None,
+    store_dir: Path | None = None,
     persist: bool = True,
 ) -> dict[str, Any]:
     now = as_vn(now)
@@ -166,7 +168,7 @@ def run_cycle(
         empty_message="" if art_rows else "Chưa có mã enabled trong data/rotation_watch/watchlist.csv",
         runner=runner_meta,
     )
-    write_board(board, board_path)
+    written_board = write_board(board, board_path)
     status = {
         "schema": "rotation_watch_status.v1",
         "observed_at": observed,
@@ -176,4 +178,7 @@ def run_cycle(
         "symbols": symbol_status,
     }
     write_status(status, status_path)
+    dest = resolve_rotation_store(store_dir)
+    if dest is not None:
+        status["publish"] = publish_rotation_artifacts(written_board.parent, dest)
     return status

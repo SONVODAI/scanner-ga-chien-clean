@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from datetime import datetime
@@ -32,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--now", default=None, help="Override now (ISO). Tests / dry-run only")
     args = p.parse_args(argv)
 
-    from modules.rotation_watch.constants import BOARD_NAME, STATUS_NAME
+    from modules.rotation_watch.constants import BOARD_NAME, ENV_STORE, STATUS_NAME, VPS_ROTATION_STORE
     from modules.rotation_watch.runner import DEFAULT_RPM, run_cycle, seconds_until_next_completed_bar
 
     n = 10
@@ -64,6 +65,7 @@ def main(argv: list[str] | None = None) -> int:
     out = args.out
     board_path = (out / BOARD_NAME) if out else None
     status_path = (out / STATUS_NAME) if out else None
+    store = Path(os.environ.get(ENV_STORE, VPS_ROTATION_STORE))
 
     def _once(now: datetime) -> dict:
         return run_cycle(
@@ -72,6 +74,7 @@ def main(argv: list[str] | None = None) -> int:
             watchlist_path=args.watchlist,
             board_path=board_path,
             status_path=status_path,
+            store_dir=store,
         )
 
     if args.now and not args.loop:

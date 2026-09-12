@@ -12,6 +12,7 @@ UI_MODULES = (
     REPO / "modules" / "rotation_watch" / "read.py",
     REPO / "modules" / "rotation_watch" / "view.py",
     REPO / "modules" / "rotation_watch" / "html.py",
+    REPO / "modules" / "rotation_watch" / "artifact_get.py",
 )
 
 FORBIDDEN = (
@@ -34,6 +35,9 @@ FORBIDDEN = (
     "modules.rotation_watch.data",
     "modules.rotation_watch.pxv",
     "modules.rotation_watch.runner",
+    "modules.rotation_watch.publish",
+    "get_live_shadow_bytes",
+    "live_evidence.jsonl",
 )
 
 
@@ -86,6 +90,7 @@ def test_no_yahoo_or_daily_fallback_in_ui_or_session():
         "modules/rotation_watch/view.py",
         "modules/rotation_watch/read.py",
         "modules/rotation_watch/session.py",
+        "modules/rotation_watch/artifact_get.py",
     ):
         src = (REPO / rel).read_text(encoding="utf-8")
         assert "yfinance" not in src

@@ -70,6 +70,18 @@ BOARD_NAME = "board.json"
 STATUS_NAME = "status.json"
 ENV_WATCHLIST = "MRBOT_ROTATION_WATCHLIST"
 ENV_DIR = "MRBOT_ROTATION_WATCH_DIR"
+ENV_STORE = "MRBOT_ROTATION_WATCH_STORE"
+ENV_UI_SOURCE = "MRBOT_ROTATION_WATCH_UI_SOURCE"
+
+# Isolated VPS publish store. Never Camera archive / Candidate / Edge bundle.
+VPS_ROTATION_STORE = "/var/lib/mrbot/rotation_watch"
+FORBIDDEN_CAMERA_ARCHIVE = "/var/lib/mrbot/intraday_memory"
+FORBIDDEN_LIVE_SHADOW_STORE = "/var/lib/mrbot/live_pxv_shadow"
+FORBIDDEN_EDGE_DURABLE = "/var/lib/mrbot/edge_research_durable"
+
+ARTIFACT_BOARD_PATH = "/current/rotation_watch/board.json"
+ARTIFACT_STATUS_PATH = "/current/rotation_watch/status.json"
+TRANSPORT_ERROR = "ROTATION_TRANSPORT_ERROR"
 
 # Artifact age during a live session. Weekend/pre-open use session overlay, not this cut.
 ARTIFACT_STALE_AFTER_SEC = 600

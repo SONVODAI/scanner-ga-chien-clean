@@ -12,7 +12,7 @@ from modules.rotation_watch.constants import (
     FRESH_MISSING,
     ST_DATA_UNCERTAIN,
 )
-from modules.rotation_watch.read import load_board_artifact
+from modules.rotation_watch.read import load_panel_sources
 from modules.rotation_watch.session import apply_actionability, session_phase
 
 
@@ -50,18 +50,36 @@ def build_panel(
     now: datetime,
     artifact_path: Path | None = None,
     sources: dict[str, Any] | None = None,
+    source_mode: str | None = None,
+    board_fetcher=None,
+    status_fetcher=None,
 ) -> dict[str, Any]:
     now = as_vn(now)
-    raw = sources if sources is not None else load_board_artifact(artifact_path)
+    transport: dict[str, Any] = {}
+    if sources is not None:
+        raw = sources
+    else:
+        packed = load_panel_sources(
+            artifact_path=artifact_path,
+            source_mode=source_mode,
+            board_fetcher=board_fetcher,
+            status_fetcher=status_fetcher,
+        )
+        raw = packed.get("board")
+        transport = dict(packed.get("transport") or {})
     phase = session_phase(now)
     if raw is None:
+        reason = "Rotation artifact missing"
+        if transport.get("error"):
+            reason = str(transport.get("detail") or transport.get("error") or reason)
         return {
             "empty": False,
             "empty_message": "",
             "observed_at": "",
             "session_phase": phase,
             "alert_eligible": False,
-            "rows": [_uncertain_row("", "Rotation artifact missing", now=now)],
+            "transport": transport,
+            "rows": [_uncertain_row("", reason, now=now)],
         }
 
     observed = raw.get("observed_at")
@@ -83,6 +101,7 @@ def build_panel(
             "observed_at": raw.get("observed_at") or "",
             "session_phase": phase,
             "alert_eligible": False,
+            "transport": transport,
             "rows": [],
         }
 
@@ -93,6 +112,7 @@ def build_panel(
         "session_phase": phase,
         "alert_eligible": False,
         "watchlist_path": raw.get("watchlist_path") or "",
+        "transport": transport,
         "rows": rows,
     }
 
