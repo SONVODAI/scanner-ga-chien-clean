@@ -10,3 +10,9 @@ __pycache__/
 
 # Intraday memory Parquet data (local/test — not committed to Git)
 /intraday_memory/
+
+# Rotation Watch runtime (watchlist.csv is source; artifacts are ephemeral)
+data/rotation_watch/state.json
+data/rotation_watch/board.json
+data/rotation_watch/status.json
+data/rotation_watch/cache/

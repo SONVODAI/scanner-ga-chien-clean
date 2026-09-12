@@ -18,6 +18,39 @@ REFERENCE_SOURCE = REPO_ROOT / "data" / "edge_research"
 TEST_TOKEN = "test-artifact-token-placeholder"
 
 
+def _load_artifact_server():
+    """Import artifact_server without executing Edge engine (scipy)."""
+    import importlib.util
+    import sys
+    import types
+
+    er = REPO_ROOT / "modules" / "edge_research"
+
+    def load(fullname: str, filepath: Path):
+        if fullname in sys.modules:
+            return sys.modules[fullname]
+        spec = importlib.util.spec_from_file_location(fullname, filepath)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[fullname] = mod
+        assert spec.loader is not None
+        spec.loader.exec_module(mod)
+        return mod
+
+    if "modules" not in sys.modules:
+        pkg = types.ModuleType("modules")
+        pkg.__path__ = [str(REPO_ROOT / "modules")]
+        sys.modules["modules"] = pkg
+    existing = sys.modules.get("modules.edge_research")
+    if existing is None or getattr(existing, "__file__", None) is None:
+        pkg = types.ModuleType("modules.edge_research")
+        pkg.__path__ = [str(er)]
+        sys.modules["modules.edge_research"] = pkg
+        load("modules.edge_research.contracts", er / "contracts.py")
+        load("modules.edge_research.storage", er / "storage.py")
+        load("modules.edge_research.bundle", er / "bundle.py")
+    return load("modules.edge_research.artifact_server", er / "artifact_server.py")
+
+
 def _free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("127.0.0.1", 0))
@@ -49,7 +82,9 @@ def reference_copy(tmp_path) -> Path:
 
 @pytest.fixture
 def artifact_server(tmp_path):
-    from modules.edge_research.artifact_server import ArtifactServer, ArtifactServerConfig
+    mod = _load_artifact_server()
+    ArtifactServer = mod.ArtifactServer
+    ArtifactServerConfig = mod.ArtifactServerConfig
 
     storage = tmp_path / "durable_root"
     port = _free_port()
@@ -120,7 +155,9 @@ def test_case4_malformed_upload_rejected(artifact_server):
 
 # CASE 5 — oversized upload rejected
 def test_case5_oversized_upload_rejected(tmp_path):
-    from modules.edge_research.artifact_server import ArtifactServer, ArtifactServerConfig
+    mod = _load_artifact_server()
+    ArtifactServer = mod.ArtifactServer
+    ArtifactServerConfig = mod.ArtifactServerConfig
 
     storage = tmp_path / "durable_root"
     port = _free_port()
@@ -229,7 +266,9 @@ def test_case10_service_restart_persistence(artifact_server, reference_copy):
     tar_bytes = _bundle_tar_from_working(reference_copy)
     _request("PUT", f"{base_url}/current/bundle.tar.gz", TEST_TOKEN, tar_bytes)
 
-    from modules.edge_research.artifact_server import ArtifactServer, ArtifactServerConfig
+    mod = _load_artifact_server()
+    ArtifactServer = mod.ArtifactServer
+    ArtifactServerConfig = mod.ArtifactServerConfig
 
     # stop implicit via fixture end not yet — simulate restart with new server instance
     port2 = _free_port()
@@ -255,3 +294,61 @@ def test_health_unauthenticated(artifact_server):
     status, body = _request("GET", f"{base_url}/health", None)
     assert status == 200
     assert json.loads(body)["ok"] is True
+
+
+def test_live_shadow_get_from_isolated_store_not_edge_root(tmp_path):
+    mod = _load_artifact_server()
+    ArtifactServer = mod.ArtifactServer
+    ArtifactServerConfig = mod.ArtifactServerConfig
+
+    storage = tmp_path / "durable_root"
+    shadow = tmp_path / "live_pxv_shadow"
+    shadow.mkdir()
+    shadow.joinpath("live_evidence.jsonl").write_text('{"ok":true}\n', encoding="utf-8")
+    shadow.joinpath("live_shadow_status.json").write_text('{"runner":"LIVE"}\n', encoding="utf-8")
+    (storage / "current").mkdir(parents=True)
+    (storage / "current" / "bundle.tar.gz").write_bytes(b"not-the-shadow")
+    port = _free_port()
+    config = ArtifactServerConfig(
+        storage_root=storage,
+        token=TEST_TOKEN,
+        host="127.0.0.1",
+        port=port,
+        live_shadow_root=shadow,
+    )
+    server = ArtifactServer(config)
+    server.start(blocking=False)
+    try:
+        status, body = _request(
+            "GET",
+            f"{server.base_url}/current/live_shadow/live_evidence.jsonl",
+            TEST_TOKEN,
+        )
+        assert status == 200
+        assert body == b'{"ok":true}\n'
+        status, body = _request(
+            "GET",
+            f"{server.base_url}/current/live_shadow/live_shadow_status.json",
+            TEST_TOKEN,
+        )
+        assert status == 200
+        assert body == b'{"runner":"LIVE"}\n'
+        status, _ = _request(
+            "PUT",
+            f"{server.base_url}/current/live_shadow/live_evidence.jsonl",
+            TEST_TOKEN,
+            b"x",
+        )
+        assert status == 405
+        status, _ = _request(
+            "GET",
+            f"{server.base_url}/current/live_shadow/live_evidence.jsonl",
+            None,
+        )
+        assert status == 401
+        # Edge bundle still served from durable root, not the shadow store.
+        status, body = _request("GET", f"{server.base_url}/current/bundle.tar.gz", TEST_TOKEN)
+        assert status == 200
+        assert body == b"not-the-shadow"
+    finally:
+        server.stop()
