@@ -1,2 +1,11 @@
 symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note
-TCH,true,11.60,11.90,12.20,12.40,,,"manual rotation watch"
+CII,true,13.8,14.2,14.3,15.0,,,"original human Rotation Top-10 zone"
+TCH,true,11.6,11.9,12.2,12.4,,,"original human Rotation Top-10 zone"
+DXG,true,10.85,11.0,11.5,12.1,,,"original human Rotation Top-10 zone"
+PHR,true,58.7,59.8,61.7,62.0,,,"original human Rotation Top-10 zone"
+NLG,true,23.5,24.0,24.5,25.7,,,"original human Rotation Top-10 zone"
+TCB,true,30.8,31.3,32.0,34.1,,,"original human Rotation Top-10 zone"
+TVS,true,13.45,13.8,14.0,14.5,,,"original human Rotation Top-10 zone"
+DGW,true,40.05,41.3,42.7,43.15,,,"original human Rotation Top-10 zone"
+DRI,true,13.0,13.3,13.7,14.2,,,"original human Rotation Top-10 zone"
+MSR,true,38.3,39.3,39.9,40.0,,,"original human Rotation Top-10 zone"
