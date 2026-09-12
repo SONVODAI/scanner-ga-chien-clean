@@ -1,0 +1,2 @@
+symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note
+TCH,true,11.60,11.90,12.20,12.40,,,"manual rotation watch"

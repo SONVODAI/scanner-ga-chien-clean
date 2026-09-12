@@ -113,6 +113,14 @@ try:
 except Exception:
     pass
 
+# ROTATION WATCH — isolated human rotation board. Not Candidate / Edge / Learning.
+try:
+    from modules.rotation_watch.render import render_rotation_watch_panel
+
+    render_rotation_watch_panel()
+except Exception:
+    pass
+
 # =========================================================
 # WATCHLIST
 # =========================================================
