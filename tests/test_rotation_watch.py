@@ -9,7 +9,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from modules.intraday_pxv_v1.constants import ACTIONABLE_CONCLUSIONS
-from modules.rotation_watch.config import load_watchlist
+from modules.rotation_watch.config import WatchRow, load_watchlist
 from modules.rotation_watch.constants import (
     ACT_BUY_READY,
     ACT_HOLD,
@@ -17,6 +17,11 @@ from modules.rotation_watch.constants import (
     ACT_SELL_READY,
     ACT_TREND_HOLD,
     ACT_WATCH_LOWER,
+    LOC_ABOVE_UPPER,
+    LOC_BELOW_LOWER,
+    LOC_LOWER,
+    LOC_MIDDLE,
+    LOC_UPPER,
     ST_BUY_READY,
     ST_DATA_UNCERTAIN,
     ST_HOLD,
@@ -26,7 +31,7 @@ from modules.rotation_watch.constants import (
     ST_TREND_HOLD,
     ST_WATCH,
 )
-from modules.rotation_watch.engine import build_board
+from modules.rotation_watch.engine import build_board, price_location
 from modules.rotation_watch.html import render_html
 from modules.rotation_watch.runner import run_cycle
 from modules.rotation_watch.state import default_state_path
@@ -132,6 +137,96 @@ def _board(tmp_path: Path, records: list[dict], now: datetime, csv: str | None =
         state_path=tmp_path / "state.json",
         **kwargs,
     )
+
+
+# TCH original human zones: 11.60–11.90 / 12.20–12.40. Inclusive lower/upper edges.
+_TCH_ZONES = WatchRow(
+    symbol="TCH",
+    enabled=True,
+    lower_min_vnd=11600,
+    lower_max_vnd=11900,
+    upper_min_vnd=12200,
+    upper_max_vnd=12400,
+    entry_price_vnd=None,
+    entry_date=None,
+    note="location regression",
+    source_path="test",
+)
+
+_FIVE_LOCATION_PRICES = (
+    (LOC_BELOW_LOWER, 11.50, 11500),
+    (LOC_LOWER, 11.70, 11700),
+    (LOC_MIDDLE, 12.00, 12000),
+    (LOC_UPPER, 12.30, 12300),
+    (LOC_ABOVE_UPPER, 12.50, 12500),
+)
+
+
+def test_price_location_all_five_paths_including_below_lower():
+    """BELOW_LOWER must resolve LOC_BELOW_LOWER — the live Top-10 NameError path."""
+    assert price_location(11500, _TCH_ZONES) == LOC_BELOW_LOWER
+    assert price_location(11600, _TCH_ZONES) == LOC_LOWER
+    assert price_location(11900, _TCH_ZONES) == LOC_LOWER
+    assert price_location(12000, _TCH_ZONES) == LOC_MIDDLE
+    assert price_location(12200, _TCH_ZONES) == LOC_UPPER
+    assert price_location(12400, _TCH_ZONES) == LOC_UPPER
+    assert price_location(12500, _TCH_ZONES) == LOC_ABOVE_UPPER
+
+
+def test_all_five_locations_are_executable_on_board(tmp_path):
+    seen: dict[str, str] = {}
+    for loc, quoted, _vnd in _FIVE_LOCATION_PRICES:
+        recs = _fill_session("TCH", "10:35", price=quoted, volume=1000)
+        row = _board(tmp_path / loc, recs, _ts("10:40")).rows[0]
+        assert row.location == loc, (quoted, row.location, row.freshness_reason)
+        assert row.rotation_state != ST_DATA_UNCERTAIN
+        assert row.current_price is not None
+        assert "NameError" not in (row.freshness_reason or "")
+        seen[loc] = row.rotation_state
+    assert set(seen) == {
+        LOC_BELOW_LOWER,
+        LOC_LOWER,
+        LOC_MIDDLE,
+        LOC_UPPER,
+        LOC_ABOVE_UPPER,
+    }
+
+
+def test_below_lower_run_cycle_is_not_wrapped_as_provider_error(tmp_path):
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    status = run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _fill_session("TCH", "10:35", price=11.50, volume=1000)},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    row = build_panel(now=_ts("10:40"), artifact_path=tmp_path / "board.json")["rows"][0]
+    assert row["location"] == LOC_BELOW_LOWER
+    assert row["last_session_state"] != ST_DATA_UNCERTAIN
+    assert row["current_price"] is not None
+    assert not any("NameError" in str(s.get("error") or "") for s in status["symbols"])
+    assert all(s.get("freshness") != "PROVIDER_ERROR" for s in status["symbols"])
+
+
+def test_engine_imports_loc_below_lower():
+    src = ast.parse((REPO / "modules" / "rotation_watch" / "engine.py").read_text(encoding="utf-8"))
+    imported: set[str] = set()
+    for node in ast.walk(src):
+        if isinstance(node, ast.ImportFrom) and (node.module or "").endswith("rotation_watch.constants"):
+            imported.update(alias.name for alias in node.names)
+    assert "LOC_BELOW_LOWER" in imported
+
+
+def test_top10_script_uses_urllib_parse_urlparse():
+    text = (REPO / "scripts" / "vps_rotation_watch_top10.sh").read_text(encoding="utf-8")
+    assert "from urllib.parse import urlparse" in text
+    assert '__import__("urllib.parse")' not in text
 
 
 def test_tch_appears_when_candidate_watchlist_empty(tmp_path, monkeypatch):

@@ -32,7 +32,20 @@ echo "BACKUP_WATCHLIST=${BACKUP}"
 echo "BACKUP_SHA256=$(sha256sum "${BACKUP}" | awk '{print $1}')"
 echo "BACKUP_BYTES=$(wc -c < "${BACKUP}")"
 
-cat > "${WL}" <<'CSV'
+HAVE="$("${VENV}/bin/python" - "${WL}" <<'PY'
+import sys
+from pathlib import Path
+import pandas as pd
+df = pd.read_csv(Path(sys.argv[1]), dtype=str, keep_default_na=False)
+print(" ".join(str(s).strip().upper() for s in df["symbol"] if str(s).strip()))
+PY
+)"
+echo "WATCHLIST_HAVE=${HAVE}"
+if [[ "${HAVE}" == "${EXPECTED}" ]]; then
+  echo "WATCHLIST_REWRITE=skipped"
+else
+  echo "WATCHLIST_REWRITE=write"
+  cat > "${WL}" <<'CSV'
 symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note
 CII,true,13.8,14.2,14.3,15.0,,,"original human Rotation Top-10 zone"
 TCH,true,11.6,11.9,12.2,12.4,,,"original human Rotation Top-10 zone"
@@ -45,6 +58,7 @@ DGW,true,40.05,41.3,42.7,43.15,,,"original human Rotation Top-10 zone"
 DRI,true,13.0,13.3,13.7,14.2,,,"original human Rotation Top-10 zone"
 MSR,true,38.3,39.3,39.9,40.0,,,"original human Rotation Top-10 zone"
 CSV
+fi
 echo "WATCHLIST_NOW_SHA256=$(sha256sum "${WL}" | awk '{print $1}')"
 
 export MRBOT_ROTATION_WATCH_STORE="${STORE}"
@@ -146,12 +160,12 @@ BASE="${EDGE_RESEARCH_DURABLE_URL:-https://mrbot-edge.duckdns.org}"
 BASE="${BASE%/}"
 python3 - "${BASE}" "${EXPECTED}" <<'PY'
 import json
-import os
 import ssl
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
+from urllib.parse import urlparse
 
 base, expected = sys.argv[1].rstrip("/"), sys.argv[2].split()
 token = ""
@@ -179,7 +193,7 @@ def get(path: str) -> tuple[int, bytes]:
     except urllib.error.HTTPError as exc:
         return int(exc.code), exc.read() if exc.fp else b""
 
-print("PUBLIC_BASE_HOST", __import__("urllib.parse").urlparse(base).netloc)
+print("PUBLIC_BASE_HOST", urlparse(base).netloc)
 print("TOKEN_PRINTED=no")
 b_code, b_raw = get("/current/rotation_watch/board.json")
 s_code, s_raw = get("/current/rotation_watch/status.json")
