@@ -63,10 +63,24 @@ STATE_TO_ACTION = {
 }
 
 SCHEMA_STATE = "rotation_watch_state.v1"
+SCHEMA_BOARD = "rotation_watch_board.v1"
 WATCHLIST_NAME = "watchlist.csv"
 STATE_NAME = "state.json"
+BOARD_NAME = "board.json"
+STATUS_NAME = "status.json"
 ENV_WATCHLIST = "MRBOT_ROTATION_WATCHLIST"
 ENV_DIR = "MRBOT_ROTATION_WATCH_DIR"
+
+# Artifact age during a live session. Weekend/pre-open use session overlay, not this cut.
+ARTIFACT_STALE_AFTER_SEC = 600
+
+PHASE_LIVE = "LIVE"
+PHASE_LUNCH = "LUNCH_HOLD"
+PHASE_SESSION_CLOSED = "SESSION_CLOSED"
+PHASE_WEEKEND = "WEEKEND"
+PHASE_PRE_OPEN = "PRE_OPEN"
+
+LIVE_ACTIONABLE_PHASES = frozenset({PHASE_LIVE, PHASE_LUNCH})
 
 # T+2.5 is a caption checkpoint only (trading days from entry to session).
 T25_MIN_SESSIONS = 2

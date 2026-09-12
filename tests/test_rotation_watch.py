@@ -28,7 +28,9 @@ from modules.rotation_watch.constants import (
 )
 from modules.rotation_watch.engine import build_board
 from modules.rotation_watch.html import render_html
+from modules.rotation_watch.runner import run_cycle
 from modules.rotation_watch.state import default_state_path
+from modules.rotation_watch.view import build_panel
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
 REPO = Path(__file__).resolve().parents[1]
@@ -148,10 +150,12 @@ def test_tch_appears_when_candidate_watchlist_empty(tmp_path, monkeypatch):
     assert not board.empty
     assert board.rows[0].symbol == "TCH"
     assert board.rows[0].rotation_state == ST_BUY_READY
-    html = render_html(board)
+    panel = build_panel(now=_ts("10:40"), sources=board.as_dict())
+    html = render_html(panel)
     assert "TCH" in html
     assert "BUY_READY" in html
     assert "data-candidate-required=\"false\"" in html
+    assert 'data-kbs-called="false"' in html
 
 
 def test_lower_strengthen_is_buy_ready(tmp_path):
@@ -463,3 +467,142 @@ def test_load_repo_watchlist_has_only_tch():
     rows = load_watchlist(REPO / "data" / "rotation_watch" / "watchlist.csv")
     assert [r.symbol for r in rows] == ["TCH"]
     assert rows[0].note == "manual rotation watch"
+
+
+def _strengthen_recs():
+    return _fill_session(
+        "TCH",
+        "10:35",
+        last=[
+            (11.68, 11.80, 11.66, 11.78, 2800),
+            (11.78, 11.88, 11.76, 11.86, 3000),
+        ],
+    )
+
+
+def test_friday_buy_ready_viewed_saturday_is_wait(tmp_path):
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _strengthen_recs()},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    sat = datetime(2026, 8, 15, 10, 0, tzinfo=VN)
+    panel = build_panel(now=sat, artifact_path=tmp_path / "board.json")
+    row = panel["rows"][0]
+    assert row["last_session_state"] == ST_BUY_READY
+    assert row["published_pxv"] == "STRENGTHEN"
+    assert row["suggested_action"] == "WAIT"
+    assert row["actionable"] is False
+    assert row["session_phase"] == "WEEKEND"
+    html = render_html(panel)
+    assert "WAIT" in html
+    assert "BUY_READY" in html
+
+
+def test_friday_buy_ready_monday_before_open_is_wait(tmp_path):
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _strengthen_recs()},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    monday_pre = datetime(2026, 8, 17, 8, 0, tzinfo=VN)
+    row = build_panel(now=monday_pre, artifact_path=tmp_path / "board.json")["rows"][0]
+    assert row["last_session_state"] == ST_BUY_READY
+    assert row["suggested_action"] == "WAIT"
+    assert row["session_phase"] == "PRE_OPEN"
+
+
+def test_live_session_lower_strengthen_stays_buy_ready(tmp_path):
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _strengthen_recs()},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    row = build_panel(now=_ts("10:41"), artifact_path=tmp_path / "board.json")["rows"][0]
+    assert row["last_session_state"] == ST_BUY_READY
+    assert row["suggested_action"] == ACT_BUY_READY
+    assert row["actionable"] is True
+
+
+def test_missing_artifact_is_data_uncertain():
+    panel = build_panel(now=_ts("10:40"), artifact_path=Path("/tmp/rotation_missing_board.json"))
+    row = panel["rows"][0]
+    assert row["rotation_state"] == ST_DATA_UNCERTAIN
+    assert row["suggested_action"] == "WAIT"
+    assert "missing" in (row.get("freshness_reason") or "").lower() or "missing" in (row.get("action_gate_reason") or "").lower()
+
+
+def test_stale_artifact_in_live_session_is_uncertain(tmp_path):
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _strengthen_recs()},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    later = _ts("10:55")
+    row = build_panel(now=later, artifact_path=tmp_path / "board.json")["rows"][0]
+    assert row["suggested_action"] == "WAIT"
+    assert row["rotation_state"] == ST_DATA_UNCERTAIN
+    assert row["freshness"] == "STALE"
+
+
+def test_one_symbol_provider_failure_does_not_suppress_others(tmp_path):
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n"
+        "HPG,true,20.00,20.40,21.00,21.40,,,\n",
+    )
+    status = run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _strengthen_recs(), "HPG": []},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    panel = build_panel(now=_ts("10:41"), artifact_path=tmp_path / "board.json")
+    by = {r["symbol"]: r for r in panel["rows"]}
+    assert set(by) == {"TCH", "HPG"}
+    assert by["TCH"]["last_session_state"] == ST_BUY_READY
+    assert by["TCH"]["suggested_action"] == ACT_BUY_READY
+    assert by["HPG"]["rotation_state"] == ST_DATA_UNCERTAIN
+    assert any(s["symbol"] == "HPG" and not s["ok"] for s in status["symbols"])
+    assert any(s["symbol"] == "TCH" for s in status["symbols"])
+
+
+def test_rotation_stays_above_earning_money_board():
+    app = (REPO / "app.py").read_text(encoding="utf-8")
+    assert app.index("render_rotation_watch_panel") < app.index("EARNING MONEY BOARD")
+    assert app.index("render_rotation_watch_panel") < app.index("run_scan(WATCHLIST)")

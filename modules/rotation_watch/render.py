@@ -1,4 +1,4 @@
-"""Streamlit adapter for isolated Rotation Watch."""
+"""Streamlit adapter — artifact read only. Never calls the Camera provider."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from modules.rotation_watch.engine import RotationBoard, build_board
+from modules.rotation_watch.view import build_panel, display_table
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
 
@@ -24,44 +24,33 @@ STATE_COLORS = {
 def render_rotation_watch_panel(
     *,
     now: datetime | None = None,
-    watchlist_path: Path | None = None,
-    provider: Any | None = None,
-    injected: dict | None = None,
-    board: RotationBoard | None = None,
-    persist: bool = True,
-) -> RotationBoard:
-    """Render one expander. Failure is handled by the app.py try/except."""
+    artifact_path: Path | None = None,
+    board: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     import streamlit as st
 
-    panel = board or build_board(
-        now=now or datetime.now(VN),
-        watchlist_path=watchlist_path,
-        provider=provider,
-        injected=injected,
-        persist=persist,
-    )
+    panel = board or build_panel(now=now or datetime.now(VN), artifact_path=artifact_path)
 
     with st.expander("🔄 ROTATION WATCH", expanded=True):
         st.caption(
-            "Danh sách xoay vòng thủ công · không phải lệnh tự động · "
-            "độc lập BOT Candidate / Edge / Learning · P×V dùng interpreter đóng băng"
+            "Danh sách xoay vòng thủ công · không tự mua/bán · đọc artifact sidecar · "
+            "độc lập Candidate / Edge / Learning · panel chỉ đọc artifact"
         )
-        if panel.empty:
-            st.info(panel.empty_message)
+        if panel.get("empty"):
+            st.info(panel.get("empty_message") or "")
             return panel
 
-        source = panel.rows[0].data_source_label if panel.rows else ""
         c1, c2, c3 = st.columns(3)
         with c1:
-            st.metric("Mã theo dõi", str(len(panel.rows)))
+            st.metric("Mã theo dõi", str(len(panel.get("rows") or [])))
         with c2:
-            st.metric("Nguồn giá", panel.rows[0].data_source if panel.rows else "—")
+            st.metric("Session", str(panel.get("session_phase") or "—"))
         with c3:
-            live_n = sum(1 for r in panel.rows if r.freshness == "LIVE")
-            st.metric("LIVE", str(live_n))
-        st.caption(f"Data source: {source}")
+            live_n = sum(1 for r in panel.get("rows") or [] if r.get("actionable"))
+            st.metric("Actionable now", str(live_n))
+        st.caption(f"Artifact observed_at: {panel.get('observed_at') or '—'}")
 
-        table = panel.display_table()
+        table = display_table(panel)
 
         def _style(s):
             colors = {
@@ -74,43 +63,46 @@ def render_rotation_watch_panel(
                 "RISK": "background-color: #fed7aa; color: #9a3412; font-weight: 700",
                 "RISK / REVIEW": "background-color: #fed7aa; color: #9a3412; font-weight: 700",
                 "DATA_UNCERTAIN": "background-color: #fde68a; color: #92400e; font-weight: 700",
+                "WAIT": "background-color: #fef3c7; color: #92400e; font-weight: 700",
             }
             return [colors.get(str(v), "") for v in s]
 
         try:
-            styled = table.style.apply(_style, subset=["Rotation State"]).apply(
+            styled = table.style.apply(_style, subset=["Last-session State"]).apply(
                 _style, subset=["Suggested Action"]
             )
             st.dataframe(styled, use_container_width=True, hide_index=True)
         except Exception:
             st.dataframe(table, use_container_width=True, hide_index=True)
 
-        for row in panel.rows:
-            color = STATE_COLORS.get(row.rotation_state, "#374151")
+        for row in panel.get("rows") or []:
+            state = str(row.get("last_session_state") or row.get("rotation_state") or "")
+            action = str(row.get("suggested_action") or "")
+            color = STATE_COLORS.get(state, "#374151")
+            if not row.get("actionable"):
+                color = "#92400e"
             with st.expander(
-                f"{row.symbol} · {row.rotation_state} · {row.suggested_action}",
-                expanded=row.rotation_state
-                in {"BUY_READY", "SELL_READY", "TREND_HOLD", "RISK", "DATA_UNCERTAIN"},
+                f"{row.get('symbol')} · last {state} · now {action}",
+                expanded=action in {"BUY READY", "SELL READY", "TREND HOLD", "RISK / REVIEW", "WAIT"}
+                and state in {"BUY_READY", "SELL_READY", "TREND_HOLD", "RISK", "DATA_UNCERTAIN"},
             ):
                 st.markdown(
                     f"<div style='color:{color};font-weight:700'>"
-                    f"{row.rotation_state} → {row.suggested_action}</div>",
+                    f"Last-session {state} → current action {action}</div>",
                     unsafe_allow_html=True,
                 )
+                if row.get("action_gate_reason"):
+                    st.warning(row.get("action_gate_reason"))
                 st.write(
-                    f"Giá **{row.current_price}** · Lower **{row.lower_zone}** · "
-                    f"Upper **{row.upper_zone}** · Range **{row.range_position_pct}**%"
-                    if row.range_position_pct is not None
-                    else f"Giá **{row.current_price}** · Lower **{row.lower_zone}** · Upper **{row.upper_zone}**"
+                    f"Giá **{row.get('current_price')}** · Lower **{row.get('lower_zone')}** · "
+                    f"Upper **{row.get('upper_zone')}** · Range **{row.get('range_position_pct')}**%"
                 )
                 st.write(
-                    f"Raw P×V **{row.raw_pxv}** · Published P×V **{row.published_pxv}** · "
-                    f"nến {row.last_bar_ts or '—'} · freshness **{row.freshness}**"
+                    f"Raw P×V **{row.get('raw_pxv')}** · Published P×V **{row.get('published_pxv')}** · "
+                    f"nến {row.get('last_bar_ts') or '—'} · freshness **{row.get('freshness')}**"
                 )
-                st.caption(row.pxv_why or "")
+                st.caption(row.get("pxv_why") or row.get("evidence_why") or "")
                 st.markdown("**Rotation evidence**")
-                for bit in row.rotation_evidence:
+                for bit in row.get("rotation_evidence") or []:
                     st.write(f"- {bit}")
-                if row.t25_checkpoint:
-                    st.info(row.t25_checkpoint)
     return panel
