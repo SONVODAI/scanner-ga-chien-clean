@@ -27,3 +27,7 @@ def test_smoke_script_never_asks_for_cli_bearer():
     assert "print(token" not in src
     assert "echo \"$TOKEN\"" not in src
     assert "echo \"${TOKEN}\"" not in src
+    assert 'or "/edge-research"' not in src
+    assert "Do not invent /edge-research" in src
+    assert "informational only" in src
+    assert "/current/live_shadow/live_shadow_status.json" in src

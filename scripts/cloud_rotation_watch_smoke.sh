@@ -12,11 +12,12 @@
 #   2. already-exported EDGE_RESEARCH_ARTIFACT_TOKEN / EDGE_RESEARCH_DURABLE_TOKEN
 #   3. hidden getpass if a TTY is available
 #
-# Public URL source (first available; repo has no production hostname):
-#   1. already-exported EDGE_RESEARCH_DURABLE_URL (URL only — not the bearer)
+# Public URL source (first available; do not invent /edge-research):
+#   1. already-exported EDGE_RESEARCH_DURABLE_URL exactly (rstrip / only)
 #   2. same env-file key EDGE_RESEARCH_DURABLE_URL if an operator added it
-#   3. nginx server_name + location /edge-research/
+#   3. nginx server_name + whatever location is actually configured
 #   Unknown hostname → STOP (do not guess).
+# Clients append /current/... directly to that base. /health is not a Cloud reader path.
 set -euo pipefail
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
@@ -212,7 +213,9 @@ def normalize_base(url: str, *, source: str) -> str:
         die(f"hostname unknown or placeholder ({host or 'empty'}; source={source})")
     if parsed.port not in (None, 443):
         die(f"unexpected TLS port {parsed.port} (source={source})")
-    path = parsed.path.rstrip("/") or "/edge-research"
+    # Same join as Candidate/Rotation clients: rstrip("/") then + "/current/..."
+    # Do not invent /edge-research when the secret has no path.
+    path = parsed.path.rstrip("/")
     return f"https://{parsed.netloc}{path}"
 
 
@@ -279,16 +282,19 @@ def main() -> int:
     print(f"TOKEN_SOURCE={token_src}")
     print("TOKEN_PRINTED=no")
 
-    health_code, _, _ = http_get(f"{base}/health", None)
-    print(f"HEALTH={health_code}")
-    if health_code == 0:
-        die("health request did not complete")
-    if health_code != 200:
-        die(f"public /health expected 200, got {health_code} (proxy/route/TLS)")
-
     board_url = f"{base}/current/rotation_watch/board.json"
     status_url = f"{base}/current/rotation_watch/status.json"
-    cand_url = f"{base}/current/live_shadow/live_evidence.jsonl"
+    cand_ev_url = f"{base}/current/live_shadow/live_evidence.jsonl"
+    cand_st_url = f"{base}/current/live_shadow/live_shadow_status.json"
+    print(f"ROTATION_BOARD_URL={board_url}")
+    print(f"ROTATION_STATUS_URL={status_url}")
+    print(f"CANDIDATE_EVIDENCE_URL={cand_ev_url}")
+    print(f"CANDIDATE_STATUS_URL={cand_st_url}")
+
+    # /health is VPS localhost / operator only — not used by Cloud readers.
+    health_code, _, _ = http_get(f"{base}/health", None)
+    print(f"HEALTH={health_code}")
+    print("HEALTH_NOTE=informational only; not part of Candidate/Rotation Cloud GET contract")
 
     rot_b_unauth, _, _ = http_get(board_url, None)
     rot_s_unauth, _, _ = http_get(status_url, None)
@@ -370,11 +376,15 @@ def main() -> int:
     print("STATUS_SCHEMA", status.get("schema"))
     print("STATUS_SESSION", status.get("session_phase"))
 
-    cand, _, _ = http_get(cand_url, token)
-    print(f"CANDIDATE_AUTH_GET={cand}")
-    if cand not in {200, 404}:
-        die(f"Candidate auth expected 200 or legitimate 404, got {cand}")
-    if cand == 404:
+    cand_ev, _, _ = http_get(cand_ev_url, token)
+    cand_st, _, _ = http_get(cand_st_url, token)
+    print(f"CANDIDATE_EVIDENCE_AUTH={cand_ev}")
+    print(f"CANDIDATE_STATUS_AUTH={cand_st}")
+    if cand_ev not in {200, 404}:
+        die(f"Candidate evidence auth expected 200 or legitimate 404, got {cand_ev}")
+    if cand_st not in {200, 404}:
+        die(f"Candidate status auth expected 200 or legitimate 404, got {cand_st}")
+    if cand_ev == 404 or cand_st == 404:
         print("CANDIDATE_NOTE=404 empty live-shadow store is legitimate")
 
     token = ""
