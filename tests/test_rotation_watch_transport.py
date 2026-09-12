@@ -26,9 +26,12 @@ from modules.rotation_watch.constants import (
     ARTIFACT_STATUS_PATH as ROTATION_STATUS_PATH,
     BOARD_NAME,
     SCHEMA_BOARD,
+    SCHEMA_STATUS,
     STATUS_NAME,
     ST_BUY_READY,
     ST_DATA_UNCERTAIN,
+    ST_LOWER_ZONE,
+    ST_SELL_READY,
     TRANSPORT_ERROR,
     VPS_ROTATION_STORE,
 )
@@ -103,7 +106,32 @@ def _request(method: str, url: str, token: str | None = None, data: bytes | None
         return exc.code, exc.read()
 
 
-def _board_payload(*, observed_at: str, state: str = ST_BUY_READY) -> dict:
+def _board_payload(*, observed_at: str, state: str = ST_BUY_READY, **row_over: object) -> dict:
+    action = {
+        ST_BUY_READY: "BUY READY",
+        ST_SELL_READY: "SELL READY",
+        ST_LOWER_ZONE: "WATCH LOWER",
+    }.get(state, "WAIT")
+    row = {
+        "symbol": "TCH",
+        "current_price": 11.78,
+        "location": "LOWER",
+        "lower_zone": "11.60–11.90",
+        "upper_zone": "12.20–12.40",
+        "last_session_state": state,
+        "last_session_action": action,
+        "rotation_state": state,
+        "suggested_action": action,
+        "published_pxv": "STRENGTHEN",
+        "raw_pxv": "STRENGTHEN",
+        "pxv_why": "frozen P×V",
+        "rotation_evidence": ["LOWER + STRENGTHEN"],
+        "last_bar_ts": "2026-08-14T10:35:00+07:00",
+        "freshness": "LIVE",
+        "data_source": "vnstock4_kbs",
+        "data_source_label": "Camera KBS 5m (vnstock4 Quote source=KBS)",
+    }
+    row.update(row_over)
     return {
         "schema": SCHEMA_BOARD,
         "observed_at": observed_at,
@@ -111,32 +139,13 @@ def _board_payload(*, observed_at: str, state: str = ST_BUY_READY) -> dict:
         "empty": False,
         "alert_eligible": False,
         "source": "rotation_watch_sidecar",
-        "rows": [
-            {
-                "symbol": "TCH",
-                "current_price": 11.78,
-                "lower_zone": "11.60–11.90",
-                "upper_zone": "12.20–12.40",
-                "last_session_state": state,
-                "last_session_action": "BUY READY",
-                "rotation_state": state,
-                "suggested_action": "BUY READY",
-                "published_pxv": "STRENGTHEN",
-                "raw_pxv": "STRENGTHEN",
-                "pxv_why": "frozen P×V",
-                "rotation_evidence": ["LOWER + STRENGTHEN"],
-                "last_bar_ts": "2026-08-14T10:35:00+07:00",
-                "freshness": "LIVE",
-                "data_source": "vnstock4_kbs",
-                "data_source_label": "Camera KBS 5m (vnstock4 Quote source=KBS)",
-            }
-        ],
+        "rows": [row],
     }
 
 
 def _status_payload(*, observed_at: str) -> dict:
     return {
-        "schema": "rotation_watch_status.v1",
+        "schema": SCHEMA_STATUS,
         "observed_at": observed_at,
         "session_phase": "LIVE",
         "alert_eligible": False,
@@ -237,7 +246,7 @@ def test_rotation_get_board_and_status_with_bearer(tmp_path):
         assert json.loads(body)["rows"][0]["symbol"] == "TCH"
         status, body = _request("GET", f"{server.base_url}{ROTATION_STATUS_PATH}", TEST_TOKEN)
         assert status == 200
-        assert json.loads(body)["schema"] == "rotation_watch_status.v1"
+        assert json.loads(body)["schema"] == SCHEMA_STATUS
     finally:
         server.stop()
 
@@ -475,6 +484,7 @@ def test_no_production_semantic_edits():
 
 def test_app_panel_order_unchanged():
     app = (REPO / "app.py").read_text(encoding="utf-8")
+    assert app.index("render_live_candidate_pxv_panel") < app.index("render_rotation_watch_panel")
     assert app.index("render_rotation_watch_panel") < app.index("EARNING MONEY BOARD")
     assert app.index("render_rotation_watch_panel") < app.index("run_scan(WATCHLIST)")
 
@@ -498,3 +508,185 @@ def test_rotation_transport_modules_do_not_import_candidate_parse():
         assert "modules.rotation_watch.engine" not in blob
         assert "KBSProvider" not in src
         assert "vnstock" not in src
+
+
+def test_remote_200_200_load_panel_sources_without_fetcher_injection(tmp_path, monkeypatch):
+    src = _write_working(tmp_path / "work")
+    dest = tmp_path / "rotation_watch"
+    publish_rotation_artifacts(src, dest)
+    server, _, _, _ = _start_server(tmp_path, rotation=dest)
+    try:
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", server.base_url)
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", TEST_TOKEN)
+        monkeypatch.delenv("MRBOT_ROTATION_WATCH_UI_SOURCE", raising=False)
+        packed = load_panel_sources()
+        assert packed["transport"]["mode"] == "remote"
+        assert packed["transport"]["error"] is None
+        assert packed["board"] is not None
+        assert packed["board"]["rows"][0]["symbol"] == "TCH"
+        assert packed["status"]["schema"] == SCHEMA_STATUS
+        panel = build_panel(now=datetime(2026, 8, 14, 10, 41, tzinfo=VN))
+        assert panel["rows"][0]["symbol"] == "TCH"
+        assert panel["rows"][0]["location"] == "LOWER"
+    finally:
+        server.stop()
+
+
+def test_remote_board_404_fail_closes(tmp_path, monkeypatch):
+    dest = tmp_path / "rotation_watch"
+    dest.mkdir()
+    (dest / STATUS_NAME).write_text(json.dumps(_status_payload(observed_at="2026-08-14T10:40:00+07:00")), encoding="utf-8")
+    server, _, _, _ = _start_server(tmp_path, rotation=dest)
+    try:
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", server.base_url)
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", TEST_TOKEN)
+        packed = load_panel_sources()
+        assert packed["board"] is None
+        assert packed["transport"]["error"] == TRANSPORT_ERROR
+        assert "board missing" in packed["transport"]["detail"]
+        panel = build_panel(now=datetime(2026, 8, 14, 10, 41, tzinfo=VN))
+        assert panel["rows"][0]["last_session_state"] == ST_DATA_UNCERTAIN
+        assert panel["rows"][0]["suggested_action"] == "WAIT"
+        assert panel["rows"][0]["actionable"] is False
+    finally:
+        server.stop()
+
+
+def test_remote_status_404_fail_closes_even_if_board_ok(tmp_path, monkeypatch):
+    dest = tmp_path / "rotation_watch"
+    dest.mkdir()
+    (dest / BOARD_NAME).write_text(
+        json.dumps(_board_payload(observed_at="2026-08-14T10:40:00+07:00")),
+        encoding="utf-8",
+    )
+    server, _, _, _ = _start_server(tmp_path, rotation=dest)
+    try:
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", server.base_url)
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", TEST_TOKEN)
+        packed = load_panel_sources()
+        assert packed["board"] is None
+        assert packed["transport"]["error"] == TRANSPORT_ERROR
+        assert "status missing" in packed["transport"]["detail"]
+        panel = build_panel(now=datetime(2026, 8, 14, 10, 41, tzinfo=VN))
+        assert panel["rows"][0]["last_session_state"] == ST_DATA_UNCERTAIN
+        assert panel["rows"][0]["suggested_action"] == "WAIT"
+    finally:
+        server.stop()
+
+
+def test_remote_invalid_board_json_and_schema_fail_closed():
+    live = datetime(2026, 8, 14, 10, 55, tzinfo=VN)
+    status = json.dumps(_status_payload(observed_at="2026-08-14T10:40:00+07:00"))
+    for bad in ("not-json", '{"nope": true}', "[]"):
+        packed = load_panel_sources(board_fetcher=lambda b=bad: b, status_fetcher=lambda: status)
+        assert packed["board"] is None
+        assert packed["transport"]["error"] == TRANSPORT_ERROR
+        panel = build_panel(now=live, board_fetcher=lambda b=bad: b, status_fetcher=lambda: status)
+        assert panel["rows"][0]["last_session_state"] == ST_DATA_UNCERTAIN
+        assert panel["rows"][0]["suggested_action"] == "WAIT"
+        assert panel["rows"][0]["actionable"] is False
+
+
+def test_remote_invalid_status_json_and_schema_fail_closed():
+    live = datetime(2026, 8, 14, 10, 41, tzinfo=VN)
+    board = json.dumps(_board_payload(observed_at="2026-08-14T10:40:00+07:00"))
+    for bad in ("not-json", '{"nope": true}', "[]"):
+        packed = load_panel_sources(board_fetcher=lambda: board, status_fetcher=lambda b=bad: b)
+        assert packed["board"] is None
+        assert packed["transport"]["error"] == TRANSPORT_ERROR
+        panel = build_panel(now=live, board_fetcher=lambda: board, status_fetcher=lambda b=bad: b)
+        assert panel["rows"][0]["last_session_state"] == ST_DATA_UNCERTAIN
+        assert panel["rows"][0]["suggested_action"] == "WAIT"
+        assert panel["rows"][0]["actionable"] is False
+
+
+def test_remote_auth_failure_is_transport_error_no_local_fallback(tmp_path, monkeypatch):
+    local = _write_working(tmp_path / "rotation")
+    dest = tmp_path / "rotation_watch"
+    publish_rotation_artifacts(local, dest)
+    server, _, _, _ = _start_server(tmp_path, rotation=dest)
+    try:
+        monkeypatch.setenv("MRBOT_ROTATION_WATCH_DIR", str(local))
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", server.base_url)
+        monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", "wrong-token")
+        packed = load_panel_sources()
+        assert packed["board"] is None
+        assert packed["transport"]["error"] == TRANSPORT_ERROR
+        assert "401" in packed["transport"]["detail"]
+        assert packed["board"] is None or packed["board"].get("rows", [{}])[0].get("symbol") != "TCH"
+    finally:
+        server.stop()
+
+
+def test_remote_transport_failure_without_fetcher_does_not_read_local(tmp_path, monkeypatch):
+    local = _write_working(tmp_path / "rotation")
+    monkeypatch.setenv("MRBOT_ROTATION_WATCH_DIR", str(local))
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_URL", "http://127.0.0.1:1")
+    monkeypatch.setenv("EDGE_RESEARCH_DURABLE_TOKEN", "t")
+    monkeypatch.delenv("MRBOT_ROTATION_WATCH_UI_SOURCE", raising=False)
+    packed = load_panel_sources()
+    assert packed["board"] is None
+    assert packed["transport"]["error"] == TRANSPORT_ERROR
+    panel = build_panel(now=datetime(2026, 8, 14, 10, 41, tzinfo=VN))
+    assert panel["rows"][0]["symbol"] != "TCH"
+    assert panel["rows"][0]["suggested_action"] == "WAIT"
+
+
+def test_weekend_historical_sell_ready_is_not_current_sell():
+    board = json.dumps(_board_payload(observed_at="2026-08-14T10:40:00+07:00", state=ST_SELL_READY))
+    status = json.dumps(_status_payload(observed_at="2026-08-14T10:40:00+07:00"))
+    sat = datetime(2026, 8, 15, 10, 0, tzinfo=VN)
+    panel = build_panel(now=sat, board_fetcher=lambda: board, status_fetcher=lambda: status)
+    row = panel["rows"][0]
+    assert row["last_session_state"] == ST_SELL_READY
+    assert row["last_session_action"] == "SELL READY"
+    assert row["suggested_action"] == "WAIT"
+    assert row["actionable"] is False
+    assert row["session_phase"] == "WEEKEND"
+
+
+def test_vps_weekend_tch_artifact_renders_historical_wait_only():
+    """Real F-shaped TCH weekend artifact: historical LOWER_ZONE, current WAIT."""
+    from modules.rotation_watch.html import render_html
+
+    observed = "2026-09-12T08:54:00+07:00"
+    board = json.dumps(
+        _board_payload(
+            observed_at=observed,
+            state=ST_LOWER_ZONE,
+            current_price=11.70,
+            location="LOWER",
+            published_pxv="NEUTRAL",
+            raw_pxv="NEUTRAL",
+            last_bar_ts="2026-09-11T14:45:00+07:00",
+            freshness="SESSION_CLOSED",
+            last_session_action="WATCH LOWER",
+            suggested_action="WATCH LOWER",
+        )
+    )
+    status = json.dumps(_status_payload(observed_at=observed))
+    sat = datetime(2026, 9, 12, 10, 0, tzinfo=VN)
+    panel = build_panel(now=sat, board_fetcher=lambda: board, status_fetcher=lambda: status)
+    row = panel["rows"][0]
+    assert row["symbol"] == "TCH"
+    assert row["current_price"] == 11.70
+    assert row["location"] == "LOWER"
+    assert row["last_session_state"] == ST_LOWER_ZONE
+    assert row["last_session_action"] == "WATCH LOWER"
+    assert row["published_pxv"] == "NEUTRAL"
+    assert row["freshness"] == "SESSION_CLOSED"
+    assert row["session_phase"] == "WEEKEND"
+    assert row["suggested_action"] == "WAIT"
+    assert row["actionable"] is False
+    html = render_html(panel)
+    assert "TCH" in html
+    assert "11.7" in html
+    assert "LOWER" in html
+    assert "LOWER_ZONE" in html
+    assert "WATCH LOWER" in html
+    assert "NEUTRAL" in html
+    assert "SESSION_CLOSED" in html
+    assert "WEEKEND" in html
+    assert "WAIT" in html
+    assert "BUY READY" not in html
+    assert "SELL READY" not in html

@@ -49,6 +49,11 @@ def render_rotation_watch_panel(
             live_n = sum(1 for r in panel.get("rows") or [] if r.get("actionable"))
             st.metric("Actionable now", str(live_n))
         st.caption(f"Artifact observed_at: {panel.get('observed_at') or '—'}")
+        transport = panel.get("transport") or {}
+        if transport.get("error"):
+            st.warning(
+                f"Rotation remote GET fail-closed: {transport.get('detail') or transport.get('error')}"
+            )
 
         table = display_table(panel)
 
@@ -94,7 +99,8 @@ def render_rotation_watch_panel(
                 if row.get("action_gate_reason"):
                     st.warning(row.get("action_gate_reason"))
                 st.write(
-                    f"Giá **{row.get('current_price')}** · Lower **{row.get('lower_zone')}** · "
+                    f"Giá **{row.get('current_price')}** · Location **{row.get('location') or '—'}** · "
+                    f"Lower **{row.get('lower_zone')}** · "
                     f"Upper **{row.get('upper_zone')}** · Range **{row.get('range_position_pct')}**%"
                 )
                 st.write(

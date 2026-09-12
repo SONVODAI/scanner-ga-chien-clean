@@ -16,7 +16,7 @@ from modules.rotation_watch.artifact_get import (
     remote_rotation_configured,
     transport_error_payload,
 )
-from modules.rotation_watch.constants import ENV_UI_SOURCE, SCHEMA_BOARD, TRANSPORT_ERROR
+from modules.rotation_watch.constants import ENV_UI_SOURCE, SCHEMA_BOARD, SCHEMA_STATUS, TRANSPORT_ERROR
 
 
 def _parse_board_text(text: str) -> dict[str, Any] | None:
@@ -41,12 +41,20 @@ def _validate_board(data: Any) -> dict[str, Any] | None:
     return None
 
 
+def _validate_status(data: Any) -> dict[str, Any] | None:
+    if not isinstance(data, dict):
+        return None
+    if data.get("schema") == SCHEMA_STATUS:
+        return data
+    return None
+
+
 def _parse_status_text(text: str) -> dict[str, Any] | None:
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
         return None
-    return data if isinstance(data, dict) else None
+    return _validate_status(data)
 
 
 def resolve_ui_source(explicit: str | None = None) -> str:

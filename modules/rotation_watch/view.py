@@ -126,10 +126,12 @@ def display_table(panel: dict[str, Any]) -> Any:
             {
                 "Symbol": row.get("symbol"),
                 "Current Price": row.get("current_price"),
+                "Location": row.get("location"),
                 "Lower Zone": row.get("lower_zone"),
                 "Upper Zone": row.get("upper_zone"),
                 "Range Position %": row.get("range_position_pct"),
                 "Last-session State": row.get("last_session_state") or row.get("rotation_state"),
+                "Last-session Action": row.get("last_session_action"),
                 "Suggested Action": row.get("suggested_action"),
                 "Session": row.get("session_phase"),
                 "Raw P×V": row.get("raw_pxv"),

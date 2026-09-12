@@ -64,6 +64,7 @@ STATE_TO_ACTION = {
 
 SCHEMA_STATE = "rotation_watch_state.v1"
 SCHEMA_BOARD = "rotation_watch_board.v1"
+SCHEMA_STATUS = "rotation_watch_status.v1"
 WATCHLIST_NAME = "watchlist.csv"
 STATE_NAME = "state.json"
 BOARD_NAME = "board.json"
