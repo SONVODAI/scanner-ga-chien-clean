@@ -542,11 +542,36 @@ step_E() {
   note "service active; /health 200; Candidate 401; Rotation 401"
 }
 
+require_f_sidecar() {
+  # F invokes the runner via python, so the file must exist and be readable.
+  # C copies git mode 100644 (not executable); -x is the wrong guard.
+  local missing=() rel
+  [[ -d "${DEST}" ]] || missing+=("${DEST}/")
+  for rel in "${ROTATION_OWNED[@]}" "${ISO_DEPS[@]}"; do
+    [[ -f "${DEST}/${rel}" ]] || missing+=("${DEST}/${rel}")
+  done
+  [[ -f "${DEST}/modules/live_camera_shadow/__init__.py" ]] \
+    || missing+=("${DEST}/modules/live_camera_shadow/__init__.py")
+  [[ -f "${DEST}/modules/live_candidate/__init__.py" ]] \
+    || missing+=("${DEST}/modules/live_candidate/__init__.py")
+  [[ -d "${STORE}" ]] || missing+=("${STORE}/")
+  if ((${#missing[@]})); then
+    echo "STOP: isolated sidecar files missing:" >&2
+    printf '  %s\n' "${missing[@]}" >&2
+    die "F cannot start — listed sidecar paths are absent (do not infer C from this unless those paths are gone)"
+  fi
+  grep -q '^MRBOT_ROTATION_WATCH_STORE=/var/lib/mrbot/rotation_watch$' "${ENV_FILE}" \
+    || die "MRBOT_ROTATION_WATCH_STORE missing from env keys (file not printed)"
+  grep -q 'TCH' "${DEST}/data/rotation_watch/watchlist.csv" \
+    || die "watchlist missing TCH: ${DEST}/data/rotation_watch/watchlist.csv"
+  note "F sidecar present (runner is 0644; python --live does not need +x)"
+}
+
 step_F() {
   echo "=== F. ONE TCH LIVE CYCLE (no --loop) ==="
   [[ "${SMOKE_CONFIRM:-}" == "YES" ]] || die "F requires SMOKE_CONFIRM=YES"
   load_stamp
-  [[ -x "${DEST}/scripts/run_rotation_watch.py" ]] || die "sidecar missing — run C"
+  require_f_sidecar
   export MRBOT_ROTATION_WATCH_STORE="${STORE}"
   export MRBOT_ROTATION_WATCH_DIR="${DEST}/data/rotation_watch"
   export PYTHONPATH="${DEST}:${CAMERA}"
