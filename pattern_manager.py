@@ -331,10 +331,15 @@ def save_pattern_history(
     brain, scan_df, market_real, market_forecast,
     market_context=None, ai_df=None, leader_df=None,
     earning_df=None, final_df=None,
+    *,
+    allow_save=True,
+    reason="",
 ):
     # Tương thích lời gọi V22 4 tham số.
     if scan_df is None or scan_df.empty:
         return pd.DataFrame(), "EMPTY_SCAN"
+    if not allow_save:
+        return read_pattern_history(), f"SKIP_NO_TRADING_SESSION | {reason}"
 
     new_samples = build_samples(
         scan_df, market_real, market_forecast,

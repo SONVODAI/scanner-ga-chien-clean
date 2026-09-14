@@ -20,6 +20,7 @@ from modules.edge_research.market_state import (
     select_canonical_market_snapshot,
 )
 from modules.edge_research.outcomes import attach_outcomes_to_panel
+from modules.regime_recall_index import _is_weekend
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -35,6 +36,23 @@ def _read_csv(path: Path, **kwargs) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     return pd.read_csv(path, low_memory=False, **kwargs)
+
+
+def _exclude_non_trading_session_dates(frame: pd.DataFrame) -> pd.DataFrame:
+    """Drop weekend calendar dates from the research series.
+
+    Uses the same weekend guard as ``is_trading_session_valid`` /
+    ``modules.regime_recall_index._is_weekend``. Historical holiday
+    filtering is not available here: ``is_vnindex_trading_today()`` is
+    today-only and this repo has no exchange holiday calendar.
+    """
+    if frame.empty or "date" not in frame.columns:
+        return frame
+    parsed = pd.to_datetime(frame["date"], errors="coerce")
+    keep = parsed.notna() & ~parsed.map(_is_weekend)
+    out = frame.loc[keep].copy()
+    out["date"] = parsed.loc[keep].dt.strftime("%Y-%m-%d")
+    return out
 
 
 def load_lifecycle(path: Optional[Path] = None) -> pd.DataFrame:
@@ -88,8 +106,7 @@ def load_raw_market_snapshots(
         return []
 
     raw = pd.concat(frames, ignore_index=True)
-    raw["date"] = pd.to_datetime(raw["date"], errors="coerce").dt.strftime("%Y-%m-%d")
-    raw = raw.dropna(subset=["date"])
+    raw = _exclude_non_trading_session_dates(raw)
     if start:
         raw = raw[raw["date"] >= start]
     if end:

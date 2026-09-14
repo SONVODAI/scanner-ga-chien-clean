@@ -6246,12 +6246,15 @@ market_forecast = forecast_result.score
 market_forecast_text = forecast_result.text
 market_confidence = forecast_result.confidence
 market_status, market_action = market_status_text(market_real)
+trading_today, trading_reason = is_vnindex_trading_today()
 try:
     _, pattern_status = save_pattern_history(
         brain=None,
         scan_df=scan_df,
         market_real=market_real,
         market_forecast=market_forecast,
+        allow_save=trading_today,
+        reason=trading_reason,
     )
     st.caption(f"Pattern Memory: {pattern_status}")
 except Exception as e:
@@ -6380,7 +6383,6 @@ st.caption("Mr.BOT PRO V4.0: tất cả bảng vẫn dùng chung scan_df. BUY EL
 # PREPARE CORE TABLES
 # =========================================================
 storm_df = build_storm_leaders(scan_df)
-trading_today, trading_reason = is_vnindex_trading_today()
 _regime_name, _, _regime_note = elite_regime(market_real, market_forecast)
 try:
     from modules.market_t0_capture import capture_market_t0_snapshot
@@ -7128,6 +7130,8 @@ try:
         scan_df=scan_df,
         market_real=market_real,
         market_forecast=market_forecast,
+        allow_save=trading_today,
+        reason=trading_reason,
     )
     print(">>> SAVE PATTERN DONE")
     print(">>> LEADER MEMORY DONE")
