@@ -31,26 +31,29 @@ import numpy as np
 # =========================================================
 DEFAULT_WATCHLIST = ""
 # =========================================================
-# PORTFOLIO MEMORY
+# PORTFOLIO MEMORY (user-owned, not keyed by trade_date)
 # =========================================================
 
 PORTFOLIO_FILE = "portfolio_symbols.txt"
+HOLDINGS_WIDGET_KEY = "position_guardian_watchlist"
+HOLDINGS_EDITOR_SHOWN_KEY = "_user_holdings_editor_shown"
 
 
 def load_portfolio():
+    from modules.user_holdings import load_holdings_text
 
     try:
-        with open(PORTFOLIO_FILE, "r", encoding="utf-8") as f:
-            return f.read()
-
-    except:
+        return load_holdings_text()
+    except Exception:
         return DEFAULT_WATCHLIST
 
 
 def save_portfolio(text):
+    from modules.user_holdings import save_holdings_text
 
-    with open(PORTFOLIO_FILE, "w", encoding="utf-8") as f:
-        f.write(text)
+    save_holdings_text(text if text is not None else "")
+
+
 SIGNAL_HOLD = "🟢 GIỮ"
 SIGNAL_WARNING = "🟡 CẢNH BÁO"
 SIGNAL_SELL = "🔴 BÁN"
@@ -104,23 +107,24 @@ def parse_watchlist(text):
 # HEADER
 # =========================================================
 
-def guardian_header():
+def render_holdings_editor():
+    """Manual holdings editor. Persist only when the text actually changes."""
+    from modules.user_holdings import load_holdings_text, persist_if_changed
 
     st.markdown("---")
-
-    st.subheader("🛡️ POSITION GUARDIAN")
-
+    st.subheader("📦 Cổ phiếu đang nắm giữ")
     st.caption(
-        "Theo dõi trạng thái các cổ phiếu đang nắm giữ"
+        "Danh sách nắm giữ do bạn nhập thủ công · giữ nguyên qua ngày mới / phiên mới · "
+        "chỉ đổi khi bạn sửa · không bị Rotation / BOT / Learning tự thêm hoặc xóa"
     )
 
+    stored = load_holdings_text()
+    if HOLDINGS_WIDGET_KEY not in st.session_state:
+        st.session_state[HOLDINGS_WIDGET_KEY] = stored
+
     watch_text = st.text_area(
-
-    "Nhập các mã đang nắm giữ (mỗi mã một dòng hoặc ngăn cách bằng dấu phẩy)",
-    value=load_portfolio(),
-
-
-    placeholder="""
+        "Nhập các mã đang nắm giữ (mỗi mã một dòng hoặc ngăn cách bằng dấu phẩy)",
+        placeholder="""
 Ví dụ:
 
 SSI
@@ -131,13 +135,16 @@ hoặc
 
 SSI,PVD,BSR
 """,
-
-    height=150,
-key="position_guardian_watchlist",
-)
-    save_portfolio(watch_text)    
-
+        height=150,
+        key=HOLDINGS_WIDGET_KEY,
+    )
+    persist_if_changed(watch_text, stored)
+    st.session_state[HOLDINGS_EDITOR_SHOWN_KEY] = True
     return parse_watchlist(watch_text)
+
+
+def guardian_header():
+    return render_holdings_editor()
 
 
 # =========================================================
@@ -397,9 +404,14 @@ def render_summary(df):
 # RENDER
 # =========================================================
 
-def render_guardian(scan_df):
+def render_guardian(scan_df, include_editor: bool = True):
 
-    symbols = guardian_header()
+    if include_editor:
+        symbols = render_holdings_editor()
+    elif HOLDINGS_WIDGET_KEY in st.session_state:
+        symbols = parse_watchlist(st.session_state.get(HOLDINGS_WIDGET_KEY) or "")
+    else:
+        symbols = parse_watchlist(load_portfolio())
 
     watch_df = build_watchlist_df(
         scan_df,
@@ -408,11 +420,16 @@ def render_guardian(scan_df):
 
     if watch_df.empty:
 
-        st.info(
-            "Không có cổ phiếu trong Watchlist."
-        )
+        if include_editor:
+            st.info(
+                "Không có cổ phiếu trong Watchlist."
+            )
 
         return
+
+    if not include_editor:
+        st.subheader("🛡️ POSITION GUARDIAN")
+        st.caption("Theo dõi trạng thái các cổ phiếu đang nắm giữ")
 
     result = build_position_table(
         watch_df

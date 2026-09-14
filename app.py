@@ -25,7 +25,11 @@ from final_decision_engine import (
     format_final_decision_for_display,
     style_final_decision,
 )
-from position_guardian import render_guardian
+from position_guardian import (
+    HOLDINGS_EDITOR_SHOWN_KEY,
+    render_guardian,
+    render_holdings_editor,
+)
 # Evolution Health is implemented locally below as the single source of truth.
 from modules.daily_summary import process_and_render_daily_summary
 from modules.earning_learning import (
@@ -118,6 +122,12 @@ try:
     from modules.rotation_watch.render import render_rotation_watch_panel
 
     render_rotation_watch_panel()
+except Exception:
+    pass
+
+# Current holdings — user-owned, not a market artifact. Editor only; table still uses scan_df later.
+try:
+    render_holdings_editor()
 except Exception:
     pass
 
@@ -6759,7 +6769,10 @@ except Exception as _shadow_board_error:
     st.caption(f"BOT Shadow board skipped: {_shadow_board_error}")
 
 st.markdown("---")
-render_guardian(scan_df)
+render_guardian(
+    scan_df,
+    include_editor=not st.session_state.get(HOLDINGS_EDITOR_SHOWN_KEY, False),
+)
 
 st.markdown("---")
 try:
