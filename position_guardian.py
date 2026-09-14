@@ -24,6 +24,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import re
 
 
 # =========================================================
@@ -37,8 +38,9 @@ DEFAULT_WATCHLIST = ""
 PORTFOLIO_FILE = "portfolio_symbols.txt"
 HOLDINGS_WIDGET_KEY = "position_guardian_watchlist"
 HOLDINGS_EDITOR_SHOWN_KEY = "_user_holdings_editor_shown"
-HOLDINGS_EDITOR_KEY = "user_holdings_ledger_editor"
+HOLDINGS_EDITOR_KEY = "user_holdings_ledger_editor_ddmm"
 ENTRY_DATE_COLUMN_FORMAT = "DD/MM/YYYY"
+ENTRY_DATE_TEXT_PATTERN = re.compile(r"^(\d{2})/(\d{2})/(\d{4})$")
 MISSING = "—"
 
 
@@ -118,44 +120,81 @@ def parse_watchlist(text):
 # =========================================================
 
 def _positions_to_editor_frame(positions):
-    from datetime import date as _date
-
     rows = []
     for item in positions:
-        raw_date = item.get("entry_date")
-        parsed_date = None
-        if raw_date:
-            try:
-                parsed_date = _date.fromisoformat(str(raw_date)[:10])
-            except ValueError:
-                parsed_date = None
         rows.append(
             {
                 "Mã": item.get("symbol") or "",
                 "Giá vốn": item.get("entry_price"),
-                "Ngày mua": parsed_date,
+                "Ngày mua": format_entry_date_display(item.get("entry_date")) or "",
             }
         )
     if not rows:
-        rows = [{"Mã": "", "Giá vốn": None, "Ngày mua": None}]
+        rows = [{"Mã": "", "Giá vốn": None, "Ngày mua": ""}]
     return pd.DataFrame(rows)
 
 
-def _editor_frame_to_positions(frame):
+def parse_editor_entry_date(value):
+    """Parse a user-facing DD/MM/YYYY cell.
+
+    Returns (iso_or_none, invalid).
+    Blank -> (None, False). Strict DD/MM/YYYY only.
+    """
+    from datetime import date as _date
+
+    if value is None:
+        return None, False
+    try:
+        if pd.isna(value):
+            return None, False
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
+    if not text:
+        return None, False
+    match = ENTRY_DATE_TEXT_PATTERN.fullmatch(text)
+    if not match:
+        return None, True
+    day, month, year = (int(match.group(1)), int(match.group(2)), int(match.group(3)))
+    try:
+        parsed = _date(year, month, day)
+    except ValueError:
+        return None, True
+    return parsed.isoformat(), False
+
+
+def parse_editor_frame(frame):
+    """Convert the ledger editor to ISO positions. Collect invalid-date errors."""
     from modules.user_holdings import normalize_positions
 
     if frame is None or frame.empty:
-        return []
+        return [], []
     rows = []
+    errors = []
     for _, raw in frame.iterrows():
+        iso_date, invalid = parse_editor_entry_date(raw.get("Ngày mua"))
+        symbol = str(raw.get("Mã") or "").strip().upper()
+        if invalid:
+            label = symbol or "mã trống"
+            errors.append(
+                f"Ngày mua của {label} không hợp lệ. "
+                "Vui lòng nhập theo DD/MM/YYYY, ví dụ 10/09/2026."
+            )
         rows.append(
             {
                 "symbol": raw.get("Mã"),
                 "entry_price": raw.get("Giá vốn"),
-                "entry_date": raw.get("Ngày mua"),
+                "entry_date": iso_date,
             }
         )
-    return normalize_positions(rows)
+    return normalize_positions(rows), errors
+
+
+def _editor_frame_to_positions(frame):
+    positions, errors = parse_editor_frame(frame)
+    if errors:
+        return []
+    return positions
 
 
 def format_entry_date_display(value):
@@ -164,19 +203,22 @@ def format_entry_date_display(value):
     from datetime import datetime as _datetime
 
     if value is None or value == "":
-        return None
+        return ""
     try:
         if pd.isna(value):
-            return None
+            return ""
     except (TypeError, ValueError):
         pass
     if isinstance(value, _date) and not isinstance(value, _datetime):
         day = value
     else:
+        text = str(value).strip()
+        if ENTRY_DATE_TEXT_PATTERN.fullmatch(text):
+            return text
         try:
-            day = _date.fromisoformat(str(value)[:10])
+            day = _date.fromisoformat(text[:10])
         except ValueError:
-            return None
+            return ""
     return day.strftime("%d/%m/%Y")
 
 
@@ -218,10 +260,13 @@ def commit_editor_positions(
     *,
     today=None,
     github_writer=None,
+    parse_errors=None,
 ):
-    """Validate then persist. Future dates block the whole save."""
+    """Validate then persist. Invalid or future dates block the whole save."""
     from modules.user_holdings import persist_positions_if_changed
 
+    if parse_errors:
+        return durable, False, "INVALID_DATE", list(parse_errors)
     errors = future_entry_date_messages(incoming, today=today)
     if errors:
         return durable, False, "FUTURE_DATE", errors
@@ -241,6 +286,7 @@ def render_holdings_editor():
     st.subheader("📦 Cổ phiếu đang nắm giữ")
     st.caption(
         "Sổ vị thế do bạn nhập thủ công · Mã / Giá vốn / Ngày mua · "
+        "Ngày mua: DD/MM/YYYY, ví dụ 10/09/2026 · "
         "giữ nguyên qua ngày mới · chỉ lưu khi bạn bấm Lưu · "
         "không bị Rotation / BOT / Learning tự thêm hoặc xóa"
     )
@@ -260,21 +306,21 @@ def render_holdings_editor():
                 min_value=0.0,
                 step=0.05,
             ),
-            "Ngày mua": st.column_config.DateColumn(
+            "Ngày mua": st.column_config.TextColumn(
                 "Ngày mua",
-                help="Ngày mua theo DD/MM/YYYY. Để trống nếu chưa nhập.",
-                format=ENTRY_DATE_COLUMN_FORMAT,
-                max_value=_vn_today(),
+                help="DD/MM/YYYY. Ví dụ: 10/09/2026. Để trống nếu chưa nhập.",
+                max_chars=10,
             ),
         },
         key=HOLDINGS_EDITOR_KEY,
     )
     save = st.button("Lưu danh sách nắm giữ", type="primary")
     if save:
-        incoming = _editor_frame_to_positions(edited)
+        incoming, parse_errors = parse_editor_frame(edited)
         durable, changed, status, errors = commit_editor_positions(
             incoming,
             durable,
+            parse_errors=parse_errors,
         )
         if errors:
             for message in errors:
