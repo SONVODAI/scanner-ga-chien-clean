@@ -626,3 +626,43 @@ def test_rotation_stays_above_earning_money_board():
     app = (REPO / "app.py").read_text(encoding="utf-8")
     assert app.index("render_rotation_watch_panel") < app.index("EARNING MONEY BOARD")
     assert app.index("render_rotation_watch_panel") < app.index("run_scan(WATCHLIST)")
+
+
+def test_loop_may_refresh_only_during_live_session():
+    from modules.rotation_watch.constants import ARTIFACT_STALE_AFTER_SEC
+    from modules.rotation_watch.runner import loop_may_refresh
+
+    assert ARTIFACT_STALE_AFTER_SEC == 600
+    assert loop_may_refresh(_ts("09:15"))[0] is True
+    assert loop_may_refresh(_ts("10:40"))[0] is True
+    assert loop_may_refresh(_ts("11:29"))[0] is True
+    assert loop_may_refresh(_ts("13:05"))[0] is True
+    assert loop_may_refresh(_ts("14:49"))[0] is True
+    lunch_ok, lunch_why = loop_may_refresh(_ts("11:45"))
+    assert lunch_ok is False
+    assert "LUNCH_HOLD" in lunch_why
+    assert loop_may_refresh(_ts("14:50"))[0] is False
+    assert loop_may_refresh(datetime(2026, 8, 17, 8, 0, tzinfo=VN))[0] is False
+    sat_ok, sat_why = loop_may_refresh(datetime(2026, 8, 15, 17, 7, tzinfo=VN))
+    assert sat_ok is False
+    assert "WEEKEND" in sat_why
+
+
+def test_run_cycle_direct_call_still_persists_on_weekend(tmp_path):
+    """One-shot / tests may still write. Only --loop uses loop_may_refresh."""
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    sat = datetime(2026, 8, 15, 17, 7, 27, tzinfo=VN)
+    status = run_cycle(
+        now=sat,
+        watchlist_path=watch,
+        injected={"TCH": _strengthen_recs()},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    assert (tmp_path / "board.json").exists()
+    assert status["observed_at"].startswith("2026-08-15T17:07:27")
