@@ -1,0 +1,247 @@
+"""Guardian presentation joins the user ledger. generate_signal must stay identical."""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import re
+import sys
+from datetime import date
+from pathlib import Path
+from types import ModuleType
+
+import pandas as pd
+import pytest
+
+REPO = Path(__file__).resolve().parents[1]
+
+# Frozen SHA-256 of generate_signal() as of origin/main before this ledger change.
+GENERATE_SIGNAL_SHA256 = (
+    "ee644fc098fc01c6c4a4f54bedcefe892e1beb26b085552f3c7a9929b4c5dd4f"
+)
+
+
+def _extract_generate_signal(src: str) -> str:
+    match = re.search(
+        r"def generate_signal\(row\):.*?(?=\n# =+\n# SELL SCORE COLOR)",
+        src,
+        re.S,
+    )
+    assert match, "generate_signal not found"
+    return match.group(0)
+
+
+def test_generate_signal_source_is_unchanged():
+    src = (REPO / "position_guardian.py").read_text(encoding="utf-8")
+    body = _extract_generate_signal(src)
+    digest = hashlib.sha256(body.encode("utf-8")).hexdigest()
+    assert digest == GENERATE_SIGNAL_SHA256
+    assert "cut-loss" not in body.lower()
+    assert "3%" not in body
+    assert "profit" not in body.lower()
+    assert "entry_price" not in body
+    assert "holding_days" not in body
+    assert "pnl" not in body.lower()
+
+
+def test_generate_signal_rules_are_identical():
+    pg = _import_position_guardian()
+    hold = pd.Series(
+        {"price": 26.0, "ema9": 25.0, "ma20": 24.0, "obv": 1000, "obv_ema9": 900}
+    )
+    warn = pd.Series(
+        {"price": 24.0, "ema9": 25.0, "ma20": 24.0, "obv": 1000, "obv_ema9": 900}
+    )
+    sell = pd.Series(
+        {"price": 24.0, "ema9": 23.0, "ma20": 24.0, "obv": 1100, "obv_ema9": 900}
+    )
+    sell_obv = pd.Series(
+        {"price": 24.0, "ema9": 23.0, "ma20": 24.0, "obv": 800, "obv_ema9": 900}
+    )
+
+    assert pg.generate_signal(hold) == (pg.SIGNAL_HOLD, "Xu hướng khỏe", 0)
+    assert pg.generate_signal(warn) == (pg.SIGNAL_WARNING, "Giá dưới EMA9", 40)
+    assert pg.generate_signal(sell) == (pg.SIGNAL_SELL, "EMA9 dưới MA20", 60)
+    assert pg.generate_signal(sell_obv) == (
+        pg.SIGNAL_SELL,
+        "EMA9 dưới MA20 + OBV xác nhận",
+        80,
+    )
+
+
+def _stub_streamlit():
+    if "streamlit" in sys.modules:
+        return
+    st = ModuleType("streamlit")
+
+    def _noop(*_a, **_k):
+        return None
+
+    class _Col:
+        def metric(self, *_a, **_k):
+            return None
+
+    class _Columns:
+        TextColumn = staticmethod(lambda *_a, **_k: None)
+        NumberColumn = staticmethod(lambda *_a, **_k: None)
+        DateColumn = staticmethod(lambda *_a, **_k: None)
+
+    st.markdown = _noop
+    st.subheader = _noop
+    st.caption = _noop
+    st.button = lambda *_a, **_k: False
+    st.success = _noop
+    st.info = _noop
+    st.dataframe = _noop
+    st.columns = lambda n: [_Col() for _ in range(n)]
+    st.session_state = {}
+    st.secrets = {}
+    st.column_config = _Columns()
+    st.data_editor = lambda frame, **_k: frame
+    sys.modules["streamlit"] = st
+
+
+def _import_position_guardian():
+    _stub_streamlit()
+    sys.path.insert(0, str(REPO))
+    import position_guardian as pg
+
+    return pg
+
+
+def test_build_position_table_joins_ledger_and_does_not_drop_unscanned():
+    pg = _import_position_guardian()
+    positions = [
+        {"symbol": "SSI", "entry_price": 24.5, "entry_date": "2026-09-01"},
+        {"symbol": "ZZZOUTSIDE", "entry_price": 10.0, "entry_date": "2026-09-10"},
+        {"symbol": "PVD", "entry_price": None, "entry_date": None},
+    ]
+    scan_df = pd.DataFrame(
+        [
+            {
+                "symbol": "SSI",
+                "price": 26.95,
+                "ema9": 26.0,
+                "ma20": 25.0,
+                "obv": 1_200_000,
+                "obv_ema9": 1_000_000,
+            },
+            {
+                "symbol": "PVD",
+                "price": 24.0,
+                "ema9": 25.0,
+                "ma20": 24.5,
+                "obv": 800,
+                "obv_ema9": 900,
+            },
+        ]
+    )
+    table = pg.build_position_table(scan_df, positions, today=date(2026, 9, 14))
+    assert list(table["Mã"]) == ["SSI", "ZZZOUTSIDE", "PVD"]
+    ssi = table.iloc[0]
+    assert ssi["Giá vốn"] == "24.50"
+    assert ssi["Ngày mua"] == "2026-09-01"
+    assert ssi["Giá hiện tại"] == "26.95"
+    assert ssi["P/L %"] == "10.00%"
+    assert ssi["Số ngày giữ"] == "13"
+    assert ssi["EMA9"] == "26.00"
+    assert ssi["MA20"] == "25.00"
+    assert "1,200,000" in str(ssi["OBV"]).replace(",", ",")
+    assert ssi["Trạng thái"] == pg.SIGNAL_HOLD
+    assert ssi["Lý do"] == "Xu hướng khỏe"
+
+    outside = table.iloc[1]
+    assert outside["Giá vốn"] == "10.00"
+    assert outside["Ngày mua"] == "2026-09-10"
+    assert outside["Giá hiện tại"] == pg.MISSING
+    assert outside["P/L %"] == pg.MISSING
+    assert outside["Số ngày giữ"] == "4"
+    assert outside["EMA9"] == pg.MISSING
+    assert outside["MA20"] == pg.MISSING
+    assert outside["OBV"] == pg.MISSING
+    assert outside["Sell Score"] == pg.MISSING
+    assert outside["Trạng thái"] == pg.MISSING
+    assert outside["Lý do"] == pg.MISSING
+
+    pvd = table.iloc[2]
+    assert pvd["Giá vốn"] == pg.MISSING
+    assert pvd["Ngày mua"] == pg.MISSING
+    assert pvd["P/L %"] == pg.MISSING
+    assert pvd["Số ngày giữ"] == pg.MISSING
+    assert pvd["Trạng thái"] == pg.SIGNAL_WARNING
+
+
+def test_missing_cost_and_date_are_emdash_not_zero():
+    pg = _import_position_guardian()
+    positions = [{"symbol": "SSI", "entry_price": None, "entry_date": None}]
+    scan_df = pd.DataFrame(
+        [
+            {
+                "symbol": "SSI",
+                "price": 26.0,
+                "ema9": 25.0,
+                "ma20": 24.0,
+                "obv": 1,
+                "obv_ema9": 1,
+            }
+        ]
+    )
+    table = pg.build_position_table(scan_df, positions, today=date(2026, 9, 14))
+    row = table.iloc[0]
+    assert row["Giá vốn"] == pg.MISSING
+    assert row["Ngày mua"] == pg.MISSING
+    assert row["P/L %"] == pg.MISSING
+    assert row["Số ngày giữ"] == pg.MISSING
+    assert "0.00%" not in str(row["P/L %"])
+    assert str(row["Số ngày giữ"]) != "0"
+
+
+def test_pnl_and_holding_days_formulas():
+    from modules.user_holdings import holding_days, pnl_pct
+
+    assert pnl_pct(26.95, 24.5) == pytest.approx(10.0)
+    assert pnl_pct(24.5, 24.5) == pytest.approx(0.0)
+    assert pnl_pct(None, 24.5) is None
+    assert pnl_pct(26.95, None) is None
+    assert pnl_pct(26.95, 0) is None
+    assert holding_days("2026-09-01", today=date(2026, 9, 14)) == 13
+    assert holding_days(None, today=date(2026, 9, 14)) is None
+    assert holding_days("", today=date(2026, 9, 14)) is None
+
+
+def test_unmatched_row_color_is_not_hold_green():
+    pg = _import_position_guardian()
+    colors = pg.row_color(pd.Series({"Trạng thái": pg.MISSING, "Mã": "ZZZ"}))
+    assert colors[0] == "background-color:#f3f4f6"
+
+
+def test_editor_does_not_fetch_market_or_run_scan():
+    src = (REPO / "position_guardian.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    fn = None
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name == "render_holdings_editor":
+            fn = ast.get_source_segment(src, node)
+            break
+    assert fn is not None
+    blob = fn.lower()
+    assert "run_scan" not in blob
+    assert "yfinance" not in blob
+    assert "yahoo" not in blob
+    assert "kbs" not in blob
+    assert "analyze_symbol" not in blob
+    assert "build_indicators" not in blob
+    assert "st.data_editor" in fn
+    assert "persist_positions_if_changed" in fn
+
+
+def test_guardian_table_stays_after_scan_and_editor_below_rotation():
+    app = (REPO / "app.py").read_text(encoding="utf-8")
+    rot = app.index("render_rotation_watch_panel()")
+    hold = app.index("render_holdings_editor()")
+    scan = app.index("run_scan(WATCHLIST)")
+    table = app.rindex("render_guardian(")
+    assert rot < hold < scan < table
+    between = app[rot:hold]
+    assert "run_scan" not in between
+    assert "render_guardian" not in between
