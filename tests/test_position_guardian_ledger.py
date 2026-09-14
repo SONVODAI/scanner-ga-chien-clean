@@ -232,7 +232,8 @@ def test_editor_does_not_fetch_market_or_run_scan():
     assert "analyze_symbol" not in blob
     assert "build_indicators" not in blob
     assert "st.data_editor" in fn
-    assert "persist_positions_if_changed" in fn
+    assert "commit_editor_positions" in fn
+    assert "ENTRY_DATE_COLUMN_FORMAT" in fn or "DD/MM/YYYY" in fn
 
 
 def test_guardian_table_stays_after_scan_and_editor_below_rotation():
@@ -245,3 +246,97 @@ def test_guardian_table_stays_after_scan_and_editor_below_rotation():
     between = app[rot:hold]
     assert "run_scan" not in between
     assert "render_guardian" not in between
+
+
+def test_date_column_uses_dd_mm_yyyy_user_format():
+    src = (REPO / "position_guardian.py").read_text(encoding="utf-8")
+    pg = _import_position_guardian()
+    assert pg.ENTRY_DATE_COLUMN_FORMAT == "DD/MM/YYYY"
+    assert "format=ENTRY_DATE_COLUMN_FORMAT" in src
+    assert 'format="YYYY-MM-DD"' not in src
+    assert "st.column_config.DateColumn" in src
+    assert pg.format_entry_date_display("2026-09-10") == "10/09/2026"
+    assert pg.format_entry_date_display(date(2026, 10, 9)) == "09/10/2026"
+
+
+def test_iso_json_storage_remains_yyyy_mm_dd():
+    from modules.user_holdings import SCHEMA, canonical_positions_text
+
+    text = canonical_positions_text(
+        [{"symbol": "PVD", "entry_price": None, "entry_date": "2026-09-10"}]
+    )
+    assert f'"schema": "{SCHEMA}"' in text
+    assert '"entry_date": "2026-09-10"' in text
+    assert "10/09/2026" not in text
+    assert "09/10/2026" not in text
+
+
+def test_today_accepted_future_rejected_null_allowed():
+    pg = _import_position_guardian()
+    today = date(2026, 9, 14)
+    assert (
+        pg.future_entry_date_messages(
+            [{"symbol": "SSI", "entry_price": None, "entry_date": "2026-09-14"}],
+            today=today,
+        )
+        == []
+    )
+    assert (
+        pg.future_entry_date_messages(
+            [{"symbol": "SSI", "entry_price": None, "entry_date": None}],
+            today=today,
+        )
+        == []
+    )
+    msgs = pg.future_entry_date_messages(
+        [{"symbol": "PVD", "entry_price": None, "entry_date": "2026-10-09"}],
+        today=today,
+    )
+    assert msgs == [
+        "Ngày mua của PVD (09/10/2026) nằm trong tương lai. Vui lòng kiểm tra lại."
+    ]
+
+
+def test_future_date_blocks_entire_save_and_writes_nothing(tmp_path, monkeypatch):
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_JSON", str(tmp_path / "positions.json"))
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_FILE", str(tmp_path / "holdings.txt"))
+    pg = _import_position_guardian()
+    writes = []
+    durable = [{"symbol": "SSI", "entry_price": None, "entry_date": None}]
+    incoming = [
+        {"symbol": "SSI", "entry_price": 24.5, "entry_date": "2026-09-01"},
+        {"symbol": "PVD", "entry_price": None, "entry_date": "2026-10-09"},
+    ]
+    saved, changed, status, errors = pg.commit_editor_positions(
+        incoming,
+        durable,
+        today=date(2026, 9, 14),
+        github_writer=lambda text: writes.append(text) or "LOCAL_ONLY",
+    )
+    assert changed is False
+    assert status == "FUTURE_DATE"
+    assert errors == [
+        "Ngày mua của PVD (09/10/2026) nằm trong tương lai. Vui lòng kiểm tra lại."
+    ]
+    assert saved == durable
+    assert writes == []
+    assert not (tmp_path / "positions.json").exists()
+
+
+def test_today_save_persists_iso_dates(tmp_path, monkeypatch):
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_JSON", str(tmp_path / "positions.json"))
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_FILE", str(tmp_path / "holdings.txt"))
+    pg = _import_position_guardian()
+    writes = []
+    saved, changed, status, errors = pg.commit_editor_positions(
+        [{"symbol": "PVD", "entry_price": None, "entry_date": "2026-09-14"}],
+        [],
+        today=date(2026, 9, 14),
+        github_writer=lambda text: writes.append(text) or "LOCAL_ONLY",
+    )
+    assert errors == []
+    assert changed is True
+    assert status == "LOCAL_ONLY"
+    assert saved == [{"symbol": "PVD", "entry_price": None, "entry_date": "2026-09-14"}]
+    assert '"entry_date": "2026-09-14"' in writes[0]
+    assert "14/09/2026" not in writes[0]

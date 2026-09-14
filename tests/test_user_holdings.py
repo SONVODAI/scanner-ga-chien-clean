@@ -122,9 +122,11 @@ def test_holdings_editor_is_immediately_below_rotation_watch():
 def test_editor_saves_only_on_change_and_does_not_bind_value():
     src = (REPO / "position_guardian.py").read_text(encoding="utf-8")
     assert "persist_positions_if_changed" in src
+    assert "commit_editor_positions" in src
     assert "render_holdings_editor" in src
     assert "st.data_editor" in src
     assert "Lưu danh sách nắm giữ" in src
+    assert 'ENTRY_DATE_COLUMN_FORMAT = "DD/MM/YYYY"' in src
     assert "value=load_portfolio()" not in src
     assert "HOLDINGS_WIDGET_KEY" in src
 
