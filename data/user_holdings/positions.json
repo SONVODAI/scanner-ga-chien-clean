@@ -1,0 +1,15 @@
+{
+  "schema": "user_holdings.v1",
+  "positions": [
+    {
+      "symbol": "PVD",
+      "entry_price": 18.8,
+      "entry_date": "2026-09-08"
+    },
+    {
+      "symbol": "MWG",
+      "entry_price": 72.5,
+      "entry_date": "2026-09-08"
+    }
+  ]
+}
