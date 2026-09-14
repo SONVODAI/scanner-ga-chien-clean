@@ -127,6 +127,8 @@ def test_editor_saves_only_on_change_and_does_not_bind_value():
     assert "st.data_editor" in src
     assert "Lưu danh sách nắm giữ" in src
     assert 'ENTRY_DATE_COLUMN_FORMAT = "DD/MM/YYYY"' in src
+    assert "st.column_config.DateColumn" not in src
+    assert "parse_editor_entry_date" in src
     assert "value=load_portfolio()" not in src
     assert "HOLDINGS_WIDGET_KEY" in src
 

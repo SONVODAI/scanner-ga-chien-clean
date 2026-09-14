@@ -233,7 +233,9 @@ def test_editor_does_not_fetch_market_or_run_scan():
     assert "build_indicators" not in blob
     assert "st.data_editor" in fn
     assert "commit_editor_positions" in fn
-    assert "ENTRY_DATE_COLUMN_FORMAT" in fn or "DD/MM/YYYY" in fn
+    assert "parse_editor_frame" in fn
+    assert "DateColumn" not in fn
+    assert "DD/MM/YYYY" in fn
 
 
 def test_guardian_table_stays_after_scan_and_editor_below_rotation():
@@ -252,10 +254,18 @@ def test_date_column_uses_dd_mm_yyyy_user_format():
     src = (REPO / "position_guardian.py").read_text(encoding="utf-8")
     pg = _import_position_guardian()
     assert pg.ENTRY_DATE_COLUMN_FORMAT == "DD/MM/YYYY"
-    assert "format=ENTRY_DATE_COLUMN_FORMAT" in src
-    assert 'format="YYYY-MM-DD"' not in src
-    assert "st.column_config.DateColumn" in src
+    assert "st.column_config.TextColumn" in src
+    assert "st.column_config.DateColumn" not in src
+    assert "Ví dụ: 10/09/2026" in src
+    frame = pg._positions_to_editor_frame(
+        [
+            {"symbol": "PVD", "entry_price": None, "entry_date": "2026-09-10"},
+            {"symbol": "SSI", "entry_price": None, "entry_date": None},
+        ]
+    )
+    assert list(frame["Ngày mua"]) == ["10/09/2026", ""]
     assert pg.format_entry_date_display("2026-09-10") == "10/09/2026"
+    assert pg.format_entry_date_display(None) == ""
     assert pg.format_entry_date_display(date(2026, 10, 9)) == "09/10/2026"
 
 
@@ -269,6 +279,99 @@ def test_iso_json_storage_remains_yyyy_mm_dd():
     assert '"entry_date": "2026-09-10"' in text
     assert "10/09/2026" not in text
     assert "09/10/2026" not in text
+
+
+def test_strict_dd_mm_yyyy_parser_and_iso_roundtrip():
+    pg = _import_position_guardian()
+    assert pg.parse_editor_entry_date("10/09/2026") == ("2026-09-10", False)
+    assert pg.parse_editor_entry_date("01/02/2026") == ("2026-02-01", False)
+    assert pg.parse_editor_entry_date("") == (None, False)
+    assert pg.parse_editor_entry_date(None) == (None, False)
+    assert pg.parse_editor_entry_date("9/10/2026") == (None, True)
+    assert pg.parse_editor_entry_date("2026-09-10") == (None, True)
+    assert pg.parse_editor_entry_date("09-10-2026") == (None, True)
+    assert pg.parse_editor_entry_date("10.09.2026") == (None, True)
+    assert pg.parse_editor_entry_date("09/31/2026") == (None, True)
+    assert pg.parse_editor_entry_date("abc") == (None, True)
+    assert pg.parse_editor_entry_date("01/02/2026")[0] != "2026-01-02"
+
+
+def test_invalid_editor_date_blocks_entire_save(tmp_path, monkeypatch):
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_JSON", str(tmp_path / "positions.json"))
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_FILE", str(tmp_path / "holdings.txt"))
+    pg = _import_position_guardian()
+    writes = []
+    frame = pd.DataFrame(
+        [
+            {"Mã": "SSI", "Giá vốn": 24.5, "Ngày mua": "01/09/2026"},
+            {"Mã": "PVD", "Giá vốn": None, "Ngày mua": "9/10/2026"},
+        ]
+    )
+    incoming, parse_errors = pg.parse_editor_frame(frame)
+    saved, changed, status, errors = pg.commit_editor_positions(
+        incoming,
+        [{"symbol": "SSI", "entry_price": None, "entry_date": None}],
+        today=date(2026, 9, 14),
+        github_writer=lambda text: writes.append(text) or "LOCAL_ONLY",
+        parse_errors=parse_errors,
+    )
+    assert changed is False
+    assert status == "INVALID_DATE"
+    assert errors == [
+        "Ngày mua của PVD không hợp lệ. Vui lòng nhập theo DD/MM/YYYY, ví dụ 10/09/2026."
+    ]
+    assert writes == []
+    assert not (tmp_path / "positions.json").exists()
+    iso_input = pd.DataFrame(
+        [{"Mã": "PVD", "Giá vốn": None, "Ngày mua": "2026-09-10"}]
+    )
+    _, iso_errors = pg.parse_editor_frame(iso_input)
+    assert iso_errors
+
+
+def test_valid_dd_mm_save_persists_iso_and_rejects_future(tmp_path, monkeypatch):
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_JSON", str(tmp_path / "positions.json"))
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_FILE", str(tmp_path / "holdings.txt"))
+    pg = _import_position_guardian()
+    writes = []
+    frame = pd.DataFrame(
+        [{"Mã": "PVD", "Giá vốn": None, "Ngày mua": "10/09/2026"}]
+    )
+    incoming, parse_errors = pg.parse_editor_frame(frame)
+    assert parse_errors == []
+    assert incoming == [{"symbol": "PVD", "entry_price": None, "entry_date": "2026-09-10"}]
+    saved, changed, status, errors = pg.commit_editor_positions(
+        incoming,
+        [],
+        today=date(2026, 9, 14),
+        github_writer=lambda text: writes.append(text) or "LOCAL_ONLY",
+        parse_errors=parse_errors,
+    )
+    assert errors == []
+    assert changed is True
+    assert saved[0]["entry_date"] == "2026-09-10"
+    assert '"entry_date": "2026-09-10"' in writes[0]
+    assert "10/09/2026" not in writes[0]
+
+    writes.clear()
+    future_frame = pd.DataFrame(
+        [{"Mã": "PVD", "Giá vốn": None, "Ngày mua": "09/10/2026"}]
+    )
+    incoming, parse_errors = pg.parse_editor_frame(future_frame)
+    assert incoming[0]["entry_date"] == "2026-10-09"
+    saved, changed, status, errors = pg.commit_editor_positions(
+        incoming,
+        [],
+        today=date(2026, 9, 14),
+        github_writer=lambda text: writes.append(text) or "LOCAL_ONLY",
+        parse_errors=parse_errors,
+    )
+    assert changed is False
+    assert status == "FUTURE_DATE"
+    assert errors == [
+        "Ngày mua của PVD (09/10/2026) nằm trong tương lai. Vui lòng kiểm tra lại."
+    ]
+    assert writes == []
 
 
 def test_today_accepted_future_rejected_null_allowed():
