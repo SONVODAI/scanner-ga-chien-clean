@@ -18,5 +18,6 @@ data/rotation_watch/status.json
 data/rotation_watch/cache/
 
 # User-owned holdings local cache (durable copy lives on GitHub when token exists)
+data/user_holdings/positions.json
 data/user_holdings/portfolio_symbols.txt
 portfolio_symbols.txt
