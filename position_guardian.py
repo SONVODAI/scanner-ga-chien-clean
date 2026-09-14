@@ -38,6 +38,7 @@ PORTFOLIO_FILE = "portfolio_symbols.txt"
 HOLDINGS_WIDGET_KEY = "position_guardian_watchlist"
 HOLDINGS_EDITOR_SHOWN_KEY = "_user_holdings_editor_shown"
 HOLDINGS_EDITOR_KEY = "user_holdings_ledger_editor"
+ENTRY_DATE_COLUMN_FORMAT = "DD/MM/YYYY"
 MISSING = "—"
 
 
@@ -157,9 +158,84 @@ def _editor_frame_to_positions(frame):
     return normalize_positions(rows)
 
 
+def format_entry_date_display(value):
+    """User-facing DD/MM/YYYY. Durable storage stays ISO YYYY-MM-DD."""
+    from datetime import date as _date
+    from datetime import datetime as _datetime
+
+    if value is None or value == "":
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, _date) and not isinstance(value, _datetime):
+        day = value
+    else:
+        try:
+            day = _date.fromisoformat(str(value)[:10])
+        except ValueError:
+            return None
+    return day.strftime("%d/%m/%Y")
+
+
+def future_entry_date_messages(positions, today=None):
+    """Reject entry_date after Vietnam today. Null dates are allowed."""
+    from datetime import date as _date
+    from datetime import datetime as _datetime
+
+    as_of = today or _vn_today()
+    messages = []
+    for item in positions or []:
+        raw = item.get("entry_date")
+        if raw is None or raw == "":
+            continue
+        try:
+            if pd.isna(raw):
+                continue
+        except (TypeError, ValueError):
+            pass
+        try:
+            if isinstance(raw, _date) and not isinstance(raw, _datetime):
+                day = raw
+            else:
+                day = _date.fromisoformat(str(raw)[:10])
+        except ValueError:
+            continue
+        if day > as_of:
+            symbol = item.get("symbol") or ""
+            shown = format_entry_date_display(day)
+            messages.append(
+                f"Ngày mua của {symbol} ({shown}) nằm trong tương lai. Vui lòng kiểm tra lại."
+            )
+    return messages
+
+
+def commit_editor_positions(
+    incoming,
+    durable,
+    *,
+    today=None,
+    github_writer=None,
+):
+    """Validate then persist. Future dates block the whole save."""
+    from modules.user_holdings import persist_positions_if_changed
+
+    errors = future_entry_date_messages(incoming, today=today)
+    if errors:
+        return durable, False, "FUTURE_DATE", errors
+    saved, changed, status = persist_positions_if_changed(
+        incoming,
+        durable,
+        github_writer=github_writer,
+    )
+    return saved, changed, status, []
+
+
 def render_holdings_editor():
     """Editable user ledger. Persist only on explicit Save when canonical JSON differs."""
-    from modules.user_holdings import load_positions, persist_positions_if_changed
+    from modules.user_holdings import load_positions
 
     st.markdown("---")
     st.subheader("📦 Cổ phiếu đang nắm giữ")
@@ -186,8 +262,9 @@ def render_holdings_editor():
             ),
             "Ngày mua": st.column_config.DateColumn(
                 "Ngày mua",
-                help="Ngày mua. Để trống nếu chưa nhập.",
-                format="YYYY-MM-DD",
+                help="Ngày mua theo DD/MM/YYYY. Để trống nếu chưa nhập.",
+                format=ENTRY_DATE_COLUMN_FORMAT,
+                max_value=_vn_today(),
             ),
         },
         key=HOLDINGS_EDITOR_KEY,
@@ -195,12 +272,17 @@ def render_holdings_editor():
     save = st.button("Lưu danh sách nắm giữ", type="primary")
     if save:
         incoming = _editor_frame_to_positions(edited)
-        _, changed, status = persist_positions_if_changed(incoming, durable)
-        if changed:
+        durable, changed, status, errors = commit_editor_positions(
+            incoming,
+            durable,
+        )
+        if errors:
+            for message in errors:
+                st.error(message)
+        elif changed:
             st.success("Đã lưu sổ vị thế." + (f" ({status})" if status else ""))
         else:
             st.info("Không có thay đổi để lưu.")
-        durable = load_positions()
     st.session_state[HOLDINGS_EDITOR_SHOWN_KEY] = True
     return durable
 
