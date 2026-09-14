@@ -73,6 +73,7 @@ def test_install_script_does_not_touch_camera_edge_or_watchlist():
     assert "ROTATION_LOOP_CONFIRM=YES" in text
     assert "mrbot-rotation-watch.service" in text
     assert "watchlist.csv" not in text
+    assert "data/rotation_watch/watchlist" not in text
     assert "Never run from a Cloud Agent" in text
     for banned in FORBIDDEN_TOUCH:
         assert banned not in text, banned

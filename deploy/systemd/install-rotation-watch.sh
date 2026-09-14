@@ -4,7 +4,7 @@
 # Run on host mrbot-camera as root. Never run from a Cloud Agent.
 # Does not pull / reset /opt/mrbot-camera.
 # Does not restart Camera timers, Edge artifacts, or Candidate services.
-# Does not rewrite watchlist.csv, engine, UI, or trading rules.
+# Does not rewrite the human watchlist, engine, UI, or trading rules.
 #
 #   bash deploy/systemd/install-rotation-watch.sh            # plan + copy + unit
 #   ROTATION_LOOP_CONFIRM=YES bash deploy/systemd/install-rotation-watch.sh
