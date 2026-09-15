@@ -26,7 +26,6 @@ from final_decision_engine import (
     style_final_decision,
 )
 from position_guardian import (
-    HOLDINGS_EDITOR_SHOWN_KEY,
     render_guardian,
     render_holdings_editor,
 )
@@ -125,11 +124,7 @@ try:
 except Exception:
     pass
 
-# Current holdings — user-owned, not a market artifact. Editor only; table still uses scan_df later.
-try:
-    render_holdings_editor()
-except Exception:
-    pass
+# Portfolio / Guardian is rendered once after scan_df is ready (before Market First).
 
 # =========================================================
 # WATCHLIST
@@ -6227,12 +6222,25 @@ with st.spinner("Đang quét realtime unified..."):
 
 if scan_df.empty:
     st.error("Không lấy được dữ liệu. Anh kiểm tra mạng, vnstock hoặc requirements.txt.")
+    try:
+        render_holdings_editor()
+    except Exception:
+        pass
     st.stop()
 
 # =========================================================
 # EVOLUTION HEALTH V1.0 - TÍNH TRÊN CHÍNH scan_df
 # =========================================================
 scan_df = add_evolution_health(scan_df)
+
+# =========================================================
+# PORTFOLIO / POSITION GUARDIAN — one high-priority area, same ledger
+# Editor + Guardian table share modules.user_holdings. Failure must not stop Market First.
+# =========================================================
+try:
+    render_guardian(scan_df, include_editor=True)
+except Exception:
+    pass
 
 # =========================================================
 # MARKET FIRST
@@ -6769,12 +6777,6 @@ try:
     render_shadow_observation_board(expanded=False)
 except Exception as _shadow_board_error:
     st.caption(f"BOT Shadow board skipped: {_shadow_board_error}")
-
-st.markdown("---")
-render_guardian(
-    scan_df,
-    include_editor=not st.session_state.get(HOLDINGS_EDITOR_SHOWN_KEY, False),
-)
 
 st.markdown("---")
 try:

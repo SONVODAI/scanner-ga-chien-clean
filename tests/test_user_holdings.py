@@ -108,15 +108,18 @@ def test_empty_github_miss_falls_back_to_local(tmp_path, monkeypatch):
     assert load_holdings_text(github_reader=lambda: None) == "NLG"
 
 
-def test_holdings_editor_is_immediately_below_rotation_watch():
+def test_combined_portfolio_is_after_scan_before_market_first():
     app = (REPO / "app.py").read_text(encoding="utf-8")
     rot = app.index("render_rotation_watch_panel()")
-    hold = app.index("render_holdings_editor()")
-    scan = app.index("run_scan(WATCHLIST)")
+    scan = app.index("scan_df = run_scan(WATCHLIST)")
     table = app.index("render_guardian(")
-    assert rot < hold < scan
-    assert hold < table
-    assert "include_editor=not st.session_state.get(HOLDINGS_EDITOR_SHOWN_KEY" in app
+    market = app.index("# MARKET FIRST", table)
+    assert rot < scan < table < market
+    assert app.count("render_guardian(") == 1
+    assert "include_editor=True" in app[table : table + 80]
+    assert "HOLDINGS_EDITOR_SHOWN_KEY" not in app
+    # Empty-scan fallback may still call the editor; the live path is one Guardian block.
+    assert "render_holdings_editor()" in app[scan:table]
 
 
 def test_editor_saves_only_on_change_and_does_not_bind_value():

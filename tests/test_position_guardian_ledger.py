@@ -204,9 +204,100 @@ def test_pnl_and_holding_days_formulas():
     assert pnl_pct(None, 24.5) is None
     assert pnl_pct(26.95, None) is None
     assert pnl_pct(26.95, 0) is None
+    # 2026-09-15 production units: integer VND, not thousands.
+    assert pnl_pct(19100, 18800) == pytest.approx(1.5957446808510638)
+    assert pnl_pct(70300, 72500) == pytest.approx(-3.0344827586206895)
     assert holding_days("2026-09-01", today=date(2026, 9, 14)) == 13
     assert holding_days(None, today=date(2026, 9, 14)) is None
     assert holding_days("", today=date(2026, 9, 14)) is None
+
+
+def test_pvd_mwg_unit_normalized_pnl_display():
+    pg = _import_position_guardian()
+    from modules.user_holdings import pnl_pct
+
+    assert pg.fmt_pnl(pnl_pct(19100, 18800)) == "1.60%"
+    assert pg.fmt_pnl(pnl_pct(70300, 72500)) == "-3.03%"
+    table = pg.build_position_table(
+        pd.DataFrame(
+            [
+                {
+                    "symbol": "PVD",
+                    "price": 19100,
+                    "ema9": 19000,
+                    "ma20": 18500,
+                    "obv": 1,
+                    "obv_ema9": 1,
+                },
+                {
+                    "symbol": "MWG",
+                    "price": 70300,
+                    "ema9": 70000,
+                    "ma20": 71000,
+                    "obv": 800,
+                    "obv_ema9": 900,
+                },
+            ]
+        ),
+        [
+            {"symbol": "PVD", "entry_price": 18800.0, "entry_date": "2026-09-08"},
+            {"symbol": "MWG", "entry_price": 72500.0, "entry_date": "2026-09-08"},
+        ],
+        today=date(2026, 9, 15),
+    )
+    assert list(table["Mã"]) == ["PVD", "MWG"]
+    assert table.iloc[0]["Giá vốn"] == "18,800.00"
+    assert table.iloc[0]["Giá hiện tại"] == "19,100.00"
+    assert table.iloc[0]["P/L %"] == "1.60%"
+    assert table.iloc[0]["Số ngày giữ"] == "7"
+    assert table.iloc[1]["Giá vốn"] == "72,500.00"
+    assert table.iloc[1]["Giá hiện tại"] == "70,300.00"
+    assert table.iloc[1]["P/L %"] == "-3.03%"
+    assert table.iloc[1]["Trạng thái"] == pg.SIGNAL_SELL
+    assert table.iloc[1]["Lý do"] == "EMA9 dưới MA20 + OBV xác nhận"
+
+
+def test_empty_portfolio_renders_safely(tmp_path, monkeypatch):
+    from modules.user_holdings import save_positions
+
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_JSON", str(tmp_path / "positions.json"))
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_FILE", str(tmp_path / "holdings.txt"))
+    monkeypatch.setattr("modules.user_holdings.LEGACY_LOCAL_PATH", tmp_path / "legacy.txt")
+    save_positions([], github_writer=lambda _t: "LOCAL_ONLY")
+    pg = _import_position_guardian()
+    infos = []
+    import streamlit as st
+
+    st.info = lambda *a, **_k: infos.append(a[0] if a else "")
+    pg.render_guardian(pd.DataFrame(), include_editor=False)
+    assert infos == ["Chưa có cổ phiếu đang nắm giữ."]
+
+
+def test_guardian_table_failure_does_not_raise(tmp_path, monkeypatch):
+    from modules.user_holdings import save_positions
+
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_JSON", str(tmp_path / "positions.json"))
+    monkeypatch.setenv("MRBOT_USER_HOLDINGS_FILE", str(tmp_path / "holdings.txt"))
+    monkeypatch.setattr("modules.user_holdings.LEGACY_LOCAL_PATH", tmp_path / "legacy.txt")
+    save_positions(
+        [{"symbol": "PVD", "entry_price": 18800.0, "entry_date": "2026-09-08"}],
+        github_writer=lambda _t: "LOCAL_ONLY",
+    )
+    pg = _import_position_guardian()
+    captions = []
+    import streamlit as st
+
+    st.caption = lambda *a, **_k: captions.append(a[0] if a else "")
+    monkeypatch.setattr(
+        pg,
+        "build_position_table",
+        lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("table boom")),
+    )
+    pg.render_guardian(
+        pd.DataFrame([{"symbol": "PVD", "price": 19100, "ema9": 1, "ma20": 1, "obv": 1, "obv_ema9": 1}]),
+        include_editor=False,
+    )
+    assert any("Guardian table skipped" in str(c) for c in captions)
 
 
 def test_unmatched_row_color_is_not_hold_green():
@@ -241,13 +332,17 @@ def test_editor_does_not_fetch_market_or_run_scan():
 def test_guardian_table_stays_after_scan_and_editor_below_rotation():
     app = (REPO / "app.py").read_text(encoding="utf-8")
     rot = app.index("render_rotation_watch_panel()")
-    hold = app.index("render_holdings_editor()")
-    scan = app.index("run_scan(WATCHLIST)")
-    table = app.rindex("render_guardian(")
-    assert rot < hold < scan < table
-    between = app[rot:hold]
-    assert "run_scan" not in between
-    assert "render_guardian" not in between
+    scan = app.index("scan_df = run_scan(WATCHLIST)")
+    table = app.index("render_guardian(")
+    market = app.index("# MARKET FIRST", table)
+    learning = app.rindex("render_bot_learning_insight()")
+    assert rot < scan < table < market < learning
+    assert app.count("render_guardian(") == 1
+    between_rot_scan = app[rot:scan]
+    assert "render_guardian" not in between_rot_scan
+    assert "render_holdings_editor()" not in between_rot_scan
+    after_market = app[market:]
+    assert "render_guardian(" not in after_market
 
 
 def test_date_column_uses_dd_mm_yyyy_user_format():
