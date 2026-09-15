@@ -288,7 +288,9 @@ def render_holdings_editor():
         "Sổ vị thế do bạn nhập thủ công · Mã / Giá vốn / Ngày mua · "
         "Ngày mua: DD/MM/YYYY, ví dụ 10/09/2026 · "
         "giữ nguyên qua ngày mới · chỉ lưu khi bạn bấm Lưu · "
-        "không bị Rotation / BOT / Learning tự thêm hoặc xóa"
+        "không bị Rotation / BOT / Learning tự thêm hoặc xóa. "
+        "Bảng Guardian ngay dưới dùng cùng sổ này — GIỮ / CẢNH BÁO / BÁN "
+        "là hỗ trợ kỹ thuật, không phải lệnh bán bắt buộc."
     )
 
     durable = load_positions()
@@ -658,28 +660,24 @@ def render_guardian(scan_df, include_editor: bool = True):
         st.info("Chưa có cổ phiếu đang nắm giữ.")
         return
 
-    result = build_position_table(scan_df, positions)
-
-    render_summary(result)
-
-    st.dataframe(
-
-        result.style.apply(
-            row_color,
-            axis=1,
-        ),
-
-        use_container_width=True,
-
-        hide_index=True,
-
-    )
-
-    st.caption(
-
-        "🟢 Giữ  |  🟡 Giá dưới EMA9  |  🔴 EMA9 dưới MA20  |  — chưa có dữ liệu quét"
-
-    )
+    try:
+        result = build_position_table(scan_df, positions)
+        render_summary(result)
+        st.dataframe(
+            result.style.apply(
+                row_color,
+                axis=1,
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.caption(
+            "🟢 Giữ  |  🟡 Giá dưới EMA9  |  🔴 EMA9 dưới MA20  |  — chưa có dữ liệu quét. "
+            "Trạng thái Guardian là bằng chứng kỹ thuật hỗ trợ quyết định, "
+            "không phải lệnh mua/bán tự động hay thanh lý bắt buộc."
+        )
+    except Exception:
+        st.caption("Guardian table skipped; sổ vị thế phía trên vẫn giữ nguyên.")
 
 
 
