@@ -1,0 +1,43 @@
+setup,source,N,testable_for_intraday_pxv,testable_for_setup_baseline
+CP MẠNH,t0_freeze EOD group (quarantine),41,NOT TESTABLE — no canonical 5m Camera,YES
+PULL ĐẸP,t0_freeze EOD group (quarantine),5,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL VỪA,t0_freeze EOD group (quarantine),202,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,t0_freeze EOD group (quarantine),856,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,t0_freeze EOD group (quarantine),19,NOT TESTABLE — no canonical 5m Camera,WEAK
+TÍCH LŨY,t0_freeze EOD group (quarantine),322,NOT TESTABLE — no canonical 5m Camera,YES
+CP MẠNH,pattern_history ALL rows (not a valid unit),1902,NOT TESTABLE — no canonical 5m Camera,YES
+PULL ĐẸP,pattern_history ALL rows (not a valid unit),82,NOT TESTABLE — no canonical 5m Camera,YES
+PULL VỪA,pattern_history ALL rows (not a valid unit),3452,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,pattern_history ALL rows (not a valid unit),30180,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,pattern_history ALL rows (not a valid unit),0,NOT TESTABLE — no canonical 5m Camera,NO
+TÍCH LŨY,pattern_history ALL rows (not a valid unit),0,NOT TESTABLE — no canonical 5m Camera,NO
+CP MẠNH,pattern_history FIRST snapshot/day (quarantine as-of),118,NOT TESTABLE — no canonical 5m Camera,YES
+PULL ĐẸP,pattern_history FIRST snapshot/day (quarantine as-of),21,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL VỪA,pattern_history FIRST snapshot/day (quarantine as-of),359,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,pattern_history FIRST snapshot/day (quarantine as-of),2548,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,pattern_history FIRST snapshot/day (quarantine as-of),0,NOT TESTABLE — no canonical 5m Camera,NO
+TÍCH LŨY,pattern_history FIRST snapshot/day (quarantine as-of),0,NOT TESTABLE — no canonical 5m Camera,NO
+CP MẠNH,pattern_history LAST snapshot/day (UNSAFE as-of),126,NOT TESTABLE — no canonical 5m Camera,YES
+PULL ĐẸP,pattern_history LAST snapshot/day (UNSAFE as-of),22,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL VỪA,pattern_history LAST snapshot/day (UNSAFE as-of),369,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,pattern_history LAST snapshot/day (UNSAFE as-of),2529,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,pattern_history LAST snapshot/day (UNSAFE as-of),0,NOT TESTABLE — no canonical 5m Camera,NO
+TÍCH LŨY,pattern_history LAST snapshot/day (UNSAFE as-of),0,NOT TESTABLE — no canonical 5m Camera,NO
+CP MẠNH,group_evolution ALL rows,177,NOT TESTABLE — no canonical 5m Camera,YES
+PULL ĐẸP,group_evolution ALL rows,22,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL VỪA,group_evolution ALL rows,623,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,group_evolution ALL rows,3151,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,group_evolution ALL rows,81,NOT TESTABLE — no canonical 5m Camera,YES
+TÍCH LŨY,group_evolution ALL rows,1288,NOT TESTABLE — no canonical 5m Camera,YES
+CP MẠNH,elite history ALL conclusions,38,NOT TESTABLE — no canonical 5m Camera,YES
+PULL ĐẸP,elite history ALL conclusions,17,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL VỪA,elite history ALL conclusions,451,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,elite history ALL conclusions,464,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,elite history ALL conclusions,4,NOT TESTABLE — no canonical 5m Camera,WEAK
+TÍCH LŨY,elite history ALL conclusions,0,NOT TESTABLE — no canonical 5m Camera,NO
+CP MẠNH,elite BUY ELITE + MUA NHỎ last-wins subset,17,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL ĐẸP,elite BUY ELITE + MUA NHỎ last-wins subset,9,NOT TESTABLE — no canonical 5m Camera,WEAK
+PULL VỪA,elite BUY ELITE + MUA NHỎ last-wins subset,251,NOT TESTABLE — no canonical 5m Camera,YES
+MUA EARLY,elite BUY ELITE + MUA NHỎ last-wins subset,128,NOT TESTABLE — no canonical 5m Camera,YES
+MUA BREAK,elite BUY ELITE + MUA NHỎ last-wins subset,0,NOT TESTABLE — no canonical 5m Camera,NO
+TÍCH LŨY,elite BUY ELITE + MUA NHỎ last-wins subset,0,NOT TESTABLE — no canonical 5m Camera,NO
