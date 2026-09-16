@@ -6554,6 +6554,22 @@ buy_elite_df = build_buy_elite_decision_engine(
     pattern_match_df=pattern_match_df,
     leader_memory_df=leader_memory_df,
 )
+try:
+    _v2_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
+    if _v2_gate in ("1", "true", "yes", "on"):
+        from modules.live_candidate_v2_camera.cloud_hook import run_v2_cloud_sidecar
+
+        _v2_sidecar = run_v2_cloud_sidecar(
+            scan_rows=scan_df.to_dict("records"),
+            market_real=market_real,
+            observed_at=vn_now(),
+            buy_elite_df=buy_elite_df,
+            early_buy_lab_df=early_buy_lab_df,
+        )
+        if not _v2_sidecar.ok and not _v2_sidecar.skipped:
+            st.warning(f"V2 Camera sidecar: {_v2_sidecar.error or _v2_sidecar.reason}")
+except Exception as e:
+    st.warning(f"V2 Camera sidecar: {type(e).__name__}: {e}")
 final_df, final_note = build_final_decision(
     buy_elite_df,
     green_red_df,

@@ -5,7 +5,15 @@ Does not change production ENABLED_SOURCES.
 Does not start the live runner.
 """
 
-from modules.live_candidate_v2_camera.contract import SCHEMA_ID, SHADOW_V2_ENABLED_SOURCES
+from modules.live_candidate_v2_camera.cloud_hook import (
+    run_v2_cloud_sidecar,
+    v2_cloud_sidecar_enabled,
+)
+from modules.live_candidate_v2_camera.contract import (
+    ENV_V2_CLOUD_SIDECAR,
+    SCHEMA_ID,
+    SHADOW_V2_ENABLED_SOURCES,
+)
 from modules.live_candidate_v2_camera.feed_pass import is_v2_camera_row, v2_event_reason
 from modules.live_candidate_v2_camera.observe import observe_close_vs_ref, pxv_implies_buy
 from modules.live_candidate_v2_camera.sidecar import (
@@ -19,6 +27,7 @@ from modules.live_candidate_v2_nomination.contract import SRC_BRAIN_A
 
 __all__ = [
     "DEFAULT_SIDECAR_PATH",
+    "ENV_V2_CLOUD_SIDECAR",
     "SCHEMA_ID",
     "SHADOW_V2_ENABLED_SOURCES",
     "SRC_BRAIN_A",
@@ -27,7 +36,9 @@ __all__ = [
     "is_v2_camera_row",
     "observe_close_vs_ref",
     "pxv_implies_buy",
+    "run_v2_cloud_sidecar",
     "shadow_route_v2",
+    "v2_cloud_sidecar_enabled",
     "v2_event_reason",
     "write_sidecar",
 ]
