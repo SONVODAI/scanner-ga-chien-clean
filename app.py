@@ -6569,6 +6569,12 @@ try:
         )
         if not _v2_sidecar.ok and not _v2_sidecar.skipped:
             st.warning(f"V2 Camera sidecar: {_v2_sidecar.error or _v2_sidecar.reason}")
+        if (
+            _v2_sidecar.ok
+            and not _v2_sidecar.skipped
+            and _v2_sidecar.reason == "WROTE"
+        ):
+            st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")
         _v2_pub_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
         if (
             _v2_sidecar.ok
