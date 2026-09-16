@@ -624,6 +624,7 @@ def test_extracted_hook_publish_exception_does_not_block_learning(monkeypatch, t
         snapshot_text = SAMPLE.read_text(encoding="utf-8")
         error = ""
         reason = "WROTE"
+        n_rows = 1
 
     dest.write_text(FakeLocal.snapshot_text, encoding="utf-8")
     before = dest.read_text(encoding="utf-8")
@@ -637,6 +638,7 @@ def test_extracted_hook_publish_exception_does_not_block_learning(monkeypatch, t
     monkeypatch.setattr(ch, "run_v2_cloud_sidecar", lambda **k: FakeLocal())
     monkeypatch.setattr(gb, "maybe_publish_v2_sidecar", boom)
     warnings: list[str] = []
+    captions: list[str] = []
     order: list[str] = []
     ns = {
         "os": os,
@@ -645,7 +647,10 @@ def test_extracted_hook_publish_exception_does_not_block_learning(monkeypatch, t
         "vn_now": lambda: datetime.now(tz=VN),
         "buy_elite_df": pd.DataFrame(),
         "early_buy_lab_df": pd.DataFrame(),
-        "st": types.SimpleNamespace(warning=lambda msg: warnings.append(str(msg))),
+        "st": types.SimpleNamespace(
+            warning=lambda msg: warnings.append(str(msg)),
+            caption=lambda msg: captions.append(str(msg)),
+        ),
     }
     order.append("elite")
     exec(compile(hook_src, "app.py", "exec"), ns, ns)
@@ -653,3 +658,4 @@ def test_extracted_hook_publish_exception_does_not_block_learning(monkeypatch, t
     assert order == ["elite", "learn"]
     assert warnings and "github boom" in warnings[0]
     assert dest.read_text(encoding="utf-8") == before
+    assert captions and captions[0].startswith("LCV2-GATE-A-WROTE rows=")
