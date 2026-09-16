@@ -21,6 +21,24 @@ Candidate publish. `freeze_ledger` is reloadable across Streamlit reruns and
 process restarts. Missing file is a first run. Corrupted file is a V2 failure,
 not a valid empty universe.
 
+## Slice 3B GitHub Contents transport (default OFF)
+
+Dedicated path: `research/live_candidate_v2_camera_sidecar/camera_sidecar.json`
+
+Gate B: `MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH`
+Truthy: `1` / `true` / `yes` / `on` (case-insensitive). Default OFF.
+Independent of Gate A. Enabling the local sidecar does **not** publish.
+Enabling publish does **not** generate nominations.
+
+Publish only a successfully written valid local document (including `rows: []`).
+Fetch/validate distinguishes OK_ROWS, OK_EMPTY, NOT_FOUND, INVALID_DOCUMENT,
+TRANSPORT_ERROR. Missing or corrupt GitHub objects are not an empty universe.
+
+Reuses `fetch_github_watchlist_text` / `publish_watchlist_bytes` with the V2
+path pinned. Production `GITHUB_WATCHLIST_PATH` and `fetch_published_watchlist()`
+are unchanged. No KBS. No runner.
+
+
 ## Flow (tests inject LiveShadowFeed; no runner)
 
 Brain A nomination → shadow Router (`enabled_sources={brain_a_scan_setup}`)
