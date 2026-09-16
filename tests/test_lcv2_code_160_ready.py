@@ -103,5 +103,5 @@ def test_code_160_ready_is_literal_caption_after_commission_before_pxv():
     assert 'os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "")' in src
     assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "")' in src
     assert 'os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in src
-    assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH"' not in src
-    assert src.count("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH") == 1
+    assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in src
+    assert 'env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate}' in src

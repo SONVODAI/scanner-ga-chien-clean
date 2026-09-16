@@ -52,6 +52,38 @@ STATUS_LOAD_FAILED = "LOAD_FAILED"
 PUBLISH_MESSAGE = "live candidate v2: publish camera sidecar snapshot"
 
 SESSION_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_PAT_RE = re.compile(r"(?i)(?:ghp_|github_pat_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9_]+")
+_AUTH_RE = re.compile(r"(?i)(?:authorization\s*[:=]\s*).+")
+_BEARER_RE = re.compile(r"(?i)bearer\s+\S+")
+_TOKEN_WORD_RE = re.compile(r"(?i)\btoken\s+\S+")
+_QUERY_RE = re.compile(r"(https?://[^\s?]+)\?[^\s]*")
+
+
+def sanitize_v2_github_message(text: object) -> str:
+    """Redact credential-shaped tokens and query strings. Never echo secrets."""
+    raw = str(text or "")
+    raw = _AUTH_RE.sub("[REDACTED]", raw)
+    raw = _BEARER_RE.sub("[REDACTED]", raw)
+    raw = _TOKEN_WORD_RE.sub("[REDACTED]", raw)
+    raw = _PAT_RE.sub("[REDACTED]", raw)
+    return _QUERY_RE.sub(r"\1", raw)
+
+
+def resolve_v2_github_token() -> str:
+    """Env first, then Streamlit secrets. Never log or return via status/UI."""
+    tok = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()
+    if tok:
+        return tok
+    try:
+        import streamlit as st
+
+        tok = str(
+            st.secrets.get("GITHUB_TOKEN", "") or st.secrets.get("GH_TOKEN", "") or ""
+        ).strip()
+    except Exception:
+        tok = ""
+    return tok
+
 
 # Identity / chronology keys already emitted by Slice 1/2/3A sidecar rows.
 # Transport checks presence/types only. Does not reinterpret nomination semantics.
@@ -269,9 +301,9 @@ def load_local_v2_sidecar_text(path: Path) -> tuple[str, dict[str, Any]]:
 
 
 def v2_github_contents_writer(path: str, text: str, message: str) -> str:
-    """GitHub Contents PUT for the pinned V2 path. Same token env as watchlist fetch."""
+    """GitHub Contents PUT for the pinned V2 path. Env then Streamlit secrets token."""
     dest = assert_v2_github_path(path)
-    tok = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()
+    tok = resolve_v2_github_token()
     if not tok:
         return "LOCAL_ONLY"
     own = (os.environ.get("GITHUB_REPO_OWNER") or DEFAULT_OWNER).strip()
@@ -375,7 +407,7 @@ def publish_v2_sidecar_text(
         status=STATUS_TRANSPORT_ERROR,
         path=dest,
         bytes_len=nbytes,
-        error=bus.detail or bus.status,
+        error=sanitize_v2_github_message(bus.detail or bus.status),
     )
 
 
@@ -442,6 +474,8 @@ def fetch_v2_sidecar(
     """Fetch + validate the V2 sidecar. Never treats 404/corrupt as empty universe."""
     dest = assert_v2_github_path(GITHUB_V2_SIDECAR_PATH)
     getter = text_fetcher or fetch_github_watchlist_text
+    if token is None and text_fetcher is None:
+        token = resolve_v2_github_token() or None
     try:
         text = getter(
             token=token,
@@ -452,9 +486,17 @@ def fetch_v2_sidecar(
         )
     except WatchlistTransportError as exc:
         status = _fetch_status_from_transport_error(exc)
-        return V2FetchResult(ok=False, status=status, error=str(exc))
+        return V2FetchResult(
+            ok=False,
+            status=status,
+            error=sanitize_v2_github_message(str(exc)),
+        )
     except Exception as exc:  # noqa: BLE001 — never invent Candidate state
-        return V2FetchResult(ok=False, status=STATUS_TRANSPORT_ERROR, error=str(exc))
+        return V2FetchResult(
+            ok=False,
+            status=STATUS_TRANSPORT_ERROR,
+            error=sanitize_v2_github_message(str(exc)),
+        )
     try:
         doc = json.loads(text)
     except json.JSONDecodeError as exc:
