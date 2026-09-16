@@ -8,6 +8,10 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import os
+import subprocess
+import sys
+import types
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -25,6 +29,7 @@ from modules.live_candidate_v2_camera.cloud_hook import (
 )
 from modules.live_candidate_v2_camera.contract import (
     ENV_V2_CLOUD_SIDECAR,
+    ENV_V2_CLOUD_SIDECAR_TRUTHY,
     SCHEMA_ID,
 )
 from modules.live_candidate_v2_camera.sidecar import (
@@ -314,8 +319,22 @@ def test_valid_empty_universe_writes_rows_empty_and_keeps_ledger(tmp_path):
     assert dest.exists()
 
 
+def _app_source() -> str:
+    return (REPO / "app.py").read_text(encoding="utf-8")
+
+
+def _v2_hook_try_node(src: str | None = None) -> ast.Try:
+    tree = ast.parse(src or _app_source())
+    for node in tree.body:
+        if isinstance(node, ast.Try):
+            blob = ast.dump(node)
+            if "cloud_hook" in blob or "run_v2_cloud_sidecar" in blob:
+                return node
+    raise AssertionError("V2 sidecar Try block not found in app.py")
+
+
 def test_app_hook_location_and_isolation():
-    app = (REPO / "app.py").read_text(encoding="utf-8")
+    app = _app_source()
     elite = app.index("buy_elite_df = build_buy_elite_decision_engine(")
     hook = app.index("_v2_sidecar = run_v2_cloud_sidecar(")
     learn = app.index("= run_buy_elite_learning_cycle(")
@@ -344,3 +363,280 @@ def test_app_hook_location_and_isolation():
     interpret = (REPO / "modules" / "intraday_pxv_v1" / "interpret.py").read_text(encoding="utf-8")
     assert "live_candidate_v2_camera.cloud_hook" not in interpret
     assert ENV_V2_CLOUD_SIDECAR == "MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR"
+
+
+def test_gate_off_missing_sidecar_is_irrelevant(tmp_path, monkeypatch):
+    monkeypatch.delenv(ENV_V2_CLOUD_SIDECAR, raising=False)
+    dest = tmp_path / "missing" / "camera_sidecar.json"
+    assert not dest.exists()
+    result = run_v2_cloud_sidecar(
+        scan_rows=[_scan("HPG", "PULL ĐẸP")],
+        market_real=7.2,
+        observed_at=_ts("2026-08-14 10:05:00"),
+        path=dest,
+        env={},
+    )
+    assert result.ok is True
+    assert result.skipped is True
+    assert result.reason == REASON_GATE_OFF
+    assert not dest.exists()
+    assert not dest.parent.exists()
+
+
+def test_gate_off_corrupted_sidecar_is_irrelevant(tmp_path, monkeypatch):
+    monkeypatch.delenv(ENV_V2_CLOUD_SIDECAR, raising=False)
+    dest = tmp_path / "camera_sidecar.json"
+    dest.write_text("{not-json", encoding="utf-8")
+    before = dest.read_text(encoding="utf-8")
+    result = run_v2_cloud_sidecar(
+        scan_rows=[_scan("HPG", "PULL ĐẸP")],
+        market_real=7.2,
+        observed_at=_ts("2026-08-14 10:05:00"),
+        path=dest,
+        env={},
+    )
+    assert result.ok is True
+    assert result.skipped is True
+    assert result.reason == REASON_GATE_OFF
+    assert dest.read_text(encoding="utf-8") == before
+
+
+def test_gate_off_run_does_not_load_write_or_nominate(monkeypatch, tmp_path):
+    monkeypatch.delenv(ENV_V2_CLOUD_SIDECAR, raising=False)
+    import modules.live_candidate_v2_camera.cloud_hook as ch
+
+    def boom(name):
+        def _inner(*args, **kwargs):
+            raise AssertionError(f"{name} must not run when gate OFF")
+
+        return _inner
+
+    monkeypatch.setattr(ch, "load_sidecar_document", boom("load_sidecar_document"))
+    monkeypatch.setattr(ch, "write_sidecar", boom("write_sidecar"))
+    monkeypatch.setattr(ch, "build_sidecar_from_scan", boom("build_sidecar_from_scan"))
+    result = run_v2_cloud_sidecar(
+        scan_rows=[_scan("HPG", "PULL ĐẸP")],
+        market_real=7.2,
+        observed_at=_ts("2026-08-14 10:05:00"),
+        path=tmp_path / "camera_sidecar.json",
+        env={},
+    )
+    assert result.reason == REASON_GATE_OFF
+    assert not (tmp_path / "camera_sidecar.json").exists()
+
+
+def test_app_has_no_unconditional_v2_import():
+    src = _app_source()
+    tree = ast.parse(src)
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom):
+            assert "live_candidate_v2" not in (node.module or "")
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                assert "live_candidate_v2" not in alias.name
+
+
+def test_app_hook_gates_import_and_call_before_learning():
+    src = _app_source()
+    tree = ast.parse(src)
+    try_node = _v2_hook_try_node(src)
+    gated_if = None
+    for node in try_node.body:
+        if isinstance(node, ast.If):
+            inner = ast.dump(node)
+            if "run_v2_cloud_sidecar" in inner and "cloud_hook" in inner:
+                gated_if = node
+                break
+    assert gated_if is not None
+    if_src = ast.get_source_segment(src, gated_if) or ""
+    assert ENV_V2_CLOUD_SIDECAR in ast.get_source_segment(src, try_node)
+    assert "cloud_hook" in if_src
+    assert "run_v2_cloud_sidecar" in if_src
+    body_dump = ast.dump(ast.Module(body=list(gated_if.body), type_ignores=[]))
+    orelse_dump = ast.dump(ast.Module(body=list(gated_if.orelse), type_ignores=[]))
+    assert "cloud_hook" in body_dump
+    assert "run_v2_cloud_sidecar" in body_dump
+    assert "cloud_hook" not in orelse_dump
+    assert "run_v2_cloud_sidecar" not in orelse_dump
+    truthy = {
+        const.value
+        for node in ast.walk(gated_if.test)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    assert truthy == set(ENV_V2_CLOUD_SIDECAR_TRUTHY)
+
+    elite = None
+    learn = None
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        func = node.value.func
+        if not isinstance(func, ast.Name):
+            continue
+        if func.id == "build_buy_elite_decision_engine":
+            elite = node
+        elif func.id == "run_buy_elite_learning_cycle":
+            learn = node
+    assert elite is not None and learn is not None
+    assert elite.lineno < try_node.lineno < learn.lineno
+    for inner in ast.walk(try_node):
+        if isinstance(inner, ast.Call) and isinstance(inner.func, ast.Name):
+            assert inner.func.id != "run_buy_elite_learning_cycle"
+            assert inner.func.id != "build_buy_elite_decision_engine"
+
+
+def test_extracted_app_hook_gate_off_does_not_call_or_import_v2(monkeypatch):
+    monkeypatch.delenv(ENV_V2_CLOUD_SIDECAR, raising=False)
+    src = _app_source()
+    try_node = _v2_hook_try_node(src)
+    hook_src = ast.get_source_segment(src, try_node)
+    assert hook_src
+    script = (
+        "import os, sys, types\n"
+        "from datetime import datetime\n"
+        "from zoneinfo import ZoneInfo\n"
+        "import pandas as pd\n"
+        "os.environ.pop(%r, None)\n"
+        "before = {k for k in sys.modules if 'live_candidate_v2' in k}\n"
+        "ns = {\n"
+        "    'os': os,\n"
+        "    'scan_df': pd.DataFrame([{'symbol': 'HPG'}]),\n"
+        "    'market_real': 7.2,\n"
+        "    'vn_now': lambda: datetime.now(tz=ZoneInfo('Asia/Ho_Chi_Minh')),\n"
+        "    'buy_elite_df': pd.DataFrame(),\n"
+        "    'early_buy_lab_df': pd.DataFrame(),\n"
+        "    'st': types.SimpleNamespace(warning=lambda msg: (_ for _ in ()).throw(AssertionError(msg))),\n"
+        "}\n"
+        "hook = %r\n"
+        "exec(compile(hook, 'app.py', 'exec'), ns, ns)\n"
+        "after = {k for k in sys.modules if 'live_candidate_v2' in k}\n"
+        "assert after == before\n"
+        "assert '_v2_sidecar' not in ns\n"
+        "print('OK')\n"
+    ) % (ENV_V2_CLOUD_SIDECAR, hook_src)
+    env = {k: v for k, v in os.environ.items() if k != ENV_V2_CLOUD_SIDECAR}
+    env["PYTHONPATH"] = str(REPO) + os.pathsep + env.get("PYTHONPATH", "")
+    proc = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=str(REPO),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert "OK" in proc.stdout
+
+
+def test_extracted_app_hook_v2_exception_does_not_block_learning(monkeypatch):
+    monkeypatch.setenv(ENV_V2_CLOUD_SIDECAR, "1")
+    src = _app_source()
+    try_node = _v2_hook_try_node(src)
+    hook_src = ast.get_source_segment(src, try_node)
+    assert hook_src
+
+    def boom(**kwargs):
+        raise RuntimeError("sidecar boom")
+
+    import modules.live_candidate_v2_camera.cloud_hook as ch
+
+    monkeypatch.setattr(ch, "run_v2_cloud_sidecar", boom)
+    warnings: list[str] = []
+    order: list[str] = []
+    ns = {
+        "os": os,
+        "scan_df": pd.DataFrame([{"symbol": "HPG"}]),
+        "market_real": 7.2,
+        "vn_now": lambda: datetime.now(tz=VN),
+        "buy_elite_df": pd.DataFrame(),
+        "early_buy_lab_df": pd.DataFrame(),
+        "st": types.SimpleNamespace(warning=lambda msg: warnings.append(str(msg))),
+    }
+    order.append("elite")
+    exec(compile(hook_src, "app.py", "exec"), ns, ns)
+    order.append("learn")
+    assert order == ["elite", "learn"]
+    assert warnings and "sidecar boom" in warnings[0]
+
+
+def test_importing_cloud_hook_gate_off_causes_no_v2_io():
+    script = r"""
+import builtins
+import os
+import sys
+
+os.environ.pop("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", None)
+hits = []
+real_open = builtins.open
+
+def guarded_open(file, *args, **kwargs):
+    path = str(file).replace("\\", "/")
+    if any(n in path for n in ("camera_sidecar", "nominations.json", "dynamic_watchlist.json")):
+        hits.append(path)
+        raise AssertionError("V2 artifact I/O at import: " + path)
+    return real_open(file, *args, **kwargs)
+
+builtins.open = guarded_open
+from modules.live_candidate_v2_camera.cloud_hook import run_v2_cloud_sidecar, v2_cloud_sidecar_enabled
+assert v2_cloud_sidecar_enabled() is False
+assert hits == []
+assert "requests" not in sys.modules
+assert "vnstock" not in sys.modules
+assert "github" not in sys.modules
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from pathlib import Path
+result = run_v2_cloud_sidecar(
+    scan_rows=[{"symbol": "HPG", "group": "PULL ĐẸP", "date": "2026-08-14"}],
+    market_real=7.2,
+    observed_at=datetime(2026, 8, 14, 10, 5, tzinfo=ZoneInfo("Asia/Ho_Chi_Minh")),
+    path=Path("research/live_candidate_v2_camera_sidecar/camera_sidecar.json"),
+    env={},
+)
+assert result.skipped is True
+assert result.reason == "GATE_OFF"
+assert hits == []
+print("OK")
+"""
+    env = {k: v for k, v in os.environ.items() if k != ENV_V2_CLOUD_SIDECAR}
+    env["PYTHONPATH"] = str(REPO) + os.pathsep + env.get("PYTHONPATH", "")
+    proc = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=str(REPO),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert "OK" in proc.stdout
+
+
+def test_off_path_has_no_github_network_vps_provider_call():
+    hook_src = (REPO / "modules" / "live_candidate_v2_camera" / "cloud_hook.py").read_text(
+        encoding="utf-8"
+    )
+    sidecar_src = (REPO / "modules" / "live_candidate_v2_camera" / "sidecar.py").read_text(
+        encoding="utf-8"
+    )
+    app = _app_source()
+    try_src = ast.get_source_segment(app, _v2_hook_try_node(app)) or ""
+    for blob in (hook_src, sidecar_src, try_src):
+        assert "watchlist_bus" not in blob
+        assert "_github_write_text" not in blob
+        assert "github.com" not in blob
+        assert "requests." not in blob
+        assert "vnstock" not in blob
+        assert "run_live_camera_shadow" not in blob
+        assert "artifact_server" not in blob
+        assert "systemctl" not in blob
+        assert "/opt/mrbot-camera" not in blob
+    tree = ast.parse(hook_src)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert "requests" not in (node.module or "")
+            assert "vnstock" not in (node.module or "")
+            assert "github" not in (node.module or "")
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                assert alias.name.split(".")[0] not in {"requests", "vnstock", "github"}
