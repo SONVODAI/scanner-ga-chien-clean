@@ -6557,6 +6557,11 @@ buy_elite_df = build_buy_elite_decision_engine(
 )
 try:
     _v2_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
+    if not _v2_gate:
+        try:
+            _v2_gate = str(st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
+        except Exception:
+            _v2_gate = ""
     if _v2_gate in ("1", "true", "yes", "on"):
         from modules.live_candidate_v2_camera.cloud_hook import run_v2_cloud_sidecar
 
@@ -6566,6 +6571,7 @@ try:
             observed_at=vn_now(),
             buy_elite_df=buy_elite_df,
             early_buy_lab_df=early_buy_lab_df,
+            env={"MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR": _v2_gate},
         )
         if not _v2_sidecar.ok and not _v2_sidecar.skipped:
             st.warning(f"V2 Camera sidecar: {_v2_sidecar.error or _v2_sidecar.reason}")
