@@ -6583,21 +6583,43 @@ try:
         ):
             st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")
         _v2_pub_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
+        if not _v2_pub_gate:
+            try:
+                _v2_pub_gate = str(st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
+            except Exception:
+                _v2_pub_gate = ""
         if (
             _v2_sidecar.ok
             and not _v2_sidecar.skipped
             and _v2_pub_gate in ("1", "true", "yes", "on")
         ):
-            from modules.live_candidate_v2_camera.github_bus import maybe_publish_v2_sidecar
+            from modules.live_candidate_v2_camera.github_bus import (
+                fetch_v2_sidecar,
+                maybe_publish_v2_sidecar,
+                sanitize_v2_github_message,
+            )
 
             _v2_github = maybe_publish_v2_sidecar(
                 local_ok=_v2_sidecar.ok,
                 local_skipped=_v2_sidecar.skipped,
                 path=_v2_sidecar.path,
                 snapshot_text=_v2_sidecar.snapshot_text,
+                env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate},
             )
             if not _v2_github.ok and not _v2_github.skipped:
-                st.warning(f"V2 Camera sidecar GitHub: {_v2_github.error or _v2_github.status}")
+                st.warning(
+                    f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_github.error or _v2_github.status)}"
+                )
+            elif _v2_github.ok and not _v2_github.skipped:
+                _v2_fetched = fetch_v2_sidecar()
+                if _v2_fetched.ok:
+                    st.caption(
+                        f"LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}"
+                    )
+                else:
+                    st.warning(
+                        f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_fetched.error or _v2_fetched.status)}"
+                    )
 except Exception as e:
     st.warning(f"V2 Camera sidecar: {type(e).__name__}: {e}")
 final_df, final_note = build_final_decision(

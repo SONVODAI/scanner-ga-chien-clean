@@ -117,8 +117,8 @@ def test_gate_a_and_gate_b_lookups_unchanged():
     assert 'os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "")' in src
     assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "")' in src
     assert 'os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in src
-    assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH"' not in src
-    assert src.count("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH") == 1
+    assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in src
+    assert src.count("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH") >= 3
     tree = ast.parse(src)
     gate_try = None
     for node in tree.body:

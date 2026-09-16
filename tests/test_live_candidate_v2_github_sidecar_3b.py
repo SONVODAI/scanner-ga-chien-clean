@@ -458,7 +458,13 @@ def test_app_hook_publish_is_nested_inside_both_gates():
             break
     assert gate_b is not None
     assert "maybe_publish_v2_sidecar" in ast.dump(gate_b)
-    assert "snapshot_text" in ast.get_source_segment(app, gate_b)
+    assert "fetch_v2_sidecar" in ast.dump(gate_b)
+    seg = ast.get_source_segment(app, gate_b)
+    assert seg is not None
+    assert "snapshot_text" in seg
+    assert 'env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate}' in seg
+    assert seg.index("maybe_publish_v2_sidecar(") < seg.index("fetch_v2_sidecar()")
+    assert "LCV2-GATE-B-GITHUB" in seg
     assert "github_bus" not in ast.dump(ast.Module(body=list(gate_a.orelse), type_ignores=[]))
     init_src = (REPO / "modules" / "live_candidate_v2_camera" / "__init__.py").read_text(
         encoding="utf-8"

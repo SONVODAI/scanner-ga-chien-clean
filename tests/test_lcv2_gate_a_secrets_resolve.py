@@ -167,9 +167,11 @@ def test_hook_uses_env_then_secrets_and_passes_env_kwarg():
     pub_i = src.index("_v2_pub_gate")
     assert env_i < sec_i < call_i < pub_i
     assert 'env={"MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR": _v2_gate}' in src
-    assert "st.secrets.get" not in src[pub_i:]
-    assert 'os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in src[pub_i:]
-    assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH"' not in src
+    env_b = src.index('os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")')
+    sec_b = src.index('st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")')
+    pub_call = src.index("maybe_publish_v2_sidecar(")
+    assert call_i < env_b < sec_b < pub_call
+    assert 'env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate}' in src
 
 
 def test_env_gate_a_on_still_writes_via_passed_env():
@@ -354,5 +356,6 @@ def test_gate_b_unset_not_imported_on_secrets_wrote():
     assert "maybe_publish_v2_sidecar" not in got["ns"]
     src = _hook_src()
     pub = src[src.index("_v2_pub_gate") :]
-    assert "st.secrets" not in pub
+    assert 'os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in pub
+    assert 'st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")' in pub
     assert set(ENV_V2_CLOUD_SIDECAR_TRUTHY) == set(TRUTHY)
