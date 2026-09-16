@@ -16,7 +16,9 @@ from modules.rotation_watch.constants import (
     ACT_RISK,
     ACT_SELL_READY,
     ACT_TREND_HOLD,
+    ACT_WAIT,
     ACT_WATCH_LOWER,
+    LOC_BELOW_LOWER,
     ST_BUY_READY,
     ST_DATA_UNCERTAIN,
     ST_HOLD,
@@ -132,6 +134,45 @@ def _board(tmp_path: Path, records: list[dict], now: datetime, csv: str | None =
         state_path=tmp_path / "state.json",
         **kwargs,
     )
+
+
+def test_engine_imports_loc_below_lower():
+    """Live Top-10 NameError: price_location returned LOC_BELOW_LOWER without importing it."""
+    src = ast.parse((REPO / "modules" / "rotation_watch" / "engine.py").read_text(encoding="utf-8"))
+    imported: set[str] = set()
+    for node in ast.walk(src):
+        if isinstance(node, ast.ImportFrom) and (node.module or "").endswith("rotation_watch.constants"):
+            imported.update(alias.name for alias in node.names)
+    assert "LOC_BELOW_LOWER" in imported
+
+
+def test_below_lower_run_cycle_is_not_wrapped_as_provider_error(tmp_path):
+    """BELOW_LOWER must execute the existing WATCH/WAIT table, not fail-closed as NameError."""
+    watch = _write_watchlist(
+        tmp_path / "watchlist.csv",
+        "symbol,enabled,lower_min,lower_max,upper_min,upper_max,entry_price,entry_date,note\n"
+        "TCH,true,11.60,11.90,12.20,12.40,,,\n",
+    )
+    status = run_cycle(
+        now=_ts("10:40"),
+        watchlist_path=watch,
+        injected={"TCH": _fill_session("TCH", "10:35", price=11.50, volume=1000)},
+        board_path=tmp_path / "board.json",
+        status_path=tmp_path / "status.json",
+        state_path=tmp_path / "state.json",
+    )
+    row = build_panel(now=_ts("10:40"), artifact_path=tmp_path / "board.json")["rows"][0]
+    assert row["location"] == LOC_BELOW_LOWER
+    assert row["current_price"] is not None
+    assert row["current_price"] < 11.60
+    assert row["last_session_state"] == ST_WATCH
+    assert row["last_session_action"] == ACT_WAIT
+    assert row["suggested_action"] == ACT_WAIT
+    assert row["last_session_state"] != ST_DATA_UNCERTAIN
+    assert row["last_session_state"] != ST_BUY_READY
+    assert "NameError" not in (row.get("freshness_reason") or "")
+    assert not any("NameError" in str(s.get("error") or "") for s in status["symbols"])
+    assert all(s.get("freshness") != "PROVIDER_ERROR" for s in status["symbols"])
 
 
 def test_tch_appears_when_candidate_watchlist_empty(tmp_path, monkeypatch):
