@@ -6556,6 +6556,7 @@ buy_elite_df = build_buy_elite_decision_engine(
     pattern_match_df=pattern_match_df,
     leader_memory_df=leader_memory_df,
 )
+_v2_ui = None
 try:
     _v2_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
     if not _v2_gate:
@@ -6598,6 +6599,10 @@ try:
                 maybe_publish_v2_sidecar,
                 sanitize_v2_github_message,
             )
+            from modules.live_candidate_v2_camera.ui import (
+                v2_ui_from_failure,
+                v2_ui_from_get,
+            )
 
             _v2_github = maybe_publish_v2_sidecar(
                 local_ok=_v2_sidecar.ok,
@@ -6610,15 +6615,24 @@ try:
                 st.warning(
                     f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_github.error or _v2_github.status)}"
                 )
+                _v2_ui = v2_ui_from_failure(
+                    status=_v2_github.status,
+                    error=_v2_github.error or _v2_github.status,
+                )
             elif _v2_github.ok and not _v2_github.skipped:
                 _v2_fetched = fetch_v2_sidecar()
                 if _v2_fetched.ok:
                     st.caption(
                         f"LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}"
                     )
+                    _v2_ui = v2_ui_from_get(_v2_fetched)
                 else:
                     st.warning(
                         f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_fetched.error or _v2_fetched.status)}"
+                    )
+                    _v2_ui = v2_ui_from_failure(
+                        status=_v2_fetched.status,
+                        error=_v2_fetched.error or _v2_fetched.status,
                     )
 except Exception as e:
     st.warning(f"V2 Camera sidecar: {type(e).__name__}: {e}")
@@ -6697,6 +6711,16 @@ mr_bot_summary = build_mr_bot_pro_summary(mr_bot_profile_after)
 # =========================================================
 # DEFAULT MAIN DASHBOARD (daily view — presentation only)
 # =========================================================
+st.markdown("---")
+try:
+    from modules.live_candidate_v2_camera.ui import (
+        render_live_candidate_v2_panel,
+        unavailable_v2_ui,
+    )
+
+    render_live_candidate_v2_panel(_v2_ui if _v2_ui is not None else unavailable_v2_ui())
+except Exception:
+    st.caption("Live Candidate V2 unavailable this cycle.")
 st.markdown("---")
 with st.expander("🤖 AI Recommendation", expanded=False):
     show_ai_recommendation()
