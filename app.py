@@ -6580,6 +6580,7 @@ try:
                 local_ok=_v2_sidecar.ok,
                 local_skipped=_v2_sidecar.skipped,
                 path=_v2_sidecar.path,
+                snapshot_text=_v2_sidecar.snapshot_text,
             )
             if not _v2_github.ok and not _v2_github.skipped:
                 st.warning(f"V2 Camera sidecar GitHub: {_v2_github.error or _v2_github.status}")

@@ -7,6 +7,10 @@ from __future__ import annotations
 
 import ast
 import json
+import os
+import subprocess
+import sys
+import types
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -17,6 +21,7 @@ from modules.candidate_router.contract import ENABLED_SOURCES, SRC_BUY_ELITE, SR
 from modules.live_candidate_v2_camera.cloud_hook import (
     REASON_GATE_OFF,
     REASON_LOAD_FAILED,
+    REASON_WRITE_FAILED,
     run_v2_cloud_sidecar,
 )
 from modules.live_candidate_v2_camera.contract import (
@@ -41,9 +46,11 @@ from modules.live_candidate_v2_camera.github_bus import (
     fetch_v2_sidecar,
     maybe_publish_v2_sidecar,
     publish_v2_sidecar_file,
+    publish_v2_sidecar_text,
     v2_github_publish_enabled,
 )
 from modules.live_candidate_v2_nomination.contract import SRC_BRAIN_A
+from modules.live_candidate_v2_camera.sidecar import SidecarShadowError
 from modules.live_shadow_transport.contract import GITHUB_WATCHLIST_PATH
 from modules.live_shadow_transport.watchlist_bus import WatchlistTransportError
 
@@ -120,6 +127,7 @@ def test_gate_a_on_gate_b_off_local_only_no_github_write(tmp_path):
         local_ok=local.ok,
         local_skipped=local.skipped,
         path=dest,
+        snapshot_text=local.snapshot_text,
         writer=writer,
         env=ON_A,
     )
@@ -142,6 +150,7 @@ def test_gate_a_off_gate_b_on_does_not_invent_or_publish(tmp_path):
         local_ok=local.ok,
         local_skipped=local.skipped,
         path=dest,
+        snapshot_text=local.snapshot_text,
         writer=writer,
         env=ON_B,
     )
@@ -175,6 +184,7 @@ def test_valid_nonempty_sidecar_publishes_v2_path(tmp_path):
         local_ok=local.ok,
         local_skipped=local.skipped,
         path=dest,
+        snapshot_text=local.snapshot_text,
         writer=writer,
         env=ON_AB,
     )
@@ -186,6 +196,7 @@ def test_valid_nonempty_sidecar_publishes_v2_path(tmp_path):
     path, text, _message = writer.calls[0]
     assert path == GITHUB_V2_SIDECAR_PATH
     assert path != GITHUB_WATCHLIST_PATH
+    assert text == local.snapshot_text
     doc = json.loads(text)
     assert doc["schema"] == SCHEMA_ID
     assert doc["rows"]
@@ -238,6 +249,7 @@ def test_load_failed_local_cycle_does_not_publish(tmp_path):
         local_ok=local.ok,
         local_skipped=local.skipped,
         path=dest,
+        snapshot_text=local.snapshot_text,
         writer=writer,
         env=ON_AB,
     )
@@ -347,11 +359,13 @@ def test_publish_fetch_round_trip_preserves_immutable_fields(tmp_path):
         local_ok=local.ok,
         local_skipped=local.skipped,
         path=dest,
+        snapshot_text=local.snapshot_text,
         writer=writer,
         env=ON_AB,
     )
     assert pub.ok
     published_text = writer.calls[0][1]
+    assert published_text == local.snapshot_text
     before = json.loads(published_text)
 
     def getter(*, path, **kwargs):
@@ -444,9 +458,198 @@ def test_app_hook_publish_is_nested_inside_both_gates():
             break
     assert gate_b is not None
     assert "maybe_publish_v2_sidecar" in ast.dump(gate_b)
+    assert "snapshot_text" in ast.get_source_segment(app, gate_b)
     assert "github_bus" not in ast.dump(ast.Module(body=list(gate_a.orelse), type_ignores=[]))
+    init_src = (REPO / "modules" / "live_candidate_v2_camera" / "__init__.py").read_text(
+        encoding="utf-8"
+    )
+    assert "github_bus" not in init_src
     for inner in ast.walk(try_node):
         if isinstance(inner, ast.Call) and isinstance(inner.func, ast.Name):
             assert inner.func.id != "run_buy_elite_learning_cycle"
             assert inner.func.id != "persist_and_publish_research_watchlist"
             assert inner.func.id != "fetch_published_watchlist"
+
+
+def test_write_failed_does_not_publish(tmp_path, monkeypatch):
+    writer = RecWriter()
+    dest = tmp_path / "camera_sidecar.json"
+
+    def boom(*args, **kwargs):
+        raise SidecarShadowError("disk full")
+
+    monkeypatch.setattr(
+        "modules.live_candidate_v2_camera.cloud_hook.write_sidecar",
+        boom,
+    )
+    local = run_v2_cloud_sidecar(
+        scan_rows=[_scan("HPG", "PULL ĐẸP")],
+        market_real=7.2,
+        observed_at=_ts("2026-08-14 10:05:00"),
+        path=dest,
+        env=ON_A,
+    )
+    assert local.ok is False
+    assert local.reason == REASON_WRITE_FAILED
+    assert local.snapshot_text == ""
+    pub = maybe_publish_v2_sidecar(
+        local_ok=local.ok,
+        local_skipped=local.skipped,
+        path=dest,
+        snapshot_text=local.snapshot_text,
+        writer=writer,
+        env=ON_AB,
+    )
+    assert pub.skipped is True
+    assert pub.status == STATUS_NOT_ELIGIBLE
+    assert writer.calls == []
+
+
+def test_invalid_document_does_not_publish():
+    writer = RecWriter()
+    doc = json.loads(SAMPLE.read_text(encoding="utf-8"))
+    doc["candidate_is_buy"] = True
+    pub = publish_v2_sidecar_text(json.dumps(doc), writer=writer, env=ON_B)
+    assert pub.ok is False
+    assert pub.status == STATUS_INVALID_DOCUMENT
+    assert writer.calls == []
+
+
+def test_publish_uses_this_invocation_snapshot_not_later_file(tmp_path):
+    writer = RecWriter()
+    local, dest = _write_local(tmp_path, env=ON_A)
+    snapshot = local.snapshot_text
+    assert snapshot
+    dest.write_text('{"schema":"mutated-later"}', encoding="utf-8")
+    pub = maybe_publish_v2_sidecar(
+        local_ok=local.ok,
+        local_skipped=local.skipped,
+        path=dest,
+        snapshot_text=snapshot,
+        writer=writer,
+        env=ON_AB,
+    )
+    assert pub.ok is True
+    assert writer.calls[0][1] == snapshot
+    assert dest.read_text(encoding="utf-8") == '{"schema":"mutated-later"}'
+
+
+def test_publish_writer_failure_leaves_local_sidecar_unchanged(tmp_path):
+    local, dest = _write_local(tmp_path, env=ON_A)
+    before = dest.read_text(encoding="utf-8")
+
+    def fail(path, text, message):
+        raise RuntimeError("github down")
+
+    pub = maybe_publish_v2_sidecar(
+        local_ok=local.ok,
+        local_skipped=local.skipped,
+        path=dest,
+        snapshot_text=local.snapshot_text,
+        writer=fail,
+        env=ON_AB,
+    )
+    assert pub.ok is False
+    assert pub.status == STATUS_TRANSPORT_ERROR
+    assert dest.read_text(encoding="utf-8") == before
+    assert dest.read_text(encoding="utf-8") == local.snapshot_text
+
+
+def test_current_empty_sidecar_publishes_empty_universe(tmp_path):
+    writer = RecWriter()
+    local, dest = _write_local(tmp_path, env=ON_A, rows=[])
+    assert local.ok
+    doc = json.loads(local.snapshot_text)
+    assert doc["rows"] == []
+    pub = maybe_publish_v2_sidecar(
+        local_ok=local.ok,
+        local_skipped=local.skipped,
+        path=dest,
+        snapshot_text=local.snapshot_text,
+        writer=writer,
+        env=ON_AB,
+    )
+    assert pub.ok is True
+    published = json.loads(writer.calls[0][1])
+    assert published["rows"] == []
+    assert published["schema"] == SCHEMA_ID
+    fetched = fetch_v2_sidecar(text_fetcher=lambda **k: writer.calls[0][1])
+    assert fetched.status == STATUS_OK_EMPTY
+
+
+def test_gate_a_on_does_not_import_github_bus():
+    script = r"""
+import os
+import sys
+os.environ["MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR"] = "1"
+os.environ.pop("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", None)
+from modules.live_candidate_v2_camera.cloud_hook import run_v2_cloud_sidecar, v2_cloud_sidecar_enabled
+assert v2_cloud_sidecar_enabled() is True
+assert "modules.live_candidate_v2_camera.github_bus" not in sys.modules
+assert "modules.live_shadow_transport.watchlist_bus" not in sys.modules
+print("OK")
+"""
+    env = {k: v for k, v in os.environ.items() if k != ENV_V2_GITHUB_PUBLISH}
+    env[ENV_V2_CLOUD_SIDECAR] = "1"
+    env["PYTHONPATH"] = str(REPO) + os.pathsep + env.get("PYTHONPATH", "")
+    proc = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=str(REPO),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert "OK" in proc.stdout
+
+
+def test_extracted_hook_publish_exception_does_not_block_learning(monkeypatch, tmp_path):
+    monkeypatch.setenv(ENV_V2_CLOUD_SIDECAR, "1")
+    monkeypatch.setenv(ENV_V2_GITHUB_PUBLISH, "1")
+    src = (REPO / "app.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    try_node = None
+    for node in tree.body:
+        if isinstance(node, ast.Try) and "maybe_publish_v2_sidecar" in ast.dump(node):
+            try_node = node
+            break
+    hook_src = ast.get_source_segment(src, try_node)
+    dest = tmp_path / "camera_sidecar.json"
+
+    class FakeLocal:
+        ok = True
+        skipped = False
+        path = str(dest)
+        snapshot_text = SAMPLE.read_text(encoding="utf-8")
+        error = ""
+        reason = "WROTE"
+
+    dest.write_text(FakeLocal.snapshot_text, encoding="utf-8")
+    before = dest.read_text(encoding="utf-8")
+
+    def boom(**kwargs):
+        raise RuntimeError("github boom")
+
+    import modules.live_candidate_v2_camera.cloud_hook as ch
+    import modules.live_candidate_v2_camera.github_bus as gb
+
+    monkeypatch.setattr(ch, "run_v2_cloud_sidecar", lambda **k: FakeLocal())
+    monkeypatch.setattr(gb, "maybe_publish_v2_sidecar", boom)
+    warnings: list[str] = []
+    order: list[str] = []
+    ns = {
+        "os": os,
+        "scan_df": pd.DataFrame([{"symbol": "HPG"}]),
+        "market_real": 7.2,
+        "vn_now": lambda: datetime.now(tz=VN),
+        "buy_elite_df": pd.DataFrame(),
+        "early_buy_lab_df": pd.DataFrame(),
+        "st": types.SimpleNamespace(warning=lambda msg: warnings.append(str(msg))),
+    }
+    order.append("elite")
+    exec(compile(hook_src, "app.py", "exec"), ns, ns)
+    order.append("learn")
+    assert order == ["elite", "learn"]
+    assert warnings and "github boom" in warnings[0]
+    assert dest.read_text(encoding="utf-8") == before

@@ -111,6 +111,7 @@ class CloudSidecarResult:
     n_rows: int = 0
     n_freeze: int = 0
     error: str = ""
+    snapshot_text: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -172,6 +173,7 @@ def run_v2_cloud_sidecar(
             generated_at=now,
             session=now.date().isoformat(),
         )
+        snapshot_text = dest.read_text(encoding="utf-8")
     except SidecarShadowError as exc:
         return CloudSidecarResult(
             ok=False,
@@ -195,4 +197,5 @@ def run_v2_cloud_sidecar(
         path=str(dest),
         n_rows=len(sidecar_rows),
         n_freeze=len(report.freeze_ledger),
+        snapshot_text=snapshot_text,
     )

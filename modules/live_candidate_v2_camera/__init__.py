@@ -16,11 +16,6 @@ from modules.live_candidate_v2_camera.contract import (
     SCHEMA_ID,
     SHADOW_V2_ENABLED_SOURCES,
 )
-from modules.live_candidate_v2_camera.github_bus import (
-    fetch_v2_sidecar,
-    maybe_publish_v2_sidecar,
-    v2_github_publish_enabled,
-)
 from modules.live_candidate_v2_camera.feed_pass import is_v2_camera_row, v2_event_reason
 from modules.live_candidate_v2_camera.observe import observe_close_vs_ref, pxv_implies_buy
 from modules.live_candidate_v2_camera.sidecar import (
@@ -42,8 +37,6 @@ __all__ = [
     "SRC_BRAIN_A",
     "build_sidecar_from_scan",
     "build_sidecar_rows",
-    "fetch_v2_sidecar",
-    "maybe_publish_v2_sidecar",
     "is_v2_camera_row",
     "observe_close_vs_ref",
     "pxv_implies_buy",
@@ -51,6 +44,5 @@ __all__ = [
     "shadow_route_v2",
     "v2_cloud_sidecar_enabled",
     "v2_event_reason",
-    "v2_github_publish_enabled",
     "write_sidecar",
 ]

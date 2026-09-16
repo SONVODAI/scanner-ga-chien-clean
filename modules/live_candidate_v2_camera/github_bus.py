@@ -405,10 +405,11 @@ def maybe_publish_v2_sidecar(
     local_ok: bool,
     local_skipped: bool,
     path: Path | str | None,
+    snapshot_text: str | None = None,
     writer: Writer | None = None,
     env: Mapping[str, str] | None = None,
 ) -> V2PublishResult:
-    """Follow-on to Slice 3A. Publish only after a successful local write this cycle."""
+    """Follow-on to Slice 3A. Publish only this invocation's validated snapshot."""
     if not v2_github_publish_enabled(env):
         return V2PublishResult(ok=True, skipped=True, status=STATUS_GATE_OFF)
     if local_skipped or not local_ok or not path:
@@ -418,6 +419,8 @@ def maybe_publish_v2_sidecar(
             status=STATUS_NOT_ELIGIBLE,
             error="no successful local V2 sidecar this cycle",
         )
+    if snapshot_text is not None:
+        return publish_v2_sidecar_text(snapshot_text, writer=writer, env=env)
     return publish_v2_sidecar_file(path, writer=writer, env=env)
 
 
