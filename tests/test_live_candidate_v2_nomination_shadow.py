@@ -37,12 +37,19 @@ from modules.live_candidate_v2_nomination.contract import (
 )
 from modules.live_candidate_v2_nomination.intent import (
     APP_PY_INTENT_STRINGS,
+    BUY_LIKE_TOKENS,
+    CAMERA_INTENTS,
     CANH_ADD_ACTION,
     CHO_PULL_ACTION,
+    INTENT_WATCH_FROZEN_REF,
+    INTENT_WATCH_SETUP,
     MUA_BREAK_ACTION,
     MUA_BREAK_REASON,
     PULL_DEP_ACTION,
+    PULL_DEP_REASON,
     PULL_VUA_ACTION,
+    REF_BREAKOUT,
+    REF_EMA9,
     TEST_EARLY_ACTION,
     observation_intent,
 )
@@ -97,6 +104,15 @@ def test_1_primary_setups_nominate():
     assert all(n.status == "NOMINATED" for n in report.nominations)
     assert all(n.source == SRC_BRAIN_A for n in report.nominations)
     assert all("BUY" not in n.status for n in report.nominations)
+    by_nom = {n.symbol: n for n in report.nominations}
+    assert by_nom["HPG"].source_action == PULL_DEP_ACTION
+    assert by_nom["HPG"].observation_intent == INTENT_WATCH_FROZEN_REF
+    assert by_nom["HPG"].observation_reference == REF_EMA9
+    assert by_nom["VCB"].observation_reference == REF_EMA9
+    assert by_nom["SSI"].source_action == MUA_BREAK_ACTION
+    assert by_nom["SSI"].observation_reference == REF_BREAKOUT
+    assert by_nom["FPT"].source_action == CANH_ADD_ACTION
+    assert by_nom["FPT"].observation_reference == REF_EMA9
 
 
 def test_2_qualified_early_nominates():
@@ -114,7 +130,10 @@ def test_2_qualified_early_nominates():
     assert set(by) == {"MWG", "PNJ"}
     assert "IN_EARLY_LAB" in by["MWG"].qualified_by
     assert "TEST EARLY" in by["PNJ"].qualified_by
-    assert TEST_EARLY_ACTION in by["PNJ"].observation_intent
+    assert by["PNJ"].source_action == TEST_EARLY_ACTION
+    assert by["PNJ"].observation_intent == INTENT_WATCH_SETUP
+    assert by["PNJ"].observation_reference == ""
+    assert TEST_EARLY_ACTION not in by["PNJ"].observation_intent
     assert by["MWG"].in_early_lab is True
 
 
@@ -246,10 +265,17 @@ def test_10_setup_reason_intent_survive_routing_and_shadow_serialization(tmp_pat
     ]
     report = _nominate(rows)
     by = {n.symbol: n for n in report.nominations}
-    assert PULL_DEP_ACTION in by["HPG"].observation_intent
-    assert by["FPT"].observation_action == CHO_PULL_ACTION
-    assert TEST_EARLY_ACTION in by["PNJ"].observation_intent
-    assert MUA_BREAK_REASON  # lock imported existing text
+    assert by["HPG"].source_action == PULL_DEP_ACTION
+    assert by["HPG"].source_reason == PULL_DEP_REASON
+    assert by["HPG"].observation_intent == INTENT_WATCH_FROZEN_REF
+    assert by["HPG"].observation_reference == REF_EMA9
+    assert by["FPT"].source_action == CHO_PULL_ACTION
+    assert by["FPT"].observation_intent == INTENT_WATCH_FROZEN_REF
+    assert by["FPT"].observation_reference == REF_EMA9
+    assert by["PNJ"].source_action == TEST_EARLY_ACTION
+    assert by["PNJ"].observation_intent == INTENT_WATCH_SETUP
+    assert by["PNJ"].observation_reference == ""
+    assert MUA_BREAK_REASON
     assert PULL_VUA_ACTION
     assert CANH_ADD_ACTION
     assert report.route_report is not None
@@ -257,7 +283,9 @@ def test_10_setup_reason_intent_survive_routing_and_shadow_serialization(tmp_pat
     assert routed["HPG"].group == "PULL ĐẸP"
     assert routed["HPG"].setup == "PULL ĐẸP"
     assert routed["HPG"].candidate_reason == by["HPG"].nomination_reason
-    assert routed["HPG"].source_reason == by["HPG"].observation_intent
+    assert routed["HPG"].source_action == PULL_DEP_ACTION
+    assert routed["HPG"].source_reason == PULL_DEP_REASON
+    assert routed["HPG"].source_reason != by["HPG"].observation_intent
     assert routed["HPG"].source == SRC_BRAIN_A
     assert routed["FPT"].source_action == CHO_PULL_ACTION
     path = write_shadow_artifact(report, path=tmp_path / "nominations.json")
@@ -266,12 +294,16 @@ def test_10_setup_reason_intent_survive_routing_and_shadow_serialization(tmp_pat
     snap = {n["symbol"]: n for n in doc["nominations"]}
     assert snap["HPG"]["setup"] == "PULL ĐẸP"
     assert snap["HPG"]["nomination_reason"] == by["HPG"].nomination_reason
-    assert snap["HPG"]["observation_intent"] == by["HPG"].observation_intent
+    assert snap["HPG"]["source_action"] == PULL_DEP_ACTION
+    assert snap["HPG"]["source_reason"] == PULL_DEP_REASON
+    assert snap["HPG"]["observation_intent"] == INTENT_WATCH_FROZEN_REF
+    assert snap["HPG"]["observation_reference"] == REF_EMA9
     assert snap["HPG"]["elite_buy_grade"] == ""
-    assert snap["FPT"]["observation_intent"] == by["FPT"].observation_intent
+    assert snap["FPT"]["observation_intent"] == INTENT_WATCH_FROZEN_REF
     routed_obj = to_nominated_candidate(by["PNJ"])
     assert routed_obj.group == "MUA EARLY"
     assert routed_obj.source_action == TEST_EARLY_ACTION
+    assert routed_obj.source_reason == by["PNJ"].source_reason
 
 
 def test_11_no_production_watchlist_bytes_change(tmp_path):
@@ -328,15 +360,42 @@ def test_12_rotation_remains_disconnected():
                     assert alias.name != "GROUP_RANK"
 
 
-def test_observation_intent_strings_are_existing_buy_recommendation_text():
+def test_observation_intent_is_neutral_camera_task_not_buy():
+    report = _nominate(
+        [
+            _row("HPG", "PULL ĐẸP"),
+            _row("VCB", "PULL VỪA"),
+            _row("SSI", "MUA BREAK"),
+            _row("FPT", "CP MẠNH", dist_from_ema9_pct=5.0),
+            _row("PNJ", "MUA EARLY", total_score=4, dist_from_ema9_pct=1.0),
+        ]
+    )
+    by = {n.symbol: n for n in report.nominations}
+    assert by["HPG"].source_action == PULL_DEP_ACTION
+    assert by["HPG"].source_reason == PULL_DEP_REASON
+    assert by["FPT"].source_action == CHO_PULL_ACTION
+    assert by["SSI"].source_action == MUA_BREAK_ACTION
+    for nom in report.nominations:
+        assert nom.observation_intent in CAMERA_INTENTS
+        assert nom.observation_intent != nom.source_action
+        upper = nom.observation_intent.upper()
+        for tok in BUY_LIKE_TOKENS:
+            assert tok not in upper
+            assert tok not in nom.observation_intent
+        assert nom.observation_reference in {REF_EMA9, REF_BREAKOUT, ""}
+
+
+def test_source_action_reason_strings_are_existing_buy_recommendation_text():
     app_src = (REPO / "app.py").read_text(encoding="utf-8")
     start = app_src.index("def buy_recommendation")
     end = app_src.index("\ndef build_buy_table")
     body = app_src[start:end]
     for phrase in APP_PY_INTENT_STRINGS:
         assert phrase in body
-    assert observation_intent(_row("HPG", "PULL ĐẸP")).startswith("MUA PULL ĐẸP")
-    assert "không đuổi quá xa" in observation_intent(_row("SSI", "MUA BREAK"))
+    assert observation_intent(_row("HPG", "PULL ĐẸP")) == INTENT_WATCH_FROZEN_REF
+    assert observation_intent(_row("SSI", "MUA BREAK")) == INTENT_WATCH_FROZEN_REF
+    assert "MUA PULL ĐẸP" not in observation_intent(_row("HPG", "PULL ĐẸP"))
+    assert "không đuổi quá xa" not in observation_intent(_row("SSI", "MUA BREAK"))
 
 
 def test_production_publishers_do_not_import_brain_a():
@@ -420,7 +479,10 @@ def test_shadow_document_schema_and_sample_fields():
         "ema9_at_first_seen",
         "breakout_ref_at_first_seen",
         "nomination_reason",
+        "source_action",
+        "source_reason",
         "observation_intent",
+        "observation_reference",
         "elite_buy_grade",
         "market_real",
         "market_permission",
@@ -431,3 +493,7 @@ def test_shadow_document_schema_and_sample_fields():
         assert key in nom
     assert nom["elite_buy_grade"] == "BUY ELITE"
     assert nom["source"] == SRC_BRAIN_A
+    assert nom["source_action"] == PULL_DEP_ACTION
+    assert nom["source_reason"] == PULL_DEP_REASON
+    assert nom["observation_intent"] == INTENT_WATCH_FROZEN_REF
+    assert nom["observation_reference"] == REF_EMA9

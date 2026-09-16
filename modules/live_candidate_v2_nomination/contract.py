@@ -86,8 +86,10 @@ class BrainANomination:
     ema9_at_first_seen: float | None
     breakout_ref_at_first_seen: float | None
     nomination_reason: str
+    source_action: str
+    source_reason: str
     observation_intent: str
-    observation_action: str
+    observation_reference: str
     source: str = SRC_BRAIN_A
     elite_buy_grade: str = ""
     market_real: float | None = None

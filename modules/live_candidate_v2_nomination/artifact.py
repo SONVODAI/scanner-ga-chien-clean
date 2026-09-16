@@ -56,6 +56,8 @@ def build_shadow_document(
         "router_wired_to_production": False,
         "notes": [
             "Candidate != BUY.",
+            "source_action/source_reason are buy_recommendation provenance only.",
+            "observation_intent is a neutral Camera watch task, not a buy action.",
             "BUY ELITE / MUA NHỎ is metadata (elite_buy_grade) only.",
             "GÀ TĂNG TỐC is reserved and not nominated in Slice 1.",
             "Does not overwrite data/live_candidate/dynamic_watchlist.json.",

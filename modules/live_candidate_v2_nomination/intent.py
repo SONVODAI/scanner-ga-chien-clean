@@ -1,8 +1,11 @@
-"""Observation intent from existing app.py buy_recommendation text.
+"""Provenance vs Camera task.
 
-Source of truth: app.py::buy_recommendation (action + lý do only).
-This is a Camera task description, NOT a buy rule.
-Does not invent P×V conditions. Does not copy NAV.
+source_action / source_reason: exact app.py::buy_recommendation text.
+observation_intent: neutral Camera watch task. Does NOT mean BUY.
+observation_reference: which already-frozen field Camera watches, if any.
+
+Does not invent P×V conditions. Does not map P×V states to actions.
+Does not copy NAV.
 """
 
 from __future__ import annotations
@@ -12,13 +15,9 @@ from typing import Any, Mapping
 
 import pandas as pd
 
-from modules.live_candidate_v2_nomination.contract import (
-    PRIMARY_SETUPS,
-    SECONDARY_SETUP,
-)
+from modules.live_candidate_v2_nomination.contract import SECONDARY_SETUP
 
-# Verbatim action + lý do from app.py buy_recommendation.
-# Keep in lockstep; tests assert these strings still exist in app.py.
+# Verbatim action + lý do from app.py buy_recommendation (provenance only).
 PULL_DEP_ACTION = "MUA PULL ĐẸP"
 PULL_DEP_REASON = "Pull sát EMA9, OBV còn xanh"
 PULL_VUA_ACTION = "MUA PULL VỪA"
@@ -35,7 +34,7 @@ CANH_ADD_REASON = "CP mạnh, có thể add nhỏ"
 # Existing CP MẠNH branch: dist > 4 → CHỜ PULL, else CANH ADD.
 CP_MANH_CHO_PULL_DIST = 4
 
-APP_PY_INTENT_STRINGS = (
+APP_PY_PROVENANCE_STRINGS = (
     PULL_DEP_ACTION,
     PULL_DEP_REASON,
     PULL_VUA_ACTION,
@@ -48,6 +47,29 @@ APP_PY_INTENT_STRINGS = (
     CHO_PULL_REASON,
     CANH_ADD_ACTION,
     CANH_ADD_REASON,
+)
+# Backward-compatible alias used by existing tests.
+APP_PY_INTENT_STRINGS = APP_PY_PROVENANCE_STRINGS
+
+# Neutral Camera task. Not BUY. Not a P×V state.
+INTENT_WATCH_FROZEN_REF = "WATCH_PRICE_TAPE_VS_FROZEN_REF"
+INTENT_WATCH_SETUP = "WATCH_NOMINATED_SETUP"
+CAMERA_INTENTS = frozenset({INTENT_WATCH_FROZEN_REF, INTENT_WATCH_SETUP})
+
+REF_EMA9 = "EMA9"
+REF_BREAKOUT = "BREAKOUT_REF"
+
+BUY_LIKE_TOKENS = (
+    "MUA ",
+    "BUY",
+    "CANH ADD",
+    "TEST EARLY",
+    "CHỜ PULL",
+    "STRENGTHEN",
+    "CONTRACTION",
+    "EXPANSION",
+    "CONFIRMING",
+    "SELL_EXPANSION",
 )
 
 
@@ -65,21 +87,8 @@ def _num(value: object) -> float | None:
     return float(n)
 
 
-def format_intent(action: str, reason: str) -> str:
-    action = str(action or "").strip()
-    reason = str(reason or "").strip()
-    if action and reason:
-        return f"{action} — {reason}"
-    return action or reason
-
-
-def observation_action_reason(row: Mapping[str, Any]) -> tuple[str, str]:
-    """Setup wait context copied from buy_recommendation branches.
-
-    Not gated on obv_ok: nomination already decided; this is what Camera
-    is asked to observe, not a permission to buy.
-    CP MẠNH still uses the existing dist > 4 split (CHỜ PULL vs CANH ADD).
-    """
+def source_action_reason(row: Mapping[str, Any]) -> tuple[str, str]:
+    """Exact buy_recommendation action + lý do. Provenance, not Camera task."""
     group = str(row.get("group") or row.get("setup") or "").strip()
     dist = _num(row.get("dist_from_ema9_pct"))
 
@@ -98,10 +107,26 @@ def observation_action_reason(row: Mapping[str, Any]) -> tuple[str, str]:
     return "", ""
 
 
+def camera_observation(setup: str) -> tuple[str, str]:
+    """Neutral Camera task + which existing frozen ref to watch.
+
+    Does not invent a price level or a P×V trigger.
+    """
+    setup = str(setup or "").strip()
+    if setup in {"PULL ĐẸP", "PULL VỪA", "CP MẠNH"}:
+        return INTENT_WATCH_FROZEN_REF, REF_EMA9
+    if setup == "MUA BREAK":
+        return INTENT_WATCH_FROZEN_REF, REF_BREAKOUT
+    if setup == SECONDARY_SETUP:
+        return INTENT_WATCH_SETUP, ""
+    return INTENT_WATCH_SETUP, ""
+
+
 def observation_intent(row: Mapping[str, Any]) -> str:
-    action, reason = observation_action_reason(row)
-    return format_intent(action, reason)
+    intent, _ref = camera_observation(str(row.get("group") or row.get("setup") or ""))
+    return intent
 
 
-def intent_applies_to_setup(group: str) -> bool:
-    return group in PRIMARY_SETUPS or group == SECONDARY_SETUP
+def observation_reference(row: Mapping[str, Any]) -> str:
+    _intent, ref = camera_observation(str(row.get("group") or row.get("setup") or ""))
+    return ref

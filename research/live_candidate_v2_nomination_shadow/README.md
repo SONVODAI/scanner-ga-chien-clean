@@ -28,20 +28,25 @@ Never nominated in Slice 1:
 - `WATCHLIST` alone, WinProb/top-N alone
 - `BUY ELITE` / `MUA NHỎ / ƯU TIÊN` alone (metadata only: `elite_buy_grade`)
 
-## observation_intent source (existing text only)
+## Provenance vs Camera task
 
-Copied from `app.py::buy_recommendation` action + lý do:
+`source_action` / `source_reason` are exact `app.py::buy_recommendation`
+action + lý do. They are provenance only. They do **not** mean Camera should BUY.
 
-| setup | observation_action | lý do |
-| --- | --- | --- |
-| PULL ĐẸP | MUA PULL ĐẸP | Pull sát EMA9, OBV còn xanh |
-| PULL VỪA | MUA PULL VỪA | Pull vừa, mua thăm dò |
-| MUA BREAK | MUA BREAK | Break xác nhận, không đuổi quá xa |
-| CP MẠNH, dist > 4 | CHỜ PULL | CP mạnh nhưng xa EMA9 |
-| CP MẠNH, else | CANH ADD CP MẠNH | CP mạnh, có thể add nhỏ |
-| qualified MUA EARLY | TEST EARLY | Early sạch, test nhỏ |
+`observation_intent` is a neutral Camera watch task. It does not inherit
+BUY-like verbs from `source_action`. No P×V state is mapped to an action.
 
-Intent is a task description for Camera, not a buy rule. No P×V thresholds.
+| setup | source_action | source_reason | observation_intent | observation_reference |
+| --- | --- | --- | --- | --- |
+| PULL ĐẸP | MUA PULL ĐẸP | Pull sát EMA9, OBV còn xanh | WATCH_PRICE_TAPE_VS_FROZEN_REF | EMA9 |
+| PULL VỪA | MUA PULL VỪA | Pull vừa, mua thăm dò | WATCH_PRICE_TAPE_VS_FROZEN_REF | EMA9 |
+| MUA BREAK | MUA BREAK | Break xác nhận, không đuổi quá xa | WATCH_PRICE_TAPE_VS_FROZEN_REF | BREAKOUT_REF |
+| CP MẠNH, dist > 4 | CHỜ PULL | CP mạnh nhưng xa EMA9 | WATCH_PRICE_TAPE_VS_FROZEN_REF | EMA9 |
+| CP MẠNH, else | CANH ADD CP MẠNH | CP mạnh, có thể add nhỏ | WATCH_PRICE_TAPE_VS_FROZEN_REF | EMA9 |
+| qualified MUA EARLY | TEST EARLY | Early sạch, test nhỏ | WATCH_NOMINATED_SETUP | _(none; do not invent a trigger)_ |
+
+`observation_reference` names an already-frozen field (`ema9_at_first_seen`
+or `breakout_ref_at_first_seen`). It does not invent a new price level.
 
 ## Chronology
 

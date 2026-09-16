@@ -27,7 +27,10 @@ from modules.live_candidate_v2_nomination.freeze import (
     session_of,
     stamp_or_reuse,
 )
-from modules.live_candidate_v2_nomination.intent import observation_action_reason, observation_intent
+from modules.live_candidate_v2_nomination.intent import (
+    camera_observation,
+    source_action_reason,
+)
 from modules.live_candidate_v2_nomination.predicate import (
     as_number,
     elite_buy_grade_of,
@@ -65,8 +68,8 @@ def to_nominated_candidate(nom: BrainANomination) -> NominatedCandidate:
         status=nom.status,
         candidate_reason=nom.nomination_reason,
         source_state=nom.elite_buy_grade or nom.status,
-        source_action=nom.observation_action,
-        source_reason=nom.observation_intent,
+        source_action=nom.source_action,
+        source_reason=nom.source_reason,
         group=nom.group,
         setup=nom.setup,
     )
@@ -90,8 +93,10 @@ def from_nominated_candidate(
         ema9_at_first_seen=original.ema9_at_first_seen,
         breakout_ref_at_first_seen=original.breakout_ref_at_first_seen,
         nomination_reason=routed.candidate_reason or original.nomination_reason,
-        observation_intent=routed.source_reason or original.observation_intent,
-        observation_action=routed.source_action or original.observation_action,
+        source_action=routed.source_action or original.source_action,
+        source_reason=routed.source_reason or original.source_reason,
+        observation_intent=original.observation_intent,
+        observation_reference=original.observation_reference,
         source=routed.source or original.source,
         elite_buy_grade=original.elite_buy_grade,
         market_real=original.market_real,
@@ -152,7 +157,8 @@ def nominate_scan_rows(
             prior=ledger,
         )
         ledger[ (session, symbol) ] = freeze
-        action, _reason = observation_action_reason(row)
+        action, reason = source_action_reason(row)
+        intent, ref = camera_observation(decision.setup)
         elig = eligible_from_for(session, freeze.candidate_first_seen_ts)
         nominations.append(
             BrainANomination(
@@ -168,8 +174,10 @@ def nominate_scan_rows(
                 ema9_at_first_seen=freeze.ema9_at_first_seen,
                 breakout_ref_at_first_seen=freeze.breakout_ref_at_first_seen,
                 nomination_reason=decision.nomination_reason,
-                observation_intent=observation_intent(row),
-                observation_action=action,
+                source_action=action,
+                source_reason=reason,
+                observation_intent=intent,
+                observation_reference=ref,
                 source=SRC_BRAIN_A,
                 elite_buy_grade=elite_buy_grade_of(row),
                 market_real=mr,
