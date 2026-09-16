@@ -11,6 +11,8 @@ from modules.live_candidate_v2_camera.cloud_hook import (
 )
 from modules.live_candidate_v2_camera.contract import (
     ENV_V2_CLOUD_SIDECAR,
+    ENV_V2_GITHUB_PUBLISH,
+    GITHUB_V2_SIDECAR_PATH,
     SCHEMA_ID,
     SHADOW_V2_ENABLED_SOURCES,
 )
@@ -28,6 +30,8 @@ from modules.live_candidate_v2_nomination.contract import SRC_BRAIN_A
 __all__ = [
     "DEFAULT_SIDECAR_PATH",
     "ENV_V2_CLOUD_SIDECAR",
+    "ENV_V2_GITHUB_PUBLISH",
+    "GITHUB_V2_SIDECAR_PATH",
     "SCHEMA_ID",
     "SHADOW_V2_ENABLED_SOURCES",
     "SRC_BRAIN_A",

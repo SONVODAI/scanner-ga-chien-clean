@@ -24,6 +24,15 @@ ENV_V2_CLOUD_SIDECAR = "MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR"
 ENV_V2_CLOUD_SIDECAR_TRUTHY = frozenset({"1", "true", "yes", "on"})
 ENV_V2_CLOUD_SIDECAR_FALSY = frozenset({"", "0", "false", "no", "off"})
 
+# Slice 3B GitHub Contents publish. Default OFF. Independent of Gate A.
+# Enabling the local sidecar does not publish. Enabling publish does not generate.
+ENV_V2_GITHUB_PUBLISH = "MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH"
+ENV_V2_GITHUB_PUBLISH_TRUTHY = ENV_V2_CLOUD_SIDECAR_TRUTHY
+ENV_V2_GITHUB_PUBLISH_FALSY = ENV_V2_CLOUD_SIDECAR_FALSY
+
+# Dedicated V2 GitHub Contents path. Never retarget production Elite watchlist.
+GITHUB_V2_SIDECAR_PATH = DEFAULT_SIDECAR_RELPATH
+
 REF_EMA9 = "EMA9"
 REF_BREAKOUT = "BREAKOUT_REF"
 REF_UNAVAILABLE = "UNAVAILABLE"

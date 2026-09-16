@@ -6568,6 +6568,22 @@ try:
         )
         if not _v2_sidecar.ok and not _v2_sidecar.skipped:
             st.warning(f"V2 Camera sidecar: {_v2_sidecar.error or _v2_sidecar.reason}")
+        _v2_pub_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
+        if (
+            _v2_sidecar.ok
+            and not _v2_sidecar.skipped
+            and _v2_pub_gate in ("1", "true", "yes", "on")
+        ):
+            from modules.live_candidate_v2_camera.github_bus import maybe_publish_v2_sidecar
+
+            _v2_github = maybe_publish_v2_sidecar(
+                local_ok=_v2_sidecar.ok,
+                local_skipped=_v2_sidecar.skipped,
+                path=_v2_sidecar.path,
+                snapshot_text=_v2_sidecar.snapshot_text,
+            )
+            if not _v2_github.ok and not _v2_github.skipped:
+                st.warning(f"V2 Camera sidecar GitHub: {_v2_github.error or _v2_github.status}")
 except Exception as e:
     st.warning(f"V2 Camera sidecar: {type(e).__name__}: {e}")
 final_df, final_note = build_final_decision(
