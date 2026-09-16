@@ -222,6 +222,7 @@ def build_sidecar_document(
             "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
             "Brain B is not required. OR not AND.",
             "No GitHub publish in Slice 2.",
+            "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd.",
         ],
         "rows": [dict(r) for r in rows],
     }

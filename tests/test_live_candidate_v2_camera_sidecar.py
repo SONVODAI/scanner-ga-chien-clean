@@ -18,7 +18,10 @@ from modules.candidate_router.router import classify_nominations, to_watchlist_f
 from modules.intraday_memory.provider import MockProvider as FakeProvider
 from modules.live_camera_shadow.feed import LiveShadowFeed
 from modules.live_camera_shadow.universe import LIVE_UNIVERSE_CAP, eligible_watchlist_symbols
+from modules.intraday_memory.normalize import normalize_price_to_integer_vnd
+from modules.intraday_pxv_v1 import interpret as pxv_interpret
 from modules.live_candidate_v2_camera.contract import (
+    CANONICAL_PRICE_UNIT,
     GENERIC_PXV,
     SCHEMA_ID,
     SHADOW_V2_ENABLED_SOURCES,
@@ -160,39 +163,111 @@ def test_end_to_end_brain_a_sidecar_injected_feed_evidence(tmp_path):
     assert hpg.get("buy_action") is None
     expected = observe_close_vs_ref(by_side["HPG"], hpg["close"])
     assert hpg["reference_value"] == 27.1
+    assert hpg["close"] >= 1000
+    assert hpg["close_canonical"] == normalize_price_to_integer_vnd(hpg["close"])
+    assert hpg["reference_canonical"] == normalize_price_to_integer_vnd(27.1)
+    assert hpg["price_unit"] == CANONICAL_PRICE_UNIT
     assert hpg["close_vs_ref"] == expected["close_vs_ref"]
+    assert hpg["close_vs_ref"] == hpg["close_canonical"] - hpg["reference_canonical"]
+    assert hpg["close_vs_ref"] != hpg["close"] - hpg["reference_value"]
     assert hpg["close_vs_ref_pct"] == expected["close_vs_ref_pct"]
     ssi = by_ev["SSI"]
     assert ssi["observation_reference"] == "BREAKOUT_REF"
     assert ssi["reference_value"] == 31.5
-    assert ssi["close_vs_ref"] == ssi["close"] - 31.5
+    assert ssi["reference_canonical"] == normalize_price_to_integer_vnd(31.5)
+    assert ssi["close_vs_ref"] == ssi["close_canonical"] - ssi["reference_canonical"]
+    assert ssi["close_vs_ref"] != ssi["close"] - 31.5
     assert isinstance(hpg["provenance"], list) and len(hpg["provenance"]) >= 1
     assert status["alert_eligible"] is False
 
 
-def test_close_vs_ref_arithmetic_and_unavailable():
-    ema = {
+def test_hpg_shaped_mixed_units_use_existing_integer_vnd_contract():
+    """Brain A 27.1 scan-price vs Camera 27700 integer VND must not subtract raw."""
+    row = {
         "observation_reference": "EMA9",
         "ema9_at_first_seen": 27.1,
-        "breakout_ref_at_first_seen": 28.0,
+        "price_at_first_seen": 27.5,
     }
-    got = observe_close_vs_ref(ema, 27.4)
+    got = observe_close_vs_ref(row, 27700)
+    assert got["close"] == 27700
     assert got["reference_value"] == 27.1
-    assert abs(got["close_vs_ref"] - 0.3) < 1e-9
-    assert abs(got["close_vs_ref_pct"] - (0.3 / 27.1 * 100)) < 1e-9
-    brk = {"observation_reference": "BREAKOUT_REF", "breakout_ref_at_first_seen": 31.5}
-    got_b = observe_close_vs_ref(brk, 32.2)
-    assert abs(got_b["close_vs_ref"] - 0.7) < 1e-9
-    empty = observe_close_vs_ref({"observation_reference": ""}, 27.4)
+    assert got["close_canonical"] == 27700
+    assert got["reference_canonical"] == 27100
+    assert got["close_canonical"] == normalize_price_to_integer_vnd(27700)
+    assert got["reference_canonical"] == normalize_price_to_integer_vnd(27.1)
+    assert got["price_unit"] == CANONICAL_PRICE_UNIT
+    assert got["close_vs_ref"] == 600.0
+    assert got["close_vs_ref"] != 27700 - 27.1
+    assert abs(got["close_vs_ref_pct"] - (600.0 / 27100.0 * 100.0)) < 1e-9
+    assert got["reference_state"] == "EMA9"
+    assert "buy" not in json.dumps(got).lower()
+    assert "sell" not in json.dumps(got).lower()
+    assert "actionable" not in json.dumps(got).lower()
+
+
+def test_matching_canonical_integer_vnd_still_calculates():
+    got = observe_close_vs_ref(
+        {"observation_reference": "EMA9", "ema9_at_first_seen": 27100},
+        27700,
+    )
+    assert got["close_vs_ref"] == 600.0
+    assert got["price_unit"] == CANONICAL_PRICE_UNIT
+    scan_both = observe_close_vs_ref(
+        {"observation_reference": "EMA9", "ema9_at_first_seen": 27.1},
+        27.4,
+    )
+    assert scan_both["close_canonical"] == 27400
+    assert scan_both["reference_canonical"] == 27100
+    assert scan_both["close_vs_ref"] == 300.0
+
+
+def test_breakout_ref_follows_same_integer_vnd_contract():
+    got = observe_close_vs_ref(
+        {"observation_reference": "BREAKOUT_REF", "breakout_ref_at_first_seen": 31.5},
+        32200,
+    )
+    assert got["reference_value"] == 31.5
+    assert got["reference_canonical"] == 31500
+    assert got["close_canonical"] == 32200
+    assert got["close_vs_ref"] == 700.0
+    assert got["close_vs_ref"] != 32200 - 31.5
+    assert got["reference_state"] == "BREAKOUT_REF"
+
+
+def test_missing_ref_unavailable_and_helper_reject_is_unit_mismatch():
+    empty = observe_close_vs_ref({"observation_reference": ""}, 27700)
     assert empty["reference_value"] is None
     assert empty["close_vs_ref"] is None
+    assert empty["close_vs_ref_pct"] is None
     assert empty["reference_state"] == "UNAVAILABLE"
-    missing = observe_close_vs_ref({"observation_reference": "EMA9", "ema9_at_first_seen": None}, 27.4)
+    missing = observe_close_vs_ref(
+        {"observation_reference": "EMA9", "ema9_at_first_seen": None},
+        27700,
+    )
     assert missing["close_vs_ref"] is None
-    assert "buy" not in json.dumps(got).lower() or got["close_vs_ref"] is not None
+    assert missing["reference_state"] == "UNAVAILABLE"
+    bad = observe_close_vs_ref(
+        {"observation_reference": "EMA9", "ema9_at_first_seen": 27.1},
+        0,
+    )
+    assert bad["reference_state"] == "UNIT_MISMATCH"
+    assert bad["close_vs_ref"] is None
+    assert bad["close_vs_ref_pct"] is None
     assert pxv_implies_buy("STRENGTHEN") is False
     assert pxv_implies_buy("WEAKEN") is False
     assert pxv_implies_buy("CONFLICT") is False
+
+
+def test_observe_does_not_change_pxv_inputs():
+    interpret_src = Path(pxv_interpret.__file__).read_text(encoding="utf-8")
+    observe_src = (REPO / "modules" / "live_candidate_v2_camera" / "observe.py").read_text(
+        encoding="utf-8"
+    )
+    assert "live_candidate_v2_camera" not in interpret_src
+    assert "observe_close_vs_ref" not in interpret_src
+    assert "normalize_price_to_integer_vnd" not in interpret_src
+    assert "intraday_pxv_v1.interpret" not in observe_src
+    assert "decide_evidence" not in observe_src
 
 
 def test_strengthen_does_not_imply_buy():

@@ -21,7 +21,13 @@ Production `ENABLED_SOURCES` stays Elite-only. Brain B is not required.
 
 ## Units (Slice 2)
 
-`close_vs_ref` is `close − named frozen field` as stored. Camera bars are
-integer VND after `validate_raw_bar` (e.g. `27700`). Brain A frozen refs stay
-in scan units (e.g. `ema9_at_first_seen=27.1`). Slice 2 does not convert and
-does not invent a level.
+Canonical comparison unit is Camera **integer VND**, via the existing helper
+`modules.intraday_memory.normalize.normalize_price_to_integer_vnd` (same
+contract as `validate_raw_bar` / `CanonicalBar`).
+
+- Brain A sidecar frozen refs stay as stored (scan-price units, e.g. `27.1`).
+- Camera evidence `close` stays as stored (integer VND after validate, e.g. `27700`).
+- At the observe boundary both sides are normalized once.
+- `close_vs_ref` / `close_vs_ref_pct` emit only when both normalize.
+- Helper rejection → `reference_state=UNIT_MISMATCH` and null deltas.
+- Missing ref → `UNAVAILABLE`. No second scale convention. No BUY/SELL mapping.

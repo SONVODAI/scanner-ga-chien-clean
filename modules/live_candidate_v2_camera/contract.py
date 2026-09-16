@@ -22,6 +22,10 @@ PRODUCTION_WATCHLIST_RELPATH = "data/live_candidate/dynamic_watchlist.json"
 REF_EMA9 = "EMA9"
 REF_BREAKOUT = "BREAKOUT_REF"
 REF_UNAVAILABLE = "UNAVAILABLE"
+REF_UNIT_MISMATCH = "UNIT_MISMATCH"
+
+# Camera canonical unit. Same helper as validate_raw_bar / CanonicalBar.
+CANONICAL_PRICE_UNIT = "integer_vnd"
 
 GENERIC_PXV = frozenset({"STRENGTHEN", "NEUTRAL", "WEAKEN", "CONFLICT", "UNUSABLE"})
 
