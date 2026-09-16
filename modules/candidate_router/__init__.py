@@ -12,23 +12,34 @@ from modules.candidate_router.contract import (
     SRC_HOF,
     SRC_LEARNING_INSIGHT,
     SRC_ROTATION,
+    SymbolProvenance,
     UNIVERSE_CAP,
     WATCHLIST_COLUMNS,
 )
 from modules.candidate_router.elite import nominations_from_buy_elite_history
-from modules.candidate_router.router import build_routed_watchlist, route_candidates
+from modules.candidate_router.router import (
+    RouteReport,
+    build_routed_report,
+    build_routed_watchlist,
+    route_candidates,
+    route_report,
+)
 
 __all__ = [
     "ENABLED_SOURCES",
     "NominatedCandidate",
+    "RouteReport",
     "SOURCE_PRIORITY",
     "SRC_BUY_ELITE",
     "SRC_HOF",
     "SRC_LEARNING_INSIGHT",
     "SRC_ROTATION",
+    "SymbolProvenance",
     "UNIVERSE_CAP",
     "WATCHLIST_COLUMNS",
+    "build_routed_report",
     "build_routed_watchlist",
     "nominations_from_buy_elite_history",
     "route_candidates",
+    "route_report",
 ]

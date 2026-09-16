@@ -28,9 +28,11 @@ from modules.candidate_router.contract import (
 )
 from modules.candidate_router.elite import nominations_from_buy_elite_history
 from modules.candidate_router.router import (
+    build_routed_report,
     build_routed_watchlist,
     classify_nominations,
     route_candidates,
+    route_report,
 )
 from modules.live_camera_shadow.rate import LIVE_UNIVERSE_CAP
 from modules.live_candidate.calendar import next_trading_session_open
@@ -78,11 +80,20 @@ def _nom(
     updated: str | None = None,
     status: str = "ACTIVE",
     reason: str = "BUY ELITE",
+    group: str = "",
+    setup: str = "",
+    source_state: str | None = None,
+    source_action: str = "",
+    source_reason: str | None = None,
 ) -> NominatedCandidate:
     if eligible_from is None:
         eligible_from = first_seen
     if updated is None:
         updated = first_seen
+    if source_state is None:
+        source_state = status
+    if source_reason is None:
+        source_reason = reason
     return NominatedCandidate(
         symbol=symbol,
         source=source,
@@ -92,8 +103,11 @@ def _nom(
         session=session,
         status=status,
         candidate_reason=reason,
-        source_state=status,
-        source_reason=reason,
+        source_state=source_state,
+        source_action=source_action,
+        source_reason=source_reason,
+        group=group,
+        setup=setup,
     )
 
 
@@ -272,7 +286,9 @@ def test_source_provenance_preserved():
     nom = nominations_from_buy_elite_history(hist, now=_ts("2026-08-14 10:05:00"))[0]
     assert nom.source == SRC_BUY_ELITE
     assert nom.source_state == "ACTIVE"
-    assert "BUY ELITE" in nom.source_reason or nom.candidate_reason == "BUY ELITE"
+    assert nom.candidate_reason == "BUY ELITE"
+    assert nom.group == "PULL VỪA"
+    assert nom.setup == ""
 
 
 def test_no_non_elite_source_can_enter_this_slice():
@@ -321,6 +337,8 @@ def test_priority_infrastructure_is_deterministic_when_enabled():
     assert len(out) == 1
     assert out.iloc[0]["source"] == SRC_BUY_ELITE
     assert out.iloc[0]["candidate_first_seen_ts"] == "2026-08-14T10:05:00+07:00"
+    reversed_out = route_candidates([elite, rotation], now=now, enabled_sources=both)
+    pd.testing.assert_frame_equal(out.reset_index(drop=True), reversed_out.reset_index(drop=True))
 
 
 def _imports_candidate_router(path: Path) -> bool:
@@ -373,3 +391,132 @@ def test_router_does_not_stamp_first_seen_via_persist():
         assert "apply_immutable_first_seen" not in text
         assert "systemctl" not in text
         assert ".service" not in text
+
+
+def test_default_router_cap_is_none():
+    assert inspect.signature(route_candidates).parameters["cap"].default is None
+    assert inspect.signature(route_report).parameters["cap"].default is None
+    assert inspect.signature(build_routed_watchlist).parameters["cap"].default is None
+    now = _ts("2026-08-14 11:00:00")
+    noms = [
+        _nom("CCC", eligible_from="2026-08-14T10:30:00+07:00", first_seen="2026-08-14T10:30:00+07:00"),
+        _nom("AAA", eligible_from="2026-08-14T10:10:00+07:00", first_seen="2026-08-14T10:10:00+07:00"),
+        _nom("BBB", eligible_from="2026-08-14T10:10:00+07:00", first_seen="2026-08-14T10:10:00+07:00"),
+        _nom("DDD", eligible_from="2026-08-14T10:40:00+07:00", first_seen="2026-08-14T10:40:00+07:00"),
+    ]
+    out = route_candidates(noms, now=now)
+    assert list(out["symbol"]) == ["AAA", "BBB", "CCC", "DDD"]
+    assert UNIVERSE_CAP == LIVE_UNIVERSE_CAP == 50
+
+
+def test_group_setup_survive_history_adapter_router():
+    hist = _hist(
+        _row("2026-08-14", "HPG", "BUY ELITE", group="PULL ĐẸP"),
+        _row("2026-08-14", "VCB", "MUA NHỎ / ƯU TIÊN", group="MUA EARLY"),
+        observed="2026-08-14 10:05:00",
+    )
+    now = _ts("2026-08-14 10:05:00")
+    noms = nominations_from_buy_elite_history(hist, now=now)
+    by_sym = {n.symbol: n for n in noms}
+    assert by_sym["HPG"].candidate_reason == "BUY ELITE"
+    assert by_sym["HPG"].group == "PULL ĐẸP"
+    assert by_sym["HPG"].setup == ""
+    assert by_sym["VCB"].candidate_reason == "MUA NHỎ / ƯU TIÊN"
+    assert by_sym["VCB"].group == "MUA EARLY"
+    report = build_routed_report(hist, now=now)
+    routed_groups = {n.symbol: n.group for n in report.canonical}
+    assert routed_groups == {"HPG": "PULL ĐẸP", "VCB": "MUA EARLY"}
+    assert list(report.watchlist.columns) == WATCHLIST_COLUMNS
+    assert "group" not in report.watchlist.columns
+    assert "setup" not in report.watchlist.columns
+    current = build_research_watchlist(hist, now=now)
+    pd.testing.assert_frame_equal(
+        current.reset_index(drop=True),
+        report.watchlist.reset_index(drop=True),
+        check_dtype=False,
+    )
+    assert encode_watchlist_text(current) == encode_watchlist_text(report.watchlist)
+
+
+def test_group_is_not_inferred_from_candidate_reason():
+    hist = _hist(_row("2026-08-14", "HPG", "BUY ELITE", group=""), observed="2026-08-14 10:05:00")
+    hist = hist.drop(columns=["group"])
+    now = _ts("2026-08-14 10:05:00")
+    nom = nominations_from_buy_elite_history(hist, now=now)[0]
+    assert nom.candidate_reason == "BUY ELITE"
+    assert nom.group == ""
+    assert nom.setup == ""
+    report = build_routed_report(hist, now=now)
+    assert report.canonical[0].group == ""
+    assert report.canonical[0].setup == ""
+
+
+def test_setup_is_not_manufactured_from_group():
+    hist = _hist(_row("2026-08-14", "HPG", "BUY ELITE", group="CP MẠNH"), observed="2026-08-14 10:05:00")
+    assert "setup" not in hist.columns
+    nom = nominations_from_buy_elite_history(hist, now=_ts("2026-08-14 10:05:00"))[0]
+    assert nom.group == "CP MẠNH"
+    assert nom.setup == ""
+
+
+def test_history_setup_column_is_passed_through_when_present():
+    hist = _hist(_row("2026-08-14", "HPG", "BUY ELITE", group="PULL VỪA"), observed="2026-08-14 10:05:00")
+    hist["setup"] = "PULL VỪA"
+    nom = nominations_from_buy_elite_history(hist, now=_ts("2026-08-14 10:05:00"))[0]
+    assert nom.group == "PULL VỪA"
+    assert nom.setup == "PULL VỪA"
+    assert nom.candidate_reason == "BUY ELITE"
+
+
+def test_competing_nominations_keep_losing_provenance():
+    now = _ts("2026-08-14 11:00:00")
+    elite = _nom(
+        "HPG",
+        source=SRC_BUY_ELITE,
+        first_seen="2026-08-14T10:05:00+07:00",
+        group="PULL ĐẸP",
+        reason="BUY ELITE",
+        source_state="ACTIVE",
+        source_reason="BUY ELITE",
+    )
+    rotation = _nom(
+        "HPG",
+        source=SRC_ROTATION,
+        first_seen="2026-08-14T10:40:00+07:00",
+        group="",
+        setup="",
+        reason="WATCH LOWER",
+        source_state="WATCH",
+        source_action="WATCH LOWER",
+        source_reason="BELOW_LOWER",
+    )
+    both = frozenset({SRC_BUY_ELITE, SRC_ROTATION})
+    a = route_report([rotation, elite], now=now, enabled_sources=both)
+    b = route_report([elite, rotation], now=now, enabled_sources=both)
+    assert a.canonical[0].source == SRC_BUY_ELITE
+    assert b.canonical[0].source == SRC_BUY_ELITE
+    assert a.canonical[0].group == "PULL ĐẸP"
+    assert a.watchlist.iloc[0]["source"] == SRC_BUY_ELITE
+    assert "group" not in a.watchlist.columns
+    pd.testing.assert_frame_equal(a.watchlist.reset_index(drop=True), b.watchlist.reset_index(drop=True))
+
+    def _by_source(report):
+        prov = next(p for p in report.provenance if p.symbol == "HPG")
+        return {n.source: n for n in prov.nominations}, prov
+
+    a_map, a_prov = _by_source(a)
+    b_map, b_prov = _by_source(b)
+    assert a_prov.canonical.source == SRC_BUY_ELITE
+    assert set(a_map) == {SRC_BUY_ELITE, SRC_ROTATION}
+    assert set(b_map) == {SRC_BUY_ELITE, SRC_ROTATION}
+    lost = a_map[SRC_ROTATION]
+    assert lost.source == SRC_ROTATION
+    assert lost.source_reason == "BELOW_LOWER"
+    assert lost.source_state == "WATCH"
+    assert lost.source_action == "WATCH LOWER"
+    assert lost.candidate_first_seen_ts == "2026-08-14T10:40:00+07:00"
+    assert lost.group == ""
+    assert a_map[SRC_BUY_ELITE].group == "PULL ĐẸP"
+    assert a_map[SRC_BUY_ELITE].candidate_first_seen_ts == "2026-08-14T10:05:00+07:00"
+    assert a_prov.nominations[0].source == SRC_BUY_ELITE
+

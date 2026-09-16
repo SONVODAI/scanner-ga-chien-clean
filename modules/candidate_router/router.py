@@ -2,11 +2,14 @@
 
 Offline / shadow foundation. Does not publish, does not write Elite history,
 does not manufacture timestamps.
+
+Source priority picks a canonical nomination per symbol. Losing accepted
+nominations remain on SymbolProvenance.nominations.
 """
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Iterable
 
@@ -27,12 +30,23 @@ from modules.candidate_router.contract import (
     REJECT_SOURCE_NOT_ENABLED,
     RejectedNomination,
     SOURCE_PRIORITY,
-    UNIVERSE_CAP,
+    SymbolProvenance,
     WATCHLIST_COLUMNS,
+    pass_through_meta,
 )
 from modules.candidate_router.elite import nominations_from_buy_elite_history
 from modules.live_candidate.calendar import as_vn
 from modules.live_candidate.contract import has_legal_first_seen
+
+
+@dataclass
+class RouteReport:
+    """Internal routed result. `watchlist` stays the 8-column consumer snapshot."""
+
+    watchlist: pd.DataFrame
+    canonical: tuple[NominatedCandidate, ...]
+    provenance: tuple[SymbolProvenance, ...]
+    rejected: tuple[RejectedNomination, ...]
 
 
 def _parse_ts(raw: object) -> pd.Timestamp | None:
@@ -56,7 +70,7 @@ def classify_nominations(
     now: datetime,
     enabled_sources: frozenset[str] | None = None,
 ) -> tuple[list[NominatedCandidate], list[RejectedNomination]]:
-    """Reject illegal rows. Never fills clocks."""
+    """Reject illegal rows. Never fills clocks. Never invents group/setup."""
     enabled = ENABLED_SOURCES if enabled_sources is None else enabled_sources
     now_ts = pd.Timestamp(as_vn(now))
     accepted: list[NominatedCandidate] = []
@@ -70,6 +84,12 @@ def classify_nominations(
             candidate_first_seen_ts=str(raw.candidate_first_seen_ts or "").strip(),
             candidate_updated_ts=str(raw.candidate_updated_ts or "").strip(),
             eligible_from=str(raw.eligible_from or "").strip(),
+            group=pass_through_meta(raw.group),
+            setup=pass_through_meta(raw.setup),
+            source_state=pass_through_meta(raw.source_state),
+            source_action=pass_through_meta(raw.source_action),
+            source_reason=pass_through_meta(raw.source_reason),
+            candidate_reason=str(raw.candidate_reason or "").strip(),
         )
         if nom.source not in enabled:
             rejected.append(RejectedNomination(nom, REJECT_SOURCE_NOT_ENABLED))
@@ -115,7 +135,7 @@ def _updated_key(nom: NominatedCandidate) -> str:
 
 
 def _dedup_sort_key(nom: NominatedCandidate) -> tuple:
-    """Ascending; last row per symbol is the winner.
+    """Ascending; last row per symbol is the canonical winner.
 
     Winner: highest source priority (lowest integer), then latest first_seen
     (chronology cannot move backward), then latest updated_ts, then stable ids.
@@ -128,15 +148,33 @@ def _dedup_sort_key(nom: NominatedCandidate) -> tuple:
         nom.source,
         nom.eligible_from,
         nom.status,
+        nom.group,
+        nom.setup,
     )
 
 
+def dedup_with_provenance(noms: Iterable[NominatedCandidate]) -> list[SymbolProvenance]:
+    """Canonical winner per symbol; all accepted competitors stay inspectable."""
+    by_symbol: dict[str, list[NominatedCandidate]] = {}
+    for nom in noms:
+        by_symbol.setdefault(nom.symbol, []).append(nom)
+    out: list[SymbolProvenance] = []
+    for symbol in sorted(by_symbol):
+        competitors = sorted(by_symbol[symbol], key=_dedup_sort_key)
+        winner = competitors[-1]
+        rest = tuple(competitors[:-1])
+        out.append(
+            SymbolProvenance(
+                symbol=symbol,
+                canonical=winner,
+                nominations=(winner,) + rest,
+            )
+        )
+    return out
+
+
 def dedup_nominations(noms: Iterable[NominatedCandidate]) -> list[NominatedCandidate]:
-    ordered = sorted(noms, key=_dedup_sort_key)
-    by_symbol: dict[str, NominatedCandidate] = {}
-    for nom in ordered:
-        by_symbol[nom.symbol] = nom
-    return [by_symbol[sym] for sym in sorted(by_symbol)]
+    return [item.canonical for item in dedup_with_provenance(noms)]
 
 
 def apply_universe_cap(
@@ -144,6 +182,7 @@ def apply_universe_cap(
     *,
     cap: int | None,
 ) -> list[NominatedCandidate]:
+    """Optional Camera-style trim. cap=None is the Candidate Router default."""
     rows = list(noms)
     if cap is None:
         return sorted(rows, key=lambda n: (n.symbol, n.candidate_first_seen_ts))
@@ -152,6 +191,7 @@ def apply_universe_cap(
 
 
 def to_watchlist_frame(noms: Iterable[NominatedCandidate]) -> pd.DataFrame:
+    """Production-compatible 8 columns. group/setup stay on NominatedCandidate only."""
     rows = [
         {
             "session": n.session,
@@ -170,6 +210,30 @@ def to_watchlist_frame(noms: Iterable[NominatedCandidate]) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=WATCHLIST_COLUMNS)
 
 
+def route_report(
+    nominations: Iterable[NominatedCandidate],
+    *,
+    now: datetime,
+    cap: int | None = None,
+    enabled_sources: frozenset[str] | None = None,
+) -> RouteReport:
+    """Route with inspectable provenance. Default cap=None (no discovery cap)."""
+    accepted, rejected = classify_nominations(
+        nominations,
+        now=now,
+        enabled_sources=enabled_sources,
+    )
+    provenance = tuple(dedup_with_provenance(accepted))
+    winners = [item.canonical for item in provenance]
+    canonical = tuple(apply_universe_cap(winners, cap=cap))
+    return RouteReport(
+        watchlist=to_watchlist_frame(canonical),
+        canonical=canonical,
+        provenance=provenance,
+        rejected=tuple(rejected),
+    )
+
+
 def route_candidates(
     nominations: Iterable[NominatedCandidate],
     *,
@@ -177,14 +241,24 @@ def route_candidates(
     cap: int | None = None,
     enabled_sources: frozenset[str] | None = None,
 ) -> pd.DataFrame:
-    """Dedup / priority / cap. Output columns match the live Candidate watchlist."""
-    accepted, _rejected = classify_nominations(
+    """Dedup / priority / optional cap. Output columns match the live Candidate watchlist."""
+    return route_report(
         nominations,
         now=now,
+        cap=cap,
         enabled_sources=enabled_sources,
-    )
-    capped = apply_universe_cap(dedup_nominations(accepted), cap=cap)
-    return to_watchlist_frame(capped)
+    ).watchlist
+
+
+def build_routed_report(
+    history: pd.DataFrame | None,
+    *,
+    now: datetime,
+    cap: int | None = None,
+) -> RouteReport:
+    """Slice 1 Elite-only report. Does not publish. Default cap=None."""
+    noms = nominations_from_buy_elite_history(history, now=now)
+    return route_report(noms, now=now, cap=cap)
 
 
 def build_routed_watchlist(
@@ -195,19 +269,21 @@ def build_routed_watchlist(
 ) -> pd.DataFrame:
     """Slice 1 Elite-only routed watchlist. Does not publish.
 
-    cap=None preserves current Elite watchlist order/membership.
-    cap=UNIVERSE_CAP (50) is the camera-compatible universe trim.
+    cap=None (default): same membership/order as the current Elite watchlist.
+    Passing an integer is an optional later Camera poll trim, not discovery.
     """
-    noms = nominations_from_buy_elite_history(history, now=now)
-    return route_candidates(noms, now=now, cap=cap)
+    return build_routed_report(history, now=now, cap=cap).watchlist
 
 
 __all__ = [
-    "UNIVERSE_CAP",
+    "RouteReport",
     "apply_universe_cap",
+    "build_routed_report",
     "build_routed_watchlist",
     "classify_nominations",
     "dedup_nominations",
+    "dedup_with_provenance",
     "route_candidates",
+    "route_report",
     "to_watchlist_frame",
 ]
