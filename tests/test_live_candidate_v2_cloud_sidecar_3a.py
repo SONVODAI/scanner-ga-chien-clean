@@ -459,7 +459,7 @@ def test_app_hook_gates_import_and_call_before_learning():
     assert "cloud_hook" not in orelse_dump
     assert "run_v2_cloud_sidecar" not in orelse_dump
     truthy = {
-        const.value
+        node.value
         for node in ast.walk(gated_if.test)
         if isinstance(node, ast.Constant) and isinstance(node.value, str)
     }
