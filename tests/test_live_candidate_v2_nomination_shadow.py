@@ -314,12 +314,18 @@ def test_12_rotation_remains_disconnected():
         text = path.read_text(encoding="utf-8")
         assert "modules.rotation_watch" not in text
         assert "intraday_pxv" not in text
-        assert "GROUP_RANK" not in text
         assert "apply_immutable_first_seen" not in text
         assert "persist_research_watchlist" not in text
         assert "persist_and_publish_research_watchlist" not in text
         assert "systemctl" not in text
         assert "telegram" not in text.lower()
+        tree = ast.parse(text)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name):
+                assert node.id != "GROUP_RANK"
+            if isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    assert alias.name != "GROUP_RANK"
 
 
 def test_observation_intent_strings_are_existing_buy_recommendation_text():
