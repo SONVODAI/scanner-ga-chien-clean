@@ -106,6 +106,7 @@ st.set_page_config(
 
 st.title("🤖 Mr.BOT PRO V4.0 - Scanner Gà Chiến")
 st.caption("Observe • Learn • Think • Evolve. Market First → Mr.BOT PRO → Decision Engine → Learning Engine → Thinking Engine → Bot Evolution. Không dự đoán tương lai; chỉ học từ quá khứ để hỗ trợ quyết định hiện tại.")
+st.caption("LCV2-COMMISSION-20260916-A")
 
 # LIVE CANDIDATE × P×V — isolated read-only observation panel.
 # Failure must not break production.
