@@ -1,0 +1,38 @@
+{
+  "schema": "live_candidate_v2_camera_sidecar_v1",
+  "slice": 2,
+  "mode": "SHADOW_ONLY",
+  "candidate_is_buy": false,
+  "alert_eligible": false,
+  "router_wired_to_production": false,
+  "production_enabled_sources": [
+    "buy_elite_learning_history"
+  ],
+  "shadow_enabled_sources": [
+    "brain_a_scan_setup"
+  ],
+  "watchlist_columns_untouched": [
+    "session",
+    "symbol",
+    "candidate_first_seen_ts",
+    "candidate_updated_ts",
+    "candidate_reason",
+    "source",
+    "status",
+    "eligible_from"
+  ],
+  "session": "2026-09-16",
+  "observed_at": "2026-09-16T20:57:15.805461+07:00",
+  "generated_at": "2026-09-16T20:57:15.805461+07:00",
+  "market_real": 5.2,
+  "market_permission": "WATCHLIST - MARKET YẾU",
+  "notes": [
+    "Candidate != BUY.",
+    "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
+    "Brain B is not required. OR not AND.",
+    "No GitHub publish in Slice 3A. Local freeze_ledger only.",
+    "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd."
+  ],
+  "freeze_ledger": [],
+  "rows": []
+}
