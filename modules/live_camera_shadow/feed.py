@@ -31,6 +31,12 @@ from modules.live_camera_shadow.bars import (
 )
 from modules.live_camera_shadow.rate import GUEST_RPM, LIVE_UNIVERSE_CAP, rate_report
 from modules.live_camera_shadow.universe import eligible_watchlist_symbols
+from modules.live_candidate_v2_camera.feed_pass import (
+    is_v2_camera_row,
+    v2_event_reason,
+    v2_evidence_overlay,
+    v2_nomination_source,
+)
 from modules.live_shadow_transport.contract import (
     EVIDENCE_TRANSPORT_ERROR,
     WATCHLIST_TRANSPORT_ERROR,
@@ -371,13 +377,21 @@ class LiveShadowFeed:
 
         overlay = completed_to_overlay(completed)
         self._last_overlay[symbol] = overlay
+        if is_v2_camera_row(rec):
+            event_reason = v2_event_reason(rec)
+            event_source = v2_nomination_source(rec)
+            event_context = str(rec.get("setup") or rec.get("group") or "")
+        else:
+            event_reason = str(rec.get("candidate_reason") or "BUY ELITE")
+            event_source = "live_shadow"
+            event_context = str(rec.get("bot_context") or "")
         event = CandidateEvent(
             symbol=symbol,
             session=session,
-            candidate_reason=str(rec.get("candidate_reason") or "BUY ELITE"),
+            candidate_reason=event_reason,
             candidate_ts=str(rec.get("candidate_first_seen_ts") or ""),
-            bot_context=str(rec.get("bot_context") or ""),
-            source="live_shadow",
+            bot_context=event_context,
+            source=event_source,
             candidate_first_seen_ts=str(rec.get("candidate_first_seen_ts") or ""),
             candidate_updated_ts=str(rec.get("candidate_updated_ts") or ""),
         )
@@ -464,6 +478,16 @@ class LiveShadowFeed:
                 "bar_source": row.bar_source_last,
                 "candidate_time_provenance": legal.provenance,
             }
+            if is_v2_camera_row(rec):
+                evidence_row.update(
+                    v2_evidence_overlay(
+                        rec,
+                        close=bar.get("close"),
+                        camera_session=session.isoformat(),
+                        feed_source="live_shadow",
+                    )
+                )
+                evidence_row["pxv_implies_buy"] = False
             self.new_bar_rows.append(bar_row)
             self.new_evidence_rows.append(evidence_row)
             self._emitted.add(key)

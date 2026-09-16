@@ -1,0 +1,41 @@
+{
+  "symbol": "HPG",
+  "setup": "PULL ĐẸP",
+  "nomination_reason": "PRIMARY setup PULL ĐẸP",
+  "observation_intent": "WATCH_PRICE_TAPE_VS_FROZEN_REF",
+  "observation_reference": "EMA9",
+  "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+  "eligible_from": "2026-08-14T10:05:00+07:00",
+  "nomination_session": "2026-08-14",
+  "camera_session": "2026-08-14",
+  "nomination_source": "brain_a_scan_setup",
+  "source": "brain_a_scan_setup",
+  "feed_source": "live_shadow",
+  "ema9_at_first_seen": 27.1,
+  "close": 27700.0,
+  "close_canonical": 27700,
+  "reference_value": 27.1,
+  "reference_canonical": 27100,
+  "price_unit": "integer_vnd",
+  "close_vs_ref": 600.0,
+  "close_vs_ref_pct": 2.2140221402214022,
+  "reference_state": "EMA9",
+  "published_evidence": "NEUTRAL",
+  "candidate_is_buy": false,
+  "alert_eligible": false,
+  "elite_buy_grade": "BUY ELITE",
+  "provenance": [
+    {
+      "source": "brain_a_scan_setup",
+      "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+      "setup": "PULL ĐẸP",
+      "group": "PULL ĐẸP",
+      "source_action": "MUA PULL ĐẸP",
+      "source_reason": "Pull sát EMA9, OBV còn xanh",
+      "candidate_reason": "PRIMARY setup PULL ĐẸP",
+      "status": "NOMINATED",
+      "eligible_from": "2026-08-14T10:05:00+07:00"
+    }
+  ],
+  "pxv_implies_buy": false
+}

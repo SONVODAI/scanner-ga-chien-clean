@@ -1,0 +1,117 @@
+{
+  "schema": "live_candidate_v2_camera_sidecar_v1",
+  "slice": 2,
+  "mode": "SHADOW_ONLY",
+  "candidate_is_buy": false,
+  "alert_eligible": false,
+  "router_wired_to_production": false,
+  "production_enabled_sources": [
+    "buy_elite_learning_history"
+  ],
+  "shadow_enabled_sources": [
+    "brain_a_scan_setup"
+  ],
+  "watchlist_columns_untouched": [
+    "session",
+    "symbol",
+    "candidate_first_seen_ts",
+    "candidate_updated_ts",
+    "candidate_reason",
+    "source",
+    "status",
+    "eligible_from"
+  ],
+  "observed_at": "2026-08-14T10:05:00+07:00",
+  "market_real": 7.2,
+  "market_permission": "OK",
+  "notes": [
+    "Candidate != BUY.",
+    "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
+    "Brain B is not required. OR not AND.",
+    "No GitHub publish in Slice 2."
+  ],
+  "rows": [
+    {
+      "v2_camera": true,
+      "symbol": "HPG",
+      "session": "2026-08-14",
+      "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+      "candidate_updated_ts": "2026-08-14T10:05:00+07:00",
+      "eligible_from": "2026-08-14T10:05:00+07:00",
+      "source": "brain_a_scan_setup",
+      "nomination_source": "brain_a_scan_setup",
+      "status": "NOMINATED",
+      "setup": "PULL ĐẸP",
+      "group": "PULL ĐẸP",
+      "observation_intent": "WATCH_PRICE_TAPE_VS_FROZEN_REF",
+      "observation_reference": "EMA9",
+      "price_at_first_seen": 27.5,
+      "ema9_at_first_seen": 27.1,
+      "breakout_ref_at_first_seen": 28.0,
+      "source_action": "MUA PULL ĐẸP",
+      "source_reason": "Pull sát EMA9, OBV còn xanh",
+      "nomination_reason": "PRIMARY setup PULL ĐẸP",
+      "candidate_reason": "PRIMARY setup PULL ĐẸP",
+      "elite_buy_grade": "BUY ELITE",
+      "market_real": 7.2,
+      "market_permission": "OK",
+      "provenance": [
+        {
+          "source": "brain_a_scan_setup",
+          "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+          "setup": "PULL ĐẸP",
+          "group": "PULL ĐẸP",
+          "source_action": "MUA PULL ĐẸP",
+          "source_reason": "Pull sát EMA9, OBV còn xanh",
+          "candidate_reason": "PRIMARY setup PULL ĐẸP",
+          "status": "NOMINATED",
+          "eligible_from": "2026-08-14T10:05:00+07:00"
+        }
+      ],
+      "candidate_is_buy": false,
+      "alert_eligible": false,
+      "chronology_status": "ELIGIBLE"
+    },
+    {
+      "v2_camera": true,
+      "symbol": "SSI",
+      "session": "2026-08-14",
+      "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+      "candidate_updated_ts": "2026-08-14T10:05:00+07:00",
+      "eligible_from": "2026-08-14T10:05:00+07:00",
+      "source": "brain_a_scan_setup",
+      "nomination_source": "brain_a_scan_setup",
+      "status": "NOMINATED",
+      "setup": "MUA BREAK",
+      "group": "MUA BREAK",
+      "observation_intent": "WATCH_PRICE_TAPE_VS_FROZEN_REF",
+      "observation_reference": "BREAKOUT_REF",
+      "price_at_first_seen": 32.0,
+      "ema9_at_first_seen": 30.8,
+      "breakout_ref_at_first_seen": 31.5,
+      "source_action": "MUA BREAK",
+      "source_reason": "Break xác nhận, không đuổi quá xa",
+      "nomination_reason": "PRIMARY setup MUA BREAK",
+      "candidate_reason": "PRIMARY setup MUA BREAK",
+      "elite_buy_grade": "",
+      "market_real": 7.2,
+      "market_permission": "OK",
+      "provenance": [
+        {
+          "source": "brain_a_scan_setup",
+          "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+          "setup": "MUA BREAK",
+          "group": "MUA BREAK",
+          "source_action": "MUA BREAK",
+          "source_reason": "Break xác nhận, không đuổi quá xa",
+          "candidate_reason": "PRIMARY setup MUA BREAK",
+          "status": "NOMINATED",
+          "eligible_from": "2026-08-14T10:05:00+07:00"
+        }
+      ],
+      "candidate_is_buy": false,
+      "alert_eligible": false,
+      "chronology_status": "ELIGIBLE"
+    }
+  ]
+}
