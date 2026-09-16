@@ -21,14 +21,35 @@
     "status",
     "eligible_from"
   ],
+  "session": "2026-08-14",
   "observed_at": "2026-08-14T10:05:00+07:00",
+  "generated_at": "2026-08-14T10:05:00+07:00",
   "market_real": 7.2,
   "market_permission": "OK",
   "notes": [
     "Candidate != BUY.",
     "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
     "Brain B is not required. OR not AND.",
-    "No GitHub publish in Slice 2."
+    "No GitHub publish in Slice 3A. Local freeze_ledger only.",
+    "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd."
+  ],
+  "freeze_ledger": [
+    {
+      "session": "2026-08-14",
+      "symbol": "HPG",
+      "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+      "price_at_first_seen": 27.5,
+      "ema9_at_first_seen": 27.1,
+      "breakout_ref_at_first_seen": 28.0
+    },
+    {
+      "session": "2026-08-14",
+      "symbol": "SSI",
+      "candidate_first_seen_ts": "2026-08-14T10:05:00+07:00",
+      "price_at_first_seen": 32.0,
+      "ema9_at_first_seen": 30.8,
+      "breakout_ref_at_first_seen": 31.5
+    }
   ],
   "rows": [
     {

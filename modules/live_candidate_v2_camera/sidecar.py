@@ -8,6 +8,7 @@ Does not enable Brain B. Absence of Brain B never blocks Brain A.
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -20,6 +21,7 @@ from modules.candidate_router.contract import (
 )
 from modules.candidate_router.router import RouteReport, route_report, to_watchlist_frame
 from modules.live_candidate.calendar import as_vn
+from modules.live_candidate.contract import has_legal_first_seen
 from modules.live_candidate_v2_camera.contract import (
     DEFAULT_SIDECAR_RELPATH,
     MODE,
@@ -29,7 +31,7 @@ from modules.live_candidate_v2_camera.contract import (
     SLICE,
 )
 from modules.live_candidate_v2_nomination.artifact import assert_not_production_watchlist
-from modules.live_candidate_v2_nomination.contract import BrainANomination
+from modules.live_candidate_v2_nomination.contract import BrainANomination, FreezeRecord
 from modules.live_candidate_v2_nomination.nominate import (
     NominationReport,
     from_nominated_candidate,
@@ -40,6 +42,10 @@ from modules.live_candidate_v2_nomination.nominate import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SIDECAR_PATH = REPO_ROOT / DEFAULT_SIDECAR_RELPATH
 PRODUCTION_WATCHLIST = REPO_ROOT / PRODUCTION_WATCHLIST_RELPATH
+
+
+class SidecarShadowError(RuntimeError):
+    """V2 sidecar load/write failure. Not a valid empty universe."""
 
 
 def shadow_route_v2(
@@ -147,12 +153,123 @@ def build_sidecar_rows(
     return rows
 
 
+def freeze_record_from_mapping(raw: Mapping[str, Any]) -> FreezeRecord | None:
+    session = str(raw.get("session") or "").strip()
+    symbol = str(raw.get("symbol") or "").strip().upper()
+    first = str(raw.get("candidate_first_seen_ts") or "").strip()
+    if not session or not symbol or not has_legal_first_seen(first):
+        return None
+    return FreezeRecord(
+        session=session,
+        symbol=symbol,
+        candidate_first_seen_ts=first,
+        price_at_first_seen=_freeze_num(raw.get("price_at_first_seen")),
+        ema9_at_first_seen=_freeze_num(raw.get("ema9_at_first_seen")),
+        breakout_ref_at_first_seen=_freeze_num(raw.get("breakout_ref_at_first_seen")),
+    )
+
+
+def _freeze_num(value: object) -> float | None:
+    if value is None or value == "":
+        return None
+    try:
+        n = float(value)
+    except (TypeError, ValueError):
+        return None
+    if n != n:
+        return None
+    return n
+
+
+def freeze_records_from_document(doc: Mapping[str, Any]) -> tuple[FreezeRecord, ...]:
+    """Recover prior_freeze from a loaded sidecar. Rows backfill if ledger absent."""
+    out: dict[tuple[str, str], FreezeRecord] = {}
+    ledger = doc.get("freeze_ledger")
+    if ledger is not None:
+        if not isinstance(ledger, list):
+            raise SidecarShadowError("sidecar freeze_ledger is not a list")
+        for raw in ledger:
+            if not isinstance(raw, Mapping):
+                raise SidecarShadowError("sidecar freeze_ledger entry is not an object")
+            rec = freeze_record_from_mapping(raw)
+            if rec is None:
+                continue
+            out[(rec.session, rec.symbol)] = rec
+    rows = doc.get("rows")
+    if isinstance(rows, list):
+        for raw in rows:
+            if not isinstance(raw, Mapping):
+                continue
+            rec = freeze_record_from_mapping(raw)
+            if rec is None:
+                continue
+            out.setdefault((rec.session, rec.symbol), rec)
+    return tuple(sorted(out.values(), key=lambda r: (r.session, r.symbol)))
+
+
+def freeze_ledger_as_dicts(records: Iterable[FreezeRecord] | None) -> list[dict[str, Any]]:
+    rows = [
+        {
+            "session": rec.session,
+            "symbol": rec.symbol,
+            "candidate_first_seen_ts": rec.candidate_first_seen_ts,
+            "price_at_first_seen": rec.price_at_first_seen,
+            "ema9_at_first_seen": rec.ema9_at_first_seen,
+            "breakout_ref_at_first_seen": rec.breakout_ref_at_first_seen,
+        }
+        for rec in records or ()
+    ]
+    rows.sort(key=lambda r: (str(r.get("session") or ""), str(r.get("symbol") or "")))
+    return rows
+
+
+def load_sidecar_document(path: Path) -> dict[str, Any] | None:
+    """Return parsed sidecar, None if missing. Corrupt/unreadable raises SidecarShadowError."""
+    src = Path(path)
+    if not src.exists():
+        return None
+    try:
+        text = src.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SidecarShadowError(f"unreadable sidecar: {exc}") from exc
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise SidecarShadowError(f"corrupted sidecar JSON: {exc}") from exc
+    if not isinstance(data, dict):
+        raise SidecarShadowError("sidecar is not a JSON object")
+    if "rows" not in data or not isinstance(data.get("rows"), list):
+        raise SidecarShadowError("sidecar missing rows list")
+    return data
+
+
+def atomic_write_text(path: Path, text: str) -> None:
+    """Same-directory temp + flush/fsync + os.replace."""
+    dest = Path(path)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(dest.name + ".tmp")
+    try:
+        with tmp.open("w", encoding="utf-8") as fh:
+            fh.write(text)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, dest)
+    except Exception:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+        raise
+
+
 def build_sidecar_from_scan(
     rows: Sequence[Mapping[str, Any]] | None,
     *,
     market_real: object,
     observed_at: datetime,
     prior_freeze: Iterable | None = None,
+    early_lab_symbols: Iterable[str] | None = None,
 ) -> tuple[NominationReport, list[dict[str, Any]]]:
     """Nominate (Brain A) then shadow-route into sidecar. Brain B is not consulted.
 
@@ -166,6 +283,7 @@ def build_sidecar_from_scan(
         market_real=market_real,
         observed_at=observed_at,
         prior_freeze=prior_freeze,
+        early_lab_symbols=early_lab_symbols,
         route=False,
     )
     now = as_vn(observed_at)
@@ -202,8 +320,12 @@ def build_sidecar_document(
     observed_at: datetime,
     market_real: object = None,
     market_permission: str = "",
+    freeze_ledger: Iterable[FreezeRecord] | None = None,
+    generated_at: datetime | None = None,
+    session: str | None = None,
 ) -> dict[str, Any]:
     now = as_vn(observed_at)
+    generated = as_vn(generated_at) if generated_at is not None else now
     return {
         "schema": SCHEMA_ID,
         "slice": SLICE,
@@ -214,16 +336,19 @@ def build_sidecar_document(
         "production_enabled_sources": sorted(ENABLED_SOURCES),
         "shadow_enabled_sources": sorted(SHADOW_V2_ENABLED_SOURCES),
         "watchlist_columns_untouched": list(WATCHLIST_COLUMNS),
+        "session": session or now.date().isoformat(),
         "observed_at": now.isoformat(),
+        "generated_at": generated.isoformat(),
         "market_real": market_real,
         "market_permission": market_permission,
         "notes": [
             "Candidate != BUY.",
             "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
             "Brain B is not required. OR not AND.",
-            "No GitHub publish in Slice 2.",
+            "No GitHub publish in Slice 3A. Local freeze_ledger only.",
             "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd.",
         ],
+        "freeze_ledger": freeze_ledger_as_dicts(freeze_ledger),
         "rows": [dict(r) for r in rows],
     }
 
@@ -239,6 +364,9 @@ def write_sidecar(
     path: Path | None = None,
     market_real: object = None,
     market_permission: str = "",
+    freeze_ledger: Iterable[FreezeRecord] | None = None,
+    generated_at: datetime | None = None,
+    session: str | None = None,
 ) -> Path:
     out = Path(path) if path is not None else DEFAULT_SIDECAR_PATH
     assert_not_production_watchlist(out)
@@ -248,8 +376,11 @@ def write_sidecar(
         observed_at=observed_at,
         market_real=market_real,
         market_permission=market_permission,
+        freeze_ledger=freeze_ledger,
+        generated_at=generated_at,
+        session=session,
     )
-    out.write_text(encode_sidecar_text(doc), encoding="utf-8")
+    atomic_write_text(out, encode_sidecar_text(doc))
     return out
 
 

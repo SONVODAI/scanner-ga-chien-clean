@@ -19,6 +19,11 @@ SHADOW_V2_ENABLED_SOURCES = frozenset({SRC_BRAIN_A})
 DEFAULT_SIDECAR_RELPATH = "research/live_candidate_v2_camera_sidecar/camera_sidecar.json"
 PRODUCTION_WATCHLIST_RELPATH = "data/live_candidate/dynamic_watchlist.json"
 
+# Slice 3A Cloud local writer. Default OFF. Do not overload Elite/live-camera flags.
+ENV_V2_CLOUD_SIDECAR = "MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR"
+ENV_V2_CLOUD_SIDECAR_TRUTHY = frozenset({"1", "true", "yes", "on"})
+ENV_V2_CLOUD_SIDECAR_FALSY = frozenset({"", "0", "false", "no", "off"})
+
 REF_EMA9 = "EMA9"
 REF_BREAKOUT = "BREAKOUT_REF"
 REF_UNAVAILABLE = "UNAVAILABLE"
