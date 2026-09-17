@@ -185,17 +185,16 @@ def test_research_execution_path_unchanged():
 
     import modules.edge_research.ui as ui_mod
 
-    helper = inspect.getsource(ui_mod._render_durable_restore_diagnostic)
-    assert "try_restore_durable" not in helper
-    assert "try_restore_production_observations_durable" not in helper
-    assert "read_persistence_status" in helper
-    assert "run_discovery" not in helper
-    assert "Durable Restore Diagnostic — TEMP" in helper
-
+    ui_src = (REPO / "modules/edge_research/ui.py").read_text(encoding="utf-8")
+    assert "_render_durable_restore_diagnostic" not in ui_src
+    assert "Durable Restore Diagnostic — TEMP" not in ui_src
+    assert "cloud_token_presence_diagnostic" not in ui_src
     panel = inspect.getsource(ui_mod.render_edge_research_panel)
-    assert "_render_durable_restore_diagnostic" in panel
+    assert "build_autonomous_daily_edge_ui_view" in panel
+    assert "engine.initialize" in panel
     assert panel.index("build_autonomous_daily_edge_ui_view") < panel.index("engine.initialize")
-    assert panel.index("engine.initialize") < panel.index("_render_durable_restore_diagnostic")
+    assert "try_restore_durable" not in panel
+    assert "try_restore_production_observations_durable" not in panel
 
 
 def _empty_restore_maps():
@@ -262,6 +261,8 @@ def test_token_presence_probe_does_not_add_http():
 
 def test_ui_expander_does_not_change_metric_labels():
     src = (REPO / "modules/edge_research/ui.py").read_text(encoding="utf-8")
+    assert "Durable Restore Diagnostic — TEMP" not in src
+    assert "_render_durable_restore_diagnostic" not in src
     assert 'st.metric("Engine status"' in src
     assert 'st.metric("Hypotheses"' in src
     assert 'st.metric("Observed Market episodes"' in src
