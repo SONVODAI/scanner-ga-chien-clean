@@ -2,12 +2,12 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "THINKING",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-09-16 21:16:24",
-  "completed_t5": 928,
-  "baseline_winrate": 0.3664,
+  "updated_at": "2026-09-17 08:20:08",
+  "completed_t5": 944,
+  "baseline_winrate": 0.3686,
   "observation": {
-    "date": "2026-09-16",
-    "time": "21:16:24",
+    "date": "2026-09-17",
+    "time": "08:20:08",
     "market_real": 5.0,
     "market_forecast": 0.5,
     "regime": "🔴 MÙA ĐÔNG",
@@ -15,32 +15,31 @@
     "signals_today": 10,
     "top_watch": "ACB, FPT, MSR",
     "avg_winprob": 51.9,
-    "avg_elite_score": 56.9,
+    "avg_elite_score": 56.7,
     "high_consensus_count": 3
   },
   "hypotheses": [
-    "🟡 Market REAL >= 8: n=206, WinRate=29.1%, AvgT+5=-1.11, lệch baseline -7.5% → GIẢ THUYẾT MẠNH",
-    "🟠 Storm trong Mùa Đông: n=130, WinRate=31.5%, AvgT+5=-2.16, lệch baseline -5.1% → GIẢ THUYẾT"
+    "🟡 Market REAL >= 8: n=206, WinRate=29.1%, AvgT+5=-1.11, lệch baseline -7.7% → GIẢ THUYẾT MẠNH"
   ],
   "beliefs": [],
   "reflections": [
     "🪞 Chưa có đủ mẫu để phản biện một niềm tin cụ thể. Bot giữ thái độ: mọi kết luận chỉ đúng cho đến khi dữ liệu mới chứng minh điều ngược lại."
   ],
-  "current_thought": "🟡 Market REAL >= 8: n=206, WinRate=29.1%, AvgT+5=-1.11, lệch baseline -7.5% → GIẢ THUYẾT MẠNH",
-  "note": "Thinking Engine V3.1 đang ở chế độ THINKING. Baseline WinRate T+5 = 36.6%, Avg T+5 = -1.01%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
-  "avg_t5_return": -1.006,
+  "current_thought": "🟡 Market REAL >= 8: n=206, WinRate=29.1%, AvgT+5=-1.11, lệch baseline -7.7% → GIẢ THUYẾT MẠNH",
+  "note": "Thinking Engine V3.1 đang ở chế độ THINKING. Baseline WinRate T+5 = 36.9%, Avg T+5 = -0.98%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
+  "avg_t5_return": -0.981,
   "observations": [
-    "⚪ Nhóm Break: n=4, WinRate=25.0%, AvgT+5=-0.17, lệch baseline -11.6% → QUAN SÁT",
-    "⚪ Storm >= 15: n=71, WinRate=26.8%, AvgT+5=-0.47, lệch baseline -9.9% → QUAN SÁT",
-    "⚪ Market REAL < 6: n=287, WinRate=41.1%, AvgT+5=-1.2, lệch baseline 4.5% → QUAN SÁT",
-    "⚪ Xa EMA9 >4%: n=9, WinRate=33.3%, AvgT+5=-0.16, lệch baseline -3.3% → QUAN SÁT",
-    "⚪ RSI > 72: n=3, WinRate=33.3%, AvgT+5=-1.37, lệch baseline -3.3% → QUAN SÁT",
-    "⚪ Persistence >= 3.5: n=215, WinRate=39.1%, AvgT+5=-0.54, lệch baseline 2.4% → QUAN SÁT",
-    "⚪ Persistence >= 5.0: n=29, WinRate=34.5%, AvgT+5=-1.09, lệch baseline -2.2% → QUAN SÁT",
-    "⚪ Market REAL >= 6: n=641, WinRate=34.6%, AvgT+5=-0.92, lệch baseline -2.0% → QUAN SÁT",
-    "⚪ Có Storm xác nhận: n=355, WinRate=34.6%, AvgT+5=-1.24, lệch baseline -2.0% → QUAN SÁT",
-    "⚪ Pull trong Mùa Đông: n=152, WinRate=35.5%, AvgT+5=-1.95, lệch baseline -1.1% → QUAN SÁT",
-    "⚪ RSI 55-65: n=524, WinRate=37.0%, AvgT+5=-1.21, lệch baseline 0.4% → QUAN SÁT",
-    "⚪ Nhóm Pull: n=412, WinRate=36.9%, AvgT+5=-1.14, lệch baseline 0.3% → QUAN SÁT"
+    "⚪ Nhóm Break: n=4, WinRate=25.0%, AvgT+5=-0.17, lệch baseline -11.9% → QUAN SÁT",
+    "⚪ Storm >= 15: n=74, WinRate=27.0%, AvgT+5=-0.38, lệch baseline -9.8% → QUAN SÁT",
+    "⚪ Market REAL < 6: n=303, WinRate=41.6%, AvgT+5=-1.12, lệch baseline 4.7% → QUAN SÁT",
+    "⚪ Storm trong Mùa Đông: n=142, WinRate=32.4%, AvgT+5=-1.91, lệch baseline -4.5% → QUAN SÁT",
+    "⚪ Xa EMA9 >4%: n=9, WinRate=33.3%, AvgT+5=-0.16, lệch baseline -3.5% → QUAN SÁT",
+    "⚪ RSI > 72: n=3, WinRate=33.3%, AvgT+5=-1.37, lệch baseline -3.5% → QUAN SÁT",
+    "⚪ Persistence >= 5.0: n=29, WinRate=34.5%, AvgT+5=-1.09, lệch baseline -2.4% → QUAN SÁT",
+    "⚪ Market REAL >= 6: n=641, WinRate=34.6%, AvgT+5=-0.92, lệch baseline -2.2% → QUAN SÁT",
+    "⚪ Persistence >= 3.5: n=218, WinRate=39.0%, AvgT+5=-0.56, lệch baseline 2.1% → QUAN SÁT",
+    "⚪ Có Storm xác nhận: n=367, WinRate=34.9%, AvgT+5=-1.17, lệch baseline -2.0% → QUAN SÁT",
+    "⚪ Pull trong Mùa Đông: n=165, WinRate=36.4%, AvgT+5=-1.73, lệch baseline -0.5% → QUAN SÁT",
+    "⚪ RSI 55-65: n=537, WinRate=37.2%, AvgT+5=-1.16, lệch baseline 0.4% → QUAN SÁT"
   ]
 }
