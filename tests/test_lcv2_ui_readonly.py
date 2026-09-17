@@ -298,10 +298,161 @@ def test_app_placement_and_gate_captions_unchanged():
     assert "_v2_ui = None" in src
     assert "_v2_ui = v2_ui_from_get(_v2_fetched)" in src
     assert "v2_ui_from_failure(" in src
-    hook = src[src.index("_v2_ui = None") : src.index("except Exception as e:")]
+    hook_start = src.index("_v2_ui = None")
+    hook = src[hook_start : src.index("except Exception as e:", hook_start)]
     assert "st.session_state" not in hook
     assert "dynamic_watchlist.json" not in hook
+    assert "fetch_v2_sidecar()" in hook
     assert PROD_WATCHLIST.exists()
+
+
+def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
+    """P×V → reserved V2 slot → Rotation Watch. Fill uses this-cycle GET only."""
+    src = APP_PY.read_text(encoding="utf-8")
+    pxv = src.index("render_live_candidate_pxv_panel()")
+    slot = src.index("_v2_slot = st.empty()")
+    rot = src.index("render_rotation_watch_panel()")
+    scan = src.index("scan_df = run_scan(WATCHLIST)")
+    elite = src.index("buy_elite_df = build_buy_elite_decision_engine(")
+    sidecar = src.index("_v2_sidecar = run_v2_cloud_sidecar(")
+    fetch = src.index("_v2_fetched = fetch_v2_sidecar()")
+    fill = src.index("with _v2_slot.container():")
+    ui_call = src.index("render_live_candidate_v2_panel(")
+    ai = src.index('with st.expander("🤖 AI Recommendation", expanded=False):')
+    assert pxv < slot < rot < scan < elite < sidecar < fetch < fill < ui_call < ai
+    assert src.count("_v2_slot = st.empty()") == 1
+    assert src.count("fetch_v2_sidecar()") == 1
+    assert src.count("render_live_candidate_v2_panel(") == 1
+
+    top = src[pxv:rot]
+    assert "_v2_slot = st.empty()" in top
+    assert "fetch_v2_sidecar" not in top
+    assert "run_v2_cloud_sidecar" not in top
+    assert "v2_ui_from_get" not in top
+    assert "session_state" not in top
+    assert "dynamic_watchlist" not in top
+    assert "snapshot_text" not in top
+    assert "render_live_candidate_v2_panel" not in top
+
+    fill_block = src[fill:ai]
+    assert "_v2_ui if _v2_ui is not None else unavailable_v2_ui()" in fill_block
+    assert "fetch_v2_sidecar" not in fill_block
+    assert "run_v2_cloud_sidecar" not in fill_block
+    assert "st.session_state" not in fill_block
+    assert "dynamic_watchlist" not in fill_block
+    assert "LCV2-GATE-A-WROTE" not in fill_block
+    assert "LCV2-GATE-B-GITHUB" not in fill_block
+
+    tree = ast.parse(src)
+    try_node = None
+    for node in tree.body:
+        if isinstance(node, ast.Try) and "run_v2_cloud_sidecar" in ast.dump(node):
+            try_node = node
+            break
+    assert try_node is not None
+    dump = ast.dump(try_node)
+    assert "fetch_v2_sidecar" in dump
+    assert "maybe_publish_v2_sidecar" in dump
+    assert "empty" not in dump
+    assert "_v2_slot" not in dump
+    assert "render_live_candidate_v2_panel" not in dump
+
+    fill_with = None
+    for node in tree.body:
+        if not isinstance(node, ast.Try):
+            continue
+        if "render_live_candidate_v2_panel" not in ast.dump(node):
+            continue
+        for inner in node.body:
+            if isinstance(inner, ast.With):
+                fill_with = inner
+                break
+    assert fill_with is not None
+    item = fill_with.items[0].context_expr
+    assert isinstance(item, ast.Call)
+    assert isinstance(item.func, ast.Attribute) and item.func.attr == "container"
+    assert isinstance(item.func.value, ast.Name) and item.func.value.id == "_v2_slot"
+    render_names = [
+        n.func.id
+        for n in ast.walk(fill_with)
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+    ]
+    assert "render_live_candidate_v2_panel" in render_names
+    assert "fetch_v2_sidecar" not in render_names
+    assert "run_v2_cloud_sidecar" not in render_names
+
+
+def test_streamlit_empty_container_places_fill_between_neighbors():
+    """st.empty() reserves a node; later .container() fill mutates that node."""
+    visual: list[str] = []
+
+    class _Container:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def markdown(self, msg, **kwargs):
+            visual.append(str(msg))
+
+        def caption(self, msg, **kwargs):
+            visual.append(f"caption:{msg}")
+
+        def dataframe(self, data, **kwargs):
+            visual.append("dataframe")
+
+        def error(self, msg, **kwargs):
+            raise AssertionError(msg)
+
+        def warning(self, msg, **kwargs):
+            raise AssertionError(msg)
+
+    class _Slot:
+        def __init__(self):
+            self.filled = None
+
+        def container(self):
+            box = _Container()
+            self.filled = box
+            return box
+
+    class _Main:
+        def __init__(self):
+            self.nodes: list[object] = []
+
+        def empty(self):
+            slot = _Slot()
+            self.nodes.append(("slot", slot))
+            return slot
+
+        def expander(self, title, **kwargs):
+            self.nodes.append(("expander", title))
+
+            class _CM:
+                def __enter__(self_cm):
+                    return self_cm
+
+                def __exit__(self_cm, *a):
+                    return False
+
+            return _CM()
+
+    main = _Main()
+    main.nodes.append(("expander", "LIVE CANDIDATE × P×V"))
+    slot = main.empty()
+    main.nodes.append(("expander", "🔄 ROTATION WATCH"))
+    view = unavailable_v2_ui()
+    with slot.container():
+        render_live_candidate_v2_panel(view, st_module=slot.filled)
+    titles = [n[1] for n in main.nodes]
+    assert titles == ["LIVE CANDIDATE × P×V", slot, "🔄 ROTATION WATCH"]
+    assert main.nodes[1][0] == "slot"
+    assert main.nodes[1][1] is slot
+    assert slot.filled is not None
+    assert any(PANEL_TITLE in m for m in visual)
+    assert UNAVAILABLE_MESSAGE in visual
+    assert EMPTY_MESSAGE not in visual
 
 
 def test_gate_a_b_conditions_still_nested():
@@ -321,6 +472,8 @@ def test_gate_a_b_conditions_still_nested():
     assert "maybe_publish_v2_sidecar" in dump
     assert "fetch_v2_sidecar" in dump
     assert "render_live_candidate_pxv_panel" not in dump
+    assert "render_live_candidate_v2_panel" not in dump
+    assert "_v2_slot" not in dump
 
 
 def test_exec_hook_binds_current_cycle_get_without_second_fetch(monkeypatch):

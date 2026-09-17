@@ -118,6 +118,12 @@ try:
 except Exception:
     pass
 
+# Live Candidate V2 visual slot. Streamlit paints in execution order, but Gate B
+# GET is produced later (after Scanner / Elite / Brain A / Gate A / Gate B).
+# Reserve the layout position now; fill it later from THIS cycle's `_v2_ui`.
+# No fetch, no sidecar read, no cached prior-cycle candidate, no Gate move.
+_v2_slot = st.empty()
+
 # ROTATION WATCH — isolated human rotation board. Not Candidate / Edge / Learning.
 try:
     from modules.rotation_watch.render import render_rotation_watch_panel
@@ -6711,16 +6717,22 @@ mr_bot_summary = build_mr_bot_pro_summary(mr_bot_profile_after)
 # =========================================================
 # DEFAULT MAIN DASHBOARD (daily view — presentation only)
 # =========================================================
-st.markdown("---")
+# V2 panel render stays here (after Gate B GET) but paints into `_v2_slot`
+# reserved above, between LIVE CANDIDATE × P×V and Rotation Watch.
 try:
     from modules.live_candidate_v2_camera.ui import (
         render_live_candidate_v2_panel,
         unavailable_v2_ui,
     )
 
-    render_live_candidate_v2_panel(_v2_ui if _v2_ui is not None else unavailable_v2_ui())
+    with _v2_slot.container():
+        render_live_candidate_v2_panel(_v2_ui if _v2_ui is not None else unavailable_v2_ui())
 except Exception:
-    st.caption("Live Candidate V2 unavailable this cycle.")
+    try:
+        with _v2_slot.container():
+            st.caption("Live Candidate V2 unavailable this cycle.")
+    except Exception:
+        st.caption("Live Candidate V2 unavailable this cycle.")
 st.markdown("---")
 with st.expander("🤖 AI Recommendation", expanded=False):
     show_ai_recommendation()
