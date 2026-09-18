@@ -21,10 +21,10 @@
     "status",
     "eligible_from"
   ],
-  "session": "2026-09-17",
-  "observed_at": "2026-09-17T20:08:06.565979+07:00",
-  "generated_at": "2026-09-17T20:08:06.565979+07:00",
-  "market_real": 5.4,
+  "session": "2026-09-18",
+  "observed_at": "2026-09-18T10:22:52.820726+07:00",
+  "generated_at": "2026-09-18T10:22:52.820726+07:00",
+  "market_real": 5.9,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
     "Candidate != BUY.",
