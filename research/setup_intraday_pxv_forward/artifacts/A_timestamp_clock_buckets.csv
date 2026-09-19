@@ -1,0 +1,7 @@
+source,POST_CLOSE,LUNCH,n,n_parse_ok,recorded_after_trade_date,recorded_same_trade_date,recorded_before_trade_date,PM_SESSION,AM_SESSION,PRE_OPEN,ATC,OPEN_AUCTION
+t0_freeze.recorded_at,2575,127,2702,2702,15,2687,0,,,,,
+t0_freeze.frozen_at,2575,127,2702,2702,15,2687,0,,,,,
+observations.recorded_at,3251,587,5400,5400,2141,3259,0,710.0,568.0,142.0,142.0,
+pattern_history.date+time (naive VN),22896,3759,35616,35616,0,35616,0,5705.0,2084.0,442.0,359.0,371.0
+group_evolution.date+time (naive VN),10992,142,11624,11624,0,11624,0,,163.0,327.0,,
+elite.date+time (naive VN),966,30,996,996,0,996,0,,,,,
