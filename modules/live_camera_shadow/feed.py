@@ -31,12 +31,27 @@ from modules.live_camera_shadow.bars import (
 )
 from modules.live_camera_shadow.rate import GUEST_RPM, LIVE_UNIVERSE_CAP, rate_report
 from modules.live_camera_shadow.universe import eligible_watchlist_symbols
+from modules.live_candidate_v2_action.artifact import persist_cycle
+from modules.live_candidate_v2_action.contract import (
+    ENV_V2_SIDECAR,
+    OVERLAY_TRUTH_CANONICAL,
+)
+from modules.live_candidate_v2_action.state import (
+    evaluate_shadow_action,
+    nomination_from_mapping,
+)
+from modules.live_candidate_v2_action.universe import (
+    current_session_v2_rows,
+    merge_elite_v2,
+    v2_nomination_of,
+)
 from modules.live_candidate_v2_camera.feed_pass import (
     is_v2_camera_row,
     v2_event_reason,
     v2_evidence_overlay,
     v2_nomination_source,
 )
+from modules.live_candidate_v2_camera.sidecar import load_sidecar_document
 from modules.live_shadow_transport.contract import (
     EVIDENCE_TRANSPORT_ERROR,
     WATCHLIST_TRANSPORT_ERROR,
@@ -137,6 +152,9 @@ class LiveShadowFeed:
     watchlist_source: str = "file"
     watchlist_fetcher: Optional[Callable[[], Any]] = None
     shadow_store_dir: Path | None = None
+    v2_sidecar_path: Path | None = None
+    v2_rows: list[dict[str, Any]] | None = None
+    action_out_dir: Path | None = None
 
     statuses: list[dict[str, Any]] = field(default_factory=list)
     fetched_symbols: list[str] = field(default_factory=list)
@@ -149,6 +167,8 @@ class LiveShadowFeed:
     _watchlist_transport_detail: str = field(default="", init=False)
     _evidence_publish: str = field(default="OK", init=False)
     _evidence_publish_detail: str = field(default="", init=False)
+    _v2_union: dict[str, Any] = field(default_factory=dict, init=False)
+    _v2_action_items: list[Any] = field(default_factory=list, init=False)
 
     def __post_init__(self) -> None:
         self.out_dir = Path(self.out_dir)
@@ -180,10 +200,32 @@ class LiveShadowFeed:
         self._watchlist_transport_detail = "file"
         return load_watchlist_rows(self.watchlist_path)
 
+    def _resolve_v2_rows(self, session: date) -> list[dict[str, Any]]:
+        """Optional current-session V2 sidecar. Empty unless injected or configured."""
+        if self.v2_rows is not None:
+            return current_session_v2_rows(self.v2_rows, session.isoformat())
+        path = self.v2_sidecar_path
+        if path is None:
+            env = os.environ.get(ENV_V2_SIDECAR, "").strip()
+            path = Path(env) if env else None
+        if path is None:
+            return []
+        src = Path(path)
+        if not src.exists():
+            return []
+        doc = load_sidecar_document(src)
+        if doc is None:
+            return []
+        return current_session_v2_rows(doc.get("rows") or [], session.isoformat())
+
     def run_cycle(self, watchlist: Iterable[dict[str, Any]] | None = None) -> dict[str, Any]:
         now = as_vn(self.now_fn())
         session = now.date()
-        rows = self._resolve_watchlist(watchlist)
+        elite_rows = self._resolve_watchlist(watchlist)
+        v2_rows = self._resolve_v2_rows(session)
+        rows, union_report = merge_elite_v2(elite_rows, v2_rows)
+        self._v2_union = union_report.as_dict()
+        self._v2_action_items = []
         universe = eligible_watchlist_symbols(rows, now=now, cap=self.hard_cap)
 
         self.statuses = []
@@ -205,6 +247,7 @@ class LiveShadowFeed:
                         fetched=False,
                     )
                 )
+                self._record_v2_action(rec, now=now, observed=True)
             else:
                 eligible.append(rec)
 
@@ -226,6 +269,18 @@ class LiveShadowFeed:
                         fetched=False,
                     )
                 )
+                self._record_v2_action(
+                    rec,
+                    now=now,
+                    observed=False,
+                    observation_reason="SKIPPED_CAP",
+                )
+                if v2_nomination_of(rec):
+                    self._v2_union.setdefault("v2_cap_dropped_symbols", [])
+                    if rec.get("symbol") not in self._v2_union["v2_cap_dropped_symbols"]:
+                        self._v2_union["v2_cap_dropped_symbols"].append(str(rec.get("symbol") or "").upper())
+                    self._v2_union["n_v2_cap_dropped"] = len(self._v2_union["v2_cap_dropped_symbols"])
+                    self._v2_union["n_cap_dropped"] = int(self._v2_union.get("n_cap_dropped") or 0) + 1
 
         for rec in eligible:
             self._process_symbol(rec, now=now, session=session)
@@ -263,6 +318,9 @@ class LiveShadowFeed:
             "watchlist_transport_detail": self._watchlist_transport_detail,
             "evidence_publish": self._evidence_publish,
             "evidence_publish_detail": self._evidence_publish_detail,
+            "candidate_is_buy": False,
+            "pxv_implies_buy": False,
+            "v2_union": dict(self._v2_union),
             "symbols": list(self.statuses),
         }
 
@@ -280,6 +338,9 @@ class LiveShadowFeed:
                     fetched=False,
                 )
             )
+            self._record_v2_action(
+                rec, now=now, observed=False, observation_reason="UNUSABLE"
+            )
             return
 
         if now < eligible_from:
@@ -293,6 +354,7 @@ class LiveShadowFeed:
                     fetched=False,
                 )
             )
+            self._record_v2_action(rec, now=now, observed=True)
             return
 
         try:
@@ -308,6 +370,9 @@ class LiveShadowFeed:
                     observed_at=now,
                     fetched=True,
                 )
+            )
+            self._record_v2_action(
+                rec, now=now, observed=False, observation_reason="PROVIDER_ERROR"
             )
             return
 
@@ -325,6 +390,9 @@ class LiveShadowFeed:
                     observed_at=now,
                     fetched=True,
                 )
+            )
+            self._record_v2_action(
+                rec, now=now, observed=False, observation_reason="NO_DATA"
             )
             return
 
@@ -347,6 +415,9 @@ class LiveShadowFeed:
                     fetched=True,
                 )
             )
+            self._record_v2_action(
+                rec, now=now, observed=False, observation_reason="UNUSABLE"
+            )
             return
 
         if not completed:
@@ -359,6 +430,7 @@ class LiveShadowFeed:
                     fetched=True,
                 )
             )
+            self._record_v2_action(rec, now=now, observed=True)
             return
 
         latest_ts = completed[-1]["bar_ts"]
@@ -372,6 +444,9 @@ class LiveShadowFeed:
                     bar_ts=latest_ts,
                     fetched=True,
                 )
+            )
+            self._record_v2_action(
+                rec, now=now, observed=False, observation_reason="STALE_BAR"
             )
             return
 
@@ -419,6 +494,7 @@ class LiveShadowFeed:
                     fetched=True,
                 )
             )
+            self._record_v2_action(rec, now=now, observed=True)
             return
 
         emitted_any = False
@@ -495,6 +571,13 @@ class LiveShadowFeed:
             last_bar_ts = bar_ts
 
         self._store_debouncer(symbol, debouncer)
+        self._record_v2_action(
+            rec,
+            now=now,
+            legal_completed=legal_completed,
+            overlay=overlay,
+            observed=True,
+        )
         if emitted_any:
             self.statuses.append(
                 self._status(
@@ -541,7 +624,54 @@ class LiveShadowFeed:
             "observed_at": _iso(observed_at) if observed_at is not None else None,
             "chronology_legal": chronology_legal,
             "fetched": fetched,
+            "v2_provenance": bool(v2_nomination_of(rec)),
         }
+
+    def _record_v2_action(
+        self,
+        rec: dict[str, Any],
+        *,
+        now: datetime,
+        legal_completed: list[dict[str, Any]] | None = None,
+        overlay: pd.DataFrame | None = None,
+        observed: bool = True,
+        observation_reason: str = "",
+    ) -> None:
+        raw = v2_nomination_of(rec)
+        if raw is None:
+            return
+        try:
+            nom = nomination_from_mapping(raw)
+            if not nom.symbol:
+                return
+            history = []
+            if observed and legal_completed:
+                from modules.live_candidate_v2_action.replay import interpret_legal_history
+
+                history = interpret_legal_history(
+                    nom,
+                    legal_completed,
+                    overlay=overlay,
+                    overlay_truth_class=OVERLAY_TRUTH_CANONICAL,
+                )
+            result = evaluate_shadow_action(
+                nom,
+                history,
+                now=now,
+                overlay_truth_class=OVERLAY_TRUTH_CANONICAL,
+                observed=observed,
+                observation_reason=observation_reason,
+            )
+        except Exception as exc:  # noqa: BLE001 — action layer must not break Camera
+            logger.warning("v2 shadow action failed %s: %s", rec.get("symbol"), exc)
+            return
+        self._v2_action_items.append((nom, history, result))
+        if self.statuses:
+            last = self.statuses[-1]
+            if str(last.get("symbol") or "").upper() == nom.symbol:
+                last["shadow_action"] = result.action_state
+                last["shadow_reason"] = result.action_reason
+                last["shadow_label"] = result.shadow_label
 
     def _debouncer_for(self, symbol: str) -> PublishedDebouncer:
         d = PublishedDebouncer()
@@ -572,6 +702,17 @@ class LiveShadowFeed:
         self._write_json(self.out_dir / EMITTED_NAME, sorted(self._emitted))
         self._write_json(self.out_dir / DEBOUNCE_NAME, self._debounce)
         self._write_json(self.out_dir / STATUS_NAME, self.status_payload(now=now, session=session))
+        if self._v2_action_items:
+            try:
+                persist_cycle(
+                    session=session,
+                    observed_at=now,
+                    items=self._v2_action_items,
+                    union=self._v2_union,
+                    out_dir=self.action_out_dir or (self.out_dir / "v2_action"),
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("v2 shadow action persist failed: %s", exc)
         dest = resolve_shadow_store(self.shadow_store_dir)
         if dest is None:
             return

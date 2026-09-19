@@ -25,6 +25,7 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Isolated live 5m Camera → P×V shadow sweep")
     p.add_argument("--live", action="store_true", help="Call KBS/vnstock (default: refuse without --live)")
     p.add_argument("--watchlist", type=Path, default=None, help="Dynamic Watchlist JSON (overrides GitHub fetch)")
+    p.add_argument("--v2-sidecar", type=Path, default=None, help="V2 Camera sidecar (union with Elite, does not replace it)")
     p.add_argument("--out", type=Path, default=None, help="Isolated shadow output dir")
     p.add_argument("--now", default=None, help="Override now (ISO VN). Dry-run / tests only")
     args = p.parse_args(argv)
@@ -35,6 +36,8 @@ def main(argv: list[str] | None = None) -> int:
         load_watchlist_rows,
     )
     from modules.live_camera_shadow.rate import rate_report
+    from modules.live_candidate_v2_action.contract import ENV_V2_SIDECAR
+    from modules.live_candidate_v2_camera.contract import DEFAULT_SIDECAR_RELPATH
     from modules.live_shadow_transport.contract import VPS_SHADOW_STORE
 
     print(json.dumps(rate_report(), ensure_ascii=False, indent=2))
@@ -52,24 +55,33 @@ def main(argv: list[str] | None = None) -> int:
     now = datetime.fromisoformat(args.now).replace(tzinfo=VN) if args.now else datetime.now(VN)
     out = args.out or default_shadow_dir()
     shadow_store = Path(os.environ.get("MRBOT_LIVE_PXV_SHADOW_STORE", VPS_SHADOW_STORE))
+    v2_path = args.v2_sidecar
+    if v2_path is None:
+        env_v2 = os.environ.get(ENV_V2_SIDECAR, "").strip()
+        if env_v2:
+            v2_path = Path(env_v2)
+        else:
+            default_v2 = REPO / DEFAULT_SIDECAR_RELPATH
+            v2_path = default_v2 if default_v2.exists() else None
+    feed_kwargs = dict(
+        provider=KBSProvider(requests_per_minute=18),
+        out_dir=out,
+        now_fn=lambda: now,
+        shadow_store_dir=shadow_store,
+        v2_sidecar_path=v2_path,
+    )
     if args.watchlist:
         rows = load_watchlist_rows(args.watchlist)
         feed = LiveShadowFeed(
-            provider=KBSProvider(requests_per_minute=18),
-            out_dir=out,
-            now_fn=lambda: now,
+            **feed_kwargs,
             watchlist_path=args.watchlist,
             watchlist_source="file",
-            shadow_store_dir=shadow_store,
         )
         status = feed.run_cycle(rows)
     else:
         feed = LiveShadowFeed(
-            provider=KBSProvider(requests_per_minute=18),
-            out_dir=out,
-            now_fn=lambda: now,
+            **feed_kwargs,
             watchlist_source="github",
-            shadow_store_dir=shadow_store,
         )
         status = feed.run_cycle()
     print(json.dumps(status, ensure_ascii=False, indent=2, default=str))

@@ -6405,6 +6405,12 @@ try:
 
     with _v2_slot.container():
         render_live_candidate_v2_panel(_v2_ui if _v2_ui is not None else unavailable_v2_ui())
+        try:
+            from modules.live_candidate_v2_action.ui import render_v2_shadow_action_panel
+
+            render_v2_shadow_action_panel()
+        except Exception:
+            pass
 except Exception:
     try:
         with _v2_slot.container():
