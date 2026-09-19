@@ -6,14 +6,16 @@ One provider failure isolates to that symbol.
 
 from __future__ import annotations
 
+import fcntl
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import IO, Any, Optional
 
 from modules.live_candidate.calendar import as_vn
 from modules.rotation_watch.artifact import board_from_rows, write_board, write_status
 from modules.rotation_watch.config import default_watchlist_path, load_watchlist
-from modules.rotation_watch.constants import ARTIFACT_STALE_AFTER_SEC, ST_DATA_UNCERTAIN
+from modules.rotation_watch.constants import ARTIFACT_STALE_AFTER_SEC, PHASE_LIVE, ST_DATA_UNCERTAIN
 from modules.rotation_watch.publish import publish_rotation_artifacts, resolve_rotation_store
 from modules.rotation_watch.data import SymbolSnapshot, fetch_symbol_snapshot
 from modules.rotation_watch.engine import RotationRow, evaluate_row
@@ -23,6 +25,7 @@ from modules.rotation_watch.state import apply_transitions, default_state_path
 
 BAR_MINUTES = 5
 DEFAULT_RPM = 18
+LOOP_LOCK_NAME = "loop.lock"
 
 
 def seconds_until_next_completed_bar(now: datetime) -> float:
@@ -33,6 +36,47 @@ def seconds_until_next_completed_bar(now: datetime) -> float:
     nxt = slot + timedelta(minutes=BAR_MINUTES)
     wait = (nxt - now).total_seconds()
     return max(1.0, wait)
+
+
+def loop_may_refresh(now: datetime) -> tuple[bool, str]:
+    """Operational --loop persist gate. Does not change zone / P×V / action tables.
+
+    A new observed_at is honest only when the VN clock is in a live trading
+    window (new 5m bars can complete). Lunch / close / weekend / pre-open
+    must not restamp old-session KBS bars as freshly observed.
+    """
+    phase = session_phase(now)
+    if phase == PHASE_LIVE:
+        return True, "LIVE session — refresh from completed KBS 5m bars"
+    return False, (
+        f"{phase} — skip persist; do not restamp old-session bars as newly observed"
+    )
+
+
+def acquire_loop_lock(store_dir: Path) -> Optional[IO[str]]:
+    """Exclusive --loop lock. Second loop returns None (do not start another)."""
+    dest = Path(store_dir)
+    dest.mkdir(parents=True, exist_ok=True)
+    handle = (dest / LOOP_LOCK_NAME).open("a+")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.close()
+        return None
+    handle.seek(0)
+    handle.truncate()
+    handle.write(str(os.getpid()))
+    handle.flush()
+    return handle
+
+
+def release_loop_lock(handle: Optional[IO[str]]) -> None:
+    if handle is None:
+        return
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+    finally:
+        handle.close()
 
 
 def _row_to_artifact(row: RotationRow, *, observed_at: str, source: str, source_label: str) -> dict[str, Any]:

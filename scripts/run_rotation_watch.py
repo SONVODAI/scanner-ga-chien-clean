@@ -3,7 +3,8 @@
 
 Intended runtime: /opt/mrbot-camera-venv (vnstock 4.x / KBS).
 Default is a dry-run (no KBS). --live performs one cycle. --loop waits for
-completed 5m bars. Never writes Camera parquet or Candidate artifacts.
+completed 5m bars and persists only while the VN clock is LIVE (not lunch /
+close / weekend / pre-open). Never writes Camera parquet or Candidate artifacts.
 """
 
 from __future__ import annotations
@@ -34,7 +35,15 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
 
     from modules.rotation_watch.constants import BOARD_NAME, ENV_STORE, STATUS_NAME, VPS_ROTATION_STORE
-    from modules.rotation_watch.runner import DEFAULT_RPM, run_cycle, seconds_until_next_completed_bar
+    from modules.rotation_watch.runner import (
+        DEFAULT_RPM,
+        acquire_loop_lock,
+        loop_may_refresh,
+        release_loop_lock,
+        run_cycle,
+        seconds_until_next_completed_bar,
+    )
+    from modules.rotation_watch.session import session_phase
 
     n = 10
     print(
@@ -85,13 +94,54 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(status, ensure_ascii=False, indent=2, default=str))
         return 0
 
-    while True:
-        now = datetime.now(VN)
-        status = _once(now)
-        print(json.dumps(status, ensure_ascii=False, indent=2, default=str))
-        if not args.loop:
-            return 0
-        time.sleep(seconds_until_next_completed_bar(datetime.now(VN)))
+    if args.loop:
+        lock = acquire_loop_lock(store)
+        if lock is None:
+            print(
+                json.dumps(
+                    {
+                        "error": "rotation_watch_loop_already_running",
+                        "detail": "another --loop holds the exclusive lock",
+                        "alert_eligible": False,
+                    },
+                    indent=2,
+                ),
+                file=sys.stderr,
+            )
+            return 2
+        try:
+            while True:
+                now = datetime.now(VN)
+                allowed, reason = loop_may_refresh(now)
+                if allowed:
+                    status = _once(now)
+                    status["loop_refresh"] = True
+                    status["loop_reason"] = reason
+                    print(json.dumps(status, ensure_ascii=False, indent=2, default=str))
+                else:
+                    print(
+                        json.dumps(
+                            {
+                                "schema": "rotation_watch_status.v1",
+                                "skipped": True,
+                                "loop_refresh": False,
+                                "loop_reason": reason,
+                                "session_phase": session_phase(now),
+                                "alert_eligible": False,
+                            },
+                            ensure_ascii=False,
+                            indent=2,
+                        )
+                    )
+                time.sleep(seconds_until_next_completed_bar(datetime.now(VN)))
+        finally:
+            release_loop_lock(lock)
+        return 0
+
+    now = datetime.now(VN)
+    status = _once(now)
+    print(json.dumps(status, ensure_ascii=False, indent=2, default=str))
+    return 0
 
 
 if __name__ == "__main__":
