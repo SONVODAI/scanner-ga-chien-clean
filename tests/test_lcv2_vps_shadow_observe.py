@@ -400,3 +400,77 @@ def test_feed_lazy_import_stays_off_replay():
     src = (REPO / "modules" / "live_camera_shadow" / "feed.py").read_text(encoding="utf-8")
     assert "live_candidate_v2_action.observe_bars import interpret_legal_history" in src
     assert "live_candidate_v2_action.replay import interpret_legal_history" not in src
+    init = (REPO / "modules" / "live_candidate_v2_action" / "__init__.py").read_text(encoding="utf-8")
+    assert init.index("def __getattr__") < init.index("from modules.live_candidate_v2_action.replay import")
+
+
+def _pinned_vps_relpaths() -> list[str]:
+    import re
+
+    text = (REPO / "scripts" / "vps_install_live_camera_consumer.sh").read_text(encoding="utf-8")
+    out: list[str] = []
+    for block in ("FILES", "LATER_LIVE_ONLY"):
+        match = re.search(rf"{block}=\((.*?)\)", text, re.S)
+        assert match, block
+        out.extend(re.findall(r'"([^"]+)"', match.group(1)))
+    assert out
+    return out
+
+
+def test_isolated_vps_allowlist_imports_live_path(tmp_path):
+    """Reproduce #168: import from the pinned tree, not the full repo."""
+    import shutil
+    import sys
+
+    dest = tmp_path / "opt-mrbot-live-shadow"
+    for rel in _pinned_vps_relpaths():
+        src = REPO / rel
+        assert src.is_file(), rel
+        target = dest / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, target)
+
+    assert not (dest / "modules" / "intraday_memory" / "storage.py").exists()
+    assert not (dest / "modules" / "candidate_router").exists()
+    assert not (dest / "modules" / "live_candidate_pxv_ui").exists()
+
+    saved_path = list(sys.path)
+    doomed = [k for k in sys.modules if k == "modules" or k.startswith("modules.")]
+    saved_mods = {k: sys.modules[k] for k in doomed}
+    try:
+        for k in doomed:
+            del sys.modules[k]
+        sys.path = [str(dest)] + [p for p in saved_path if Path(p).resolve() != REPO.resolve()]
+        from modules.live_camera_shadow.feed import LiveShadowFeed
+        from modules.live_candidate_v2_action.contract import (
+            ALERT_ELIGIBLE,
+            CANDIDATE_IS_BUY,
+            PXV_IMPLIES_BUY,
+        )
+        from modules.live_candidate_v2_action.sidecar_source import resolve_published_v2_sidecar
+        from modules.live_candidate_v2_action.state import evaluate_shadow_action
+        from modules.live_candidate_v2_camera.contract import GITHUB_V2_SIDECAR_PATH
+        from modules.live_candidate_v2_camera.github_bus import fetch_v2_sidecar
+        from modules.live_shadow_transport.artifact_get import get_v2_action_state_text
+        from modules.live_shadow_transport.shadow_store import publish_shadow_artifacts
+
+        assert LiveShadowFeed is not None
+        assert resolve_published_v2_sidecar is not None
+        assert evaluate_shadow_action is not None
+        assert fetch_v2_sidecar is not None
+        assert get_v2_action_state_text is not None
+        assert publish_shadow_artifacts is not None
+        assert GITHUB_V2_SIDECAR_PATH == "research/live_candidate_v2_camera_sidecar/camera_sidecar.json"
+        assert CANDIDATE_IS_BUY is False
+        assert PXV_IMPLIES_BUY is False
+        assert ALERT_ELIGIBLE is False
+        assert "modules.intraday_memory.storage" not in sys.modules
+        assert "modules.live_candidate_v2_action.replay" not in sys.modules
+        assert "modules.live_candidate_v2_camera.sidecar" not in sys.modules
+        assert "modules.live_candidate_v2_camera.cloud_hook" not in sys.modules
+    finally:
+        for k in list(sys.modules):
+            if k == "modules" or k.startswith("modules."):
+                del sys.modules[k]
+        sys.path[:] = saved_path
+        sys.modules.update(saved_mods)

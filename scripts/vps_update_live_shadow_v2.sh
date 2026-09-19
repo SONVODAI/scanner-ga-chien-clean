@@ -101,15 +101,21 @@ EOF
 
 if [[ -x "$VENV/bin/python" ]]; then
   PYTHONPATH="$DEST" "$VENV/bin/python" - <<'PY'
+import sys
 from modules.live_camera_shadow.feed import LiveShadowFeed
 from modules.live_candidate_v2_action.contract import ALERT_ELIGIBLE, CANDIDATE_IS_BUY, PXV_IMPLIES_BUY
 from modules.live_candidate_v2_action.sidecar_source import resolve_published_v2_sidecar
+from modules.live_candidate_v2_action.state import evaluate_shadow_action
 from modules.live_candidate_v2_camera.contract import GITHUB_V2_SIDECAR_PATH
+from modules.live_shadow_transport.shadow_store import publish_shadow_artifacts
 assert CANDIDATE_IS_BUY is False
 assert PXV_IMPLIES_BUY is False
 assert ALERT_ELIGIBLE is False
 assert GITHUB_V2_SIDECAR_PATH == "research/live_candidate_v2_camera_sidecar/camera_sidecar.json"
-print("IMPORT_OK", GITHUB_V2_SIDECAR_PATH, LiveShadowFeed, resolve_published_v2_sidecar)
+assert "modules.intraday_memory.storage" not in sys.modules
+assert "modules.live_candidate_v2_action.replay" not in sys.modules
+assert "modules.live_candidate_v2_camera.sidecar" not in sys.modules
+print("IMPORT_OK", GITHUB_V2_SIDECAR_PATH, LiveShadowFeed, resolve_published_v2_sidecar, evaluate_shadow_action, publish_shadow_artifacts)
 PY
 fi
 

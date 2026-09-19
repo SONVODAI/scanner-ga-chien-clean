@@ -2,6 +2,9 @@
 
 Brain A = WHAT. Camera/P×V = WHEN. Action Layer = shadow confirmation of WHEN.
 Not authority to spend capital.
+
+Replay helpers are lazy: the live Camera consumer must not import
+``replay.py`` (historical parquet / ``intraday_memory.storage``).
 """
 
 from modules.live_candidate_v2_action.contract import (
@@ -21,7 +24,6 @@ from modules.live_candidate_v2_action.state import (
     evaluate_shadow_action,
     nomination_from_mapping,
 )
-from modules.live_candidate_v2_action.replay import replay_shadow_action, replay_sidecar_session
 
 __all__ = [
     "ALERT_ELIGIBLE",
@@ -40,3 +42,14 @@ __all__ = [
     "replay_shadow_action",
     "replay_sidecar_session",
 ]
+
+
+def __getattr__(name: str):
+    if name in {"replay_shadow_action", "replay_sidecar_session"}:
+        from modules.live_candidate_v2_action.replay import (
+            replay_shadow_action,
+            replay_sidecar_session,
+        )
+
+        return replay_shadow_action if name == "replay_shadow_action" else replay_sidecar_session
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -63,6 +63,7 @@ FILES=(
   "modules/live_candidate_v2_action/artifact.py"
   "modules/live_candidate_v2_action/contract.py"
   "modules/live_candidate_v2_action/observe_bars.py"
+  # replay.py is historical-only. Live Camera must not import it.
   "modules/live_candidate_v2_action/replay.py"
   "modules/live_candidate_v2_action/sidecar_source.py"
   "modules/live_candidate_v2_action/state.py"
