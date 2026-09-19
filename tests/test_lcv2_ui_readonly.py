@@ -290,24 +290,29 @@ def test_app_placement_and_gate_captions_unchanged():
     ui_call = src.index("render_live_candidate_v2_panel(")
     ai = src.index('with st.expander("🤖 AI Recommendation", expanded=False):')
     pxv = src.index("render_live_candidate_pxv_panel()")
-    assert pxv < dash
-    assert dash < ui_call < ai
+    scan = src.index("scan_df = run_scan(WATCHLIST)")
+    elite = src.index("buy_elite_df = build_buy_elite_decision_engine(")
+    hook = src.index("_v2_sidecar = run_v2_cloud_sidecar(")
+    guardian = src.index("render_guardian(")
+    assert pxv < scan < elite < hook < ui_call < guardian < dash < ai
     assert 'st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")' in src
     assert "LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}" in src
     assert src.count("fetch_v2_sidecar()") == 1
+    assert src.count("run_v2_cloud_sidecar(") == 1
+    assert src.count("buy_elite_df = build_buy_elite_decision_engine(") == 1
     assert "_v2_ui = None" in src
     assert "_v2_ui = v2_ui_from_get(_v2_fetched)" in src
     assert "v2_ui_from_failure(" in src
     hook_start = src.index("_v2_ui = None")
-    hook = src[hook_start : src.index("except Exception as e:", hook_start)]
-    assert "st.session_state" not in hook
-    assert "dynamic_watchlist.json" not in hook
-    assert "fetch_v2_sidecar()" in hook
+    hook_src = src[hook_start : src.index("except Exception as e:", hook_start)]
+    assert "st.session_state" not in hook_src
+    assert "dynamic_watchlist.json" not in hook_src
+    assert "fetch_v2_sidecar()" in hook_src
     assert PROD_WATCHLIST.exists()
 
 
 def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
-    """P×V → reserved V2 slot → Rotation Watch. Fill uses this-cycle GET only."""
+    """P×V → reserved V2 slot → Rotation Watch. Fill is this-cycle GET, after scan."""
     src = APP_PY.read_text(encoding="utf-8")
     pxv = src.index("render_live_candidate_pxv_panel()")
     slot = src.index("_v2_slot = st.empty()")
@@ -318,11 +323,14 @@ def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
     fetch = src.index("_v2_fetched = fetch_v2_sidecar()")
     fill = src.index("with _v2_slot.container():")
     ui_call = src.index("render_live_candidate_v2_panel(")
+    guardian = src.index("render_guardian(")
+    learn = src.index("= run_buy_elite_learning_cycle(")
     ai = src.index('with st.expander("🤖 AI Recommendation", expanded=False):')
-    assert pxv < slot < rot < scan < elite < sidecar < fetch < fill < ui_call < ai
+    assert pxv < slot < rot < scan < elite < sidecar < fetch < fill < ui_call < guardian < learn < ai
     assert src.count("_v2_slot = st.empty()") == 1
     assert src.count("fetch_v2_sidecar()") == 1
     assert src.count("render_live_candidate_v2_panel(") == 1
+    assert src.count("run_v2_cloud_sidecar(") == 1
 
     top = src[pxv:rot]
     assert "_v2_slot = st.empty()" in top
@@ -334,7 +342,7 @@ def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
     assert "snapshot_text" not in top
     assert "render_live_candidate_v2_panel" not in top
 
-    fill_block = src[fill:ai]
+    fill_block = src[fill:guardian]
     assert "_v2_ui if _v2_ui is not None else unavailable_v2_ui()" in fill_block
     assert "fetch_v2_sidecar" not in fill_block
     assert "run_v2_cloud_sidecar" not in fill_block
@@ -342,6 +350,10 @@ def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
     assert "dynamic_watchlist" not in fill_block
     assert "LCV2-GATE-A-WROTE" not in fill_block
     assert "LCV2-GATE-B-GITHUB" not in fill_block
+    assert "show_ai_recommendation" not in fill_block
+    below = src[ui_call:]
+    assert below.count("run_v2_cloud_sidecar(") == 0
+    assert below.count("fetch_v2_sidecar()") == 0
 
     tree = ast.parse(src)
     try_node = None

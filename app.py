@@ -118,10 +118,11 @@ try:
 except Exception:
     pass
 
-# Live Candidate V2 visual slot. Streamlit paints in execution order, but Gate B
-# GET is produced later (after Scanner / Elite / Brain A / Gate A / Gate B).
-# Reserve the layout position now; fill it later from THIS cycle's `_v2_ui`.
-# No fetch, no sidecar read, no cached prior-cycle candidate, no Gate move.
+# Live Candidate V2 visual slot between P×V and Rotation Watch.
+# Streamlit paints in execution order; the slot is reserved here so V2 stays
+# visually above Rotation Watch. This-cycle prep / Brain A / Gate A-B / render
+# fill the slot immediately after scan, before Guardian / Market First / AI Rec.
+# No second fetch, no sidecar read, no cached prior-cycle candidate.
 _v2_slot = st.empty()
 
 # ROTATION WATCH — isolated human rotation board. Not Candidate / Edge / Learning.
@@ -6242,6 +6243,176 @@ if scan_df.empty:
 scan_df = add_evolution_health(scan_df)
 
 # =========================================================
+# LIVE CANDIDATE V2 — prepare once, then Brain A / Gate A-B, then render.
+# Same Elite/Brain A inputs as before; execution is upstream of the V2 slot
+# so the top panel does not wait for Guardian / Market First / Learning / AI Rec.
+# Rotation Watch already rendered above and stays independent.
+# =========================================================
+market_real = calc_market_real(scan_df)
+market_live = calc_market_live(scan_df)
+forecast_result = calc_market_forecast(scan_df)
+market_forecast = forecast_result.score
+market_forecast_text = forecast_result.text
+market_confidence = forecast_result.confidence
+market_status, market_action = market_status_text(market_real)
+trading_today, trading_reason = is_vnindex_trading_today()
+rsi_breadth_report = build_rsi_breadth_report(scan_df)
+_learning_breadth = _learning_breadth_score(rsi_breadth_report)
+leader_memory_df = pd.DataFrame()
+try:
+    leader_memory_df = update_memory(
+        df_today=scan_df,
+        market_real=market_real,
+        market_forecast=market_forecast,
+        market_regime=market_forecast_text,
+        breadth=_learning_breadth,
+        raise_errors=True,
+    )
+except Exception as e:
+    st.warning(f"Leader Memory: {type(e).__name__}: {e}")
+storm_df = build_storm_leaders(scan_df)
+_regime_name, _, _regime_note = elite_regime(market_real, market_forecast)
+evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
+evo_table, evo_buy_table = build_evolution_tables(scan_df)
+pullback_df = build_pullback_buy_list(
+    scan_df=scan_df,
+    evo_table=evo_table,
+    storm_df=storm_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+early_buy_lab_df = build_early_buy_lab(
+    scan_df=scan_df,
+    evo_table=evo_table,
+    storm_df=storm_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+green_red_df = build_green_red_board(
+    scan_df=scan_df,
+    evo_table=evo_table,
+    storm_df=storm_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+)
+learning_profile = read_buy_elite_learning_profile()
+try:
+    pattern_input_df = scan_df.copy()
+    pattern_input_df["market_real"] = market_real
+    pattern_match_df = build_pattern_match(pattern_input_df)
+except Exception as e:
+    pattern_match_df = pd.DataFrame()
+    st.warning(f"Pattern -> Decision Bridge: {type(e).__name__}: {e}")
+buy_elite_df = build_buy_elite_decision_engine(
+    scan_df=scan_df,
+    green_red_df=green_red_df,
+    storm_df=storm_df,
+    evo_table=evo_table,
+    pullback_df=pullback_df,
+    early_buy_lab_df=early_buy_lab_df,
+    market_real=market_real,
+    market_forecast=market_forecast,
+    breadth=_learning_breadth,
+    learning_profile=learning_profile,
+    pattern_match_df=pattern_match_df,
+    leader_memory_df=leader_memory_df,
+)
+_v2_ui = None
+try:
+    _v2_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
+    if not _v2_gate:
+        try:
+            _v2_gate = str(st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
+        except Exception:
+            _v2_gate = ""
+    if _v2_gate in ("1", "true", "yes", "on"):
+        from modules.live_candidate_v2_camera.cloud_hook import run_v2_cloud_sidecar
+
+        _v2_sidecar = run_v2_cloud_sidecar(
+            scan_rows=scan_df.to_dict("records"),
+            market_real=market_real,
+            observed_at=vn_now(),
+            buy_elite_df=buy_elite_df,
+            early_buy_lab_df=early_buy_lab_df,
+            env={"MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR": _v2_gate},
+        )
+        if not _v2_sidecar.ok and not _v2_sidecar.skipped:
+            st.warning(f"V2 Camera sidecar: {_v2_sidecar.error or _v2_sidecar.reason}")
+        if (
+            _v2_sidecar.ok
+            and not _v2_sidecar.skipped
+            and _v2_sidecar.reason == "WROTE"
+        ):
+            st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")
+        _v2_pub_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
+        if not _v2_pub_gate:
+            try:
+                _v2_pub_gate = str(st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
+            except Exception:
+                _v2_pub_gate = ""
+        if (
+            _v2_sidecar.ok
+            and not _v2_sidecar.skipped
+            and _v2_pub_gate in ("1", "true", "yes", "on")
+        ):
+            from modules.live_candidate_v2_camera.github_bus import (
+                fetch_v2_sidecar,
+                maybe_publish_v2_sidecar,
+                sanitize_v2_github_message,
+            )
+            from modules.live_candidate_v2_camera.ui import (
+                v2_ui_from_failure,
+                v2_ui_from_get,
+            )
+
+            _v2_github = maybe_publish_v2_sidecar(
+                local_ok=_v2_sidecar.ok,
+                local_skipped=_v2_sidecar.skipped,
+                path=_v2_sidecar.path,
+                snapshot_text=_v2_sidecar.snapshot_text,
+                env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate},
+            )
+            if not _v2_github.ok and not _v2_github.skipped:
+                st.warning(
+                    f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_github.error or _v2_github.status)}"
+                )
+                _v2_ui = v2_ui_from_failure(
+                    status=_v2_github.status,
+                    error=_v2_github.error or _v2_github.status,
+                )
+            elif _v2_github.ok and not _v2_github.skipped:
+                _v2_fetched = fetch_v2_sidecar()
+                if _v2_fetched.ok:
+                    st.caption(
+                        f"LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}"
+                    )
+                    _v2_ui = v2_ui_from_get(_v2_fetched)
+                else:
+                    st.warning(
+                        f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_fetched.error or _v2_fetched.status)}"
+                    )
+                    _v2_ui = v2_ui_from_failure(
+                        status=_v2_fetched.status,
+                        error=_v2_fetched.error or _v2_fetched.status,
+                    )
+except Exception as e:
+    st.warning(f"V2 Camera sidecar: {type(e).__name__}: {e}")
+try:
+    from modules.live_candidate_v2_camera.ui import (
+        render_live_candidate_v2_panel,
+        unavailable_v2_ui,
+    )
+
+    with _v2_slot.container():
+        render_live_candidate_v2_panel(_v2_ui if _v2_ui is not None else unavailable_v2_ui())
+except Exception:
+    try:
+        with _v2_slot.container():
+            st.caption("Live Candidate V2 unavailable this cycle.")
+    except Exception:
+        st.caption("Live Candidate V2 unavailable this cycle.")
+
+# =========================================================
 # PORTFOLIO / POSITION GUARDIAN — one high-priority area, same ledger
 # Editor + Guardian table share modules.user_holdings. Failure must not stop Market First.
 # =========================================================
@@ -6253,16 +6424,7 @@ except Exception:
 # =========================================================
 # MARKET FIRST
 # =========================================================
-market_real = calc_market_real(scan_df)
-market_live = calc_market_live(scan_df)
-
-forecast_result = calc_market_forecast(scan_df)
-
-market_forecast = forecast_result.score
-market_forecast_text = forecast_result.text
-market_confidence = forecast_result.confidence
-market_status, market_action = market_status_text(market_real)
-trading_today, trading_reason = is_vnindex_trading_today()
+# market_real / forecast / trading_today already computed in the V2 prep path.
 try:
     _, pattern_status = save_pattern_history(
         brain=None,
@@ -6366,22 +6528,7 @@ try:
 
 except Exception as e:
     st.warning(f"Experience Engine: {e}")
-# =========================================================
-# LEADER MEMORY ENGINE
-# Cập nhật trước khi Pattern Match đọc Leader Brain.
-# =========================================================
-leader_memory_df = pd.DataFrame()
-try:
-    leader_memory_df = update_memory(
-        df_today=scan_df,
-        market_real=market_real,
-        market_forecast=market_forecast,
-        market_regime=market_forecast_text,
-        breadth=_learning_breadth,
-        raise_errors=True,
-    )
-except Exception as e:
-    st.warning(f"Leader Memory: {type(e).__name__}: {e}")
+# Leader Memory already updated once in the V2 prep path (leader_memory_df).
 
 if market_real < 6:
     st.error(market_action)
@@ -6398,8 +6545,7 @@ st.caption("Mr.BOT PRO V4.0: tất cả bảng vẫn dùng chung scan_df. BUY EL
 # =========================================================
 # PREPARE CORE TABLES
 # =========================================================
-storm_df = build_storm_leaders(scan_df)
-_regime_name, _, _regime_note = elite_regime(market_real, market_forecast)
+# storm_df / evo_table / elite frames already built in the V2 prep path.
 try:
     from modules.market_t0_capture import capture_market_t0_snapshot
 
@@ -6440,8 +6586,6 @@ try:
         )
 except Exception as _forward_finalize_error:
     st.caption(f"Forward shadow finalize skipped: {_forward_finalize_error}")
-evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
-evo_table, evo_buy_table = build_evolution_tables(scan_df)
 
 # =========================================================
 # EARNING LEARNING ENGINE (after Storm / Evolution / Leader)
@@ -6513,135 +6657,6 @@ try:
 except Exception as _observer_err:
     st.caption(f"Market-Aware Sweetspot Observer skipped: {_observer_err}")
 
-pullback_df = build_pullback_buy_list(
-    scan_df=scan_df,
-    evo_table=evo_table,
-    storm_df=storm_df,
-    market_real=market_real,
-    market_forecast=market_forecast,
-)
-early_buy_lab_df = build_early_buy_lab(
-    scan_df=scan_df,
-    evo_table=evo_table,
-    storm_df=storm_df,
-    market_real=market_real,
-    market_forecast=market_forecast,
-)
-
-green_red_df = build_green_red_board(
-    scan_df=scan_df,
-    evo_table=evo_table,
-    storm_df=storm_df,
-    market_real=market_real,
-    market_forecast=market_forecast,
-)
-
-learning_profile = read_buy_elite_learning_profile()
-
-# PATTERN -> DECISION BRIDGE
-# Dùng Market Real hiện tại để Pattern Match chấm đúng bối cảnh phiên đang chạy.
-try:
-    pattern_input_df = scan_df.copy()
-    pattern_input_df["market_real"] = market_real
-    pattern_match_df = build_pattern_match(pattern_input_df)
-except Exception as e:
-    pattern_match_df = pd.DataFrame()
-    st.warning(f"Pattern -> Decision Bridge: {type(e).__name__}: {e}")
-
-buy_elite_df = build_buy_elite_decision_engine(
-    scan_df=scan_df,
-    green_red_df=green_red_df,
-    storm_df=storm_df,
-    evo_table=evo_table,
-    pullback_df=pullback_df,
-    early_buy_lab_df=early_buy_lab_df,
-    market_real=market_real,
-    market_forecast=market_forecast,
-    breadth=_learning_breadth,
-    learning_profile=learning_profile,
-    pattern_match_df=pattern_match_df,
-    leader_memory_df=leader_memory_df,
-)
-_v2_ui = None
-try:
-    _v2_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
-    if not _v2_gate:
-        try:
-            _v2_gate = str(st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
-        except Exception:
-            _v2_gate = ""
-    if _v2_gate in ("1", "true", "yes", "on"):
-        from modules.live_candidate_v2_camera.cloud_hook import run_v2_cloud_sidecar
-
-        _v2_sidecar = run_v2_cloud_sidecar(
-            scan_rows=scan_df.to_dict("records"),
-            market_real=market_real,
-            observed_at=vn_now(),
-            buy_elite_df=buy_elite_df,
-            early_buy_lab_df=early_buy_lab_df,
-            env={"MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR": _v2_gate},
-        )
-        if not _v2_sidecar.ok and not _v2_sidecar.skipped:
-            st.warning(f"V2 Camera sidecar: {_v2_sidecar.error or _v2_sidecar.reason}")
-        if (
-            _v2_sidecar.ok
-            and not _v2_sidecar.skipped
-            and _v2_sidecar.reason == "WROTE"
-        ):
-            st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")
-        _v2_pub_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
-        if not _v2_pub_gate:
-            try:
-                _v2_pub_gate = str(st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
-            except Exception:
-                _v2_pub_gate = ""
-        if (
-            _v2_sidecar.ok
-            and not _v2_sidecar.skipped
-            and _v2_pub_gate in ("1", "true", "yes", "on")
-        ):
-            from modules.live_candidate_v2_camera.github_bus import (
-                fetch_v2_sidecar,
-                maybe_publish_v2_sidecar,
-                sanitize_v2_github_message,
-            )
-            from modules.live_candidate_v2_camera.ui import (
-                v2_ui_from_failure,
-                v2_ui_from_get,
-            )
-
-            _v2_github = maybe_publish_v2_sidecar(
-                local_ok=_v2_sidecar.ok,
-                local_skipped=_v2_sidecar.skipped,
-                path=_v2_sidecar.path,
-                snapshot_text=_v2_sidecar.snapshot_text,
-                env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate},
-            )
-            if not _v2_github.ok and not _v2_github.skipped:
-                st.warning(
-                    f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_github.error or _v2_github.status)}"
-                )
-                _v2_ui = v2_ui_from_failure(
-                    status=_v2_github.status,
-                    error=_v2_github.error or _v2_github.status,
-                )
-            elif _v2_github.ok and not _v2_github.skipped:
-                _v2_fetched = fetch_v2_sidecar()
-                if _v2_fetched.ok:
-                    st.caption(
-                        f"LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}"
-                    )
-                    _v2_ui = v2_ui_from_get(_v2_fetched)
-                else:
-                    st.warning(
-                        f"V2 Camera sidecar GitHub: {sanitize_v2_github_message(_v2_fetched.error or _v2_fetched.status)}"
-                    )
-                    _v2_ui = v2_ui_from_failure(
-                        status=_v2_fetched.status,
-                        error=_v2_fetched.error or _v2_fetched.status,
-                    )
-except Exception as e:
-    st.warning(f"V2 Camera sidecar: {type(e).__name__}: {e}")
 final_df, final_note = build_final_decision(
     buy_elite_df,
     green_red_df,
@@ -6717,22 +6732,6 @@ mr_bot_summary = build_mr_bot_pro_summary(mr_bot_profile_after)
 # =========================================================
 # DEFAULT MAIN DASHBOARD (daily view — presentation only)
 # =========================================================
-# V2 panel render stays here (after Gate B GET) but paints into `_v2_slot`
-# reserved above, between LIVE CANDIDATE × P×V and Rotation Watch.
-try:
-    from modules.live_candidate_v2_camera.ui import (
-        render_live_candidate_v2_panel,
-        unavailable_v2_ui,
-    )
-
-    with _v2_slot.container():
-        render_live_candidate_v2_panel(_v2_ui if _v2_ui is not None else unavailable_v2_ui())
-except Exception:
-    try:
-        with _v2_slot.container():
-            st.caption("Live Candidate V2 unavailable this cycle.")
-    except Exception:
-        st.caption("Live Candidate V2 unavailable this cycle.")
 st.markdown("---")
 with st.expander("🤖 AI Recommendation", expanded=False):
     show_ai_recommendation()
