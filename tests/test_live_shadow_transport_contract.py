@@ -3,6 +3,7 @@
 from modules.live_shadow_transport.contract import (
     ALERT_ELIGIBLE,
     ARTIFACT_EVIDENCE_PATH,
+    ARTIFACT_V2_ACTION_STATE_PATH,
     EMPTY_WATCHLIST_TEXT,
     FORBIDDEN_CAMERA_ARCHIVE,
     GITHUB_WATCHLIST_PATH,
@@ -18,6 +19,8 @@ def test_watchlist_path_is_research_not_camera():
 def test_artifact_shadow_paths_are_not_edge_bundle():
     assert ARTIFACT_EVIDENCE_PATH.startswith("/current/live_shadow/")
     assert ARTIFACT_EVIDENCE_PATH != "/current/bundle.tar.gz"
+    assert ARTIFACT_V2_ACTION_STATE_PATH == "/current/live_shadow/v2_action_state.json"
+    assert ARTIFACT_V2_ACTION_STATE_PATH.startswith("/current/live_shadow/")
 
 
 def test_camera_archive_forbidden():

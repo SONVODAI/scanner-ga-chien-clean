@@ -308,6 +308,22 @@ if "ALLOWED_PRODUCTION_OBS_PATH" not in text:
 if "ALLOWED_PATH" not in text:
     die("Edge bundle ALLOWED_PATH missing")
 
+if "/current/live_shadow/v2_action_state.json" not in text:
+    needle_legacy = """LIVE_SHADOW_GET_PATHS = {
+    \"/current/live_shadow/live_evidence.jsonl\": \"live_evidence.jsonl\",
+    \"/current/live_shadow/live_shadow_status.json\": \"live_shadow_status.json\",
+}
+"""
+    needle_v2 = """LIVE_SHADOW_GET_PATHS = {
+    \"/current/live_shadow/live_evidence.jsonl\": \"live_evidence.jsonl\",
+    \"/current/live_shadow/live_shadow_status.json\": \"live_shadow_status.json\",
+    \"/current/live_shadow/v2_action_state.json\": \"v2_action_state.json\",
+}
+"""
+    if needle_legacy not in text:
+        die("LIVE_SHADOW_GET_PATHS dict block not found for V2 SHADOW upgrade")
+    text = text.replace(needle_legacy, needle_v2, 1)
+
 if "DEFAULT_ROTATION_WATCH_ROOT" not in text:
     needle = 'DEFAULT_LIVE_SHADOW_ROOT = Path("/var/lib/mrbot/live_pxv_shadow")\n'
     if needle not in text:
@@ -319,16 +335,24 @@ if "DEFAULT_ROTATION_WATCH_ROOT" not in text:
     )
 
 if "ROTATION_WATCH_GET_PATHS" not in text:
-    needle = """LIVE_SHADOW_GET_PATHS = {
+    needle_v2 = """LIVE_SHADOW_GET_PATHS = {
+    \"/current/live_shadow/live_evidence.jsonl\": \"live_evidence.jsonl\",
+    \"/current/live_shadow/live_shadow_status.json\": \"live_shadow_status.json\",
+    \"/current/live_shadow/v2_action_state.json\": \"v2_action_state.json\",
+}
+"""
+    needle_legacy = """LIVE_SHADOW_GET_PATHS = {
     \"/current/live_shadow/live_evidence.jsonl\": \"live_evidence.jsonl\",
     \"/current/live_shadow/live_shadow_status.json\": \"live_shadow_status.json\",
 }
 """
-    if needle not in text:
+    if needle_legacy in text and needle_v2 not in text:
+        text = text.replace(needle_legacy, needle_v2, 1)
+    if needle_v2 not in text:
         die("LIVE_SHADOW_GET_PATHS dict block not found — overlay shape unexpected")
     text = text.replace(
-        needle,
-        needle
+        needle_v2,
+        needle_v2
         + """ROTATION_WATCH_GET_PATHS = {
     \"/current/rotation_watch/board.json\": \"board.json\",
     \"/current/rotation_watch/status.json\": \"status.json\",

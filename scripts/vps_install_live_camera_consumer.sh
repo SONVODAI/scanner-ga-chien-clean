@@ -14,7 +14,8 @@
 set -euo pipefail
 
 MODE="${1:-plan}"
-APPROVED_REV="fedc7d53cb9a902bb7aa73760f00d402f913ed22"
+# Override with APPROVED_REV=<sha> for V2 SHADOW activation updates.
+APPROVED_REV="${APPROVED_REV:-fedc7d53cb9a902bb7aa73760f00d402f913ed22}"
 CAMERA="/opt/mrbot-camera"
 DEST="/opt/mrbot-live-shadow"
 ISO="/tmp/mrbot-live-shadow-src-${APPROVED_REV:0:12}"
@@ -58,6 +59,25 @@ FILES=(
   "modules/intraday_memory/schema.py"
   "modules/intraday_memory/timezone_policy.py"
   "modules/intraday_memory/validate.py"
+  "modules/live_candidate_v2_action/__init__.py"
+  "modules/live_candidate_v2_action/artifact.py"
+  "modules/live_candidate_v2_action/contract.py"
+  "modules/live_candidate_v2_action/observe_bars.py"
+  "modules/live_candidate_v2_action/replay.py"
+  "modules/live_candidate_v2_action/sidecar_source.py"
+  "modules/live_candidate_v2_action/state.py"
+  "modules/live_candidate_v2_action/ui.py"
+  "modules/live_candidate_v2_action/universe.py"
+  "modules/live_candidate_v2_camera/__init__.py"
+  "modules/live_candidate_v2_camera/cloud_hook.py"
+  "modules/live_candidate_v2_camera/contract.py"
+  "modules/live_candidate_v2_camera/feed_pass.py"
+  "modules/live_candidate_v2_camera/github_bus.py"
+  "modules/live_candidate_v2_camera/observe.py"
+  "modules/live_candidate_v2_camera/sidecar.py"
+  "modules/live_candidate_v2_camera/ui.py"
+  "modules/live_candidate_v2_nomination/contract.py"
+  "modules/live_candidate_v2_nomination/intent.py"
 )
 
 # provider.py is required only for a later --live session. Copy it into the
@@ -74,7 +94,12 @@ ISOLATED_SRC=$ISO @ $APPROVED_REV
 INSTALL_DEST=$DEST
 PYTHON=$VENV/bin/python
 WATCHLIST_PATH=data/live_candidate/dynamic_watchlist.json
+V2_SIDECAR_PATH=research/live_candidate_v2_camera_sidecar/camera_sidecar.json
+V2_SIDECAR_SOURCE=github (MRBOT_V2_SIDECAR_SOURCE / --live default)
 VPS_AUTH_METHOD=public GitHub Contents GET (no token, no secret paste)
+SHADOW_STATE=$DEST out_dir/v2_action/v2_action_state.json
+SHADOW_EVIDENCE=$DEST out_dir/v2_action/v2_action_evidence.jsonl
+SHADOW_PUBLISH=/var/lib/mrbot/live_pxv_shadow/v2_action_state.json
 
 PRESERVE:
   - $CAMERA dirty working tree and artifact_server overlay

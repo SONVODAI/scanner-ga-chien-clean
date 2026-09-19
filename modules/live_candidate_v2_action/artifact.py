@@ -225,10 +225,10 @@ class V2ActionStore:
 
     def _write_json(self, path: Path, payload: Any) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n",
-            encoding="utf-8",
-        )
+        text = json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n"
+        tmp = path.with_name(f".{path.name}.tmp")
+        tmp.write_text(text, encoding="utf-8")
+        os.replace(tmp, path)
 
 
 def persist_cycle(

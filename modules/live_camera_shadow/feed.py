@@ -34,7 +34,13 @@ from modules.live_camera_shadow.universe import eligible_watchlist_symbols
 from modules.live_candidate_v2_action.artifact import persist_cycle
 from modules.live_candidate_v2_action.contract import (
     ENV_V2_SIDECAR,
+    ENV_V2_SIDECAR_SOURCE,
     OVERLAY_TRUTH_CANONICAL,
+)
+from modules.live_candidate_v2_action.sidecar_source import (
+    SOURCE_FILE,
+    SOURCE_GITHUB,
+    resolve_published_v2_sidecar,
 )
 from modules.live_candidate_v2_action.state import (
     evaluate_shadow_action,
@@ -51,7 +57,6 @@ from modules.live_candidate_v2_camera.feed_pass import (
     v2_evidence_overlay,
     v2_nomination_source,
 )
-from modules.live_candidate_v2_camera.sidecar import load_sidecar_document
 from modules.live_shadow_transport.contract import (
     EVIDENCE_TRANSPORT_ERROR,
     WATCHLIST_TRANSPORT_ERROR,
@@ -154,6 +159,8 @@ class LiveShadowFeed:
     shadow_store_dir: Path | None = None
     v2_sidecar_path: Path | None = None
     v2_rows: list[dict[str, Any]] | None = None
+    v2_sidecar_source: str = ""
+    v2_sidecar_fetcher: Optional[Callable[[], Any]] = None
     action_out_dir: Path | None = None
 
     statuses: list[dict[str, Any]] = field(default_factory=list)
@@ -169,6 +176,9 @@ class LiveShadowFeed:
     _evidence_publish_detail: str = field(default="", init=False)
     _v2_union: dict[str, Any] = field(default_factory=dict, init=False)
     _v2_action_items: list[Any] = field(default_factory=list, init=False)
+    _v2_sidecar_status: dict[str, Any] = field(default_factory=dict, init=False)
+    _v2_action_publish: str = field(default="ABSENT", init=False)
+    _v2_action_publish_detail: str = field(default="", init=False)
 
     def __post_init__(self) -> None:
         self.out_dir = Path(self.out_dir)
@@ -201,22 +211,44 @@ class LiveShadowFeed:
         return load_watchlist_rows(self.watchlist_path)
 
     def _resolve_v2_rows(self, session: date) -> list[dict[str, Any]]:
-        """Optional current-session V2 sidecar. Empty unless injected or configured."""
+        """Current-session published V2 sidecar only. Elite is never treated as V2."""
         if self.v2_rows is not None:
-            return current_session_v2_rows(self.v2_rows, session.isoformat())
+            rows = current_session_v2_rows(self.v2_rows, session.isoformat())
+            self._v2_sidecar_status = {
+                "ok": True,
+                "reason": "OK",
+                "source": "injected",
+                "session": session.isoformat(),
+                "n_current_session": len(rows),
+            }
+            return rows
         path = self.v2_sidecar_path
         if path is None:
-            env = os.environ.get(ENV_V2_SIDECAR, "").strip()
-            path = Path(env) if env else None
-        if path is None:
+            env_path = os.environ.get(ENV_V2_SIDECAR, "").strip()
+            path = Path(env_path) if env_path else None
+        source = (self.v2_sidecar_source or os.environ.get(ENV_V2_SIDECAR_SOURCE, "") or "").strip().lower()
+        if path is not None:
+            source = SOURCE_FILE
+        if not source:
+            self._v2_sidecar_status = {
+                "ok": False,
+                "reason": "SIDECAR_ABSENT",
+                "source": "",
+                "session": session.isoformat(),
+                "n_current_session": 0,
+                "detail": "no V2 sidecar source configured",
+            }
             return []
-        src = Path(path)
-        if not src.exists():
+        resolved = resolve_published_v2_sidecar(
+            session=session,
+            source=source if source in {SOURCE_GITHUB, SOURCE_FILE} else SOURCE_GITHUB,
+            path=path,
+            fetcher=self.v2_sidecar_fetcher,
+        )
+        self._v2_sidecar_status = resolved.as_dict()
+        if not resolved.ok:
             return []
-        doc = load_sidecar_document(src)
-        if doc is None:
-            return []
-        return current_session_v2_rows(doc.get("rows") or [], session.isoformat())
+        return list(resolved.rows)
 
     def run_cycle(self, watchlist: Iterable[dict[str, Any]] | None = None) -> dict[str, Any]:
         now = as_vn(self.now_fn())
@@ -321,6 +353,9 @@ class LiveShadowFeed:
             "candidate_is_buy": False,
             "pxv_implies_buy": False,
             "v2_union": dict(self._v2_union),
+            "v2_sidecar": dict(self._v2_sidecar_status),
+            "v2_action_publish": self._v2_action_publish,
+            "v2_action_publish_detail": self._v2_action_publish_detail,
             "symbols": list(self.statuses),
         }
 
@@ -646,7 +681,7 @@ class LiveShadowFeed:
                 return
             history = []
             if observed and legal_completed:
-                from modules.live_candidate_v2_action.replay import interpret_legal_history
+                from modules.live_candidate_v2_action.observe_bars import interpret_legal_history
 
                 history = interpret_legal_history(
                     nom,
@@ -704,15 +739,20 @@ class LiveShadowFeed:
         self._write_json(self.out_dir / STATUS_NAME, self.status_payload(now=now, session=session))
         if self._v2_action_items:
             try:
+                action_dir = self.action_out_dir or (self.out_dir / "v2_action")
                 persist_cycle(
                     session=session,
                     observed_at=now,
                     items=self._v2_action_items,
                     union=self._v2_union,
-                    out_dir=self.action_out_dir or (self.out_dir / "v2_action"),
+                    out_dir=action_dir,
                 )
+                self._v2_action_publish = "WRITTEN"
+                self._v2_action_publish_detail = str(action_dir)
             except Exception as exc:  # noqa: BLE001
                 logger.warning("v2 shadow action persist failed: %s", exc)
+                self._v2_action_publish = "ERROR"
+                self._v2_action_publish_detail = str(exc)
         dest = resolve_shadow_store(self.shadow_store_dir)
         if dest is None:
             return
@@ -720,6 +760,11 @@ class LiveShadowFeed:
         if pub.get("ok"):
             self._evidence_publish = "OK"
             self._evidence_publish_detail = str(pub.get("dest") or dest)
+            v2_st = str(pub.get("v2_status") or "")
+            if v2_st:
+                self._v2_action_publish = v2_st
+                self._v2_action_publish_detail = str(pub.get("v2_detail") or dest)
+            self._write_json(self.out_dir / STATUS_NAME, self.status_payload(now=now, session=session))
             return
         self._evidence_publish = EVIDENCE_TRANSPORT_ERROR
         self._evidence_publish_detail = str(pub.get("detail") or EVIDENCE_TRANSPORT_ERROR)

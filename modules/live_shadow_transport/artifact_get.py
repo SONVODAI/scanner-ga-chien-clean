@@ -12,8 +12,15 @@ from typing import Any, Callable, Optional
 from modules.live_shadow_transport.contract import (
     ARTIFACT_EVIDENCE_PATH,
     ARTIFACT_STATUS_PATH,
+    ARTIFACT_V2_ACTION_STATE_PATH,
     EVIDENCE_TRANSPORT_ERROR,
 )
+
+ALLOWED_LIVE_SHADOW_GET = {
+    ARTIFACT_EVIDENCE_PATH,
+    ARTIFACT_STATUS_PATH,
+    ARTIFACT_V2_ACTION_STATE_PATH,
+}
 
 try:
     from modules.edge_research.durable import _secret_or_env
@@ -49,7 +56,7 @@ def get_live_shadow_bytes(
     tok = token if token is not None else (_secret_or_env("EDGE_RESEARCH_DURABLE_TOKEN") or "")
     if not base:
         raise EvidenceTransportError("EDGE_RESEARCH_DURABLE_URL missing")
-    if rel_path not in {ARTIFACT_EVIDENCE_PATH, ARTIFACT_STATUS_PATH}:
+    if rel_path not in ALLOWED_LIVE_SHADOW_GET:
         raise EvidenceTransportError("disallowed live-shadow path")
     url = f"{base}{rel_path}"
     headers = {"User-Agent": "mrbot-live-shadow-ui/1.0"}
@@ -84,6 +91,14 @@ def get_live_status_text(**kwargs: Any) -> str:
         return raw.decode("utf-8")
     except UnicodeDecodeError as exc:
         raise EvidenceTransportError("live_shadow_status.json is not utf-8") from exc
+
+
+def get_v2_action_state_text(**kwargs: Any) -> str:
+    raw = get_live_shadow_bytes(ARTIFACT_V2_ACTION_STATE_PATH, **kwargs)
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise EvidenceTransportError("v2_action_state.json is not utf-8") from exc
 
 
 def transport_error_payload(detail: str = "") -> dict[str, Any]:

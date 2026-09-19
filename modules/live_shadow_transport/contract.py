@@ -15,7 +15,11 @@ GITHUB_ELITE_HISTORY_PATH = "buy_elite_learning_history.csv"
 # New GET-only objects; do not put these inside Edge Research bundle.tar.gz.
 ARTIFACT_EVIDENCE_PATH = "/current/live_shadow/live_evidence.jsonl"
 ARTIFACT_STATUS_PATH = "/current/live_shadow/live_shadow_status.json"
+ARTIFACT_V2_ACTION_STATE_PATH = "/current/live_shadow/v2_action_state.json"
 VPS_SHADOW_STORE = "/var/lib/mrbot/live_pxv_shadow"
+V2_ACTION_SUBDIR = "v2_action"
+V2_ACTION_STATE_NAME = "v2_action_state.json"
+V2_ACTION_EVIDENCE_NAME = "v2_action_evidence.jsonl"
 
 # Never these:
 FORBIDDEN_CAMERA_ARCHIVE = "/var/lib/mrbot/intraday_memory"

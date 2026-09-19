@@ -3,6 +3,7 @@
 from modules.live_shadow_transport.contract import (
     ARTIFACT_EVIDENCE_PATH,
     ARTIFACT_STATUS_PATH,
+    ARTIFACT_V2_ACTION_STATE_PATH,
     EVIDENCE_TRANSPORT_ERROR,
     GITHUB_WATCHLIST_PATH,
     IDENTITY_FIELDS,
@@ -12,6 +13,7 @@ from modules.live_shadow_transport.contract import (
 __all__ = [
     "ARTIFACT_EVIDENCE_PATH",
     "ARTIFACT_STATUS_PATH",
+    "ARTIFACT_V2_ACTION_STATE_PATH",
     "EVIDENCE_TRANSPORT_ERROR",
     "GITHUB_WATCHLIST_PATH",
     "IDENTITY_FIELDS",

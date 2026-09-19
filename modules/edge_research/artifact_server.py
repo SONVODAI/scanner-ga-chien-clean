@@ -67,6 +67,7 @@ ALLOWED_PRODUCTION_OBS_PATH = "/current/production_observations.tar.gz"
 LIVE_SHADOW_GET_PATHS = {
     "/current/live_shadow/live_evidence.jsonl": "live_evidence.jsonl",
     "/current/live_shadow/live_shadow_status.json": "live_shadow_status.json",
+    "/current/live_shadow/v2_action_state.json": "v2_action_state.json",
 }
 ROTATION_WATCH_GET_PATHS = {
     "/current/rotation_watch/board.json": "board.json",
