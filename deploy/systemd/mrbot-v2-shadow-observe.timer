@@ -1,0 +1,15 @@
+[Unit]
+Description=Mr.BOT V2 SHADOW observe after Intraday Memory collect
+Requires=mrbot-v2-shadow-observe.service
+
+[Timer]
+# After existing collect fires (18:30 / 20:00 / 22:30 / 06:00). Does not collect.
+OnCalendar=Mon..Fri *-*-* 18:40:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 20:10:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 22:40:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 06:10:00 Asia/Ho_Chi_Minh
+Persistent=true
+Unit=mrbot-v2-shadow-observe.service
+
+[Install]
+WantedBy=timers.target

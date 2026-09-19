@@ -1,0 +1,20 @@
+[Unit]
+Description=Mr.BOT V2 SHADOW observe from collected Camera parquet
+Documentation=file:/opt/mrbot-live-shadow/scripts/run_v2_shadow_observe_store.py
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-live-shadow
+Environment=PYTHONPATH=/opt/mrbot-live-shadow
+Environment=MRBOT_V2_SIDECAR_SOURCE=github
+Environment=MRBOT_LIVE_PXV_SHADOW_STORE=/var/lib/mrbot/live_pxv_shadow
+Environment=MRBOT_INTRADAY_DATA_ROOT=/var/lib/mrbot/intraday_memory
+EnvironmentFile=-/etc/mrbot/intraday.env
+ExecStart=/opt/mrbot-camera-venv/bin/python /opt/mrbot-live-shadow/scripts/run_v2_shadow_observe_store.py
+Nice=10
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

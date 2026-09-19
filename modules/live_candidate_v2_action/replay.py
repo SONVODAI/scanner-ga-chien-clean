@@ -17,7 +17,10 @@ from modules.intraday_memory.storage import load_session
 from modules.intraday_pxv_v1.constants import OVERLAY_TRUTH_CANONICAL
 from modules.live_candidate.calendar import as_vn
 from modules.live_camera_shadow.bars import is_completed_bar
-from modules.live_candidate_v2_action.observe_bars import interpret_legal_history
+from modules.live_candidate_v2_action.observe_bars import (
+    interpret_legal_history,
+    legal_completed_from_frame,
+)
 from modules.live_candidate_v2_action.state import (
     ActionResult,
     FrozenNomination,
@@ -30,50 +33,6 @@ from modules.live_candidate_v2_camera.sidecar import (
 )
 
 BAR_MINUTES = 5
-
-
-def legal_completed_from_frame(
-    frame: pd.DataFrame,
-    *,
-    symbol: str,
-    now: datetime,
-) -> list[dict[str, Any]]:
-    """Completed 5m rows only. Unfinished and future bars are dropped."""
-    if frame is None or frame.empty:
-        return []
-    now_l = as_vn(now)
-    work = frame.copy()
-    if "symbol" in work.columns:
-        work = work[work["symbol"].astype(str).str.upper() == symbol.upper()]
-    if work.empty:
-        return []
-    ts_col = "timestamp" if "timestamp" in work.columns else "bar_ts"
-    work[ts_col] = pd.to_datetime(work[ts_col], errors="coerce")
-    out: list[dict[str, Any]] = []
-    for _, row in work.sort_values(ts_col).iterrows():
-        ts = row[ts_col]
-        if pd.isna(ts):
-            continue
-        bar_ts = as_vn(ts.to_pydatetime() if hasattr(ts, "to_pydatetime") else ts)
-        if not is_completed_bar(bar_ts, now_l):
-            continue
-        out.append(
-            {
-                "symbol": symbol.upper(),
-                "bar_ts": bar_ts,
-                "timestamp": bar_ts,
-                "open": row.get("open"),
-                "high": row.get("high"),
-                "low": row.get("low"),
-                "close": row.get("close"),
-                "volume": row.get("volume"),
-                "source": row.get("source") or "replay",
-                "data_quality": row.get("quality_flag") or row.get("data_quality") or "ok",
-                "session_date": row.get("session_date"),
-                "overlay_applied": bool(row.get("overlay_applied", False)),
-            }
-        )
-    return out
 
 
 def replay_shadow_action(
@@ -89,7 +48,7 @@ def replay_shadow_action(
     """Replay one nomination against completed 5m history."""
     nom = nomination if isinstance(nomination, FrozenNomination) else nomination_from_mapping(nomination)
     if isinstance(bars, pd.DataFrame):
-        records = legal_completed_from_frame(bars, symbol=nom.symbol, now=now)
+        records = legal_completed_from_frame(bars, symbol=nom.symbol, now=now, source="replay")
         overlay = None
         if not bars.empty and "timestamp" in bars.columns:
             overlay = bars.copy()

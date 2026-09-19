@@ -54,6 +54,23 @@ def _atomic_replace(src: Path, dest: Path) -> None:
     os.replace(tmp, dest)
 
 
+def publish_v2_action_state(src_state: Path, dest_dir: Path) -> dict[str, Any]:
+    """Copy only v2_action_state.json. Does not rewrite Elite evidence."""
+    dest_dir = Path(dest_dir)
+    dest_s = str(dest_dir)
+    if dest_s.startswith(FORBIDDEN_CAMERA_ARCHIVE) or dest_s == FORBIDDEN_CAMERA_ARCHIVE:
+        return {"v2_status": "ERROR", "v2_detail": "refusing Camera archive path", "v2_copied": []}
+    if not Path(src_state).exists():
+        return {"v2_status": "ABSENT", "v2_detail": "no v2_action_state.json", "v2_copied": []}
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    _atomic_replace(Path(src_state), dest_dir / V2_ACTION_STATE_NAME)
+    return {
+        "v2_status": "OK",
+        "v2_detail": str(dest_dir / V2_ACTION_STATE_NAME),
+        "v2_copied": [V2_ACTION_STATE_NAME],
+    }
+
+
 def _copy_optional_v2(src_dir: Path, dest_dir: Path) -> dict[str, Any]:
     """Publish V2 SHADOW state next to Elite artifacts. Fail-open for Elite."""
     src_state = src_dir / V2_ACTION_SUBDIR / V2_ACTION_STATE_NAME

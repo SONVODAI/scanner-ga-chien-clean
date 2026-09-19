@@ -25,6 +25,7 @@ WATCHLIST_URL="https://api.github.com/repos/SONVODAI/scanner-ga-chien-clean/cont
 
 FILES=(
   "scripts/run_live_camera_shadow.py"
+  "scripts/run_v2_shadow_observe_store.py"
   "modules/live_camera_shadow/__init__.py"
   "modules/live_camera_shadow/bars.py"
   "modules/live_camera_shadow/feed.py"
@@ -59,11 +60,13 @@ FILES=(
   "modules/intraday_memory/schema.py"
   "modules/intraday_memory/timezone_policy.py"
   "modules/intraday_memory/validate.py"
+  "modules/intraday_memory/storage.py"
   "modules/live_candidate_v2_action/__init__.py"
   "modules/live_candidate_v2_action/artifact.py"
   "modules/live_candidate_v2_action/contract.py"
   "modules/live_candidate_v2_action/observe_bars.py"
-  # replay.py is historical-only. Live Camera must not import it.
+  "modules/live_candidate_v2_action/observe_store.py"
+  # replay.py is historical-only. Store observe must not import it.
   "modules/live_candidate_v2_action/replay.py"
   "modules/live_candidate_v2_action/sidecar_source.py"
   "modules/live_candidate_v2_action/state.py"

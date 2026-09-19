@@ -388,6 +388,9 @@ def test_vps_install_allowlist_is_narrow():
     src = (REPO / "scripts" / "vps_install_live_camera_consumer.sh").read_text(encoding="utf-8")
     assert "modules/live_candidate_v2_action/sidecar_source.py" in src
     assert "modules/live_candidate_v2_action/observe_bars.py" in src
+    assert "modules/live_candidate_v2_action/observe_store.py" in src
+    assert "modules/intraday_memory/storage.py" in src
+    assert "scripts/run_v2_shadow_observe_store.py" in src
     assert "modules/live_candidate_v2_camera/github_bus.py" in src
     assert "modules/live_candidate_v2_camera/feed_pass.py" in src
     assert "modules/live_candidate_v2_nomination/contract.py" in src
@@ -430,8 +433,10 @@ def test_isolated_vps_allowlist_imports_live_path(tmp_path):
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, target)
 
-    assert not (dest / "modules" / "intraday_memory" / "storage.py").exists()
+    assert (dest / "modules" / "intraday_memory" / "storage.py").is_file()
+    assert (dest / "modules" / "live_candidate_v2_action" / "observe_store.py").is_file()
     assert not (dest / "modules" / "candidate_router").exists()
+    assert not (dest / "modules" / "intraday_memory" / "collector.py").exists()
     assert not (dest / "modules" / "live_candidate_pxv_ui").exists()
 
     saved_path = list(sys.path)
@@ -441,33 +446,34 @@ def test_isolated_vps_allowlist_imports_live_path(tmp_path):
         for k in doomed:
             del sys.modules[k]
         sys.path = [str(dest)] + [p for p in saved_path if Path(p).resolve() != REPO.resolve()]
-        from modules.live_camera_shadow.feed import LiveShadowFeed
         from modules.live_candidate_v2_action.contract import (
             ALERT_ELIGIBLE,
             CANDIDATE_IS_BUY,
             PXV_IMPLIES_BUY,
         )
+        from modules.live_candidate_v2_action.observe_store import observe_from_collected_session
         from modules.live_candidate_v2_action.sidecar_source import resolve_published_v2_sidecar
         from modules.live_candidate_v2_action.state import evaluate_shadow_action
         from modules.live_candidate_v2_camera.contract import GITHUB_V2_SIDECAR_PATH
         from modules.live_candidate_v2_camera.github_bus import fetch_v2_sidecar
         from modules.live_shadow_transport.artifact_get import get_v2_action_state_text
-        from modules.live_shadow_transport.shadow_store import publish_shadow_artifacts
+        from modules.live_shadow_transport.shadow_store import publish_v2_action_state
 
-        assert LiveShadowFeed is not None
+        assert observe_from_collected_session is not None
         assert resolve_published_v2_sidecar is not None
         assert evaluate_shadow_action is not None
         assert fetch_v2_sidecar is not None
         assert get_v2_action_state_text is not None
-        assert publish_shadow_artifacts is not None
+        assert publish_v2_action_state is not None
         assert GITHUB_V2_SIDECAR_PATH == "research/live_candidate_v2_camera_sidecar/camera_sidecar.json"
         assert CANDIDATE_IS_BUY is False
         assert PXV_IMPLIES_BUY is False
         assert ALERT_ELIGIBLE is False
-        assert "modules.intraday_memory.storage" not in sys.modules
         assert "modules.live_candidate_v2_action.replay" not in sys.modules
         assert "modules.live_candidate_v2_camera.sidecar" not in sys.modules
         assert "modules.live_candidate_v2_camera.cloud_hook" not in sys.modules
+        assert "modules.intraday_memory.provider" not in sys.modules
+        assert "modules.intraday_memory.collector" not in sys.modules
     finally:
         for k in list(sys.modules):
             if k == "modules" or k.startswith("modules."):

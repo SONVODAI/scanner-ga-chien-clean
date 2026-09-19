@@ -14,7 +14,7 @@ from modules.intraday_pxv_v1.features import FAM_EXPANSION, FAM_PXV, FAM_SELL, P
 from modules.intraday_pxv_v1.interpret import interpret_asof
 from modules.intraday_pxv_v1.time_contract import asof_allowed, parse_legal_ts, resolve_legal_existence
 from modules.live_candidate.calendar import as_vn
-from modules.live_camera_shadow.bars import completed_to_overlay
+from modules.live_camera_shadow.bars import completed_to_overlay, is_completed_bar
 from modules.live_candidate_v2_action.state import BarEvidence, FrozenNomination
 from modules.live_candidate_v2_camera.feed_pass import v2_event_reason, v2_nomination_source
 from modules.live_candidate_v2_camera.observe import observe_close_vs_ref
@@ -107,6 +107,51 @@ def _candidate_event(nom: FrozenNomination, session: date) -> CandidateEvent:
         candidate_first_seen_ts=nom.candidate_first_seen_ts,
         candidate_updated_ts=nom.candidate_first_seen_ts,
     )
+
+
+def legal_completed_from_frame(
+    frame: pd.DataFrame,
+    *,
+    symbol: str,
+    now: datetime,
+    source: str = "camera_store",
+) -> list[dict[str, Any]]:
+    """Completed 5m rows only. Unfinished and future bars are dropped."""
+    if frame is None or frame.empty:
+        return []
+    now_l = as_vn(now)
+    work = frame.copy()
+    if "symbol" in work.columns:
+        work = work[work["symbol"].astype(str).str.upper() == symbol.upper()]
+    if work.empty:
+        return []
+    ts_col = "timestamp" if "timestamp" in work.columns else "bar_ts"
+    work[ts_col] = pd.to_datetime(work[ts_col], errors="coerce")
+    out: list[dict[str, Any]] = []
+    for _, row in work.sort_values(ts_col).iterrows():
+        ts = row[ts_col]
+        if pd.isna(ts):
+            continue
+        bar_ts = as_vn(ts.to_pydatetime() if hasattr(ts, "to_pydatetime") else ts)
+        if not is_completed_bar(bar_ts, now_l):
+            continue
+        out.append(
+            {
+                "symbol": symbol.upper(),
+                "bar_ts": bar_ts,
+                "timestamp": bar_ts,
+                "open": row.get("open"),
+                "high": row.get("high"),
+                "low": row.get("low"),
+                "close": row.get("close"),
+                "volume": row.get("volume"),
+                "source": row.get("source") or source,
+                "data_quality": row.get("quality_flag") or row.get("data_quality") or "ok",
+                "session_date": row.get("session_date"),
+                "overlay_applied": bool(row.get("overlay_applied", False)),
+            }
+        )
+    return out
 
 
 def overlay_from_records(records: Sequence[Mapping[str, Any]]) -> pd.DataFrame:
