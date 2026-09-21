@@ -22,8 +22,8 @@
     "eligible_from"
   ],
   "session": "2026-09-21",
-  "observed_at": "2026-09-21T09:33:55.677511+07:00",
-  "generated_at": "2026-09-21T09:33:55.677511+07:00",
+  "observed_at": "2026-09-21T09:38:25.467082+07:00",
+  "generated_at": "2026-09-21T09:38:25.467082+07:00",
   "market_real": 5.9,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
@@ -433,6 +433,518 @@
       "price_at_first_seen": 10650.0,
       "ema9_at_first_seen": 10547.83,
       "breakout_ref_at_first_seen": 10850.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "AGR",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13050.0,
+      "ema9_at_first_seen": 12870.09,
+      "breakout_ref_at_first_seen": 13500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "ANV",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 16200.0,
+      "ema9_at_first_seen": 16105.4,
+      "breakout_ref_at_first_seen": 17800.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "BAF",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 32150.0,
+      "ema9_at_first_seen": 32113.01,
+      "breakout_ref_at_first_seen": 33000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "BID",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 36750.0,
+      "ema9_at_first_seen": 36445.24,
+      "breakout_ref_at_first_seen": 37750.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "BVH",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 68900.0,
+      "ema9_at_first_seen": 67667.63,
+      "breakout_ref_at_first_seen": 71700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "BVS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 28700.0,
+      "ema9_at_first_seen": 28163.21,
+      "breakout_ref_at_first_seen": 30700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "DPR",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 37900.0,
+      "ema9_at_first_seen": 37744.99,
+      "breakout_ref_at_first_seen": 39000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "DRI",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 14800.0,
+      "ema9_at_first_seen": 14600.51,
+      "breakout_ref_at_first_seen": 15200.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "EIB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 16600.0,
+      "ema9_at_first_seen": 16485.91,
+      "breakout_ref_at_first_seen": 17700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "FCN",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 11100.0,
+      "ema9_at_first_seen": 11048.69,
+      "breakout_ref_at_first_seen": 11750.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "FTS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 21100.0,
+      "ema9_at_first_seen": 20922.79,
+      "breakout_ref_at_first_seen": 23500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "GEE",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 64100.0,
+      "ema9_at_first_seen": 62696.07,
+      "breakout_ref_at_first_seen": 69340.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "GMD",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 77800.0,
+      "ema9_at_first_seen": 76552.31,
+      "breakout_ref_at_first_seen": 81300.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "GVR",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 32050.0,
+      "ema9_at_first_seen": 31614.31,
+      "breakout_ref_at_first_seen": 34250.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HAG",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 14050.0,
+      "ema9_at_first_seen": 13972.22,
+      "breakout_ref_at_first_seen": 14600.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HAH",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 48000.0,
+      "ema9_at_first_seen": 47123.53,
+      "breakout_ref_at_first_seen": 48800.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HCM",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 25700.0,
+      "ema9_at_first_seen": 25534.84,
+      "breakout_ref_at_first_seen": 27050.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HDC",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 11500.0,
+      "ema9_at_first_seen": 11487.42,
+      "breakout_ref_at_first_seen": 12750.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HDG",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 16350.0,
+      "ema9_at_first_seen": 16174.23,
+      "breakout_ref_at_first_seen": 17700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HPG",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 21500.0,
+      "ema9_at_first_seen": 21375.36,
+      "breakout_ref_at_first_seen": 22400.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "HUT",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13000.0,
+      "ema9_at_first_seen": 12864.82,
+      "breakout_ref_at_first_seen": 13500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "IDC",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 32200.0,
+      "ema9_at_first_seen": 31477.8,
+      "breakout_ref_at_first_seen": 33700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "KSB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13150.0,
+      "ema9_at_first_seen": 13133.66,
+      "breakout_ref_at_first_seen": 14150.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "MBS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 17000.0,
+      "ema9_at_first_seen": 16870.41,
+      "breakout_ref_at_first_seen": 18500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "MSB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13150.0,
+      "ema9_at_first_seen": 12975.72,
+      "breakout_ref_at_first_seen": 13400.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "MSH",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 30150.0,
+      "ema9_at_first_seen": 30121.36,
+      "breakout_ref_at_first_seen": 31000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "MSN",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 68900.0,
+      "ema9_at_first_seen": 67989.08,
+      "breakout_ref_at_first_seen": 71100.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "MWG",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 72300.0,
+      "ema9_at_first_seen": 72118.51,
+      "breakout_ref_at_first_seen": 75900.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "NT2",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 20800.0,
+      "ema9_at_first_seen": 20611.05,
+      "breakout_ref_at_first_seen": 21800.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "NTL",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 12600.0,
+      "ema9_at_first_seen": 12539.71,
+      "breakout_ref_at_first_seen": 13500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "NTP",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 52500.0,
+      "ema9_at_first_seen": 52310.89,
+      "breakout_ref_at_first_seen": 55500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "OCB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 10550.0,
+      "ema9_at_first_seen": 10388.83,
+      "breakout_ref_at_first_seen": 11000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "OIL",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 14400.0,
+      "ema9_at_first_seen": 14260.5,
+      "breakout_ref_at_first_seen": 15500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "ORS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13450.0,
+      "ema9_at_first_seen": 13363.04,
+      "breakout_ref_at_first_seen": 15000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "PET",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 39250.0,
+      "ema9_at_first_seen": 38384.8,
+      "breakout_ref_at_first_seen": 39950.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "PLX",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 37050.0,
+      "ema9_at_first_seen": 36804.83,
+      "breakout_ref_at_first_seen": 39500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "PVB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 22500.0,
+      "ema9_at_first_seen": 22206.76,
+      "breakout_ref_at_first_seen": 23700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "PVS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 33300.0,
+      "ema9_at_first_seen": 33028.52,
+      "breakout_ref_at_first_seen": 35300.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "PVT",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 22750.0,
+      "ema9_at_first_seen": 22221.96,
+      "breakout_ref_at_first_seen": 23700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "REE",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 47250.0,
+      "ema9_at_first_seen": 45721.57,
+      "breakout_ref_at_first_seen": 46700.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "SBT",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 23100.0,
+      "ema9_at_first_seen": 23006.22,
+      "breakout_ref_at_first_seen": 24150.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "SHB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 11700.0,
+      "ema9_at_first_seen": 11652.88,
+      "breakout_ref_at_first_seen": 12250.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "SIP",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 49500.0,
+      "ema9_at_first_seen": 48743.14,
+      "breakout_ref_at_first_seen": 50500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "SSI",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 21550.0,
+      "ema9_at_first_seen": 20919.95,
+      "breakout_ref_at_first_seen": 21750.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "STB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 78000.0,
+      "ema9_at_first_seen": 76574.31,
+      "breakout_ref_at_first_seen": 79000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "TCH",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 11800.0,
+      "ema9_at_first_seen": 11728.39,
+      "breakout_ref_at_first_seen": 12590.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "TNG",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 16500.0,
+      "ema9_at_first_seen": 16361.34,
+      "breakout_ref_at_first_seen": 17400.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "TPB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 14250.0,
+      "ema9_at_first_seen": 14220.83,
+      "breakout_ref_at_first_seen": 14950.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "TVS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 14500.0,
+      "ema9_at_first_seen": 14346.46,
+      "breakout_ref_at_first_seen": 15250.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VCB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 60000.0,
+      "ema9_at_first_seen": 59297.57,
+      "breakout_ref_at_first_seen": 61400.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VCI",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 20900.0,
+      "ema9_at_first_seen": 20494.59,
+      "breakout_ref_at_first_seen": 23150.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VCK",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 29700.0,
+      "ema9_at_first_seen": 29143.19,
+      "breakout_ref_at_first_seen": 30900.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VGC",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 40500.0,
+      "ema9_at_first_seen": 40076.29,
+      "breakout_ref_at_first_seen": 42200.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VGT",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 11000.0,
+      "ema9_at_first_seen": 10970.23,
+      "breakout_ref_at_first_seen": 11900.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VIB",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13650.0,
+      "ema9_at_first_seen": 13545.35,
+      "breakout_ref_at_first_seen": 13840.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VIC",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 242500.0,
+      "ema9_at_first_seen": 241649.9,
+      "breakout_ref_at_first_seen": 265000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VIX",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13400.0,
+      "ema9_at_first_seen": 13183.95,
+      "breakout_ref_at_first_seen": 14650.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VJC",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 127500.0,
+      "ema9_at_first_seen": 125515.76,
+      "breakout_ref_at_first_seen": 128000.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VND",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 15300.0,
+      "ema9_at_first_seen": 15217.1,
+      "breakout_ref_at_first_seen": 17200.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VNM",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 61000.0,
+      "ema9_at_first_seen": 60516.15,
+      "breakout_ref_at_first_seen": 64400.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VOS",
+      "candidate_first_seen_ts": "2026-09-21T09:35:52.718833+07:00",
+      "price_at_first_seen": 12000.0,
+      "ema9_at_first_seen": 11743.31,
+      "breakout_ref_at_first_seen": 12500.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VPX",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 24150.0,
+      "ema9_at_first_seen": 24106.93,
+      "breakout_ref_at_first_seen": 26300.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VRE",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 25850.0,
+      "ema9_at_first_seen": 25839.88,
+      "breakout_ref_at_first_seen": 27950.0
+    },
+    {
+      "session": "2026-09-18",
+      "symbol": "VSC",
+      "candidate_first_seen_ts": "2026-09-21T09:35:12.749687+07:00",
+      "price_at_first_seen": 13600.0,
+      "ema9_at_first_seen": 13409.47,
+      "breakout_ref_at_first_seen": 15800.0
     }
   ],
   "rows": []
