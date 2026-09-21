@@ -22,9 +22,9 @@
     "status",
     "eligible_from"
   ],
-  "session": "2026-09-21",
-  "observed_at": "2026-09-21T19:40:59.340227+07:00",
-  "generated_at": "2026-09-21T19:40:59.340227+07:00",
+  "session": "2026-09-22",
+  "observed_at": "2026-09-22T05:40:29.702536+07:00",
+  "generated_at": "2026-09-22T05:40:29.702536+07:00",
   "market_real": 4.8,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
@@ -1000,10 +1000,10 @@
   "rows": [],
   "brain_b": {
     "source": "market_aware_sweetspot",
-    "status": "UNAVAILABLE",
-    "session": "2026-09-21",
-    "predecessor": "2026-09-18",
-    "reason": "PREDECESSOR_SWEET_FREEZE_MISSING",
+    "status": "NOT_TRADING_SESSION",
+    "session": "2026-09-22",
+    "predecessor": "",
+    "reason": "T_NOT_VNINDEX_TRADING_SESSION",
     "n_nominations": 0
   }
 }
