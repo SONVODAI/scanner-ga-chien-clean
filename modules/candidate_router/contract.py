@@ -22,6 +22,8 @@ SRC_BUY_ELITE = ELITE_SOURCE
 SRC_ROTATION = "rotation_watch"
 SRC_HOF = "hall_of_fame"
 SRC_LEARNING_INSIGHT = "learning_insight"
+SRC_BRAIN_A_SCAN_SETUP = "brain_a_scan_setup"
+SRC_MARKET_AWARE_SWEETSPOT = "market_aware_sweetspot"
 
 # Slice 1 gate. Future adapters must not be added here until their chronology
 # contract is live. Direction: source artifact → downstream adapter → router.
@@ -30,11 +32,15 @@ ENABLED_SOURCES = frozenset({SRC_BUY_ELITE})
 # Lower integer = higher priority. Unused sources stay listed so a later
 # Rotation adapter can plug in without inventing a second priority table.
 # Priority selects the canonical nomination; it must not erase losing provenance.
+# Brain A is explicit so A+B cannot fall through to DEFAULT_SOURCE_PRIORITY /
+# string-order accident (both would otherwise be 1000).
 SOURCE_PRIORITY = {
     SRC_BUY_ELITE: 0,
+    SRC_BRAIN_A_SCAN_SETUP: 5,
     SRC_ROTATION: 10,
     SRC_HOF: 20,
     SRC_LEARNING_INSIGHT: 30,
+    SRC_MARKET_AWARE_SWEETSPOT: 40,
 }
 DEFAULT_SOURCE_PRIORITY = 1000
 

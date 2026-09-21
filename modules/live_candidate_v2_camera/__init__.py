@@ -14,6 +14,7 @@ from modules.live_candidate_v2_camera.contract import (
     GITHUB_V2_SIDECAR_PATH,
     SCHEMA_ID,
     SHADOW_V2_ENABLED_SOURCES,
+    SRC_MARKET_AWARE_SWEETSPOT,
 )
 from modules.live_candidate_v2_camera.feed_pass import is_v2_camera_row, v2_event_reason
 from modules.live_candidate_v2_camera.observe import observe_close_vs_ref, pxv_implies_buy
@@ -27,6 +28,7 @@ __all__ = [
     "SCHEMA_ID",
     "SHADOW_V2_ENABLED_SOURCES",
     "SRC_BRAIN_A",
+    "SRC_MARKET_AWARE_SWEETSPOT",
     "build_sidecar_from_scan",
     "build_sidecar_rows",
     "is_v2_camera_row",

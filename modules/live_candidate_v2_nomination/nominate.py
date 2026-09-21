@@ -50,6 +50,10 @@ class NominationReport:
     observed_at: str
     market_real: float | None
     market_permission: str
+    brain_b_status: str = ""
+    brain_b_predecessor: str = ""
+    brain_b_reason: str = ""
+    brain_b_provenance: tuple[dict[str, Any], ...] = ()
 
 
 def _winprob(row: Mapping[str, Any]) -> float | None:

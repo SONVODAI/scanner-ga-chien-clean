@@ -12,9 +12,13 @@ SCHEMA_ID = "live_candidate_v2_camera_sidecar_v1"
 SLICE = 2
 MODE = "SHADOW_ONLY"
 
+# Keep this string identical to candidate_router.contract.SRC_MARKET_AWARE_SWEETSPOT.
+# camera.contract is on the VPS allowlist; candidate_router is not.
+SRC_MARKET_AWARE_SWEETSPOT = "market_aware_sweetspot"
+
 # Shadow-only Router enablement. Production ENABLED_SOURCES is unchanged.
-# Brain B / SRC_LEARNING_INSIGHT is intentionally absent: OR, not AND.
-SHADOW_V2_ENABLED_SOURCES = frozenset({SRC_BRAIN_A})
+# Brain A ∪ Sweet Brain B. OR, not AND. learning_insight stays out.
+SHADOW_V2_ENABLED_SOURCES = frozenset({SRC_BRAIN_A, SRC_MARKET_AWARE_SWEETSPOT})
 
 DEFAULT_SIDECAR_RELPATH = "research/live_candidate_v2_camera_sidecar/camera_sidecar.json"
 PRODUCTION_WATCHLIST_RELPATH = "data/live_candidate/dynamic_watchlist.json"

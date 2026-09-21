@@ -27,6 +27,7 @@ from modules.live_candidate_v2_camera.sidecar import (
     write_sidecar,
 )
 from modules.live_candidate_v2_nomination.contract import ELITE_BUY_GRADES
+from modules.live_candidate_v2_nomination.sweet_brain_b import BrainBConsult, consult_brain_b
 
 REASON_GATE_OFF = "GATE_OFF"
 REASON_WROTE = "WROTE"
@@ -134,8 +135,9 @@ def run_v2_cloud_sidecar(
     early_buy_lab_df: Any = None,
     path: Path | None = None,
     env: Mapping[str, str] | None = None,
+    brain_b: BrainBConsult | None = None,
 ) -> CloudSidecarResult:
-    """Load prior freeze → nominate → atomic local write. No GitHub."""
+    """Load prior freeze → nominate A ∪ consult Sweet B → atomic local write. No GitHub."""
     if not v2_cloud_sidecar_enabled(env):
         return CloudSidecarResult(ok=True, skipped=True, reason=REASON_GATE_OFF)
 
@@ -156,12 +158,17 @@ def run_v2_cloud_sidecar(
     early_lab = early_lab_symbols_from_frame(early_buy_lab_df)
     now = as_vn(observed_at)
     try:
+        consulted = brain_b if brain_b is not None else consult_brain_b(
+            observed_at=now,
+            market_real=market_real,
+        )
         report, sidecar_rows = build_sidecar_from_scan(
             rows,
             market_real=market_real,
             observed_at=now,
             prior_freeze=prior_freeze,
             early_lab_symbols=early_lab,
+            brain_b=consulted,
         )
         write_sidecar(
             sidecar_rows,
@@ -172,6 +179,7 @@ def run_v2_cloud_sidecar(
             freeze_ledger=report.freeze_ledger,
             generated_at=now,
             session=now.date().isoformat(),
+            brain_b=consulted.as_dict(),
         )
         snapshot_text = dest.read_text(encoding="utf-8")
     except SidecarShadowError as exc:

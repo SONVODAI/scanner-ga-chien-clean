@@ -1,4 +1,4 @@
-"""Read-only Live Candidate V2 — Brain A operator panel.
+"""Read-only Live Candidate V2 operator panel.
 
 Current-cycle Gate B GET only. Candidate != BUY. Does not nominate,
 does not GET, does not read the production Elite watchlist.
@@ -14,9 +14,9 @@ KIND_OK_EMPTY = "OK_EMPTY"
 KIND_OK_ROWS = "OK_ROWS"
 KIND_FAILURE = "FAILURE"
 
-PANEL_TITLE = "Live Candidate V2 — Brain A"
+PANEL_TITLE = "Live Candidate V2"
 SEMANTIC_CAPTION = "Candidate ≠ BUY · observation only · not Elite action · not NAV"
-EMPTY_MESSAGE = "No Brain A candidate this session."
+EMPTY_MESSAGE = "No V2 candidate this session."
 UNAVAILABLE_MESSAGE = "Live Candidate V2 unavailable this cycle."
 
 STATUS_OK_EMPTY = "OK_EMPTY"
@@ -133,7 +133,7 @@ def project_operator_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, A
 
 
 def render_live_candidate_v2_panel(view: V2UiView | None, *, st_module: Any = None) -> None:
-    """Render the durable Brain A panel. Never fetches. Never writes."""
+    """Render the durable V2 panel. Never fetches. Never writes."""
     st = st_module
     if st is None:
         import streamlit as st

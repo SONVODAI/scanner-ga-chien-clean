@@ -1,8 +1,8 @@
-"""Brain A nomination → V2 Camera sidecar rows.
+"""Brain A ∪ Sweet Brain B nomination → V2 Camera sidecar rows.
 
 Shadow Router chronology via enabled_sources override only.
 Does not publish data/live_candidate/dynamic_watchlist.json.
-Does not enable Brain B. Absence of Brain B never blocks Brain A.
+Sweet Brain B is observation-only. Absence of Brain B never blocks Brain A.
 """
 
 from __future__ import annotations
@@ -19,7 +19,12 @@ from modules.candidate_router.contract import (
     SymbolProvenance,
     WATCHLIST_COLUMNS,
 )
-from modules.candidate_router.router import RouteReport, route_report, to_watchlist_frame
+from modules.candidate_router.router import (
+    RouteReport,
+    dedup_with_provenance,
+    route_report,
+    to_watchlist_frame,
+)
 from modules.live_candidate.calendar import as_vn
 from modules.live_candidate.contract import has_legal_first_seen
 from modules.live_candidate_v2_camera.contract import (
@@ -29,6 +34,7 @@ from modules.live_candidate_v2_camera.contract import (
     SCHEMA_ID,
     SHADOW_V2_ENABLED_SOURCES,
     SLICE,
+    SRC_MARKET_AWARE_SWEETSPOT,
 )
 from modules.live_candidate_v2_nomination.artifact import assert_not_production_watchlist
 from modules.live_candidate_v2_nomination.contract import BrainANomination, FreezeRecord
@@ -38,6 +44,7 @@ from modules.live_candidate_v2_nomination.nominate import (
     nominate_scan_rows,
     to_nominated_candidate,
 )
+from modules.live_candidate_v2_nomination.sweet_brain_b import BrainBConsult
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SIDECAR_PATH = REPO_ROOT / DEFAULT_SIDECAR_RELPATH
@@ -60,8 +67,11 @@ def shadow_route_v2(
     return route_report(nominations, now=now, cap=cap, enabled_sources=enabled)
 
 
-def _provenance_entry(nom: NominatedCandidate) -> dict[str, Any]:
-    return {
+def _provenance_entry(
+    nom: NominatedCandidate,
+    extra: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    entry: dict[str, Any] = {
         "source": nom.source,
         "candidate_first_seen_ts": nom.candidate_first_seen_ts,
         "setup": nom.setup or nom.group,
@@ -72,28 +82,61 @@ def _provenance_entry(nom: NominatedCandidate) -> dict[str, Any]:
         "status": nom.status,
         "eligible_from": nom.eligible_from,
     }
+    if extra:
+        reserved = set(entry)
+        reserved.add("symbol")
+        for key, value in extra.items():
+            if key in reserved:
+                continue
+            entry[key] = value
+    return entry
+
+
+def _extras_by_key(
+    extras: Sequence[Mapping[str, Any]] | None,
+) -> dict[tuple[str, str], dict[str, Any]]:
+    out: dict[tuple[str, str], dict[str, Any]] = {}
+    for raw in extras or ():
+        sym = str(raw.get("symbol") or "").strip().upper()
+        if not sym:
+            continue
+        src = str(raw.get("source") or SRC_MARKET_AWARE_SWEETSPOT).strip()
+        out[(sym, src)] = dict(raw)
+    return out
 
 
 def _provenance_for(
     nom: BrainANomination,
     by_symbol: Mapping[str, SymbolProvenance],
+    extras_by_key: Mapping[tuple[str, str], Mapping[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
+    extras = extras_by_key or {}
     hit = by_symbol.get(nom.symbol)
     if hit is not None and hit.nominations:
-        return [_provenance_entry(n) for n in hit.nominations]
-    return [
-        {
-            "source": nom.source,
-            "candidate_first_seen_ts": nom.candidate_first_seen_ts,
-            "setup": nom.setup,
-            "group": nom.group,
-            "source_action": nom.source_action,
-            "source_reason": nom.source_reason,
-            "candidate_reason": nom.nomination_reason,
-            "status": nom.status,
-            "eligible_from": nom.eligible_from,
-        }
-    ]
+        return [
+            _provenance_entry(n, extras.get((n.symbol, n.source)))
+            for n in hit.nominations
+        ]
+    extra = extras.get((nom.symbol, nom.source))
+    fallback = {
+        "source": nom.source,
+        "candidate_first_seen_ts": nom.candidate_first_seen_ts,
+        "setup": nom.setup,
+        "group": nom.group,
+        "source_action": nom.source_action,
+        "source_reason": nom.source_reason,
+        "candidate_reason": nom.nomination_reason,
+        "status": nom.status,
+        "eligible_from": nom.eligible_from,
+    }
+    if extra:
+        reserved = set(fallback)
+        reserved.add("symbol")
+        for key, value in extra.items():
+            if key in reserved:
+                continue
+            fallback[key] = value
+    return [fallback]
 
 
 def sidecar_row_from_nomination(
@@ -138,14 +181,15 @@ def sidecar_row_from_nomination(
 def build_sidecar_rows(
     report: NominationReport,
 ) -> list[dict[str, Any]]:
-    """Canonical Brain A nominations as Camera sidecar rows. List provenance, not a score."""
+    """Canonical V2 nominations as Camera sidecar rows. List provenance, not a score."""
     by_symbol: dict[str, SymbolProvenance] = {}
     if report.route_report is not None:
         by_symbol = {p.symbol: p for p in report.route_report.provenance}
+    extras = _extras_by_key(report.brain_b_provenance)
     rows = [
         sidecar_row_from_nomination(
             nom,
-            provenance=_provenance_for(nom, by_symbol),
+            provenance=_provenance_for(nom, by_symbol, extras),
         )
         for nom in report.nominations
     ]
@@ -263,6 +307,27 @@ def atomic_write_text(path: Path, text: str) -> None:
         raise
 
 
+def _with_brain_b_meta(
+    report: NominationReport,
+    brain_b: BrainBConsult | None,
+) -> NominationReport:
+    if brain_b is None:
+        return report
+    return NominationReport(
+        nominations=report.nominations,
+        rejected=report.rejected,
+        freeze_ledger=report.freeze_ledger,
+        route_report=report.route_report,
+        observed_at=report.observed_at,
+        market_real=report.market_real,
+        market_permission=report.market_permission,
+        brain_b_status=brain_b.status,
+        brain_b_predecessor=brain_b.predecessor,
+        brain_b_reason=brain_b.reason,
+        brain_b_provenance=brain_b.provenance,
+    )
+
+
 def build_sidecar_from_scan(
     rows: Sequence[Mapping[str, Any]] | None,
     *,
@@ -270,13 +335,14 @@ def build_sidecar_from_scan(
     observed_at: datetime,
     prior_freeze: Iterable | None = None,
     early_lab_symbols: Iterable[str] | None = None,
+    brain_b: BrainBConsult | None = None,
 ) -> tuple[NominationReport, list[dict[str, Any]]]:
-    """Nominate (Brain A) then shadow-route into sidecar. Brain B is not consulted.
+    """Nominate Brain A, optionally union Sweet Brain B, then shadow-route.
 
-    Uses ``shadow_route_v2`` (Brain A enabled_sources override). Production
-    ``ENABLED_SOURCES`` and ``nominate_scan_rows(..., route=True)`` are unused.
-    Router NOT_YET_ELIGIBLE drops stay on the sidecar as nominations — Camera
-    must still see first_seen/eligible_from so it can wait.
+    Default ``brain_b=None`` does not consult Sweet (existing Brain-A-only tests).
+    Production Cloud hook always passes a consult. Zero B never blocks A.
+    Uses ``shadow_route_v2``. Production ``ENABLED_SOURCES`` unused.
+    Sweet is never written to freeze_ledger (Brain A clocks/refs stay Brain A).
     """
     report = nominate_scan_rows(
         rows,
@@ -287,29 +353,41 @@ def build_sidecar_from_scan(
         route=False,
     )
     now = as_vn(observed_at)
-    if not report.nominations:
+    b_noms = list(brain_b.nominations) if brain_b is not None else []
+    all_noms = list(report.nominations) + b_noms
+    if not all_noms:
+        report = _with_brain_b_meta(report, brain_b)
         return report, build_sidecar_rows(report)
-    routed = shadow_route_v2(
-        [to_nominated_candidate(n) for n in report.nominations],
-        now=now,
-    )
-    by_sym = {n.symbol: n for n in report.nominations}
+
+    routed_noms = [to_nominated_candidate(n) for n in all_noms]
+    routed = shadow_route_v2(routed_noms, now=now)
+    # Canonical V2 row uses SOURCE_PRIORITY over the full union, including
+    # not-yet-eligible nominations the eligible router drops. Camera must wait.
+    full_prov = tuple(dedup_with_provenance(routed_noms))
+    by_key = {(n.symbol, n.source): n for n in all_noms}
     merged: list = []
-    for canon in routed.canonical:
-        merged.append(from_nominated_candidate(canon, by_sym[canon.symbol]))
-    kept = {n.symbol for n in merged}
-    for nom in report.nominations:
-        if nom.symbol not in kept:
-            merged.append(nom)
+    for item in full_prov:
+        original = by_key[(item.canonical.symbol, item.canonical.source)]
+        merged.append(from_nominated_candidate(item.canonical, original))
     merged.sort(key=lambda n: (n.symbol, n.candidate_first_seen_ts))
+    combined = RouteReport(
+        watchlist=to_watchlist_frame([to_nominated_candidate(n) for n in merged]),
+        canonical=tuple(to_nominated_candidate(n) for n in merged),
+        provenance=full_prov,
+        rejected=routed.rejected,
+    )
     report = NominationReport(
         nominations=tuple(merged),
         rejected=report.rejected,
         freeze_ledger=report.freeze_ledger,
-        route_report=routed,
+        route_report=combined,
         observed_at=report.observed_at,
         market_real=report.market_real,
         market_permission=report.market_permission,
+        brain_b_status=brain_b.status if brain_b is not None else "",
+        brain_b_predecessor=brain_b.predecessor if brain_b is not None else "",
+        brain_b_reason=brain_b.reason if brain_b is not None else "",
+        brain_b_provenance=brain_b.provenance if brain_b is not None else (),
     )
     return report, build_sidecar_rows(report)
 
@@ -323,10 +401,11 @@ def build_sidecar_document(
     freeze_ledger: Iterable[FreezeRecord] | None = None,
     generated_at: datetime | None = None,
     session: str | None = None,
+    brain_b: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     now = as_vn(observed_at)
     generated = as_vn(generated_at) if generated_at is not None else now
-    return {
+    doc: dict[str, Any] = {
         "schema": SCHEMA_ID,
         "slice": SLICE,
         "mode": MODE,
@@ -344,13 +423,17 @@ def build_sidecar_document(
         "notes": [
             "Candidate != BUY.",
             "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
-            "Brain B is not required. OR not AND.",
+            "Brain B Sweet is observation-only. OR not AND. Zero B never blocks A.",
             "No GitHub publish in Slice 3A. Local freeze_ledger only.",
             "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd.",
+            "Sweet-only has no EMA9/breakout Camera timing reference.",
         ],
         "freeze_ledger": freeze_ledger_as_dicts(freeze_ledger),
         "rows": [dict(r) for r in rows],
     }
+    if brain_b is not None:
+        doc["brain_b"] = dict(brain_b)
+    return doc
 
 
 def encode_sidecar_text(document: dict[str, Any]) -> str:
@@ -367,6 +450,7 @@ def write_sidecar(
     freeze_ledger: Iterable[FreezeRecord] | None = None,
     generated_at: datetime | None = None,
     session: str | None = None,
+    brain_b: Mapping[str, Any] | None = None,
 ) -> Path:
     out = Path(path) if path is not None else DEFAULT_SIDECAR_PATH
     assert_not_production_watchlist(out)
@@ -379,6 +463,7 @@ def write_sidecar(
         freeze_ledger=freeze_ledger,
         generated_at=generated_at,
         session=session,
+        brain_b=brain_b,
     )
     atomic_write_text(out, encode_sidecar_text(doc))
     return out
