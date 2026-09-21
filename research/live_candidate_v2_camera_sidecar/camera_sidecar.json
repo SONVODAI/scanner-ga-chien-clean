@@ -9,7 +9,8 @@
     "buy_elite_learning_history"
   ],
   "shadow_enabled_sources": [
-    "brain_a_scan_setup"
+    "brain_a_scan_setup",
+    "market_aware_sweetspot"
   ],
   "watchlist_columns_untouched": [
     "session",
@@ -22,16 +23,17 @@
     "eligible_from"
   ],
   "session": "2026-09-21",
-  "observed_at": "2026-09-21T16:52:27.596314+07:00",
-  "generated_at": "2026-09-21T16:52:27.596314+07:00",
+  "observed_at": "2026-09-21T18:12:33.529897+07:00",
+  "generated_at": "2026-09-21T18:12:33.529897+07:00",
   "market_real": 4.8,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
     "Candidate != BUY.",
     "Sidecar for Camera observation, not data/live_candidate/dynamic_watchlist.json.",
-    "Brain B is not required. OR not AND.",
+    "Brain B Sweet is observation-only. OR not AND. Zero B never blocks A.",
     "No GitHub publish in Slice 3A. Local freeze_ledger only.",
-    "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd."
+    "Frozen refs stay scan units; close_vs_ref is integer VND via normalize_price_to_integer_vnd.",
+    "Sweet-only has no EMA9/breakout Camera timing reference."
   ],
   "freeze_ledger": [
     {
@@ -995,5 +997,13 @@
       "breakout_ref_at_first_seen": 10850.0
     }
   ],
-  "rows": []
+  "rows": [],
+  "brain_b": {
+    "source": "market_aware_sweetspot",
+    "status": "UNAVAILABLE",
+    "session": "2026-09-21",
+    "predecessor": "2026-09-18",
+    "reason": "PREDECESSOR_SWEET_FREEZE_MISSING",
+    "n_nominations": 0
+  }
 }
