@@ -148,6 +148,10 @@ def _exec_hook(*, env_a=None, env_b=None, secrets=None, result=None, real_runner
             os.environ[ENV_V2_GITHUB_PUBLISH] = saved_b
     after_v2 = {k for k in sys.modules if "live_candidate_v2" in k}
     after_gh = {k for k in sys.modules if "github_bus" in k}
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     return {
         "captions": captions,
         "warnings": warnings,

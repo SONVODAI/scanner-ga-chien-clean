@@ -117,6 +117,10 @@ def _exec_hook(*, gate_a: str | None, gate_b: str | None, result: _FakeSidecar |
         if saved_b is not None:
             os.environ[ENV_V2_GITHUB_PUBLISH] = saved_b
     after = {k for k in sys.modules if "github_bus" in k}
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     return captions, warnings, ns, before, after
 
 
@@ -125,7 +129,7 @@ def test_caption_placement_after_warning_before_gate_b():
     try_node = _v2_hook_try_node(src)
     hook = ast.get_source_segment(src, try_node) or ""
     warn_i = hook.index("st.warning(f\"V2 Camera sidecar: ")
-    cap_i = hook.index("st.caption(f\"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}\")")
+    cap_i = hook.index("_v2_gate_a_caption = f\"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}\"")
     pub_i = hook.index("_v2_pub_gate")
     github_i = hook.index("maybe_publish_v2_sidecar(")
     assert warn_i < cap_i < pub_i < github_i

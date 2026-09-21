@@ -661,6 +661,10 @@ def test_extracted_hook_publish_exception_does_not_block_learning(monkeypatch, t
     order.append("elite")
     exec(compile(hook_src, "app.py", "exec"), ns, ns)
     order.append("learn")
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     assert order == ["elite", "learn"]
     assert warnings and "github boom" in warnings[0]
     assert dest.read_text(encoding="utf-8") == before

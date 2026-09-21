@@ -6311,6 +6311,8 @@ buy_elite_df = build_buy_elite_decision_engine(
     leader_memory_df=leader_memory_df,
 )
 _v2_ui = None
+_v2_gate_a_caption = None
+_v2_gate_b_caption = None
 try:
     _v2_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_CLOUD_SIDECAR", "") or "").strip().lower()
     if not _v2_gate:
@@ -6336,7 +6338,7 @@ try:
             and not _v2_sidecar.skipped
             and _v2_sidecar.reason == "WROTE"
         ):
-            st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")
+            _v2_gate_a_caption = f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}"
         _v2_pub_gate = str(os.environ.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "") or "").strip().lower()
         if not _v2_pub_gate:
             try:
@@ -6376,7 +6378,7 @@ try:
             elif _v2_github.ok and not _v2_github.skipped:
                 _v2_fetched = fetch_v2_sidecar()
                 if _v2_fetched.ok:
-                    st.caption(
+                    _v2_gate_b_caption = (
                         f"LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}"
                     )
                     _v2_ui = v2_ui_from_get(_v2_fetched)
@@ -6404,6 +6406,10 @@ try:
             render_v2_shadow_action_panel()
         except Exception:
             pass
+        if _v2_gate_a_caption:
+            st.caption(_v2_gate_a_caption)
+        if _v2_gate_b_caption:
+            st.caption(_v2_gate_b_caption)
 except Exception:
     try:
         with _v2_slot.container():
