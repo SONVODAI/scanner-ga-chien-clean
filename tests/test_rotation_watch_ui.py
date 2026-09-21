@@ -128,3 +128,180 @@ def test_range_position_display_is_one_decimal_percent():
     assert "12.5%" in html
     assert "12.500000" not in html
     assert panel["rows"][0]["range_position_pct"] == raw
+
+
+class _CM:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+class _FakeSt:
+    def __init__(self, *, checkbox_force=None):
+        self.expanders: list[str] = []
+        self.checkbox_calls: list[tuple[str, bool]] = []
+        self.tables: list[object] = []
+        self.captions: list[str] = []
+        self.markdowns: list[str] = []
+        self.writes: list[str] = []
+        self.checkbox_force = checkbox_force
+
+    def expander(self, title, **kwargs):
+        self.expanders.append(str(title))
+        return _CM()
+
+    def columns(self, n):
+        return [_CM() for _ in range(int(n))]
+
+    def checkbox(self, label, value=False, **kwargs):
+        self.checkbox_calls.append((str(label), bool(value)))
+        if self.checkbox_force is None:
+            return bool(value)
+        return bool(self.checkbox_force)
+
+    def caption(self, msg, **kwargs):
+        self.captions.append(str(msg))
+
+    def metric(self, *a, **kwargs):
+        return None
+
+    def warning(self, msg, **kwargs):
+        return None
+
+    def info(self, msg, **kwargs):
+        return None
+
+    def dataframe(self, data, **kwargs):
+        self.tables.append(data)
+
+    def markdown(self, msg, **kwargs):
+        self.markdowns.append(str(msg))
+
+    def write(self, msg, **kwargs):
+        self.writes.append(str(msg))
+
+
+def _detail_board():
+    return {
+        "empty": False,
+        "observed_at": "2026-08-14T10:40:00+07:00",
+        "session_phase": "LIVE",
+        "transport": {},
+        "rows": [
+            {
+                "symbol": "CII",
+                "current_price": 12.3,
+                "location": "MIDDLE",
+                "lower_zone": 11.0,
+                "upper_zone": 14.0,
+                "range_position_pct": 40.0,
+                "last_session_state": "DATA_UNCERTAIN",
+                "suggested_action": "WAIT",
+                "raw_pxv": "NEUTRAL",
+                "published_pxv": "NEUTRAL",
+                "pxv_why": "no confirming P×V",
+                "last_bar_ts": "2026-08-14T10:35:00+07:00",
+                "freshness": "STALE",
+                "rotation_evidence": ["DATA_UNCERTAIN: stale artifact"],
+                "actionable": False,
+            },
+            {
+                "symbol": "TCH",
+                "current_price": 11.7,
+                "location": "LOWER",
+                "lower_zone": 11.0,
+                "upper_zone": 13.0,
+                "range_position_pct": 12.5,
+                "last_session_state": "LOWER_ZONE",
+                "suggested_action": "WATCH LOWER",
+                "raw_pxv": "NEUTRAL",
+                "published_pxv": "NEUTRAL",
+                "pxv_why": "",
+                "last_bar_ts": "2026-08-14T10:35:00+07:00",
+                "freshness": "LIVE",
+                "rotation_evidence": ["in lower zone"],
+                "actionable": True,
+            },
+        ],
+    }
+
+
+def test_show_rotation_details_defaults_off_and_skips_symbol_cards():
+    from modules.rotation_watch.render import (
+        DETAILS_TOGGLE_LABEL,
+        render_rotation_watch_panel,
+    )
+
+    st = _FakeSt()
+    panel = render_rotation_watch_panel(board=_detail_board(), st_module=st)
+    assert st.checkbox_calls == [(DETAILS_TOGGLE_LABEL, False)]
+    assert st.expanders == ["🔄 ROTATION WATCH"]
+    assert not any(" · last " in title for title in st.expanders)
+    assert st.tables
+    assert list(st.tables[0]["Symbol"]) == ["CII", "TCH"]
+    assert panel["rows"][0]["symbol"] == "CII"
+    assert "Rotation evidence" not in st.markdowns
+
+
+def test_show_rotation_details_on_renders_existing_symbol_cards():
+    from modules.rotation_watch.render import (
+        DETAILS_TOGGLE_LABEL,
+        render_rotation_watch_panel,
+    )
+
+    st = _FakeSt(checkbox_force=True)
+    render_rotation_watch_panel(board=_detail_board(), st_module=st)
+    assert st.checkbox_calls == [(DETAILS_TOGGLE_LABEL, False)]
+    assert st.expanders[0] == "🔄 ROTATION WATCH"
+    assert "CII · last DATA_UNCERTAIN · now WAIT" in st.expanders
+    assert "TCH · last LOWER_ZONE · now WATCH LOWER" in st.expanders
+    assert st.tables
+    assert list(st.tables[0]["Symbol"]) == ["CII", "TCH"]
+    assert "**Rotation evidence**" in st.markdowns
+    assert any("Raw P×V" in w for w in st.writes)
+
+
+def test_details_toggle_does_not_call_build_panel_twice(monkeypatch):
+    import modules.rotation_watch.render as render_mod
+
+    calls: list[int] = []
+
+    def boom(*a, **k):
+        calls.append(1)
+        raise AssertionError("details must reuse the already-built panel")
+
+    monkeypatch.setattr(render_mod, "build_panel", boom)
+    board = _detail_board()
+    render_mod.render_rotation_watch_panel(board=board, st_module=_FakeSt())
+    render_mod.render_rotation_watch_panel(
+        board=board, st_module=_FakeSt(checkbox_force=True)
+    )
+    assert calls == []
+
+
+def test_render_source_has_one_build_panel_and_gated_detail_loop():
+    src = (REPO / "modules" / "rotation_watch" / "render.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    fn = None
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name == "render_rotation_watch_panel":
+            fn = node
+            break
+    assert fn is not None
+    calls = [
+        node
+        for node in ast.walk(fn)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "build_panel"
+    ]
+    assert len(calls) == 1
+    assert "load_panel_sources" not in src
+    assert 'st.checkbox(DETAILS_TOGGLE_LABEL, value=False)' in src
+    assert "if not show_details:" in src
+    loop_i = src.index("for row in panel.get(\"rows\") or []:")
+    gate_i = src.index("if not show_details:")
+    table_i = src.index("table = display_table(panel)")
+    assert table_i < gate_i < loop_i

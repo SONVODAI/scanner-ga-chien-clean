@@ -21,13 +21,19 @@ STATE_COLORS = {
 }
 
 
+DETAILS_TOGGLE_LABEL = "Show Rotation details"
+
+
 def render_rotation_watch_panel(
     *,
     now: datetime | None = None,
     artifact_path: Path | None = None,
     board: dict[str, Any] | None = None,
+    st_module: Any = None,
 ) -> dict[str, Any]:
-    import streamlit as st
+    st = st_module
+    if st is None:
+        import streamlit as st
 
     panel = board or build_panel(now=now or datetime.now(VN), artifact_path=artifact_path)
 
@@ -79,6 +85,10 @@ def render_rotation_watch_panel(
             st.dataframe(styled, use_container_width=True, hide_index=True)
         except Exception:
             st.dataframe(table, use_container_width=True, hide_index=True)
+
+        show_details = st.checkbox(DETAILS_TOGGLE_LABEL, value=False)
+        if not show_details:
+            return panel
 
         for row in panel.get("rows") or []:
             state = str(row.get("last_session_state") or row.get("rotation_state") or "")
