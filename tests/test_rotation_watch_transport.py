@@ -484,7 +484,8 @@ def test_no_production_semantic_edits():
 
 def test_app_panel_order_unchanged():
     app = (REPO / "app.py").read_text(encoding="utf-8")
-    assert app.index("render_live_candidate_pxv_panel") < app.index("render_rotation_watch_panel")
+    assert "render_live_candidate_pxv_panel()" not in app
+    assert app.index("_v2_slot = st.empty()") < app.index("render_rotation_watch_panel")
     assert app.index("render_rotation_watch_panel") < app.index("EARNING MONEY BOARD")
     assert app.index("render_rotation_watch_panel") < app.index("run_scan(WATCHLIST)")
 

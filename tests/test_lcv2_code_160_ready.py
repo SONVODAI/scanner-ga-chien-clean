@@ -67,7 +67,7 @@ def _caption_calls_with_marker(tree: ast.AST, token: str) -> list[ast.Call]:
     return hits
 
 
-def test_code_160_ready_is_literal_caption_after_commission_before_pxv():
+def test_code_160_ready_is_literal_caption_after_commission_before_v2_slot():
     src = _app_source()
     tree = ast.parse(src)
     hits = _caption_calls_with_marker(tree, MARKER)
@@ -78,8 +78,8 @@ def test_code_160_ready_is_literal_caption_after_commission_before_pxv():
 
     prior_i = src.index(f'st.caption("{PRIOR}")')
     marker_i = src.index(f'st.caption("{MARKER}")')
-    pxv_i = src.index("# LIVE CANDIDATE × P×V")
-    assert prior_i < marker_i < pxv_i
+    slot_i = src.index("_v2_slot = st.empty()")
+    assert prior_i < marker_i < slot_i
 
     call = hits[0]
     for node in ast.walk(call):

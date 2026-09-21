@@ -470,11 +470,12 @@ def test_app_hook_isolated_and_production_titles_remain():
     assert "except Exception" in chunk
     for title in (
         "👑 BUY ELITE - DECISION ENGINE",
-        "LIVE CANDIDATE × P×V",
-        "render_live_candidate_pxv_panel",
+        "render_live_candidate_v2_panel",
+        "render_v2_shadow_action_panel",
         "render_edge_research_panel",
     ):
         assert title in app
+    assert "render_live_candidate_pxv_panel()" not in app
 
 
 def test_production_semantic_files_unchanged_vs_main():

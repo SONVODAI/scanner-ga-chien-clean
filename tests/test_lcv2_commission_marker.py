@@ -79,8 +79,8 @@ def test_marker_is_one_literal_caption_under_title():
 
     title_i = src.index('st.title("🤖 Mr.BOT PRO V4.0 - Scanner Gà Chiến")')
     marker_i = src.index(f'st.caption("{MARKER}")')
-    pxv_i = src.index("# LIVE CANDIDATE × P×V")
-    assert title_i < marker_i < pxv_i
+    slot_i = src.index("_v2_slot = st.empty()")
+    assert title_i < marker_i < slot_i
 
 
 def test_marker_call_has_no_side_channels():
