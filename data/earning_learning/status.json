@@ -11,7 +11,7 @@
   "lifecycle_rows": 5258,
   "continuation_rows": 2863,
   "snapshot_rows": 5684,
-  "history_rows": 27371,
+  "history_rows": 27513,
   "decision_archive_rows": 5684,
   "verified_decisions_rows": 5258,
   "t0_freeze_added": 0,
@@ -19,7 +19,7 @@
   "github_sync": "GITHUB_OK",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-09-21T09:08:19Z",
+  "last_run_at": "2026-09-21T09:20:06Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
