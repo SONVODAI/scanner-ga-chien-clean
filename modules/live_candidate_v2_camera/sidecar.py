@@ -37,7 +37,11 @@ from modules.live_candidate_v2_camera.contract import (
     SRC_MARKET_AWARE_SWEETSPOT,
 )
 from modules.live_candidate_v2_nomination.artifact import assert_not_production_watchlist
-from modules.live_candidate_v2_nomination.contract import BrainANomination, FreezeRecord
+from modules.live_candidate_v2_nomination.contract import (
+    SRC_BRAIN_A,
+    BrainANomination,
+    FreezeRecord,
+)
 from modules.live_candidate_v2_nomination.nominate import (
     NominationReport,
     from_nominated_candidate,
@@ -197,7 +201,31 @@ def build_sidecar_rows(
     return rows
 
 
-def freeze_record_from_mapping(raw: Mapping[str, Any]) -> FreezeRecord | None:
+def _row_freeze_source(raw: Mapping[str, Any]) -> str:
+    """Top-level candidate source. Provenance[] does not confer freeze ownership."""
+    return str(raw.get("nomination_source") or raw.get("source") or "").strip()
+
+
+def freeze_record_from_mapping(
+    raw: Mapping[str, Any],
+    *,
+    require_brain_a_source: bool = False,
+) -> FreezeRecord | None:
+    """Brain A freeze reconstruction. Non-Brain-A sources never mint a FreezeRecord.
+
+    Explicit freeze_ledger entries have no source field; they remain Brain A owned.
+    Candidate-row backfill requires source == brain_a_scan_setup. A Sweet-only row
+    (or any future non-Brain-A source) cannot acquire freeze ownership, even if
+    provenance[] lists Brain A. Canonical Brain A with Sweet in provenance[] still
+    qualifies because top-level source is Brain A. SOURCE_PRIORITY makes the reverse
+    (canonical Sweet + Brain A in provenance) unreachable while both are accepted.
+    """
+    source = _row_freeze_source(raw)
+    if require_brain_a_source:
+        if source != SRC_BRAIN_A:
+            return None
+    elif source and source != SRC_BRAIN_A:
+        return None
     session = str(raw.get("session") or "").strip()
     symbol = str(raw.get("symbol") or "").strip().upper()
     first = str(raw.get("candidate_first_seen_ts") or "").strip()
@@ -226,7 +254,12 @@ def _freeze_num(value: object) -> float | None:
 
 
 def freeze_records_from_document(doc: Mapping[str, Any]) -> tuple[FreezeRecord, ...]:
-    """Recover prior_freeze from a loaded sidecar. Rows backfill if ledger absent."""
+    """Recover Brain A prior_freeze. Ledger first; Brain A rows backfill if absent.
+
+    freeze_ledger stays Brain A-owned even without a source field.
+    Row backfill is source == brain_a_scan_setup only. Sweet / other sources
+    remain on candidate rows and provenance[] but never enter prior_freeze.
+    """
     out: dict[tuple[str, str], FreezeRecord] = {}
     ledger = doc.get("freeze_ledger")
     if ledger is not None:
@@ -244,7 +277,7 @@ def freeze_records_from_document(doc: Mapping[str, Any]) -> tuple[FreezeRecord, 
         for raw in rows:
             if not isinstance(raw, Mapping):
                 continue
-            rec = freeze_record_from_mapping(raw)
+            rec = freeze_record_from_mapping(raw, require_brain_a_source=True)
             if rec is None:
                 continue
             out.setdefault((rec.session, rec.symbol), rec)

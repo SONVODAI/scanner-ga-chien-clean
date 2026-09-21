@@ -42,7 +42,12 @@ from modules.live_candidate_v2_camera.contract import (
     SHADOW_V2_ENABLED_SOURCES,
 )
 from modules.live_candidate_v2_camera.observe import observe_close_vs_ref
-from modules.live_candidate_v2_camera.sidecar import build_sidecar_from_scan
+from modules.live_candidate_v2_camera.sidecar import (
+    build_sidecar_document,
+    build_sidecar_from_scan,
+    freeze_record_from_mapping,
+    freeze_records_from_document,
+)
 from modules.live_candidate_v2_camera.ui import PANEL_TITLE
 from modules.live_candidate_v2_nomination.contract import (
     MARKET_PERMISSION_OK,
@@ -123,6 +128,17 @@ def _sidecar(scan, brain_b, *, now: str, market_real: object = 7.2, prior_freeze
         observed_at=_ts(now),
         prior_freeze=prior_freeze,
         brain_b=brain_b,
+    )
+
+
+def _sidecar_doc(report, rows, *, now: str):
+    return build_sidecar_document(
+        rows,
+        observed_at=_ts(now),
+        market_real=report.market_real,
+        market_permission=report.market_permission,
+        freeze_ledger=report.freeze_ledger,
+        session=str(now)[:10],
     )
 
 
@@ -604,3 +620,166 @@ def test_idc_observe_clocks_from_historical_ledger_row():
     assert extra["evidence_status"] == "EARLY"
     assert by["IDC"].source_reason == "OBSERVE"
     assert extra["evidence_status"] == "EARLY"
+
+
+# ---------- freeze ownership: Sweet must never backfill Brain A prior_freeze ----------
+
+
+def test_sweet_only_row_does_not_backfill_brain_a_freeze():
+    brain_b = _consult(
+        "2026-08-25 10:05:00",
+        trading_dates=("2026-08-24", "2026-08-25"),
+    )
+    report, rows = _sidecar([], brain_b, now="2026-08-25 10:05:00")
+    row = rows[0]
+    assert row["symbol"] == "DPG"
+    assert row["source"] == SRC_MARKET_AWARE_SWEETSPOT
+    assert freeze_record_from_mapping(row) is None
+    assert freeze_record_from_mapping(row, require_brain_a_source=True) is None
+    doc = _sidecar_doc(report, rows, now="2026-08-25 10:05:00")
+    assert doc["freeze_ledger"] == []
+    prior = freeze_records_from_document(doc)
+    assert prior == ()
+    assert not any(r.symbol == "DPG" for r in report.freeze_ledger)
+
+
+def test_sweet_only_then_later_brain_a_same_session_mints_own_freeze():
+    """Original DPG poison: Sweet-only first, then same-T Brain A PULL."""
+    sweet_at = "2026-08-25 10:05:00"
+    brain_b = _consult(sweet_at, trading_dates=("2026-08-24", "2026-08-25"))
+    report1, rows1 = _sidecar([], brain_b, now=sweet_at)
+    sweet_first = rows1[0]["candidate_first_seen_ts"]
+    assert sweet_first == "2026-08-24T11:13:40Z"
+    doc1 = _sidecar_doc(report1, rows1, now=sweet_at)
+    prior = freeze_records_from_document(doc1)
+    assert prior == ()
+
+    later = "2026-08-25 13:00:00"
+    report2, rows2 = _sidecar(
+        [_scan("DPG", "PULL ĐẸP", date="2026-08-25", ema9=30.1, price=31.0)],
+        brain_b,
+        now=later,
+        prior_freeze=prior,
+    )
+    assert len(rows2) == 1
+    row = rows2[0]
+    assert row["source"] == SRC_BRAIN_A
+    assert row["setup"] == "PULL ĐẸP"
+    assert row["ema9_at_first_seen"] == 30.1
+    assert row["candidate_first_seen_ts"] == _ts(later).isoformat()
+    assert row["candidate_first_seen_ts"] != sweet_first
+    assert SRC_MARKET_AWARE_SWEETSPOT in {p["source"] for p in row["provenance"]}
+    assert report2.freeze_ledger[0].ema9_at_first_seen == 30.1
+    assert report2.freeze_ledger[0].candidate_first_seen_ts == row["candidate_first_seen_ts"]
+
+
+def test_brain_a_then_later_sweet_keeps_brain_a_freeze_and_adds_provenance():
+    first_at = "2026-08-25 10:05:00"
+    report1, rows1 = _sidecar(
+        [_scan("DPG", "PULL ĐẸP", date="2026-08-25", ema9=30.1, price=31.0)],
+        None,
+        now=first_at,
+    )
+    assert rows1[0]["source"] == SRC_BRAIN_A
+    first_seen = rows1[0]["candidate_first_seen_ts"]
+    assert first_seen.startswith("2026-08-25T10:05:00")
+    doc1 = _sidecar_doc(report1, rows1, now=first_at)
+    prior = freeze_records_from_document(doc1)
+    assert len(prior) == 1
+    assert prior[0].symbol == "DPG"
+    assert prior[0].ema9_at_first_seen == 30.1
+    assert prior[0].candidate_first_seen_ts == first_seen
+
+    later = "2026-08-25 13:00:00"
+    brain_b = _consult(later, trading_dates=("2026-08-24", "2026-08-25"))
+    report2, rows2 = _sidecar(
+        [_scan("DPG", "PULL ĐẸP", date="2026-08-25", ema9=99.0, price=40.0)],
+        brain_b,
+        now=later,
+        prior_freeze=prior,
+    )
+    assert len(rows2) == 1
+    row = rows2[0]
+    assert row["source"] == SRC_BRAIN_A
+    assert row["setup"] == "PULL ĐẸP"
+    assert row["ema9_at_first_seen"] == 30.1
+    assert row["candidate_first_seen_ts"] == first_seen
+    sources = [p["source"] for p in row["provenance"]]
+    assert SRC_BRAIN_A in sources
+    assert SRC_MARKET_AWARE_SWEETSPOT in sources
+    assert report2.freeze_ledger[0].ema9_at_first_seen == 30.1
+    assert report2.freeze_ledger[0].candidate_first_seen_ts == first_seen
+
+
+def test_genuine_brain_a_row_still_backfills_prior_freeze():
+    now = "2026-08-14 10:05:00"
+    report, rows = build_sidecar_from_scan(
+        [_scan("HPG", "PULL ĐẸP", date="2026-08-14")],
+        market_real=7.2,
+        observed_at=_ts(now),
+    )
+    row = rows[0]
+    assert row["source"] == SRC_BRAIN_A
+    rec = freeze_record_from_mapping(row, require_brain_a_source=True)
+    assert rec is not None
+    assert rec.ema9_at_first_seen == 27.1
+    doc = _sidecar_doc(report, rows, now=now)
+    doc["freeze_ledger"] = []
+    prior = freeze_records_from_document(doc)
+    assert len(prior) == 1
+    assert prior[0].symbol == "HPG"
+    assert prior[0].candidate_first_seen_ts == row["candidate_first_seen_ts"]
+    assert prior[0].ema9_at_first_seen == 27.1
+
+    later, rows2 = build_sidecar_from_scan(
+        [_scan("HPG", "PULL ĐẸP", date="2026-08-14", ema9=40.0, price=41.0)],
+        market_real=7.2,
+        observed_at=_ts("2026-08-14 13:00:00"),
+        prior_freeze=prior,
+    )
+    assert rows2[0]["candidate_first_seen_ts"] == row["candidate_first_seen_ts"]
+    assert rows2[0]["ema9_at_first_seen"] == 27.1
+    assert later.freeze_ledger[0].ema9_at_first_seen == 27.1
+
+
+def test_non_brain_a_generic_source_cannot_poison_brain_a_freeze():
+    fake = {
+        "symbol": "DPG",
+        "session": "2026-08-25",
+        "source": SRC_LEARNING_INSIGHT,
+        "nomination_source": SRC_LEARNING_INSIGHT,
+        "candidate_first_seen_ts": "2026-08-24T11:13:40Z",
+        "eligible_from": "2026-08-25T09:15:00+07:00",
+        "setup": "PULL ĐẸP",
+        "ema9_at_first_seen": None,
+        "breakout_ref_at_first_seen": None,
+        "price_at_first_seen": 30500.0,
+        "provenance": [{"source": SRC_BRAIN_A}],
+    }
+    assert freeze_record_from_mapping(fake) is None
+    assert freeze_record_from_mapping(fake, require_brain_a_source=True) is None
+    prior = freeze_records_from_document({"freeze_ledger": [], "rows": [fake]})
+    assert prior == ()
+
+
+def test_brain_a_row_with_sweet_in_provenance_still_owns_freeze():
+    brain_b = _consult(
+        "2026-08-25 10:05:00",
+        trading_dates=("2026-08-24", "2026-08-25"),
+    )
+    report, rows = _sidecar(
+        [_scan("DPG", "PULL ĐẸP", date="2026-08-25", ema9=30.1, price=31.0)],
+        brain_b,
+        now="2026-08-25 10:05:00",
+    )
+    row = rows[0]
+    assert row["source"] == SRC_BRAIN_A
+    assert SRC_MARKET_AWARE_SWEETSPOT in {p["source"] for p in row["provenance"]}
+    rec = freeze_record_from_mapping(row, require_brain_a_source=True)
+    assert rec is not None
+    assert rec.ema9_at_first_seen == 30.1
+    doc = _sidecar_doc(report, rows, now="2026-08-25 10:05:00")
+    doc["freeze_ledger"] = []
+    prior = freeze_records_from_document(doc)
+    assert len(prior) == 1
+    assert prior[0].ema9_at_first_seen == 30.1
