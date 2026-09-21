@@ -222,6 +222,10 @@ def _exec_hook(
             os.environ[ENV_V2_CLOUD_SIDECAR] = saved_a
         if saved_b is not None:
             os.environ[ENV_V2_GITHUB_PUBLISH] = saved_b
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     return {
         "captions": captions,
         "warnings": warnings,
@@ -241,7 +245,7 @@ def test_gate_b_resolution_env_then_secrets_ast():
     sec_i = src.index('st.secrets.get("MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH", "")')
     pub_i = src.index("maybe_publish_v2_sidecar(")
     fetch_i = src.index("fetch_v2_sidecar()")
-    cap_a = src.index('st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")')
+    cap_a = src.index('_v2_gate_a_caption = f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}"')
     assert cap_a < env_i < sec_i < pub_i < fetch_i
     assert 'env={"MRBOT_LIVE_CANDIDATE_V2_GITHUB_PUBLISH": _v2_pub_gate}' in src
     assert "_v2_sidecar.snapshot_text" in src[pub_i : pub_i + 400]
@@ -380,6 +384,10 @@ def test_gate_b_off_subprocess_no_github_bus_import_put_get():
         "assert after == before\n"
         "assert 'maybe_publish_v2_sidecar' not in ns\n"
         "assert 'fetch_v2_sidecar' not in ns\n"
+        "for key in ('_v2_gate_a_caption', '_v2_gate_b_caption'):\n"
+        "    val = ns.get(key)\n"
+        "    if val:\n"
+        "        captions.append(str(val))\n"
         "assert captions == ['LCV2-GATE-A-WROTE rows=0']\n"
         "print('OK')\n"
     ) % (ENV_V2_GITHUB_PUBLISH, _hook_src())

@@ -297,8 +297,12 @@ def test_app_placement_and_gate_captions_unchanged():
     guardian = src.index("render_guardian(")
     assert "render_live_candidate_pxv_panel()" not in src
     assert slot < rot < scan < elite < hook < ui_call < guardian < dash < ai
-    assert 'st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")' in src
+    assert 'st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")' not in src
+    assert '_v2_gate_a_caption = f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}"' in src
     assert "LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}" in src
+    assert src.count("st.caption(_v2_gate_a_caption)") == 1
+    assert src.count("st.caption(_v2_gate_b_caption)") == 1
+    assert src.count("_v2_gate_a_caption = f\"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}\"") == 1
     assert src.count("fetch_v2_sidecar()") == 1
     assert src.count("run_v2_cloud_sidecar(") == 1
     assert src.count("buy_elite_df = build_buy_elite_decision_engine(") == 1
@@ -310,6 +314,8 @@ def test_app_placement_and_gate_captions_unchanged():
     assert "st.session_state" not in hook_src
     assert "dynamic_watchlist.json" not in hook_src
     assert "fetch_v2_sidecar()" in hook_src
+    assert "_v2_gate_a_caption = f" in hook_src
+    assert "st.caption(_v2_gate_a_caption)" not in hook_src
     assert PROD_WATCHLIST.exists()
 
 
@@ -356,6 +362,17 @@ def test_v2_visual_slot_above_rotation_filled_after_gate_b():
     assert "LCV2-GATE-A-WROTE" not in fill_block
     assert "LCV2-GATE-B-GITHUB" not in fill_block
     assert "show_ai_recommendation" not in fill_block
+    assert "st.caption(_v2_gate_a_caption)" in fill_block
+    assert "st.caption(_v2_gate_b_caption)" in fill_block
+    assert fill_block.index("render_live_candidate_v2_panel(") < fill_block.index(
+        "render_v2_shadow_action_panel()"
+    )
+    assert fill_block.index("render_v2_shadow_action_panel()") < fill_block.index(
+        "st.caption(_v2_gate_a_caption)"
+    )
+    assert fill_block.index("st.caption(_v2_gate_a_caption)") < fill_block.index(
+        "st.caption(_v2_gate_b_caption)"
+    )
     below = src[ui_call:]
     assert below.count("run_v2_cloud_sidecar(") == 0
     assert below.count("fetch_v2_sidecar()") == 0
@@ -580,6 +597,10 @@ def test_exec_hook_binds_current_cycle_get_without_second_fetch(monkeypatch):
             os.environ[ENV_V2_CLOUD_SIDECAR] = saved_a
         if saved_b is not None:
             os.environ[ENV_V2_GITHUB_PUBLISH] = saved_b
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     assert fetch_calls == [1]
     assert any(c.startswith("LCV2-GATE-A-WROTE rows=") for c in captions)
     assert any(c.startswith("LCV2-GATE-B-GITHUB status=OK_EMPTY") for c in captions)
@@ -655,6 +676,10 @@ def test_exec_hook_gate_b_off_stays_unavailable():
             os.environ[ENV_V2_CLOUD_SIDECAR] = saved_a
         if saved_b is not None:
             os.environ[ENV_V2_GITHUB_PUBLISH] = saved_b
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     assert ns["_v2_ui"].kind == KIND_UNAVAILABLE
     assert captions == ["LCV2-GATE-A-WROTE rows=0"]
     st = _render(ns["_v2_ui"])
@@ -744,6 +769,10 @@ def test_exec_hook_put_failure_binds_failure_not_empty():
             os.environ[ENV_V2_CLOUD_SIDECAR] = saved_a
         if saved_b is not None:
             os.environ[ENV_V2_GITHUB_PUBLISH] = saved_b
+    for key in ("_v2_gate_a_caption", "_v2_gate_b_caption"):
+        val = ns.get(key)
+        if val:
+            captions.append(str(val))
     assert fetch_calls == []
     assert ns["_v2_ui"].kind == KIND_FAILURE
     assert captions == ["LCV2-GATE-A-WROTE rows=0"]
