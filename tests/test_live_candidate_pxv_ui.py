@@ -300,10 +300,11 @@ def test_m_production_panels_unaffected():
         "⚡ STORM LEADERS - TIỀN ĐANG VÀO ĐÂU",
     ):
         assert title in app
-    assert "LIVE CANDIDATE × P×V" in app
-    assert "render_live_candidate_pxv_panel" in app
-    # Hook is isolated: failure must not break production.
-    assert "render_live_candidate_pxv_panel()" in app
+    # Legacy Streamlit renderer is not mounted; read/view stay for V2 Action Layer.
+    assert "render_live_candidate_pxv_panel()" not in app
+    assert Path("modules/live_candidate_pxv_ui/read.py").exists()
+    assert Path("modules/live_candidate_pxv_ui/view.py").exists()
+    assert Path("modules/live_candidate_pxv_ui/render.py").exists()
 
 
 def test_sort_published_before_neutral_before_unusable():

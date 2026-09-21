@@ -289,12 +289,14 @@ def test_app_placement_and_gate_captions_unchanged():
     dash = src.index("# DEFAULT MAIN DASHBOARD")
     ui_call = src.index("render_live_candidate_v2_panel(")
     ai = src.index('with st.expander("🤖 AI Recommendation", expanded=False):')
-    pxv = src.index("render_live_candidate_pxv_panel()")
+    slot = src.index("_v2_slot = st.empty()")
+    rot = src.index("render_rotation_watch_panel()")
     scan = src.index("scan_df = run_scan(WATCHLIST)")
     elite = src.index("buy_elite_df = build_buy_elite_decision_engine(")
     hook = src.index("_v2_sidecar = run_v2_cloud_sidecar(")
     guardian = src.index("render_guardian(")
-    assert pxv < scan < elite < hook < ui_call < guardian < dash < ai
+    assert "render_live_candidate_pxv_panel()" not in src
+    assert slot < rot < scan < elite < hook < ui_call < guardian < dash < ai
     assert 'st.caption(f"LCV2-GATE-A-WROTE rows={_v2_sidecar.n_rows}")' in src
     assert "LCV2-GATE-B-GITHUB status={_v2_fetched.status} rows={_v2_fetched.n_rows}" in src
     assert src.count("fetch_v2_sidecar()") == 1
@@ -311,10 +313,10 @@ def test_app_placement_and_gate_captions_unchanged():
     assert PROD_WATCHLIST.exists()
 
 
-def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
-    """P×V → reserved V2 slot → Rotation Watch. Fill is this-cycle GET, after scan."""
+def test_v2_visual_slot_above_rotation_filled_after_gate_b():
+    """Top reserved V2 slot → Rotation Watch. Fill is this-cycle GET, after scan."""
     src = APP_PY.read_text(encoding="utf-8")
-    pxv = src.index("render_live_candidate_pxv_panel()")
+    assert "render_live_candidate_pxv_panel()" not in src
     slot = src.index("_v2_slot = st.empty()")
     rot = src.index("render_rotation_watch_panel()")
     scan = src.index("scan_df = run_scan(WATCHLIST)")
@@ -323,16 +325,18 @@ def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
     fetch = src.index("_v2_fetched = fetch_v2_sidecar()")
     fill = src.index("with _v2_slot.container():")
     ui_call = src.index("render_live_candidate_v2_panel(")
+    action = src.index("render_v2_shadow_action_panel()")
     guardian = src.index("render_guardian(")
     learn = src.index("= run_buy_elite_learning_cycle(")
     ai = src.index('with st.expander("🤖 AI Recommendation", expanded=False):')
-    assert pxv < slot < rot < scan < elite < sidecar < fetch < fill < ui_call < guardian < learn < ai
+    assert slot < rot < scan < elite < sidecar < fetch < fill < ui_call < action < guardian < learn < ai
     assert src.count("_v2_slot = st.empty()") == 1
     assert src.count("fetch_v2_sidecar()") == 1
     assert src.count("render_live_candidate_v2_panel(") == 1
+    assert src.count("render_v2_shadow_action_panel()") == 1
     assert src.count("run_v2_cloud_sidecar(") == 1
 
-    top = src[pxv:rot]
+    top = src[slot:rot]
     assert "_v2_slot = st.empty()" in top
     assert "fetch_v2_sidecar" not in top
     assert "run_v2_cloud_sidecar" not in top
@@ -341,6 +345,7 @@ def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
     assert "dynamic_watchlist" not in top
     assert "snapshot_text" not in top
     assert "render_live_candidate_v2_panel" not in top
+    assert "render_live_candidate_pxv_panel" not in top
 
     fill_block = src[fill:guardian]
     assert "_v2_ui if _v2_ui is not None else unavailable_v2_ui()" in fill_block
@@ -390,6 +395,7 @@ def test_v2_visual_slot_between_pxv_and_rotation_filled_after_gate_b():
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
     ]
     assert "render_live_candidate_v2_panel" in render_names
+    assert "render_v2_shadow_action_panel" in render_names
     assert "fetch_v2_sidecar" not in render_names
     assert "run_v2_cloud_sidecar" not in render_names
 
@@ -451,16 +457,15 @@ def test_streamlit_empty_container_places_fill_between_neighbors():
             return _CM()
 
     main = _Main()
-    main.nodes.append(("expander", "LIVE CANDIDATE × P×V"))
     slot = main.empty()
     main.nodes.append(("expander", "🔄 ROTATION WATCH"))
     view = unavailable_v2_ui()
     with slot.container():
         render_live_candidate_v2_panel(view, st_module=slot.filled)
     titles = [n[1] for n in main.nodes]
-    assert titles == ["LIVE CANDIDATE × P×V", slot, "🔄 ROTATION WATCH"]
-    assert main.nodes[1][0] == "slot"
-    assert main.nodes[1][1] is slot
+    assert titles == [slot, "🔄 ROTATION WATCH"]
+    assert main.nodes[0][0] == "slot"
+    assert main.nodes[0][1] is slot
     assert slot.filled is not None
     assert any(PANEL_TITLE in m for m in visual)
     assert UNAVAILABLE_MESSAGE in visual

@@ -109,19 +109,12 @@ st.caption("Observe • Learn • Think • Evolve. Market First → Mr.BOT PRO 
 st.caption("LCV2-COMMISSION-20260916-A")
 st.caption("LCV2-CODE-160-READY")
 
-# LIVE CANDIDATE × P×V — isolated read-only observation panel.
-# Failure must not break production.
-try:
-    from modules.live_candidate_pxv_ui.render import render_live_candidate_pxv_panel
-
-    render_live_candidate_pxv_panel()
-except Exception:
-    pass
-
-# Live Candidate V2 visual slot between P×V and Rotation Watch.
+# Live Candidate V2 visual slot at top (legacy LIVE CANDIDATE × P×V Streamlit
+# renderer is not mounted; pxv_ui read helpers remain for V2 Action Layer).
 # Streamlit paints in execution order; the slot is reserved here so V2 stays
 # visually above Rotation Watch. This-cycle prep / Brain A / Gate A-B / render
 # fill the slot immediately after scan, before Guardian / Market First / AI Rec.
+# Data is bound before render — the empty slot is visual placement only.
 # No second fetch, no sidecar read, no cached prior-cycle candidate.
 _v2_slot = st.empty()
 
@@ -6246,7 +6239,7 @@ scan_df = add_evolution_health(scan_df)
 # LIVE CANDIDATE V2 — prepare once, then Brain A / Gate A-B, then render.
 # Same Elite/Brain A inputs as before; execution is upstream of the V2 slot
 # so the top panel does not wait for Guardian / Market First / Learning / AI Rec.
-# Rotation Watch already rendered above and stays independent.
+# Rotation Watch already rendered above (immediately below the V2 slot) and stays independent.
 # =========================================================
 market_real = calc_market_real(scan_df)
 market_live = calc_market_live(scan_df)
