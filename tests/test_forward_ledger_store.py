@@ -49,7 +49,7 @@ def test_github_replaces_cache_without_merging_rows(tmp_path, monkeypatch):
     assert list(pd.read_csv(path).columns) == ["symbol", "extra"]
 
 
-def test_seed_uploads_local_cache_when_github_is_missing(tmp_path, monkeypatch):
+def test_missing_github_object_is_not_seeded(tmp_path, monkeypatch):
     brain = tmp_path / "brain"
     brain.mkdir(exist_ok=True)
     monkeypatch.setenv("MRBOT_BRAIN_DIR", str(brain))
@@ -58,8 +58,8 @@ def test_seed_uploads_local_cache_when_github_is_missing(tmp_path, monkeypatch):
     path.write_text(local, encoding="utf-8")
     store = _Store(None)
     status = refresh_cache_from_github(path, storage=store)
-    assert status == "SEEDED"
-    assert store.writes == [local]
+    assert status == "GITHUB_MISSING"
+    assert store.writes == []
     assert path.read_text(encoding="utf-8") == local
 
 
@@ -83,7 +83,11 @@ def test_explicit_ledger_path_bypasses_github(tmp_path, monkeypatch):
     assert store.writes == []
 
 
-def test_publish_writes_cache_bytes_unchanged(tmp_path, monkeypatch):
+def test_publish_waits_for_migration_then_writes_bytes_unchanged(tmp_path, monkeypatch):
+    import json
+
+    from modules.forward_ledger_store import MIGRATION_REPORT_NAME, MIGRATION_REPORT_SCHEMA
+
     brain = tmp_path / "brain"
     brain.mkdir(exist_ok=True)
     monkeypatch.setenv("MRBOT_BRAIN_DIR", str(brain))
@@ -91,6 +95,10 @@ def test_publish_writes_cache_bytes_unchanged(tmp_path, monkeypatch):
     text = "session_date,symbol,evaluation_mode\n2026-09-22,AAA,FORWARD_FROZEN\n"
     path.write_text(text, encoding="utf-8")
     store = _Store(None)
+    assert publish_cache(path, storage=store) == "AUTHORITY_NOT_READY"
+    assert store.writes == []
+    report = {"schema": MIGRATION_REPORT_SCHEMA, "ready": True, "ledgers": {}}
+    (brain / MIGRATION_REPORT_NAME).write_text(json.dumps(report), encoding="utf-8")
     assert publish_cache(path, storage=store) == "PUBLISHED"
     assert store.writes == [text]
     assert list(pd.read_csv(path).columns) == ["session_date", "symbol", "evaluation_mode"]

@@ -13,6 +13,9 @@ permissions:
 
 jobs:
   finalize:
+    # Stay off until the Streamlit one-time migration has been confirmed.
+    # The cron expressions remain; this variable is the operator switch.
+    if: vars.POST_CLOSE_RESEARCH_ENABLED == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +30,7 @@ jobs:
       - name: Finalize session handoff
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          POST_CLOSE_RESEARCH_ENABLED: ${{ vars.POST_CLOSE_RESEARCH_ENABLED }}
           GITHUB_REPO_OWNER: SONVODAI
           GITHUB_REPO_NAME: scanner-ga-chien-clean
           GITHUB_BRANCH: main

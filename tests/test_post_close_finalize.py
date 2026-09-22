@@ -256,5 +256,7 @@ def test_workflow_cron_permissions_and_secret_names():
     assert 'cron: "30 13 * * 1-5"' in text
     assert "contents: write" in text
     assert "secrets.GITHUB_TOKEN" in text
+    assert "vars.POST_CLOSE_RESEARCH_ENABLED == 'true'" in text
+    assert "POST_CLOSE_RESEARCH_ENABLED: ${{ vars.POST_CLOSE_RESEARCH_ENABLED }}" in text
     assert "VNSTOCK_API_KEY" not in text
     assert "python -m modules.post_close_finalize" in text

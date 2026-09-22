@@ -6139,6 +6139,22 @@ daily_result = process_and_render_daily_summary(
     title="📊 DAILY EARNING MONEY REPORT",
 )
 
+# One-time forward-ledger copy. Above the lock so it can run during the session.
+# It does not scan, score, or start the post-close writers.
+with st.expander("Forward ledger migration", expanded=False):
+    st.caption(
+        "Copy this app's forward-ledger cache to GitHub once. "
+        "Uploads only when the GitHub file is absent. Does not merge rows "
+        "and does not replace a GitHub file that already has rows."
+    )
+    if st.button("Migrate forward ledgers to GitHub"):
+        try:
+            from modules.forward_ledger_migration import migrate_forward_ledgers
+
+            st.json(migrate_forward_ledgers())
+        except Exception as _migration_err:
+            st.caption(f"Forward ledger migration failed: {_migration_err}")
+
 # =========================================================
 # INTRADAY EXECUTION BOUNDARY
 # Last block above this line is Daily Report / T+3/T+5/T+10 / Snapshot Storage

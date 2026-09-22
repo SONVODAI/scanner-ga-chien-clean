@@ -9,13 +9,17 @@ contract. They are the only writers allowed to see ``close_scan``. After
 midnight, those two report ``SAME_DAY_WINDOW_CLOSED`` for session D and do
 not freeze D+1.
 
-The close scan is injected. Importing ``app.py`` would execute the Streamlit
-page, so this module does not invent a board when no callback is supplied.
+Market T0 and SweetSpot use the headless close scan
+(``modules.close_session_scan``), which executes the production scan
+definitions. That scan is not the intraday handoff. A supplied ``close_scan``
+callback replaces the loader. An empty or failed scan does not call either
+writer.
 """
 
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime
 from typing import Any, Callable, Optional
 
@@ -255,20 +259,34 @@ def run_post_close_finalize(
     elif clock < canonical_minute:
         report["steps"]["market_t0"] = _status(BEFORE_CANONICAL_WINDOW, source=None)
         report["steps"]["sweetspot"] = _status(BEFORE_CANONICAL_WINDOW, source=None)
-    elif close_scan is None:
-        report["steps"]["market_t0"] = _status(CLOSE_SCAN_UNAVAILABLE, source=None)
-        report["steps"]["sweetspot"] = _status(CLOSE_SCAN_UNAVAILABLE, source=None)
     else:
         report["close_scan_calls"] = 1
-        payload = _close_payload(close_scan())
-        market_t0, sweetspot = _run_close_writers(
-            payload,
-            trade_date=session_date,
-            now=local_now,
-            data_dir=data_dir,
-        )
-        report["steps"]["market_t0"] = market_t0
-        report["steps"]["sweetspot"] = sweetspot
+        if close_scan is None:
+            from modules.close_session_scan import build_close_scan_inputs
+
+            payload = build_close_scan_inputs(now=local_now)
+            if not payload.get("ok"):
+                status = str(payload.get("status") or "CLOSE_SCAN_FAILED")
+                detail: dict[str, Any] = {
+                    "source": "close_scan",
+                    "trade_date": payload.get("trade_date", session_date),
+                }
+                if payload.get("error"):
+                    detail["error"] = payload["error"]
+                report["steps"]["market_t0"] = _status(status, **detail)
+                report["steps"]["sweetspot"] = _status(status, **detail)
+                payload = None
+        else:
+            payload = _close_payload(close_scan())
+        if payload is not None:
+            market_t0, sweetspot = _run_close_writers(
+                payload,
+                trade_date=session_date,
+                now=local_now,
+                data_dir=data_dir,
+            )
+            report["steps"]["market_t0"] = market_t0
+            report["steps"]["sweetspot"] = sweetspot
 
     if mature:
         report["steps"]["maturation"] = _mature(session_date)
@@ -276,6 +294,26 @@ def run_post_close_finalize(
 
 
 def main() -> None:
+    if os.environ.get("POST_CLOSE_RESEARCH_ENABLED") != "true":
+        print(json.dumps({
+            "status": "SCHEDULE_DISABLED",
+            "reason": "POST_CLOSE_RESEARCH_ENABLED is not true",
+        }))
+        return
+    from modules.forward_ledger_store import (
+        FORWARD_LEDGER_NAMES,
+        _storage_for,
+        authority_ready,
+        brain_dir,
+    )
+
+    store = _storage_for(brain_dir() / FORWARD_LEDGER_NAMES[0])
+    if not authority_ready(storage=store):
+        print(json.dumps({
+            "status": "AUTHORITY_NOT_READY",
+            "reason": "forward ledger migration report is not ready",
+        }))
+        return
     report = run_post_close_finalize()
     print(json.dumps(report, ensure_ascii=False, default=str, indent=2))
 
