@@ -108,6 +108,49 @@ executed.append("capture_market_t0_snapshot")
     assert "run_experience_engine" not in executed
 
 
+def test_capture_then_stop_does_not_run_research_below():
+    """Intraday control flow is capture, then st.stop(). Nothing below runs."""
+    executed: list[str] = []
+
+    class _St:
+        @staticmethod
+        def caption(message: str) -> None:
+            executed.append("caption")
+
+        @staticmethod
+        def stop() -> None:
+            executed.append("stop")
+            raise SystemExit
+
+    def capture_locked_session_handoff() -> None:
+        executed.append("capture")
+
+    namespace = {
+        "research_below_boundary_locked": research_below_boundary_locked,
+        "vn_now": lambda: _at(14, 49),
+        "st": _St,
+        "capture_locked_session_handoff": capture_locked_session_handoff,
+        "executed": executed,
+    }
+    script = """
+if research_below_boundary_locked(vn_now()):
+    try:
+        capture_locked_session_handoff()
+    except Exception:
+        pass
+    st.caption("locked")
+    st.stop()
+executed.append("run_experience_engine")
+executed.append("update_learning")
+executed.append("finalize_session_forward_shadow")
+"""
+    try:
+        exec(script, namespace)
+    except SystemExit:
+        pass
+    assert executed == ["capture", "caption", "stop"]
+
+
 def test_unlocked_path_runs_following_code():
     executed: list[str] = []
 
@@ -164,7 +207,8 @@ def test_app_gate_is_a_single_stop_after_daily_report():
     body_calls = []
     for stmt in gate.body:
         body_calls.extend(_call_names(stmt))
-    assert body_calls == ["caption", "stop"]
+    assert body_calls == ["capture_locked_session_handoff", "caption", "stop"]
+    assert body_calls[-1] == "stop"
 
     gate_at = src.index("if research_below_boundary_locked(")
     daily_at = src.index("process_and_render_daily_summary(")
@@ -209,3 +253,17 @@ def test_app_gate_is_a_single_stop_after_daily_report():
     assert above_lines.count("update_memory(") == 1
     assert after_lines.count("update_memory(") == 1
     assert "st.stop()" in "\n".join(src.splitlines()[gate.lineno - 1 : gate.end_lineno])
+    gate_src = "\n".join(src.splitlines()[gate.lineno - 1 : gate.end_lineno])
+    for name in (
+        "run_experience_engine",
+        "compute_storm_scores",
+        "_compute_storm_score_frame",
+        "update_learning",
+        "finalize_session_forward_shadow",
+        "run_buy_elite_learning_cycle",
+        "capture_market_t0_snapshot",
+        "freeze_daily_observer_if_eligible",
+    ):
+        assert name not in gate_src
+    assert src.count("storm_df = build_storm_leaders(scan_df, storm_score_frame=_storm_score_frame)") == 1
+    assert src.count("_storm_score_frame = _compute_storm_score_frame(scan_df)") == 1
