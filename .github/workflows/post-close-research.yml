@@ -1,0 +1,38 @@
+name: post-close-research
+
+on:
+  schedule:
+    # 18:30 Asia/Ho_Chi_Minh (UTC+7), weekdays.
+    - cron: "30 11 * * 1-5"
+    # 20:30 Asia/Ho_Chi_Minh retry. Same calendar session and the same handoff.
+    - cron: "30 13 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    # Stay off until the Streamlit one-time migration has been confirmed.
+    # The cron expressions remain; this variable is the operator switch.
+    if: vars.POST_CLOSE_RESEARCH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Finalize session handoff
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          POST_CLOSE_RESEARCH_ENABLED: ${{ vars.POST_CLOSE_RESEARCH_ENABLED }}
+          GITHUB_REPO_OWNER: SONVODAI
+          GITHUB_REPO_NAME: scanner-ga-chien-clean
+          GITHUB_BRANCH: main
+          EARNING_LEARNING_GITHUB_DIR: data/earning_learning
+        run: python -m modules.post_close_finalize

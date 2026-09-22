@@ -441,7 +441,9 @@ def freeze_t0_ledger(
     T0 evidence or scores. RECONSTRUCTED_AUDIT rows are stored separately by mode
     and never overwrite FORWARD_FROZEN rows.
     """
+    explicit = ledger_path is not None
     ledger_path = _default_ledger_path(ledger_path)
+    _sync_default_ledger(ledger_path, explicit=explicit)
     ledger = _load_csv(ledger_path, LEDGER_COLUMNS)
     if shadow_df is None or shadow_df.empty:
         return ledger
@@ -487,6 +489,7 @@ def freeze_t0_ledger(
             keep="first",
         )
         _atomic_write_csv(ledger, ledger_path)
+        _sync_default_ledger(ledger_path, explicit=explicit, publish=True)
 
     return ledger
 
@@ -527,7 +530,9 @@ def freeze_insight_t0_ledger(
     FORWARD_FROZEN rows are never overwritten — later knowledge updates cannot
     reconstruct historical InsightRank or evidence fields.
     """
+    explicit = ledger_path is not None
     ledger_path = _default_insight_ledger_path(ledger_path)
+    _sync_default_ledger(ledger_path, explicit=explicit)
     ledger = _load_csv(ledger_path, INSIGHT_LEDGER_COLUMNS)
     if insight_df is None or insight_df.empty:
         return ledger
@@ -573,8 +578,21 @@ def freeze_insight_t0_ledger(
             keep="first",
         )
         _atomic_write_csv(ledger, ledger_path)
+        _sync_default_ledger(ledger_path, explicit=explicit, publish=True)
 
     return ledger
+
+
+def _sync_default_ledger(path: Path, *, explicit: bool, publish: bool = False) -> None:
+    """GitHub authority only for the default brain cache. Explicit paths bypass it."""
+    if explicit:
+        return
+    from modules.forward_ledger_store import publish_cache, refresh_cache_from_github
+
+    if publish:
+        publish_cache(path)
+    else:
+        refresh_cache_from_github(path)
 
 
 def load_insight_forward_ledger(
@@ -582,7 +600,9 @@ def load_insight_forward_ledger(
     evaluation_mode: Optional[str] = EVAL_MODE_FORWARD_FROZEN,
     ledger_path: Optional[Path] = None,
 ) -> pd.DataFrame:
+    explicit = ledger_path is not None
     ledger_path = _default_insight_ledger_path(ledger_path)
+    _sync_default_ledger(ledger_path, explicit=explicit)
     ledger = _load_csv(ledger_path, INSIGHT_LEDGER_COLUMNS)
     if ledger.empty or evaluation_mode is None:
         return ledger
@@ -594,7 +614,9 @@ def load_forward_ledger(
     evaluation_mode: Optional[str] = EVAL_MODE_FORWARD_FROZEN,
     ledger_path: Optional[Path] = None,
 ) -> pd.DataFrame:
+    explicit = ledger_path is not None
     ledger_path = _default_ledger_path(ledger_path)
+    _sync_default_ledger(ledger_path, explicit=explicit)
     ledger = _load_csv(ledger_path, LEDGER_COLUMNS)
     if ledger.empty or evaluation_mode is None:
         return ledger
@@ -1061,6 +1083,9 @@ def finalize_forward_shadow_snapshot(
     market_forecast: Optional[float] = None,
     breadth: Optional[float] = None,
     recommendations: Optional[pd.DataFrame] = None,
+    brain_df: Optional[pd.DataFrame] = None,
+    patterns_df: Optional[pd.DataFrame] = None,
+    history_df: Optional[pd.DataFrame] = None,
     ledger_path: Optional[Path] = None,
     outcomes_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
@@ -1069,6 +1094,9 @@ def finalize_forward_shadow_snapshot(
 
     Uses the runtime recommendation DataFrame when supplied (primary). Falls back
     to ``load_recommendations()`` for backward compatibility only.
+
+    Optional in-memory ``brain_df``, ``patterns_df``, and ``history_df`` freeze
+    that session state. When they are omitted, the ledger still reads disk.
 
     Does NOT mature outcomes — call ``mature_forward_outcomes()`` after
     ``update_learning()`` so lifecycle reads use fresh storage-backed data.
@@ -1106,8 +1134,8 @@ def finalize_forward_shadow_snapshot(
     if rec is None or rec.empty:
         return {"ok": False, "reason": "empty_recommendations", "frozen_rows": 0}
 
-    brain = _safe_read_csv(BRAIN_FILE, BRAIN_COLUMNS)
-    patterns = load_pattern_library()
+    brain = brain_df.copy() if brain_df is not None else _safe_read_csv(BRAIN_FILE, BRAIN_COLUMNS)
+    patterns = patterns_df.copy() if patterns_df is not None else load_pattern_library()
     config = _load_config()
     shadow_candidates = build_shadow_candidate_universe(
         brain,
@@ -1115,7 +1143,7 @@ def finalize_forward_shadow_snapshot(
         rec,
         max_candidates=int(config.get("max_shadow_candidate_rows", 250)),
     )
-    history = _safe_read_csv(HISTORY_FILE, HISTORY_COLUMNS)
+    history = history_df.copy() if history_df is not None else _safe_read_csv(HISTORY_FILE, HISTORY_COLUMNS)
     snapshot = _latest_session_experience_snapshot(history)
     if not snapshot.empty and "session_date" in snapshot.columns:
         snap_dates = snapshot["session_date"].astype(str).str.strip()

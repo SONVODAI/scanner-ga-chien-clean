@@ -733,11 +733,21 @@ def _normalize_key(session_date: Any, symbol: Any) -> Tuple[str, str]:
     return str(session_date).strip(), str(symbol).strip().upper()
 
 
+def _sync_trajectory_cache(ledger_path: Path, *, publish: bool = False) -> None:
+    from modules.forward_ledger_store import publish_cache, refresh_cache_from_github
+
+    if publish:
+        publish_cache(ledger_path)
+    else:
+        refresh_cache_from_github(ledger_path)
+
+
 def load_trajectory_forward_ledger(
     *,
     evaluation_mode: Optional[str] = EVAL_MODE_FORWARD_FROZEN,
     ledger_path: Path = TRAJECTORY_LEDGER_FILE,
 ) -> pd.DataFrame:
+    _sync_trajectory_cache(ledger_path)
     if not ledger_path.exists():
         return pd.DataFrame(columns=list(TRAJECTORY_LEDGER_COLUMNS))
     ledger = pd.read_csv(ledger_path, encoding="utf-8-sig", low_memory=False)
@@ -792,6 +802,7 @@ def freeze_trajectory_t0_ledger(
             keep="first",
         )
         _atomic_write_csv(ledger, ledger_path)
+        _sync_trajectory_cache(ledger_path, publish=True)
 
     return ledger
 

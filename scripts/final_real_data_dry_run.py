@@ -420,7 +420,10 @@ def insight_top10_reasons(insight: pd.DataFrame) -> List[Dict[str, Any]]:
 
 
 def forward_ledger_check() -> Dict[str, Any]:
-    from modules.regime_alpha_forward_eval import INSIGHT_IMMUTABLE_T0_FIELDS
+    from modules.regime_alpha_forward_eval import (
+        INSIGHT_IMMUTABLE_T0_FIELDS,
+        load_forward_ledger,
+    )
 
     required_ranks = [
         "BaselineRank",
@@ -428,8 +431,8 @@ def forward_ledger_check() -> Dict[str, Any]:
         "ProductionRank",
     ]
     missing = [f for f in required_ranks if f not in IMMUTABLE_T0_FIELDS]
-    ledger_path = ROOT / "brain" / "regime_alpha_shadow_ledger.csv"
-    ledger_cols = list(pd.read_csv(ledger_path, nrows=0).columns) if ledger_path.exists() else []
+    ledger = load_forward_ledger(evaluation_mode=None)
+    ledger_cols = list(ledger.columns)
     return {
         "immutable_t0_fields_count": len(IMMUTABLE_T0_FIELDS),
         "rank_fields_in_immutable": {f: f in IMMUTABLE_T0_FIELDS for f in required_ranks + ["InsightRank"]},

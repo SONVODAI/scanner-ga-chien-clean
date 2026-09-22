@@ -1537,6 +1537,9 @@ def finalize_session_forward_shadow(
     market_forecast: Optional[Any] = None,
     breadth: Optional[Any] = None,
     recommendations: Optional[pd.DataFrame] = None,
+    brain_df: Optional[pd.DataFrame] = None,
+    patterns_df: Optional[pd.DataFrame] = None,
+    history_df: Optional[pd.DataFrame] = None,
 ) -> Dict[str, Any]:
     """
     N3.7C canonical forward freeze — call after is_vnindex_trading_today() in app pipeline.
@@ -1554,6 +1557,9 @@ def finalize_session_forward_shadow(
             market_forecast=mf if not math.isnan(mf) else None,
             breadth=bw if not math.isnan(bw) else None,
             recommendations=recommendations,
+            brain_df=brain_df,
+            patterns_df=patterns_df,
+            history_df=history_df,
         )
     except Exception:
         logger.exception("Forward shadow finalize failed safely")
