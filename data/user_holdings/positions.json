@@ -10,6 +10,16 @@
       "symbol": "MWG",
       "entry_price": 72500.0,
       "entry_date": "2026-09-08"
+    },
+    {
+      "symbol": "NLG",
+      "entry_price": 24000.0,
+      "entry_date": "2026-09-15"
+    },
+    {
+      "symbol": "IDC",
+      "entry_price": 32200.0,
+      "entry_date": "2026-09-18"
     }
   ]
 }
