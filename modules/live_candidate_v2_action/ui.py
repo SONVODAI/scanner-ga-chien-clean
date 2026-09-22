@@ -39,6 +39,11 @@ EMPTY_MESSAGE = "SHADOW Action Layer: no V2 nominations observed this session."
 STALE_MESSAGE = "SHADOW Action Layer: VPS state rejected (stale or wrong session)."
 TRANSPORT_MESSAGE = "SHADOW Action Layer: VPS state transport failed (fail closed)."
 PERMISSIONS_MESSAGE = "SHADOW Action Layer: production BUY flags present — rejected."
+VALIDATION_TITLE = "SHADOW BUY_READY — FOR VALIDATION ONLY"
+VALIDATION_NOTE = (
+    "Historical shadow evidence only. Not the current action state and not a production BUY. "
+    "candidate_is_buy=false · pxv_implies_buy=false · alert_eligible=false"
+)
 
 REASON_OK = "OK"
 REASON_ABSENT = "ABSENT"
@@ -48,6 +53,7 @@ REASON_TRANSPORT = "TRANSPORT"
 REASON_PERMISSIONS = "PERMISSIONS"
 REASON_INVALID = "INVALID"
 REASON_WAITING = WAITING_FOR_NEXT_LIVE_ELIGIBLE_5M
+STALE_REASONS = frozenset({REASON_STALE_SESSION, REASON_STALE_OBSERVED_AT})
 
 SHADOW_COLUMNS: tuple[tuple[str, str], ...] = (
     ("Symbol", "symbol"),
@@ -56,6 +62,18 @@ SHADOW_COLUMNS: tuple[tuple[str, str], ...] = (
     ("Last legal 5m", "last_legal_bar_ts"),
     ("Frozen ref", "frozen_ref_display"),
     ("Close vs ref", "close_vs_ref"),
+    ("Reason", "action_reason"),
+)
+
+VALIDATION_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("Symbol", "symbol"),
+    ("Source", "source"),
+    ("Setup", "setup"),
+    ("Trigger time", "trigger_time"),
+    ("Trigger price", "trigger_price"),
+    ("Frozen ref", "frozen_ref_display"),
+    ("Volume/P×V evidence", "pxv_evidence"),
+    ("Market permission", "market_permission"),
     ("Reason", "action_reason"),
 )
 
@@ -152,6 +170,99 @@ def project_shadow_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any
     return projected
 
 
+def _row_permissions_closed(rec: Mapping[str, Any]) -> bool:
+    return (
+        rec.get("candidate_is_buy") is not True
+        and rec.get("pxv_implies_buy") is not True
+        and rec.get("alert_eligible") is not True
+    )
+
+
+def _is_buy_ready_row(rec: Mapping[str, Any]) -> bool:
+    state = str(rec.get("shadow_action") or rec.get("action_state") or "")
+    return state == STATE_BUY_READY and _row_permissions_closed(rec)
+
+
+def historical_buy_ready_rows(doc: Mapping[str, Any] | None) -> list[Mapping[str, Any]]:
+    """BUY_READY rows retained for validation. Not a current action."""
+    if not isinstance(doc, Mapping):
+        return []
+    if doc.get("candidate_is_buy") is True or doc.get("alert_eligible") is True or doc.get("pxv_implies_buy") is True:
+        return []
+    rows = doc.get("rows")
+    if not isinstance(rows, list):
+        return []
+    return [rec for rec in rows if isinstance(rec, Mapping) and _is_buy_ready_row(rec)]
+
+
+def _pxv_evidence(rec: Mapping[str, Any]) -> str:
+    published = str(rec.get("published_evidence") or "")
+    volume = rec.get("volume_expansion_state")
+    pxv = rec.get("price_volume_state")
+    parts = []
+    if published:
+        parts.append(f"published={published}")
+    if volume not in (None, ""):
+        parts.append(f"volume={volume}")
+    if pxv not in (None, ""):
+        parts.append(f"pxv={pxv}")
+    return " · ".join(parts)
+
+
+def project_validation_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    projected: list[dict[str, Any]] = []
+    for rec in rows:
+        if not _is_buy_ready_row(rec):
+            continue
+        view = dict(rec)
+        view["frozen_ref_display"] = _ref_display(rec)
+        view["trigger_time"] = rec.get("trigger_bar_ts") or rec.get("last_legal_bar_ts") or ""
+        view["pxv_evidence"] = _pxv_evidence(rec)
+        projected.append({label: view.get(key, "") for label, key in VALIDATION_COLUMNS})
+    return projected
+
+
+def _load_raw_shadow_state(
+    path: Path | None,
+    *,
+    source_mode: str | None,
+    fetcher: Callable[[], str] | None,
+) -> tuple[dict[str, Any] | None, str]:
+    """Fetch the document without applying freshness. Fail closed on transport."""
+    mode = resolve_ui_source(source_mode)
+    if mode == "remote":
+        try:
+            text = fetcher() if fetcher is not None else get_v2_action_state_text()
+            data = json.loads(text)
+        except LiveShadowNotFound:
+            return None, REASON_ABSENT
+        except (EvidenceTransportError, json.JSONDecodeError, TypeError):
+            return None, REASON_TRANSPORT
+        if not isinstance(data, dict):
+            return None, REASON_INVALID
+        return data, REASON_OK
+    doc = load_shadow_state(path)
+    if doc is None:
+        return None, REASON_ABSENT
+    return doc, REASON_OK
+
+
+def _render_historical_buy_ready(st: Any, raw: Mapping[str, Any] | None) -> None:
+    """Stale or rolled-over snapshot: BUY_READY evidence only, never as current state."""
+    ready = historical_buy_ready_rows(raw)
+    if not ready:
+        return
+    session = str((raw or {}).get("session") or "")
+    observed = str((raw or {}).get("observed_at") or "")
+    st.markdown(f"#### {VALIDATION_TITLE}")
+    st.caption(VALIDATION_NOTE)
+    if session or observed:
+        st.caption(f"snapshot session={session or '—'} · observed_at={observed or '—'} · not current")
+    table = project_validation_rows(ready)
+    if table:
+        st.dataframe(table, use_container_width=True, hide_index=True)
+
+
 def _reason_caption(reason: str, *, local: bool) -> str:
     if reason == REASON_ABSENT:
         return LOCAL_UNAVAILABLE_MESSAGE if local else UNAVAILABLE_MESSAGE
@@ -182,6 +293,7 @@ def render_v2_shadow_action_panel(
     resolved_mode = source_mode
     if resolved_mode is None and artifact_dir is not None:
         resolved_mode = "local"
+    raw: dict[str, Any] | None = None
     if document is not None:
         doc: dict[str, Any] | None = dict(document) if isinstance(document, Mapping) else None
         if doc is None:
@@ -190,12 +302,19 @@ def render_v2_shadow_action_panel(
             doc = None
             reason = REASON_PERMISSIONS
     else:
-        doc, reason = load_accepted_shadow_state(
+        raw, reason = _load_raw_shadow_state(
             artifact_dir,
-            now=now,
             source_mode=resolved_mode,
             fetcher=fetcher,
         )
+        if raw is None:
+            doc = None
+        elif raw.get("candidate_is_buy") is True or raw.get("alert_eligible") is True or raw.get("pxv_implies_buy") is True:
+            doc = None
+            raw = None
+            reason = REASON_PERMISSIONS
+        else:
+            doc, reason = accept_shadow_state_document(raw, now=now)
 
     st.markdown(f"### {PANEL_TITLE}")
     st.caption(SHADOW_CAPTION)
@@ -206,6 +325,8 @@ def render_v2_shadow_action_panel(
     if doc is None:
         local = resolve_ui_source(resolved_mode) == "local"
         st.caption(_reason_caption(reason, local=local))
+        if reason in STALE_REASONS:
+            _render_historical_buy_ready(st, raw)
         return
     rows = doc.get("rows") if isinstance(doc, Mapping) else None
     session = str(doc.get("session") or "")
