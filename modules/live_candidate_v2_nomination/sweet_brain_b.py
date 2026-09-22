@@ -167,6 +167,20 @@ def normalize_session_dates(dates: Iterable[object]) -> tuple[str, ...]:
     return tuple(out)
 
 
+def cash_session_open(now: datetime) -> bool:
+    """True while the production cash-session clock says T is already open.
+
+    Reuses ``research_below_boundary_locked``: weekday 09:15 inclusive through
+    15:10 exclusive, including lunch. That clock is the app's live-session
+    signal. It does not read today's VNINDEX daily bar, and it is false on
+    weekends and outside the window, so a bare Mon–Fri date is not a session.
+    This repo has no exchange holiday calendar.
+    """
+    from modules.intraday_execution_boundary import research_below_boundary_locked
+
+    return research_below_boundary_locked(now)
+
+
 def predecessor_vnindex_session(session_t: str, trading_dates: Sequence[str]) -> str | None:
     """D = immediately preceding VNINDEX session strictly before T. Not calendar T-1."""
     want = str(session_t or "").strip()[:10]
@@ -336,7 +350,13 @@ def consult_brain_b(
     vnindex_fetcher: VnindexFetcher | None = None,
     lookback_days: int = 10,
 ) -> BrainBConsult:
-    """Predecessor-on-T: D is the VNINDEX session strictly before T. Never latest Sweet day."""
+    """Predecessor-on-T: D is the VNINDEX session strictly before T. Never latest Sweet day.
+
+    T is recognized when it is already in the VNINDEX daily history, or when
+    the cash-session clock says today's session is open. The open clock does
+    not require today's completed daily bar. D is always taken from that
+    history, never from the open clock.
+    """
     now = as_vn(observed_at)
     session_t = now.date().isoformat()
     try:
@@ -353,7 +373,11 @@ def consult_brain_b(
             reason=f"{REASON_FETCH_FAILURE}: {type(exc).__name__}: {exc}",
         )
 
-    if session_t not in set(dates):
+    history = tuple(dates)
+    session_known = session_t in set(history) or (
+        cash_session_open(now) and now.date().isoformat() == session_t
+    )
+    if not session_known:
         return BrainBConsult(
             status=BRAIN_B_NOT_TRADING_SESSION,
             session=session_t,
@@ -361,7 +385,7 @@ def consult_brain_b(
             reason=REASON_NOT_TRADING,
         )
 
-    predecessor = predecessor_vnindex_session(session_t, dates)
+    predecessor = predecessor_vnindex_session(session_t, history)
     if not predecessor:
         return _unavailable(
             session=session_t,

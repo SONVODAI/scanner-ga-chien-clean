@@ -783,3 +783,127 @@ def test_brain_a_row_with_sweet_in_provenance_still_owns_freeze():
     prior = freeze_records_from_document(doc)
     assert len(prior) == 1
     assert prior[0].ema9_at_first_seen == 30.1
+
+
+# ---------- live session before today's VNINDEX daily bar ----------
+
+LIVE_GAP_SYMBOLS = (
+    "BFC",
+    "BID",
+    "BMP",
+    "CTG",
+    "HAH",
+    "NTL",
+    "OCB",
+    "TVN",
+    "VCB",
+    "VGC",
+)
+
+
+def _live_gap_ledger() -> pd.DataFrame:
+    """2026-09-21 freeze, one look-ahead D row, and one same-day T freeze."""
+    rows = [
+        {
+            "t0_date": "2026-09-21",
+            "symbol": symbol,
+            "observer_status": "OBSERVE",
+            "created_at": "2026-09-21T11:16:38Z",
+            "price_t0": 10000.0,
+        }
+        for symbol in LIVE_GAP_SYMBOLS
+    ]
+    rows.append(
+        {
+            "t0_date": "2026-09-21",
+            "symbol": "POISON",
+            "observer_status": "OBSERVE",
+            "created_at": "2026-09-22T04:00:00Z",
+            "price_t0": 1.0,
+        }
+    )
+    rows.append(
+        {
+            "t0_date": "2026-09-22",
+            "symbol": "SAMEDAY",
+            "observer_status": "OBSERVE",
+            "created_at": "2026-09-22T01:00:00Z",
+            "price_t0": 1.0,
+        }
+    )
+    return pd.DataFrame(rows)
+
+
+def test_open_live_session_uses_prior_freeze_before_todays_daily_bar():
+    """VNINDEX history has 2026-09-21 only. 10:52 on 2026-09-22 is an open session."""
+    from modules.intraday_execution_boundary import research_below_boundary_locked
+
+    now = _ts("2026-09-22 10:52:00")
+    assert research_below_boundary_locked(now) is True
+    brain_b = _consult(
+        "2026-09-22 10:52:00",
+        market_real=5.7,
+        trading_dates=("2026-09-21",),
+        ledger=_live_gap_ledger(),
+    )
+    assert brain_b.status == BRAIN_B_NOMINATED
+    assert brain_b.session == "2026-09-22"
+    assert brain_b.predecessor == "2026-09-21"
+    assert brain_b.reason == "PREDECESSOR_SWEET_OBSERVE"
+    symbols = [n.symbol for n in brain_b.nominations]
+    assert symbols == sorted(LIVE_GAP_SYMBOLS)
+    assert "SAMEDAY" not in symbols
+    assert "POISON" not in symbols
+    for nom in brain_b.nominations:
+        assert nom.eligible_from.startswith("2026-09-22T09:15:00")
+        assert nom.chronology_status == "ELIGIBLE"
+        assert nom.candidate_first_seen_ts == "2026-09-21T11:16:38Z"
+        assert nom.market_permission == MARKET_PERMISSION_WEAK
+        assert nom.source == SRC_MARKET_AWARE_SWEETSPOT
+    _, rows = _sidecar([], brain_b, now="2026-09-22 10:52:00", market_real=5.7)
+    assert [r["symbol"] for r in rows] == sorted(LIVE_GAP_SYMBOLS)
+    assert rows[0]["market_permission"] == "WATCHLIST - MARKET YẾU"
+    assert all(r["source"] == SRC_MARKET_AWARE_SWEETSPOT for r in rows)
+
+
+def test_weekend_and_closed_clock_stay_not_trading_without_todays_bar():
+    sunday = _consult(
+        "2026-09-20 10:52:00",
+        market_real=5.7,
+        trading_dates=("2026-09-18",),
+        ledger=_live_gap_ledger(),
+    )
+    assert sunday.status == BRAIN_B_NOT_TRADING_SESSION
+    assert sunday.reason == REASON_NOT_TRADING
+    assert sunday.nominations == ()
+
+    pre_open = _consult(
+        "2026-09-22 08:30:00",
+        market_real=5.7,
+        trading_dates=("2026-09-21",),
+        ledger=_live_gap_ledger(),
+    )
+    assert pre_open.status == BRAIN_B_NOT_TRADING_SESSION
+    assert pre_open.predecessor == ""
+
+    after_close = _consult(
+        "2026-09-22 15:30:00",
+        market_real=5.7,
+        trading_dates=("2026-09-21",),
+        ledger=_live_gap_ledger(),
+    )
+    assert after_close.status == BRAIN_B_NOT_TRADING_SESSION
+    assert after_close.nominations == ()
+
+
+def test_completed_daily_bar_still_recognizes_t_after_the_cash_window():
+    brain_b = _consult(
+        "2026-09-22 19:40:00",
+        market_real=5.7,
+        trading_dates=("2026-09-21", "2026-09-22"),
+        ledger=_live_gap_ledger(),
+    )
+    assert brain_b.status == BRAIN_B_NOMINATED
+    assert brain_b.session == "2026-09-22"
+    assert brain_b.predecessor == "2026-09-21"
+    assert "SAMEDAY" not in {n.symbol for n in brain_b.nominations}
