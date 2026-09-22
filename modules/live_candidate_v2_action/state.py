@@ -253,6 +253,12 @@ class ActionResult:
     mode: str = MODE
     slice: str = SLICE
     shadow_label: str = ""
+    source: str = ""
+    trigger_price: float | None = None
+    published_evidence: str = ""
+    volume_expansion_state: str | None = None
+    price_volume_state: str | None = None
+    market_permission: str = ""
     notes: tuple[str, ...] = field(default_factory=tuple)
 
     def as_dict(self) -> dict[str, Any]:
@@ -371,6 +377,12 @@ def _result(
         pxv_implies_buy=pxv_implies_buy(last.published_evidence if last is not None else None),
         alert_eligible=ALERT_ELIGIBLE,
         shadow_label=_shadow_label(state),
+        source=nom.source,
+        trigger_price=last.close if last is not None else None,
+        published_evidence=str(last.published_evidence or "") if last is not None else "",
+        volume_expansion_state=last.volume_expansion_state if last is not None else None,
+        price_volume_state=last.price_volume_state if last is not None else None,
+        market_permission=nom.market_permission,
         notes=tuple(notes),
     )
 

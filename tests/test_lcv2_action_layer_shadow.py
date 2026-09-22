@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -15,7 +16,12 @@ from modules.intraday_pxv_v1.constants import (
 )
 from modules.live_camera_shadow.feed import LiveShadowFeed
 from modules.live_camera_shadow.rate import LIVE_UNIVERSE_CAP
-from modules.live_candidate_v2_action.artifact import V2ActionStore, evidence_row, persist_cycle
+from modules.live_candidate_v2_action.artifact import (
+    V2ActionStore,
+    evidence_row,
+    persist_cycle,
+    state_document,
+)
 from modules.live_candidate_v2_action.contract import (
     ALERT_ELIGIBLE,
     CANDIDATE_IS_BUY,
@@ -52,7 +58,11 @@ from modules.live_candidate_v2_action.state import (
 from modules.live_candidate_v2_action.ui import (
     PANEL_TITLE,
     SHADOW_CAPTION,
+    STALE_MESSAGE,
+    VALIDATION_NOTE,
+    VALIDATION_TITLE,
     project_shadow_rows,
+    project_validation_rows,
     render_v2_shadow_action_panel,
 )
 from modules.live_candidate_v2_action.universe import merge_elite_v2, union_watchlist
@@ -731,3 +741,296 @@ def test_camera_operator_ui_still_has_no_buy_ready():
     src = (REPO / "modules" / "live_candidate_v2_camera" / "ui.py").read_text(encoding="utf-8")
     assert "BUY_READY" not in src
     assert "render_v2_shadow_action_panel" not in src
+
+
+# ---------- Visibility: evidence fields and stale BUY_READY ----------
+# Synthetic bars and documents. Not 2026-09-22 production candidates.
+
+
+class _VisSt:
+    def __init__(self):
+        self.markdowns = []
+        self.captions = []
+        self.tables = []
+
+    def markdown(self, msg, **k):
+        self.markdowns.append(str(msg))
+
+    def caption(self, msg, **k):
+        self.captions.append(str(msg))
+
+    def dataframe(self, data, **k):
+        self.tables.append(data)
+
+
+def _synthetic_ready_row(**overrides):
+    row = {
+        "symbol": "SYN",
+        "source": "brain_a_scan_setup",
+        "setup": "PULL ĐẸP",
+        "shadow_action": STATE_BUY_READY,
+        "shadow_label": SHADOW_BUY_READY_LABEL,
+        "trigger_bar_ts": "2026-08-14T09:20:00+07:00",
+        "last_legal_bar_ts": "2026-08-14T09:20:00+07:00",
+        "trigger_price": 27140.0,
+        "frozen_ref_kind": "EMA9",
+        "frozen_ref_value": 27.1,
+        "published_evidence": "NEUTRAL",
+        "volume_expansion_state": "NORMAL",
+        "price_volume_state": "FLAT",
+        "market_permission": "OK",
+        "action_reason": REASON_PULL_BUY_READY,
+        "candidate_is_buy": False,
+        "pxv_implies_buy": False,
+        "alert_eligible": False,
+        "n_legal_bars": 2,
+    }
+    row.update(overrides)
+    return row
+
+
+def _synthetic_state(rows, *, observed_at, session="2026-08-14"):
+    return {
+        "schema": "live_candidate_v2_action_state.v1",
+        "session": session,
+        "observed_at": observed_at,
+        "candidate_is_buy": False,
+        "pxv_implies_buy": False,
+        "alert_eligible": False,
+        "rows": rows,
+    }
+
+
+def test_state_row_carries_existing_evaluator_fields():
+    nom = FrozenNomination(
+        symbol="SYN",
+        session="2026-08-14",
+        setup="PULL ĐẸP",
+        group="PULL ĐẸP",
+        candidate_first_seen_ts="2026-08-14T09:00:00+07:00",
+        eligible_from="2026-08-14T09:00:00+07:00",
+        observation_reference="EMA9",
+        ema9_at_first_seen=27.1,
+        market_permission="OK",
+        source="brain_a_scan_setup",
+    )
+    bars = [
+        _bar("09:15", close_vs_ref=20, vol_state="CONTRACTION", published="NEUTRAL", pxv="FLAT"),
+        _bar("09:20", close_vs_ref=40, vol_state="NORMAL", published="NEUTRAL", pxv="FLAT"),
+    ]
+    result = evaluate_shadow_action(nom, bars)
+    assert result.action_state == STATE_BUY_READY
+    assert result.action_reason == REASON_PULL_BUY_READY
+    assert result.candidate_is_buy is False
+    assert result.pxv_implies_buy is False
+    assert result.alert_eligible is False
+    assert result.source == "brain_a_scan_setup"
+    assert result.trigger_price == bars[-1].close
+    assert result.published_evidence == "NEUTRAL"
+    assert result.volume_expansion_state == "NORMAL"
+    assert result.price_volume_state == "FLAT"
+    assert result.market_permission == "OK"
+    doc = state_document(session="2026-08-14", observed_at=_ts("2026-08-14 09:30:00"), results=[result])
+    row = doc["rows"][0]
+    assert row["source"] == "brain_a_scan_setup"
+    assert row["trigger_bar_ts"] == result.last_legal_bar_ts
+    assert row["trigger_price"] == bars[-1].close
+    assert row["frozen_ref_kind"] == "EMA9"
+    assert row["frozen_ref_value"] == 27.1
+    assert row["published_evidence"] == "NEUTRAL"
+    assert row["volume_expansion_state"] == "NORMAL"
+    assert row["price_volume_state"] == "FLAT"
+    assert row["market_permission"] == "OK"
+    assert row["action_reason"] == REASON_PULL_BUY_READY
+    assert row["candidate_is_buy"] is False
+    assert row["pxv_implies_buy"] is False
+    assert row["alert_eligible"] is False
+    assert doc["candidate_is_buy"] is False
+    assert doc["pxv_implies_buy"] is False
+    assert doc["alert_eligible"] is False
+
+
+def test_pull_manh_break_transitions_unchanged():
+    """Synthetic confirmation pairs. State names and reasons stay the existing machine."""
+    pull = evaluate_shadow_action(
+        _nom(),
+        [
+            _bar("09:15", close_vs_ref=20, vol_state="CONTRACTION"),
+            _bar("09:20", close_vs_ref=40, vol_state="NORMAL"),
+        ],
+    )
+    assert pull.action_state == STATE_BUY_READY
+    assert pull.action_reason == REASON_PULL_BUY_READY
+    pull_wait = evaluate_shadow_action(_nom(), [_bar("09:15", close_vs_ref=50)])
+    assert pull_wait.action_state == STATE_WAIT
+    assert pull_wait.action_reason == REASON_PULL_SINGLE_BAR
+
+    manh = evaluate_shadow_action(
+        _nom("CP MẠNH"),
+        [
+            _bar("09:15", close_vs_ref=50, published="NEUTRAL", vol_state="EXPANSION", pxv="CONFIRMING"),
+            _bar("09:20", close_vs_ref=80, published=EV_STRENGTHEN, vol_state="EXPANSION", pxv="CONFIRMING"),
+        ],
+    )
+    assert manh.action_state == STATE_BUY_READY
+    assert manh.action_reason == REASON_MANH_BUY_READY
+    manh_wait = evaluate_shadow_action(
+        _nom("CP MẠNH"),
+        [
+            _bar("09:15", close_vs_ref=100, published="NEUTRAL"),
+            _bar("09:20", close_vs_ref=120, published="NEUTRAL"),
+        ],
+    )
+    assert manh_wait.action_state == STATE_WAIT
+    assert manh_wait.action_reason == REASON_MANH_PRICE_NO_STRENGTHEN
+
+    brk = evaluate_shadow_action(
+        _nom("MUA BREAK", ema9=None, breakout=27.0, ref="BREAKOUT_REF"),
+        [
+            _bar("09:15", close_vs_ref=30, published="NEUTRAL", ref_state="BREAKOUT_REF", ref_kind="BREAKOUT_REF"),
+            _bar(
+                "09:20",
+                close_vs_ref=60,
+                published=EV_STRENGTHEN,
+                ref_state="BREAKOUT_REF",
+                ref_kind="BREAKOUT_REF",
+            ),
+        ],
+    )
+    assert brk.action_state == STATE_BUY_READY
+    assert brk.action_reason == REASON_MANH_BUY_READY
+    assert brk.route == "BREAK"
+    for result in (pull, manh, brk, pull_wait, manh_wait):
+        assert result.candidate_is_buy is False
+        assert result.pxv_implies_buy is False
+        assert result.alert_eligible is False
+
+
+def test_fresh_buy_ready_renders_current_shadow_table():
+    now = _ts("2026-08-14 09:30:00")
+    payload = _synthetic_state([_synthetic_ready_row()], observed_at=now.isoformat())
+    st = _VisSt()
+    render_v2_shadow_action_panel(
+        None,
+        st_module=st,
+        now=now,
+        source_mode="remote",
+        fetcher=lambda: json.dumps(payload),
+    )
+    assert any(PANEL_TITLE in m for m in st.markdowns)
+    assert VALIDATION_TITLE not in "\n".join(st.markdowns)
+    assert SHADOW_CAPTION in st.captions
+    assert any("candidate_is_buy=False" in c for c in st.captions)
+    assert st.tables
+    current = st.tables[0][0]
+    assert "Shadow action" in current
+    assert "research" in current["Shadow action"].lower()
+    assert "Trigger price" not in current
+    assert current["Symbol"] == "SYN"
+
+
+def test_stale_buy_ready_is_historical_validation_only():
+    now = _ts("2026-08-14 10:00:00")
+    stale_at = (now - timedelta(minutes=20)).isoformat()
+    rows = [
+        _synthetic_ready_row(),
+        _synthetic_ready_row(symbol="WAIT1", shadow_action=STATE_WAIT, action_reason="WAIT_CONFIRMATION_INCOMPLETE"),
+        _synthetic_ready_row(symbol="NOM1", shadow_action=STATE_NOMINATED, action_reason="NOMINATED_NO_LEGAL_COMPLETED_BARS"),
+        _synthetic_ready_row(symbol="WEAK1", shadow_action=STATE_WEAKENED, action_reason="WEAKENING_CONJUNCTION"),
+    ]
+    payload = _synthetic_state(rows, observed_at=stale_at)
+    st = _VisSt()
+    render_v2_shadow_action_panel(
+        None,
+        st_module=st,
+        now=now,
+        source_mode="remote",
+        fetcher=lambda: json.dumps(payload),
+    )
+    assert STALE_MESSAGE in st.captions
+    assert any("session=" in c and "SHADOW only" in c for c in st.captions) is False
+    assert any(VALIDATION_TITLE in m for m in st.markdowns)
+    assert VALIDATION_NOTE in st.captions
+    assert any("not current" in c for c in st.captions)
+    assert len(st.tables) == 1
+    table = st.tables[0]
+    assert len(table) == 1
+    shown = table[0]
+    assert shown["Symbol"] == "SYN"
+    assert shown["Source"] == "brain_a_scan_setup"
+    assert shown["Setup"] == "PULL ĐẸP"
+    assert shown["Trigger time"] == "2026-08-14T09:20:00+07:00"
+    assert shown["Trigger price"] == 27140.0
+    assert shown["Frozen ref"] == "EMA9=27.1"
+    assert "published=NEUTRAL" in shown["Volume/P×V evidence"]
+    assert "volume=NORMAL" in shown["Volume/P×V evidence"]
+    assert "pxv=FLAT" in shown["Volume/P×V evidence"]
+    assert shown["Market permission"] == "OK"
+    assert shown["Reason"] == REASON_PULL_BUY_READY
+    assert "Shadow action" not in shown
+    blob = str(table)
+    assert "WAIT1" not in blob
+    assert "NOM1" not in blob
+    assert "WEAK1" not in blob
+    assert any("candidate_is_buy=False" in c for c in st.captions)
+    assert project_validation_rows(rows)[0]["Symbol"] == "SYN"
+
+
+def test_stale_non_ready_rows_are_not_current_actions():
+    now = _ts("2026-08-14 10:00:00")
+    stale_at = (now - timedelta(minutes=20)).isoformat()
+    rows = [
+        _synthetic_ready_row(symbol="WAIT1", shadow_action=STATE_WAIT),
+        _synthetic_ready_row(symbol="NOM1", shadow_action=STATE_NOMINATED),
+        _synthetic_ready_row(symbol="WEAK1", shadow_action=STATE_WEAKENED),
+    ]
+    payload = _synthetic_state(rows, observed_at=stale_at)
+    st = _VisSt()
+    render_v2_shadow_action_panel(
+        None,
+        st_module=st,
+        now=now,
+        source_mode="remote",
+        fetcher=lambda: json.dumps(payload),
+    )
+    assert STALE_MESSAGE in st.captions
+    assert VALIDATION_TITLE not in "\n".join(st.markdowns)
+    assert not st.tables
+
+    wrong = _synthetic_state(
+        [_synthetic_ready_row()],
+        observed_at=now.isoformat(),
+        session="2026-08-13",
+    )
+    st_roll = _VisSt()
+    render_v2_shadow_action_panel(
+        None,
+        st_module=st_roll,
+        now=now,
+        source_mode="remote",
+        fetcher=lambda: json.dumps(wrong),
+    )
+    assert STALE_MESSAGE in st_roll.captions
+    assert any(VALIDATION_TITLE in m for m in st_roll.markdowns)
+    assert st_roll.tables and st_roll.tables[0][0]["Symbol"] == "SYN"
+    assert any("session=" in c and "SHADOW only" in c for c in st_roll.captions) is False
+
+
+def test_stale_buy_flags_still_reject_historical_rows():
+    now = _ts("2026-08-14 10:00:00")
+    payload = _synthetic_state(
+        [_synthetic_ready_row()],
+        observed_at=(now - timedelta(minutes=20)).isoformat(),
+    )
+    payload["candidate_is_buy"] = True
+    st = _VisSt()
+    render_v2_shadow_action_panel(
+        None,
+        st_module=st,
+        now=now,
+        source_mode="remote",
+        fetcher=lambda: json.dumps(payload),
+    )
+    assert any("production BUY flags" in c for c in st.captions)
+    assert VALIDATION_TITLE not in "\n".join(st.markdowns)
+    assert not st.tables
