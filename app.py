@@ -6520,6 +6520,25 @@ daily_result = process_and_render_daily_summary(
     scan_df,
     title="📊 DAILY EARNING MONEY REPORT",
 )
+
+# =========================================================
+# INTRADAY EXECUTION BOUNDARY
+# Last block above this line is Daily Report / T+3/T+5/T+10 / Snapshot Storage
+# (process_and_render_daily_summary). While locked, research below must not
+# execute — st.stop() aborts the script; it does not merely skip rendering.
+# Post-close (15:10 VN onward) falls through and runs the block unchanged.
+# Weekend stays unlocked (current full-page behavior).
+# =========================================================
+from modules.intraday_execution_boundary import research_below_boundary_locked
+
+if research_below_boundary_locked(vn_now()):
+    st.caption(
+        "Research phía dưới Daily Report đang khóa "
+        "(09:15–15:10 giờ VN, kể cả nghỉ trưa và 14:50–15:10). "
+        "Phần này chạy lại từ 15:10."
+    )
+    st.stop()
+
 # =========================================================
 # EXPERIENCE ENGINE
 # =========================================================
