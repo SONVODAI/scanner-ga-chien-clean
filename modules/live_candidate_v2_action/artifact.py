@@ -25,6 +25,7 @@ from modules.live_candidate_v2_action.contract import (
     SCHEMA_EVIDENCE,
     SCHEMA_STATE,
     SLICE,
+    STATE_BUY_READY,
     STATE_NAME,
 )
 from modules.live_candidate_v2_action.state import ActionResult, BarEvidence, FrozenNomination
@@ -33,6 +34,72 @@ from modules.live_candidate_v2_camera.observe import pxv_implies_buy
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ARTIFACT_DIR = REPO_ROOT / DEFAULT_ARTIFACT_RELPATH
+
+
+def buy_ready_identity(rec: Mapping[str, Any]) -> str:
+    """One trigger. Does not invent fields that the stored row lacks."""
+    symbol = str(rec.get("symbol") or "").upper()
+    session = str(rec.get("session") or "")
+    trigger = str(rec.get("trigger_bar_ts") or rec.get("last_legal_bar_ts") or "")
+    return f"{symbol}|{session}|{trigger}"
+
+
+def _closed_buy_ready(rec: object) -> bool:
+    if not isinstance(rec, Mapping):
+        return False
+    state = str(rec.get("shadow_action") or rec.get("action_state") or "")
+    if state != STATE_BUY_READY:
+        return False
+    if rec.get("candidate_is_buy") is True or rec.get("pxv_implies_buy") is True:
+        return False
+    if rec.get("alert_eligible") is True:
+        return False
+    return True
+
+
+def merge_historical_buy_ready(
+    new_doc: Mapping[str, Any],
+    previous: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Keep validation BUY_READY when a later publisher replaces the file.
+
+    Carries records only while the document session is unchanged. A later
+    session starts clean. Current rows are never rewritten from history.
+    WAIT / NOMINATED / WEAKENED / NO_OBSERVATION are not retained.
+    """
+    out = dict(new_doc)
+    current_symbols = {
+        str(rec.get("symbol") or "").upper()
+        for rec in (out.get("rows") or [])
+        if isinstance(rec, Mapping) and str(rec.get("symbol") or "").strip()
+    }
+    seen: set[str] = set()
+    kept: list[dict[str, Any]] = []
+
+    def _add(rec: object) -> None:
+        if not _closed_buy_ready(rec):
+            return
+        assert isinstance(rec, Mapping)
+        symbol = str(rec.get("symbol") or "").upper()
+        if symbol and symbol in current_symbols:
+            return
+        ident = buy_ready_identity(rec)
+        if ident in seen:
+            return
+        seen.add(ident)
+        kept.append(dict(rec))
+
+    for rec in out.get("historical_buy_ready") or []:
+        _add(rec)
+    new_session = str(out.get("session") or "").strip()
+    prev_session = str((previous or {}).get("session") or "").strip() if isinstance(previous, Mapping) else ""
+    if new_session and prev_session and new_session == prev_session:
+        for key in ("historical_buy_ready", "rows"):
+            for rec in (previous or {}).get(key) or []:
+                _add(rec)
+    if kept or "historical_buy_ready" in out:
+        out["historical_buy_ready"] = kept
+    return out
 
 
 def default_action_dir() -> Path:

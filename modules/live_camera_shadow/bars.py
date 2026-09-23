@@ -26,6 +26,41 @@ def classify_stale(latest_completed: datetime | None, now: datetime) -> bool:
     return as_vn(now) - as_vn(latest_completed) > timedelta(minutes=STALE_MINUTES + BAR_MINUTES)
 
 
+def _lunch_overlap(start: datetime, end: datetime) -> timedelta:
+    """Official cash lunch 11:30–13:00 ICT that falls inside [start, end]."""
+    start_l = as_vn(start)
+    end_l = as_vn(end)
+    if end_l <= start_l:
+        return timedelta(0)
+    total = timedelta(0)
+    day = start_l.date()
+    while day <= end_l.date():
+        lunch_lo = datetime.combine(day, datetime.min.time(), tzinfo=start_l.tzinfo).replace(
+            hour=11, minute=30
+        )
+        lunch_hi = lunch_lo.replace(hour=13, minute=0)
+        lo = max(start_l, lunch_lo)
+        hi = min(end_l, lunch_hi)
+        if hi > lo:
+            total += hi - lo
+        day = day.fromordinal(day.toordinal() + 1)
+    return total
+
+
+def classify_stale_ignoring_lunch(latest_completed: datetime | None, now: datetime) -> bool:
+    """Stale check for the live WHEN path.
+
+    The 11:30–13:00 closure is not missing tape. Gaps outside that closure
+    still use the existing 20-minute stale window.
+    """
+    if latest_completed is None:
+        return False
+    latest = as_vn(latest_completed)
+    now_l = as_vn(now)
+    adjusted = (now_l - latest) - _lunch_overlap(latest, now_l)
+    return adjusted > timedelta(minutes=STALE_MINUTES + BAR_MINUTES)
+
+
 def validate_live_records(
     symbol: str,
     records: list[dict[str, Any]],
