@@ -14,6 +14,7 @@ from modules.live_candidate_v2_action.contract import (
     CANDIDATE_IS_BUY,
     EARLY_MAX_PROGRESS_PCT,
     EARLY_MODERATE_VOLUME_MIN,
+    PULL_EVIDENCE_WINDOW_BARS,
     PULL_SUPPLY_VOLUME,
     PULL_ZONE_MAX_PCT,
     PXV_IMPLIES_BUY,
@@ -146,6 +147,7 @@ def test_thresholds_reuse_existing_pxv_cuts():
     assert EARLY_MODERATE_VOLUME_MIN == 1.0
     assert RESEARCH_DEFAULT_EXPANSION_X == 2.0
     assert PULL_SUPPLY_VOLUME == "CONTRACTION"
+    assert PULL_EVIDENCE_WINDOW_BARS == 6
 
 
 def test_early_price_alone_is_wait():
@@ -282,15 +284,15 @@ def test_pull_quiet_supply_then_reclaim_is_shadow_buy_ready():
     assert result.action_state == "BUY_READY"
     assert result.action_reason == REASON_PULL_BUY_READY
     _assert_shadow(result)
-    touched = evaluate_shadow_action(
+    on_the_pair = evaluate_shadow_action(
         _nom("PULL ĐẸP"),
         [
             _bar("09:15", close_vs_ref=40, vol_state="CONTRACTION"),
             _bar("09:20", close_vs_ref=80, vol_state="NORMAL"),
         ],
     )
-    assert touched.action_state == "BUY_READY"
-    assert touched.action_reason == REASON_PULL_BUY_READY
+    assert on_the_pair.action_state == "WAIT"
+    assert on_the_pair.action_reason == REASON_PULL_NO_QUIET_SUPPLY
 
 
 def test_pull_expansion_or_sell_blocks_the_same_price_path():
@@ -334,6 +336,132 @@ def test_pull_missing_volume_classification_fails_closed():
     )
     assert no_class.action_state != "BUY_READY"
     assert no_class.action_reason == REASON_PULL_VOLUME_NOT_QUIET
+
+
+def _quiet_above(hm: str) -> BarEvidence:
+    return _bar(hm, close_vs_ref=80, vol_state="NORMAL")
+
+
+def _supply(hm: str) -> BarEvidence:
+    return _bar(hm, close_vs_ref=-40, vol_state="CONTRACTION")
+
+
+def test_pull_supply_inside_six_bar_window_is_buy_ready():
+    # Supply is the 4th completed bar before the pair: still inside the window.
+    bars = [
+        _supply("09:15"),
+        _quiet_above("09:20"),
+        _quiet_above("09:25"),
+        _quiet_above("09:30"),
+        _quiet_above("09:35"),
+        _quiet_above("09:40"),
+    ]
+    result = evaluate_shadow_action(_nom("PULL VỪA"), bars)
+    assert result.action_state == "BUY_READY"
+    assert result.action_reason == REASON_PULL_BUY_READY
+    _assert_shadow(result)
+
+
+def test_pull_supply_older_than_six_bar_window_is_wait():
+    bars = [
+        _supply("09:10"),
+        _quiet_above("09:15"),
+        _quiet_above("09:20"),
+        _quiet_above("09:25"),
+        _quiet_above("09:30"),
+        _quiet_above("09:35"),
+        _quiet_above("09:40"),
+    ]
+    result = evaluate_shadow_action(_nom("PULL ĐẸP"), bars)
+    assert result.action_state == "WAIT"
+    assert result.action_reason == REASON_PULL_NO_QUIET_SUPPLY
+    _assert_shadow(result)
+
+
+def test_pull_lunch_gap_uses_completed_bar_distance():
+    across_lunch = evaluate_shadow_action(
+        _nom("PULL VỪA"),
+        [
+            _supply("11:25"),
+            _quiet_above("13:00"),
+            _quiet_above("13:05"),
+        ],
+    )
+    assert across_lunch.action_state == "BUY_READY"
+    assert across_lunch.action_reason == REASON_PULL_BUY_READY
+    # Five completed bars sit before the pair, so the supply is outside the
+    # window even though the only long gap is lunch.
+    counted_out = evaluate_shadow_action(
+        _nom("PULL VỪA"),
+        [
+            _supply("11:00"),
+            _quiet_above("11:05"),
+            _quiet_above("11:10"),
+            _quiet_above("11:15"),
+            _quiet_above("11:20"),
+            _quiet_above("13:00"),
+            _quiet_above("13:05"),
+        ],
+    )
+    assert counted_out.action_state == "WAIT"
+    assert counted_out.action_reason == REASON_PULL_NO_QUIET_SUPPLY
+
+
+def test_cho_pull_uses_the_same_freshness_window():
+    fresh = [
+        _supply("09:15"),
+        _quiet_above("09:20"),
+        _quiet_above("09:25"),
+    ]
+    stale = [
+        _supply("09:10"),
+        _quiet_above("09:15"),
+        _quiet_above("09:20"),
+        _quiet_above("09:25"),
+        _quiet_above("09:30"),
+        _quiet_above("09:35"),
+        _quiet_above("09:40"),
+    ]
+    ready = evaluate_shadow_action(_nom("CP MẠNH", source_action=CHO_PULL_ACTION), fresh)
+    assert ready.route == "PULL"
+    assert ready.action_state == "BUY_READY"
+    assert ready.action_reason == REASON_PULL_BUY_READY
+    old = evaluate_shadow_action(_nom("CP MẠNH", source_action=CHO_PULL_ACTION), stale)
+    assert old.route == "PULL"
+    assert old.action_state == "WAIT"
+    assert old.action_reason == REASON_PULL_NO_QUIET_SUPPLY
+
+
+def test_early_and_break_ignore_the_pull_freshness_window():
+    early = evaluate_shadow_action(_nom("MUA EARLY"), _early_pair())
+    assert early.action_state == "BUY_READY"
+    assert early.action_reason == REASON_EARLY_BUY_READY
+    brk = evaluate_shadow_action(
+        _nom("MUA BREAK"),
+        [
+            _bar(
+                "09:15",
+                close_vs_ref=30,
+                published="NEUTRAL",
+                vol_state="EXPANSION",
+                pxv="CONFIRMING",
+                ref_state="BREAKOUT_REF",
+                ref_kind="BREAKOUT_REF",
+            ),
+            _bar(
+                "09:20",
+                close_vs_ref=60,
+                published="STRENGTHEN",
+                vol_state="EXPANSION",
+                pxv="CONFIRMING",
+                ref_state="BREAKOUT_REF",
+                ref_kind="BREAKOUT_REF",
+            ),
+        ],
+    )
+    assert brk.route == "BREAK"
+    assert brk.action_state == "BUY_READY"
+    assert brk.action_reason == REASON_MANH_BUY_READY
 
 
 def test_cp_manh_momentum_keeps_strengthen():

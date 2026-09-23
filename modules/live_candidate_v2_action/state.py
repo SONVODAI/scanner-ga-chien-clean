@@ -36,6 +36,7 @@ from modules.live_candidate_v2_action.contract import (
     EARLY_MODERATE_VOLUME_MIN,
     MARKET_PERMISSION_OK,
     MODE,
+    PULL_EVIDENCE_WINDOW_BARS,
     PULL_SUPPLY_VOLUME,
     PULL_ZONE_MAX_PCT,
     PXV_IMPLIES_BUY,
@@ -553,6 +554,17 @@ def _pull_supply_bar(bar: BarEvidence) -> bool:
     return str(bar.volume_expansion_state or "") == PULL_SUPPLY_VOLUME
 
 
+def _pull_supply_lookback(history: Sequence[BarEvidence]) -> Sequence[BarEvidence]:
+    """Bars before the confirmation pair inside the last 6 legal bars.
+
+    ``history`` ends at the second reclaim bar. The last two entries are that
+    pair and cannot themselves be the required prior pull. Lunch does not
+    insert bars, so a 11:25 contraction can still sit next to a 13:00 reclaim.
+    """
+    window = list(history[-PULL_EVIDENCE_WINDOW_BARS:])
+    return window[:-2]
+
+
 def _pull_ready(pair: Sequence[BarEvidence], history: Sequence[BarEvidence]) -> tuple[bool, str]:
     if any(bar.has_sell for bar in pair):
         return False, REASON_PULL_FAM_SELL
@@ -560,7 +572,7 @@ def _pull_ready(pair: Sequence[BarEvidence], history: Sequence[BarEvidence]) -> 
         return False, REASON_PULL_VOLUME_NOT_QUIET
     if not _gate_ok(pair):
         return False, REASON_DATA_UNUSABLE
-    if not any(_pull_supply_bar(bar) for bar in history):
+    if not any(_pull_supply_bar(bar) for bar in _pull_supply_lookback(history)):
         return False, REASON_PULL_NO_QUIET_SUPPLY
     return True, REASON_PULL_BUY_READY
 

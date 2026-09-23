@@ -59,6 +59,11 @@ QUIET_VOLUME = frozenset({"CONTRACTION", "NORMAL"})
 # Quiet-supply evidence inside a pull. NORMAL may confirm a hold; it is not
 # itself evidence that supply dried up.
 PULL_SUPPLY_VOLUME = "CONTRACTION"
+# Last N legal completed bars ending at the second reclaim bar.
+# The final two are the confirmation pair and do not count as prior pull
+# evidence, so a qualifying contraction can sit at most 4 completed bars
+# before that pair. Count is legal bars, not wall-clock minutes.
+PULL_EVIDENCE_WINDOW_BARS = 6
 
 # close_vs_ref_pct at or under this is the frozen EMA9 area (every close
 # below the ref is included). 1.0 is the existing daily PULL ĐẸP distance
