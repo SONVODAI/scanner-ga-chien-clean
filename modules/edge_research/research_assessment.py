@@ -52,6 +52,8 @@ class ResearchAssessment:
 
     branch_tools_attempted: Tuple[str, ...] = field(default_factory=tuple)
     branch_observation_codes: Tuple[str, ...] = field(default_factory=tuple)
+    observation_kind: str = ""
+    conditional_candidate: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -76,4 +78,6 @@ class ResearchAssessment:
             "actionable": self.actionable,
             "branch_tools_attempted": list(self.branch_tools_attempted),
             "branch_observation_codes": list(self.branch_observation_codes),
+            "observation_kind": self.observation_kind,
+            "conditional_candidate": self.conditional_candidate,
         }

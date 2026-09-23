@@ -1,0 +1,50 @@
+{
+  "session_ledger": {
+    "experiments_executed": 1,
+    "questions_generated": 2,
+    "candidate_actions_considered": 31,
+    "unique_outcome_specs": [
+      "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+    ],
+    "unique_population_specs": [
+      "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+    ],
+    "unique_research_frames": [],
+    "explanatory_features_tested": [],
+    "partitions_evaluated": 0,
+    "threshold_candidates_evaluated": 0,
+    "neighborhood_cuts_evaluated": 0,
+    "categorical_levels_evaluated": 0,
+    "interactions_attempted": 0,
+    "branch_depth_max": 1,
+    "refinements_reframes": 0,
+    "duplicate_experiments_blocked": 0,
+    "abandoned_branches": 0,
+    "falsification_experiments_executed": 0
+  },
+  "branch_ledgers": {
+    "obs-43f1b44e0643": {
+      "experiments_executed": 1,
+      "questions_generated": 2,
+      "candidate_actions_considered": 31,
+      "unique_outcome_specs": [
+        "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+      ],
+      "unique_population_specs": [
+        "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+      ],
+      "unique_research_frames": [],
+      "explanatory_features_tested": [],
+      "partitions_evaluated": 0,
+      "threshold_candidates_evaluated": 0,
+      "neighborhood_cuts_evaluated": 0,
+      "categorical_levels_evaluated": 0,
+      "interactions_attempted": 0,
+      "branch_depth_max": 1,
+      "refinements_reframes": 0,
+      "duplicate_experiments_blocked": 0,
+      "abandoned_branches": 0,
+      "falsification_experiments_executed": 0
+    }
+  }
+}

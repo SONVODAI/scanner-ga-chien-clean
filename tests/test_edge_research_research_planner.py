@@ -345,7 +345,13 @@ def test_exhausted_branch_stops():
     spec = _spec("date_decomposition")
     graph.experiment_index[compute_experiment_content_hash(spec)] = "E-dup"
     cands = generate_action_candidates(assess, graph, REGISTRY)
-    viable = [c for c in cands if not c.blocked and c.intent not in (ActionIntent.STOP.value, ActionIntent.ABANDON.value)]
+    viable = [
+        c
+        for c in cands
+        if not c.blocked
+        and c.intent
+        not in (ActionIntent.STOP.value, ActionIntent.STOP_SESSION.value, ActionIntent.ABANDON.value)
+    ]
     assert not viable
     plan = plan_next_action(assess, cands, graph)
     assert plan.decision_type in (PlanDecisionType.STOP, PlanDecisionType.ABANDON)
@@ -503,6 +509,7 @@ def test_multistep_session_abandon_after_fragility():
                 PlanDecisionType.ABANDON,
                 PlanDecisionType.STOP,
                 PlanDecisionType.EXPERIMENT,
+                PlanDecisionType.SWITCH_OPPORTUNITY,
             )
 
 

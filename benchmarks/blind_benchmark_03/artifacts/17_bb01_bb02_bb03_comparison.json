@@ -1,0 +1,110 @@
+{
+  "comparison_type": "architectural_behavior_only",
+  "no_human_edge_comparison": true,
+  "metrics_table": [
+    {
+      "metric": "experiments",
+      "bb01": 2,
+      "bb02": 12,
+      "bb03": 1
+    },
+    {
+      "metric": "pct_budget_used",
+      "bb01": 16.67,
+      "bb02": 100.0,
+      "bb03": 8.33
+    },
+    {
+      "metric": "features_touched",
+      "bb01": 0,
+      "bb02": 4,
+      "bb03": 0
+    },
+    {
+      "metric": "tools",
+      "bb01": 2,
+      "bb02": 6,
+      "bb03": 1
+    },
+    {
+      "metric": "research_frames_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03": 2
+    },
+    {
+      "metric": "outcome_specs_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03": 2
+    },
+    {
+      "metric": "population_specs_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03": 2
+    },
+    {
+      "metric": "observation_horizons_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03": 2
+    },
+    {
+      "metric": "frame_transitions",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03": 0
+    },
+    {
+      "metric": "outcome_reframes_executed",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03": 0
+    },
+    {
+      "metric": "population_reframes_executed",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03": 0
+    },
+    {
+      "metric": "outcome_to_population_executed",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03": 0
+    },
+    {
+      "metric": "falsifications",
+      "bb01": 1,
+      "bb02": 3,
+      "bb03": 0
+    },
+    {
+      "metric": "conditional_candidates",
+      "bb01": 0,
+      "bb02": 1,
+      "bb03": 1
+    },
+    {
+      "metric": "terminal_status",
+      "bb01": "ACTIVE",
+      "bb02": "BUDGET_EXHAUSTED",
+      "bb03": "ACTIVE"
+    },
+    {
+      "metric": "research_capability_score",
+      "bb01": 51,
+      "bb02": 87,
+      "bb03": 44
+    },
+    {
+      "metric": "reframing_capability_score",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03": 10
+    }
+  ],
+  "bb02_limitation_addressed": "BB02: 1 OutcomeSpec + 1 PopulationSpec despite feature exploration",
+  "bb03_primary_question": "Did Bot change the research frame (executed, not merely created)?"
+}

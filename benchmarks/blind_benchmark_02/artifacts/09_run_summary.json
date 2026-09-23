@@ -1,0 +1,19 @@
+{
+  "benchmark_id": "blind_benchmark_02",
+  "completed_at": "2026-08-21T12:03:13Z",
+  "session_id": "bb02-autonomous-001",
+  "session_status": "BUDGET_EXHAUSTED",
+  "session_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "remaining_budget": 0,
+    "unexplored_frontier_count": 12,
+    "features_touched": 4,
+    "eligible_features": 8
+  },
+  "experiments_used": 12,
+  "step_count": 12,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "artifact_dir": "benchmarks/blind_benchmark_02/artifacts",
+  "research_capability_score": 87
+}

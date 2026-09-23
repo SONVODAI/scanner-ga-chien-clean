@@ -18,6 +18,13 @@ from modules.edge_research.adapters import (
     load_lifecycle,
     load_verified_decisions,
 )
+from modules.edge_research.autonomous_research import (
+    AutonomousResearchConfig,
+    AutonomousResearchResult,
+    autonomous_research_enabled,
+    load_autonomous_research_session,
+    run_autonomous_research_session,
+)
 from modules.edge_research.challenger import ChallengerRunResult, run_challenger
 from modules.edge_research.contracts import ENGINE_VERSION, ROBUSTNESS_FRAGILE, ROBUSTNESS_PASS, ROBUSTNESS_REJECT
 from modules.edge_research.discovery import DiscoveryRunResult, run_discovery
@@ -317,3 +324,38 @@ class EdgeResearchEngine:
     def verify_learning_files_unchanged(before: Dict[str, Optional[str]]) -> bool:
         after = earning_learning_digests()
         return before == after
+
+    def is_autonomous_research_enabled(self) -> bool:
+        """Feature flag for PATCH 3D autonomous research entry point."""
+        return autonomous_research_enabled()
+
+    def run_autonomous_research(
+        self,
+        config: AutonomousResearchConfig,
+        *,
+        panel: Optional[pd.DataFrame] = None,
+        enabled: Optional[bool] = None,
+    ) -> AutonomousResearchResult:
+        """
+        Safe autonomous research session on read-only panel (PATCH 3D).
+
+        Does not mutate discovery/challenger ledgers or production paths.
+        """
+        self.initialize()
+        work_panel = panel if panel is not None else self.build_panel()
+        return run_autonomous_research_session(
+            work_panel,
+            config,
+            data_dir=self.data_dir,
+            enabled=enabled,
+        )
+
+    def load_autonomous_research_session(self, session_id: str) -> Any:
+        """Reload persisted research session graph."""
+        from modules.edge_research.research_graph import ResearchGraph
+
+        self.initialize()
+        graph = load_autonomous_research_session(session_id, data_dir=self.data_dir)
+        if not isinstance(graph, ResearchGraph):
+            raise TypeError("Expected ResearchGraph from session loader")
+        return graph

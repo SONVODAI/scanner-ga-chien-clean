@@ -1,0 +1,167 @@
+{
+  "benchmark_id": "blind_benchmark_02",
+  "categorical_variables": [],
+  "continuous_variables": [
+    "close",
+    "rs10",
+    "rs5",
+    "rs_spread",
+    "rsi14"
+  ],
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "date_coverage": {
+    "distinct_t0_dates": 22,
+    "max_trade_date": "2026-08-17",
+    "min_trade_date": "2026-07-23"
+  },
+  "eligible_explanatory_at_t0": [
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "breadth_score",
+      "reason": "eligible",
+      "role": "ordinal"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "close",
+      "reason": "eligible",
+      "role": "continuous"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "research_market_state",
+      "reason": "eligible",
+      "role": "context"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "research_market_transition",
+      "reason": "eligible",
+      "role": "context"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "rs10",
+      "reason": "eligible",
+      "role": "continuous"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "rs5",
+      "reason": "eligible",
+      "role": "continuous"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "rs_spread",
+      "reason": "eligible",
+      "role": "continuous"
+    },
+    {
+      "availability_horizon": 0,
+      "eligible_at_observation": true,
+      "field_name": "rsi14",
+      "reason": "eligible",
+      "role": "continuous"
+    }
+  ],
+  "eligible_outcome_fields": [
+    "t10_return",
+    "t3_return",
+    "t5_return"
+  ],
+  "eligible_population_fields": [
+    "close",
+    "group_rank",
+    "health_group",
+    "health_rank",
+    "health_score",
+    "obv_status",
+    "partition_group",
+    "research_market_state",
+    "research_market_transition",
+    "rs10",
+    "rs5",
+    "rs_spread",
+    "rsi14",
+    "rsi_slope",
+    "symbol",
+    "volume_ratio20"
+  ],
+  "generated_at": "2026-08-21T12:03:10Z",
+  "interpretation": "INVENTORY_ONLY_NO_RESEARCH_OPPORTUNITIES",
+  "inventory_type": "neutral_legal_research_universe",
+  "market_context_variables": [
+    "research_market_state",
+    "research_market_transition"
+  ],
+  "panel_fields": [
+    "breadth_score",
+    "breadth_t0",
+    "close",
+    "delta_breadth_1",
+    "delta_breadth_3",
+    "delta_mr_1",
+    "delta_mr_3",
+    "market_forecast",
+    "market_real",
+    "market_snapshot_ambiguous",
+    "market_snapshot_count",
+    "market_snapshot_time",
+    "median_rs10",
+    "median_rs5",
+    "mr_t0",
+    "mr_t_minus_1",
+    "mr_t_minus_2",
+    "mr_t_minus_3",
+    "outcome_missing_reason",
+    "outcome_source",
+    "pct_rs10_negative",
+    "pct_rs5_positive",
+    "pct_rsi_le_40",
+    "research_market_level",
+    "research_market_state",
+    "research_market_trajectory",
+    "research_market_transition",
+    "rs10",
+    "rs5",
+    "rs_spread",
+    "rsi14",
+    "symbol",
+    "t10_return",
+    "t3_return",
+    "t5_return",
+    "trade_date"
+  ],
+  "row_count": 3124,
+  "symbol_count": 142,
+  "temporal_availability_metadata": {
+    "close": 0,
+    "group_rank": 0,
+    "health_group": 0,
+    "health_rank": 0,
+    "health_score": 0,
+    "obv_status": 0,
+    "partition_group": 0,
+    "research_market_state": 0,
+    "research_market_transition": 0,
+    "rs10": 0,
+    "rs5": 0,
+    "rs_spread": 0,
+    "rsi14": 0,
+    "rsi_slope": 0,
+    "symbol": 0,
+    "t10_return": 10,
+    "t3_return": 3,
+    "t5_return": 5,
+    "trade_date": 0,
+    "volume_ratio20": 0
+  }
+}
