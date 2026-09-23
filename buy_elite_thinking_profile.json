@@ -2,45 +2,45 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "THINKING",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-09-23 20:54:21",
-  "completed_t5": 973,
-  "baseline_winrate": 0.3751,
+  "updated_at": "2026-09-24 06:39:41",
+  "completed_t5": 985,
+  "baseline_winrate": 0.3756,
   "observation": {
-    "date": "2026-09-23",
-    "time": "20:54:21",
-    "market_real": 6.3,
-    "market_forecast": 1.3,
-    "regime": "🟡 TRUNG TÍNH",
-    "regime_note": "Market trung tính: ưu tiên Pull/Early, mua nhỏ, stop gần.",
-    "signals_today": 30,
-    "top_watch": "SIP, HDB, GMD",
-    "avg_winprob": 67.5,
-    "avg_elite_score": 62.4,
-    "high_consensus_count": 11
+    "date": "2026-09-24",
+    "time": "06:39:41",
+    "market_real": 5.7,
+    "market_forecast": 0.8,
+    "regime": "🔴 MÙA ĐÔNG",
+    "regime_note": "Market yếu: chỉ lập watchlist, chưa giải ngân thật.",
+    "signals_today": 11,
+    "top_watch": "STB, HDB, DPM",
+    "avg_winprob": 51.7,
+    "avg_elite_score": 56.6,
+    "high_consensus_count": 4
   },
   "hypotheses": [
     "🟡 Market REAL >= 8: n=206, WinRate=29.1%, AvgT+5=-1.11, lệch baseline -8.4% → GIẢ THUYẾT MẠNH",
-    "🟠 Market REAL < 6: n=332, WinRate=43.1%, AvgT+5=-0.96, lệch baseline 5.6% → GIẢ THUYẾT"
+    "🟠 Market REAL < 6: n=344, WinRate=43.0%, AvgT+5=-0.95, lệch baseline 5.5% → GIẢ THUYẾT"
   ],
   "beliefs": [],
   "reflections": [
     "🪞 Chưa có đủ mẫu để phản biện một niềm tin cụ thể. Bot giữ thái độ: mọi kết luận chỉ đúng cho đến khi dữ liệu mới chứng minh điều ngược lại."
   ],
   "current_thought": "🟡 Market REAL >= 8: n=206, WinRate=29.1%, AvgT+5=-1.11, lệch baseline -8.4% → GIẢ THUYẾT MẠNH",
-  "note": "Thinking Engine V3.1 đang ở chế độ THINKING. Baseline WinRate T+5 = 37.5%, Avg T+5 = -0.93%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
-  "avg_t5_return": -0.933,
+  "note": "Thinking Engine V3.1 đang ở chế độ THINKING. Baseline WinRate T+5 = 37.6%, Avg T+5 = -0.93%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
+  "avg_t5_return": -0.928,
   "observations": [
-    "⚪ Nhóm Break: n=4, WinRate=25.0%, AvgT+5=-0.17, lệch baseline -12.5% → QUAN SÁT",
-    "⚪ Storm >= 15: n=76, WinRate=27.6%, AvgT+5=-0.37, lệch baseline -9.9% → QUAN SÁT",
+    "⚪ RSI > 72: n=4, WinRate=25.0%, AvgT+5=-1.6, lệch baseline -12.6% → QUAN SÁT",
+    "⚪ Nhóm Break: n=4, WinRate=25.0%, AvgT+5=-0.17, lệch baseline -12.6% → QUAN SÁT",
+    "⚪ Storm >= 15: n=77, WinRate=27.3%, AvgT+5=-0.39, lệch baseline -10.3% → QUAN SÁT",
     "⚪ Xa EMA9 >4%: n=9, WinRate=33.3%, AvgT+5=-0.16, lệch baseline -4.2% → QUAN SÁT",
-    "⚪ RSI > 72: n=3, WinRate=33.3%, AvgT+5=-1.37, lệch baseline -4.2% → QUAN SÁT",
     "⚪ Market REAL >= 6: n=641, WinRate=34.6%, AvgT+5=-0.92, lệch baseline -2.9% → QUAN SÁT",
-    "⚪ Storm trong Mùa Đông: n=162, WinRate=35.2%, AvgT+5=-1.57, lệch baseline -2.3% → QUAN SÁT",
-    "⚪ Pull trong Mùa Đông: n=188, WinRate=39.4%, AvgT+5=-1.41, lệch baseline 1.8% → QUAN SÁT",
-    "⚪ Có Storm xác nhận: n=387, WinRate=35.9%, AvgT+5=-1.07, lệch baseline -1.6% → QUAN SÁT",
-    "⚪ Persistence >= 3.5: n=225, WinRate=39.1%, AvgT+5=-0.52, lệch baseline 1.6% → QUAN SÁT",
-    "⚪ Persistence >= 5.0: n=31, WinRate=38.7%, AvgT+5=-0.74, lệch baseline 1.2% → QUAN SÁT",
-    "⚪ Nhóm Pull: n=448, WinRate=38.4%, AvgT+5=-0.98, lệch baseline 0.9% → QUAN SÁT",
-    "⚪ RSI 55-65: n=560, WinRate=38.2%, AvgT+5=-1.07, lệch baseline 0.7% → QUAN SÁT"
+    "⚪ Pull trong Mùa Đông: n=198, WinRate=39.9%, AvgT+5=-1.36, lệch baseline 2.3% → QUAN SÁT",
+    "⚪ Persistence >= 5.0: n=33, WinRate=39.4%, AvgT+5=-0.86, lệch baseline 1.8% → QUAN SÁT",
+    "⚪ Persistence >= 3.5: n=227, WinRate=39.2%, AvgT+5=-0.54, lệch baseline 1.6% → QUAN SÁT",
+    "⚪ Storm trong Mùa Đông: n=171, WinRate=36.3%, AvgT+5=-1.48, lệch baseline -1.3% → QUAN SÁT",
+    "⚪ Có Storm xác nhận: n=396, WinRate=36.4%, AvgT+5=-1.04, lệch baseline -1.2% → QUAN SÁT",
+    "⚪ Nhóm Pull: n=458, WinRate=38.6%, AvgT+5=-0.97, lệch baseline 1.1% → QUAN SÁT",
+    "⚪ RSI 55-65: n=568, WinRate=38.4%, AvgT+5=-1.09, lệch baseline 0.8% → QUAN SÁT"
   ]
 }
