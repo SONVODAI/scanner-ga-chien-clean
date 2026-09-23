@@ -23,12 +23,23 @@ from modules.live_camera_shadow.when_schedule import (
     is_live_when_window,
     live_when_fire_clocks,
 )
+from modules.intraday_pxv_v1.constants import EV_STRENGTHEN
 from modules.live_candidate_v2_action.contract import (
     ALERT_ELIGIBLE,
     CANDIDATE_IS_BUY,
     PXV_IMPLIES_BUY,
+    REASON_CHRONOLOGY_PRE_ELIGIBLE,
+    REASON_MANH_BUY_READY,
+    REASON_PULL_BUY_READY,
+    REASON_SESSION_RESET,
+    REASON_UNFINISHED,
     STATE_BUY_READY,
 )
+from modules.live_candidate_v2_action.state import (
+    evaluate_shadow_action,
+    evaluation_trading_session,
+)
+from tests.test_lcv2_action_layer_shadow import _bar, _nom
 from modules.live_candidate_v2_action.live_universe import (
     ACTIONABLE_LIVE_SETUPS,
     document_rows_for_live_when,
@@ -588,6 +599,204 @@ def test_replay_2026_09_23_universe_counts_only():
         assert len(selected.fetch) <= LIVE_UNIVERSE_CAP
         assert len(selected.fetch) * (60.0 / GUEST_RPM) < 300
     assert 17 <= 23 <= LIVE_UNIVERSE_CAP
+
+
+def _rollover_nom(setup: str = "PULL VỪA", *, symbol: str = "BVH"):
+    """Scan date D, first_seen after D cash close, eligible at D+1 09:15."""
+    kwargs = dict(
+        symbol=symbol,
+        session="2026-09-22",
+        first="2026-09-22T15:22:00+07:00",
+        eligible="2026-09-23T09:15:00+07:00",
+        ema9=27.1,
+        market="OK",
+    )
+    if setup == "MUA BREAK":
+        kwargs.update(ema9=None, breakout=27.0, ref="BREAKOUT_REF")
+    return _nom(setup, **kwargs)
+
+
+def _pull_pair(day: str, hms=("09:15", "09:20")):
+    return [
+        _bar(hms[0], day=day, close_vs_ref=20, vol_state="CONTRACTION"),
+        _bar(hms[1], day=day, close_vs_ref=40, vol_state="NORMAL"),
+    ]
+
+
+def _manh_pair(day: str):
+    return [
+        _bar(
+            "09:15",
+            day=day,
+            close_vs_ref=50,
+            published="NEUTRAL",
+            vol_state="EXPANSION",
+            pxv="CONFIRMING",
+        ),
+        _bar(
+            "09:20",
+            day=day,
+            close_vs_ref=80,
+            published=EV_STRENGTHEN,
+            vol_state="EXPANSION",
+            pxv="CONFIRMING",
+        ),
+    ]
+
+
+def _break_pair(day: str):
+    return [
+        _bar(
+            "09:15",
+            day=day,
+            close_vs_ref=30,
+            published="NEUTRAL",
+            ref_state="BREAKOUT_REF",
+            ref_kind="BREAKOUT_REF",
+        ),
+        _bar(
+            "09:20",
+            day=day,
+            close_vs_ref=60,
+            published=EV_STRENGTHEN,
+            ref_state="BREAKOUT_REF",
+            ref_kind="BREAKOUT_REF",
+        ),
+    ]
+
+
+def test_rollover_pull_uses_eligible_from_trading_date():
+    nom = _rollover_nom("PULL VỪA")
+    assert nom.session == "2026-09-22"
+    assert evaluation_trading_session(nom) == "2026-09-23"
+    prior = evaluate_shadow_action(
+        nom,
+        _pull_pair("2026-09-22", ("14:30", "14:40")),
+    )
+    assert prior.action_state != STATE_BUY_READY
+    assert prior.n_legal_bars == 0
+    before_open = evaluate_shadow_action(
+        nom,
+        [_bar("09:10", day=DAY, close_vs_ref=20, vol_state="NORMAL")],
+    )
+    assert before_open.action_state != STATE_BUY_READY
+    assert REASON_CHRONOLOGY_PRE_ELIGIBLE in before_open.notes
+    unfinished = evaluate_shadow_action(
+        nom,
+        [_bar("09:20", day=DAY, close_vs_ref=40, vol_state="NORMAL", unfinished=True, completed=False)],
+    )
+    assert unfinished.action_state != STATE_BUY_READY
+    assert REASON_UNFINISHED in unfinished.notes
+    ready = evaluate_shadow_action(nom, _pull_pair(DAY))
+    assert ready.action_state == STATE_BUY_READY
+    assert ready.action_reason == REASON_PULL_BUY_READY
+    assert ready.n_legal_bars == 2
+    assert ready.session == "2026-09-22"
+    assert ready.candidate_is_buy is False
+    assert ready.pxv_implies_buy is False
+    assert ready.alert_eligible is False
+
+
+def test_rollover_manh_and_break_keep_existing_confirmation():
+    manh = evaluate_shadow_action(_rollover_nom("CP MẠNH"), _manh_pair(DAY))
+    assert manh.action_state == STATE_BUY_READY
+    assert manh.action_reason == REASON_MANH_BUY_READY
+    assert manh.candidate_is_buy is False
+    blocked = evaluate_shadow_action(_rollover_nom("CP MẠNH"), _manh_pair("2026-09-22"))
+    assert blocked.action_state != STATE_BUY_READY
+    assert blocked.n_legal_bars == 0
+
+    brk = evaluate_shadow_action(_rollover_nom("MUA BREAK"), _break_pair(DAY))
+    assert brk.action_state == STATE_BUY_READY
+    assert brk.action_reason == REASON_MANH_BUY_READY
+    assert brk.session == "2026-09-22"
+    assert brk.pxv_implies_buy is False
+    assert brk.alert_eligible is False
+
+
+def test_same_day_evaluation_session_matches_provenance():
+    nom = _nom(session=DAY, first=f"{DAY}T09:00:00+07:00", eligible=f"{DAY}T09:00:00+07:00")
+    assert evaluation_trading_session(nom) == DAY
+    assert evaluation_trading_session(nom) == nom.session
+    ready = evaluate_shadow_action(nom, _pull_pair(DAY))
+    assert ready.action_state == STATE_BUY_READY
+    assert ready.action_reason == REASON_PULL_BUY_READY
+    next_day = evaluate_shadow_action(nom, _pull_pair("2026-09-24"))
+    assert next_day.action_state != STATE_BUY_READY
+    assert REASON_SESSION_RESET in next_day.notes
+    assert next_day.n_legal_bars == 0
+
+
+def test_rollover_does_not_accept_other_sessions():
+    nom = _rollover_nom()
+    older = evaluate_shadow_action(nom, _pull_pair("2026-09-21", ("10:00", "10:05")))
+    assert older.n_legal_bars == 0
+    assert older.action_state != STATE_BUY_READY
+    scan_day = evaluate_shadow_action(nom, _pull_pair("2026-09-22", ("10:00", "10:05")))
+    assert scan_day.n_legal_bars == 0
+    future = evaluate_shadow_action(nom, _pull_pair("2026-09-24"))
+    assert future.n_legal_bars == 0
+    assert REASON_SESSION_RESET in future.notes
+    unfinished = evaluate_shadow_action(
+        nom,
+        [
+            *_pull_pair(DAY),
+            _bar("09:25", day=DAY, close_vs_ref=40, vol_state="NORMAL", unfinished=True, completed=False),
+        ],
+    )
+    assert unfinished.action_state == STATE_BUY_READY
+    assert unfinished.n_legal_bars == 2
+    assert REASON_UNFINISHED in unfinished.notes
+
+
+def test_rollover_live_buy_ready_is_retained_when_symbol_leaves(tmp_path):
+    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    provider = MockProvider({("BVH", DAY): _quiet_bars()})
+    feed = _feed(tmp_path, provider, clock["now"])
+    feed.now_fn = lambda: clock["now"]
+    row = _row(
+        "BVH",
+        "PULL VỪA",
+        session="2026-09-22",
+        first="2026-09-22T15:22:00+07:00",
+        eligible=f"{DAY}T09:15:00+07:00",
+        ema9=27.0,
+        breakout=28.0,
+    )
+    feed.run_v2_when_cycle(sidecar_rows=[row])
+    state = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    assert state["rows"][0]["shadow_action"] == STATE_BUY_READY
+    assert state["rows"][0]["session"] == "2026-09-22"
+    assert state["rows"][0]["candidate_is_buy"] is False
+    assert state["rows"][0]["pxv_implies_buy"] is False
+    assert state["rows"][0]["alert_eligible"] is False
+    trigger = state["rows"][0]["trigger_bar_ts"]
+    price = state["rows"][0]["trigger_price"]
+
+    clock["now"] = _ts(f"{DAY} 09:35:45")
+    sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
+    status = feed.run_v2_when_cycle(sidecar_rows=[sweet])
+    current = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    assert status["published_empty"] is True
+    assert current["rows"] == []
+    kept = current["historical_buy_ready"][0]
+    assert kept["symbol"] == "BVH"
+    assert kept["shadow_action"] == STATE_BUY_READY
+    assert kept["trigger_bar_ts"] == trigger
+    assert kept["trigger_price"] == price
+    assert kept["source"] == "brain_a_scan_setup"
+    assert kept["setup"] == "PULL VỪA"
+    assert kept["session"] == "2026-09-22"
+    assert kept["candidate_is_buy"] is False
+    assert kept["pxv_implies_buy"] is False
+    assert kept["alert_eligible"] is False
+
+
+def test_post_close_selector_still_drops_scan_date_rows():
+    row = _row("BVH", "PULL VỪA", session="2026-09-22", eligible=f"{DAY}T09:15:00+07:00")
+    assert current_session_v2_rows([row], DAY) == []
+    kept, _ = document_rows_for_live_when(_doc([row]), session=DAY)
+    assert kept[0]["session"] == "2026-09-22"
 
 
 def test_state_machine_module_was_not_rewritten_for_live_when():

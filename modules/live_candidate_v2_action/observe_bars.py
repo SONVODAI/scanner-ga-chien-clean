@@ -15,7 +15,11 @@ from modules.intraday_pxv_v1.interpret import interpret_asof
 from modules.intraday_pxv_v1.time_contract import asof_allowed, parse_legal_ts, resolve_legal_existence
 from modules.live_candidate.calendar import as_vn
 from modules.live_camera_shadow.bars import completed_to_overlay, is_completed_bar
-from modules.live_candidate_v2_action.state import BarEvidence, FrozenNomination
+from modules.live_candidate_v2_action.state import (
+    BarEvidence,
+    FrozenNomination,
+    evaluation_trading_session,
+)
 from modules.live_candidate_v2_camera.feed_pass import v2_event_reason, v2_nomination_source
 from modules.live_candidate_v2_camera.observe import observe_close_vs_ref
 
@@ -189,9 +193,15 @@ def interpret_legal_history(
     """Walk legal completed bars with a fresh debouncer — live and replay share this."""
     if parse_legal_ts(nom.candidate_first_seen_ts) is None:
         return []
-    session = date.fromisoformat(str(nom.session)[:10]) if nom.session else as_vn(
-        legal_completed[0]["bar_ts"]
-    ).date()
+    # Provenance session stays on the nomination. P×V existence uses the
+    # evaluation trading date so a next-open carry is usable without reading now.
+    action_day = evaluation_trading_session(nom)
+    if action_day:
+        session = date.fromisoformat(action_day)
+    elif nom.session:
+        session = date.fromisoformat(str(nom.session)[:10])
+    else:
+        session = as_vn(legal_completed[0]["bar_ts"]).date()
     event = _candidate_event(nom, session)
     legal = resolve_legal_existence(event)
     overlay_df = overlay if overlay is not None else overlay_from_records(legal_completed)

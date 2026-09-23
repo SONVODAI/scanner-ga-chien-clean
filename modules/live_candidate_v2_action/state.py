@@ -400,6 +400,26 @@ def _no_observation_reason(observation_reason: str) -> str:
     return REASON_NO_OBSERVATION_MISSING_CAMERA
 
 
+def evaluation_trading_session(nom: FrozenNomination) -> str:
+    """Cash-session date a legal 5m bar must belong to.
+
+    ``nom.session`` remains the freeze / scan provenance key. It is not
+    rewritten. ``eligible_from`` is the chronology clock from
+    ``episode_window``: a discovery after the provenance cash close is
+    eligible at the next session open, and live bars belong to that date.
+    An ``eligible_from`` earlier than the provenance date does not pull
+    the guard backward. This does not read ``now``.
+    """
+    provenance = str(nom.session or "")[:10]
+    eligible = parse_legal_ts(nom.eligible_from)
+    if eligible is None:
+        return provenance
+    elig_day = as_vn(eligible).date().isoformat()
+    if provenance and elig_day < provenance:
+        return provenance
+    return elig_day or provenance
+
+
 def _legal_history(
     nom: FrozenNomination,
     history: Sequence[BarEvidence | Mapping[str, Any]],
@@ -417,6 +437,7 @@ def _legal_history(
         notes.append(REASON_DATE_ONLY)
         return [], notes
 
+    action_session = evaluation_trading_session(nom)
     out: list[BarEvidence] = []
     for raw in history:
         bar = raw if isinstance(raw, BarEvidence) else bar_evidence_from_mapping(raw)
@@ -432,7 +453,7 @@ def _legal_history(
         if bar.asof < first:
             notes.append(REASON_CHRONOLOGY_PRE_ELIGIBLE)
             continue
-        if nom.session and as_vn(bar.asof).date().isoformat() != str(nom.session)[:10]:
+        if action_session and as_vn(bar.asof).date().isoformat() != action_session:
             notes.append(REASON_SESSION_RESET)
             continue
         out.append(bar)
