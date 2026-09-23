@@ -304,6 +304,141 @@ def test_empty_universe_clears_current_rows(tmp_path):
     assert all("BVH" not in str(frame) for frame in stale.frames)
 
 
+def _quiet_bars() -> list[dict]:
+    """Three completed bars. Equal volume stays NORMAL; close sits above EMA9."""
+    rows = []
+    for hm in ("09:15", "09:20", "09:25"):
+        rows.append(
+            {
+                "time": f"{DAY} {hm}:00",
+                "open": 27.15,
+                "high": 27.30,
+                "low": 27.10,
+                "close": 27.20,
+                "volume": 1000,
+            }
+        )
+    return rows
+
+
+def _below_ref_bars() -> list[dict]:
+    rows = []
+    for hm in ("09:15", "09:20", "09:25"):
+        rows.append(
+            {
+                "time": f"{DAY} {hm}:00",
+                "open": 20.05,
+                "high": 20.15,
+                "low": 19.90,
+                "close": 20.00,
+                "volume": 1000,
+            }
+        )
+    return rows
+
+
+def _feed(tmp_path, provider, now: datetime) -> LiveShadowFeed:
+    return LiveShadowFeed(
+        provider=provider,
+        out_dir=tmp_path,
+        now_fn=lambda: now,
+        archive_root=tmp_path / "archive",
+        action_out_dir=tmp_path / "v2_action",
+    )
+
+
+def test_departed_buy_ready_is_historical_only(tmp_path):
+    """Cycle N mints SHADOW BUY_READY. Cycle N+1 drops that symbol."""
+    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    provider = MockProvider({("BVH", DAY): _quiet_bars(), ("HPG", DAY): _below_ref_bars()})
+    feed = _feed(tmp_path, provider, clock["now"])
+    feed.now_fn = lambda: clock["now"]
+    bvh = _row("BVH", "PULL VỪA", session=DAY, first=f"{DAY}T09:00:00+07:00", ema9=27.0, breakout=28.0)
+    hpg = _row("HPG", "PULL ĐẸP", session=DAY, first=f"{DAY}T09:00:00+07:00", ema9=27.0, breakout=28.0)
+    first = feed.run_v2_when_cycle(sidecar_rows=[bvh, hpg])
+    state = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    by_symbol = {rec["symbol"]: rec for rec in state["rows"]}
+    assert by_symbol["BVH"]["shadow_action"] == STATE_BUY_READY
+    assert by_symbol["HPG"]["shadow_action"] != STATE_BUY_READY
+    assert first["candidate_is_buy"] is False
+
+    clock["now"] = _ts(f"{DAY} 09:35:45")
+    second = feed.run_v2_when_cycle(sidecar_rows=[hpg])
+    current = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    assert second["published_empty"] is False
+    assert [rec["symbol"] for rec in current["rows"]] == ["HPG"]
+    assert all(rec["shadow_action"] != STATE_BUY_READY for rec in current["rows"])
+    ready = current["historical_buy_ready"]
+    assert [rec["symbol"] for rec in ready] == ["BVH"]
+    kept = ready[0]
+    assert kept["shadow_action"] == STATE_BUY_READY
+    assert kept["trigger_bar_ts"]
+    assert kept["trigger_price"] == 27200
+    assert kept["source"] == "brain_a_scan_setup"
+    assert kept["setup"] == "PULL VỪA"
+    assert kept["frozen_ref_kind"] == "EMA9"
+    assert kept["frozen_ref_value"] == 27.0
+    assert kept["published_evidence"]
+    assert kept["volume_expansion_state"] in {"NORMAL", "CONTRACTION"}
+    assert kept["market_permission"] == "OK"
+    assert kept["action_reason"]
+    assert kept["candidate_is_buy"] is False
+    assert kept["pxv_implies_buy"] is False
+    assert kept["alert_eligible"] is False
+    assert current["candidate_is_buy"] is False
+    assert current["pxv_implies_buy"] is False
+    assert current["alert_eligible"] is False
+
+    fresh = _St()
+    render_v2_shadow_action_panel(current, st_module=fresh)
+    assert VALIDATION_TITLE not in "\n".join(fresh.markdowns)
+    assert all("BVH" not in str(frame) for frame in fresh.frames)
+
+    current["observed_at"] = f"{DAY}T09:00:00+07:00"
+    (tmp_path / "v2_action" / "v2_action_state.json").write_text(json.dumps(current), encoding="utf-8")
+    stale = _St()
+    render_v2_shadow_action_panel(
+        None,
+        st_module=stale,
+        artifact_dir=tmp_path / "v2_action",
+        now=clock["now"],
+    )
+    assert any(VALIDATION_TITLE in line for line in stale.markdowns)
+    table = stale.frames[0]
+    assert table[0]["Symbol"] == "BVH"
+    assert table[0]["Source"] == "brain_a_scan_setup"
+    assert table[0]["Setup"] == "PULL VỪA"
+    assert str(table[0]["Trigger time"])
+    assert table[0]["Trigger price"] == 27200
+    assert "EMA9" in str(table[0]["Frozen ref"])
+    assert "NORMAL" in str(table[0]["Volume/P×V evidence"]) or "CONTRACTION" in str(table[0]["Volume/P×V evidence"])
+    assert table[0]["Market permission"] == "OK"
+    assert table[0]["Reason"]
+    assert all(row.get("Symbol") != "HPG" for row in table)
+
+
+def test_departed_wait_is_not_historical_validation(tmp_path):
+    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    provider = MockProvider({("STB", DAY): _below_ref_bars()})
+    feed = _feed(tmp_path, provider, clock["now"])
+    feed.now_fn = lambda: clock["now"]
+    stb = _row("STB", "PULL VỪA", session=DAY, first=f"{DAY}T09:00:00+07:00", ema9=27.0, breakout=28.0)
+    feed.run_v2_when_cycle(sidecar_rows=[stb])
+    state = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    assert state["rows"][0]["symbol"] == "STB"
+    assert state["rows"][0]["shadow_action"] == "WAIT"
+
+    clock["now"] = _ts(f"{DAY} 09:35:45")
+    sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
+    status = feed.run_v2_when_cycle(sidecar_rows=[sweet])
+    current = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    assert status["published_empty"] is True
+    assert current["rows"] == []
+    assert current.get("historical_buy_ready") == []
+    assert historical_buy_ready_rows(current) == []
+    assert "STB" not in json.dumps(current["rows"])
+
+
 def test_overlap_lock_skips_second_cycle(tmp_path):
     held = LiveWhenLock(tmp_path)
     assert held.acquire() is True

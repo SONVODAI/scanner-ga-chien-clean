@@ -405,6 +405,7 @@ class LiveShadowFeed:
             self._v2_action_items = []
             previous_stale = self._stale_fn
             self._stale_fn = classify_stale_ignoring_lunch
+            prior_ready = self._prior_buy_ready_rows()
             try:
                 for rec in universe.not_yet:
                     self.statuses.append(
@@ -437,6 +438,7 @@ class LiveShadowFeed:
                 for rec in list(universe.fetch):
                     self._process_symbol(rec, now=now, session=session)
                 self._flush(now=now, session=session)
+                self._retain_departed_buy_ready(prior_ready)
             finally:
                 self._stale_fn = previous_stale
             payload = self.status_payload(now=now, session=session)
@@ -593,6 +595,53 @@ class LiveShadowFeed:
         self._write_json(path, doc)
         self._v2_action_publish = "EMPTY"
         self._v2_action_publish_detail = str(path)
+        dest = resolve_shadow_store(self.shadow_store_dir)
+        if dest is not None:
+            from modules.live_shadow_transport.shadow_store import publish_v2_action_state
+
+            publish_v2_action_state(path, dest)
+
+    def _retain_departed_buy_ready(self, prior_ready: list[dict[str, Any]]) -> None:
+        """Keep a prior SHADOW BUY_READY after its symbol leaves the current rows.
+
+        WAIT / NOMINATED / WEAKENED are not copied. A symbol that is still
+        in the current document stays current and is not duplicated here.
+        """
+        if not prior_ready:
+            return
+        path = (self.action_out_dir or (self.out_dir / "v2_action")) / "v2_action_state.json"
+        if not path.exists():
+            return
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return
+        if not isinstance(doc, dict):
+            return
+        current = {
+            str(rec.get("symbol") or "").upper()
+            for rec in (doc.get("rows") or [])
+            if isinstance(rec, dict)
+        }
+        kept: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for rec in prior_ready:
+            symbol = str(rec.get("symbol") or "").upper()
+            if not symbol or symbol in current:
+                continue
+            if rec.get("candidate_is_buy") is True or rec.get("alert_eligible") is True:
+                continue
+            if rec.get("pxv_implies_buy") is True:
+                continue
+            marker = f"{symbol}|{rec.get('trigger_bar_ts') or rec.get('last_legal_bar_ts') or ''}"
+            if marker in seen:
+                continue
+            seen.add(marker)
+            kept.append(dict(rec))
+        if not kept:
+            return
+        doc["historical_buy_ready"] = kept
+        self._write_json(path, doc)
         dest = resolve_shadow_store(self.shadow_store_dir)
         if dest is not None:
             from modules.live_shadow_transport.shadow_store import publish_v2_action_state
