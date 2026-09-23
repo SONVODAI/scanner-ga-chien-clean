@@ -28,6 +28,11 @@ VN = ZoneInfo("Asia/Ho_Chi_Minh")
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Isolated live 5m Camera → P×V shadow sweep")
     p.add_argument("--live", action="store_true", help="Call KBS/vnstock (default: refuse without --live)")
+    p.add_argument(
+        "--v2-when",
+        action="store_true",
+        help="V2 actionable universe only (PULL/MẠNH/BREAK). No Elite poll.",
+    )
     p.add_argument("--watchlist", type=Path, default=None, help="Dynamic Watchlist JSON (overrides GitHub fetch)")
     p.add_argument("--v2-sidecar", type=Path, default=None, help="V2 Camera sidecar file (overrides GitHub fetch)")
     p.add_argument("--out", type=Path, default=None, help="Isolated shadow output dir")
@@ -52,6 +57,20 @@ def main(argv: list[str] | None = None) -> int:
             "No archive writes. No alerts.",
             file=sys.stderr,
         )
+        if args.v2_when:
+            from modules.live_camera_shadow.when_schedule import live_when_fire_clocks
+
+            print(
+                json.dumps(
+                    {
+                        "mode": "v2_when_dry_run",
+                        "kbs_polled": False,
+                        "fires": [f"{h:02d}:{m:02d}:{s:02d}" for h, m, s in live_when_fire_clocks()],
+                    },
+                    ensure_ascii=False,
+                ),
+                file=sys.stderr,
+            )
         return 0
 
     from modules.intraday_memory.provider import KBSProvider
@@ -76,6 +95,13 @@ def main(argv: list[str] | None = None) -> int:
         v2_sidecar_path=v2_path,
         v2_sidecar_source=v2_source,
     )
+    if args.v2_when:
+        feed = LiveShadowFeed(**feed_kwargs, watchlist_source="unused")
+        status = feed.run_v2_when_cycle()
+        print(json.dumps(status, ensure_ascii=False, indent=2, default=str))
+        if status.get("candidate_is_buy") is True or status.get("alert_eligible") is True:
+            return 2
+        return int(status.get("exit_code") or 0)
     if args.watchlist:
         rows = load_watchlist_rows(args.watchlist)
         feed = LiveShadowFeed(

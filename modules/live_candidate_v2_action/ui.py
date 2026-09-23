@@ -189,10 +189,22 @@ def historical_buy_ready_rows(doc: Mapping[str, Any] | None) -> list[Mapping[str
         return []
     if doc.get("candidate_is_buy") is True or doc.get("alert_eligible") is True or doc.get("pxv_implies_buy") is True:
         return []
-    rows = doc.get("rows")
-    if not isinstance(rows, list):
-        return []
-    return [rec for rec in rows if isinstance(rec, Mapping) and _is_buy_ready_row(rec)]
+    collected: list[Mapping[str, Any]] = []
+    seen: set[str] = set()
+    for key in ("historical_buy_ready", "rows"):
+        rows = doc.get(key)
+        if not isinstance(rows, list):
+            continue
+        for rec in rows:
+            if not isinstance(rec, Mapping) or not _is_buy_ready_row(rec):
+                continue
+            symbol = str(rec.get("symbol") or "")
+            marker = f"{symbol}|{rec.get('trigger_bar_ts') or rec.get('last_legal_bar_ts') or ''}"
+            if marker in seen:
+                continue
+            seen.add(marker)
+            collected.append(rec)
+    return collected
 
 
 def _pxv_evidence(rec: Mapping[str, Any]) -> str:

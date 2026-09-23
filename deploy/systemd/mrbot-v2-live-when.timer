@@ -1,0 +1,18 @@
+[Unit]
+Description=Mr.BOT V2 live SHADOW WHEN after each completed cash-session 5m slot
+Requires=mrbot-v2-live-when.service
+
+[Timer]
+# +45s after each completed slot. Morning 09:20–11:30, afternoon 13:05–14:50 ICT.
+# No lunch. No post-close. Separate from the archive collector and the
+# post-close Action observer.
+OnCalendar=Mon..Fri *-*-* 09:20,25,30,35,40,45,50,55:45 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 10:00,05,10,15,20,25,30,35,40,45,50,55:45 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 11:00,05,10,15,20,25,30:45 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 13:05,10,15,20,25,30,35,40,45,50,55:45 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 14:00,05,10,15,20,25,30,35,40,45,50:45 Asia/Ho_Chi_Minh
+Persistent=false
+Unit=mrbot-v2-live-when.service
+
+[Install]
+WantedBy=timers.target

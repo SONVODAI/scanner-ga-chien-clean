@@ -26,16 +26,28 @@ from modules.live_candidate.calendar import as_vn
 from modules.live_candidate.watchlist import WATCHLIST_NAME, output_root
 from modules.live_camera_shadow.bars import (
     classify_stale,
+    classify_stale_ignoring_lunch,
     completed_to_overlay,
     validate_live_records,
 )
+from modules.live_camera_shadow.cycle_lock import (
+    EXIT_ALREADY_RUNNING,
+    REASON_ALREADY_RUNNING,
+    LiveWhenLock,
+)
+from modules.live_camera_shadow.when_schedule import is_live_when_window
 from modules.live_camera_shadow.rate import GUEST_RPM, LIVE_UNIVERSE_CAP, rate_report
 from modules.live_camera_shadow.universe import eligible_watchlist_symbols
-from modules.live_candidate_v2_action.artifact import persist_cycle
+from modules.live_candidate_v2_action.artifact import persist_cycle, state_document
 from modules.live_candidate_v2_action.contract import (
     ENV_V2_SIDECAR,
     ENV_V2_SIDECAR_SOURCE,
     OVERLAY_TRUTH_CANONICAL,
+    STATE_BUY_READY,
+)
+from modules.live_candidate_v2_action.live_universe import (
+    document_rows_for_live_when,
+    select_actionable_v2,
 )
 from modules.live_candidate_v2_action.sidecar_source import (
     SOURCE_FILE,
@@ -189,6 +201,7 @@ class LiveShadowFeed:
             self.shadow_store_dir = Path(self.shadow_store_dir)
         self._emitted = self._load_json_set(EMITTED_NAME)
         self._debounce = self._load_json(DEBOUNCE_NAME) or {}
+        self._stale_fn = classify_stale
 
     def _resolve_watchlist(self, watchlist: Iterable[dict[str, Any]] | None) -> list[dict[str, Any]]:
         """In-memory list wins. GitHub fetch never falls back to a stale local file."""
@@ -319,6 +332,272 @@ class LiveShadowFeed:
 
         self._flush(now=now, session=session)
         return self.status_payload(now=now, session=session)
+
+    def run_v2_when_cycle(
+        self,
+        *,
+        sidecar_document: dict[str, Any] | None = None,
+        sidecar_rows: list[dict[str, Any]] | None = None,
+        enforce_window: bool = True,
+    ) -> dict[str, Any]:
+        """One SHADOW WHEN cycle over a frozen actionable V2 snapshot.
+
+        Does not read the Elite watchlist. Does not write the Camera archive.
+        A held live-when lock skips the cycle without calling KBS.
+        """
+        now = as_vn(self.now_fn())
+        session = now.date()
+        lock = LiveWhenLock(self.out_dir)
+        if not lock.acquire():
+            return self._when_skip(
+                now=now,
+                session=session,
+                reason=REASON_ALREADY_RUNNING,
+                exit_code=EXIT_ALREADY_RUNNING,
+            )
+        try:
+            if enforce_window and not is_live_when_window(now):
+                return self._when_skip(
+                    now=now,
+                    session=session,
+                    reason="OUTSIDE_LIVE_WINDOW",
+                    exit_code=0,
+                )
+            rows, reason = self._frozen_v2_when_rows(
+                session=session,
+                sidecar_document=sidecar_document,
+                sidecar_rows=sidecar_rows,
+            )
+            if reason:
+                return self._when_skip(
+                    now=now,
+                    session=session,
+                    reason=reason,
+                    exit_code=0,
+                )
+            universe = select_actionable_v2(rows, now=now, cap=self.hard_cap)
+            self._v2_union = {
+                "policy": "v2_actionable_only",
+                "n_actionable": universe.n_actionable,
+                "n_fetch": len(universe.fetch),
+                "n_not_yet": len(universe.not_yet),
+                "n_cap_dropped": len(universe.cap_dropped),
+                "hard_cap": universe.hard_cap,
+                "symbols": [rec["symbol"] for rec in universe.fetch],
+            }
+            if universe.empty:
+                self._publish_empty_actionable(now=now, session=session)
+                payload = self._when_skip(
+                    now=now,
+                    session=session,
+                    reason="ACTIONABLE_UNIVERSE_EMPTY",
+                    exit_code=0,
+                )
+                payload["published_empty"] = True
+                payload["v2_union"] = dict(self._v2_union)
+                return payload
+
+            self.statuses = []
+            self.fetched_symbols = []
+            self.new_evidence_rows = []
+            self.new_bar_rows = []
+            self._last_overlay = {}
+            self._v2_action_items = []
+            previous_stale = self._stale_fn
+            self._stale_fn = classify_stale_ignoring_lunch
+            try:
+                for rec in universe.not_yet:
+                    self.statuses.append(
+                        self._status(
+                            rec,
+                            STATUS_NOT_YET_ELIGIBLE,
+                            detail="now < eligible_from",
+                            observed_at=now,
+                            chronology_legal=False,
+                            fetched=False,
+                        )
+                    )
+                    self._record_v2_action(rec, now=now, observed=True)
+                for rec in universe.cap_dropped:
+                    self.statuses.append(
+                        self._status(
+                            rec,
+                            STATUS_SKIPPED_CAP,
+                            detail=f"hard cap {self.hard_cap}",
+                            observed_at=now,
+                            fetched=False,
+                        )
+                    )
+                    self._record_v2_action(
+                        rec,
+                        now=now,
+                        observed=False,
+                        observation_reason="SKIPPED_CAP",
+                    )
+                for rec in list(universe.fetch):
+                    self._process_symbol(rec, now=now, session=session)
+                self._flush(now=now, session=session)
+            finally:
+                self._stale_fn = previous_stale
+            payload = self.status_payload(now=now, session=session)
+            payload["kbs_polled"] = bool(self.fetched_symbols)
+            payload["exit_code"] = 0
+            payload["reason"] = "OK"
+            payload["published_empty"] = False
+            payload["v2_union"] = dict(self._v2_union)
+            return payload
+        finally:
+            lock.release()
+
+    def _frozen_v2_when_rows(
+        self,
+        *,
+        session: date,
+        sidecar_document: dict[str, Any] | None,
+        sidecar_rows: list[dict[str, Any]] | None,
+    ) -> tuple[list[dict[str, Any]], str]:
+        """Resolve the sidecar once. Later mutations of the caller's list are ignored."""
+        if sidecar_rows is not None:
+            frozen = [dict(row) for row in sidecar_rows]
+            self._v2_sidecar_status = {
+                "ok": True,
+                "reason": "OK",
+                "source": "injected",
+                "session": session.isoformat(),
+                "n_current_session": len(frozen),
+            }
+            return frozen, ""
+        if sidecar_document is not None:
+            rows, reason = document_rows_for_live_when(sidecar_document, session=session)
+            self._v2_sidecar_status = {
+                "ok": not reason,
+                "reason": reason or "OK",
+                "source": "document",
+                "session": session.isoformat(),
+                "n_rows": len(rows),
+            }
+            return rows, reason
+        document, source, fail = self._read_sidecar_document_once()
+        if fail:
+            self._v2_sidecar_status = {
+                "ok": False,
+                "reason": fail,
+                "source": source,
+                "session": session.isoformat(),
+            }
+            return [], fail
+        rows, reason = document_rows_for_live_when(document, session=session)
+        self._v2_sidecar_status = {
+            "ok": not reason,
+            "reason": reason or "OK",
+            "source": source,
+            "session": session.isoformat(),
+            "n_rows": len(rows),
+        }
+        return rows, reason
+
+    def _read_sidecar_document_once(self) -> tuple[dict[str, Any] | None, str, str]:
+        """One GET or one file read. The sweep does not call this again."""
+        if self.v2_sidecar_fetcher is not None:
+            fetched = self.v2_sidecar_fetcher()
+            document = getattr(fetched, "document", None)
+            if not getattr(fetched, "ok", False) or not isinstance(document, dict):
+                return None, "fetcher", str(getattr(fetched, "status", "") or "SIDECAR_ABSENT")
+            return document, "fetcher", ""
+        path = self.v2_sidecar_path
+        if path is None:
+            env_path = os.environ.get(ENV_V2_SIDECAR, "").strip()
+            path = Path(env_path) if env_path else None
+        if path is not None:
+            from modules.live_candidate_v2_action.sidecar_source import load_sidecar_file
+
+            document = load_sidecar_file(Path(path))
+            if document is None:
+                return None, SOURCE_FILE, "SIDECAR_ABSENT"
+            return document, SOURCE_FILE, ""
+        from modules.live_candidate_v2_camera.github_bus import fetch_v2_sidecar
+
+        fetched = fetch_v2_sidecar()
+        document = getattr(fetched, "document", None)
+        if not getattr(fetched, "ok", False) or not isinstance(document, dict):
+            return None, SOURCE_GITHUB, str(getattr(fetched, "status", "") or "SIDECAR_ABSENT")
+        return document, SOURCE_GITHUB, ""
+
+    def _when_skip(
+        self,
+        *,
+        now: datetime,
+        session: date,
+        reason: str,
+        exit_code: int,
+    ) -> dict[str, Any]:
+        return {
+            "schema": "live_camera_shadow_status.v1",
+            "session": session.isoformat(),
+            "observed_at": _iso(now),
+            "reason": reason,
+            "exit_code": exit_code,
+            "skipped": True,
+            "kbs_polled": False,
+            "fetched_symbols": [],
+            "archive_writes": 0,
+            "candidate_is_buy": False,
+            "pxv_implies_buy": False,
+            "alert_eligible": False,
+            "published_empty": False,
+        }
+
+    def _prior_buy_ready_rows(self) -> list[dict[str, Any]]:
+        path = (self.action_out_dir or (self.out_dir / "v2_action")) / "v2_action_state.json"
+        if not path.exists():
+            return []
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return []
+        if not isinstance(doc, dict):
+            return []
+        kept: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for key in ("historical_buy_ready", "rows"):
+            rows = doc.get(key)
+            if not isinstance(rows, list):
+                continue
+            for rec in rows:
+                if not isinstance(rec, dict):
+                    continue
+                state = str(rec.get("shadow_action") or rec.get("action_state") or "")
+                if state != STATE_BUY_READY:
+                    continue
+                if rec.get("candidate_is_buy") is True or rec.get("alert_eligible") is True:
+                    continue
+                marker = f"{rec.get('symbol')}|{rec.get('trigger_bar_ts') or rec.get('last_legal_bar_ts') or ''}"
+                if marker in seen:
+                    continue
+                seen.add(marker)
+                kept.append(dict(rec))
+        return kept
+
+    def _publish_empty_actionable(self, *, now: datetime, session: date) -> None:
+        historical = self._prior_buy_ready_rows()
+        doc = state_document(session=session.isoformat(), observed_at=now, results=[])
+        doc["historical_buy_ready"] = historical
+        doc["actionable_universe_empty"] = True
+        doc["v2_live_when"] = True
+        doc["notes"] = list(doc.get("notes") or []) + [
+            "Current actionable V2 universe is empty. Ordinary rows are not current.",
+        ]
+        action_dir = self.action_out_dir or (self.out_dir / "v2_action")
+        action_dir.mkdir(parents=True, exist_ok=True)
+        path = action_dir / "v2_action_state.json"
+        self._write_json(path, doc)
+        self._v2_action_publish = "EMPTY"
+        self._v2_action_publish_detail = str(path)
+        dest = resolve_shadow_store(self.shadow_store_dir)
+        if dest is not None:
+            from modules.live_shadow_transport.shadow_store import publish_v2_action_state
+
+            publish_v2_action_state(path, dest)
 
     def read_evidence(self) -> list[dict[str, Any]]:
         return self._read_jsonl(self.out_dir / EVIDENCE_NAME)
@@ -469,7 +748,7 @@ class LiveShadowFeed:
             return
 
         latest_ts = completed[-1]["bar_ts"]
-        if classify_stale(latest_ts, now):
+        if self._stale_fn(latest_ts, now):
             self.statuses.append(
                 self._status(
                     rec,
