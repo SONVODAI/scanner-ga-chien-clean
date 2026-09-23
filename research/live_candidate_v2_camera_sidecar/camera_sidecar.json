@@ -23,9 +23,9 @@
     "eligible_from"
   ],
   "session": "2026-09-23",
-  "observed_at": "2026-09-23T10:05:26.815792+07:00",
-  "generated_at": "2026-09-23T10:05:26.815792+07:00",
-  "market_real": 6.4,
+  "observed_at": "2026-09-23T10:06:28.485666+07:00",
+  "generated_at": "2026-09-23T10:06:28.485666+07:00",
+  "market_real": 6.6,
   "market_permission": "OK",
   "notes": [
     "Candidate != BUY.",
@@ -1515,7 +1515,7 @@
       "symbol": "AGR",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -1532,7 +1532,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1574,7 +1574,7 @@
       "symbol": "ANV",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -1591,7 +1591,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1615,7 +1615,7 @@
       "symbol": "BAF",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -1632,7 +1632,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1674,7 +1674,7 @@
       "symbol": "BFC",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -1691,7 +1691,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1733,7 +1733,7 @@
       "symbol": "BID",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T10:05:26.815792+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -1750,7 +1750,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1774,7 +1774,7 @@
       "symbol": "BVH",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -1791,7 +1791,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1815,7 +1815,7 @@
       "symbol": "BVS",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -1832,7 +1832,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1856,7 +1856,7 @@
       "symbol": "CSV",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -1873,7 +1873,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1915,7 +1915,7 @@
       "symbol": "DCM",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -1932,7 +1932,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1956,7 +1956,7 @@
       "symbol": "DGW",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:22:33.468655+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -1973,7 +1973,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -1997,7 +1997,7 @@
       "symbol": "DPR",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:42:55.165618+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2014,7 +2014,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2038,7 +2038,7 @@
       "symbol": "DRI",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2055,7 +2055,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2079,7 +2079,7 @@
       "symbol": "EIB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2096,7 +2096,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2120,7 +2120,7 @@
       "symbol": "FOX",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2137,7 +2137,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2161,7 +2161,7 @@
       "symbol": "GEE",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:42:55.165618+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2178,7 +2178,7 @@
       "nomination_reason": "PRIMARY setup MUA BREAK",
       "candidate_reason": "PRIMARY setup MUA BREAK",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2199,92 +2199,10 @@
     },
     {
       "v2_camera": true,
-      "symbol": "GEX",
-      "session": "2026-09-22",
-      "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
-      "eligible_from": "2026-09-23T09:15:00+07:00",
-      "source": "brain_a_scan_setup",
-      "nomination_source": "brain_a_scan_setup",
-      "status": "NOMINATED",
-      "setup": "MUA EARLY",
-      "group": "MUA EARLY",
-      "observation_intent": "WATCH_NOMINATED_SETUP",
-      "observation_reference": "",
-      "price_at_first_seen": 24400.0,
-      "ema9_at_first_seen": 23989.11,
-      "breakout_ref_at_first_seen": 27200.0,
-      "source_action": "TEST EARLY",
-      "source_reason": "Early sạch, test nhỏ",
-      "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
-      "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
-      "elite_buy_grade": "",
-      "market_real": 6.4,
-      "market_permission": "OK",
-      "provenance": [
-        {
-          "source": "brain_a_scan_setup",
-          "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-          "setup": "MUA EARLY",
-          "group": "MUA EARLY",
-          "source_action": "TEST EARLY",
-          "source_reason": "Early sạch, test nhỏ",
-          "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
-          "status": "NOMINATED",
-          "eligible_from": "2026-09-23T09:15:00+07:00"
-        }
-      ],
-      "candidate_is_buy": false,
-      "alert_eligible": false,
-      "chronology_status": "ELIGIBLE"
-    },
-    {
-      "v2_camera": true,
-      "symbol": "GIL",
-      "session": "2026-09-22",
-      "candidate_first_seen_ts": "2026-09-23T09:48:00.873056+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
-      "eligible_from": "2026-09-23T09:15:00+07:00",
-      "source": "brain_a_scan_setup",
-      "nomination_source": "brain_a_scan_setup",
-      "status": "NOMINATED",
-      "setup": "MUA EARLY",
-      "group": "MUA EARLY",
-      "observation_intent": "WATCH_NOMINATED_SETUP",
-      "observation_reference": "",
-      "price_at_first_seen": 8150.0,
-      "ema9_at_first_seen": 8020.92,
-      "breakout_ref_at_first_seen": 8650.0,
-      "source_action": "TEST EARLY",
-      "source_reason": "Early sạch, test nhỏ",
-      "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
-      "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
-      "elite_buy_grade": "",
-      "market_real": 6.4,
-      "market_permission": "OK",
-      "provenance": [
-        {
-          "source": "brain_a_scan_setup",
-          "candidate_first_seen_ts": "2026-09-23T09:48:00.873056+07:00",
-          "setup": "MUA EARLY",
-          "group": "MUA EARLY",
-          "source_action": "TEST EARLY",
-          "source_reason": "Early sạch, test nhỏ",
-          "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
-          "status": "NOMINATED",
-          "eligible_from": "2026-09-23T09:15:00+07:00"
-        }
-      ],
-      "candidate_is_buy": false,
-      "alert_eligible": false,
-      "chronology_status": "ELIGIBLE"
-    },
-    {
-      "v2_camera": true,
       "symbol": "GMD",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2301,7 +2219,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2325,7 +2243,7 @@
       "symbol": "GVR",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2342,7 +2260,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2366,7 +2284,7 @@
       "symbol": "HAH",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2383,7 +2301,7 @@
       "nomination_reason": "PRIMARY setup MUA BREAK",
       "candidate_reason": "PRIMARY setup MUA BREAK",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2407,7 +2325,7 @@
       "symbol": "HDG",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:42:55.165618+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2424,7 +2342,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2448,7 +2366,7 @@
       "symbol": "HPG",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -2465,7 +2383,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2507,7 +2425,7 @@
       "symbol": "IDC",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2524,7 +2442,7 @@
       "nomination_reason": "PRIMARY setup CP MẠNH",
       "candidate_reason": "PRIMARY setup CP MẠNH",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2548,7 +2466,7 @@
       "symbol": "KSB",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -2565,7 +2483,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2607,7 +2525,7 @@
       "symbol": "LAS",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2624,7 +2542,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2648,7 +2566,7 @@
       "symbol": "MML",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2665,7 +2583,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2689,7 +2607,7 @@
       "symbol": "MSB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2706,7 +2624,7 @@
       "nomination_reason": "PRIMARY setup MUA BREAK",
       "candidate_reason": "PRIMARY setup MUA BREAK",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2730,7 +2648,7 @@
       "symbol": "MSH",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:42:55.165618+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2747,7 +2665,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2800,7 +2718,7 @@
       "symbol": "MWG",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2817,7 +2735,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2841,7 +2759,7 @@
       "symbol": "NHA",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2858,7 +2776,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2882,7 +2800,7 @@
       "symbol": "NT2",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2899,7 +2817,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2923,7 +2841,7 @@
       "symbol": "NTP",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2940,7 +2858,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -2964,7 +2882,7 @@
       "symbol": "OCB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -2981,7 +2899,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3005,7 +2923,7 @@
       "symbol": "ORS",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:42:55.165618+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3022,7 +2940,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3046,7 +2964,7 @@
       "symbol": "PC1",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T10:05:26.815792+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3063,7 +2981,7 @@
       "nomination_reason": "PRIMARY setup CP MẠNH",
       "candidate_reason": "PRIMARY setup CP MẠNH",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3087,7 +3005,7 @@
       "symbol": "PVC",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3104,7 +3022,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3128,7 +3046,7 @@
       "symbol": "REE",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3145,7 +3063,7 @@
       "nomination_reason": "PRIMARY setup CP MẠNH",
       "candidate_reason": "PRIMARY setup CP MẠNH",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3169,7 +3087,7 @@
       "symbol": "SIP",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3186,7 +3104,7 @@
       "nomination_reason": "PRIMARY setup CP MẠNH",
       "candidate_reason": "PRIMARY setup CP MẠNH",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3210,7 +3128,7 @@
       "symbol": "SSI",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3227,7 +3145,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3251,7 +3169,7 @@
       "symbol": "STB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3268,7 +3186,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3292,7 +3210,7 @@
       "symbol": "TCB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3309,7 +3227,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3333,7 +3251,7 @@
       "symbol": "TNG",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3350,7 +3268,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3374,7 +3292,7 @@
       "symbol": "TPB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3391,7 +3309,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3415,7 +3333,7 @@
       "symbol": "TVN",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3432,7 +3350,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3456,7 +3374,7 @@
       "symbol": "VCI",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3473,7 +3391,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3497,7 +3415,7 @@
       "symbol": "VGC",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3514,7 +3432,7 @@
       "nomination_reason": "PRIMARY setup CP MẠNH",
       "candidate_reason": "PRIMARY setup CP MẠNH",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3538,7 +3456,7 @@
       "symbol": "VGI",
       "session": "2026-09-23",
       "candidate_first_seen_ts": "2026-09-22T12:53:28Z",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -3555,7 +3473,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=-5 → 0 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3597,7 +3515,7 @@
       "symbol": "VGT",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3614,7 +3532,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3638,7 +3556,7 @@
       "symbol": "VIX",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:42:55.165618+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3655,7 +3573,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3679,7 +3597,7 @@
       "symbol": "VNM",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3696,7 +3614,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3720,7 +3638,7 @@
       "symbol": "VPB",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3737,7 +3655,7 @@
       "nomination_reason": "PRIMARY setup PULL VỪA",
       "candidate_reason": "PRIMARY setup PULL VỪA",
       "elite_buy_grade": "MUA NHỎ / ƯU TIÊN",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3761,7 +3679,7 @@
       "symbol": "VPX",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-23T09:48:00.873056+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3778,7 +3696,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3802,7 +3720,7 @@
       "symbol": "VSC",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3819,7 +3737,7 @@
       "nomination_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "candidate_reason": "SECONDARY MUA EARLY qualified by TEST EARLY",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
@@ -3843,7 +3761,7 @@
       "symbol": "VTO",
       "session": "2026-09-22",
       "candidate_first_seen_ts": "2026-09-22T15:22:00.643840+07:00",
-      "candidate_updated_ts": "2026-09-23T10:05:26.815792+07:00",
+      "candidate_updated_ts": "2026-09-23T10:06:28.485666+07:00",
       "eligible_from": "2026-09-23T09:15:00+07:00",
       "source": "brain_a_scan_setup",
       "nomination_source": "brain_a_scan_setup",
@@ -3860,7 +3778,7 @@
       "nomination_reason": "PRIMARY setup CP MẠNH",
       "candidate_reason": "PRIMARY setup CP MẠNH",
       "elite_buy_grade": "",
-      "market_real": 6.4,
+      "market_real": 6.6,
       "market_permission": "OK",
       "provenance": [
         {
