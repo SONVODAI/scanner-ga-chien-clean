@@ -6,6 +6,7 @@ V2 SHADOW state is optional: missing V2 must not fail Elite publication.
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 from pathlib import Path
@@ -54,6 +55,37 @@ def _atomic_replace(src: Path, dest: Path) -> None:
     os.replace(tmp, dest)
 
 
+def _read_json_object(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _publish_state_merging_history(src_state: Path, dest: Path) -> None:
+    """Atomic replace. Same-session BUY_READY validation survives the replace."""
+    from modules.live_candidate_v2_action.artifact import merge_historical_buy_ready
+
+    new_doc = _read_json_object(src_state)
+    if new_doc is None:
+        _atomic_replace(src_state, dest)
+        return
+    merged = merge_historical_buy_ready(new_doc, _read_json_object(dest))
+    if merged.get("historical_buy_ready") == new_doc.get("historical_buy_ready") or (
+        not merged.get("historical_buy_ready") and "historical_buy_ready" not in new_doc
+    ):
+        _atomic_replace(src_state, dest)
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(merged, ensure_ascii=False, indent=2, default=str) + "\n"
+    tmp = dest.with_name(f".{dest.name}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, dest)
+
+
 def publish_v2_action_state(src_state: Path, dest_dir: Path) -> dict[str, Any]:
     """Copy only v2_action_state.json. Does not rewrite Elite evidence."""
     dest_dir = Path(dest_dir)
@@ -63,7 +95,7 @@ def publish_v2_action_state(src_state: Path, dest_dir: Path) -> dict[str, Any]:
     if not Path(src_state).exists():
         return {"v2_status": "ABSENT", "v2_detail": "no v2_action_state.json", "v2_copied": []}
     dest_dir.mkdir(parents=True, exist_ok=True)
-    _atomic_replace(Path(src_state), dest_dir / V2_ACTION_STATE_NAME)
+    _publish_state_merging_history(Path(src_state), dest_dir / V2_ACTION_STATE_NAME)
     return {
         "v2_status": "OK",
         "v2_detail": str(dest_dir / V2_ACTION_STATE_NAME),
@@ -80,7 +112,7 @@ def _copy_optional_v2(src_dir: Path, dest_dir: Path) -> dict[str, Any]:
         return {"v2_status": "ABSENT", "v2_detail": "no v2_action_state.json", "v2_copied": []}
     copied: list[str] = []
     try:
-        _atomic_replace(src_state, dest_dir / V2_ACTION_STATE_NAME)
+        _publish_state_merging_history(src_state, dest_dir / V2_ACTION_STATE_NAME)
         copied.append(V2_ACTION_STATE_NAME)
         src_ev = src_dir / V2_ACTION_SUBDIR / V2_ACTION_EVIDENCE_NAME
         if not src_ev.exists():

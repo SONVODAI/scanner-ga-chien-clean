@@ -1,6 +1,6 @@
 """Live V2 WHEN universe, schedule, lunch, lock, and archive isolation.
 
-Does not claim a historical BUY_READY. Does not call KBS.
+Does not call KBS. SHADOW BUY_READY rows in this file are synthetic bars.
 """
 
 from __future__ import annotations
@@ -807,3 +807,304 @@ def test_state_machine_module_was_not_rewritten_for_live_when():
     )
     assert "ACTIONABLE_LIVE_SETUPS" not in source
     assert "classify_stale_ignoring_lunch" not in source
+
+
+_PRESERVE_KEYS = (
+    "symbol",
+    "source",
+    "setup",
+    "session",
+    "trigger_bar_ts",
+    "trigger_price",
+    "frozen_ref_kind",
+    "frozen_ref_value",
+    "published_evidence",
+    "volume_expansion_state",
+    "price_volume_state",
+    "market_permission",
+    "action_reason",
+    "last_legal_bar_ts",
+    "candidate_first_seen_ts",
+    "eligible_from",
+)
+
+
+def _store_doc(store: Path) -> dict:
+    return json.loads((store / "v2_action_state.json").read_text(encoding="utf-8"))
+
+
+def _when_feed(tmp_path: Path, provider, clock: dict, store: Path) -> LiveShadowFeed:
+    out = tmp_path / "live_out"
+    return LiveShadowFeed(
+        provider=provider,
+        out_dir=out,
+        now_fn=lambda: clock["now"],
+        archive_root=tmp_path / "archive",
+        action_out_dir=out / "v2_action",
+        shadow_store_dir=store,
+    )
+
+
+def _rollover_bvh() -> dict:
+    return _row(
+        "BVH",
+        "PULL VỪA",
+        session="2026-09-22",
+        first="2026-09-22T15:22:00+07:00",
+        eligible=f"{DAY}T09:15:00+07:00",
+        ema9=27.0,
+        breakout=28.0,
+    )
+
+
+def _same_day_pull(symbol: str = "HPG") -> dict:
+    return _row(
+        symbol,
+        "PULL VỪA",
+        session=DAY,
+        first=f"{DAY}T09:00:00+07:00",
+        eligible=f"{DAY}T09:15:00+07:00",
+        ema9=27.0,
+        breakout=28.0,
+    )
+
+
+def _post_close(tmp_path: Path, store: Path, *, session: str, now: datetime, rows: list[dict], monkeypatch) -> dict:
+    import pandas as pd
+
+    from modules.live_candidate_v2_action.observe_store import observe_from_collected_session
+    from modules.live_candidate_v2_camera.github_bus import V2FetchResult
+
+    monkeypatch.setattr(
+        "modules.live_candidate_v2_action.observe_store.load_session",
+        lambda root, sess: pd.DataFrame(),
+    )
+    document = _doc(rows, session=session)
+
+    def _fetch():
+        return V2FetchResult(ok=True, status="OK_ROWS", document=document, n_rows=len(rows))
+
+    return observe_from_collected_session(
+        session=session,
+        now=now,
+        camera_root=tmp_path / "camera",
+        out_dir=tmp_path / "observe",
+        shadow_store_dir=store,
+        sidecar_fetcher=_fetch,
+    )
+
+
+def _assert_preserved(kept: dict, original: dict) -> None:
+    assert kept["shadow_action"] == STATE_BUY_READY
+    for key in _PRESERVE_KEYS:
+        if key in original:
+            assert kept.get(key) == original[key]
+    assert kept["candidate_is_buy"] is False
+    assert kept["pxv_implies_buy"] is False
+    assert kept["alert_eligible"] is False
+
+
+def _assert_permissions(doc: dict) -> None:
+    assert doc["candidate_is_buy"] is False
+    assert doc["pxv_implies_buy"] is False
+    assert doc["alert_eligible"] is False
+
+
+def test_post_close_publish_keeps_live_rollover_buy_ready(tmp_path, monkeypatch):
+    """Live WHEN retains BUY_READY, then 18:40 republishes the same store file."""
+    store = tmp_path / "store"
+    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    provider = MockProvider({("BVH", DAY): _quiet_bars()})
+    feed = _when_feed(tmp_path, provider, clock, store)
+    row = _rollover_bvh()
+    assert current_session_v2_rows([row], DAY) == []
+
+    feed.run_v2_when_cycle(sidecar_rows=[row])
+    first = _store_doc(store)
+    assert first["rows"][0]["shadow_action"] == STATE_BUY_READY
+    assert first["rows"][0]["session"] == "2026-09-22"
+    original = dict(first["rows"][0])
+
+    clock["now"] = _ts(f"{DAY} 09:35:45")
+    sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
+    status = feed.run_v2_when_cycle(sidecar_rows=[sweet])
+    departed = _store_doc(store)
+    assert status["published_empty"] is True
+    assert departed["rows"] == []
+    assert len(departed["historical_buy_ready"]) == 1
+    _assert_preserved(departed["historical_buy_ready"][0], original)
+
+    close = _ts(f"{DAY} 18:40:00")
+    same_day = _same_day_pull("HPG")
+    payload = _post_close(
+        tmp_path,
+        store,
+        session=DAY,
+        now=close,
+        rows=[row, same_day],
+        monkeypatch=monkeypatch,
+    )
+    assert payload["kbs_polled"] is False
+    assert [rec["symbol"] for rec in payload["rows"]] == ["HPG"]
+    assert all(rec["shadow_action"] != STATE_BUY_READY for rec in payload["rows"])
+    local = json.loads((tmp_path / "observe" / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
+    assert all(rec.get("symbol") != "BVH" for rec in local.get("rows") or [])
+    assert all(rec.get("symbol") != "BVH" for rec in local.get("historical_buy_ready") or [])
+
+    published = _store_doc(store)
+    assert published["session"] == DAY
+    assert [rec["symbol"] for rec in published["rows"]] == ["HPG"]
+    assert all(rec["shadow_action"] != STATE_BUY_READY for rec in published["rows"])
+    assert len(published["historical_buy_ready"]) == 1
+    _assert_preserved(published["historical_buy_ready"][0], original)
+    _assert_permissions(published)
+    assert not list(store.glob("*.tmp"))
+
+    _post_close(
+        tmp_path,
+        store,
+        session=DAY,
+        now=_ts(f"{DAY} 20:10:00"),
+        rows=[row, same_day],
+        monkeypatch=monkeypatch,
+    )
+    again = _store_doc(store)
+    assert len(again["historical_buy_ready"]) == 1
+    _assert_preserved(again["historical_buy_ready"][0], original)
+    assert [rec["symbol"] for rec in again["rows"]] == ["HPG"]
+    _assert_permissions(again)
+
+
+def _bars_at(times: tuple[str, ...], close: float) -> list[dict]:
+    rows = []
+    for hm in times:
+        rows.append(
+            {
+                "time": f"{DAY} {hm}:00",
+                "open": close - 0.05,
+                "high": close + 0.10,
+                "low": close - 0.10,
+                "close": close,
+                "volume": 1000,
+            }
+        )
+    return rows
+
+
+def test_final_live_cycle_buy_ready_survives_post_close(tmp_path, monkeypatch):
+    """No later live cycle moves BUY_READY. 18:40 must keep that current row.
+
+    14:50:45 can be the last live fire. This reproduces that handoff: the
+    published current row is still BUY_READY when post-close replaces the file.
+    """
+    store = tmp_path / "store"
+    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    provider = MockProvider({("BVH", DAY): _quiet_bars()})
+    feed = _when_feed(tmp_path, provider, clock, store)
+    feed.run_v2_when_cycle(sidecar_rows=[_rollover_bvh()])
+    live = _store_doc(store)
+    assert live["rows"][0]["shadow_action"] == STATE_BUY_READY
+    assert not live.get("historical_buy_ready")
+    original = dict(live["rows"][0])
+
+    payload = _post_close(
+        tmp_path,
+        store,
+        session=DAY,
+        now=_ts(f"{DAY} 18:40:00"),
+        rows=[_rollover_bvh()],
+        monkeypatch=monkeypatch,
+    )
+    assert payload["rows"] == []
+    assert payload.get("observe_reason") == "NO_CURRENT_SESSION_V2_ROWS"
+    published = _store_doc(store)
+    assert published["rows"] == []
+    assert len(published["historical_buy_ready"]) == 1
+    _assert_preserved(published["historical_buy_ready"][0], original)
+    _assert_permissions(published)
+    assert current_session_v2_rows([_rollover_bvh()], DAY) == []
+
+
+def test_post_close_does_not_retain_departed_wait(tmp_path, monkeypatch):
+    store = tmp_path / "store"
+    clock = {"now": _ts(f"{DAY} 14:50:45")}
+    provider = MockProvider({("STB", DAY): _bars_at(("14:35", "14:40", "14:45"), 20.00)})
+    feed = _when_feed(tmp_path, provider, clock, store)
+    stb = _row(
+        "STB",
+        "PULL VỪA",
+        session=DAY,
+        first=f"{DAY}T09:00:00+07:00",
+        eligible=f"{DAY}T09:15:00+07:00",
+        ema9=27.0,
+        breakout=28.0,
+    )
+    feed.run_v2_when_cycle(sidecar_rows=[stb])
+    live = _store_doc(store)
+    assert live["rows"][0]["symbol"] == "STB"
+    assert live["rows"][0]["shadow_action"] == "WAIT"
+
+    _post_close(
+        tmp_path,
+        store,
+        session=DAY,
+        now=_ts(f"{DAY} 18:40:00"),
+        rows=[_rollover_bvh()],
+        monkeypatch=monkeypatch,
+    )
+    published = _store_doc(store)
+    historical = published.get("historical_buy_ready") or []
+    assert historical == []
+    assert historical_buy_ready_rows(published) == []
+    assert all(rec.get("shadow_action") != "WAIT" for rec in published.get("rows") or [])
+    _assert_permissions(published)
+
+
+def test_historical_buy_ready_stays_inside_one_document_session():
+    from modules.live_candidate_v2_action.artifact import merge_historical_buy_ready
+
+    ready = {
+        "symbol": "BVH",
+        "session": "2026-09-22",
+        "shadow_action": STATE_BUY_READY,
+        "trigger_bar_ts": f"{DAY}T09:25:00+07:00",
+        "candidate_is_buy": False,
+        "pxv_implies_buy": False,
+        "alert_eligible": False,
+    }
+    previous = {
+        "session": DAY,
+        "rows": [],
+        "historical_buy_ready": [ready],
+        "candidate_is_buy": False,
+        "pxv_implies_buy": False,
+        "alert_eligible": False,
+    }
+    nxt = merge_historical_buy_ready(
+        {"session": "2026-09-24", "rows": [], "candidate_is_buy": False, "pxv_implies_buy": False, "alert_eligible": False},
+        previous,
+    )
+    assert nxt.get("historical_buy_ready") in (None, [])
+    assert nxt["rows"] == []
+
+    same = merge_historical_buy_ready(
+        {"session": DAY, "rows": [{"symbol": "HPG", "shadow_action": "NOMINATED"}]},
+        previous,
+    )
+    assert [rec["symbol"] for rec in same["rows"]] == ["HPG"]
+    assert same["rows"][0]["shadow_action"] == "NOMINATED"
+    assert [rec["symbol"] for rec in same["historical_buy_ready"]] == ["BVH"]
+
+    still_current = merge_historical_buy_ready(
+        {"session": DAY, "rows": [{"symbol": "BVH", "shadow_action": "WAIT"}]},
+        previous,
+    )
+    assert still_current["rows"][0]["shadow_action"] == "WAIT"
+    assert still_current.get("historical_buy_ready") in (None, [])
+
+    for state in ("WAIT", "NOMINATED", "WEAKENED", "NO_OBSERVATION"):
+        departed = merge_historical_buy_ready(
+            {"session": DAY, "rows": []},
+            {"session": DAY, "rows": [{"symbol": "STB", "shadow_action": state, "session": DAY}]},
+        )
+        assert departed.get("historical_buy_ready") in (None, [])
