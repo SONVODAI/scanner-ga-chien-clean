@@ -153,8 +153,8 @@ def test_actionable_routes_only():
         _row("GGG", "THEO DÕI", source="buy_elite_learning_history"),
     ]
     selected = select_actionable_v2(rows, now=_ts(f"{DAY} 09:20:45"))
-    assert {rec["symbol"] for rec in selected.fetch} == {"AAA", "BBB", "CCC", "DDD"}
-    assert ACTIONABLE_LIVE_SETUPS == {"PULL ĐẸP", "PULL VỪA", "CP MẠNH", "MUA BREAK"}
+    assert {rec["symbol"] for rec in selected.fetch} == {"AAA", "BBB", "CCC", "DDD", "EEE"}
+    assert ACTIONABLE_LIVE_SETUPS == {"PULL ĐẸP", "PULL VỪA", "CP MẠNH", "MUA BREAK", "MUA EARLY"}
     assert selected.fetch[0]["ema9_at_first_seen"] == 100.0
     assert selected.fetch[0]["provenance"]
 
@@ -286,8 +286,8 @@ def test_empty_universe_clears_current_rows(tmp_path):
         action_out_dir=action_dir,
     )
     sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
-    early = _row("MSH", "MUA EARLY")
-    status = feed.run_v2_when_cycle(sidecar_rows=[sweet, early])
+    watched = _row("MSH", "THEO DÕI")
+    status = feed.run_v2_when_cycle(sidecar_rows=[sweet, watched])
     assert status["published_empty"] is True
     assert status["kbs_polled"] is False
     current = json.loads((action_dir / "v2_action_state.json").read_text(encoding="utf-8"))
@@ -316,20 +316,46 @@ def test_empty_universe_clears_current_rows(tmp_path):
 
 
 def _quiet_bars() -> list[dict]:
-    """Three completed bars. Equal volume stays NORMAL; close sits above EMA9."""
-    rows = []
-    for hm in ("09:15", "09:20", "09:25"):
-        rows.append(
-            {
-                "time": f"{DAY} {hm}:00",
-                "open": 27.15,
-                "high": 27.30,
-                "low": 27.10,
-                "close": 27.20,
-                "volume": 1000,
-            }
-        )
-    return rows
+    """Supply contraction, then a two-bar quiet hold above EMA9.
+
+    09:15 seeds the session median. 09:20 is the pull (half volume, in the
+    EMA9 area) and is not one of the confirmation bars. 09:25 and 09:30 are
+    the reclaim pair; 09:30 is completed only once now >= 09:35.
+    """
+    return [
+        {
+            "time": f"{DAY} 09:15:00",
+            "open": 27.15,
+            "high": 27.30,
+            "low": 27.10,
+            "close": 27.20,
+            "volume": 2000,
+        },
+        {
+            "time": f"{DAY} 09:20:00",
+            "open": 27.12,
+            "high": 27.16,
+            "low": 27.00,
+            "close": 27.05,
+            "volume": 1000,
+        },
+        {
+            "time": f"{DAY} 09:25:00",
+            "open": 27.10,
+            "high": 27.30,
+            "low": 27.08,
+            "close": 27.18,
+            "volume": 1400,
+        },
+        {
+            "time": f"{DAY} 09:30:00",
+            "open": 27.12,
+            "high": 27.30,
+            "low": 27.10,
+            "close": 27.20,
+            "volume": 1400,
+        },
+    ]
 
 
 def _below_ref_bars() -> list[dict]:
@@ -360,7 +386,7 @@ def _feed(tmp_path, provider, now: datetime) -> LiveShadowFeed:
 
 def test_departed_buy_ready_is_historical_only(tmp_path):
     """Cycle N mints SHADOW BUY_READY. Cycle N+1 drops that symbol."""
-    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    clock = {"now": _ts(f"{DAY} 09:35:45")}
     provider = MockProvider({("BVH", DAY): _quiet_bars(), ("HPG", DAY): _below_ref_bars()})
     feed = _feed(tmp_path, provider, clock["now"])
     feed.now_fn = lambda: clock["now"]
@@ -373,7 +399,7 @@ def test_departed_buy_ready_is_historical_only(tmp_path):
     assert by_symbol["HPG"]["shadow_action"] != STATE_BUY_READY
     assert first["candidate_is_buy"] is False
 
-    clock["now"] = _ts(f"{DAY} 09:35:45")
+    clock["now"] = _ts(f"{DAY} 09:40:45")
     second = feed.run_v2_when_cycle(sidecar_rows=[hpg])
     current = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
     assert second["published_empty"] is False
@@ -592,13 +618,16 @@ def test_replay_2026_09_23_universe_counts_only():
         ("2026-09-23T14:13:28+07:00", 11, 6, 2, 24, 8, 19),
         ("2026-09-23T14:33:17+07:00", 0, 0, 0, 0, 8, 0),
     ]
-    for observed, pull, manh, break_, early, sweet, expect_fetch in cases:
-        selected = select_actionable_v2(book(pull, manh, break_, early, sweet), now=_ts(observed))
-        assert len(selected.fetch) == expect_fetch
-        assert selected.n_actionable == pull + manh + break_
+    for observed, pull, manh, break_, early, _sweet, _prior_fetch in cases:
+        selected = select_actionable_v2(book(pull, manh, break_, early, _sweet), now=_ts(observed))
+        actionable = pull + manh + break_ + early
+        assert selected.n_actionable == actionable
         assert len(selected.fetch) <= LIVE_UNIVERSE_CAP
         assert len(selected.fetch) * (60.0 / GUEST_RPM) < 300
-    assert 17 <= 23 <= LIVE_UNIVERSE_CAP
+        if _ts(observed) < _ts(f"{DAY} 09:15:00"):
+            assert selected.fetch == []
+        else:
+            assert len(selected.fetch) == min(actionable, LIVE_UNIVERSE_CAP)
 
 
 def _rollover_nom(setup: str = "PULL VỪA", *, symbol: str = "BVH"):
@@ -616,9 +645,18 @@ def _rollover_nom(setup: str = "PULL VỪA", *, symbol: str = "BVH"):
     return _nom(setup, **kwargs)
 
 
-def _pull_pair(day: str, hms=("09:15", "09:20")):
+def _pull_pair(day: str, hms=("09:20", "09:25")):
+    """Prior contraction, then the two-bar quiet reclaim. Supply is not on the pair."""
+    hour, minute = hms[0].split(":")
+    supply_min = int(minute) - 5
+    supply_hour = int(hour)
+    if supply_min < 0:
+        supply_min += 60
+        supply_hour -= 1
+    supply = f"{supply_hour:02d}:{supply_min:02d}"
     return [
-        _bar(hms[0], day=day, close_vs_ref=20, vol_state="CONTRACTION"),
+        _bar(supply, day=day, close_vs_ref=-40, vol_state="CONTRACTION"),
+        _bar(hms[0], day=day, close_vs_ref=20, vol_state="NORMAL"),
         _bar(hms[1], day=day, close_vs_ref=40, vol_state="NORMAL"),
     ]
 
@@ -690,7 +728,8 @@ def test_rollover_pull_uses_eligible_from_trading_date():
     ready = evaluate_shadow_action(nom, _pull_pair(DAY))
     assert ready.action_state == STATE_BUY_READY
     assert ready.action_reason == REASON_PULL_BUY_READY
-    assert ready.n_legal_bars == 2
+    # Supply bar plus the two-bar reclaim. Chronology still keeps the evaluation session.
+    assert ready.n_legal_bars == 3
     assert ready.session == "2026-09-22"
     assert ready.candidate_is_buy is False
     assert ready.pxv_implies_buy is False
@@ -741,16 +780,16 @@ def test_rollover_does_not_accept_other_sessions():
         nom,
         [
             *_pull_pair(DAY),
-            _bar("09:25", day=DAY, close_vs_ref=40, vol_state="NORMAL", unfinished=True, completed=False),
+            _bar("09:30", day=DAY, close_vs_ref=40, vol_state="NORMAL", unfinished=True, completed=False),
         ],
     )
     assert unfinished.action_state == STATE_BUY_READY
-    assert unfinished.n_legal_bars == 2
+    assert unfinished.n_legal_bars == 3
     assert REASON_UNFINISHED in unfinished.notes
 
 
 def test_rollover_live_buy_ready_is_retained_when_symbol_leaves(tmp_path):
-    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    clock = {"now": _ts(f"{DAY} 09:35:45")}
     provider = MockProvider({("BVH", DAY): _quiet_bars()})
     feed = _feed(tmp_path, provider, clock["now"])
     feed.now_fn = lambda: clock["now"]
@@ -773,7 +812,7 @@ def test_rollover_live_buy_ready_is_retained_when_symbol_leaves(tmp_path):
     trigger = state["rows"][0]["trigger_bar_ts"]
     price = state["rows"][0]["trigger_price"]
 
-    clock["now"] = _ts(f"{DAY} 09:35:45")
+    clock["now"] = _ts(f"{DAY} 09:40:45")
     sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
     status = feed.run_v2_when_cycle(sidecar_rows=[sweet])
     current = json.loads((tmp_path / "v2_action" / "v2_action_state.json").read_text(encoding="utf-8"))
@@ -913,7 +952,7 @@ def _assert_permissions(doc: dict) -> None:
 def test_post_close_publish_keeps_live_rollover_buy_ready(tmp_path, monkeypatch):
     """Live WHEN retains BUY_READY, then 18:40 republishes the same store file."""
     store = tmp_path / "store"
-    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    clock = {"now": _ts(f"{DAY} 09:35:45")}
     provider = MockProvider({("BVH", DAY): _quiet_bars()})
     feed = _when_feed(tmp_path, provider, clock, store)
     row = _rollover_bvh()
@@ -925,7 +964,7 @@ def test_post_close_publish_keeps_live_rollover_buy_ready(tmp_path, monkeypatch)
     assert first["rows"][0]["session"] == "2026-09-22"
     original = dict(first["rows"][0])
 
-    clock["now"] = _ts(f"{DAY} 09:35:45")
+    clock["now"] = _ts(f"{DAY} 09:40:45")
     sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
     status = feed.run_v2_when_cycle(sidecar_rows=[sweet])
     departed = _store_doc(store)
@@ -998,7 +1037,7 @@ def test_final_live_cycle_buy_ready_survives_post_close(tmp_path, monkeypatch):
     published current row is still BUY_READY when post-close replaces the file.
     """
     store = tmp_path / "store"
-    clock = {"now": _ts(f"{DAY} 09:30:45")}
+    clock = {"now": _ts(f"{DAY} 09:35:45")}
     provider = MockProvider({("BVH", DAY): _quiet_bars()})
     feed = _when_feed(tmp_path, provider, clock, store)
     feed.run_v2_when_cycle(sidecar_rows=[_rollover_bvh()])

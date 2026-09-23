@@ -21,25 +21,37 @@ from modules.intraday_pxv_v1.constants import (
     EV_WEAKEN,
     OVERLAY_TRUTH_CANONICAL,
     OVERLAY_TRUTH_RETROSPECTIVE,
+    RESEARCH_DEFAULT_EXPANSION_X,
 )
 from modules.intraday_pxv_v1.features import PXV_SELL_EXP, PXV_WEAK
 from modules.intraday_pxv_v1.time_contract import parse_legal_ts
 from modules.live_candidate.calendar import as_vn
 from modules.live_candidate_v2_camera.contract import REF_UNAVAILABLE, REF_UNIT_MISMATCH
 from modules.live_candidate_v2_camera.observe import pxv_implies_buy
+from modules.live_candidate_v2_nomination.intent import CHO_PULL_ACTION
 from modules.live_candidate_v2_action.contract import (
     ALERT_ELIGIBLE,
     CANDIDATE_IS_BUY,
+    EARLY_MAX_PROGRESS_PCT,
+    EARLY_MODERATE_VOLUME_MIN,
     MARKET_PERMISSION_OK,
     MODE,
+    PULL_EVIDENCE_WINDOW_BARS,
+    PULL_SUPPLY_VOLUME,
+    PULL_ZONE_MAX_PCT,
     PXV_IMPLIES_BUY,
     QUIET_VOLUME,
     REASON_CHRONOLOGY_PRE_ELIGIBLE,
     REASON_CONFLICT,
     REASON_DATA_UNUSABLE,
     REASON_DATE_ONLY,
+    REASON_EARLY_BUY_READY,
     REASON_EARLY_EVIDENCE_ONLY,
+    REASON_EARLY_FAM_SELL,
     REASON_EARLY_NO_FROZEN_REF,
+    REASON_EARLY_PRICE,
+    REASON_EARLY_SINGLE_BAR,
+    REASON_EARLY_VOLUME,
     REASON_MANH_BUY_READY,
     REASON_MANH_FAM_SELL,
     REASON_MANH_PRICE_NO_STRENGTHEN,
@@ -54,6 +66,7 @@ from modules.live_candidate_v2_action.contract import (
     REASON_PULL_BELOW_REF,
     REASON_PULL_BUY_READY,
     REASON_PULL_FAM_SELL,
+    REASON_PULL_NO_QUIET_SUPPLY,
     REASON_PULL_SINGLE_BAR,
     REASON_PULL_VOLUME_NOT_QUIET,
     REASON_REF_UNIT_MISMATCH,
@@ -117,11 +130,14 @@ def _num(value: object) -> float | None:
     return float(n)
 
 
-def action_route(setup: str) -> str:
+def action_route(setup: str, source_action: str = "") -> str:
+    """Route from the frozen setup. CP MẠNH `CHỜ PULL` is the frozen action only."""
     setup = str(setup or "").strip()
     if setup in ROUTE_PULL:
         return "PULL"
     if setup == ROUTE_MANH:
+        if str(source_action or "").strip() == CHO_PULL_ACTION:
+            return "PULL"
         return "MANH"
     if setup == ROUTE_BREAK:
         return "BREAK"
@@ -132,7 +148,7 @@ def action_route(setup: str) -> str:
 
 def required_reference_kind(setup: str) -> str:
     setup = str(setup or "").strip()
-    if setup in ROUTE_PULL or setup == ROUTE_MANH:
+    if setup in ROUTE_PULL or setup == ROUTE_MANH or setup == ROUTE_EARLY:
         return REF_EMA9
     if setup == ROUTE_BREAK:
         return REF_BREAKOUT
@@ -156,10 +172,11 @@ class FrozenNomination:
     group: str = ""
     nomination_reason: str = ""
     source: str = ""
+    source_action: str = ""
 
     @property
     def route(self) -> str:
-        return action_route(self.setup or self.group)
+        return action_route(self.setup or self.group, self.source_action)
 
     @property
     def required_ref(self) -> str:
@@ -190,6 +207,7 @@ class BarEvidence:
     raw_evidence: str = ""
     published_evidence: str = ""
     volume_expansion_state: str | None = None
+    volume_expansion_ratio: float | None = None
     price_volume_state: str | None = None
     fam_sell: bool = False
     sell_expansion: bool = False
@@ -281,6 +299,7 @@ def nomination_from_mapping(raw: Mapping[str, Any]) -> FrozenNomination:
         chronology_status=str(raw.get("chronology_status") or ""),
         nomination_reason=str(raw.get("nomination_reason") or raw.get("candidate_reason") or ""),
         source=str(raw.get("nomination_source") or raw.get("source") or ""),
+        source_action=str(raw.get("source_action") or ""),
     )
 
 
@@ -326,6 +345,7 @@ def bar_evidence_from_mapping(raw: Mapping[str, Any]) -> BarEvidence:
         raw_evidence=str(raw.get("raw_evidence") or ""),
         published_evidence=str(raw.get("published_evidence") or ""),
         volume_expansion_state=raw.get("volume_expansion_state"),
+        volume_expansion_ratio=_num(raw.get("volume_expansion_ratio")),
         price_volume_state=raw.get("price_volume_state"),
         fam_sell=bool(fam_sell),
         sell_expansion=bool(sell_exp),
@@ -516,14 +536,44 @@ def _market_ok(nom: FrozenNomination) -> bool:
     return str(nom.market_permission or "").strip() == MARKET_PERMISSION_OK
 
 
-def _pull_ready(pair: Sequence[BarEvidence]) -> tuple[bool, str]:
-    a, b = pair
+def _in_pull_zone(bar: BarEvidence) -> bool:
+    """Touched or under the frozen EMA9 area. Far-above bars are not a pull."""
+    if bar.close_vs_ref_pct is None:
+        return bar.close_lt_ref is True
+    return float(bar.close_vs_ref_pct) <= PULL_ZONE_MAX_PCT
+
+
+def _pull_supply_bar(bar: BarEvidence) -> bool:
+    """Price in the EMA9 area while classified volume is CONTRACTION.
+
+    NORMAL is not supply evidence. A missing expansion classification is not
+    supply evidence. Sell on that bar disqualifies it.
+    """
+    if not _in_pull_zone(bar) or bar.has_sell or not bar.data_usable:
+        return False
+    return str(bar.volume_expansion_state or "") == PULL_SUPPLY_VOLUME
+
+
+def _pull_supply_lookback(history: Sequence[BarEvidence]) -> Sequence[BarEvidence]:
+    """Bars before the confirmation pair inside the last 6 legal bars.
+
+    ``history`` ends at the second reclaim bar. The last two entries are that
+    pair and cannot themselves be the required prior pull. Lunch does not
+    insert bars, so a 11:25 contraction can still sit next to a 13:00 reclaim.
+    """
+    window = list(history[-PULL_EVIDENCE_WINDOW_BARS:])
+    return window[:-2]
+
+
+def _pull_ready(pair: Sequence[BarEvidence], history: Sequence[BarEvidence]) -> tuple[bool, str]:
     if any(bar.has_sell for bar in pair):
         return False, REASON_PULL_FAM_SELL
     if not all(bar.quiet_volume for bar in pair):
         return False, REASON_PULL_VOLUME_NOT_QUIET
     if not _gate_ok(pair):
         return False, REASON_DATA_UNUSABLE
+    if not any(_pull_supply_bar(bar) for bar in _pull_supply_lookback(history)):
+        return False, REASON_PULL_NO_QUIET_SUPPLY
     return True, REASON_PULL_BUY_READY
 
 
@@ -592,10 +642,86 @@ def _try_buy_ready(
     if _conflict(pair):
         return False, REASON_CONFLICT
     if nom.route == "PULL":
-        return _pull_ready(pair)
+        return _pull_ready(pair, legal)
     if nom.route in {"MANH", "BREAK"}:
         return _manh_break_ready(pair)
     return False, REASON_UNKNOWN_SETUP
+
+
+def _moderate_volume(bar: BarEvidence) -> bool:
+    """Existing expansion ratio, strictly between the median and the 2.0× spike."""
+    ratio = bar.volume_expansion_ratio
+    if ratio is None:
+        return False
+    return EARLY_MODERATE_VOLUME_MIN < float(ratio) < float(RESEARCH_DEFAULT_EXPANSION_X)
+
+
+def _early_price_progress(bar: BarEvidence) -> bool:
+    """Slightly above the frozen EMA9. Flat, below, or extended is not EARLY."""
+    if bar.close_vs_ref is None or bar.close_vs_ref_pct is None:
+        return False
+    pct = float(bar.close_vs_ref_pct)
+    return float(bar.close_vs_ref) > 0.0 and 0.0 < pct <= EARLY_MAX_PROGRESS_PCT
+
+
+def _try_early_ready(
+    nom: FrozenNomination,
+    legal: Sequence[BarEvidence],
+) -> tuple[bool, str]:
+    if len(legal) < 2:
+        return False, REASON_EARLY_SINGLE_BAR
+    if not _market_ok(nom):
+        return False, REASON_MARKET_NOT_OK
+    pair = legal[-2:]
+    if not _gate_ok(pair):
+        return False, REASON_DATA_UNUSABLE
+    if any(bar.has_sell for bar in pair):
+        return False, REASON_EARLY_FAM_SELL
+    if not all(_early_price_progress(bar) for bar in pair):
+        return False, REASON_EARLY_PRICE
+    if not all(_moderate_volume(bar) for bar in pair):
+        return False, REASON_EARLY_VOLUME
+    return True, REASON_EARLY_BUY_READY
+
+
+def _is_retrospective(legal: Sequence[BarEvidence], overlay_truth_class: str) -> bool:
+    return overlay_truth_class == OVERLAY_TRUTH_RETROSPECTIVE or any(
+        bar.overlay_truth_class == OVERLAY_TRUTH_RETROSPECTIVE or bar.overlay_applied for bar in legal
+    )
+
+
+def _evaluate_early(
+    nom: FrozenNomination,
+    legal: Sequence[BarEvidence],
+    notes: Sequence[str],
+    *,
+    overlay_truth_class: str,
+) -> ActionResult:
+    """Controlled progress vs frozen EMA9 plus moderate volume. Never STRENGTHEN."""
+    if not legal:
+        if nom.ema9_at_first_seen is None:
+            return _result(nom, STATE_NOMINATED, REASON_EARLY_NO_FROZEN_REF, notes=notes)
+        return _result(nom, STATE_NOMINATED, REASON_NOMINATED_NO_BARS, notes=notes)
+
+    ok, ref_why = _ref_usable(legal[-1], REF_EMA9)
+    if not ok:
+        reason = REASON_EARLY_NO_FROZEN_REF if ref_why == REASON_REF_UNUSABLE else ref_why
+        return _result(nom, STATE_WAIT, reason, bars=legal, notes=notes)
+
+    ready, why = _try_early_ready(nom, legal)
+    if ready and _is_retrospective(legal, overlay_truth_class):
+        return _result(
+            nom,
+            STATE_WAIT,
+            REASON_RETROSPECTIVE,
+            bars=legal,
+            notes=tuple(notes) + (REASON_RETROSPECTIVE,),
+        )
+    if ready:
+        return _result(nom, STATE_BUY_READY, why, bars=legal, notes=notes)
+    if why == REASON_WAIT:
+        return _result(nom, STATE_WAIT, REASON_EARLY_EVIDENCE_ONLY, bars=legal, notes=notes)
+    return _result(nom, STATE_WAIT, why, bars=legal, notes=notes)
 
 
 def evaluate_shadow_action(
@@ -630,9 +756,7 @@ def evaluate_shadow_action(
         return _result(nom, STATE_NOMINATED, REASON_DATE_ONLY, notes=notes)
 
     if nom.route == "EARLY":
-        if not legal:
-            return _result(nom, STATE_NOMINATED, REASON_EARLY_NO_FROZEN_REF, notes=notes)
-        return _result(nom, STATE_WAIT, REASON_EARLY_EVIDENCE_ONLY, bars=legal, notes=notes)
+        return _evaluate_early(nom, legal, notes, overlay_truth_class=overlay_truth_class)
 
     if nom.route == "UNKNOWN":
         if not legal:

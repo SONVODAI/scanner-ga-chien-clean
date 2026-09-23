@@ -170,7 +170,7 @@ def _bar_pair_that_would_buy_pull(day: str = "2026-08-25") -> list[BarEvidence]:
             chronology_legal=True,
         )
 
-    return [bar("09:20", 50), bar("09:25", 80)]
+    return [bar("09:15", -40), bar("09:20", 50), bar("09:25", 80)]
 
 
 # ---------- source contract ----------
