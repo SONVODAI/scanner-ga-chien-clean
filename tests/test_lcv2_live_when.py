@@ -153,8 +153,8 @@ def test_actionable_routes_only():
         _row("GGG", "THEO DÕI", source="buy_elite_learning_history"),
     ]
     selected = select_actionable_v2(rows, now=_ts(f"{DAY} 09:20:45"))
-    assert {rec["symbol"] for rec in selected.fetch} == {"AAA", "BBB", "CCC", "DDD"}
-    assert ACTIONABLE_LIVE_SETUPS == {"PULL ĐẸP", "PULL VỪA", "CP MẠNH", "MUA BREAK"}
+    assert {rec["symbol"] for rec in selected.fetch} == {"AAA", "BBB", "CCC", "DDD", "EEE"}
+    assert ACTIONABLE_LIVE_SETUPS == {"PULL ĐẸP", "PULL VỪA", "CP MẠNH", "MUA BREAK", "MUA EARLY"}
     assert selected.fetch[0]["ema9_at_first_seen"] == 100.0
     assert selected.fetch[0]["provenance"]
 
@@ -286,8 +286,8 @@ def test_empty_universe_clears_current_rows(tmp_path):
         action_out_dir=action_dir,
     )
     sweet = _row("AGR", "", source="market_aware_sweetspot", session=DAY)
-    early = _row("MSH", "MUA EARLY")
-    status = feed.run_v2_when_cycle(sidecar_rows=[sweet, early])
+    watched = _row("MSH", "THEO DÕI")
+    status = feed.run_v2_when_cycle(sidecar_rows=[sweet, watched])
     assert status["published_empty"] is True
     assert status["kbs_polled"] is False
     current = json.loads((action_dir / "v2_action_state.json").read_text(encoding="utf-8"))
@@ -316,20 +316,38 @@ def test_empty_universe_clears_current_rows(tmp_path):
 
 
 def _quiet_bars() -> list[dict]:
-    """Three completed bars. Equal volume stays NORMAL; close sits above EMA9."""
-    rows = []
-    for hm in ("09:15", "09:20", "09:25"):
-        rows.append(
-            {
-                "time": f"{DAY} {hm}:00",
-                "open": 27.15,
-                "high": 27.30,
-                "low": 27.10,
-                "close": 27.20,
-                "volume": 1000,
-            }
-        )
-    return rows
+    """Pull touch with contracting volume, then a quiet hold back above EMA9.
+
+    09:15 only seeds the session median (the first bar has no expansion class).
+    09:20 trades in the EMA9 area on half that volume (CONTRACTION).
+    09:25 holds 27.20 on volume that stays under 2.0× the prior median (NORMAL).
+    """
+    return [
+        {
+            "time": f"{DAY} 09:15:00",
+            "open": 27.15,
+            "high": 27.30,
+            "low": 27.10,
+            "close": 27.20,
+            "volume": 2000,
+        },
+        {
+            "time": f"{DAY} 09:20:00",
+            "open": 27.12,
+            "high": 27.16,
+            "low": 27.00,
+            "close": 27.05,
+            "volume": 1000,
+        },
+        {
+            "time": f"{DAY} 09:25:00",
+            "open": 27.10,
+            "high": 27.30,
+            "low": 27.08,
+            "close": 27.20,
+            "volume": 1400,
+        },
+    ]
 
 
 def _below_ref_bars() -> list[dict]:
@@ -592,13 +610,16 @@ def test_replay_2026_09_23_universe_counts_only():
         ("2026-09-23T14:13:28+07:00", 11, 6, 2, 24, 8, 19),
         ("2026-09-23T14:33:17+07:00", 0, 0, 0, 0, 8, 0),
     ]
-    for observed, pull, manh, break_, early, sweet, expect_fetch in cases:
-        selected = select_actionable_v2(book(pull, manh, break_, early, sweet), now=_ts(observed))
-        assert len(selected.fetch) == expect_fetch
-        assert selected.n_actionable == pull + manh + break_
+    for observed, pull, manh, break_, early, _sweet, _prior_fetch in cases:
+        selected = select_actionable_v2(book(pull, manh, break_, early, _sweet), now=_ts(observed))
+        actionable = pull + manh + break_ + early
+        assert selected.n_actionable == actionable
         assert len(selected.fetch) <= LIVE_UNIVERSE_CAP
         assert len(selected.fetch) * (60.0 / GUEST_RPM) < 300
-    assert 17 <= 23 <= LIVE_UNIVERSE_CAP
+        if _ts(observed) < _ts(f"{DAY} 09:15:00"):
+            assert selected.fetch == []
+        else:
+            assert len(selected.fetch) == min(actionable, LIVE_UNIVERSE_CAP)
 
 
 def _rollover_nom(setup: str = "PULL VỪA", *, symbol: str = "BVH"):

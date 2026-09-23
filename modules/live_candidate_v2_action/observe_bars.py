@@ -41,6 +41,20 @@ def _expansion_state(features: Mapping[str, Any]) -> str | None:
     return None
 
 
+def _expansion_ratio(features: Mapping[str, Any]) -> float | None:
+    """Existing FAM_EXPANSION value. None when the family was omitted."""
+    fam = features.get(FAM_EXPANSION)
+    if not isinstance(fam, Mapping):
+        return None
+    raw = fam.get("value")
+    if raw is None:
+        return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
+
+
 def _pxv_state(features: Mapping[str, Any]) -> str | None:
     fam = features.get(FAM_PXV)
     if isinstance(fam, Mapping):
@@ -86,6 +100,7 @@ def bar_evidence_from_interpret(
         raw_evidence=str(getattr(ledger, "raw_evidence", "") or ""),
         published_evidence=str(published or ""),
         volume_expansion_state=_expansion_state(features),
+        volume_expansion_ratio=_expansion_ratio(features),
         price_volume_state=pxv,
         fam_sell=_fam_sell(features),
         sell_expansion=pxv == PXV_SELL_EXP,

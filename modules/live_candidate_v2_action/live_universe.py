@@ -19,6 +19,7 @@ from modules.live_candidate_v2_action.contract import (
     CANDIDATE_IS_BUY,
     PXV_IMPLIES_BUY,
     ROUTE_BREAK,
+    ROUTE_EARLY,
     ROUTE_MANH,
     ROUTE_PULL,
 )
@@ -26,8 +27,9 @@ from modules.live_candidate_v2_camera.github_bus import validate_v2_sidecar_docu
 from modules.live_candidate_v2_camera.observe import pxv_implies_buy
 
 # Routes evaluate_shadow_action can still move to BUY_READY.
-# MUA EARLY and empty/UNKNOWN setups are intentionally absent.
-ACTIONABLE_LIVE_SETUPS = frozenset(ROUTE_PULL | {ROUTE_MANH, ROUTE_BREAK})
+# MUA EARLY is observed so completed 5m bars can reach its own WHEN rule.
+# Empty/UNKNOWN setups stay out.
+ACTIONABLE_LIVE_SETUPS = frozenset(ROUTE_PULL | {ROUTE_MANH, ROUTE_BREAK, ROUTE_EARLY})
 
 
 @dataclass
@@ -145,7 +147,7 @@ def select_actionable_v2(
     now: datetime,
     cap: int = LIVE_UNIVERSE_CAP,
 ) -> ActionableUniverse:
-    """PULL / MẠNH / BREAK only. Dedup by symbol. Cap applies to the fetch list."""
+    """PULL / MẠNH / BREAK / EARLY. Dedup by symbol. Cap applies to the fetch list."""
     now_ts = pd.Timestamp(as_vn(now))
     by_symbol: dict[str, list[dict[str, Any]]] = {}
     for raw in rows or []:

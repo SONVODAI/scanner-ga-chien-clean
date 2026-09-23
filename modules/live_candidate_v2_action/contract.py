@@ -56,6 +56,25 @@ ROUTE_EARLY = SECONDARY_SETUP
 PRIMARY_ACTION_SETUPS = PRIMARY_SETUPS
 
 QUIET_VOLUME = frozenset({"CONTRACTION", "NORMAL"})
+# Quiet-supply evidence inside a pull. NORMAL may confirm a hold; it is not
+# itself evidence that supply dried up.
+PULL_SUPPLY_VOLUME = "CONTRACTION"
+
+# close_vs_ref_pct at or under this is the frozen EMA9 area (every close
+# below the ref is included). 1.0 is the existing daily PULL ĐẸP distance
+# band from classify_pull_label, read here off the frozen 5m comparison.
+# Not a new indicator.
+PULL_ZONE_MAX_PCT = 1.0
+
+# EARLY reads FAM_EXPANSION["value"] (bar volume / median of up to
+# RESEARCH_DEFAULT_SESSION_MEDIAN_BARS prior same-session bars).
+# Improvement is strictly above that median. The ceiling is the existing
+# breakout multiple RESEARCH_DEFAULT_EXPANSION_X (2.0), exclusive, so a
+# 2.0× spike stays a BREAK/MẠNH event and cannot qualify EARLY.
+# Price progress uses the same 1.0% EMA9 band: above the frozen EMA9, and
+# not an extension beyond that band.
+EARLY_MODERATE_VOLUME_MIN = 1.0
+EARLY_MAX_PROGRESS_PCT = PULL_ZONE_MAX_PCT
 
 DEFAULT_ARTIFACT_RELPATH = "research/live_candidate_v2_action"
 EVIDENCE_NAME = "v2_action_evidence.jsonl"
@@ -79,6 +98,12 @@ REASON_PULL_BELOW_REF = "PULL_BELOW_REF"
 REASON_PULL_BUY_READY = "PULL_TWO_BAR_RECLAIM_QUIET_VOLUME"
 REASON_PULL_FAM_SELL = "PULL_FAM_SELL_ON_CONFIRMATION"
 REASON_PULL_VOLUME_NOT_QUIET = "PULL_VOLUME_NOT_QUIET"
+REASON_PULL_NO_QUIET_SUPPLY = "PULL_NO_QUIET_SUPPLY_BEFORE_RECLAIM"
+REASON_EARLY_SINGLE_BAR = "EARLY_SINGLE_BAR_INCOMPLETE"
+REASON_EARLY_PRICE = "EARLY_PRICE_NOT_CONTROLLED"
+REASON_EARLY_VOLUME = "EARLY_VOLUME_NOT_MODERATE"
+REASON_EARLY_FAM_SELL = "EARLY_DISTRIBUTION_ON_CONFIRMATION"
+REASON_EARLY_BUY_READY = "EARLY_CONTROLLED_PROGRESS_MODERATE_VOLUME"
 REASON_MANH_PRICE_NO_STRENGTHEN = "MANH_BREAK_PRICE_ABOVE_NO_STRENGTHEN"
 REASON_MANH_STRENGTHEN_BELOW = "MANH_BREAK_STRENGTHEN_BELOW_REF"
 REASON_MANH_BUY_READY = "MANH_BREAK_TWO_BAR_ABOVE_REF_PUBLISHED_STRENGTHEN"

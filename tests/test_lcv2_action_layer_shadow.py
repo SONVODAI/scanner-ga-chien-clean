@@ -28,7 +28,6 @@ from modules.live_candidate_v2_action.contract import (
     PXV_IMPLIES_BUY,
     REASON_CONFLICT,
     REASON_DATE_ONLY,
-    REASON_EARLY_EVIDENCE_ONLY,
     REASON_MANH_BUY_READY,
     REASON_MANH_PRICE_NO_STRENGTHEN,
     REASON_MANH_STRENGTHEN_BELOW,
@@ -213,7 +212,7 @@ def test_pull_weakening_conjunction_is_weakened():
 def test_weakened_must_pass_wait_before_buy_ready():
     bars = [
         _bar("09:15", close_vs_ref=-80, fam_sell=True, published="WEAKEN"),
-        _bar("09:20", close_vs_ref=20, vol_state="NORMAL"),
+        _bar("09:20", close_vs_ref=20, vol_state="CONTRACTION"),
         _bar("09:25", close_vs_ref=40, vol_state="NORMAL"),
     ]
     r = evaluate_shadow_action(_nom(), bars)
@@ -311,7 +310,7 @@ def test_early_never_buy_ready():
         [_bar("09:15", close_vs_ref=50, ref_state="UNAVAILABLE", ref_kind="")],
     )
     assert r1.action_state == STATE_WAIT
-    assert r1.action_reason == REASON_EARLY_EVIDENCE_ONLY
+    assert r1.action_reason == "EARLY_NO_DEFENSIBLE_FROZEN_REF"
     assert r1.action_state != STATE_BUY_READY
 
 
@@ -323,7 +322,7 @@ def test_pre_eligible_bars_ignored():
         _nom(eligible="2026-08-14T09:20:00+07:00"),
         [
             _bar("09:15", close_vs_ref=20, vol_state="NORMAL"),
-            _bar("09:20", close_vs_ref=40, vol_state="NORMAL"),
+            _bar("09:20", close_vs_ref=40, vol_state="CONTRACTION"),
             _bar("09:25", close_vs_ref=60, vol_state="NORMAL"),
         ],
     )
@@ -368,7 +367,7 @@ def test_unit_mismatch_fail_closed():
 
 def test_retrospective_overlay_cannot_mint_live_buy_ready():
     bars = [
-        _bar("09:15", close_vs_ref=20, vol_state="NORMAL", overlay_class=OVERLAY_TRUTH_RETROSPECTIVE),
+        _bar("09:15", close_vs_ref=20, vol_state="CONTRACTION", overlay_class=OVERLAY_TRUTH_RETROSPECTIVE),
         _bar("09:20", close_vs_ref=40, vol_state="NORMAL", overlay_class=OVERLAY_TRUTH_RETROSPECTIVE),
     ]
     r = evaluate_shadow_action(_nom(), bars, overlay_truth_class=OVERLAY_TRUTH_RETROSPECTIVE)
@@ -573,7 +572,7 @@ def test_elite_only_cycle_unchanged_no_v2_overlay(tmp_path):
 def test_permissions_remain_false_on_buy_ready_artifact(tmp_path):
     nom = _nom()
     bars = [
-        _bar("09:15", close_vs_ref=20, vol_state="NORMAL"),
+        _bar("09:15", close_vs_ref=20, vol_state="CONTRACTION"),
         _bar("09:20", close_vs_ref=40, vol_state="NORMAL"),
     ]
     result = evaluate_shadow_action(nom, bars)
