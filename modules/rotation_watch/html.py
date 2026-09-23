@@ -5,7 +5,7 @@ from __future__ import annotations
 from html import escape
 from typing import Any
 
-from modules.rotation_watch.view import format_range_position_pct
+from modules.rotation_watch.view import format_last_buy_ready, format_range_position_pct
 
 CSS = """
 :root { color-scheme: light; }
@@ -21,6 +21,7 @@ th { background: #f3f5f8; }
 .TREND_HOLD { background: #dbeafe; color: #1e3a8a; font-weight: 700; }
 .RISK { background: #ffedd5; color: #9a3412; font-weight: 700; }
 .DATA_UNCERTAIN, .WAIT { background: #fef3c7; color: #92400e; font-weight: 700; }
+.history { color: #5b6370; font-weight: 400; background: transparent; }
 .empty { padding: 16px; font-weight: 700; }
 .evidence { font-size: 12px; color: #374151; }
 """
@@ -44,6 +45,7 @@ def render_html(panel: dict[str, Any]) -> str:
         for row in data.get("rows") or []:
             last = str(row.get("last_session_state") or row.get("rotation_state") or "")
             action = str(row.get("suggested_action") or "")
+            history = format_last_buy_ready(row)
             ev = escape(" · ".join(row.get("rotation_evidence") or []))
             rng_s = format_range_position_pct(row.get("range_position_pct"))
             pnl = row.get("pnl_pct")
@@ -61,6 +63,7 @@ def render_html(panel: dict[str, Any]) -> str:
                 f"<td class=\"{HIGHLIGHT.get(last, '')}\">{escape(last)}</td>"
                 f"<td>{escape(str(row.get('last_session_action') or ''))}</td>"
                 f"<td class=\"{HIGHLIGHT.get(action, '')}\">{escape(action)}</td>"
+                f"<td class=\"history\">{escape(history)}</td>"
                 f"<td>{escape(str(row.get('session_phase') or ''))}</td>"
                 f"<td>{escape(str(row.get('raw_pxv') or ''))}</td>"
                 f"<td>{escape(str(row.get('published_pxv') or ''))}</td>"
@@ -78,7 +81,7 @@ def render_html(panel: dict[str, Any]) -> str:
             "<th>Symbol</th><th>Current Price</th><th>Location</th>"
             "<th>Lower Zone</th><th>Upper Zone</th>"
             "<th>Range Position %</th><th>Last-session State</th>"
-            "<th>Last-session Action</th><th>Suggested Action</th>"
+            "<th>Last-session Action</th><th>Suggested Action</th><th>History</th>"
             "<th>Session</th><th>Raw P×V</th><th>Published P×V</th><th>P×V evidence / why</th>"
             "<th>Last completed 5m bar</th><th>Data Freshness</th>"
             "<th>Entry Price</th><th>P/L %</th><th>Rotation evidence</th><th>Action gate</th>"

@@ -9,7 +9,7 @@ from typing import Any
 
 from modules.live_candidate.calendar import as_vn
 from modules.rotation_watch.config import default_watch_dir
-from modules.rotation_watch.constants import SCHEMA_STATE, STATE_NAME
+from modules.rotation_watch.constants import SCHEMA_STATE, ST_BUY_READY, STATE_NAME
 
 # Future alert hooks look at these pairs only. V1 records them; no Telegram.
 ALERTABLE_TRANSITIONS = frozenset(
@@ -56,6 +56,74 @@ def save_state(payload: dict[str, Any], path: Path | None = None) -> Path:
     return dest
 
 
+def _row_value(row: Any, key: str) -> Any:
+    if isinstance(row, dict):
+        return row.get(key)
+    return getattr(row, key, None)
+
+
+def _nonempty_text(value: Any) -> str:
+    if isinstance(value, str) and value.strip():
+        return value
+    return ""
+
+
+def capture_buy_ready(row: Any, symbol: str, stamp: str) -> dict[str, Any]:
+    """Fields already present on this cycle. Missing values are omitted, not guessed."""
+    record: dict[str, Any] = {
+        "symbol": symbol,
+        "last_buy_ready_at": stamp,
+    }
+    price = _row_value(row, "current_price")
+    if price is not None and price != "":
+        record["price"] = price
+    location = _nonempty_text(_row_value(row, "location"))
+    if location:
+        record["location"] = location
+    published = _nonempty_text(_row_value(row, "published_pxv"))
+    if published:
+        record["published_pxv"] = published
+    reason = _nonempty_text(_row_value(row, "pxv_why")) or _nonempty_text(
+        _row_value(row, "published_why")
+    )
+    if reason:
+        record["reason"] = reason
+    return record
+
+
+def backfill_buy_ready(symbol: str, transitions: list[Any]) -> dict[str, Any] | None:
+    """Latest retained transition into BUY_READY. Timestamp only — old rows have no price/P×V."""
+    latest_at = ""
+    for item in transitions:
+        if not isinstance(item, dict):
+            continue
+        if item.get("to") != ST_BUY_READY:
+            continue
+        at = _nonempty_text(item.get("at"))
+        if at and at > latest_at:
+            latest_at = at
+    if not latest_at:
+        return None
+    return {"symbol": symbol, "last_buy_ready_at": latest_at}
+
+
+def _kept_buy_ready(rec: dict[str, Any]) -> dict[str, Any] | None:
+    raw = rec.get("last_buy_ready")
+    if not isinstance(raw, dict):
+        return None
+    if not _nonempty_text(raw.get("last_buy_ready_at")):
+        return None
+    return dict(raw)
+
+
+def copy_persisted_fields(row: Any, rec: dict[str, Any]) -> None:
+    row.previous_state = str(rec.get("previous_state") or "")
+    row.first_entered_at = str(rec.get("first_entered_at") or "")
+    row.latest_transition_at = str(rec.get("latest_transition_at") or "")
+    raw = rec.get("last_buy_ready")
+    row.last_buy_ready = dict(raw) if isinstance(raw, dict) else {}
+
+
 def apply_transitions(
     rows: list[Any],
     *,
@@ -75,6 +143,8 @@ def apply_transitions(
         first = rec.get("first_entered_at") or stamp
         latest = rec.get("latest_transition_at") or stamp
         transitions = list(rec.get("transitions") or [])
+        last_buy_ready = _kept_buy_ready(rec)
+        entered_buy_ready = current == ST_BUY_READY and previous != current
         if previous != current:
             if previous:
                 transitions.append(
@@ -91,6 +161,14 @@ def apply_transitions(
                 first = stamp
                 latest = stamp
             transitions = transitions[-50:]
+        # last_buy_ready survives later states and calendar days. The 50-transition
+        # cap does not apply to it. A newer entry into BUY_READY replaces it.
+        # If the field is absent, backfill only the latest retained to==BUY_READY
+        # timestamp — price/location/P×V are not reconstructed.
+        if entered_buy_ready:
+            last_buy_ready = capture_buy_ready(row, symbol, stamp)
+        elif last_buy_ready is None:
+            last_buy_ready = backfill_buy_ready(symbol, transitions)
         symbols[symbol] = {
             "previous_state": previous,
             "current_state": current,
@@ -98,6 +176,8 @@ def apply_transitions(
             "latest_transition_at": latest,
             "transitions": transitions,
         }
+        if last_buy_ready:
+            symbols[symbol]["last_buy_ready"] = last_buy_ready
         out.append(symbols[symbol] | {"symbol": symbol})
     payload["updated_at"] = stamp
     payload["schema"] = SCHEMA_STATE

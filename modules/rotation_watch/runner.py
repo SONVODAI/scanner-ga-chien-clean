@@ -19,7 +19,7 @@ from modules.rotation_watch.data import SymbolSnapshot, fetch_symbol_snapshot
 from modules.rotation_watch.engine import RotationRow, evaluate_row
 from modules.rotation_watch.pxv import RotationPxV, interpret_completed_bars
 from modules.rotation_watch.session import session_phase
-from modules.rotation_watch.state import apply_transitions, default_state_path
+from modules.rotation_watch.state import apply_transitions, copy_persisted_fields, default_state_path
 
 BAR_MINUTES = 5
 DEFAULT_RPM = 18
@@ -67,6 +67,7 @@ def _row_to_artifact(row: RotationRow, *, observed_at: str, source: str, source_
         "current_state": row.rotation_state,
         "first_entered_at": row.first_entered_at,
         "latest_transition_at": row.latest_transition_at,
+        "last_buy_ready": dict(row.last_buy_ready) if row.last_buy_ready else {},
         "t25_checkpoint": row.t25_checkpoint,
         "has_position": row.has_position,
         "note": row.note,
@@ -138,10 +139,7 @@ def run_cycle(
         persisted = apply_transitions(evaluated, now=now, path=state_path or default_state_path())
         by_sym = {p["symbol"]: p for p in persisted}
         for item in evaluated:
-            rec = by_sym.get(item.symbol) or {}
-            item.previous_state = str(rec.get("previous_state") or "")
-            item.first_entered_at = str(rec.get("first_entered_at") or "")
-            item.latest_transition_at = str(rec.get("latest_transition_at") or "")
+            copy_persisted_fields(item, by_sym.get(item.symbol) or {})
 
     art_rows = [
         _row_to_artifact(

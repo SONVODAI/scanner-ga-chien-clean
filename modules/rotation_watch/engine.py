@@ -38,7 +38,7 @@ from modules.rotation_watch.constants import (
 )
 from modules.rotation_watch.data import SymbolSnapshot, fetch_snapshots
 from modules.rotation_watch.pxv import RotationPxV, interpret_completed_bars
-from modules.rotation_watch.state import apply_transitions, default_state_path
+from modules.rotation_watch.state import apply_transitions, copy_persisted_fields, default_state_path
 
 
 def price_location(price_vnd: int, row: WatchRow) -> str:
@@ -150,6 +150,7 @@ class RotationRow:
     latest_transition_at: str = ""
     t25_checkpoint: str = ""
     has_position: bool = False
+    last_buy_ready: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -414,10 +415,7 @@ def build_board(
         )
         by_sym = {p["symbol"]: p for p in persisted}
         for item in evaluated:
-            rec = by_sym.get(item.symbol) or {}
-            item.previous_state = str(rec.get("previous_state") or "")
-            item.first_entered_at = str(rec.get("first_entered_at") or "")
-            item.latest_transition_at = str(rec.get("latest_transition_at") or "")
+            copy_persisted_fields(item, by_sym.get(item.symbol) or {})
 
     return RotationBoard(
         rows=evaluated,
