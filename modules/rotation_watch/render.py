@@ -7,7 +7,12 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from modules.rotation_watch.view import build_panel, display_table, format_range_position_pct
+from modules.rotation_watch.view import (
+    build_panel,
+    display_table,
+    format_last_buy_ready,
+    format_range_position_pct,
+)
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
 
@@ -106,6 +111,9 @@ def render_rotation_watch_panel(
                     f"Last-session {state} → current action {action}</div>",
                     unsafe_allow_html=True,
                 )
+                history = format_last_buy_ready(row)
+                if history:
+                    st.caption(history)
                 if row.get("action_gate_reason"):
                     st.warning(row.get("action_gate_reason"))
                 st.write(

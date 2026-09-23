@@ -16,6 +16,21 @@ from modules.rotation_watch.read import load_panel_sources
 from modules.rotation_watch.session import apply_actionability, session_phase
 
 
+def format_last_buy_ready(row: Any) -> str:
+    """Compact history line. Empty unless this symbol has a stored BUY_READY entry."""
+    rec = row.get("last_buy_ready") if isinstance(row, dict) else getattr(row, "last_buy_ready", None)
+    if not isinstance(rec, dict):
+        return ""
+    stamp = rec.get("last_buy_ready_at") or ""
+    if not isinstance(stamp, str) or not stamp.strip():
+        return ""
+    try:
+        dt = as_vn(datetime.fromisoformat(stamp.strip()))
+    except ValueError:
+        return ""
+    return f"Last BUY READY: {dt.strftime('%Y-%m-%d %H:%M')}"
+
+
 def format_range_position_pct(value: Any) -> str:
     """Display-only. One decimal plus %. No clamp; underlying value unchanged."""
     if value is None or value == "":
@@ -143,6 +158,7 @@ def display_table(panel: dict[str, Any]) -> Any:
                 "Last-session State": row.get("last_session_state") or row.get("rotation_state"),
                 "Last-session Action": row.get("last_session_action"),
                 "Suggested Action": row.get("suggested_action"),
+                "History": format_last_buy_ready(row),
                 "Session": row.get("session_phase"),
                 "Raw P×V": row.get("raw_pxv"),
                 "Published P×V": row.get("published_pxv"),
