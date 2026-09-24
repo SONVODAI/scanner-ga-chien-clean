@@ -20,6 +20,21 @@
       "symbol": "IDC",
       "entry_price": 32200.0,
       "entry_date": "2026-09-18"
+    },
+    {
+      "symbol": "VGI",
+      "entry_price": 83700.0,
+      "entry_date": "2026-09-24"
+    },
+    {
+      "symbol": "VHM",
+      "entry_price": 66200.0,
+      "entry_date": "2026-09-24"
+    },
+    {
+      "symbol": "F88",
+      "entry_price": 54900.0,
+      "entry_date": "2026-09-24"
     }
   ]
 }
