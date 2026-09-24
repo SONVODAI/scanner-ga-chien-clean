@@ -187,7 +187,10 @@ def state_document(
             {
                 "symbol": r.symbol,
                 "setup": r.setup,
+                # Nomination / freeze provenance. Not rewritten on rollover.
                 "session": r.session,
+                # Cash session of this observation. Independent of row.session.
+                "observation_session": session,
                 "shadow_action": r.action_state,
                 "shadow_label": r.shadow_label,
                 "action_reason": r.action_reason,
