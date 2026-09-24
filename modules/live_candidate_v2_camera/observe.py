@@ -35,7 +35,23 @@ def _num(value: object) -> float | None:
 
 
 def to_canonical_integer_vnd(value: object) -> int | None:
-    """Reuse Camera CanonicalBar normalization. None if the helper rejects."""
+    """Integer VND at the action comparison boundary.
+
+    KBS closes below 1000 are thousands (145.9 → 145900). Whole numbers at or
+    above 1000 are already VND (13500 → 13500, 145900 → 145900) and stay on
+    the Camera helper.
+
+    A fractional value at or above 1000 is a Brain A VND level, such as EMA9
+    143958.2. The collector helper treats every non-integer as KBS thousands
+    and would multiply it by 1000. Round that value to the nearest VND here
+    instead. This function does not change collector normalization.
+    """
+    number = _num(value)
+    if number is not None and number >= 1000 and number != int(number):
+        rounded = int(round(number))
+        if rounded < 1:
+            return None
+        return rounded
     try:
         return normalize_price_to_integer_vnd(value)
     except (TypeError, ValueError):

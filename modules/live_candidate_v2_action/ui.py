@@ -23,8 +23,11 @@ from modules.live_candidate_v2_action.contract import (
     SHADOW_BUY_READY_LABEL,
     SHADOW_CAPTION,
     STATE_BUY_READY,
+    STATE_NAME as ACTION_STATE_NAME,
     WAITING_FOR_NEXT_LIVE_ELIGIBLE_5M,
 )
+from modules.live_shadow_transport.contract import V2_ACTION_STATE_NAME
+from modules.live_shadow_transport.shadow_store import default_shadow_store
 from modules.live_shadow_transport.artifact_get import (
     EvidenceTransportError,
     LiveShadowNotFound,
@@ -78,9 +81,64 @@ VALIDATION_COLUMNS: tuple[tuple[str, str], ...] = (
 )
 
 
+def _read_json_object(path: Path) -> dict[str, Any] | None:
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _row_count(doc: Mapping[str, Any] | None) -> int:
+    if not isinstance(doc, Mapping):
+        return 0
+    rows = doc.get("rows")
+    if not isinstance(rows, list):
+        return 0
+    return sum(1 for rec in rows if isinstance(rec, Mapping))
+
+
+def choose_local_action_state(
+    published: Path,
+    research: Path,
+) -> dict[str, Any] | None:
+    """Prefer the published live-WHEN file over an empty local copy.
+
+    Remote GET is unchanged and does not fall back here. A file with rows
+    wins over a same-reader empty ``rows`` list. Two populated files keep
+    the later ``observed_at``. An empty current file does not hide rows.
+    """
+    published_doc = _read_json_object(published)
+    research_doc = _read_json_object(research)
+    if published_doc is None:
+        return research_doc
+    if research_doc is None:
+        return published_doc
+    published_session = str(published_doc.get("session") or "")
+    research_session = str(research_doc.get("session") or "")
+    if published_session and research_session and published_session != research_session:
+        return published_doc if published_session > research_session else research_doc
+    published_rows = _row_count(published_doc)
+    research_rows = _row_count(research_doc)
+    if published_rows and not research_rows:
+        return published_doc
+    if research_rows and not published_rows:
+        return research_doc
+    published_at = str(published_doc.get("observed_at") or "")
+    research_at = str(research_doc.get("observed_at") or "")
+    if research_at > published_at:
+        return research_doc
+    return published_doc
+
+
 def load_shadow_state(path: Path | None = None) -> dict[str, Any] | None:
-    store = V2ActionStore(path) if path is not None else V2ActionStore(default_action_dir())
-    return store.read_state()
+    if path is not None:
+        return V2ActionStore(path).read_state()
+    published = default_shadow_store() / V2_ACTION_STATE_NAME
+    research = default_action_dir() / ACTION_STATE_NAME
+    return choose_local_action_state(published, research)
 
 
 def accept_shadow_state_document(
