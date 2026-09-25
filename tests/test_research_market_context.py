@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -102,6 +103,60 @@ def test_stale_history_keeps_the_close_and_marks_status(tmp_path: Path):
     assert result["row"]["previous_close_date"] == "2026-08-01"
 
 
+def test_canonical_previous_close_is_t_minus_1_not_same_day():
+    bars = _bars(
+        ("2026-09-20", 21000),
+        ("2026-09-24", 22200),
+        ("2026-09-25", 23000),
+    )
+    selected = select_canonical_previous_close(bars, session_date=SESSION)
+    assert selected["previous_close_date"] == "2026-09-24"
+    assert selected["previous_close"] == 22200
+    assert selected["previous_close_date"] != SESSION.isoformat()
+    assert selected["last_d1_date"] == "2026-09-25"
+
+
+def test_stale_row_can_be_superseded_by_a_later_prior_bar(tmp_path: Path):
+    path = tmp_path / "previous_close.jsonl"
+    stale_bars = _bars(("2026-09-01", 18000))
+    better_bars = _bars(("2026-09-01", 18000), ("2026-09-24", 22200), ("2026-09-25", 23000))
+    first = archive_previous_close(
+        symbol="HPG",
+        daily_bars=stale_bars,
+        session_date=SESSION,
+        captured_at=datetime(2026, 9, 25, 9, 16, tzinfo=VN),
+        path=path,
+    )
+    second = archive_previous_close(
+        symbol="HPG",
+        daily_bars=better_bars,
+        session_date=SESSION,
+        captured_at=datetime(2026, 9, 25, 10, 0, tzinfo=VN),
+        path=path,
+    )
+    locked = archive_previous_close(
+        symbol="HPG",
+        daily_bars=_bars(("2026-09-24", 11111)),
+        session_date=SESSION,
+        captured_at=datetime(2026, 9, 25, 11, 0, tzinfo=VN),
+        path=path,
+    )
+    rows = load_previous_close(path)
+    assert first["row"]["status"] == "stale"
+    assert first["written"] is True
+    assert second["written"] is True
+    assert second["reason"] == "superseded"
+    assert second["row"]["previous_close"] == 22200
+    assert second["row"]["previous_close_date"] == "2026-09-24"
+    assert second["row"]["status"] == "ok"
+    assert second["row"]["supersedes"] == first["row"]["captured_at"]
+    assert locked["written"] is False
+    assert locked["reason"] == "duplicate"
+    assert len(rows) == 2
+    assert rows[0]["previous_close"] == 18000
+    assert rows[-1]["previous_close"] == 22200
+
+
 def test_d1_price_stays_integer_vnd_and_is_not_scaled_by_1000():
     assert integer_vnd_from_d1(22200) == 22200
     assert integer_vnd_from_d1(22200.4) == 22200
@@ -122,6 +177,44 @@ def test_duplicate_session_symbol_does_not_add_a_second_row(tmp_path: Path):
     assert rows[0]["previous_close"] == 22200
     assert rows[0]["price_unit"] == "integer_vnd"
     assert rows[0]["source"] == "vnstock_d1_bar_before_session"
+
+
+def test_malformed_market_context_tail_stays_fail_open(tmp_path: Path):
+    path = tmp_path / "market_context.jsonl"
+    good = {
+        "trade_date": "2026-09-25",
+        "captured_at": "2026-09-25T09:16:00+07:00",
+        "market_real": 4.2,
+        "market_live": 3.0,
+        "market_forecast": 5.0,
+        "market_regime": "WEAK",
+        "source": "streamlit_scan",
+        "scan_fingerprint": "old",
+        "status": "ok",
+    }
+    path.write_bytes((json.dumps(good) + "\n").encode() + b'{"trade_date":')
+    scan = _scan([("HPG", 22200, "PULL ĐẸP")])
+
+    def production_caller() -> str:
+        result = try_append_market_context(
+            trade_date=SESSION,
+            market_real=4.8,
+            market_live=3.0,
+            market_forecast=5.0,
+            market_regime="WEAK",
+            source="streamlit_scan",
+            scan_df=scan,
+            captured_at=datetime(2026, 9, 25, 9, 20, tzinfo=VN),
+            path=path,
+        )
+        assert result["ok"] is True
+        assert result["written"] is True
+        return "continued"
+
+    assert production_caller() == "continued"
+    rows = load_market_context(path)
+    assert [row["market_real"] for row in rows] == [4.2, 4.8]
+    assert rows[-1]["scan_fingerprint"] != "old"
 
 
 def test_identical_market_context_rerun_is_not_appended(tmp_path: Path):

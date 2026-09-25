@@ -17,7 +17,7 @@ from typing import Any
 import pandas as pd
 
 from modules.live_candidate.calendar import as_vn
-from modules.research_market_context.previous_close import context_dir
+from modules.research_market_context.previous_close import append_json_line, context_dir
 
 MARKET_CONTEXT_NAME = "market_context.jsonl"
 STATUS_OK = "ok"
@@ -135,14 +135,10 @@ def append_market_context(
         "status": STATUS_OK,
     }
     dest = Path(path) if path is not None else market_context_path()
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    previous = _last_for(_read_rows(dest), day, src)
+    previous = _last_for(_read_rows(dest), day, src) if dest.exists() else None
     if previous is not None and _unchanged(previous, row):
         return {"ok": True, "written": False, "reason": "unchanged", "row": previous}
-    with dest.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-        fh.flush()
-        os.fsync(fh.fileno())
+    append_json_line(dest, row)
     return {"ok": True, "written": True, "reason": "appended", "row": row}
 
 

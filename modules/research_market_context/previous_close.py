@@ -150,6 +150,39 @@ def _key(session_date: str, symbol: str) -> tuple[str, str]:
     return session_date, symbol.strip().upper()
 
 
+def append_json_line(path: Path, row: Mapping[str, Any]) -> None:
+    """Append one JSON object as its own line.
+
+    A truncated tail from an interrupted write is left in place and separated
+    with a newline so the new record stays parseable. The bad fragment is
+    skipped on read.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    prefix = b""
+    if path.exists() and path.stat().st_size > 0:
+        with path.open("rb") as fh:
+            fh.seek(-1, os.SEEK_END)
+            if fh.read(1) != b"\n":
+                prefix = b"\n"
+    payload = (json.dumps(dict(row), ensure_ascii=False) + "\n").encode("utf-8")
+    with path.open("ab") as fh:
+        if prefix:
+            fh.write(prefix)
+        fh.write(payload)
+        fh.flush()
+        os.fsync(fh.fileno())
+
+
+def _effective_row(existing: list[dict[str, Any]], session_date: str, symbol: str) -> dict[str, Any] | None:
+    """Last retained line for the key. Earlier stale lines stay in the file."""
+    found: dict[str, Any] | None = None
+    want = _key(session_date, symbol)
+    for prior_row in existing:
+        if _key(str(prior_row.get("session_date") or ""), str(prior_row.get("symbol") or "")) == want:
+            found = prior_row
+    return found
+
+
 def archive_previous_close(
     *,
     symbol: str,
@@ -158,7 +191,12 @@ def archive_previous_close(
     captured_at: datetime | None = None,
     path: Path | None = None,
 ) -> dict[str, Any]:
-    """Insert one canonical row per (session_date, symbol). First row wins."""
+    """Append the canonical close. An ``ok`` row is immutable.
+
+    A ``stale`` row may be followed by a later line whose ``previous_close_date``
+    is strictly newer and still before ``session_date``. The stale line stays
+    for audit. ``supersedes`` is that line's ``captured_at``.
+    """
     sym = str(symbol or "").strip().upper()
     if not sym:
         raise ValueError("symbol is required")
@@ -179,20 +217,24 @@ def archive_previous_close(
         "status": selected["status"],
         "last_d1_date": selected["last_d1_date"],
         "last_d1_close_before_injection": selected["last_d1_close_before_injection"],
+        "supersedes": None,
     }
     if row["status"] == STATUS_MISSING:
         return {"ok": True, "written": False, "reason": "missing", "row": row}
     dest = Path(path) if path is not None else previous_close_path()
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    existing = _read_rows(dest)
-    want = _key(row["session_date"], row["symbol"])
-    for prior_row in existing:
-        if _key(str(prior_row.get("session_date") or ""), str(prior_row.get("symbol") or "")) == want:
-            return {"ok": True, "written": False, "reason": "duplicate", "row": prior_row}
-    with dest.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-        fh.flush()
-        os.fsync(fh.fileno())
+    existing = _read_rows(dest) if dest.exists() else []
+    current = _effective_row(existing, row["session_date"], row["symbol"])
+    if current is not None:
+        if str(current.get("status") or "") == STATUS_OK:
+            return {"ok": True, "written": False, "reason": "duplicate", "row": current}
+        old_date = str(current.get("previous_close_date") or "")
+        new_date = str(row["previous_close_date"] or "")
+        if not new_date or not old_date or new_date <= old_date:
+            return {"ok": True, "written": False, "reason": "not_newer", "row": current}
+        row["supersedes"] = current.get("captured_at")
+        append_json_line(dest, row)
+        return {"ok": True, "written": True, "reason": "superseded", "row": row}
+    append_json_line(dest, row)
     return {"ok": True, "written": True, "reason": "appended", "row": row}
 
 

@@ -6,19 +6,24 @@ Runtime JSONL files are local artifacts and are not source.
 
 ## `previous_close.jsonl`
 
-One row per `(session_date, symbol)`. The first write wins. A later attempt does not add a second row.
-
 Canonical previous close is the close of the latest daily bar whose date is strictly before `session_date`. A same-day daily row is never stored in `previous_close`.
+
+The current row for a `(session_date, symbol)` is the **last line** with that key. Earlier lines stay in the file.
+
+- An `ok` line is immutable. A later scan does not append another line for that key.
+- A `stale` line may be followed by a correction when a later download has a strictly newer `previous_close_date` that is still before `session_date`. The new line sets `supersedes` to the corrected line's `captured_at`. The stale line is not deleted.
 
 `previous_close` is integer VND via `round(d1_close, 0)`. The KBS thousands multiplier is not applied.
 
 `last_d1_date` and `last_d1_close_before_injection` describe the last daily row before live injection. They are audit fields, not the canonical previous close.
 
-`status`:
+`status` is a research quality label, not a validity bit and not a trading rule:
 
-- `ok` — prior bar exists and is within 7 calendar days
-- `stale` — prior bar exists but the gap is longer than 7 calendar days; the close is still stored
-- `missing` — no dated bar before `session_date`; `previous_close` is null
+- `ok` — a prior bar exists and the calendar gap is 7 days or less
+- `stale` — a prior bar exists and the calendar gap is longer than 7 days. The close is still stored and is still usable. This is only a data-quality warning. A long exchange holiday can make the true prior session older than 7 calendar days, so `stale` does **not** mean invalid, discarded, or unusable
+- `missing` — no dated bar before `session_date`. Nothing is written, and no close is invented
+
+There is no exchange-holiday calendar in this archive. `modules/live_candidate/calendar.py` only skips weekends, so it is not used to decide `stale`.
 
 ## `market_context.jsonl`
 
