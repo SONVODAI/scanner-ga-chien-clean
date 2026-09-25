@@ -1519,8 +1519,23 @@ def classify_group(row: dict) -> str:
 # =========================================================
 # ANALYZE ONE SYMBOL
 # =========================================================
+def _archive_research_previous_close(symbol: str, raw: pd.DataFrame) -> None:
+    """Best-effort research archive. Failure must not change the scan row."""
+    try:
+        from modules.research_market_context.previous_close import try_archive_previous_close
+
+        try_archive_previous_close(
+            symbol=symbol,
+            daily_bars=raw,
+            session_date=vn_now().date(),
+        )
+    except Exception:
+        pass
+
+
 def analyze_symbol(symbol: str) -> dict | None:
     raw = download_symbol_data(symbol)
+    _archive_research_previous_close(symbol, raw)
     if raw.empty or len(raw) < 40:
         return None
 
@@ -5883,6 +5898,21 @@ except Exception as e:
 _storm_score_frame = _compute_storm_score_frame(scan_df)
 storm_df = build_storm_leaders(scan_df, storm_score_frame=_storm_score_frame)
 _regime_name, _, _regime_note = elite_regime(market_real, market_forecast)
+try:
+    from modules.research_market_context.contract import SOURCE_STREAMLIT_SCAN
+    from modules.research_market_context.market_context import try_append_market_context
+
+    try_append_market_context(
+        trade_date=vn_now().date(),
+        market_real=market_real,
+        market_live=market_live,
+        market_forecast=market_forecast,
+        market_regime=_regime_name,
+        source=SOURCE_STREAMLIT_SCAN,
+        scan_df=scan_df,
+    )
+except Exception:
+    pass
 evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
 pullback_df = build_pullback_buy_list(

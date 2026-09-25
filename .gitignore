@@ -11,6 +11,9 @@ __pycache__/
 # Intraday memory Parquet data (local/test — not committed to Git)
 /intraday_memory/
 
+# Research retention runtime (schema is documented in the README)
+research/market_context_history/*.jsonl
+
 # Rotation Watch runtime (watchlist.csv is source; artifacts are ephemeral)
 data/rotation_watch/state.json
 data/rotation_watch/board.json

@@ -280,6 +280,22 @@ def build_close_scan_inputs(
             "error": f"{type(exc).__name__}: {exc}",
             "scan_df": pd.DataFrame(),
         }
+    try:
+        from modules.research_market_context.contract import SOURCE_CLOSE_SCAN
+        from modules.research_market_context.market_context import try_append_market_context
+
+        try_append_market_context(
+            trade_date=trade_date,
+            market_real=market_real,
+            market_live=market_live,
+            market_forecast=forecast.score,
+            market_regime=regime_name,
+            source=SOURCE_CLOSE_SCAN,
+            scan_df=scan_df,
+            captured_at=local_now,
+        )
+    except Exception:
+        pass
     return {
         "ok": True,
         "status": "READY",
