@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import numpy as np
 import pandas as pd
 
 from modules.live_candidate_v2_action.contract import (
@@ -24,9 +25,14 @@ from modules.research_evolution_ledger.contract import (
 from modules.research_evolution_ledger.ledger import (
     append_evolution_ledger,
     load_evolution_ledger,
+    state_hash,
     try_append_evolution_ledger,
 )
-from modules.research_market_context.market_context import scan_fingerprint
+from modules.research_market_context.market_context import (
+    append_market_context,
+    load_market_context,
+    scan_fingerprint,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -280,6 +286,182 @@ def test_market_weak_still_rejects_and_permissions_stay_closed():
     assert CANDIDATE_IS_BUY is False
     assert PXV_IMPLIES_BUY is False
     assert ALERT_ELIGIBLE is False
+
+
+def test_two_states_keep_distinct_vietnam_timestamps(tmp_path: Path):
+    path = tmp_path / "evolution_ledger.jsonl"
+    first_at = datetime(2026, 9, 25, 3, 0, tzinfo=timezone.utc)  # 10:00 VN
+    second_at = datetime(2026, 9, 25, 10, 5, tzinfo=VN)
+    _append(path, _frame([_row("GEE", price=22000)]), source=SOURCE_STREAMLIT_SCAN, when=first_at)
+    _append(
+        path,
+        _frame([_row("GEE", price=22100)]),
+        source=SOURCE_STREAMLIT_SCAN,
+        when=second_at,
+    )
+    stored = load_evolution_ledger(path)
+    stamps = [datetime.fromisoformat(row["captured_at"]) for row in stored]
+    assert [stamp.tzinfo is not None and stamp.utcoffset() == timedelta(hours=7) for stamp in stamps] == [
+        True,
+        True,
+    ]
+    assert stamps[0] < stamps[1]
+    assert stamps[0].hour == 10 and stamps[1].hour == 10
+    assert stamps[0].minute == 0 and stamps[1].minute == 5
+    assert stored[0]["source"] == stored[1]["source"] == SOURCE_STREAMLIT_SCAN
+
+
+def test_default_clock_is_vietnam_not_naive_utc(tmp_path: Path, monkeypatch):
+    path = tmp_path / "evolution_ledger.jsonl"
+    fixed = datetime(2026, 9, 25, 20, 2, tzinfo=VN)
+
+    class _FixedDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            if tz is None:
+                return datetime(2026, 9, 25, 13, 2)  # naive UTC, must not be used
+            return fixed.astimezone(tz)
+
+    monkeypatch.setattr(
+        "modules.research_evolution_ledger.ledger.datetime",
+        _FixedDateTime,
+    )
+    append_evolution_ledger(
+        trade_date=DAY,
+        source=SOURCE_CLOSE_SCAN,
+        scan_df=_frame([_row("GEE")]),
+        path=path,
+    )
+    stamp = datetime.fromisoformat(load_evolution_ledger(path)[0]["captured_at"])
+    assert stamp == fixed
+    assert stamp.utcoffset() == timedelta(hours=7)
+
+
+def test_state_hash_ignores_representation(tmp_path: Path):
+    path = tmp_path / "evolution_ledger.jsonl"
+    python_row = _row("GEE", price=22200, rs5=1.5, rsi14=None, pull_label="")
+    numpy_row = _row(
+        "GEE",
+        price=np.float64(22200.0),
+        rs5=np.float64(1.5),
+        rsi14=np.float64("nan"),
+        pull_label="  ",
+        is_live_adjusted=np.bool_(True),
+    )
+    wide = pd.DataFrame([python_row])
+    reordered = pd.DataFrame([numpy_row])[list(reversed(wide.columns))]
+    first = _append(path, wide)
+    second = _append(path, reordered, when=LATER)
+    assert first["appended"] == 1
+    assert second["appended"] == 0
+    assert len(load_evolution_ledger(path)) == 1
+
+
+def test_missing_blank_and_null_are_one_state_until_a_real_value(tmp_path: Path):
+    path = tmp_path / "evolution_ledger.jsonl"
+    missing = pd.DataFrame([{"symbol": "GEE", "price": 22200, "group": "THEO DÕI"}])
+    blank = pd.DataFrame([{
+        "symbol": "GEE",
+        "price": 22200.0,
+        "group": "THEO DÕI",
+        "rs5": np.nan,
+        "pull_label": "",
+        "rsi14": pd.NA,
+        "evolution_health_score": None,
+    }])
+    assert _append(path, missing)["appended"] == 1
+    assert _append(path, blank, when=LATER)["appended"] == 0
+    filled = blank.copy()
+    filled["rs5"] = 1.25
+    assert _append(path, filled, when=CLOSE)["appended"] == 1
+    stored = load_evolution_ledger(path)
+    assert [row["rs5"] for row in stored] == [None, 1.25]
+    assert stored[0]["state_hash"] != stored[1]["state_hash"]
+
+
+def test_same_scan_fingerprint_as_market_context(tmp_path: Path):
+    frame = _frame([
+        _row("YEU", price=10000, group="THEO DÕI"),
+        _row("MANH", price=50000, group="GÀ TĂNG TỐC"),
+    ]).sample(frac=1, random_state=1).reset_index(drop=True)
+    market_path = tmp_path / "market_context.jsonl"
+    evo_path = tmp_path / "evolution_ledger.jsonl"
+    market = append_market_context(
+        trade_date=DAY,
+        market_real=5.5,
+        market_live=4.0,
+        market_forecast=6.0,
+        market_regime="WEAK",
+        source=SOURCE_STREAMLIT_SCAN,
+        scan_df=frame,
+        captured_at=MORNING,
+        path=market_path,
+    )
+    evolution = _append(evo_path, frame)
+    market_fp = load_market_context(market_path)[0]["scan_fingerprint"]
+    evo_fp = load_evolution_ledger(evo_path)[0]["scan_fingerprint"]
+    assert market["row"]["scan_fingerprint"] == market_fp == evo_fp == evolution["scan_fingerprint"]
+    assert {row["scan_fingerprint"] for row in load_evolution_ledger(evo_path)} == {market_fp}
+
+    app = (REPO / "app.py").read_text(encoding="utf-8")
+    block = app[app.index("try_append_market_context("):app.index("evo_saved_df, evo_save_status")]
+    assert "try_append_evolution_ledger(" in block
+    assert not any(line.strip().startswith("scan_df ") for line in block.splitlines())
+
+
+def test_malformed_tail_does_not_repeat_an_existing_state(tmp_path: Path):
+    path = tmp_path / "evolution_ledger.jsonl"
+    _append(path, _frame([_row("GEE", price=22000)]))
+    with path.open("ab") as handle:
+        handle.write(b'{"trade_date":"2026-09-25","symbol":"GEE","broken"')
+    first = _append(path, _frame([_row("GEE", price=22000)]), when=LATER)
+    second = _append(path, _frame([_row("GEE", price=22000)]), when=CLOSE)
+    assert first["appended"] == 0
+    assert second["appended"] == 0
+    gee = [row for row in load_evolution_ledger(path) if row["symbol"] == "GEE"]
+    assert len(gee) == 1
+    assert gee[0]["price"] == 22000
+
+
+def test_glued_truncated_tail_recovers_once(tmp_path: Path):
+    path = tmp_path / "evolution_ledger.jsonl"
+    _append(path, _frame([_row("GEE", price=22000)]))
+    text = path.read_text(encoding="utf-8").rstrip("\n")
+    path.write_text(text + '{"truncated"', encoding="utf-8")
+    assert load_evolution_ledger(path) == []
+    recovered = _append(path, _frame([_row("GEE", price=22000)]), when=LATER)
+    repeated = _append(path, _frame([_row("GEE", price=22000)]), when=CLOSE)
+    assert recovered["appended"] == 1
+    assert repeated["appended"] == 0
+    assert len(load_evolution_ledger(path)) == 1
+
+
+def test_close_scan_observer_failure_stays_downstream(tmp_path: Path, monkeypatch):
+    from modules.close_session_scan import build_close_scan_inputs
+    from tests.test_close_session_scan import _patched_api
+
+    monkeypatch.setenv("MRBOT_MARKET_CONTEXT_DIR", str(tmp_path / "market"))
+    monkeypatch.setenv("MRBOT_EVOLUTION_LEDGER_DIR", str(tmp_path / "evolution"))
+
+    def _boom(**_kwargs):
+        raise RuntimeError("evolution ledger unavailable")
+
+    monkeypatch.setattr(
+        "modules.research_evolution_ledger.ledger.try_append_evolution_ledger",
+        _boom,
+    )
+    result = build_close_scan_inputs(
+        now=datetime(2026, 9, 22, 18, 30, tzinfo=VN),
+        symbols=["AAA"],
+        api=_patched_api(),
+    )
+    assert result["ok"] is True
+    assert result["status"] == "READY"
+    assert result["market_real"] is not None
+    assert list(result["scan_df"]["symbol"]) == ["AAA"]
+    market_file = tmp_path / "market" / "market_context.jsonl"
+    assert market_file.exists() and market_file.stat().st_size > 0
+    assert not (tmp_path / "evolution" / "evolution_ledger.jsonl").exists()
 
 
 def test_writer_does_not_call_providers_or_scoring():

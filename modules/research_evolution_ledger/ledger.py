@@ -13,11 +13,14 @@ import os
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
 from market_snapshot import market_session_slot
 from modules.live_candidate.calendar import as_vn
+
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 from modules.research_evolution_ledger.contract import (
     BOOL_FIELDS,
     LEDGER_NAME,
@@ -188,7 +191,8 @@ def append_evolution_ledger(
     if not day or not src:
         raise ValueError("trade_date and source are required")
 
-    now = as_vn(captured_at or datetime.now())
+    # Host local time may be naive UTC. Never label that clock as Vietnam.
+    now = as_vn(captured_at) if captured_at is not None else datetime.now(VN_TZ)
     slot = market_session_slot(now)
     dest = Path(path) if path is not None else ledger_path()
     fingerprint = scan_fingerprint(scan_df if isinstance(scan_df, pd.DataFrame) else None)
