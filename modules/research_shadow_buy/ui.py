@@ -36,18 +36,29 @@ def _display_rows(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def _status_decision(item: dict[str, Any]) -> str:
+    if item.get("condition_met") and item.get("market_blocked"):
+        return "SHADOW BUY — MARKET BLOCKED"
+    if item.get("condition_met"):
+        return "SHADOW BUY"
+    if item.get("route_became_evaluable_at"):
+        return "CURRENT ROUTE ACQUIRED / WAITING WHEN"
+    return "NO CURRENT EVALUABLE ROUTE"
+
+
 def _non_event_rows(status: dict[str, Any]) -> list[dict[str, Any]]:
     rows = []
     for item in status.values():
         if not isinstance(item, dict) or item.get("condition_met"):
             continue
-        reason = str(item.get("non_event_reason") or "")
-        if not reason:
+        reason = str(item.get("non_event_reason") or item.get("current_route_status") or "")
+        if not reason and not item.get("route_became_evaluable_at"):
             continue
         rows.append(
             {
                 "symbol": item.get("symbol") or "",
-                "decision": "NOT SHADOW BUY",
+                "decision": _status_decision(item),
+                "current_setup": item.get("evaluated_setup") or "",
                 "origin_setup": item.get("origin_setup") or item.get("origin_group") or "",
                 "reason": reason,
                 "source": item.get("candidate_source") or "",

@@ -74,7 +74,11 @@ from modules.live_candidate_v2_action.contract import (
     REASON_RETROSPECTIVE,
     REASON_SESSION_RESET,
     REASON_UNFINISHED,
+    REASON_CURRENT_EARLY_QUALIFIER,
+    REASON_CURRENT_REFERENCE,
+    REASON_CURRENT_UNSUPPORTED,
     REASON_INSUFFICIENT_BARS,
+    REASON_NO_CURRENT_ROUTE,
     REASON_MISSING_QUALIFIER,
     REASON_MISSING_REFERENCE,
     REASON_NO_ORIGIN_SETUP,
@@ -187,6 +191,9 @@ class FrozenNomination:
     origin_breakout_ref: float | None = None
     origin_pull_label: str = ""
     market_real: float | None = None
+    route_became_evaluable_at: str = ""
+    research_qualification: str = ""
+    current_route_status: str = ""
 
     @property
     def route(self) -> str:
@@ -333,6 +340,9 @@ def nomination_from_mapping(raw: Mapping[str, Any]) -> FrozenNomination:
         origin_breakout_ref=_num(raw.get("origin_breakout_ref")),
         origin_pull_label=str(raw.get("origin_pull_label") or ""),
         market_real=_num(raw.get("market_real")),
+        route_became_evaluable_at=str(raw.get("route_became_evaluable_at") or ""),
+        research_qualification=str(raw.get("research_qualification") or ""),
+        current_route_status=str(raw.get("current_route_status") or ""),
     )
 
 
@@ -504,6 +514,10 @@ def _legal_history(
             notes.append(REASON_CHRONOLOGY_PRE_ELIGIBLE)
             continue
         if bar.asof < first:
+            notes.append(REASON_CHRONOLOGY_PRE_ELIGIBLE)
+            continue
+        route_at = parse_legal_ts(nom.route_became_evaluable_at)
+        if route_at is not None and (bar.asof < route_at or bar.bar_ts < route_at):
             notes.append(REASON_CHRONOLOGY_PRE_ELIGIBLE)
             continue
         if action_session and as_vn(bar.asof).date().isoformat() != action_session:
@@ -746,6 +760,9 @@ def _non_event_reason(
     if condition_met:
         return ""
     if nom.route == "UNKNOWN":
+        status = str(nom.current_route_status or "").strip()
+        if status:
+            return status
         origin = str(nom.origin_setup or "").strip()
         group = str(nom.origin_group or "").strip()
         if origin == ROUTE_EARLY or group == ROUTE_EARLY:

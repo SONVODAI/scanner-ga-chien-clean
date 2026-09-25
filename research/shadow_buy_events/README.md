@@ -8,5 +8,9 @@ It is not a production BUY, not `BUY_READY` authority, and not an order.
 `execution_enabled` is false. NAV, Telegram, and order paths do not read this
 directory.
 
-Runtime files `shadow_buy_events.jsonl` and `shadow_buy_status.json` are
-gitignored. This README is the only tracked artifact.
+`research_route_stamps.jsonl` is the research-only current-session route
+stamp. It is not the Brain A freeze ledger.
+
+Runtime files `shadow_buy_events.jsonl`, `shadow_buy_status.json`, and
+`research_route_stamps.jsonl` are gitignored. This README is the only
+tracked artifact.

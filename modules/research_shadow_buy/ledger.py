@@ -88,6 +88,8 @@ def _event_row(nom: Any, result: Any) -> dict[str, Any]:
         "origin_pull_label": str(getattr(nom, "origin_pull_label", "") or ""),
         "evaluated_setup": str(getattr(result, "setup", "") or getattr(nom, "setup", "") or ""),
         "evaluated_route": route,
+        "route_became_evaluable_at": str(getattr(nom, "route_became_evaluable_at", "") or ""),
+        "research_qualification": str(getattr(nom, "research_qualification", "") or ""),
         "first_met_at": getattr(result, "first_met_at", None),
         "legal_bar_ts": getattr(result, "first_met_at", None),
         "price_at_first_met": getattr(result, "price_at_first_met", None),

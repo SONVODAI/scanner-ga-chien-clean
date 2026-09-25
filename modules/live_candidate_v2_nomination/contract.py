@@ -105,6 +105,11 @@ class BrainANomination:
     origin_pull_label: str = ""
     origin_evolution_health_group: str = ""
     origin_evolution_health_score: float | None = None
+    # Research-only current-session evaluation. Not a Brain A freeze.
+    route_became_evaluable_at: str = ""
+    research_qualification: str = ""
+    current_route_status: str = ""
+    research_stamp: bool = False
 
 
 @dataclass(frozen=True)
