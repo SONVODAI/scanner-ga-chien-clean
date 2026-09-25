@@ -42,6 +42,13 @@ STATUS_ZERO_CANDIDATES = "QUALIFIED_SWEETSPOT_BUT_0_CANDIDATES"
 
 HORIZON_ORDER: Tuple[str, ...] = ("T5", "T10", "T3")
 
+# Existing Action setup labels only. A scan group outside this set is stored
+# as origin_group and does not become origin_setup. Duplicated here so the
+# observer does not import the nomination or action packages.
+ORIGIN_ACTION_SETUPS = frozenset(
+    {"PULL ĐẸP", "PULL VỪA", "MUA BREAK", "CP MẠNH", "MUA EARLY"}
+)
+
 LEDGER_COLUMNS: Tuple[str, ...] = (
     "observer_id",
     "t0_date",
@@ -58,6 +65,13 @@ LEDGER_COLUMNS: Tuple[str, ...] = (
     "rs5_t0",
     "rs10_t0",
     "rsi14_t0",
+    "origin_group",
+    "origin_setup",
+    "origin_ema9",
+    "origin_breakout_ref",
+    "origin_pull_label",
+    "origin_evolution_health_group",
+    "origin_evolution_health_score",
     "matched_sweetspot",
     "sweetspot_horizon",
     "historical_sample_n",
@@ -292,6 +306,70 @@ def _stock_bucket_labels(
     return str(rs5_b), str(rs10_b), str(rsi_b)
 
 
+def _origin_text(value: Any) -> str:
+    if value is None:
+        return ""
+    try:
+        if pd.isna(value):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
+    if not text or text.lower() in {"nan", "none", "nat"}:
+        return ""
+    return text
+
+
+def _blank_origin(row: Dict[str, Any]) -> Dict[str, Any]:
+    row["origin_group"] = ""
+    row["origin_setup"] = ""
+    row["origin_ema9"] = np.nan
+    row["origin_breakout_ref"] = np.nan
+    row["origin_pull_label"] = ""
+    row["origin_evolution_health_group"] = ""
+    row["origin_evolution_health_score"] = np.nan
+    return row
+
+
+def origin_fields_from_scan_row(scan_row: Optional[Mapping[str, Any]]) -> Dict[str, Any]:
+    """Copy production scan fields that actually existed. Never infer a setup."""
+    blank = _blank_origin({})
+    if scan_row is None:
+        return blank
+    keys = set(scan_row.index) if hasattr(scan_row, "index") and not isinstance(scan_row, dict) else set(scan_row)
+    group = _origin_text(scan_row.get("group")) if "group" in keys else ""
+    blank["origin_group"] = group
+    blank["origin_setup"] = group if group in ORIGIN_ACTION_SETUPS else ""
+    blank["origin_ema9"] = _safe_float(scan_row.get("ema9")) if "ema9" in keys else np.nan
+    blank["origin_breakout_ref"] = (
+        _safe_float(scan_row.get("breakout_ref")) if "breakout_ref" in keys else np.nan
+    )
+    blank["origin_pull_label"] = _origin_text(scan_row.get("pull_label")) if "pull_label" in keys else ""
+    if "evolution_health_group" in keys:
+        blank["origin_evolution_health_group"] = _origin_text(scan_row.get("evolution_health_group"))
+    if "evolution_health_score" in keys:
+        blank["origin_evolution_health_score"] = _safe_float(scan_row.get("evolution_health_score"))
+    return blank
+
+
+def _origin_lookup(scan_df: Optional[pd.DataFrame]) -> Dict[str, Any]:
+    if scan_df is None or not isinstance(scan_df, pd.DataFrame) or scan_df.empty:
+        return {}
+    if "symbol" not in scan_df.columns:
+        return {}
+    lookup: Dict[str, Any] = {}
+    for _, scan_row in scan_df.iterrows():
+        symbol = _normalize_symbol_text(scan_row.get("symbol"))
+        if symbol:
+            lookup[symbol] = scan_row
+    return lookup
+
+
+def _stamp_origin(row: Dict[str, Any], scan_row: Optional[Mapping[str, Any]]) -> Dict[str, Any]:
+    row.update(origin_fields_from_scan_row(scan_row))
+    return row
+
+
 def _stock_matches_sweetspot(
     rs5: float,
     rs10: float,
@@ -355,7 +433,7 @@ def _base_row(
                 "evidence_status": evidence_label(n),
             }
         )
-    return row
+    return _blank_origin(row)
 
 
 def compute_observer_snapshot(
@@ -367,6 +445,7 @@ def compute_observer_snapshot(
     market_forecast: float,
     breadth: float | None,
     market_regime: str = "",
+    scan_df: Optional[pd.DataFrame] = None,
 ) -> Dict[str, Any]:
     """
     Pure AS-OF computation — does not read or write the ledger.
@@ -500,6 +579,7 @@ def compute_observer_snapshot(
         )
         rows.append(status_row)
     else:
+        origins = _origin_lookup(scan_df)
         for _, stock in candidates.iterrows():
             row = _base_row(
                 t0_date=t0_date,
@@ -519,6 +599,7 @@ def compute_observer_snapshot(
             row["rs5_t0"] = _safe_float(stock["rs5"])
             row["rs10_t0"] = _safe_float(stock["rs10"])
             row["rsi14_t0"] = _safe_float(stock["rsi14"])
+            _stamp_origin(row, origins.get(str(stock["symbol"]).strip().upper()))
             rows.append(row)
 
     result.update(
@@ -606,6 +687,7 @@ def freeze_daily_observer_if_eligible(
     market_forecast: float,
     breadth: float | None,
     market_regime: str = "",
+    scan_df: Optional[pd.DataFrame] = None,
     lifecycle_df: Optional[pd.DataFrame] = None,
     data_dir: Optional[str] = None,
     remote_dir: Optional[str] = None,
@@ -652,6 +734,7 @@ def freeze_daily_observer_if_eligible(
         market_forecast=market_forecast,
         breadth=breadth,
         market_regime=market_regime,
+        scan_df=scan_df,
     )
 
     storage = _make_storage(data_dir, remote_dir)

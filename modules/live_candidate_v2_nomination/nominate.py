@@ -108,6 +108,13 @@ def from_nominated_candidate(
         in_early_lab=original.in_early_lab,
         status=routed.status or original.status,
         qualified_by=original.qualified_by,
+        origin_setup=original.origin_setup,
+        origin_group=original.origin_group,
+        origin_ema9=original.origin_ema9,
+        origin_breakout_ref=original.origin_breakout_ref,
+        origin_pull_label=original.origin_pull_label,
+        origin_evolution_health_group=original.origin_evolution_health_group,
+        origin_evolution_health_score=original.origin_evolution_health_score,
     )
 
 

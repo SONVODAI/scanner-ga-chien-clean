@@ -8,7 +8,7 @@ Does not import Streamlit. Does not mint a production BUY.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
@@ -74,8 +74,16 @@ from modules.live_candidate_v2_action.contract import (
     REASON_RETROSPECTIVE,
     REASON_SESSION_RESET,
     REASON_UNFINISHED,
+    REASON_INSUFFICIENT_BARS,
+    REASON_MISSING_QUALIFIER,
+    REASON_MISSING_REFERENCE,
+    REASON_NO_ORIGIN_SETUP,
     REASON_UNKNOWN_SETUP,
+    REASON_UNSUPPORTED_ORIGIN,
     REASON_WAIT,
+    REASON_WHEN_NOT_MET,
+    RESEARCH_DECISION_SHADOW_BUY,
+    EXECUTION_ENABLED,
     REASON_WEAKENED_WAIT,
     REASON_WEAKENING,
     REF_BREAKOUT,
@@ -173,6 +181,12 @@ class FrozenNomination:
     nomination_reason: str = ""
     source: str = ""
     source_action: str = ""
+    origin_setup: str = ""
+    origin_group: str = ""
+    origin_ema9: float | None = None
+    origin_breakout_ref: float | None = None
+    origin_pull_label: str = ""
+    market_real: float | None = None
 
     @property
     def route(self) -> str:
@@ -278,6 +292,19 @@ class ActionResult:
     price_volume_state: str | None = None
     market_permission: str = ""
     notes: tuple[str, ...] = field(default_factory=tuple)
+    condition_met: bool = False
+    research_decision: str = ""
+    market_ok: bool = False
+    market_blocked: bool = False
+    execution_enabled: bool = EXECUTION_ENABLED
+    first_met_at: str | None = None
+    price_at_first_met: float | None = None
+    condition_reason: str = ""
+    non_event_reason: str = ""
+    evaluated_route: str = ""
+    origin_setup: str = ""
+    origin_group: str = ""
+    market_real: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -300,6 +327,12 @@ def nomination_from_mapping(raw: Mapping[str, Any]) -> FrozenNomination:
         nomination_reason=str(raw.get("nomination_reason") or raw.get("candidate_reason") or ""),
         source=str(raw.get("nomination_source") or raw.get("source") or ""),
         source_action=str(raw.get("source_action") or ""),
+        origin_setup=str(raw.get("origin_setup") or ""),
+        origin_group=str(raw.get("origin_group") or ""),
+        origin_ema9=_num(raw.get("origin_ema9")),
+        origin_breakout_ref=_num(raw.get("origin_breakout_ref")),
+        origin_pull_label=str(raw.get("origin_pull_label") or ""),
+        market_real=_num(raw.get("market_real")),
     )
 
 
@@ -627,14 +660,13 @@ def _classify_wait(
     return _result(nom, STATE_WAIT, REASON_WAIT, bars=legal, notes=notes)
 
 
-def _try_buy_ready(
+def _raw_buy_ready(
     nom: FrozenNomination,
     legal: Sequence[BarEvidence],
 ) -> tuple[bool, str]:
+    """Existing stock-level WHEN. Market permission is not an input."""
     if len(legal) < 2:
         return False, REASON_PULL_SINGLE_BAR if nom.route == "PULL" else REASON_WAIT
-    if not _market_ok(nom):
-        return False, REASON_MARKET_NOT_OK
     pair = legal[-2:]
     required = nom.required_ref
     if not _pair_above_ref(pair[0], pair[1], required):
@@ -646,6 +678,17 @@ def _try_buy_ready(
     if nom.route in {"MANH", "BREAK"}:
         return _manh_break_ready(pair)
     return False, REASON_UNKNOWN_SETUP
+
+
+def _try_buy_ready(
+    nom: FrozenNomination,
+    legal: Sequence[BarEvidence],
+) -> tuple[bool, str]:
+    if len(legal) < 2:
+        return False, REASON_PULL_SINGLE_BAR if nom.route == "PULL" else REASON_WAIT
+    if not _market_ok(nom):
+        return False, REASON_MARKET_NOT_OK
+    return _raw_buy_ready(nom, legal)
 
 
 def _moderate_volume(bar: BarEvidence) -> bool:
@@ -664,14 +707,13 @@ def _early_price_progress(bar: BarEvidence) -> bool:
     return float(bar.close_vs_ref) > 0.0 and 0.0 < pct <= EARLY_MAX_PROGRESS_PCT
 
 
-def _try_early_ready(
+def _raw_early_ready(
     nom: FrozenNomination,
     legal: Sequence[BarEvidence],
 ) -> tuple[bool, str]:
+    """Existing EARLY WHEN. Market permission is not an input."""
     if len(legal) < 2:
         return False, REASON_EARLY_SINGLE_BAR
-    if not _market_ok(nom):
-        return False, REASON_MARKET_NOT_OK
     pair = legal[-2:]
     if not _gate_ok(pair):
         return False, REASON_DATA_UNUSABLE
@@ -682,6 +724,87 @@ def _try_early_ready(
     if not all(_moderate_volume(bar) for bar in pair):
         return False, REASON_EARLY_VOLUME
     return True, REASON_EARLY_BUY_READY
+
+
+def _try_early_ready(
+    nom: FrozenNomination,
+    legal: Sequence[BarEvidence],
+) -> tuple[bool, str]:
+    if len(legal) < 2:
+        return False, REASON_EARLY_SINGLE_BAR
+    if not _market_ok(nom):
+        return False, REASON_MARKET_NOT_OK
+    return _raw_early_ready(nom, legal)
+
+
+def _non_event_reason(
+    nom: FrozenNomination,
+    legal: Sequence[BarEvidence],
+    condition_met: bool,
+) -> str:
+    """Why this candidate is not a SHADOW BUY. Empty when condition_met."""
+    if condition_met:
+        return ""
+    if nom.route == "UNKNOWN":
+        origin = str(nom.origin_setup or "").strip()
+        group = str(nom.origin_group or "").strip()
+        if origin == ROUTE_EARLY or group == ROUTE_EARLY:
+            return REASON_MISSING_QUALIFIER
+        if origin:
+            return REASON_MISSING_REFERENCE
+        if group:
+            return REASON_UNSUPPORTED_ORIGIN
+        return REASON_NO_ORIGIN_SETUP
+    if len(legal) < 2:
+        return REASON_INSUFFICIENT_BARS
+    return REASON_WHEN_NOT_MET
+
+
+def _finish(
+    nom: FrozenNomination,
+    result: ActionResult,
+    legal: Sequence[BarEvidence],
+    first_bar: BarEvidence | None,
+    condition_reason: str,
+) -> ActionResult:
+    met = first_bar is not None
+    market_ok = _market_ok(nom)
+    return replace(
+        result,
+        condition_met=met,
+        research_decision=RESEARCH_DECISION_SHADOW_BUY if met else "",
+        market_ok=market_ok,
+        market_blocked=not market_ok,
+        execution_enabled=EXECUTION_ENABLED,
+        first_met_at=_iso(first_bar.bar_ts) if first_bar is not None else None,
+        price_at_first_met=first_bar.close if first_bar is not None else None,
+        condition_reason=condition_reason if met else "",
+        non_event_reason=_non_event_reason(nom, legal, met),
+        evaluated_route="" if nom.route == "UNKNOWN" else nom.route,
+        origin_setup=str(nom.origin_setup or ""),
+        origin_group=str(nom.origin_group or ""),
+        market_real=nom.market_real,
+        candidate_is_buy=CANDIDATE_IS_BUY,
+        pxv_implies_buy=PXV_IMPLIES_BUY,
+        alert_eligible=ALERT_ELIGIBLE,
+    )
+
+
+def _first_raw_met(
+    nom: FrozenNomination,
+    legal: Sequence[BarEvidence],
+    *,
+    early: bool,
+    retrospective: bool,
+) -> tuple[BarEvidence | None, str]:
+    if retrospective or len(legal) < 2:
+        return None, ""
+    raw = _raw_early_ready if early else _raw_buy_ready
+    for index in range(2, len(legal) + 1):
+        ok, why = raw(nom, legal[:index])
+        if ok:
+            return legal[index - 1], why
+    return None, ""
 
 
 def _is_retrospective(legal: Sequence[BarEvidence], overlay_truth_class: str) -> bool:
@@ -698,30 +821,41 @@ def _evaluate_early(
     overlay_truth_class: str,
 ) -> ActionResult:
     """Controlled progress vs frozen EMA9 plus moderate volume. Never STRENGTHEN."""
+    retrospective = _is_retrospective(legal, overlay_truth_class)
+    first_bar, condition_reason = _first_raw_met(
+        nom, legal, early=True, retrospective=retrospective
+    )
+
+    def finish(result: ActionResult) -> ActionResult:
+        return _finish(nom, result, legal, first_bar, condition_reason)
+
     if not legal:
         if nom.ema9_at_first_seen is None:
-            return _result(nom, STATE_NOMINATED, REASON_EARLY_NO_FROZEN_REF, notes=notes)
-        return _result(nom, STATE_NOMINATED, REASON_NOMINATED_NO_BARS, notes=notes)
+            return finish(_result(nom, STATE_NOMINATED, REASON_EARLY_NO_FROZEN_REF, notes=notes))
+        return finish(_result(nom, STATE_NOMINATED, REASON_NOMINATED_NO_BARS, notes=notes))
 
     ok, ref_why = _ref_usable(legal[-1], REF_EMA9)
     if not ok:
+        first_bar, condition_reason = None, ""
         reason = REASON_EARLY_NO_FROZEN_REF if ref_why == REASON_REF_UNUSABLE else ref_why
-        return _result(nom, STATE_WAIT, reason, bars=legal, notes=notes)
+        return finish(_result(nom, STATE_WAIT, reason, bars=legal, notes=notes))
 
     ready, why = _try_early_ready(nom, legal)
-    if ready and _is_retrospective(legal, overlay_truth_class):
-        return _result(
-            nom,
-            STATE_WAIT,
-            REASON_RETROSPECTIVE,
-            bars=legal,
-            notes=tuple(notes) + (REASON_RETROSPECTIVE,),
+    if ready and retrospective:
+        return finish(
+            _result(
+                nom,
+                STATE_WAIT,
+                REASON_RETROSPECTIVE,
+                bars=legal,
+                notes=tuple(notes) + (REASON_RETROSPECTIVE,),
+            )
         )
     if ready:
-        return _result(nom, STATE_BUY_READY, why, bars=legal, notes=notes)
+        return finish(_result(nom, STATE_BUY_READY, why, bars=legal, notes=notes))
     if why == REASON_WAIT:
-        return _result(nom, STATE_WAIT, REASON_EARLY_EVIDENCE_ONLY, bars=legal, notes=notes)
-    return _result(nom, STATE_WAIT, why, bars=legal, notes=notes)
+        return finish(_result(nom, STATE_WAIT, REASON_EARLY_EVIDENCE_ONLY, bars=legal, notes=notes))
+    return finish(_result(nom, STATE_WAIT, why, bars=legal, notes=notes))
 
 
 def evaluate_shadow_action(
@@ -742,26 +876,36 @@ def evaluate_shadow_action(
     if prior_session and nom.session and str(prior_session) != str(nom.session):
         prior_action_state = STATE_NOMINATED
 
+    def finish(
+        result: ActionResult,
+        legal_bars: Sequence[BarEvidence] = (),
+        first_bar: BarEvidence | None = None,
+        condition_reason: str = "",
+    ) -> ActionResult:
+        return _finish(nom, result, legal_bars, first_bar, condition_reason)
+
     if not observed:
-        return _result(
-            nom,
-            STATE_NO_OBSERVATION,
-            _no_observation_reason(observation_reason),
-            observed=False,
-            notes=(REASON_SESSION_RESET,) if prior_session and prior_session != nom.session else (),
+        return finish(
+            _result(
+                nom,
+                STATE_NO_OBSERVATION,
+                _no_observation_reason(observation_reason),
+                observed=False,
+                notes=(REASON_SESSION_RESET,) if prior_session and prior_session != nom.session else (),
+            )
         )
 
     legal, notes = _legal_history(nom, legal_completed_bars)
     if REASON_DATE_ONLY in notes:
-        return _result(nom, STATE_NOMINATED, REASON_DATE_ONLY, notes=notes)
+        return finish(_result(nom, STATE_NOMINATED, REASON_DATE_ONLY, notes=notes), legal)
 
     if nom.route == "EARLY":
         return _evaluate_early(nom, legal, notes, overlay_truth_class=overlay_truth_class)
 
     if nom.route == "UNKNOWN":
         if not legal:
-            return _result(nom, STATE_NOMINATED, REASON_UNKNOWN_SETUP, notes=notes)
-        return _result(nom, STATE_WAIT, REASON_UNKNOWN_SETUP, bars=legal, notes=notes)
+            return finish(_result(nom, STATE_NOMINATED, REASON_UNKNOWN_SETUP, notes=notes), legal)
+        return finish(_result(nom, STATE_WAIT, REASON_UNKNOWN_SETUP, bars=legal, notes=notes), legal)
 
     if not legal:
         reason = REASON_NOMINATED_NO_BARS
@@ -769,7 +913,7 @@ def evaluate_shadow_action(
             reason = REASON_UNFINISHED
         elif REASON_CHRONOLOGY_PRE_ELIGIBLE in notes:
             reason = REASON_CHRONOLOGY_PRE_ELIGIBLE
-        return _result(nom, STATE_NOMINATED, reason, notes=notes)
+        return finish(_result(nom, STATE_NOMINATED, reason, notes=notes), legal)
 
     # Walk bar-by-bar so WEAKENED cannot skip WAIT on the way to BUY_READY.
     # First-slice recovery: a WEAKENED touch in this evaluation can only
@@ -780,6 +924,8 @@ def evaluate_shadow_action(
         state = STATE_WEAKENED
         touched_weakened = True
     reason = REASON_NOMINATED_NO_BARS
+    first_bar: BarEvidence | None = None
+    condition_reason = ""
     prefix: list[BarEvidence] = []
     retrospective = overlay_truth_class == OVERLAY_TRUTH_RETROSPECTIVE or any(
         bar.overlay_truth_class == OVERLAY_TRUTH_RETROSPECTIVE or bar.overlay_applied for bar in legal
@@ -801,6 +947,12 @@ def evaluate_shadow_action(
                 state = STATE_WAIT
                 reason = REASON_CONFLICT
             continue
+
+        if first_bar is None and not touched_weakened and not retrospective:
+            raw_ok, raw_why = _raw_buy_ready(nom, prefix)
+            if raw_ok:
+                first_bar = bar
+                condition_reason = raw_why
 
         ready, ready_why = _try_buy_ready(nom, prefix)
         if ready:
@@ -831,20 +983,25 @@ def evaluate_shadow_action(
         reason = ready_why or REASON_WAIT
 
     if state == STATE_BUY_READY:
-        return _result(nom, STATE_BUY_READY, reason, bars=legal, notes=notes)
+        return finish(_result(nom, STATE_BUY_READY, reason, bars=legal, notes=notes), legal, first_bar, condition_reason)
     if state == STATE_WEAKENED:
-        return _result(nom, STATE_WEAKENED, REASON_WEAKENING, bars=legal, notes=notes)
+        return finish(_result(nom, STATE_WEAKENED, REASON_WEAKENING, bars=legal, notes=notes), legal, first_bar, condition_reason)
     if state == STATE_WAIT:
         # Prefer a more specific WAIT reason from the latest bars when the walk
         # stored a generic incomplete-pair token.
         if reason in {REASON_WAIT, REASON_PULL_SINGLE_BAR, REASON_WEAKENED_WAIT, REASON_RETROSPECTIVE}:
             specific = _classify_wait(nom, legal, notes=notes)
             if reason in {REASON_WEAKENED_WAIT, REASON_RETROSPECTIVE}:
-                return _result(nom, STATE_WAIT, reason, bars=legal, notes=specific.notes)
+                return finish(
+                    _result(nom, STATE_WAIT, reason, bars=legal, notes=specific.notes),
+                    legal,
+                    first_bar,
+                    condition_reason,
+                )
             if specific.action_reason != REASON_WAIT:
-                return specific
-        return _result(nom, STATE_WAIT, reason, bars=legal, notes=notes)
-    return _result(nom, STATE_NOMINATED, reason, bars=legal, notes=notes)
+                return finish(specific, legal, first_bar, condition_reason)
+        return finish(_result(nom, STATE_WAIT, reason, bars=legal, notes=notes), legal, first_bar, condition_reason)
+    return finish(_result(nom, STATE_NOMINATED, reason, bars=legal, notes=notes), legal, first_bar, condition_reason)
 
 
 def session_of(value: datetime | date | str | None) -> str:

@@ -176,6 +176,13 @@ def sidecar_row_from_nomination(
         "candidate_is_buy": False,
         "alert_eligible": False,
         "chronology_status": nom.chronology_status,
+        "origin_setup": nom.origin_setup,
+        "origin_group": nom.origin_group,
+        "origin_ema9": nom.origin_ema9,
+        "origin_breakout_ref": nom.origin_breakout_ref,
+        "origin_pull_label": nom.origin_pull_label,
+        "origin_evolution_health_group": nom.origin_evolution_health_group,
+        "origin_evolution_health_score": nom.origin_evolution_health_score,
     }
     if not row["provenance"]:
         row["provenance"] = _provenance_for(nom, {})

@@ -130,6 +130,12 @@ def observe_from_collected_session(
             observed=True,
             observation_reason="" if history else "NOMINATED_NO_LEGAL_COMPLETED_BARS",
         )
+        try:
+            from modules.research_shadow_buy.ledger import try_record_shadow_buy
+
+            try_record_shadow_buy(nom, result)
+        except Exception:
+            pass
         items.append((nom, history, result))
     if items:
         persist_cycle(

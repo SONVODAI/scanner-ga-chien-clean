@@ -97,6 +97,14 @@ class BrainANomination:
     in_early_lab: bool = False
     status: str = STATUS_NOMINATED
     qualified_by: str = ""
+    # T0 production-scan provenance. Not the evaluation-session setup or ref.
+    origin_setup: str = ""
+    origin_group: str = ""
+    origin_ema9: float | None = None
+    origin_breakout_ref: float | None = None
+    origin_pull_label: str = ""
+    origin_evolution_health_group: str = ""
+    origin_evolution_health_score: float | None = None
 
 
 @dataclass(frozen=True)

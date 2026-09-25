@@ -1025,6 +1025,12 @@ class LiveShadowFeed:
                 observed=observed,
                 observation_reason=observation_reason,
             )
+            try:
+                from modules.research_shadow_buy.ledger import try_record_shadow_buy
+
+                try_record_shadow_buy(nom, result)
+            except Exception:
+                pass
         except Exception as exc:  # noqa: BLE001 — action layer must not break Camera
             logger.warning("v2 shadow action failed %s: %s", rec.get("symbol"), exc)
             return
