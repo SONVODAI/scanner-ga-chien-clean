@@ -3,7 +3,7 @@
 #
 #   pip install -r requirements-collector.txt
 #
-# Production app.py continues to use vnstock==0.2.9.2 via requirements.txt
+# Production app.py uses the legacy git pin in requirements.txt (not vnstock 4.x).
 
 vnstock>=4.0.5,<5
 pyarrow>=14.0.0

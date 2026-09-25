@@ -95,7 +95,7 @@ Writes are atomic (temp file + `os.replace`). Idempotent on `(symbol, timestamp)
 
 ## Dependency Isolation
 
-Production `requirements.txt` keeps `vnstock==0.2.9.2` for `app.py`.
+Production `requirements.txt` installs legacy vnstock `0.2.9.2.3` from a pinned git commit for `app.py` (PyPI `vnstock==0.2.9.2` is quarantined).
 Collector uses `requirements-collector.txt` (`vnstock>=4.0.5`, `pyarrow`).
 
 Install collector deps separately:
