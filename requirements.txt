@@ -1,7 +1,13 @@
 streamlit
 pandas
 numpy
-vnstock==0.2.9.2
+# PyPI project "vnstock" is quarantined (empty simple index), so
+# vnstock==0.2.9.2 has no distribution and Streamlit cannot boot.
+# This commit is legacy 0.2.9.2.3 (stock_historical_data). Not vnstock 4.x.
+# Collector stays on requirements-collector.txt.
+vnstock @ git+https://github.com/thinh-vu/vnstock.git@e8339514ad7cd757259d3f1b797bca379f93606a
+# Legacy setup.cfg does not declare this import-time dependency.
+packaging
 scipy
 scikit-learn
 beautifulsoup4
