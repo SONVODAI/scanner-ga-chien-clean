@@ -6063,6 +6063,9 @@ try:
             from modules.live_candidate_v2_action.ui import render_v2_shadow_action_panel
 
             render_v2_shadow_action_panel()
+            from modules.research_shadow_buy.ui import render_shadow_buy_research_panel
+
+            render_shadow_buy_research_panel()
         except Exception:
             pass
         if _v2_gate_a_caption:
@@ -6411,6 +6414,7 @@ try:
         market_forecast=market_forecast,
         breadth=_learning_breadth,
         market_regime=_regime_name,
+        scan_df=scan_df,
     )
     if _observer_freeze.get("added", 0) > 0:
         st.caption(

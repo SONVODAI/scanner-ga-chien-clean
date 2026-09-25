@@ -67,6 +67,13 @@ SWEET_PROVENANCE_FIELDS: tuple[str, ...] = (
     "rs10_t0",
     "rsi14_t0",
     "market_real_t0",
+    "origin_group",
+    "origin_setup",
+    "origin_ema9",
+    "origin_breakout_ref",
+    "origin_pull_label",
+    "origin_evolution_health_group",
+    "origin_evolution_health_score",
 )
 SWEET_OUTCOME_FIELDS: tuple[str, ...] = (
     "t3_return_pct",
@@ -334,6 +341,13 @@ def nomination_from_sweet_row(
         in_early_lab=False,
         status=STATUS_NOMINATED,
         qualified_by=STATUS_OBSERVE,
+        origin_setup=str(extra.get("origin_setup") or ""),
+        origin_group=str(extra.get("origin_group") or ""),
+        origin_ema9=as_number(extra.get("origin_ema9")),
+        origin_breakout_ref=as_number(extra.get("origin_breakout_ref")),
+        origin_pull_label=str(extra.get("origin_pull_label") or ""),
+        origin_evolution_health_group=str(extra.get("origin_evolution_health_group") or ""),
+        origin_evolution_health_score=as_number(extra.get("origin_evolution_health_score")),
     )
     extra["symbol"] = symbol
     extra["chronology_status"] = nom.chronology_status

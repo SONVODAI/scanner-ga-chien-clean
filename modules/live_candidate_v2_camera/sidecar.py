@@ -176,6 +176,17 @@ def sidecar_row_from_nomination(
         "candidate_is_buy": False,
         "alert_eligible": False,
         "chronology_status": nom.chronology_status,
+        "origin_setup": nom.origin_setup,
+        "origin_group": nom.origin_group,
+        "origin_ema9": nom.origin_ema9,
+        "origin_breakout_ref": nom.origin_breakout_ref,
+        "origin_pull_label": nom.origin_pull_label,
+        "origin_evolution_health_group": nom.origin_evolution_health_group,
+        "origin_evolution_health_score": nom.origin_evolution_health_score,
+        "route_became_evaluable_at": nom.route_became_evaluable_at,
+        "research_qualification": nom.research_qualification,
+        "current_route_status": nom.current_route_status,
+        "research_stamp": nom.research_stamp,
     }
     if not row["provenance"]:
         row["provenance"] = _provenance_for(nom, {})
@@ -369,6 +380,7 @@ def build_sidecar_from_scan(
     prior_freeze: Iterable | None = None,
     early_lab_symbols: Iterable[str] | None = None,
     brain_b: BrainBConsult | None = None,
+    research_stamp_dir: Path | None = None,
 ) -> tuple[NominationReport, list[dict[str, Any]]]:
     """Nominate Brain A, optionally union Sweet Brain B, then shadow-route.
 
@@ -403,6 +415,20 @@ def build_sidecar_from_scan(
         original = by_key[(item.canonical.symbol, item.canonical.source)]
         merged.append(from_nominated_candidate(item.canonical, original))
     merged.sort(key=lambda n: (n.symbol, n.candidate_first_seen_ts))
+    brain_a_symbols = {n.symbol for n in all_noms if n.source == SRC_BRAIN_A}
+    try:
+        from modules.research_shadow_buy.acquire import attach_sweet_research_routes
+
+        merged = attach_sweet_research_routes(
+            merged,
+            rows,
+            observed_at=now,
+            early_lab_symbols=early_lab_symbols,
+            directory=research_stamp_dir,
+            brain_a_symbols=brain_a_symbols,
+        )
+    except Exception:
+        pass
     combined = RouteReport(
         watchlist=to_watchlist_frame([to_nominated_candidate(n) for n in merged]),
         canonical=tuple(to_nominated_candidate(n) for n in merged),

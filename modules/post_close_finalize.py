@@ -187,6 +187,7 @@ def _run_close_writers(payload: dict[str, Any], *, trade_date: str, now: datetim
         market_forecast=payload.get("market_forecast"),
         breadth=payload.get("breadth"),
         market_regime=str(payload.get("market_regime") or ""),
+        scan_df=scan_df,
         data_dir=data_dir,
         now=now,
     )
