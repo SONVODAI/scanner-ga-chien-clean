@@ -296,6 +296,18 @@ def build_close_scan_inputs(
         )
     except Exception:
         pass
+    try:
+        from modules.research_evolution_ledger.ledger import try_append_evolution_ledger
+        from modules.research_market_context.contract import SOURCE_CLOSE_SCAN
+
+        try_append_evolution_ledger(
+            trade_date=trade_date,
+            source=SOURCE_CLOSE_SCAN,
+            scan_df=scan_df,
+            captured_at=local_now,
+        )
+    except Exception:
+        pass
     return {
         "ok": True,
         "status": "READY",

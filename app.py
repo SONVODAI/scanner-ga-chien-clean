@@ -5913,6 +5913,17 @@ try:
     )
 except Exception:
     pass
+try:
+    from modules.research_evolution_ledger.ledger import try_append_evolution_ledger
+    from modules.research_market_context.contract import SOURCE_STREAMLIT_SCAN
+
+    try_append_evolution_ledger(
+        trade_date=vn_now().date(),
+        source=SOURCE_STREAMLIT_SCAN,
+        scan_df=scan_df,
+    )
+except Exception:
+    pass
 evo_saved_df, evo_save_status = save_evolution(scan_df, allow_save=trading_today, reason=trading_reason)
 evo_table, evo_buy_table = build_evolution_tables(scan_df)
 pullback_df = build_pullback_buy_list(
