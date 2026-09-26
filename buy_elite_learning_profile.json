@@ -2,7 +2,7 @@
   "version": "BUY_ELITE_LEARNING_V3",
   "mode": "ACTIVE_LEARNING",
   "created_at": "2026-06-25 16:55:06",
-  "updated_at": "2026-09-26 10:55:11",
+  "updated_at": "2026-09-26 11:00:59",
   "completed_t5": 1017,
   "baseline_winrate": 0.3756,
   "min_completed_to_learn": 80,
