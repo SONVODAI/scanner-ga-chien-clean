@@ -1,0 +1,8 @@
+source,n_dates,missing_vs_union,date_min,date_max,n_weekdays,missing_vs_weekday_union
+pattern_history,48,42,2026-07-02,2026-09-16,37,39
+evolution,78,12,2026-05-26,2026-09-16,76,0
+elite,53,37,2026-06-25,2026-09-16,53,23
+freeze,20,70,2026-08-13,2026-09-16,20,56
+observations,39,51,2026-07-23,2026-09-16,35,41
+lifecycle,36,54,2026-07-23,2026-09-10,32,44
+market_t0,18,72,2026-08-13,2026-09-14,18,58
