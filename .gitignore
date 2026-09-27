@@ -16,6 +16,7 @@ research/market_context_history/*.jsonl
 research/evolution_history/*.jsonl
 research/shadow_buy_events/*.jsonl
 research/shadow_buy_events/*.json
+research/early_recovery_watch/*.jsonl
 
 # Rotation Watch runtime (watchlist.csv is source; artifacts are ephemeral)
 data/rotation_watch/state.json
