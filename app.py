@@ -6166,6 +6166,27 @@ except Exception as _edge_research_err:
 
 st.markdown("---")
 # =========================================================
+# EARLY RECOVERY WATCH V1 — RESEARCH ONLY
+# Above the Earning Money Board. Does not score, rank, or trade.
+# =========================================================
+try:
+    from modules.early_recovery_watch.panel import render_early_recovery_watch
+
+    render_early_recovery_watch(
+        scan_df=scan_df,
+        market_real=market_real,
+        trade_date=vn_now().date(),
+        market_live=market_live,
+        market_forecast=market_forecast,
+        market_regime=_regime_name,
+        breadth=_learning_breadth,
+        market_status=market_status,
+        market_action=market_action,
+    )
+except Exception as _early_recovery_err:
+    st.caption(f"Early Recovery Watch skipped: {_early_recovery_err}")
+
+# =========================================================
 # EARNING MONEY BOARD - BẢNG ĐIỀU KHIỂN CHÍNH
 # =========================================================
 render_earning_money_board(
