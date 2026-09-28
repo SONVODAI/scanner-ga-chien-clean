@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "last_learning_at": "2026-09-28T11:07:04Z",
+  "last_learning_at": "2026-09-28T11:12:33Z",
   "last_trade_date": "2026-09-28",
   "module_version": "4.0.0",
   "brain_generation": "GEN3_EXPERIENCE",
@@ -11,7 +11,7 @@
   "lifecycle_rows": 5968,
   "continuation_rows": 3206,
   "pattern_snapshot_rows": 6394,
-  "pattern_history_rows": 31011,
+  "pattern_history_rows": 31015,
   "decision_archive_rows": 6394,
   "verified_decisions_rows": 5968
 }
