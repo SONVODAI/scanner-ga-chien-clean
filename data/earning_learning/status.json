@@ -11,15 +11,15 @@
   "lifecycle_rows": 6252,
   "continuation_rows": 3292,
   "snapshot_rows": 6678,
-  "history_rows": 32310,
+  "history_rows": 32455,
   "decision_archive_rows": 6678,
   "verified_decisions_rows": 6252,
   "t0_freeze_added": 0,
   "storage_mode": "GITHUB_PRIMARY",
-  "github_sync": "GITHUB_OK",
+  "github_sync": "GITHUB_PARTIAL",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-09-30T12:59:48Z",
+  "last_run_at": "2026-09-30T13:09:27Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
