@@ -1,0 +1,40 @@
+{
+  "missingness": {
+    "row_count": 6248,
+    "fields": {
+      "trade_date": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "symbol": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "rs_spread": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "t5_return": {
+        "non_null": 6106,
+        "coverage": 0.9773
+      },
+      "t3_return": {
+        "non_null": 6248,
+        "coverage": 1.0
+      },
+      "t10_return": {
+        "non_null": 5396,
+        "coverage": 0.8636
+      }
+    }
+  },
+  "schema": {
+    "june_rows": 3124,
+    "july_aug_rows": 3124,
+    "overlap_dates": [],
+    "dedup_policy": "keep_last_on_trade_date_symbol",
+    "issues": []
+  },
+  "no_synthetic": true,
+  "no_future_leakage": true
+}

@@ -1,0 +1,14 @@
+{
+  "record_version": "evidence_independence_profile_v1_3i11",
+  "dimensions": {
+    "sample_independence": "distinct row cohort vs prior experiment",
+    "episode_independence": "distinct trade_date sets / motivating episode exclusion",
+    "population_independence": "distinct population_spec semantics",
+    "temporal_independence": "non-overlapping time windows",
+    "measurement_independence": "distinct outcome/feature/metric formulation",
+    "methodological_independence": "distinct tool operationalizing different test",
+    "semantic_independence": "distinct uncertainty dimension tested (3H cores)"
+  },
+  "not_interchangeable": true,
+  "aggregate_rule": "Report per-dimension; no single yes/no unless all relevant dimensions pass"
+}

@@ -1,0 +1,13 @@
+{
+  "leakage_audit": true,
+  "provenance_tests": true,
+  "birth_certificate": true,
+  "falsification_validation": true,
+  "laundering_controls": true,
+  "deterministic_replay": true,
+  "negative_controls": true,
+  "template_evaluator_frozen": true,
+  "detector_thresholds_frozen": true,
+  "generator_commit_frozen": "75b256ead57b49c72be5e57ef7e0b47895385f6d",
+  "all_pass": true
+}
