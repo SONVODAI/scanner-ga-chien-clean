@@ -1,0 +1,14 @@
+source,class,reason
+canonical 5m Camera parquet,UNSAFE FOR THIS STUDY,No parquet under camera_data_root candidates in this workspace. Frozen P×V features cannot be computed. Do not invent bars.
+frozen P×V interpreter / data/intraday_pxv_v1 ledger,UNSAFE FOR THIS STUDY,Output store absent; interpreter is code-only. Historical STRENGTHEN/CONFIRMING states were never persisted here.
+pattern_history.csv group at a given row timestamp,PARTIAL / QUARANTINE,"Row carries a group at CSV save clock. Useful as as-of IF that clock is true observation time. Documented Elite path says CSV time is save clock, last-wins — same risk here. PRE_OPEN 08:30 rows are not 5m session bars. Do not use a later same-day row as the morning group."
+pattern_history last row per symbol×date,UNSAFE FOR THIS STUDY,"Last-wins. If group evolved intra-day, the saved label is future relative to earlier 5m bars."
+group_evolution_history.csv,PARTIAL / QUARANTINE,"Dated group snapshots exist. Times cluster pre-open / save clock. Rank/score often empty. Safe only as ordered history of saved labels, not as 5m as-of."
+t0_observation_freeze.group,PARTIAL / QUARANTINE,Same-day post-close freeze (typically ~15:54 VN). Valid as EOD T0 setup for daily T3/T5/T10. UNSAFE as intra-day as-of for 5m P×V (group already embeds the finished session).
+observations.csv group / recorded_at,UNSAFE FOR THIS STUDY,recorded_at is frequently next calendar morning UTC. Using that group as T0 intra-day knowledge is look-ahead.
+pattern_lifecycle.group,UNSAFE FOR THIS STUDY,Lifecycle copies observation group (T+1 clock) plus later outcome fill. Not first_seen setup.
+buy_elite_learning_history.group,PARTIAL / QUARANTINE,"One row per symbol×date, last file order wins. CSV time is save clock not candidate_first_seen_ts. Group is pass-through scan label on an Elite-filtered subset (selection bias)."
+daily volume_ratio / volume_ratio20 on freeze or pattern_history,UNSAFE FOR THIS STUDY,Daily (or session-injected daily) volume vs 20-day mean. Not frozen 5m expansion/contraction/CONFIRMING. Must not proxy P×V.
+outcomes.csv / pattern_lifecycle T3 T5 T10,SAFE AS-OF for forward daily outcomes,"Horizons are forward from T0 observation price. Nested by construction. Computed as +n observation rows per symbol, which approximates trading sessions when coverage is complete. MFE=max_gain_pct, MAE=max_drawdown_pct on the forward slice."
+pattern_history t1/t3/t5/t10 columns on the same snapshot row,UNSAFE FOR THIS STUDY as contemporaneous features,Forward returns attached onto historical snapshot rows are filled later. Using them as if known at sample time is look-ahead. They may still be used as outcomes if join is by symbol×date and fill is complete — prefer earning_learning outcomes.
+market_daily_t0 VNINDEX OHLCV,SAFE AS-OF for market regime (EOD),"AFTER_CLOSE snapshots. Use as regime control, not as 5m P×V."
