@@ -1,0 +1,10 @@
+{
+  "forbidden_tokens": [
+    "prop-efb650d9bd5c451f",
+    "rs_spread",
+    "t5_return"
+  ],
+  "cases_checked": 17,
+  "violations": [],
+  "passed": true
+}

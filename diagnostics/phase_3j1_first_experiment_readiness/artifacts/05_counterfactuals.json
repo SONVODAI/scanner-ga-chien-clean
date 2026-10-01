@@ -1,0 +1,51 @@
+{
+  "CF-FE1": {
+    "description": "Remove motivating evidence \u2192 rationale changes",
+    "current_capability": "NOT_DEMONSTRATED",
+    "passed": false,
+    "reason": "No first-experiment objective derivation module"
+  },
+  "CF-FE2": {
+    "description": "Increase birth overlap \u2192 independence falls",
+    "current_capability": "PARTIAL",
+    "passed": false,
+    "reason": "cohort_overlap_estimator exists but not wired at proposition birth"
+  },
+  "CF-FE3": {
+    "description": "Resolve central uncertainty \u2192 experiment disappears",
+    "current_capability": "NOT_DEMONSTRATED",
+    "passed": false,
+    "reason": "No objective lifecycle at birth"
+  },
+  "CF-FE4": {
+    "description": "Rename/reorder tools \u2192 scientific winner unchanged",
+    "current_capability": "NOT_APPLICABLE",
+    "passed": false,
+    "reason": "Only one candidate path \u2014 no selection invariance test possible"
+  },
+  "CF-FE5": {
+    "description": "Representation change only \u2192 identity unchanged",
+    "current_capability": "PARTIAL",
+    "passed": false,
+    "reason": "scientific_action_core dedup exists for post-synthesis actions, not first experiment"
+  },
+  "CF-FE6": {
+    "description": "Redundant cohort \u2192 alternate or silence",
+    "current_capability": "NOT_DEMONSTRATED",
+    "passed": false,
+    "reason": "No first-experiment selector"
+  },
+  "CF-FE7": {
+    "description": "Best candidate non-executable \u2192 no silent inferior substitution",
+    "current_capability": "NOT_DEMONSTRATED",
+    "passed": false,
+    "reason": "No selector policy at birth"
+  },
+  "CF-FE8": {
+    "description": "Rescue mutation \u2192 reject",
+    "current_capability": "PARTIAL",
+    "passed": true,
+    "reason": "Anti-rescue in falsification generator + scientific_action_operators \u2014 but post-synthesis only"
+  },
+  "all_passed": false
+}

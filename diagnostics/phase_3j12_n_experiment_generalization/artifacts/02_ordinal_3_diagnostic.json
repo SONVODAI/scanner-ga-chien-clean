@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "reached_experiment_3_design": true,
+  "experiments_completed": 2,
+  "outcome": "FAILED_CLOSED",
+  "termination_reason": "experiment_3_execution_failed",
+  "journey": [
+    {
+      "ordinal": 1,
+      "has_package": true,
+      "has_execution": true,
+      "has_interpretation": true,
+      "has_decision": true,
+      "experiment_ordinal": null
+    },
+    {
+      "ordinal": 2,
+      "has_package": true,
+      "has_execution": true,
+      "has_interpretation": true,
+      "has_decision": true,
+      "experiment_ordinal": 2
+    },
+    {
+      "ordinal": 3,
+      "has_package": true,
+      "has_execution": false,
+      "has_interpretation": false,
+      "has_decision": false,
+      "experiment_ordinal": 3
+    }
+  ]
+}

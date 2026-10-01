@@ -1,0 +1,18 @@
+{
+  "policy_version": "first_experiment_selector_lex_v1_design_3j1",
+  "ordering": [
+    "1. Reject NON_EXECUTABLE, RESCUE_MUTATION, NEW_PROPOSITION_REQUIRED",
+    "2. Reject REDUNDANT_WITH_BIRTH_EVIDENCE (overlap thresholds)",
+    "3. Reject CONFIRMATORY_ONLY when FALSIFICATION_CAPABLE available",
+    "4. Reject REPRESENTATION_ONLY duplicates",
+    "5. Prefer higher birth-evidence independence (lexicographic dimensions)",
+    "6. Prefer directness to central proposition commitment",
+    "7. Prefer falsification-capable outcome branches",
+    "8. Executability tie-break only \u2014 tools last"
+  ],
+  "valid_non_selection_outcomes": [
+    "AMBIGUOUS_FIRST_EXPERIMENT",
+    "NO_HIGH_INFORMATION_FIRST_EXPERIMENT"
+  ],
+  "capability_gap": "No FirstExperimentSelector module exists"
+}
