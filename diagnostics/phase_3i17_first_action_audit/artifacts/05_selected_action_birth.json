@@ -1,0 +1,24 @@
+{
+  "trace": {
+    "target_uncertainty": "population_robustness",
+    "vulnerability": "population_specificity",
+    "cohort_strategy": "population_subgroup_contrast",
+    "subgroup_binding": {
+      "kind": "filter",
+      "field": "research_market_state",
+      "operator": "in",
+      "values": [
+        "NORMAL"
+      ],
+      "grammar_version": "research_grammar_v1"
+    }
+  },
+  "classification": "CONTEXTUAL_SCIENTIFIC_INSTANTIATION_WITH_TEMPLATE_RISK",
+  "effective_rule": "population_robustness \u2192 population_subgroup_contrast (single strategy in operator)",
+  "context_dependence": [
+    "Would not generate if population_robustness not in unresolved",
+    "Would not generate if axis in redundant_test_axes",
+    "Subgroup field (research_market_state) is NOT derived from evidence \u2014 hardcoded NORMAL"
+  ],
+  "template_translation_risk": "PARTIAL \u2014 axis\u2192strategy is 1:1; subgroup choice is fixed human category"
+}
