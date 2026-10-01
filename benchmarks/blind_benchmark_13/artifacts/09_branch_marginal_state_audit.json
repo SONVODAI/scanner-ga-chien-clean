@@ -1,0 +1,507 @@
+{
+  "research_branch_marginal_state_version": "research_branch_marginal_state_v1",
+  "entries": [
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 0,
+      "current_frame_id": "frame-00001",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "HORIZON_STABILITY",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "prior_resolution_attempts": 1,
+      "recent_information_value_history": [],
+      "realized_information_gain_history": [
+        "LOW"
+      ],
+      "redundancy_evidence": [],
+      "novelty_evidence": [
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [],
+      "marginal_state": "INSUFFICIENT_EVIDENCE",
+      "marginal_state_reason": "Fewer than two experiments on branch \u2014 insufficient decay evidence",
+      "planning_sequence": 1,
+      "built_at": "2026-08-22T01:13:19Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 5,
+      "experiments_on_branch": 1,
+      "current_frame_id": "frame-00007",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "HORIZON_STABILITY",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "prior_resolution_attempts": 2,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        2.25
+      ],
+      "realized_information_gain_history": [
+        "LOW",
+        "ZERO"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        16.83
+      ],
+      "marginal_state": "INSUFFICIENT_EVIDENCE",
+      "marginal_state_reason": "Fewer than two experiments on branch \u2014 insufficient decay evidence",
+      "planning_sequence": 2,
+      "built_at": "2026-08-22T01:13:19Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 2,
+      "current_frame_id": "frame-00007",
+      "unresolved_uncertainty_codes": [],
+      "prior_resolution_attempts": 3,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        2.25
+      ],
+      "realized_information_gain_history": [
+        "LOW",
+        "ZERO",
+        "HIGH"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-12558a49",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        16.83,
+        14.635625
+      ],
+      "marginal_state": "DIMINISHING",
+      "marginal_state_reason": "2 recent LOW/ZERO realized gains; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 3,
+      "built_at": "2026-08-22T01:13:19Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 3,
+      "current_frame_id": "frame-00003",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "HORIZON_STABILITY",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "prior_resolution_attempts": 2,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        2.25
+      ],
+      "realized_information_gain_history": [
+        "LOW",
+        "ZERO",
+        "HIGH",
+        "ZERO"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-12558a49",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        16.83,
+        14.635625,
+        4.968750000000002
+      ],
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "marginal_state_reason": "3 recent LOW/ZERO realized gains; persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 4,
+      "built_at": "2026-08-22T01:13:19Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 4,
+      "current_frame_id": "frame-00003",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SHAPE_GRADIENT",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE",
+        "TRAJECTORY_ROLE"
+      ],
+      "prior_resolution_attempts": 3,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        2.25
+      ],
+      "realized_information_gain_history": [
+        "LOW",
+        "ZERO",
+        "HIGH",
+        "ZERO",
+        "MEDIUM"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-12558a49",
+        "experiment:exp-a87ce4fc",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        16.83,
+        14.635625,
+        4.968750000000002,
+        5.49
+      ],
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "marginal_state_reason": "2 recent LOW/ZERO realized gains; persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 5,
+      "built_at": "2026-08-22T01:13:20Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 5,
+      "current_frame_id": "frame-00003",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE",
+        "TRAJECTORY_ROLE"
+      ],
+      "prior_resolution_attempts": 4,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        3.0,
+        2.5
+      ],
+      "realized_information_gain_history": [
+        "LOW",
+        "ZERO",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-a87ce4fc",
+        "experiment:exp-c5e53d75",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        16.83,
+        14.635625,
+        4.968750000000002,
+        5.49,
+        12.19018675
+      ],
+      "marginal_state": "DIMINISHING",
+      "marginal_state_reason": "persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']; many open gaps without recent resolution",
+      "planning_sequence": 6,
+      "built_at": "2026-08-22T01:13:20Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 6,
+      "current_frame_id": "frame-00003",
+      "unresolved_uncertainty_codes": [],
+      "prior_resolution_attempts": 5,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        3.0
+      ],
+      "realized_information_gain_history": [
+        "ZERO",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-a87ce4fc",
+        "experiment:exp-c5e53d75",
+        "experiment:exp-b12619b4",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        14.635625,
+        4.968750000000002,
+        5.49,
+        12.19018675,
+        4.3616875
+      ],
+      "marginal_state": "PRODUCTIVE",
+      "marginal_state_reason": "redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 7,
+      "built_at": "2026-08-22T01:13:21Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 7,
+      "current_frame_id": "frame-00006",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "HORIZON_STABILITY",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "prior_resolution_attempts": 2,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        3.0
+      ],
+      "realized_information_gain_history": [
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH",
+        "ZERO"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-c5e53d75",
+        "experiment:exp-b12619b4",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        4.968750000000002,
+        5.49,
+        12.19018675,
+        4.3616875,
+        1.1443541666666666
+      ],
+      "marginal_state": "DIMINISHING",
+      "marginal_state_reason": "persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 8,
+      "built_at": "2026-08-22T01:13:21Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 8,
+      "current_frame_id": "frame-00006",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SHAPE_GRADIENT",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE",
+        "TRAJECTORY_ROLE"
+      ],
+      "prior_resolution_attempts": 3,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        2.25
+      ],
+      "realized_information_gain_history": [
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH",
+        "ZERO",
+        "MEDIUM"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-b12619b4",
+        "experiment:exp-044038eb",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        5.49,
+        12.19018675,
+        4.3616875,
+        1.1443541666666666,
+        -1.0996249999999994
+      ],
+      "marginal_state": "DIMINISHING",
+      "marginal_state_reason": "persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 9,
+      "built_at": "2026-08-22T01:13:21Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 9,
+      "current_frame_id": "frame-00006",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE",
+        "TRAJECTORY_ROLE"
+      ],
+      "prior_resolution_attempts": 4,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        3.0,
+        2.5
+      ],
+      "realized_information_gain_history": [
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-044038eb",
+        "experiment:exp-1d4f1df0",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        12.19018675,
+        4.3616875,
+        1.1443541666666666,
+        -1.0996249999999994,
+        5.7789375
+      ],
+      "marginal_state": "DIMINISHING",
+      "marginal_state_reason": "persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']; many open gaps without recent resolution",
+      "planning_sequence": 10,
+      "built_at": "2026-08-22T01:13:22Z"
+    },
+    {
+      "version": "research_branch_marginal_state_v1",
+      "branch_root_id": "obs-e285dcafa3c4",
+      "observation_horizon": 0,
+      "experiments_on_branch": 10,
+      "current_frame_id": "frame-00004",
+      "unresolved_uncertainty_codes": [
+        "EPISODE_REPLICATION",
+        "HORIZON_STABILITY",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "prior_resolution_attempts": 2,
+      "recent_information_value_history": [
+        2.5,
+        2.5,
+        2.5,
+        2.5,
+        3.0
+      ],
+      "realized_information_gain_history": [
+        "MEDIUM",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM",
+        "ZERO"
+      ],
+      "redundancy_evidence": [
+        "repeated_tool_attempt:horizon_comparisonx2"
+      ],
+      "novelty_evidence": [
+        "experiment:exp-044038eb",
+        "experiment:exp-1d4f1df0",
+        "semantic_relationship:GENUINELY_INDEPENDENT"
+      ],
+      "recent_revalued_opportunity_history": [
+        4.3616875,
+        1.1443541666666666,
+        -1.0996249999999994,
+        5.7789375,
+        0.30918750000000017
+      ],
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "marginal_state_reason": "2 recent LOW/ZERO realized gains; persistent unresolved uncertainties with low gain; redundancy evidence: ['repeated_tool_attempt:horizon_comparisonx2']",
+      "planning_sequence": 11,
+      "built_at": "2026-08-22T01:13:22Z"
+    }
+  ],
+  "marginal_state_counts": {
+    "INSUFFICIENT_EVIDENCE": 2,
+    "DIMINISHING": 5,
+    "LOW_MARGINAL_VALUE": 3,
+    "PRODUCTIVE": 1
+  },
+  "competing_exit_state_events": 3
+}
