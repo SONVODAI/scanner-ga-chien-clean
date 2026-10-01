@@ -1,0 +1,19 @@
+{
+  "NEG_01_PURE_NOISE": {
+    "propositions": 0,
+    "silences": 13,
+    "pass": true
+  },
+  "NEG_03_DUPLICATED_EVIDENCE": {
+    "propositions": 0,
+    "pass": true
+  },
+  "NEG_09_ONTOLOGY_ONLY": {
+    "pass": true,
+    "detail": "OPR pipeline has no ontology input parameter \u2014 structural exclusion"
+  },
+  "NEG_10_SILENCE_VALID": {
+    "silences": 1,
+    "pass": true
+  }
+}

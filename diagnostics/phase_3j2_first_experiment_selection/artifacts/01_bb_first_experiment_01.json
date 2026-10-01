@@ -1,0 +1,149 @@
+{
+  "benchmark": "BB-FirstExperiment-01",
+  "version": "bb_first_experiment_01_v1_3j2",
+  "passed": 20,
+  "total": 20,
+  "all_passed": true,
+  "case_summaries": [
+    {
+      "case_id": "BBFE-01",
+      "family": "flux_tier_dispersion",
+      "scenario": "obvious_direct_test",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-02",
+      "family": "flux_tier_dispersion",
+      "scenario": "confirmatory_only_lure",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-03",
+      "family": "delta_yield_gate",
+      "scenario": "same_evidence_different_tool",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-04",
+      "family": "flux_tier_dispersion",
+      "scenario": "birth_evidence_duplication",
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-05",
+      "family": "context_gate_modulation",
+      "scenario": "independent_cohort",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-06",
+      "family": "context_gate_modulation",
+      "scenario": "non_independent_cohort",
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-07",
+      "family": "delta_yield_gate",
+      "scenario": "rescue_by_horizon_mutation",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-08",
+      "family": "flux_tier_dispersion",
+      "scenario": "rescue_by_population_narrowing",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-09",
+      "family": "modulation_axis",
+      "scenario": "outcome_mutation",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-10",
+      "family": "flux_tier_dispersion",
+      "scenario": "representation_only_candidate",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-11",
+      "family": "delta_yield_gate",
+      "scenario": "two_equivalent_tools",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-12",
+      "family": "context_gate_modulation",
+      "scenario": "invalid_evidence_path",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-13",
+      "family": "modulation_axis",
+      "scenario": "non_executable_best_idea",
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-14",
+      "family": "flux_tier_dispersion",
+      "scenario": "ambiguous_tie",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-15",
+      "family": "delta_yield_gate",
+      "scenario": "valid_silence",
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-16",
+      "family": "flux_tier_dispersion",
+      "scenario": "proposition_fully_encoded_by_birth",
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-17",
+      "family": "context_gate_modulation",
+      "scenario": "counterexample_capable_test",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-18",
+      "family": "modulation_axis",
+      "scenario": "candidate_order_perturbation",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-19",
+      "family": "delta_yield_gate",
+      "scenario": "tool_order_perturbation",
+      "disposition": "SELECTED",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-20",
+      "family": "volatility_surface_skew",
+      "scenario": "abstract_family_not_dispersion_return",
+      "disposition": "SELECTED",
+      "passed": true
+    }
+  ]
+}

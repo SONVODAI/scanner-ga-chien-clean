@@ -1,0 +1,56 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "classification": "PRESERVES_MEANING",
+    "scientific_before_adaptation": {
+      "question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+      "partition_by": "rs_spread",
+      "outcome": "t5_return",
+      "population": "all_market",
+      "expected_pattern": "Low-rs_spread quintile mean t5_return (-0.3253) exceeds high-rs_spread quintile (-1.2546) on partition test."
+    },
+    "executable_form": {
+      "tool": "partition_group_compare",
+      "partition_column": "rs_spread",
+      "n_groups": 5,
+      "outcome": "t5_return"
+    },
+    "drift_notes": "partition_group_compare tests quintile spread of t5_return across rs_spread \u2014 matches proposition. Does not encode observed non-monotonic pattern as explicit hypothesis \u2014 tests general partition difference."
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "classification": "PRESERVES_MEANING",
+    "scientific_before_adaptation": {
+      "question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+      "partition_by": "rs_spread",
+      "outcome": "t5_return",
+      "population": "all_market",
+      "expected_pattern": "Low-rs_spread quintile mean t5_return (-1.2885) exceeds high-rs_spread quintile (-3.1303) on partition test."
+    },
+    "executable_form": {
+      "tool": "partition_group_compare",
+      "partition_column": "rs_spread",
+      "n_groups": 5,
+      "outcome": "t5_return"
+    },
+    "drift_notes": "partition_group_compare tests quintile spread of t5_return across rs_spread \u2014 matches proposition. Does not encode observed non-monotonic pattern as explicit hypothesis \u2014 tests general partition difference."
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "classification": "PRESERVES_MEANING",
+    "scientific_before_adaptation": {
+      "question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+      "partition_by": "rs_spread",
+      "outcome": "t5_return",
+      "population": "all_market",
+      "expected_pattern": "Low-rs_spread quintile mean t5_return (0.5853) exceeds high-rs_spread quintile (-1.4626) on partition test."
+    },
+    "executable_form": {
+      "tool": "partition_group_compare",
+      "partition_column": "rs_spread",
+      "n_groups": 5,
+      "outcome": "t5_return"
+    },
+    "drift_notes": "partition_group_compare tests quintile spread of t5_return across rs_spread \u2014 matches proposition. Does not encode observed non-monotonic pattern as explicit hypothesis \u2014 tests general partition difference."
+  }
+]
