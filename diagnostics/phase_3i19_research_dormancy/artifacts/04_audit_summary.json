@@ -1,0 +1,8 @@
+{
+  "phase": "3I.19",
+  "head": "4e74cabaaa04930a5560fa93191dd4cf0ff9503d",
+  "verdict": "AUTONOMOUS_RESEARCH_DORMANCY_PASS",
+  "execution_status": "NOT_EXECUTED",
+  "t2_dormant": true,
+  "frontier_decision": "NO_HIGH_INFORMATION_ACTION"
+}

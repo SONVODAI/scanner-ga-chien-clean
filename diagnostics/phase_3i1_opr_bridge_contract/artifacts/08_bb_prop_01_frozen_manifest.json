@@ -1,0 +1,116 @@
+{
+  "artifact_id": "08_bb_prop_01_frozen_manifest",
+  "phase": "3I.1",
+  "benchmark_id": "BB-Prop-01",
+  "status": "FROZEN_PRE_REGISTRATION",
+  "purpose": "Blind evaluation of autonomous proposition generation without contaminating generator development",
+  "architecture": {
+    "zone_A_generator_development_set": {
+      "id": "A",
+      "name": "GENERATOR_DEVELOPMENT_SET",
+      "access": "Generator implementation team during 3I.2+ development",
+      "contents": {
+        "panel_slice": "First 60% chronological of frozen_panel_snapshot.csv (by date)",
+        "observation_classes": "Synthetic + historical tool outputs with known structure",
+        "hidden_answers": "Visible to developers for debugging ONLY in zone A",
+        "allowed_use": [
+          "Unit/integration tests",
+          "Grounding pipeline validation",
+          "Executability adapter tests",
+          "Laundering detector tests"
+        ],
+        "forbidden_use": [
+          "Threshold tuning from zone C phenomena",
+          "Embedding template phrasing from zone C"
+        ]
+      },
+      "path": "benchmarks/bb_prop_01/zone_a_development/"
+    },
+    "zone_B_frozen_blind_market_panel": {
+      "id": "B",
+      "name": "FROZEN_BLIND_MARKET_PANEL",
+      "access": "Generator at benchmark run time — NO hidden answers",
+      "contents": {
+        "panel": "Remaining 40% chronological holdout of frozen_panel_snapshot.csv",
+        "source_of_truth": "benchmarks/blind_benchmark_01/artifacts/frozen_panel_snapshot.csv",
+        "split_method": "Chronological 60/40 by trading date — frozen in manifest hash",
+        "generator_sees": [
+          "Raw market columns",
+          "Tool execution on panel",
+          "Execution metadata"
+        ],
+        "generator_must_not_see": [
+          "Zone C phenomenon definitions",
+          "Human/ChatGPT discovery narratives",
+          "Prior BB hidden convergence labels"
+        ]
+      },
+      "path": "benchmarks/bb_prop_01/zone_b_blind_panel/"
+    },
+    "zone_C_hidden_phenomenon_set": {
+      "id": "C",
+      "name": "HIDDEN_PHENOMENON_SET",
+      "access": "OFFLINE EVALUATOR ONLY — never generator, prompts, configs, or code modules",
+      "contents": {
+        "phenomena": "Independently established market structures / human discoveries NOT encoded in template catalog",
+        "storage": "benchmarks/bb_prop_01/zone_c_hidden/ — git-crypt or separate secret store in production eval",
+        "format": {
+          "phenomenon_id": "string",
+          "scientific_description": "human-readable",
+          "embedding_text": "for semantic match",
+          "population_outcome_horizon_signature": "structural features",
+          "discovery_provenance": "independent of Mr.BOT templates",
+          "never_include_in_repo": "Full zone C may be split — manifest references hash only in public repo"
+        },
+        "minimum_phenomena_count": 8,
+        "maximum_phenomena_count": 15
+      },
+      "path": "benchmarks/bb_prop_01/zone_c_hidden/",
+      "public_repo_policy": "Only manifest hash + phenomenon count; actual definitions in protected store"
+    },
+    "zone_D_offline_hidden_evaluator": {
+      "id": "D",
+      "name": "OFFLINE_HIDDEN_EVALUATOR",
+      "access": "Runs once per frozen generator commit on CI protected runner",
+      "inputs": [
+        "Frozen PropositionRecord export from zone B run",
+        "Zone C phenomenon set",
+        "Template catalog (for independence audit)",
+        "04_template_independence_evaluator.json rules"
+      ],
+      "outputs": [
+        "Creativity metrics (10_creativity_metrics_preregistration.json)",
+        "Hidden convergence class per phenomenon",
+        "Capability diagnosis buckets (abstract)",
+        "NO per-phenomenon answer leakage to generator team"
+      ],
+      "path": "benchmarks/bb_prop_01/zone_d_evaluator/"
+    }
+  },
+  "run_protocol": {
+    "steps": [
+      "1. Generator commit SHA frozen",
+      "2. Zone B panel mounted read-only",
+      "3. OPR bridge run with pre-registered budget (07)",
+      "4. PropositionRecords exported with content hashes",
+      "5. Run artifact sealed — no generator iteration until D completes",
+      "6. Zone D evaluator compares to zone C",
+      "7. Abstract report published — see 09_hidden_benchmark_protection_policy.json"
+    ],
+    "one_shot_blind_eval": true,
+    "re_run_allowed": "Only on new generator commit; never mid-iteration on same commit after seeing D output"
+  },
+  "contamination_controls": [
+    "Zone C paths in .gitignore / secret store for generator repo checkout used in dev",
+    "CI job D uses separate credentials",
+    "No zone C strings in test fixtures checked into main",
+    "Manifest content hash pinned in 08_bb_prop_01_frozen_manifest.json at freeze time",
+    "Generator logs must not echo zone C phenomenon descriptions on failure"
+  ],
+  "manifest_hashes": {
+    "panel_split_spec": "TO_BE_COMPUTED_AT_FREEZE",
+    "evaluator_rules_version": "04_template_independence_evaluator.json@v1",
+    "budget_policy_version": "07_generation_budget_policy.json@v1",
+    "frozen_at_phase": "3I.1"
+  }
+}

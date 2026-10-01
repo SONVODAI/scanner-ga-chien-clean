@@ -1,0 +1,33 @@
+{
+  "bb12_id": "blind_benchmark_12",
+  "frozen_panel_fingerprint": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "experiment_budget": 12,
+  "research_cutoff": "2026-08-17",
+  "baseline_comparison": "blind_benchmark_11 @ 84d689b0d artifacts",
+  "pass_requires_all": [
+    "mechanical_cycling_count <= bb11 OR justified with independent-alt increase",
+    "premature_stop_count <= bb11",
+    "no market-specific logic in diff vs 2792eb06d",
+    "frozen subsystem invariant audit PASS",
+    "synthetic tests A-G PASS"
+  ],
+  "improvement_signals_any_two": [
+    "mechanical_cycling_count < bb11",
+    "same_question_different_tool_selections reduced",
+    "independent_research_lines_explored >= bb11",
+    "unexplored_frontier_at_stop >= bb11 OR experiments_more_diverse",
+    "evidence_responsive_direction_changes >= bb11"
+  ],
+  "fail_if_any": [
+    "premature_stop_count > bb11 + 1",
+    "independent_line_selection_count < bb11 - 1",
+    "STOP_won_earlier_than_T11 without exit_evidence",
+    "post_bb12_code_changes"
+  ],
+  "valid_terminal_outcomes": [
+    "NO_EDGE_FOUND",
+    "BUDGET_EXHAUSTED",
+    "RESEARCH_COMPLETE_WITH_CANDIDATES"
+  ],
+  "note": "Gates defined before BB12 execution; no tuning from BB12 results"
+}
