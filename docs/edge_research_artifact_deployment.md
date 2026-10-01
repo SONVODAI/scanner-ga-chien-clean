@@ -8,8 +8,9 @@ Isolated HTTP service for Streamlit Cloud → VPS durable bundle transport.
 
 | Path | Purpose |
 |------|---------|
-| `/var/lib/mrbot/edge_research_durable/current/bundle.tar.gz` | Active bundle |
-| `/var/lib/mrbot/edge_research_durable/previous/` | Rollback during failed publish |
+| `/var/lib/mrbot/edge_research_durable/current/bundle.tar.gz` | Active Challenger bundle |
+| `/var/lib/mrbot/edge_research_durable/current/production_observations.tar.gz` | Autonomous daily Edge sidecar |
+| `/var/lib/mrbot/edge_research_durable/previous/` | Rollback during failed Challenger publish |
 | `/var/lib/mrbot/intraday_memory/` | Camera data — **never accessed by this service** |
 
 ## API contract
@@ -21,8 +22,18 @@ Base URL example: `https://artifacts.example.com/edge-research`
 | `GET` | `/health` | none | — |
 | `GET` | `/current/bundle.tar.gz` | Bearer | — |
 | `PUT` | `/current/bundle.tar.gz` | Bearer | gzip tarball |
+| `GET` | `/current/production_observations.tar.gz` | Bearer | — |
+| `PUT` | `/current/production_observations.tar.gz` | Bearer | gzip tarball |
 
-Tarball must contain `manifest.json` and `artifacts/*` only (validated server-side).
+Challenger tarball must contain `manifest.json` and `artifacts/*` only (validated server-side).
+Autonomous sidecar tarball must contain only `production_observations/**` members.
+
+### VPS publish vs Streamlit restore
+
+| Role | Config | Notes |
+|------|--------|-------|
+| VPS daily publisher | `EDGE_RESEARCH_ARTIFACT_*` via `/etc/mrbot/edge-artifacts.env` | Writes into artifact storage (or PUT to local artifact HTTP). No `DURABLE_*` required on VPS. |
+| Streamlit Cloud restore | `EDGE_RESEARCH_DURABLE_URL` + `EDGE_RESEARCH_DURABLE_TOKEN` secrets | Base URL of the reverse-proxied artifact service; object path `/current/production_observations.tar.gz`. |
 
 ## VPS install
 
