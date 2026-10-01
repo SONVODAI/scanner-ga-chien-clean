@@ -1,0 +1,28 @@
+{
+  "authority_version": "production_opr_authority_v1_3j0",
+  "canonical_authority": "OPR_LIFECYCLE",
+  "legacy_parallel_paths": [
+    "research_actions.generate_action_candidates",
+    "research_planner.plan_next_action",
+    "autonomous_research.bootstrap_research_graph"
+  ],
+  "execution_utilities": [
+    "research_tools.execute_research_experiment",
+    "research_tools.ToolRegistry"
+  ],
+  "path_classifications": {
+    "opr_bridge.prioritized_pipeline": "OPR_AUTHORITY",
+    "opr_bridge.lifecycle_runner": "OPR_AUTHORITY",
+    "opr_bridge.lifecycle_synthesis_hook": "OPR_AUTHORITY",
+    "opr_bridge.lifecycle_dormancy_integration": "OPR_AUTHORITY",
+    "opr_bridge.scientific_action_generator": "OPR_AUTHORITY",
+    "research_actions.generate_action_candidates": "DEPRECATED_PARALLEL_AUTHORITY",
+    "research_planner.plan_next_action": "DEPRECATED_PARALLEL_AUTHORITY",
+    "research_interpreter.interpret_tool_result": "LEGACY_SUPPORT_ONLY",
+    "research_tools.execute_research_experiment": "EXECUTION_UTILITY",
+    "research_tools.ToolRegistry": "EXECUTION_UTILITY",
+    "research_graph.ResearchGraph": "LEGACY_SUPPORT_ONLY",
+    "autonomous_research.bootstrap_research_graph": "DEPRECATED_PARALLEL_AUTHORITY",
+    "diagnostics.run_phase_3i": "LEGACY_DIAGNOSTIC_ONLY"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "evaluation_timing": "pre_result \u2014 no ToolResult access",
+  "ranking_style": "lexicographic_dominance \u2014 no tuned weighted scores",
+  "dominance_layers": [
+    "1. INVALID / RESCUE_RISK \u2192 reject",
+    "2. REDUNDANT (core hash or saturation redundant_test_axes) \u2192 reject",
+    "3. Non-executable \u2192 deprioritize vs executable (preserve record)",
+    "4. Priority alignment (SEEK_FALSIFICATION \u2192 falsification-capable first)",
+    "5. Attacks major unresolved uncertainty not in redundant_test_axes",
+    "6. Higher expected independence vs ledger",
+    "7. Contradiction-resolution capability when contradiction_structure non-empty",
+    "8. Lower correlation with prior cohort (cohort_overlap_ratio)"
+  ],
+  "gain_signals": [
+    "attacks unresolved major uncertainty",
+    "scientifically independent of prior evidence",
+    "can distinguish competing explanations",
+    "can falsify proposition",
+    "can resolve contradiction",
+    "covers new uncertainty dimension",
+    "low redundancy"
+  ],
+  "loss_signals": [
+    "same scientific action already executed",
+    "representation-only novelty",
+    "correlated cohort",
+    "rescue mutation",
+    "low interpretability given current interpreter",
+    "uncertainty already saturated"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "benchmark_version": "bb_first_experiment_execution_01_v1_3j3",
+  "counterfactuals": {
+    "CF-EX1": {
+      "passed": true,
+      "description": "Selected experiment remains authoritative over convenient default",
+      "selected_tool": "tier_compare",
+      "executed_tool": "tier_compare"
+    },
+    "CF-EX2": {
+      "passed": true,
+      "description": "Unsupported tool \u2192 fail closed, no fallback experiment",
+      "reasons": [
+        "unsupported_tool:nonexistent_research_tool_xyz"
+      ]
+    },
+    "CF-EX3": {
+      "passed": true,
+      "description": "Population/horizon mutation rejected rather than applied"
+    },
+    "CF-EX4": {
+      "passed": true,
+      "description": "No confirmatory full-panel substitution for falsification selection",
+      "population_kind": "filter"
+    },
+    "CF-EX5": {
+      "passed": true,
+      "description": "Real panel unavailable \u2014 skipped",
+      "skipped": true
+    },
+    "CF-EX6": {
+      "passed": true,
+      "description": "No envelope from CF-EX1 \u2014 gate rejected",
+      "skipped": true
+    },
+    "CF-EX7": {
+      "passed": true,
+      "description": "No envelope \u2014 no judgment added",
+      "skipped": true
+    },
+    "CF-EX8": {
+      "passed": true,
+      "description": "Irrelevant ordering does not alter execution identity",
+      "hash_a": "79dc58b7c4d7997eacb6573d12f6614771bc5911f8e561132435155692c6a1f4",
+      "hash_b": "79dc58b7c4d7997eacb6573d12f6614771bc5911f8e561132435155692c6a1f4"
+    }
+  },
+  "all_passed": true
+}
