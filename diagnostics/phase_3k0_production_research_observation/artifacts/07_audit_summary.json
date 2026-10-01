@@ -1,0 +1,13 @@
+{
+  "head": "abd97dac9b70d814f1ae3423a24dfb9cfadb1146",
+  "phase": "3K.0",
+  "stop_boundary": "STOP_PRODUCTION_RESEARCH_OBSERVATION_FOUNDATION",
+  "cf_obs_pass": true,
+  "historical_replay_temporal_integrity": true,
+  "counts_as_forward_evidence": false,
+  "observation_id": "obs-3af5cdd0c7759e26",
+  "trading_isolation_pass": true,
+  "hidden_answer_audit_pass": true,
+  "regressions_pass": true,
+  "phase_pass": true
+}

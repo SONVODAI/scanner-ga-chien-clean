@@ -1,0 +1,115 @@
+{
+  "experiment_1": {
+    "scientific_objective": "Does rs_spread quintile ordering survive excluding motivating episode (2026-08-02)?",
+    "targeted_null": "episode_artifact",
+    "target_uncertainty": "episode_robustness",
+    "population": {
+      "kind": "filter",
+      "field": "trade_date",
+      "operator": "not_in",
+      "values": [
+        "2026-08-02"
+      ],
+      "grammar_version": "research_grammar_v1"
+    },
+    "cohort_strategy": "counterexample_period_search",
+    "contrast": "partition_quintile_contrast",
+    "outcome": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "horizon": 0,
+    "grouping": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "statistic": "quintile_mean_spread (interpretation) + success_rate spread (tool metrics)",
+    "falsifying_observation": "Quintile spread collapse/reversal on holdout excluding motivating date",
+    "supporting_observation": "high_quintile_mean > low_quintile_mean with spread >= 0.5 on holdout",
+    "contradicting_observation": "Direction reversal or spread <= 0 on holdout cohort",
+    "row_count": 6106,
+    "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+    "experiment_content_hash": "383e822e4c33a1eddf806200dbfd48013efc9bc88e947765526a9cfa1fae442d"
+  },
+  "experiment_2_proposed": {
+    "scientific_objective": "Test whether directional rs_spread quintile commitment holds on the full cross-section",
+    "targeted_null": "directional_reversal",
+    "target_uncertainty": "directional_effect_full_universe",
+    "population": {
+      "kind": "all",
+      "grammar_version": "research_grammar_v1"
+    },
+    "cohort_strategy": "full_panel_contrast",
+    "contrast": "partition_quintile_contrast",
+    "outcome": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "horizon": 0,
+    "grouping": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "statistic": "quintile_mean_spread (interpretation) + success_rate spread (tool metrics)",
+    "falsifying_observation": "Full-panel quintile spread collapse or directional reversal",
+    "supporting_observation": "high_quintile_mean > low_quintile_mean with spread >= 0.5 on full panel",
+    "contradicting_observation": "Direction reversal or spread <= 0 on full cross-section",
+    "row_count": 6248,
+    "rows_added_vs_exp1": 142,
+    "exp1_subset_of_exp2": true,
+    "scientific_action_core_hash": "58ee7b6d5cf9052c6f80b9e1edd54e7f2cd813198766a1b20d62b8aa231340b5",
+    "experiment_content_hash": "65a641bae1a96205a2e01d776216cd1c0ccf4315e0e1c38ad847cd0e421c8a72"
+  },
+  "overlap": {
+    "row_overlap": 0.9772727272727273,
+    "intersection_rows": 6106,
+    "exp2_only_rows": 142
+  },
+  "novelty_decomposition": {
+    "ROW_OVERLAP": 0.9772727272727273,
+    "POPULATION_OVERLAP": 0.9772727272727273,
+    "CONTRAST_OVERLAP": 0.0,
+    "OUTCOME_OVERLAP": 1.0,
+    "NULL_TARGET_OVERLAP": 0.0,
+    "SCIENTIFIC_QUESTION_OVERLAP": 0.0,
+    "INFORMATION_NOVELTY": "MARGINAL_POPULATION_COMPLETION",
+    "SAMPLE_NOVELTY": "LOW",
+    "SCIENTIFIC_CONTRAST_NOVELTY": "HIGH",
+    "coarse_redundancy_interpretation": "HIGH_SAMPLE_REUSE_NEW_QUESTION",
+    "decomposition_hash": "0bcaf23b88ee1868a98bf37710d5dc617a11775b288900f74cd47fc89231e748"
+  },
+  "new_information_answer": "Experiment #2 produces a full-universe quintile_mean_spread over all 6248 rows including the 142 motivating-date rows excluded from Experiment #1. This binds epistemic assessment to directional_reversal / directional_effect_full_universe \u2014 a null and uncertainty Experiment #1 did not test. Experiment #1 addressed episode_artifact on a holdout excluding 2026-08-02; it cannot mechanically answer whether directional commitment holds on the complete cross-section. The incremental rows can shift quintile assignments and aggregate spread; falsification occurs if full-panel spread collapses/reverses despite holdout support.",
+  "falsification_geometry": {
+    "proposition_expectation": "High rs_spread quintile mean t5_return exceeds low quintile on full panel",
+    "pattern_against_proposition": "Quintile mean spread <= 0 or high/low ordering reversed on full panel",
+    "why_exp1_cannot_answer": "Exp #1 population excludes motivating date and targets episode_robustness null; interpretation contract maps holdout result to episode_artifact, not directional_reversal on full universe"
+  },
+  "outcome_semantics_audit": {
+    "bound_outcome_spec": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "stated_objective": "Test whether directional rs_spread quintile commitment holds on the full cross-section",
+    "tool_primary_metric": "incremental_success_rate spread across partition groups",
+    "interpretation_primary_metric": "quintile_mean_spread from extract_quintile_metrics (executor path)",
+    "semantic_alignment": "PARTIAL_BUT_CONSISTENT",
+    "blocker": false,
+    "note": "outcome_spec t5_return>0 drives tool success_rate spread; interpretation uses quintile means via frozen contract (high_quintile_mean vs low_quintile_mean). Same binding in both experiments. Not introduced by Exp #2; pre-existing 3J.3/3J.4 pattern."
+  },
+  "counterfactual_abc": {
+    "A_high_rows_new_contrast": "A_HIGH_ROWS_NEW_CONTRAST_ADMISSIBLE",
+    "B_high_rows_same_contrast": "B_HIGH_ROWS_SAME_CONTRAST_REJECT",
+    "C_low_rows_wrong_question": "C_LOW_ROWS_WRONG_QUESTION_CONTEXT"
+  },
+  "verdict": "PASS_WITH_AUDIT_HARDENING",
+  "verdict_rationale": "Scientific/contrast novelty is genuine (NULL_TARGET_OVERLAP=0, different epistemic question). HIGH_FIRST_EXPERIMENT_OVERLAP reflects sample reuse (Exp1 strict subset of Exp2), not scientific redundancy. Information novelty is marginal (142 new rows) but non-zero and mechanistically tied to full-universe directional falsification required by frozen 3J.5 decision. Novelty accounting should decompose dimensions before execution gate."
+}
