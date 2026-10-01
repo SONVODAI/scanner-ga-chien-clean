@@ -1,0 +1,27 @@
+{
+  "funnel": {
+    "research_needs_inferred": 76,
+    "needs_with_legal_capability_match": 73,
+    "constructible_needs": 63,
+    "candidates_generated": 150,
+    "candidates_surviving_filters": 150,
+    "candidates_entering_local_valuation": 166,
+    "candidates_entering_global_comparison": 11,
+    "experiments_selected": 11,
+    "experiments_executed": 11
+  },
+  "by_operation_class_inferred": {
+    "decomposition": 40,
+    "falsification": 15,
+    "horizon/outcome": 5,
+    "partition": 10,
+    "other": 1,
+    "threshold/boundary": 3,
+    "revisit": 2
+  },
+  "by_operation_class_executed": {
+    "other": 4,
+    "falsification": 1,
+    "threshold/boundary": 3
+  }
+}
