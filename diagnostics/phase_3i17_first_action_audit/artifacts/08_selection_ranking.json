@@ -1,0 +1,93 @@
+{
+  "winner": {
+    "candidate_id": "sac-e5fcc3e8b761",
+    "axis": "population_robustness",
+    "strategy": "population_subgroup_contrast",
+    "rank_key": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      "population_robustness"
+    ],
+    "sample_independence": "HIGH",
+    "redundancy": "NOVEL"
+  },
+  "top_alternatives": [
+    {
+      "candidate_id": "sac-5e485f5fc3ed",
+      "axis": "effect_stability",
+      "strategy": "regime_separated_contrast",
+      "rank_key": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        "effect_stability"
+      ],
+      "sample_independence": "MEDIUM",
+      "redundancy": "NOVEL"
+    },
+    {
+      "candidate_id": "sac-98038835688b",
+      "axis": "horizon_robustness",
+      "strategy": "regime_separated_contrast",
+      "rank_key": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        "horizon_robustness"
+      ],
+      "sample_independence": "MEDIUM",
+      "redundancy": "NOVEL"
+    },
+    {
+      "candidate_id": "sac-6f8215fe29fe",
+      "axis": "temporal_regime_robustness",
+      "strategy": "regime_separated_contrast",
+      "rank_key": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        "temporal_regime_robustness"
+      ],
+      "sample_independence": "MEDIUM",
+      "redundancy": "NOVEL"
+    }
+  ],
+  "pairwise_comparisons": [
+    {
+      "alternative_axis": "effect_stability",
+      "alternative_strategy": "regime_separated_contrast",
+      "first_separating_dimension": "independence",
+      "separating_index": 5,
+      "winner_wins_because": "independence: winner sample_independence=HIGH vs alt=MEDIUM"
+    },
+    {
+      "alternative_axis": "horizon_robustness",
+      "alternative_strategy": "regime_separated_contrast",
+      "first_separating_dimension": "independence",
+      "separating_index": 5,
+      "winner_wins_because": "independence: winner sample_independence=HIGH vs alt=MEDIUM"
+    },
+    {
+      "alternative_axis": "temporal_regime_robustness",
+      "alternative_strategy": "regime_separated_contrast",
+      "first_separating_dimension": "independence",
+      "separating_index": 5,
+      "winner_wins_because": "independence: winner sample_independence=HIGH vs alt=MEDIUM"
+    }
+  ],
+  "winner_margin": "NARROWLY_DOMINANT",
+  "note_independence_hardcoded": "population_subgroup_contrast assigns sample_independence=HIGH in _independence_estimate without computing expected cohort overlap vs prior ledger"
+}

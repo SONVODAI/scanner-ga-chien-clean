@@ -1,0 +1,21 @@
+{
+  "convergence_classes": [
+    "EXACT_HIDDEN_EDGE_REDISCOVERY",
+    "PARTIAL_SEMANTIC_CONVERGENCE",
+    "SCIENTIFICALLY_ADJACENT_INDEPENDENT",
+    "UNRELATED_PROPOSITION",
+    "TEMPLATE_LEAKAGE_OR_ANSWER_IMITATION"
+  ],
+  "leakage_controls": [
+    "Hidden predicates never in SEARCH_FEATURES or template text",
+    "Evaluator runs post-hoc only",
+    "Generator commit hash frozen before evaluator access",
+    "No human/ChatGPT edge strings in generation rules or examples"
+  ],
+  "name": "Blind Benchmark Proposition Discovery (BB-Prop-01)",
+  "separation": {
+    "frozen_blind_eval": "Held-out panel fingerprint + hidden outcome definitions never in generator code",
+    "generator_development": "Historical panels WITHOUT hidden-edge labels; synthetic observation fixtures only",
+    "hidden_evaluator": "Offline-only semantic matcher comparing generated proposition cores to frozen hidden phenomena"
+  }
+}
