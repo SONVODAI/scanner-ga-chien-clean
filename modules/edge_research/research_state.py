@@ -40,6 +40,11 @@ class SessionStatus(str, Enum):
     PAUSED = "PAUSED"
     COMPLETE = "COMPLETE"
     NO_EDGE_FOUND = "NO_EDGE_FOUND"
+    RESEARCH_COMPLETE_WITH_CANDIDATES = "RESEARCH_COMPLETE_WITH_CANDIDATES"
+    BUDGET_EXHAUSTED = "BUDGET_EXHAUSTED"
+    NO_VALID_FRONTIER = "NO_VALID_FRONTIER"
+    INCOMPLETE = "INCOMPLETE"
+    ERROR = "ERROR"
 
 
 @dataclass(frozen=True)
@@ -90,6 +95,53 @@ class QuestionRationale:
             reason_code=str(payload.get("reason_code", "")),
             prior_node_id=str(payload.get("prior_node_id", "")),
             evidence_summary=dict(payload.get("evidence_summary") or {}),
+        )
+
+
+@dataclass(frozen=True)
+class ResearchQuestionContext:
+    """
+    Structured question frame — population + outcome specs and search accounting hooks.
+
+    Answers: why did Bot ask this question?
+    """
+
+    population_spec: Dict[str, Any]
+    outcome_spec: Dict[str, Any]
+    research_depth: int = 0
+    search_complexity: int = 0
+    population_n: Optional[int] = None
+    search_accounting: Dict[str, Any] = field(default_factory=dict)
+    population_change: Optional[Dict[str, Any]] = None
+    frame_id: str = ""
+    observation_horizon: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "population_spec": dict(self.population_spec),
+            "outcome_spec": dict(self.outcome_spec),
+            "research_depth": self.research_depth,
+            "search_complexity": self.search_complexity,
+            "population_n": self.population_n,
+            "search_accounting": dict(self.search_accounting),
+            "population_change": dict(self.population_change) if self.population_change else None,
+            "frame_id": self.frame_id,
+            "observation_horizon": self.observation_horizon,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "ResearchQuestionContext":
+        pc = payload.get("population_change")
+        return cls(
+            population_spec=dict(payload.get("population_spec") or {}),
+            outcome_spec=dict(payload.get("outcome_spec") or {}),
+            research_depth=int(payload.get("research_depth", 0)),
+            search_complexity=int(payload.get("search_complexity", 0)),
+            population_n=payload.get("population_n"),
+            search_accounting=dict(payload.get("search_accounting") or {}),
+            population_change=dict(pc) if pc else None,
+            frame_id=str(payload.get("frame_id", "")),
+            observation_horizon=int(payload.get("observation_horizon", 0)),
         )
 
 
@@ -281,9 +333,14 @@ class ResearchSession:
     experiment_budget: Optional[int] = None
     experiments_used: int = 0
     schema_version: str = RESEARCH_GRAPH_SCHEMA_VERSION
+    search_accounting: Dict[str, Any] = field(default_factory=dict)
+    research_frontier: Dict[str, Any] = field(default_factory=dict)
+    session_stop_reason: Optional[Dict[str, Any]] = None
+    panel_preflight: Optional[Dict[str, Any]] = None
+    research_frames: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        payload: Dict[str, Any] = {
             "research_session_id": self.research_session_id,
             "started_at": self.started_at,
             "data_cutoff_date": self.data_cutoff_date,
@@ -294,6 +351,17 @@ class ResearchSession:
             "experiments_used": self.experiments_used,
             "schema_version": self.schema_version,
         }
+        if self.search_accounting:
+            payload["search_accounting"] = dict(self.search_accounting)
+        if self.research_frontier:
+            payload["research_frontier"] = dict(self.research_frontier)
+        if self.session_stop_reason:
+            payload["session_stop_reason"] = dict(self.session_stop_reason)
+        if self.panel_preflight:
+            payload["panel_preflight"] = dict(self.panel_preflight)
+        if self.research_frames:
+            payload["research_frames"] = dict(self.research_frames)
+        return payload
 
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "ResearchSession":
@@ -309,6 +377,13 @@ class ResearchSession:
             experiment_budget=payload.get("experiment_budget"),
             experiments_used=int(payload.get("experiments_used", 0)),
             schema_version=str(payload.get("schema_version", RESEARCH_GRAPH_SCHEMA_VERSION)),
+            search_accounting=dict(payload.get("search_accounting") or {}),
+            research_frontier=dict(payload.get("research_frontier") or {}),
+            session_stop_reason=dict(payload["session_stop_reason"])
+            if payload.get("session_stop_reason")
+            else None,
+            panel_preflight=dict(payload["panel_preflight"]) if payload.get("panel_preflight") else None,
+            research_frames=dict(payload.get("research_frames") or {}),
         )
 
 
@@ -325,6 +400,7 @@ class ResearchNode:
     trigger: Optional[ResearchTrigger] = None
     question_text: str = ""
     rationale: Optional[QuestionRationale] = None
+    question_context: Optional[ResearchQuestionContext] = None
     experiment_spec: Optional[ExperimentSpec] = None
     experiment_content_hash: Optional[str] = None
     experiment_result: Optional[ExperimentResult] = None
@@ -336,6 +412,8 @@ class ResearchNode:
     terminal_reason: str = ""
     frozen_spec_ref: Optional[Dict[str, Any]] = None
     revisit_allowed: bool = False
+    research_status: str = ""
+    candidate_summary: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -350,6 +428,7 @@ class ResearchNode:
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "question_text": self.question_text,
             "rationale": self.rationale.to_dict() if self.rationale else None,
+            "question_context": self.question_context.to_dict() if self.question_context else None,
             "experiment_spec": self.experiment_spec.to_dict() if self.experiment_spec else None,
             "experiment_content_hash": self.experiment_content_hash,
             "experiment_result": self.experiment_result.to_dict() if self.experiment_result else None,
@@ -363,12 +442,15 @@ class ResearchNode:
             "terminal_reason": self.terminal_reason,
             "frozen_spec_ref": dict(self.frozen_spec_ref) if self.frozen_spec_ref else None,
             "revisit_allowed": self.revisit_allowed,
+            "research_status": self.research_status,
+            "candidate_summary": dict(self.candidate_summary) if self.candidate_summary else None,
         }
 
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "ResearchNode":
         trigger = payload.get("trigger")
         rationale = payload.get("rationale")
+        qctx = payload.get("question_context")
         spec = payload.get("experiment_spec")
         result = payload.get("experiment_result")
         selected = payload.get("selected_next_action")
@@ -385,6 +467,7 @@ class ResearchNode:
             trigger=ResearchTrigger.from_dict(trigger) if trigger else None,
             question_text=str(payload.get("question_text", "")),
             rationale=QuestionRationale.from_dict(rationale) if rationale else None,
+            question_context=ResearchQuestionContext.from_dict(qctx) if qctx else None,
             experiment_spec=ExperimentSpec.from_dict(spec) if spec else None,
             experiment_content_hash=payload.get("experiment_content_hash"),
             experiment_result=ExperimentResult.from_dict(result) if result else None,
@@ -403,6 +486,8 @@ class ResearchNode:
             terminal_reason=str(payload.get("terminal_reason", "")),
             frozen_spec_ref=dict(frozen) if frozen else None,
             revisit_allowed=bool(payload.get("revisit_allowed", False)),
+            research_status=str(payload.get("research_status", "")),
+            candidate_summary=dict(payload.get("candidate_summary")) if payload.get("candidate_summary") else None,
         )
 
 
