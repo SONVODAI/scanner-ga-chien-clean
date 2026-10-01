@@ -1,0 +1,439 @@
+{
+  "test_kind": "DAY_0_SMOKE",
+  "version": "day0_smoke_v1_3k5",
+  "target_trade_date": "2026-08-18",
+  "isolated_namespace": "/workspace/data/edge_research/production_observations/day0_smoke_namespace",
+  "readiness": {
+    "ready": true,
+    "disposition": "READY",
+    "reason": "data_ready",
+    "source_max_trade_date": "2026-08-18",
+    "researcher_visible_max_trade_date": "2026-08-18",
+    "source_dataset_identity": "research_panel:0eebf65b98bc62b5",
+    "source_dataset_hash": "0eebf65b98bc62b52761d023a75bc300b732d8eed527047e8be3e5a78177d9dc",
+    "temporal_provenance_established": true,
+    "market_context_available": true,
+    "market_context_classification": "AVAILABLE",
+    "errors": []
+  },
+  "cutoff_diag": {
+    "data_cutoff_date": "2026-08-18",
+    "rows_before_cutoff_filter": 3266,
+    "rows_excluded_after_t0_cutoff": 0,
+    "rows_after_t0_cutoff": 3266,
+    "future_t0_rows_in_source": 0,
+    "max_source_trade_date": "2026-08-18",
+    "max_researcher_visible_trade_date": "2026-08-18",
+    "temporal_provenance_established": true
+  },
+  "lock": {
+    "acquired": true,
+    "reason": "acquired",
+    "lock_path": "/workspace/data/edge_research/production_observations/day0_smoke_namespace/production_observations/daily_run.lock",
+    "holder_pid": null,
+    "holder_run_id": null
+  },
+  "run": {
+    "run": {
+      "run_id": "pdrun-5ca6c2d3523b90b6",
+      "target_trade_date": "2026-08-18",
+      "run_mode": "DAY_0_SMOKE",
+      "run_started_at": "2026-08-22T11:35:09.827517+00:00",
+      "run_completed_at": "2026-08-22T11:35:13.057245+00:00",
+      "cutoff": {
+        "observation_id": "obs-781ec997a000a326",
+        "trade_date": "2026-08-18",
+        "cutoff_timestamp": "2026-08-22T11:35:09.850247+00:00",
+        "timezone": "UTC",
+        "data_availability_status": "EOD_FINAL",
+        "market_data_max_timestamp": "2026-08-18T23:59:59Z",
+        "dataset_identities": [
+          "pattern_lifecycle",
+          "market_t0_snapshot",
+          "outcomes"
+        ],
+        "dataset_hashes": [
+          "0eebf65b98bc62b52761d023a75bc300b732d8eed527047e8be3e5a78177d9dc"
+        ],
+        "universe_identity": "9923d7383758d5e837cbe380f0feff6d1d42d12693bc501a3dbbff329de39d64",
+        "universe_hash": "7e1f637b74201e9f710c5ec6df13de7fd6bb6a7a291f5c783f3bfaf73d786808",
+        "market_context_identity": "623097467c819fb2a04b9cb1eb7751ca1e9f20ccd9a14bd365e8b6035bdee235",
+        "market_context_hash": "01b0bb3060afe30be17b352c9efb07f7758ce9310d0298c9ed25884ef69a9aa3",
+        "research_policy_hashes": {
+          "bounded_lifecycle_controller.py": "ff078e346b174fdd63d07ec051677c8f75c394d773762a86d84a620a70bdfdba",
+          "bounded_lifecycle_records.py": "ba749a12e799b11d26eff8b8218f72654dd6b9dc122b27183469a5bac9ac5ca8",
+          "bounded_lifecycle_state.py": "a011c2d3052590fa3df8bddfd2bd64f052d0cfcecca9b1974a11f6353e1cef24",
+          "production_bounded_lifecycle.py": "236ad19f9156729438678e0685d8a9d767bf9df3c8d295cfd5b63fb67c943471",
+          "first_experiment_research_decider.py": "e04febd02446894265ea1bd0bb7fe6b5142ef388ce21736219dd7179041c559d",
+          "second_experiment_research_decider.py": "7650db3406adc1ebe7c9d3a61c813fca9c26cbec197c18ec0d815ad29a33b5c8",
+          "first_experiment_evidence_interpreter.py": "78e55b430e877e8f45eae41a7950cc88694d89f6b0e79e291958efa6e48c3296",
+          "second_experiment_evidence_interpreter.py": "e74c8529dfdc9e615c5d49aec2cedc7eac44ae9e96d637d4bb7abf440aeaceae",
+          "multi_evidence_accounting.py": "26bdd50e4b35127ace7c3c537032376fa1c2f49d4980150ebf8af49601550994",
+          "production_trigger.py": "bf02dacd1b8d82416aa5eb50e91a83bd2c2c66f56af90e45e79bb12a8e573912",
+          "prioritized_pipeline.py": "7b6f9896014d5de44c8f490c0534f7e1041d7686812f33e17ec8aed68d9df5ac",
+          "proposition_synthesizer.py": "25f51accd27a8ff6d4b1d2af8e3e9426defe600ad3897235451d81507ce11cf5"
+        },
+        "code_identity": "fec9e08f07b2358dfca2092c45892eb6622a9574",
+        "panel_row_count": 3266,
+        "panel_max_trade_date": "2026-08-18",
+        "temporal_provenance_hash": "43ca068ffe87704fef5e379726cc6d74de12c752092325f30b5ce4289299959b",
+        "record_version": "production_research_observation_v1_3k0"
+      },
+      "source_dataset_identity": "research_panel:0eebf65b98bc62b5",
+      "source_dataset_hash": "0eebf65b98bc62b52761d023a75bc300b732d8eed527047e8be3e5a78177d9dc",
+      "source_max_trade_date": "2026-08-18",
+      "researcher_visible_max_trade_date": "2026-08-18",
+      "market_context_identity": "623097467c819fb2a04b9cb1eb7751ca1e9f20ccd9a14bd365e8b6035bdee235",
+      "market_context_hash": "01b0bb3060afe30be17b352c9efb07f7758ce9310d0298c9ed25884ef69a9aa3",
+      "prior_successful_run_id": null,
+      "policy_version_hashes": {
+        "bounded_lifecycle_controller.py": "ff078e346b174fdd63d07ec051677c8f75c394d773762a86d84a620a70bdfdba",
+        "bounded_lifecycle_records.py": "ba749a12e799b11d26eff8b8218f72654dd6b9dc122b27183469a5bac9ac5ca8",
+        "bounded_lifecycle_state.py": "a011c2d3052590fa3df8bddfd2bd64f052d0cfcecca9b1974a11f6353e1cef24",
+        "production_bounded_lifecycle.py": "236ad19f9156729438678e0685d8a9d767bf9df3c8d295cfd5b63fb67c943471",
+        "first_experiment_research_decider.py": "e04febd02446894265ea1bd0bb7fe6b5142ef388ce21736219dd7179041c559d",
+        "second_experiment_research_decider.py": "7650db3406adc1ebe7c9d3a61c813fca9c26cbec197c18ec0d815ad29a33b5c8",
+        "first_experiment_evidence_interpreter.py": "78e55b430e877e8f45eae41a7950cc88694d89f6b0e79e291958efa6e48c3296",
+        "second_experiment_evidence_interpreter.py": "e74c8529dfdc9e615c5d49aec2cedc7eac44ae9e96d637d4bb7abf440aeaceae",
+        "multi_evidence_accounting.py": "26bdd50e4b35127ace7c3c537032376fa1c2f49d4980150ebf8af49601550994",
+        "production_trigger.py": "bf02dacd1b8d82416aa5eb50e91a83bd2c2c66f56af90e45e79bb12a8e573912",
+        "prioritized_pipeline.py": "7b6f9896014d5de44c8f490c0534f7e1041d7686812f33e17ec8aed68d9df5ac",
+        "proposition_synthesizer.py": "25f51accd27a8ff6d4b1d2af8e3e9426defe600ad3897235451d81507ce11cf5"
+      },
+      "observations_born": [
+        "obs-781ec997a000a326"
+      ],
+      "observations_reassessed": [
+        "obs-781ec997a000a326"
+      ],
+      "forward_outcomes_released": [],
+      "daily_summary_id": "dysum-ca368de8b4c74799",
+      "run_disposition": "SUCCESS",
+      "failure_or_skip_reason": null,
+      "counts_as_forward_evidence": false,
+      "current_phase": "RUN_FINALIZED",
+      "phase_history": [
+        {
+          "phase": "DATA_READINESS",
+          "timestamp": "2026-08-22T11:35:09.828115+00:00"
+        },
+        {
+          "phase": "CUTOFF_ESTABLISHED",
+          "timestamp": "2026-08-22T11:35:09.852451+00:00"
+        },
+        {
+          "phase": "RESEARCH_COMPLETED",
+          "timestamp": "2026-08-22T11:35:13.031334+00:00"
+        },
+        {
+          "phase": "BIRTHS_PERSISTED",
+          "timestamp": "2026-08-22T11:35:13.031989+00:00"
+        },
+        {
+          "phase": "OUTCOMES_RELEASED",
+          "timestamp": "2026-08-22T11:35:13.050315+00:00"
+        },
+        {
+          "phase": "ASSESSMENTS_COMPLETED",
+          "timestamp": "2026-08-22T11:35:13.050582+00:00"
+        },
+        {
+          "phase": "SUMMARY_COMPLETED",
+          "timestamp": "2026-08-22T11:35:13.051225+00:00"
+        },
+        {
+          "phase": "RUN_FINALIZED",
+          "timestamp": "2026-08-22T11:35:13.057253+00:00"
+        }
+      ],
+      "shadow_authority": {
+        "research_only": true,
+        "trading_authority": false,
+        "buy_signal": false,
+        "sell_signal": false,
+        "edge_active": false
+      },
+      "run_identity_hash": "5ca6c2d3523b90b668abfb02539f64a0880c778014e4ea7b0ba10dc8cf90a1bd",
+      "frozen": true,
+      "record_version": "production_daily_research_run_v1_3k2"
+    },
+    "manifest": {
+      "trade_date": "2026-08-18",
+      "run_id": "pdrun-5ca6c2d3523b90b6",
+      "run_status": "SUCCESS",
+      "bot_spoke_today": true,
+      "discovery_count": 1,
+      "active_assessment_count": 1,
+      "newly_released_outcomes": [],
+      "meaningful_belief_changes": 0,
+      "silence_or_no_discovery": false,
+      "market_context_hash": "01b0bb3060afe30be17b352c9efb07f7758ce9310d0298c9ed25884ef69a9aa3",
+      "summary_id": "dysum-ca368de8b4c74799",
+      "errors": [],
+      "warnings": [],
+      "shadow_authority": {
+        "research_only": true,
+        "trading_authority": false,
+        "buy_signal": false,
+        "sell_signal": false,
+        "edge_active": false
+      },
+      "counts_as_forward_evidence": false,
+      "record_version": "production_daily_manifest_v1_3k2"
+    },
+    "notifications": [
+      {
+        "event_kind": "DAILY_RESEARCH_READY",
+        "run_id": "pdrun-5ca6c2d3523b90b6",
+        "trade_date": "2026-08-18",
+        "payload": {
+          "summary_id": "dysum-ca368de8b4c74799",
+          "bot_spoke_today": true,
+          "silence_or_no_discovery": false,
+          "discovery_count": 1
+        },
+        "timestamp": "2026-08-22T11:35:13.058319+00:00",
+        "delivery_status": "NOT_DELIVERED",
+        "record_version": "daily_run_notification_contract_v1_3k2"
+      }
+    ],
+    "assessment_result": {
+      "assessment_trade_date": "2026-08-18",
+      "assessments": [
+        {
+          "assessment_id": "asmt-dd886faeaf75d4cd",
+          "observation_id": "obs-781ec997a000a326",
+          "assessment_trade_date": "2026-08-18",
+          "assessment_timestamp": "2026-08-22T11:35:13.048247+00:00",
+          "previous_assessment_id": null,
+          "birth_record_hash": "0ba128a78dd0d4776d4192d4d4eefaf4c23369a24493bc0bb26f808b833ac834",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-08-18",
+            "temporal_provenance_hash": "43ca068ffe87704fef5e379726cc6d74de12c752092325f30b5ce4289299959b",
+            "panel_row_count": 3266,
+            "replay_mode": "DAY_0_SMOKE"
+          },
+          "current_market_context_identity": "623097467c819fb2a04b9cb1eb7751ca1e9f20ccd9a14bd365e8b6035bdee235",
+          "current_market_context_hash": "01b0bb3060afe30be17b352c9efb07f7758ce9310d0298c9ed25884ef69a9aa3",
+          "previous_market_context_identity": "623097467c819fb2a04b9cb1eb7751ca1e9f20ccd9a14bd365e8b6035bdee235",
+          "previous_market_context_hash": "01b0bb3060afe30be17b352c9efb07f7758ce9310d0298c9ed25884ef69a9aa3",
+          "market_delta": {
+            "regime_changed": false,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": true,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "UNKNOWN",
+            "summary_keys": [
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "dispersion:changed",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "8976da9c7351fd0b2aa7390ea3bf484e78405cce4ff7bacc2d6f9e1ce5c04905",
+            "current_context_hash": "01b0bb3060afe30be17b352c9efb07f7758ce9310d0298c9ed25884ef69a9aa3",
+            "delta_hash": "257d94df365e67419b7082550b67e349c0a2c1870a2f596408452bf6eee882a4"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": "FALSIFIED",
+          "previous_epistemic_state": "FALSIFIED",
+          "epistemic_delta": {
+            "previous_state": "FALSIFIED",
+            "current_state": "FALSIFIED",
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "BORN",
+          "observation_lifecycle_state": "BORN",
+          "what_changed": [
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "dispersion:changed",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:FALSIFIED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains FALSIFIED. Market context changed (breadth:UNKNOWN; transition:CHANGED; dispersion:changed; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-08-21",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-08-21",
+          "observation_age_trading_days": 0,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "dd886faeaf75d4cd7db8d2d319dd20e54b13898d2b5d2e6037acbd1746d27fd0",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        }
+      ],
+      "summary": {
+        "summary_id": "dysum-ca368de8b4c74799",
+        "trade_date": "2026-08-18",
+        "summary_timestamp": "2026-08-22T11:35:13.049457+00:00",
+        "market_state_summary": {
+          "market_real": 5.7,
+          "market_forecast": 1.3,
+          "research_market_state": "ROLLOVER",
+          "research_market_transition": "ROLLOVER -> ROLLOVER",
+          "research_market_level": "MID",
+          "research_market_trajectory": "DETERIORATING"
+        },
+        "most_meaningful_market_delta": "breadth:UNKNOWN",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-781ec997a000a326"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-08-21",
+        "provenance_hash": "e65f6c7eef8d2c6491d0a1fc2ef976ce6efc350d2dd437fabe6c32c65f0e3084",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      "new_outcome_count": 0,
+      "idempotent_keys": [
+        "dd886faeaf75d4cd7db8d2d319dd20e54b13898d2b5d2e6037acbd1746d27fd0"
+      ]
+    },
+    "forward_clock": [
+      {
+        "observation_id": "obs-781ec997a000a326",
+        "birth_trade_date": "2026-08-18",
+        "age_trading_sessions": 0,
+        "t3_eligible_date": "2026-08-21",
+        "t5_eligible_date": "2026-08-25",
+        "t10_eligible_date": "2026-09-01",
+        "t3_release_date": null,
+        "t5_release_date": null,
+        "t10_release_date": null,
+        "missing_data_delay": null,
+        "record_version": "forward_clock_ledger_v1_3k2"
+      }
+    ],
+    "calibration_result": {
+      "updated": false,
+      "reason": "not_live_forward"
+    },
+    "observability": {
+      "run_id": "pdrun-5ca6c2d3523b90b6",
+      "events": [
+        {
+          "timestamp": "2026-08-22T11:35:09.827948+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "run_started",
+          "version": "production_daily_run_observability_v1_3k2"
+        },
+        {
+          "timestamp": "2026-08-22T11:35:09.827965+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "data_readiness",
+          "version": "production_daily_run_observability_v1_3k2",
+          "ready": true,
+          "disposition": "READY",
+          "reason": "data_ready"
+        },
+        {
+          "timestamp": "2026-08-22T11:35:09.852140+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "cutoff_established",
+          "version": "production_daily_run_observability_v1_3k2",
+          "cutoff_hash": "43ca068ffe87704fef5e379726cc6d74de12c752092325f30b5ce4289299959b",
+          "observation_id": null
+        },
+        {
+          "timestamp": "2026-08-22T11:35:13.031093+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "research_completed",
+          "version": "production_daily_run_observability_v1_3k2",
+          "observation_id": "obs-781ec997a000a326",
+          "outcome_kind": "STOP"
+        },
+        {
+          "timestamp": "2026-08-22T11:35:13.031823+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "births_persisted",
+          "version": "production_daily_run_observability_v1_3k2",
+          "observation_ids": [
+            "obs-781ec997a000a326"
+          ]
+        },
+        {
+          "timestamp": "2026-08-22T11:35:13.050072+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "outcomes_released",
+          "version": "production_daily_run_observability_v1_3k2",
+          "outcome_ids": []
+        },
+        {
+          "timestamp": "2026-08-22T11:35:13.050091+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "assessments_completed",
+          "version": "production_daily_run_observability_v1_3k2",
+          "assessment_ids": [
+            "asmt-dd886faeaf75d4cd"
+          ]
+        },
+        {
+          "timestamp": "2026-08-22T11:35:13.051053+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "summary_completed",
+          "version": "production_daily_run_observability_v1_3k2",
+          "summary_id": "dysum-ca368de8b4c74799"
+        },
+        {
+          "timestamp": "2026-08-22T11:35:13.058079+00:00",
+          "run_id": "pdrun-5ca6c2d3523b90b6",
+          "target_trade_date": "2026-08-18",
+          "event": "run_finalized",
+          "version": "production_daily_run_observability_v1_3k2",
+          "disposition": "SUCCESS"
+        }
+      ]
+    },
+    "idempotent_replay": false,
+    "counts_as_forward_evidence": false,
+    "stop_boundary": "STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY"
+  },
+  "counts_as_forward_evidence": false,
+  "main_calibration_contaminated": false,
+  "smoke_observation_count": 1,
+  "ui_available": true,
+  "promotable": false
+}

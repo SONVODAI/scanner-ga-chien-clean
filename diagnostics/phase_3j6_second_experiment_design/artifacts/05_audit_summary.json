@@ -1,0 +1,14 @@
+{
+  "phase": "3J.6",
+  "branch": "cursor/phase-3j6-second-experiment-design-aad2",
+  "head": "b1c487bb90929e21a51539504c88881b2b5352d1",
+  "cf_sd_all_passed": true,
+  "real_proposition_id": "prop-efb650d9bd5c451f",
+  "selected_design_or_silence": "SELECTED",
+  "package_status": "NOT_EXECUTED",
+  "execution_occurred": false,
+  "stop_boundary": "STOP_SECOND_EXPERIMENT_DESIGNED",
+  "hidden_answer_clean": true,
+  "regressions_passed": true,
+  "pass": true
+}

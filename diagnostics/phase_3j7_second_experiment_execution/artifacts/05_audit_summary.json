@@ -1,0 +1,10 @@
+{
+  "phase": "3J.7",
+  "git_head": "83878890109b35a53b67475d8948ae75503146a6",
+  "cf_se_all_passed": true,
+  "hidden_answer_passed": true,
+  "real_diagnostic_proposition": "prop-efb650d9bd5c451f",
+  "execution_status": "IDEMPOTENT_REPLAY",
+  "stop_boundary": "STOP_SECOND_EXPERIMENT_EXECUTED",
+  "regression_failures": []
+}

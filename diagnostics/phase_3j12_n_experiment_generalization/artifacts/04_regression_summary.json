@@ -1,0 +1,21 @@
+{
+  "suites": {
+    "tests/test_edge_research_opr_phase_3j12.py": {
+      "passed": true,
+      "tail": "5 passed in 29.22s"
+    },
+    "tests/test_edge_research_opr_phase_3j11.py": {
+      "passed": true,
+      "tail": "8 passed in 12.21s"
+    },
+    "tests/test_edge_research_opr_phase_3j10.py": {
+      "passed": true,
+      "tail": "8 passed in 8.77s"
+    },
+    "tests/test_edge_research_opr_phase_3j9.py": {
+      "passed": true,
+      "tail": "11 passed in 9.35s"
+    }
+  },
+  "all_passed": true
+}

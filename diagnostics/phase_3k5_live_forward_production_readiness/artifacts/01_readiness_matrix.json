@@ -1,0 +1,21 @@
+{
+  "matrix": {
+    "Scientific integrity": "PASS",
+    "Temporal integrity": "PASS",
+    "Production data readiness": "PASS",
+    "EOD completeness": "PASS_WITH_PREREQUISITE",
+    "Timezone correctness": "PASS_WITH_PREREQUISITE",
+    "Idempotency": "PASS",
+    "Crash recovery": "PASS",
+    "Persistence durability": "PASS_WITH_PREREQUISITE",
+    "Backup readiness": "PASS_WITH_PREREQUISITE",
+    "UI truthfulness": "PASS",
+    "Operational observability": "PASS",
+    "Security/trading isolation": "PASS",
+    "Scheduling readiness": "PASS_WITH_PREREQUISITE",
+    "Day-0 smoke readiness": "PASS_WITH_PREREQUISITE",
+    "LIVE_FORWARD Day-1 readiness": "PASS_WITH_PREREQUISITE"
+  },
+  "all_pass_or_prerequisite": true,
+  "any_fail": false
+}

@@ -1,0 +1,96 @@
+{
+  "version": "bb_production_prerequisite_01_v1_3k5a",
+  "counterfactuals": {
+    "CF-PR1": {
+      "passed": true,
+      "description": "Partial rows but no authoritative freeze -> block",
+      "reason": "weekend_non_session"
+    },
+    "CF-PR2": {
+      "passed": true,
+      "description": "Freeze exists for wrong session -> block",
+      "eod": "no_freeze_rows_for_session"
+    },
+    "CF-PR3": {
+      "passed": true,
+      "description": "Source mutates after freeze -> block",
+      "eod": {
+        "complete": false,
+        "disposition": "FAILED_CLOSED",
+        "reason": "partial_freeze_rows_vs_panel",
+        "freeze_row_count": 10,
+        "panel_row_count": 40,
+        "market_after_close": false,
+        "freeze_max_frozen_at": "2026-08-18T12:00:00Z",
+        "source_mutation_detected": true,
+        "freeze_content_hash": "e81fbaf5b9279dbf8ac247ad081cb1dcb9a20b0729897ba866545345f490261d",
+        "panel_content_hash": "0ec3d1006cad6475eeca228d1c213c766e26f815e79d34f64ab2d6aaf0d12d99",
+        "errors": [
+          "partial_freeze_rows_vs_panel",
+          "freeze_symbol_set_mismatch",
+          "market_after_close_missing:none"
+        ],
+        "version": "eod_completeness_v1_3k5a"
+      }
+    },
+    "CF-PR4": {
+      "passed": true,
+      "description": "VN holiday -> no run",
+      "calendar": "exchange_holiday"
+    },
+    "CF-PR5": {
+      "passed": true,
+      "description": "Server UTC date differs from VN market date -> correct market session",
+      "utc": "2026-08-21",
+      "vn": "2026-08-22"
+    },
+    "CF-PR6": {
+      "passed": true,
+      "description": "Missing/unknown calendar state -> fail closed"
+    },
+    "CF-PR7": {
+      "passed": true,
+      "description": "Backup write failure -> visible unhealthy state"
+    },
+    "CF-PR8": {
+      "passed": true,
+      "description": "Corrupted backup -> restore verification rejects",
+      "reason": "manifest_hash_mismatch"
+    },
+    "CF-PR9": {
+      "passed": true,
+      "description": "Scheduler duplicate invocation -> single writer"
+    },
+    "CF-PR10": {
+      "passed": true,
+      "description": "Smoke artifact promotion attempt -> reject",
+      "reason": "day0_smoke_never_counts_as_forward"
+    },
+    "CF-PR11": {
+      "passed": true,
+      "description": "Genesis date derived from UTC instead of VN session -> reject"
+    },
+    "CF-PR12": {
+      "passed": true,
+      "description": "T3/T5/T10 across holiday -> correct trading-session count",
+      "t3_date": "2026-05-04",
+      "session_count": 4
+    },
+    "CF-PR13": {
+      "passed": true,
+      "description": "Restart after completed run -> no duplicate history"
+    },
+    "CF-PR14": {
+      "passed": true,
+      "description": "Existing NON_FORWARD records remain untouched (no exception)"
+    },
+    "CF-PR15": {
+      "passed": true,
+      "description": "Scheduler artifacts accidentally enabled during phase -> audit failure",
+      "activated": false
+    }
+  },
+  "all_passed": true,
+  "passed_count": 15,
+  "total": 15
+}

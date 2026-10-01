@@ -1,0 +1,37 @@
+{
+  "status": "DESIGN_PREVIEW_ONLY \u2014 not frozen because PARTIALLY_READY",
+  "would_select": "FC-02 exclude_focal_date_partition",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+  "interpretation_contract_ref": "diagnostics/phase_3i7_minimal_lifecycle/artifacts/03_interpretation_contract.json",
+  "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "proposed_experiment_spec_sketch": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "research_scope": {
+      "population_spec": {
+        "kind": "filter",
+        "field": "trade_date",
+        "operator": "!=",
+        "value": "2026-08-02",
+        "grammar_version": "research_grammar_v1"
+      },
+      "outcome_spec": {
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0,
+        "grammar_version": "research_grammar_v1"
+      },
+      "observation_horizon": 0
+    },
+    "data_cutoff_date": "2026-08-17"
+  },
+  "interpretation_requirements": "Reuse 3I.7 contract rules on quintile metrics from excluded-focal cohort",
+  "selector_version": "lexicographic_falsification_selector_v1_3i8 (design)",
+  "execution_status": "NOT_EXECUTED \u2014 awaiting 3I.9 implementation"
+}

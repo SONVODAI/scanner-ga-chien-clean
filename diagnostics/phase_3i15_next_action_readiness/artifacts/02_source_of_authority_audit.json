@@ -1,0 +1,24 @@
+{
+  "authority_hierarchy": {
+    "single_result_interpretation": "EpistemicUpdateRecord",
+    "proposition_knowledge": "EvidenceSynthesisRecord",
+    "research_budget_recommendation": "ResearchPriorityDecision",
+    "immediate_single_evidence": "ResearchDecisionRecord (transitional \u2014 must not override multi-evidence)"
+  },
+  "next_action_layer_must_consume": "ResearchPriorityDecision",
+  "must_not_override_with": "ResearchDecisionRecord",
+  "current_violations": [
+    {
+      "component": "FalsificationCandidateGenerator",
+      "issue": "Gates on ResearchDecisionRecord.chosen_next_action, not ResearchPriorityDecision",
+      "severity": "autonomy_blocker_for_multi_evidence_path"
+    },
+    {
+      "component": "generate_action_candidates",
+      "issue": "Uses GAP codes from ResearchAssessment \u2014 unrelated authority chain",
+      "severity": "disconnected_stack"
+    }
+  ],
+  "synthesis_hook_compliant": true,
+  "hook_stops_at": "ACTION_RECORDED_ONLY"
+}
