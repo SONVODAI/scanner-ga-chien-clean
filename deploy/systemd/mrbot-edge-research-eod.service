@@ -1,0 +1,20 @@
+[Unit]
+Description=Mr.BOT Edge Research headless EOD cycle (Phase A → C → B)
+After=network-online.target
+Wants=network-online.target
+# Not After=intraday-collect: that camera job is a different pipeline and fires
+# multiple times. Edge Research gates on canonical T0 freeze presence instead.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+EnvironmentFile=-/etc/mrbot/edge-research.env
+ExecStart=/opt/mrbot-camera-venv/bin/python -m modules.edge_research.eod_cycle
+Nice=10
+IOSchedulingClass=best-effort
+Restart=no
+# Completed science including NO_QUALIFIED_MATCH / UNABLE_TO_ASSESS / SKIPPED is exit 0.
+# Only unexpected process failure is non-zero.
+
+[Install]
+WantedBy=multi-user.target

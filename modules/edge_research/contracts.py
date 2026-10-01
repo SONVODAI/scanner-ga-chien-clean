@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, FrozenSet, Mapping, Optional, Sequence, Tuple
 
-ENGINE_VERSION = "3.0.0-challenger"
+ENGINE_VERSION = "6.0.0-continuous-learning"
 GUARDRAILS_CONFIG_VERSION = "guardrails_v1"
 DISCOVERY_CONFIG_VERSION = "discovery_v1"
 ROBUSTNESS_CONFIG_VERSION = "robustness_v1"
@@ -18,6 +18,8 @@ FEATURE_BUCKET_CONFIG_VERSION = "feature_buckets_v1"
 MARKET_LEVEL_CONFIG_VERSION = "market_level_v1_provisional"
 MARKET_STATE_CONFIG_VERSION = "market_state_v1_provisional"
 SNAPSHOT_POLICY_VERSION = "canonical_market_t0_v2_eod_preferred"
+FROZEN_SPEC_SCHEMA_VERSION = "frozen_hypothesis_spec_v2"
+OOS_POLICY_VERSION = "oos_policy_v1_conservative"
 
 # Phase 2 sample guards — research defaults, NOT optimized from returns.
 CANDIDATE_MIN_N = 20
@@ -34,6 +36,69 @@ CANDIDATE_STATUS_INSUFFICIENT_SAMPLE = "INSUFFICIENT_SAMPLE"
 ROBUSTNESS_PASS = "PASS"
 ROBUSTNESS_FRAGILE = "FRAGILE"
 ROBUSTNESS_REJECT = "REJECT"
+
+OOS_STATUS_NOT_TESTED = "NOT_TESTED"
+OOS_STATUS_PENDING = "OOS_PENDING"
+OOS_STATUS_PASS = "OOS_PASS"
+OOS_STATUS_FAIL = "OOS_FAIL"
+OOS_STATUS_INCONCLUSIVE = "OOS_INCONCLUSIVE"
+OOS_STATUS_ABORTED_LEAKAGE = "EVALUATION_ABORTED_LEAKAGE"
+
+FREEZE_ELIGIBLE = "ELIGIBLE"
+FREEZE_HISTORICAL_ONLY = "HISTORICAL_ONLY"
+FREEZE_NON_FREEZABLE = "NON_FREEZABLE"
+FREEZE_FRAGILE = "FRAGILE_NOT_ELIGIBLE"
+FREEZE_REJECT = "REJECT_NOT_ELIGIBLE"
+FREEZE_CHALLENGER_PENDING = "CHALLENGER_PENDING"
+
+OOS_MODE_HOLDOUT_SPLIT = "HOLDOUT_SPLIT"
+OOS_MODE_PROSPECTIVE_AFTER_FREEZE = "PROSPECTIVE_AFTER_FREEZE"
+
+EDGE_MEMORY_STATUS_ACTIVE = "ACTIVE"
+EDGE_MEMORY_STATUS_INACTIVE = "INACTIVE"
+EDGE_MEMORY_STATUS_DECAYING = "DECAYING"
+EDGE_MEMORY_STATUS_INVALIDATED = "INVALIDATED"
+
+FORWARD_HEALTH_POLICY_VERSION = "forward_edge_health_policy_v1"
+ANTI_CONTEXT_POLICY_VERSION = "anti_context_policy_v1"
+FORWARD_MATURITY_VERSION = "forward_maturity_v1"
+BASELINE_CALC_VERSION = "contemporaneous_baseline_v1"
+
+HORIZON_STATUS_PENDING = "PENDING"
+HORIZON_STATUS_MATURE = "MATURE"
+HORIZON_STATUS_UNAVAILABLE = "UNAVAILABLE"
+
+FORWARD_OUTCOME_PARTIAL = "PARTIAL"
+FORWARD_OUTCOME_MATURE = "MATURE"
+
+HEALTH_SUPPORTED = "SUPPORTED"
+HEALTH_INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+HEALTH_WEAKENED = "WEAKENED"
+HEALTH_FAILED = "FAILED"
+
+VALIDATION_TYPE_FORWARD_HEALTH = "FORWARD_HEALTH"
+VALIDATION_TYPE_STATE_TRANSITION = "STATE_TRANSITION"
+VALIDATION_TYPE_ANTI_CONTEXT = "ANTI_CONTEXT"
+
+REASON_ALL_ACTIVE_EDGES_CONTEXT_INCOMPATIBLE = "ALL_ACTIVE_EDGES_CONTEXT_INCOMPATIBLE"
+REASON_MATCHES_SUPPRESSED_BY_EDGE_HEALTH = "MATCHES_SUPPRESSED_BY_EDGE_HEALTH"
+REASON_MATCHES_SUPPRESSED_BY_ANTI_CONTEXT = "MATCHES_SUPPRESSED_BY_ANTI_CONTEXT"
+REASON_NO_STOCK_SATISFIES_ACTIVE_EDGE = "NO_STOCK_SATISFIES_ACTIVE_EDGE_IN_COMPATIBLE_CONTEXT"
+
+FROZEN_SPECS_DIRNAME = "frozen_specs"
+FUTURE_RECOGNITION_VERSION = "future_recognition_v1"
+
+ASSESSMENT_QUALIFIED_MATCH_FOUND = "QUALIFIED_MATCH_FOUND"
+ASSESSMENT_NO_QUALIFIED_MATCH = "NO_QUALIFIED_MATCH"
+ASSESSMENT_UNABLE_TO_ASSESS = "UNABLE_TO_ASSESS"
+
+CONTEXT_COMPATIBLE = "COMPATIBLE"
+CONTEXT_INCOMPATIBLE = "INCOMPATIBLE"
+CONTEXT_UNKNOWN = "UNKNOWN"
+
+FORWARD_OUTCOME_PENDING = "PENDING"
+
+REASON_NO_ACTIVE_EDGE_AVAILABLE = "NO_ACTIVE_EDGE_AVAILABLE"
 
 # Fixed robustness thresholds — NOT optimized from returns.
 DATE_CONCENTRATION_SEVERE = 0.50
@@ -142,6 +207,16 @@ EDGE_HYPOTHESIS_LEDGER_COLUMNS: Tuple[str, ...] = (
     "fragility_flags",
     "rejection_reasons",
     "main_fragility_flag",
+    # Phase A additive scientific lifecycle (backward-compatible)
+    "condition_key",
+    "feature_clauses_json",
+    "scientific_status",
+    "hypothesis_id",
+    "frozen_spec_path",
+    "frozen_spec_hash",
+    "freeze_eligibility",
+    "oos_mode",
+    "challenger_run_id",
 )
 
 DISCOVERY_RUN_COLUMNS: Tuple[str, ...] = (
@@ -232,6 +307,39 @@ EDGE_VALIDATION_HISTORY_COLUMNS: Tuple[str, ...] = (
     "validation_type",
     "result",
     "validated_at",
+    # Phase A additive OOS audit fields
+    "edge_id",
+    "evaluated_at",
+    "evaluation_seq",
+    "oos_start",
+    "oos_end",
+    "candidate_n",
+    "baseline_n",
+    "candidate_mean",
+    "candidate_median",
+    "candidate_win_rate",
+    "baseline_mean",
+    "baseline_median",
+    "baseline_win_rate",
+    "incremental_mean",
+    "incremental_median",
+    "incremental_win_rate",
+    "best_horizon",
+    "baseline_type",
+    "market_episode_count",
+    "concentration_json",
+    "threshold_policy_version",
+    "frozen_spec_hash",
+    "embargo_trading_sessions",
+    "data_cutoff_date",
+    "leakage_check",
+    "reason",
+    # Phase C additive health / anti-context audit
+    "policy_version",
+    "from_status",
+    "to_status",
+    "session_date",
+    "evidence_json",
 )
 
 EDGE_MEMORY_COLUMNS: Tuple[str, ...] = (
@@ -241,6 +349,45 @@ EDGE_MEMORY_COLUMNS: Tuple[str, ...] = (
     "confirmed_at",
     "decayed_at",
     "notes",
+    # Phase A additive ACTIVE memory fields for future matcher (Phase B)
+    "spec_path",
+    "spec_hash",
+    "market_state",
+    "market_transition",
+    "baseline_type",
+    "feature_clauses_json",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "feature_bucket_config_version",
+    "market_state_config_version",
+    "activated_at",
+    "oos_result",
+    "oos_candidate_n",
+    "oos_baseline_n",
+    "oos_incremental_median",
+    "oos_incremental_mean",
+    "oos_incremental_win_rate",
+    "oos_evaluated_at",
+    "episode_count",
+    "concentration_notes",
+    "forward_matches",
+    "forward_matured",
+    "forward_hits",
+    # Phase C additive health summary
+    "health_status",
+    "health_reason",
+    "health_policy_version",
+    "last_health_evaluated_at",
+    "last_state_change_at",
+    "last_state_change_from",
+    "last_state_change_to",
+    "forward_incremental_median",
+    "forward_incremental_mean",
+    "forward_unique_sessions",
+    "forward_unique_episodes",
+    "forward_evidence_json",
+    "anti_context_json",
 )
 
 EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
@@ -250,6 +397,149 @@ EDGE_FORWARD_LEDGER_COLUMNS: Tuple[str, ...] = (
     "symbol",
     "frozen_at",
     "outcome_status",
+    # Phase B additive birth fields
+    "edge_id",
+    "t0_trade_date",
+    "born_at",
+    "spec_path",
+    "spec_hash",
+    "spec_schema_version",
+    "feature_bucket_config_version",
+    "market_state_config_version",
+    "market_state_t0",
+    "market_transition_t0",
+    "context_verdict",
+    "context_reason",
+    "stock_feature_values_json",
+    "matched_clauses_json",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "active_status_at_birth",
+    "oos_evidence_json",
+    "universe_count",
+    "universe_hash",
+    "pit_artifact",
+    "pit_artifact_hash",
+    "assessment_run_id",
+    "selection_reason",
+    "selection_reason_vi",
+    "research_label",
+    # Phase C additive maturity / contemporaneous baseline (T0 birth fields stay immutable)
+    "t3_target_date",
+    "t3_status",
+    "t3_return",
+    "t3_close_t0",
+    "t3_close_tn",
+    "t3_matured_at",
+    "t3_source",
+    "t5_target_date",
+    "t5_status",
+    "t5_return",
+    "t5_close_t0",
+    "t5_close_tn",
+    "t5_matured_at",
+    "t5_source",
+    "t10_target_date",
+    "t10_status",
+    "t10_return",
+    "t10_close_t0",
+    "t10_close_tn",
+    "t10_matured_at",
+    "t10_source",
+    "baseline_type",
+    "baseline_context_key",
+    "baseline_horizon",
+    "baseline_n",
+    "baseline_median",
+    "baseline_mean",
+    "candidate_horizon_return",
+    "incremental_return",
+    "baseline_status",
+    "baseline_source",
+    "baseline_calc_version",
+    "maturity_policy_version",
+)
+
+EDGE_SESSION_ASSESSMENT_COLUMNS: Tuple[str, ...] = (
+    "trade_date",
+    "run_id",
+    "started_at",
+    "completed_at",
+    "assessment_state",
+    "reason",
+    "t0_source_status",
+    "universe_count",
+    "universe_hash",
+    "active_edge_count",
+    "edges_loaded_ok",
+    "edges_uninterpretable",
+    "edges_context_compatible",
+    "edges_context_incompatible",
+    "edges_context_unknown",
+    "stock_edge_evaluations",
+    "qualified_match_count",
+    "new_birth_count",
+    "duplicate_skip_count",
+    "matcher_version",
+    "spec_schema_version",
+    "pit_artifact",
+    "failure_detail",
+)
+
+EDGE_SHADOW_OBSERVATION_COLUMNS: Tuple[str, ...] = (
+    "shadow_id",
+    "hypothesis_id",
+    "edge_id",
+    "spec_hash",
+    "t0_trade_date",
+    "symbol",
+    "context_y",
+    "market_state_t0",
+    "condition_key",
+    "condition_text",
+    "best_horizon",
+    "research_label",
+    "born_at",
+    "outcome_status",
+    "t3_target_date",
+    "t3_status",
+    "t3_return",
+    "t3_matured_at",
+    "t5_target_date",
+    "t5_status",
+    "t5_return",
+    "t5_matured_at",
+    "t10_target_date",
+    "t10_status",
+    "t10_return",
+    "t10_matured_at",
+    "baseline_n",
+    "baseline_median",
+    "incremental_return",
+    "baseline_status",
+    "universe_count",
+    "assessment_run_id",
+)
+
+EDGE_ANTI_CONTEXT_COLUMNS: Tuple[str, ...] = (
+    "anti_context_id",
+    "hypothesis_id",
+    "edge_id",
+    "spec_hash",
+    "condition_key",
+    "context_y",
+    "sample_n",
+    "baseline_n",
+    "incremental_median",
+    "incremental_mean",
+    "unique_sessions",
+    "unique_episodes",
+    "evidence_status",
+    "learned_at",
+    "policy_version",
+    "reason",
+    "evidence_json",
 )
 
 RESEARCH_OBSERVATION_COLUMNS: Tuple[str, ...] = (

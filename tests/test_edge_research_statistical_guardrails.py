@@ -201,8 +201,26 @@ def test_chronological_split_no_future_in_discovery():
 
 
 def test_embargo_prevents_label_overlap():
-    assert labels_overlap_embargo("2026-08-20", "2026-08-15", target_horizon_days=10) is True
-    assert labels_overlap_embargo("2026-08-20", "2026-07-01", target_horizon_days=10) is False
+    # Trading-session embargo: weekends do not count as sessions.
+    sessions = [
+        "2026-07-01",
+        "2026-07-02",
+        "2026-08-10",
+        "2026-08-11",
+        "2026-08-12",
+        "2026-08-13",
+        "2026-08-14",
+        "2026-08-17",
+        "2026-08-18",
+        "2026-08-19",
+        "2026-08-20",
+    ]
+    assert labels_overlap_embargo(
+        "2026-08-20", "2026-08-17", target_horizon_days=10, session_dates=sessions
+    ) is True
+    assert labels_overlap_embargo(
+        "2026-08-20", "2026-07-01", target_horizon_days=10, session_dates=sessions
+    ) is False
 
 
 def test_frozen_hypothesis_spec_deterministic():
