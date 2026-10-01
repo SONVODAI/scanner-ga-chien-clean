@@ -1,0 +1,9 @@
+{
+  "benchmark_id": "blind_benchmark_01",
+  "completed_at": "2026-08-21T11:24:29Z",
+  "session_id": "bb01-autonomous-001",
+  "session_status": "ACTIVE",
+  "experiments_used": 2,
+  "step_count": 2,
+  "artifact_dir": "benchmarks/blind_benchmark_01/artifacts"
+}
