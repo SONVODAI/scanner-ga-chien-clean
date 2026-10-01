@@ -1,0 +1,1115 @@
+{
+  "dataset_version": "ff_hsx_symbol_daily_v1_20260825T045650Z",
+  "schema_version": "ff_hsx_symbol_daily_v1",
+  "creation_timestamp": "2026-08-25T04:56:50Z",
+  "source": "HSX_FOREIGN_API",
+  "grain": "trade_date x symbol",
+  "symbol_count": 117,
+  "row_count": 337236,
+  "first_trade_date": "2009-01-02",
+  "last_trade_date": "2026-08-24",
+  "per_symbol_coverage": [
+    {
+      "symbol": "ACB",
+      "n_rows": 1422,
+      "first_trade_date": "2020-12-09",
+      "last_trade_date": "2026-08-24",
+      "sha256": "435450629ca151cc5b59d1f46a503c14df3e3a4a3c0b00eb7df9643ade0e525c",
+      "bytes": 400563
+    },
+    {
+      "symbol": "AGR",
+      "n_rows": 4165,
+      "first_trade_date": "2009-12-10",
+      "last_trade_date": "2026-08-24",
+      "sha256": "4d28cd072c628fb196c154c1942b188aa1c75d9b071e5c720e0a2703afff0127",
+      "bytes": 1083772
+    },
+    {
+      "symbol": "ANV",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "8c8362f03a964e6d129f9133b2baec37231b4d6c4e3647518121e1e576eb534e",
+      "bytes": 1171040
+    },
+    {
+      "symbol": "BAF",
+      "n_rows": 1177,
+      "first_trade_date": "2021-12-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2ae6d1c149585ba469286c8a0a1e555d0c1c16f8e0b92d93a04538023ba2bce9",
+      "bytes": 327698
+    },
+    {
+      "symbol": "BFC",
+      "n_rows": 2718,
+      "first_trade_date": "2015-10-07",
+      "last_trade_date": "2026-08-24",
+      "sha256": "9828f92b5fa3a9ffc8806a760d3f46061f315ca114b01d938c9718d5971d78ad",
+      "bytes": 735633
+    },
+    {
+      "symbol": "BID",
+      "n_rows": 3135,
+      "first_trade_date": "2014-01-24",
+      "last_trade_date": "2026-08-24",
+      "sha256": "a43396d8e5e96eef6cf01c70e246bf2bb679766688941489cbdc1a9a35f12e3a",
+      "bytes": 905934
+    },
+    {
+      "symbol": "BMP",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "7545bb3c0c7dbcebe580cd20acec5d78abc1c3642e14bf16e6a013b6bc29dfc1",
+      "bytes": 1226356
+    },
+    {
+      "symbol": "BSI",
+      "n_rows": 3682,
+      "first_trade_date": "2011-07-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "8b25f327297320a0709a50b8c951a34d0b627c007d090dcafc234c855a3f253b",
+      "bytes": 965614
+    },
+    {
+      "symbol": "BSR",
+      "n_rows": 397,
+      "first_trade_date": "2025-01-16",
+      "last_trade_date": "2026-08-24",
+      "sha256": "ad6ea8c8c3c595e2f00b48658fe9441c1bc34d48987e05c6c076f53de1039fdb",
+      "bytes": 115002
+    },
+    {
+      "symbol": "BVH",
+      "n_rows": 4286,
+      "first_trade_date": "2009-06-25",
+      "last_trade_date": "2026-08-24",
+      "sha256": "fa1c19e8085ffbbb264fe5cd10e3825ca58598d384a3f4495df855e33f7a90f8",
+      "bytes": 1234352
+    },
+    {
+      "symbol": "CII",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "df2e06b0d956915019d36e08bb20f873a55dcaa9232616b325c2b6ddcdb958dc",
+      "bytes": 1245640
+    },
+    {
+      "symbol": "CMG",
+      "n_rows": 4135,
+      "first_trade_date": "2010-01-22",
+      "last_trade_date": "2026-08-24",
+      "sha256": "7a0651ee58a29f15aa06d5106f861d0b17b74f65ad90628188127de9d32dedc4",
+      "bytes": 1108075
+    },
+    {
+      "symbol": "CSV",
+      "n_rows": 2858,
+      "first_trade_date": "2015-03-18",
+      "last_trade_date": "2026-08-24",
+      "sha256": "d2da43dfdef6f292f5f6f14f38b67dcebb8c9bca2907be6403eb6edfbef24600",
+      "bytes": 776435
+    },
+    {
+      "symbol": "CTD",
+      "n_rows": 4137,
+      "first_trade_date": "2010-01-20",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2d80af0d527b27370094148f7d857874178cccbca104b560f29d4c684192faf8",
+      "bytes": 1143243
+    },
+    {
+      "symbol": "CTG",
+      "n_rows": 4269,
+      "first_trade_date": "2009-07-16",
+      "last_trade_date": "2026-08-24",
+      "sha256": "f259eac227b06f0ad15a01ee6631f5be26d9f302a2d93ac30775548f79a5fe03",
+      "bytes": 1229461
+    },
+    {
+      "symbol": "CTR",
+      "n_rows": 1125,
+      "first_trade_date": "2022-02-22",
+      "last_trade_date": "2026-08-24",
+      "sha256": "27dfdab54f2833bec8159c92832c050902a2ae95cbd32ee52d28c07abfcde929",
+      "bytes": 322383
+    },
+    {
+      "symbol": "DBC",
+      "n_rows": 1769,
+      "first_trade_date": "2019-07-26",
+      "last_trade_date": "2026-08-24",
+      "sha256": "4e907b4744b57dc5fd7db9cda7047c88519114238c6043d787cbecb152a78be3",
+      "bytes": 502006
+    },
+    {
+      "symbol": "DCM",
+      "n_rows": 2849,
+      "first_trade_date": "2015-03-31",
+      "last_trade_date": "2026-08-24",
+      "sha256": "81dda3b32b8f3c1e28626b47324cb588b2f7dd642b798a0b0324ad03daa5ba31",
+      "bytes": 784984
+    },
+    {
+      "symbol": "DGC",
+      "n_rows": 1517,
+      "first_trade_date": "2020-07-28",
+      "last_trade_date": "2026-08-24",
+      "sha256": "5d1a6017a318d5c988c42f5f896fcfbd136422ec0ab537ffb37fc9ee0f099df2",
+      "bytes": 443789
+    },
+    {
+      "symbol": "DGW",
+      "n_rows": 2764,
+      "first_trade_date": "2015-08-03",
+      "last_trade_date": "2026-08-24",
+      "sha256": "ae081e059e62517618c5a9b2f3754e778cb246a50728c1652fc9c11a74808d90",
+      "bytes": 770408
+    },
+    {
+      "symbol": "DIG",
+      "n_rows": 4245,
+      "first_trade_date": "2009-08-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "322a18a08493cd2990c946bf074d42baabea26a9c4c91434f983657684971048",
+      "bytes": 1183364
+    },
+    {
+      "symbol": "DPG",
+      "n_rows": 2065,
+      "first_trade_date": "2018-05-22",
+      "last_trade_date": "2026-08-24",
+      "sha256": "963c7b3ef5ee4bfbf4d3889cbcd2b041dc3b6b781fc0bd25c1a62af722d2f5a1",
+      "bytes": 567779
+    },
+    {
+      "symbol": "DPM",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "dfb41264afdd2089186de773db789fbc96789ff9c81c8ab3aa79b8a24101041d",
+      "bytes": 1275819
+    },
+    {
+      "symbol": "DPR",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "5de7781bd7527216517f592ab0c186834c97b6a92badc7a93b2664ec23a59943",
+      "bytes": 1197286
+    },
+    {
+      "symbol": "DXG",
+      "n_rows": 4157,
+      "first_trade_date": "2009-12-22",
+      "last_trade_date": "2026-08-24",
+      "sha256": "11cf6101f2e6ed5568bc75177cd1cf0c57380bd3d923997e9cd7e4dcdfb56d98",
+      "bytes": 1161962
+    },
+    {
+      "symbol": "DXS",
+      "n_rows": 1241,
+      "first_trade_date": "2021-09-01",
+      "last_trade_date": "2026-08-24",
+      "sha256": "be64ca3d0d79dd8b6ff9c75e63de1bbf148bf0110d8c22c9301aa4a9d224090a",
+      "bytes": 350825
+    },
+    {
+      "symbol": "EIB",
+      "n_rows": 4197,
+      "first_trade_date": "2009-10-27",
+      "last_trade_date": "2026-08-24",
+      "sha256": "ce9807321488513ddb21da4a1f1be1f35573508247a5a2fa22a99582e5e5bd77",
+      "bytes": 1153267
+    },
+    {
+      "symbol": "EVF",
+      "n_rows": 1150,
+      "first_trade_date": "2022-01-11",
+      "last_trade_date": "2026-08-24",
+      "sha256": "172f6b1bd7ff9293019941aa6711fdd8e2bd6dae6ce600206fd28c5578d04af9",
+      "bytes": 320250
+    },
+    {
+      "symbol": "FCN",
+      "n_rows": 3514,
+      "first_trade_date": "2012-07-24",
+      "last_trade_date": "2026-08-24",
+      "sha256": "d6a2aeb8be49ab5562cd76b1a3de3eed6a6026b93b06332be5a25ec88de28c56",
+      "bytes": 949919
+    },
+    {
+      "symbol": "FPT",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "7bcbdc8e18d5b0159c463759e5311e5a99d6e0ef7822af40fbe03557a007ce89",
+      "bytes": 1294577
+    },
+    {
+      "symbol": "FRT",
+      "n_rows": 2081,
+      "first_trade_date": "2018-04-26",
+      "last_trade_date": "2026-08-24",
+      "sha256": "9290aac2529b1ab2aaf51c0ec13fecd63b23f483d19639080f9429ad9d98f185",
+      "bytes": 604761
+    },
+    {
+      "symbol": "FTS",
+      "n_rows": 2397,
+      "first_trade_date": "2017-01-13",
+      "last_trade_date": "2026-08-24",
+      "sha256": "c99ba7311d14990182b97b4b4fa8a157c1b0dbae5675c551aa133fae8faf1c52",
+      "bytes": 659169
+    },
+    {
+      "symbol": "GAS",
+      "n_rows": 3560,
+      "first_trade_date": "2012-05-21",
+      "last_trade_date": "2026-08-24",
+      "sha256": "18e1a64f37c164648b27475c914312b52c9c208c96838ae7eadb852e1e5cd3a2",
+      "bytes": 1037376
+    },
+    {
+      "symbol": "GEE",
+      "n_rows": 506,
+      "first_trade_date": "2024-08-13",
+      "last_trade_date": "2026-08-24",
+      "sha256": "11138621381af7e2046b9701eb5e4d7a4cbeae1260d84a2a8bfc9cec13ba15e2",
+      "bytes": 144258
+    },
+    {
+      "symbol": "GEG",
+      "n_rows": 1731,
+      "first_trade_date": "2019-09-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b002541737b07d2c9da2f015e8755d12a504b995a353f4ca80f4596b6337c4b5",
+      "bytes": 476173
+    },
+    {
+      "symbol": "GEX",
+      "n_rows": 2143,
+      "first_trade_date": "2018-01-18",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2e90bc0c5e8e3efbb26712f1001359d6dd15a9d2f38167f3c0276153fdb6589a",
+      "bytes": 619348
+    },
+    {
+      "symbol": "GIL",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "752456df36a8c4376b43e78fb77336a410ecff1389ad839e1d68869ef0be48a8",
+      "bytes": 1162204
+    },
+    {
+      "symbol": "GMD",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "fe120d392e1b0f9fd1cd7d3ce01f7229c14a93008094ce96f98b749ef2ee1e46",
+      "bytes": 1227566
+    },
+    {
+      "symbol": "GVR",
+      "n_rows": 1609,
+      "first_trade_date": "2020-03-17",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b50d8be39656a230657afa7b50ee1217f5a2ce80d7b70ecf8371c4a21e44fbf9",
+      "bytes": 461765
+    },
+    {
+      "symbol": "HAG",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "10912b7c7f38e61f5147704aff530087944961d5e8465c245e26caa55e993dc7",
+      "bytes": 1246515
+    },
+    {
+      "symbol": "HAH",
+      "n_rows": 2863,
+      "first_trade_date": "2015-03-11",
+      "last_trade_date": "2026-08-24",
+      "sha256": "ae99bae42398acedddf144a43553afc634e1363f3088f551a06c337aa9b0afd0",
+      "bytes": 790654
+    },
+    {
+      "symbol": "HCM",
+      "n_rows": 4313,
+      "first_trade_date": "2009-05-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "383fc842dc398dc2c81b4f5ca622cbe13c60b2647f4d4d7fe756174325e46037",
+      "bytes": 1188876
+    },
+    {
+      "symbol": "HDB",
+      "n_rows": 2152,
+      "first_trade_date": "2018-01-05",
+      "last_trade_date": "2026-08-24",
+      "sha256": "c5c257e17e13e1ce03290bf1b5ce8c21e40184aad536bf4c1a741b184e816850",
+      "bytes": 638810
+    },
+    {
+      "symbol": "HDC",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "6d7bde9b82321c253b987355558c103682776129f2c15d5e7dee9cf956fc4e4c",
+      "bytes": 1170961
+    },
+    {
+      "symbol": "HDG",
+      "n_rows": 4128,
+      "first_trade_date": "2010-02-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "61f7cc1d15a2108a7c86f1d06b25e4b873d2d4381ab9dc14ec86abcffebb4cfe",
+      "bytes": 1113175
+    },
+    {
+      "symbol": "HHS",
+      "n_rows": 3625,
+      "first_trade_date": "2012-02-15",
+      "last_trade_date": "2026-08-24",
+      "sha256": "c412e4ac6286f34b8df9b9613b09471793a3fd2984fa5d3e442cbba4320bc795",
+      "bytes": 974975
+    },
+    {
+      "symbol": "HHV",
+      "n_rows": 1144,
+      "first_trade_date": "2022-01-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "ae25425d7c1c7ddd26ede6a157a180dd24ea63a136e088e09a9e8214ad9cbf94",
+      "bytes": 325027
+    },
+    {
+      "symbol": "HPG",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "99fc305f3c2b402bdf3c101be1aac30c4558bec5c61943c1f1e2d250538ace7b",
+      "bytes": 1312509
+    },
+    {
+      "symbol": "HSG",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "e25a0f24e14b9d7e2956fce3401f7d06845c7d895984cb0dcc281855764d0356",
+      "bytes": 1247929
+    },
+    {
+      "symbol": "HVN",
+      "n_rows": 1827,
+      "first_trade_date": "2019-05-07",
+      "last_trade_date": "2026-08-24",
+      "sha256": "e633581ad82b71fe1cd8183758cf21e462e71635dc656556123276bc07a3c8a6",
+      "bytes": 519828
+    },
+    {
+      "symbol": "IJC",
+      "n_rows": 4079,
+      "first_trade_date": "2010-04-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "f7f447410d58c0a4cf8222a218ef1469f7c6308ed2009689d9c41d09b417551e",
+      "bytes": 1109770
+    },
+    {
+      "symbol": "KBC",
+      "n_rows": 4159,
+      "first_trade_date": "2009-12-18",
+      "last_trade_date": "2026-08-24",
+      "sha256": "42b816fb33846c50ad216304a2679b07fa93322e066922eeb49b15adc5cfa888",
+      "bytes": 1190365
+    },
+    {
+      "symbol": "KDH",
+      "n_rows": 4129,
+      "first_trade_date": "2010-02-01",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2318e3b4776da36d2abd5fd421a12cd91c2cc821948af58f52f2eb72bde8e42d",
+      "bytes": 1140096
+    },
+    {
+      "symbol": "KSB",
+      "n_rows": 4137,
+      "first_trade_date": "2010-01-20",
+      "last_trade_date": "2026-08-24",
+      "sha256": "3fd10840c3f66e9abb66f9025252655abfd6ea7a7da88a2b583ee76364d2a67f",
+      "bytes": 1111642
+    },
+    {
+      "symbol": "LPB",
+      "n_rows": 1444,
+      "first_trade_date": "2020-11-09",
+      "last_trade_date": "2026-08-24",
+      "sha256": "f291d5e6ce131f9eeae12638cf40f85c6240914f77c64350a21643c6250bbae4",
+      "bytes": 414329
+    },
+    {
+      "symbol": "MBB",
+      "n_rows": 3695,
+      "first_trade_date": "2011-11-01",
+      "last_trade_date": "2026-08-24",
+      "sha256": "27826fc1ccddb5563ec6212295368cf626e095419365f437e33ab180e04949e9",
+      "bytes": 1051514
+    },
+    {
+      "symbol": "MCH",
+      "n_rows": 163,
+      "first_trade_date": "2025-12-25",
+      "last_trade_date": "2026-08-24",
+      "sha256": "420aa77615300b9773d3fd431a79709b9dcf3e1cbbb06f189a324ea0755f544d",
+      "bytes": 47991
+    },
+    {
+      "symbol": "MSB",
+      "n_rows": 1412,
+      "first_trade_date": "2020-12-23",
+      "last_trade_date": "2026-08-24",
+      "sha256": "f85237f513f08c47bc2ec103faf45ac246174e7a9cb38e41da5de03899eb1830",
+      "bytes": 395868
+    },
+    {
+      "symbol": "MSH",
+      "n_rows": 1930,
+      "first_trade_date": "2018-11-28",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b96138383ab159a404c866987accb82358e5e80b10e7f6554e93f7601d181d21",
+      "bytes": 534294
+    },
+    {
+      "symbol": "MSN",
+      "n_rows": 4190,
+      "first_trade_date": "2009-11-05",
+      "last_trade_date": "2026-08-24",
+      "sha256": "0cbe659a6632aff71134e265d7ee953debe1c6da6ad284dcef04d6889978b747",
+      "bytes": 1242202
+    },
+    {
+      "symbol": "MWG",
+      "n_rows": 3025,
+      "first_trade_date": "2014-07-14",
+      "last_trade_date": "2026-08-24",
+      "sha256": "368e7d92d24b0afdfa6caeafe1fe710336f3be05110462c7cce5963dcbd8baf1",
+      "bytes": 854749
+    },
+    {
+      "symbol": "NAB",
+      "n_rows": 615,
+      "first_trade_date": "2024-03-07",
+      "last_trade_date": "2026-08-24",
+      "sha256": "591e8ebaee060aa1f0157524e29c2aedbfab64d1b78b5bc45ad356a47953e321",
+      "bytes": 175641
+    },
+    {
+      "symbol": "NHA",
+      "n_rows": 1392,
+      "first_trade_date": "2021-01-21",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b82de554fe9c8b1503f0ce04b234d507fd7613a1966e8d49567a72ed141f8ade",
+      "bytes": 379157
+    },
+    {
+      "symbol": "NKG",
+      "n_rows": 3891,
+      "first_trade_date": "2011-01-14",
+      "last_trade_date": "2026-08-24",
+      "sha256": "0deaa8c2f7844fa94febf2b8c96ddc63c0041c662ed2419232fcad9663a96402",
+      "bytes": 1046984
+    },
+    {
+      "symbol": "NLG",
+      "n_rows": 3338,
+      "first_trade_date": "2013-04-08",
+      "last_trade_date": "2026-08-24",
+      "sha256": "bd6599fe396b7c6f0cc4226dbdcb680a76dd0b369a231161df9881d636b0f66f",
+      "bytes": 934119
+    },
+    {
+      "symbol": "NT2",
+      "n_rows": 2800,
+      "first_trade_date": "2015-06-12",
+      "last_trade_date": "2026-08-24",
+      "sha256": "8d32be7b6ff21c6e9170b9369cc9cc7be0fb4e095ca5223b7a606107aea24afa",
+      "bytes": 799743
+    },
+    {
+      "symbol": "NTL",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "29278e79281c7a4d31ef6a2097585980f8cef24124c536e5ae2e18dd76eeb75a",
+      "bytes": 1204506
+    },
+    {
+      "symbol": "NVL",
+      "n_rows": 2408,
+      "first_trade_date": "2016-12-28",
+      "last_trade_date": "2026-08-24",
+      "sha256": "4026679f3fb0d275d7ee16f5abf0493ac1cedabd8694832df86ebe4d094a1869",
+      "bytes": 701168
+    },
+    {
+      "symbol": "OCB",
+      "n_rows": 1387,
+      "first_trade_date": "2021-01-28",
+      "last_trade_date": "2026-08-24",
+      "sha256": "d7757acf07283bcec84985ac24074e819d50c4085e186646cc2531cca75fc06f",
+      "bytes": 396307
+    },
+    {
+      "symbol": "ORS",
+      "n_rows": 1198,
+      "first_trade_date": "2021-11-03",
+      "last_trade_date": "2026-08-24",
+      "sha256": "91f7ac590808bee8ddebf6143fc89eed324dc6c874e72b8d12e6e4de434b4623",
+      "bytes": 335663
+    },
+    {
+      "symbol": "PC1",
+      "n_rows": 2438,
+      "first_trade_date": "2016-11-16",
+      "last_trade_date": "2026-08-24",
+      "sha256": "51512a9e80cd19c8a72d7141bbd0cb11631980d61ce374b02ee95a4663ed4f35",
+      "bytes": 689309
+    },
+    {
+      "symbol": "PDR",
+      "n_rows": 4008,
+      "first_trade_date": "2010-07-30",
+      "last_trade_date": "2026-08-24",
+      "sha256": "a32d3e65daa648ea187228839d6072fe970f0661c02bb8968ad1b7b77ad3acf6",
+      "bytes": 1082829
+    },
+    {
+      "symbol": "PET",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "227d0d9e7c86aa2f0d0429bc818b4c06676dc778b1131d565028f30b57ce9510",
+      "bytes": 1166256
+    },
+    {
+      "symbol": "PHR",
+      "n_rows": 4246,
+      "first_trade_date": "2009-08-18",
+      "last_trade_date": "2026-08-24",
+      "sha256": "af8717e9b0fc8b95466d80e8ec3c6c872dd3b313e0e822efed5e8432757b1061",
+      "bytes": 1169708
+    },
+    {
+      "symbol": "PLX",
+      "n_rows": 2333,
+      "first_trade_date": "2017-04-21",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b23e7fa065a4ea6a4eaa4b6cbf3715f1445858584a12b1ae2ccfcc40c9be35fb",
+      "bytes": 674195
+    },
+    {
+      "symbol": "PNJ",
+      "n_rows": 4351,
+      "first_trade_date": "2009-03-23",
+      "last_trade_date": "2026-08-24",
+      "sha256": "7cc3432096aae13c1b0ab6d211b1fc76348ff699ca196e0e1cd07a6bded24c36",
+      "bytes": 1204051
+    },
+    {
+      "symbol": "POW",
+      "n_rows": 1899,
+      "first_trade_date": "2019-01-14",
+      "last_trade_date": "2026-08-24",
+      "sha256": "9eb52f3df5e7b439012b3e55b90a4deac810d5beb356c6e7526b35be2f4c4212",
+      "bytes": 555624
+    },
+    {
+      "symbol": "PTB",
+      "n_rows": 3766,
+      "first_trade_date": "2011-07-22",
+      "last_trade_date": "2026-08-24",
+      "sha256": "f357acd21490fc504aa916e289ec6ea70dece3958bc93348899c1d1db278bf30",
+      "bytes": 1023742
+    },
+    {
+      "symbol": "PVD",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "6dd08e081884765f2d24f96c1b0505d9a7ca8aee0b6cbe65e4ceb69fa4df9b00",
+      "bytes": 1275143
+    },
+    {
+      "symbol": "PVT",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b0716e372bb94b8b67a47a9af3091e041844a0d4ea3bd12b18b274a776c27510",
+      "bytes": 1228631
+    },
+    {
+      "symbol": "REE",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2c66ca1a164af1c888dda9713553252900fe32fe50097f642666e2480c3e525b",
+      "bytes": 1181707
+    },
+    {
+      "symbol": "SAB",
+      "n_rows": 2424,
+      "first_trade_date": "2016-12-06",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2b08a5262fddea657c2fbf2424eb91527b1f2e687c6fa53e5f401376d7d447ef",
+      "bytes": 722099
+    },
+    {
+      "symbol": "SBT",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "55d9cb5e3cf2b4ce23eddad6c51a332297b914e9f1b9c981210d516ec3c03ba2",
+      "bytes": 1221842
+    },
+    {
+      "symbol": "SHB",
+      "n_rows": 1216,
+      "first_trade_date": "2021-10-08",
+      "last_trade_date": "2026-08-24",
+      "sha256": "1eadec32486a663913b51b6569e4a9b1239b3528ddae886ce37333a5b1c4092d",
+      "bytes": 354499
+    },
+    {
+      "symbol": "SIP",
+      "n_rows": 760,
+      "first_trade_date": "2023-08-07",
+      "last_trade_date": "2026-08-24",
+      "sha256": "552984d00ffa08dc557a0bd262b0a62ff8874cfa9cc579d202f957d3c877d933",
+      "bytes": 214734
+    },
+    {
+      "symbol": "SSB",
+      "n_rows": 1353,
+      "first_trade_date": "2021-03-24",
+      "last_trade_date": "2026-08-24",
+      "sha256": "5fdb9b2f29abd2dbbf629ab1ce9a7cc61ad77914db8dae785b4f547f0e13129d",
+      "bytes": 375841
+    },
+    {
+      "symbol": "SSI",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "cd2bbe1531d201135d49a091682ce879a38d4d7e21189c889fc52caa9a65bce3",
+      "bytes": 1290009
+    },
+    {
+      "symbol": "STB",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "0092fa155fe741c17d75c70f74fe72e45ac3096faccf724bdb586fa64f36febf",
+      "bytes": 1269969
+    },
+    {
+      "symbol": "SZC",
+      "n_rows": 1898,
+      "first_trade_date": "2019-01-15",
+      "last_trade_date": "2026-08-24",
+      "sha256": "6c35e8407f363235ff29e8aa9132a51b9937fc9463301c20755da722197c3a45",
+      "bytes": 527531
+    },
+    {
+      "symbol": "TCB",
+      "n_rows": 2056,
+      "first_trade_date": "2018-06-04",
+      "last_trade_date": "2026-08-24",
+      "sha256": "bb4c6d23f20cafaf6265e3c6baea25a326372a940cbffde9660444cc59a78b95",
+      "bytes": 590032
+    },
+    {
+      "symbol": "TCH",
+      "n_rows": 2468,
+      "first_trade_date": "2016-10-05",
+      "last_trade_date": "2026-08-24",
+      "sha256": "220117c5dcba4d9224857c11e9c6aba182ecd8332b9707d51a8780f53a248e42",
+      "bytes": 693229
+    },
+    {
+      "symbol": "TCM",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "5b3c9da58af45a4c31f09ba4b40037782ba2a770b40eab5f73284675d895e006",
+      "bytes": 1161789
+    },
+    {
+      "symbol": "TCX",
+      "n_rows": 210,
+      "first_trade_date": "2025-10-21",
+      "last_trade_date": "2026-08-24",
+      "sha256": "8177b9e59324a17d4506e70c5ab0ec9e0f29309ce16fb999d4db1fb85ec3beed",
+      "bytes": 62529
+    },
+    {
+      "symbol": "TPB",
+      "n_rows": 2085,
+      "first_trade_date": "2018-04-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "af01f218a61e6b6403bfa0b65f6eec420fcddf0235cf84394115076f04a0721c",
+      "bytes": 572504
+    },
+    {
+      "symbol": "TVS",
+      "n_rows": 2896,
+      "first_trade_date": "2015-01-15",
+      "last_trade_date": "2026-08-24",
+      "sha256": "54b862d9f8389f4832934e57018a811b169345555f546071bbf83abe05ca4244",
+      "bytes": 761507
+    },
+    {
+      "symbol": "VCB",
+      "n_rows": 4283,
+      "first_trade_date": "2009-06-30",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b896c17d1f282b469b3dffb7ba78b67c949625c8369178fd53d9e2a5d8acb28c",
+      "bytes": 1270705
+    },
+    {
+      "symbol": "VCG",
+      "n_rows": 1408,
+      "first_trade_date": "2020-12-29",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b15b63faca46e07d6724a3f374c1ad0bc6efd9317e2d0000fb6bcb0b2ee6b897",
+      "bytes": 401141
+    },
+    {
+      "symbol": "VCI",
+      "n_rows": 2280,
+      "first_trade_date": "2017-07-07",
+      "last_trade_date": "2026-08-24",
+      "sha256": "a8e408dbd76040424dcaa3673e2814c87508e773c3a59b310fe823e9ca2a87f9",
+      "bytes": 660723
+    },
+    {
+      "symbol": "VCK",
+      "n_rows": 170,
+      "first_trade_date": "2025-12-16",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b629ebb4035fb46d0e821d4f4097a9d6bdb83cecf198fd23af6af107170f751c",
+      "bytes": 49555
+    },
+    {
+      "symbol": "VDS",
+      "n_rows": 2272,
+      "first_trade_date": "2017-07-19",
+      "last_trade_date": "2026-08-24",
+      "sha256": "8467c0b31df51a2d6e8d0cd6921cb36a3bd57696eee9fe2418c75a208b79c80c",
+      "bytes": 607652
+    },
+    {
+      "symbol": "VGC",
+      "n_rows": 1811,
+      "first_trade_date": "2019-05-29",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2d364742834cb15e80e2cc8e6b09961b9e058955ff7327d5c37b1f5e3f687ea6",
+      "bytes": 514831
+    },
+    {
+      "symbol": "VHC",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "b9f0e27561b4252d7ec2c0daf1ac995b38ca39baece5c1ac1e4a935b000fc1e3",
+      "bytes": 1213583
+    },
+    {
+      "symbol": "VHM",
+      "n_rows": 2068,
+      "first_trade_date": "2018-05-17",
+      "last_trade_date": "2026-08-24",
+      "sha256": "0a45d32ef1019cb3bc98826bf60ed8717e1913b33c2fc7953f7b498a556c04e4",
+      "bytes": 632991
+    },
+    {
+      "symbol": "VIB",
+      "n_rows": 1443,
+      "first_trade_date": "2020-11-10",
+      "last_trade_date": "2026-08-24",
+      "sha256": "416eed74e7d53d7ce057f5c0a3b4af7b6e867d1184de304b70a834c03027ca8f",
+      "bytes": 393610
+    },
+    {
+      "symbol": "VIC",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "ba9b449037f810f80e37f3997e0fc174b860b431d480d1b7553a3c9e4ef2deca",
+      "bytes": 1308647
+    },
+    {
+      "symbol": "VIX",
+      "n_rows": 1401,
+      "first_trade_date": "2021-01-08",
+      "last_trade_date": "2026-08-24",
+      "sha256": "2a0b86d8168f3ae75e419c54977607f286e6d3fe1ab08a03a8f6a344959c5458",
+      "bytes": 404354
+    },
+    {
+      "symbol": "VJC",
+      "n_rows": 2370,
+      "first_trade_date": "2017-02-28",
+      "last_trade_date": "2026-08-24",
+      "sha256": "c7369b1bbfc8ed4387439e7bd492fe335f9f08df6033479ee99ea4955afb7c74",
+      "bytes": 698165
+    },
+    {
+      "symbol": "VND",
+      "n_rows": 2143,
+      "first_trade_date": "2017-08-18",
+      "last_trade_date": "2026-08-24",
+      "sha256": "f8ec6e9e9b47e86067c79a10eafc71a5de00d6aea067948a975e2fcd3d276fce",
+      "bytes": 620651
+    },
+    {
+      "symbol": "VNM",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "3aa79a09b7ade2eb6563d484a8d308b99443e6d73f403a304f1be3bac1d737d9",
+      "bytes": 1343618
+    },
+    {
+      "symbol": "VOS",
+      "n_rows": 3982,
+      "first_trade_date": "2010-09-08",
+      "last_trade_date": "2026-08-24",
+      "sha256": "af11f9f120175345f91cd3454b6901dc06b5e2c3ead783a49c4b1e5c2169d15e",
+      "bytes": 1032728
+    },
+    {
+      "symbol": "VPB",
+      "n_rows": 2251,
+      "first_trade_date": "2017-08-17",
+      "last_trade_date": "2026-08-24",
+      "sha256": "7593f560c9bf83d9940d94af57155a53da5ae2836b281e8ff9d0422b443b1515",
+      "bytes": 647990
+    },
+    {
+      "symbol": "VPL",
+      "n_rows": 1069,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "c62d5667639ff15b6d977bfa6c8809f0034ed827dd1d55423dbca0cb33ddbe45",
+      "bytes": 288060
+    },
+    {
+      "symbol": "VPX",
+      "n_rows": 173,
+      "first_trade_date": "2025-12-11",
+      "last_trade_date": "2026-08-24",
+      "sha256": "8b7c0b888bc35510a583f3218e1ca6b05c3c2d2745e5edd201a5b11e8e75f8bf",
+      "bytes": 50545
+    },
+    {
+      "symbol": "VRE",
+      "n_rows": 2195,
+      "first_trade_date": "2017-11-06",
+      "last_trade_date": "2026-08-24",
+      "sha256": "4aeb0ffe05800e8e4a75063d22cb2db3414d5b8c32da30d2d6c2bb564ce334d2",
+      "bytes": 665987
+    },
+    {
+      "symbol": "VSC",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "fc3b6ea3ac853c70a2e38acfba7744be52363dd1e99e59ccf290210607a9b926",
+      "bytes": 1184185
+    },
+    {
+      "symbol": "VTO",
+      "n_rows": 4402,
+      "first_trade_date": "2009-01-02",
+      "last_trade_date": "2026-08-24",
+      "sha256": "13709bc2fee4d5bdbafbebc2855996bf886eeb163adc656ac72baf3eb1f6bec5",
+      "bytes": 1136393
+    },
+    {
+      "symbol": "VTP",
+      "n_rows": 613,
+      "first_trade_date": "2024-03-11",
+      "last_trade_date": "2026-08-24",
+      "sha256": "defd4ba1c5d487874c848592d65cf773929d4854ca2613065257560c6bd61b58",
+      "bytes": 177087
+    }
+  ],
+  "hashes": {
+    "ACB": "435450629ca151cc5b59d1f46a503c14df3e3a4a3c0b00eb7df9643ade0e525c",
+    "AGR": "4d28cd072c628fb196c154c1942b188aa1c75d9b071e5c720e0a2703afff0127",
+    "ANV": "8c8362f03a964e6d129f9133b2baec37231b4d6c4e3647518121e1e576eb534e",
+    "BAF": "2ae6d1c149585ba469286c8a0a1e555d0c1c16f8e0b92d93a04538023ba2bce9",
+    "BFC": "9828f92b5fa3a9ffc8806a760d3f46061f315ca114b01d938c9718d5971d78ad",
+    "BID": "a43396d8e5e96eef6cf01c70e246bf2bb679766688941489cbdc1a9a35f12e3a",
+    "BMP": "7545bb3c0c7dbcebe580cd20acec5d78abc1c3642e14bf16e6a013b6bc29dfc1",
+    "BSI": "8b25f327297320a0709a50b8c951a34d0b627c007d090dcafc234c855a3f253b",
+    "BSR": "ad6ea8c8c3c595e2f00b48658fe9441c1bc34d48987e05c6c076f53de1039fdb",
+    "BVH": "fa1c19e8085ffbbb264fe5cd10e3825ca58598d384a3f4495df855e33f7a90f8",
+    "CII": "df2e06b0d956915019d36e08bb20f873a55dcaa9232616b325c2b6ddcdb958dc",
+    "CMG": "7a0651ee58a29f15aa06d5106f861d0b17b74f65ad90628188127de9d32dedc4",
+    "CSV": "d2da43dfdef6f292f5f6f14f38b67dcebb8c9bca2907be6403eb6edfbef24600",
+    "CTD": "2d80af0d527b27370094148f7d857874178cccbca104b560f29d4c684192faf8",
+    "CTG": "f259eac227b06f0ad15a01ee6631f5be26d9f302a2d93ac30775548f79a5fe03",
+    "CTR": "27dfdab54f2833bec8159c92832c050902a2ae95cbd32ee52d28c07abfcde929",
+    "DBC": "4e907b4744b57dc5fd7db9cda7047c88519114238c6043d787cbecb152a78be3",
+    "DCM": "81dda3b32b8f3c1e28626b47324cb588b2f7dd642b798a0b0324ad03daa5ba31",
+    "DGC": "5d1a6017a318d5c988c42f5f896fcfbd136422ec0ab537ffb37fc9ee0f099df2",
+    "DGW": "ae081e059e62517618c5a9b2f3754e778cb246a50728c1652fc9c11a74808d90",
+    "DIG": "322a18a08493cd2990c946bf074d42baabea26a9c4c91434f983657684971048",
+    "DPG": "963c7b3ef5ee4bfbf4d3889cbcd2b041dc3b6b781fc0bd25c1a62af722d2f5a1",
+    "DPM": "dfb41264afdd2089186de773db789fbc96789ff9c81c8ab3aa79b8a24101041d",
+    "DPR": "5de7781bd7527216517f592ab0c186834c97b6a92badc7a93b2664ec23a59943",
+    "DXG": "11cf6101f2e6ed5568bc75177cd1cf0c57380bd3d923997e9cd7e4dcdfb56d98",
+    "DXS": "be64ca3d0d79dd8b6ff9c75e63de1bbf148bf0110d8c22c9301aa4a9d224090a",
+    "EIB": "ce9807321488513ddb21da4a1f1be1f35573508247a5a2fa22a99582e5e5bd77",
+    "EVF": "172f6b1bd7ff9293019941aa6711fdd8e2bd6dae6ce600206fd28c5578d04af9",
+    "FCN": "d6a2aeb8be49ab5562cd76b1a3de3eed6a6026b93b06332be5a25ec88de28c56",
+    "FPT": "7bcbdc8e18d5b0159c463759e5311e5a99d6e0ef7822af40fbe03557a007ce89",
+    "FRT": "9290aac2529b1ab2aaf51c0ec13fecd63b23f483d19639080f9429ad9d98f185",
+    "FTS": "c99ba7311d14990182b97b4b4fa8a157c1b0dbae5675c551aa133fae8faf1c52",
+    "GAS": "18e1a64f37c164648b27475c914312b52c9c208c96838ae7eadb852e1e5cd3a2",
+    "GEE": "11138621381af7e2046b9701eb5e4d7a4cbeae1260d84a2a8bfc9cec13ba15e2",
+    "GEG": "b002541737b07d2c9da2f015e8755d12a504b995a353f4ca80f4596b6337c4b5",
+    "GEX": "2e90bc0c5e8e3efbb26712f1001359d6dd15a9d2f38167f3c0276153fdb6589a",
+    "GIL": "752456df36a8c4376b43e78fb77336a410ecff1389ad839e1d68869ef0be48a8",
+    "GMD": "fe120d392e1b0f9fd1cd7d3ce01f7229c14a93008094ce96f98b749ef2ee1e46",
+    "GVR": "b50d8be39656a230657afa7b50ee1217f5a2ce80d7b70ecf8371c4a21e44fbf9",
+    "HAG": "10912b7c7f38e61f5147704aff530087944961d5e8465c245e26caa55e993dc7",
+    "HAH": "ae99bae42398acedddf144a43553afc634e1363f3088f551a06c337aa9b0afd0",
+    "HCM": "383fc842dc398dc2c81b4f5ca622cbe13c60b2647f4d4d7fe756174325e46037",
+    "HDB": "c5c257e17e13e1ce03290bf1b5ce8c21e40184aad536bf4c1a741b184e816850",
+    "HDC": "6d7bde9b82321c253b987355558c103682776129f2c15d5e7dee9cf956fc4e4c",
+    "HDG": "61f7cc1d15a2108a7c86f1d06b25e4b873d2d4381ab9dc14ec86abcffebb4cfe",
+    "HHS": "c412e4ac6286f34b8df9b9613b09471793a3fd2984fa5d3e442cbba4320bc795",
+    "HHV": "ae25425d7c1c7ddd26ede6a157a180dd24ea63a136e088e09a9e8214ad9cbf94",
+    "HPG": "99fc305f3c2b402bdf3c101be1aac30c4558bec5c61943c1f1e2d250538ace7b",
+    "HSG": "e25a0f24e14b9d7e2956fce3401f7d06845c7d895984cb0dcc281855764d0356",
+    "HVN": "e633581ad82b71fe1cd8183758cf21e462e71635dc656556123276bc07a3c8a6",
+    "IJC": "f7f447410d58c0a4cf8222a218ef1469f7c6308ed2009689d9c41d09b417551e",
+    "KBC": "42b816fb33846c50ad216304a2679b07fa93322e066922eeb49b15adc5cfa888",
+    "KDH": "2318e3b4776da36d2abd5fd421a12cd91c2cc821948af58f52f2eb72bde8e42d",
+    "KSB": "3fd10840c3f66e9abb66f9025252655abfd6ea7a7da88a2b583ee76364d2a67f",
+    "LPB": "f291d5e6ce131f9eeae12638cf40f85c6240914f77c64350a21643c6250bbae4",
+    "MBB": "27826fc1ccddb5563ec6212295368cf626e095419365f437e33ab180e04949e9",
+    "MCH": "420aa77615300b9773d3fd431a79709b9dcf3e1cbbb06f189a324ea0755f544d",
+    "MSB": "f85237f513f08c47bc2ec103faf45ac246174e7a9cb38e41da5de03899eb1830",
+    "MSH": "b96138383ab159a404c866987accb82358e5e80b10e7f6554e93f7601d181d21",
+    "MSN": "0cbe659a6632aff71134e265d7ee953debe1c6da6ad284dcef04d6889978b747",
+    "MWG": "368e7d92d24b0afdfa6caeafe1fe710336f3be05110462c7cce5963dcbd8baf1",
+    "NAB": "591e8ebaee060aa1f0157524e29c2aedbfab64d1b78b5bc45ad356a47953e321",
+    "NHA": "b82de554fe9c8b1503f0ce04b234d507fd7613a1966e8d49567a72ed141f8ade",
+    "NKG": "0deaa8c2f7844fa94febf2b8c96ddc63c0041c662ed2419232fcad9663a96402",
+    "NLG": "bd6599fe396b7c6f0cc4226dbdcb680a76dd0b369a231161df9881d636b0f66f",
+    "NT2": "8d32be7b6ff21c6e9170b9369cc9cc7be0fb4e095ca5223b7a606107aea24afa",
+    "NTL": "29278e79281c7a4d31ef6a2097585980f8cef24124c536e5ae2e18dd76eeb75a",
+    "NVL": "4026679f3fb0d275d7ee16f5abf0493ac1cedabd8694832df86ebe4d094a1869",
+    "OCB": "d7757acf07283bcec84985ac24074e819d50c4085e186646cc2531cca75fc06f",
+    "ORS": "91f7ac590808bee8ddebf6143fc89eed324dc6c874e72b8d12e6e4de434b4623",
+    "PC1": "51512a9e80cd19c8a72d7141bbd0cb11631980d61ce374b02ee95a4663ed4f35",
+    "PDR": "a32d3e65daa648ea187228839d6072fe970f0661c02bb8968ad1b7b77ad3acf6",
+    "PET": "227d0d9e7c86aa2f0d0429bc818b4c06676dc778b1131d565028f30b57ce9510",
+    "PHR": "af8717e9b0fc8b95466d80e8ec3c6c872dd3b313e0e822efed5e8432757b1061",
+    "PLX": "b23e7fa065a4ea6a4eaa4b6cbf3715f1445858584a12b1ae2ccfcc40c9be35fb",
+    "PNJ": "7cc3432096aae13c1b0ab6d211b1fc76348ff699ca196e0e1cd07a6bded24c36",
+    "POW": "9eb52f3df5e7b439012b3e55b90a4deac810d5beb356c6e7526b35be2f4c4212",
+    "PTB": "f357acd21490fc504aa916e289ec6ea70dece3958bc93348899c1d1db278bf30",
+    "PVD": "6dd08e081884765f2d24f96c1b0505d9a7ca8aee0b6cbe65e4ceb69fa4df9b00",
+    "PVT": "b0716e372bb94b8b67a47a9af3091e041844a0d4ea3bd12b18b274a776c27510",
+    "REE": "2c66ca1a164af1c888dda9713553252900fe32fe50097f642666e2480c3e525b",
+    "SAB": "2b08a5262fddea657c2fbf2424eb91527b1f2e687c6fa53e5f401376d7d447ef",
+    "SBT": "55d9cb5e3cf2b4ce23eddad6c51a332297b914e9f1b9c981210d516ec3c03ba2",
+    "SHB": "1eadec32486a663913b51b6569e4a9b1239b3528ddae886ce37333a5b1c4092d",
+    "SIP": "552984d00ffa08dc557a0bd262b0a62ff8874cfa9cc579d202f957d3c877d933",
+    "SSB": "5fdb9b2f29abd2dbbf629ab1ce9a7cc61ad77914db8dae785b4f547f0e13129d",
+    "SSI": "cd2bbe1531d201135d49a091682ce879a38d4d7e21189c889fc52caa9a65bce3",
+    "STB": "0092fa155fe741c17d75c70f74fe72e45ac3096faccf724bdb586fa64f36febf",
+    "SZC": "6c35e8407f363235ff29e8aa9132a51b9937fc9463301c20755da722197c3a45",
+    "TCB": "bb4c6d23f20cafaf6265e3c6baea25a326372a940cbffde9660444cc59a78b95",
+    "TCH": "220117c5dcba4d9224857c11e9c6aba182ecd8332b9707d51a8780f53a248e42",
+    "TCM": "5b3c9da58af45a4c31f09ba4b40037782ba2a770b40eab5f73284675d895e006",
+    "TCX": "8177b9e59324a17d4506e70c5ab0ec9e0f29309ce16fb999d4db1fb85ec3beed",
+    "TPB": "af01f218a61e6b6403bfa0b65f6eec420fcddf0235cf84394115076f04a0721c",
+    "TVS": "54b862d9f8389f4832934e57018a811b169345555f546071bbf83abe05ca4244",
+    "VCB": "b896c17d1f282b469b3dffb7ba78b67c949625c8369178fd53d9e2a5d8acb28c",
+    "VCG": "b15b63faca46e07d6724a3f374c1ad0bc6efd9317e2d0000fb6bcb0b2ee6b897",
+    "VCI": "a8e408dbd76040424dcaa3673e2814c87508e773c3a59b310fe823e9ca2a87f9",
+    "VCK": "b629ebb4035fb46d0e821d4f4097a9d6bdb83cecf198fd23af6af107170f751c",
+    "VDS": "8467c0b31df51a2d6e8d0cd6921cb36a3bd57696eee9fe2418c75a208b79c80c",
+    "VGC": "2d364742834cb15e80e2cc8e6b09961b9e058955ff7327d5c37b1f5e3f687ea6",
+    "VHC": "b9f0e27561b4252d7ec2c0daf1ac995b38ca39baece5c1ac1e4a935b000fc1e3",
+    "VHM": "0a45d32ef1019cb3bc98826bf60ed8717e1913b33c2fc7953f7b498a556c04e4",
+    "VIB": "416eed74e7d53d7ce057f5c0a3b4af7b6e867d1184de304b70a834c03027ca8f",
+    "VIC": "ba9b449037f810f80e37f3997e0fc174b860b431d480d1b7553a3c9e4ef2deca",
+    "VIX": "2a0b86d8168f3ae75e419c54977607f286e6d3fe1ab08a03a8f6a344959c5458",
+    "VJC": "c7369b1bbfc8ed4387439e7bd492fe335f9f08df6033479ee99ea4955afb7c74",
+    "VND": "f8ec6e9e9b47e86067c79a10eafc71a5de00d6aea067948a975e2fcd3d276fce",
+    "VNM": "3aa79a09b7ade2eb6563d484a8d308b99443e6d73f403a304f1be3bac1d737d9",
+    "VOS": "af11f9f120175345f91cd3454b6901dc06b5e2c3ead783a49c4b1e5c2169d15e",
+    "VPB": "7593f560c9bf83d9940d94af57155a53da5ae2836b281e8ff9d0422b443b1515",
+    "VPL": "c62d5667639ff15b6d977bfa6c8809f0034ed827dd1d55423dbca0cb33ddbe45",
+    "VPX": "8b7c0b888bc35510a583f3218e1ca6b05c3c2d2745e5edd201a5b11e8e75f8bf",
+    "VRE": "4aeb0ffe05800e8e4a75063d22cb2db3414d5b8c32da30d2d6c2bb564ce334d2",
+    "VSC": "fc3b6ea3ac853c70a2e38acfba7744be52363dd1e99e59ccf290210607a9b926",
+    "VTO": "13709bc2fee4d5bdbafbebc2855996bf886eeb163adc656ac72baf3eb1f6bec5",
+    "VTP": "defd4ba1c5d487874c848592d65cf773929d4854ca2613065257560c6bd61b58"
+  },
+  "exclusions": {
+    "current_ems_hnx_upcom": [
+      "ACV",
+      "BVS",
+      "C4G",
+      "CEO",
+      "DDV",
+      "DRI",
+      "FOX",
+      "HUT",
+      "IDC",
+      "LAS",
+      "MBS",
+      "MML",
+      "MSR",
+      "NTP",
+      "OIL",
+      "PLC",
+      "PVB",
+      "PVC",
+      "PVS",
+      "SHS",
+      "TNG",
+      "TVN",
+      "VGI",
+      "VGS",
+      "VGT"
+    ],
+    "reason": "HSX foreign endpoint returns empty for non-HOSE; not fabricated"
+  },
+  "known_biases": [
+    "Current EMS HOSE overlap (117) is a present-day relevance set, not historical membership-as-of.",
+    "Long-listed names have deeper history than recent listings (listing-age bias).",
+    "No complete historical HOSE membership reconstruction claimed.",
+    "Market-context / ADV overlap much shorter than foreign-flow history.",
+    "Raw OHLC; corporate-action adjustment status unknown."
+  ],
+  "provenance": {
+    "endpoint": "https://api.hsx.vn/mk/api/v1/market/securities/foreign/{SYM}",
+    "eligibility_manifest": "diagnostics/foreign_flow_historical_audit/ems142_hsx_eligibility.json",
+    "eligibility_asof": "2026-08-24",
+    "checkpoint": "data/foreign_flow_history/manifests/backfill_checkpoint.json",
+    "data_root": "data/foreign_flow_history"
+  },
+  "no_propositions": true,
+  "no_winning_conditions": true,
+  "no_outcome_labels_in_store": true
+}

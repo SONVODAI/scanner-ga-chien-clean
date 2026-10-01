@@ -1,0 +1,16 @@
+[Unit]
+Description=DEBUG ONLY manual A→C→B. Production scheduler is mrbot-daily-research.timer.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+EnvironmentFile=-/etc/mrbot/edge-research.env
+ExecStart=/opt/mrbot-camera-venv/bin/python -m modules.edge_research.eod_cycle
+Nice=10
+IOSchedulingClass=best-effort
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

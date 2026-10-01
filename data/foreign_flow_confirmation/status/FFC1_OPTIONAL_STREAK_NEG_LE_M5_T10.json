@@ -1,0 +1,13 @@
+{
+  "candidate_id": "FFC1_OPTIONAL_STREAK_NEG_LE_M5_T10",
+  "feature": "streak_neg_le_m5",
+  "role": "optional_exploratory_anti_edge",
+  "state": "WAITING_FOR_EVENTS",
+  "triggers": 0,
+  "matured_t10": 0,
+  "unique_symbols": 0,
+  "unique_dates": 0,
+  "data_quality_status": "OK",
+  "final_judgment_allowed": false,
+  "exploratory": true
+}

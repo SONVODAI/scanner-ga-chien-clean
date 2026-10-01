@@ -1,0 +1,140 @@
+{
+  "protocol_id": "ff_confirmation_v1",
+  "freeze_boundary": {
+    "last_in_sample_trade_date": "2026-08-24",
+    "first_eligible_confirmation_t0": "STRICTLY_AFTER_2026-08-24",
+    "note": "No trade_date <= 2026-08-24 may enter the confirmation event ledger as a prospective T0."
+  },
+  "source_blind_research": {
+    "artifact_dir": "diagnostics/foreign_flow_blind_research_v1",
+    "research_run_id": "ff_blind_v1_20260825T055811Z",
+    "dataset_version": "ff_hsx_symbol_daily_v1_20260825T045650Z",
+    "feature_code": "modules/foreign_flow_blind_research/run_v1.py::add_features",
+    "outcome_semantics": "diagnostics/foreign_flow_blind_research_v1/OUTCOME_SEMANTICS.md"
+  },
+  "hierarchy": {
+    "primary": "abn_abs_z20_T10",
+    "secondary": "net_hi_pct90_T10",
+    "optional_exploratory_anti_edge": "streak_neg_le_m5_T10",
+    "combine_candidates": false,
+    "secondary_cannot_rescue_primary": true
+  },
+  "candidates": [
+    {
+      "candidate_id": "FFC1_PRIMARY_ABN_ABS_Z20_T10",
+      "role": "primary",
+      "feature": "abn_abs_z20",
+      "horizon_sessions": 10,
+      "v1_registry_id": "FFB1_0045",
+      "historical_classification": "RESEARCH_CANDIDATE",
+      "definition": {
+        "intermediate": {
+          "net_z_60": "(foreign_net_value - rolling_mean_60) / rolling_std_60",
+          "rolling": "per-symbol, window=60, min_periods=60, including T0",
+          "std_ddof": 0,
+          "zero_std": "division yields NaN; candidate not eligible"
+        },
+        "trigger": "abs(net_z_60) > 2.0",
+        "trigger_dtype": "float 0/1 as in V1; confirmation eligibility requires == 1 and finite intermediates",
+        "lookback_sessions": 60,
+        "threshold": 2.0,
+        "threshold_locked": true,
+        "forbidden_variants": [
+          "z60 threshold change",
+          "z20 window rename to 20",
+          "replace with z60 window",
+          "signed-only abn_net_pos_z20 / abn_net_neg_z20 as substitute"
+        ]
+      },
+      "historical_holdout_reference": {
+        "split": "holdout_2022_to_2026-08-24",
+        "n": 8508,
+        "n_symbols": 117,
+        "n_dates": 1137,
+        "mean_ret": 0.0010883871803705684,
+        "incremental_mean_ret_vs_unconditional": 0.0027638842721887514,
+        "baseline_mean_ret": -0.001675497091818183,
+        "win_rate": 0.49047954866008464,
+        "conc_top1_share_abs_sumret": 0.038046874567859254,
+        "conc_top5_share": 0.14378535439535972
+      },
+      "historical_sign": "positive_incremental"
+    },
+    {
+      "candidate_id": "FFC1_SECONDARY_NET_HI_PCT90_T10",
+      "role": "secondary",
+      "feature": "net_hi_pct90",
+      "horizon_sessions": 10,
+      "v1_registry_id": "FFB1_0048",
+      "historical_classification": "RESEARCH_CANDIDATE",
+      "definition": {
+        "intermediate": {
+          "net_pct_252": "per-symbol rolling(252, min_periods=252).rank(pct=True) on foreign_net_value, including T0"
+        },
+        "trigger": "net_pct_252 >= 0.90",
+        "lookback_sessions": 252,
+        "threshold": 0.9,
+        "threshold_locked": true,
+        "forbidden_variants": [
+          "pct80",
+          "pct95",
+          "window != 252",
+          "expanding percentile"
+        ]
+      },
+      "historical_holdout_reference": {
+        "split": "holdout_2022_to_2026-08-24",
+        "n": 16076,
+        "n_symbols": 113,
+        "n_dates": 1145,
+        "mean_ret": 0.0019488236934421363,
+        "incremental_mean_ret_vs_unconditional": 0.0036243207852603193,
+        "baseline_mean_ret": -0.001675497091818183,
+        "win_rate": 0.5018039313262005,
+        "conc_top1_share_abs_sumret": 0.062234621032909776,
+        "conc_top5_share": 0.16710295016862212
+      },
+      "historical_sign": "positive_incremental"
+    },
+    {
+      "candidate_id": "FFC1_OPTIONAL_STREAK_NEG_LE_M5_T10",
+      "role": "optional_exploratory_anti_edge",
+      "feature": "streak_neg_le_m5",
+      "horizon_sessions": 10,
+      "v1_registry_id": "FFB1_0019",
+      "historical_classification": "RESEARCH_CANDIDATE",
+      "pre_registered_for_pass_fail": true,
+      "definition": {
+        "intermediate": {
+          "net_streak": "consecutive same-sign foreign_net_value sessions including T0; zero-net resets streak to 0; negative streak accumulates downward"
+        },
+        "trigger": "net_streak <= -5",
+        "threshold_locked": true,
+        "note": "Exploratory anti-edge: expected negative incremental. Judged independently; cannot rescue or condemn primary/secondary."
+      },
+      "historical_holdout_reference": {
+        "split": "holdout_2022_to_2026-08-24",
+        "n": 12800,
+        "n_symbols": 117,
+        "n_dates": 1143,
+        "mean_ret": -0.0031321262017223617,
+        "incremental_mean_ret_vs_unconditional": -0.0014566291099041787,
+        "baseline_mean_ret": -0.001675497091818183,
+        "historical_sign": "negative_incremental",
+        "win_rate": 0.469609375,
+        "conc_top1_share_abs_sumret": 0.04229609528542619,
+        "conc_top5_share": 0.15817794603634702
+      }
+    }
+  ],
+  "explicit_nulls_not_revived": [
+    "net_pos / net_neg as T3/T5/T10 predictors",
+    "price\u00d7flow agree_* interactions as flow-attributable edges",
+    "short-horizon interaction search"
+  ],
+  "outcome_locked": {
+    "primary_horizon": "T10",
+    "definition": "10th subsequent trading-session close / T0 close - 1",
+    "session_not_calendar": true
+  }
+}

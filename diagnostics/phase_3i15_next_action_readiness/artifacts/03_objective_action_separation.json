@@ -1,0 +1,43 @@
+{
+  "causal_order_required": [
+    "uncertainty",
+    "ScientificObjective",
+    "ScientificAction",
+    "ExperimentSpec",
+    "tool"
+  ],
+  "forbidden_order": "available_tool \u2192 invent reason to use it",
+  "layers": {
+    "ScientificObjective": {
+      "definition": "What epistemic vulnerability or uncertainty dimension should be attacked",
+      "examples": [
+        "challenge unresolved temporal_regime_robustness",
+        "seek counterexample to claimed partition contrast",
+        "resolve contradictory independent evidence",
+        "test concentration/dominance explanation",
+        "examine measurement-dependence of apparent support"
+      ],
+      "must_not_include": [
+        "tool_name",
+        "ExperimentSpec",
+        "GAP_code"
+      ]
+    },
+    "ScientificAction": {
+      "definition": "Concrete testable operation producing evidence relevant to objective",
+      "examples": [
+        "regime-separated quintile contrast on non-motivating episodes",
+        "population holdout excluding prior cohort overlap",
+        "counterexample-period search for directional reversal"
+      ],
+      "must_not_include": [
+        "tool as identity",
+        "template_id as scientific semantics"
+      ]
+    },
+    "ExperimentSpec": {
+      "definition": "Executable representation of chosen action",
+      "binding": "Derived from ScientificAction after scientific ranking \u2014 not before"
+    }
+  }
+}

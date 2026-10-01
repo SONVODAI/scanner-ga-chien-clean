@@ -1,0 +1,12 @@
+{
+  "candidate_id": "FFC1_PRIMARY_ABN_ABS_Z20_T10",
+  "feature": "abn_abs_z20",
+  "role": "primary",
+  "state": "WAITING_FOR_EVENTS",
+  "triggers": 0,
+  "matured_t10": 0,
+  "unique_symbols": 0,
+  "unique_dates": 0,
+  "data_quality_status": "OK",
+  "final_judgment_allowed": false
+}

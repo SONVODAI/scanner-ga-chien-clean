@@ -1,0 +1,14 @@
+[Unit]
+Description=DEBUG ONLY — not the production scheduler. Production uses mrbot-daily-research.timer.
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+
+[Timer]
+# Retired as an independent production timer. Kept for manual debug only.
+# Do NOT enable this unit on the VPS. Authoritative EOD is:
+#   mrbot-daily-research.timer → production_daily_run_entrypoint → A→C→B
+# Calendar trigger intentionally omitted so an accidental enable cannot race.
+Persistent=false
+Unit=mrbot-edge-research-eod.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,23 @@
+{
+  "fc1_version": "forecast_v2_fc1_v1",
+  "label_schema_version": "fc1_labels_v1",
+  "n_rows": 63,
+  "session_dates_n": 17,
+  "by_horizon": {
+    "3": {
+      "n": 24,
+      "date_min": "2026-07-23",
+      "date_max": "2026-08-19"
+    },
+    "5": {
+      "n": 22,
+      "date_min": "2026-07-23",
+      "date_max": "2026-08-17"
+    },
+    "10": {
+      "n": 17,
+      "date_min": "2026-07-23",
+      "date_max": "2026-08-10"
+    }
+  }
+}

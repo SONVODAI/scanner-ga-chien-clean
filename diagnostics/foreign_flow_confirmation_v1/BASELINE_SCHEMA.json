@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ForeignFlowConfirmationBaselineV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "baseline_id",
+    "protocol_id",
+    "era",
+    "asof_trade_date",
+    "horizon",
+    "n_eligible",
+    "mean_ret_t10",
+    "median_ret_t10",
+    "win_rate_t10",
+    "created_at"
+  ],
+  "properties": {
+    "baseline_id": { "type": "string" },
+    "protocol_id": { "const": "ff_confirmation_v1" },
+    "era": { "const": "confirmation_post_2026-08-24" },
+    "baseline_family": {
+      "type": "string",
+      "enum": [
+        "unconditional_eligible",
+        "same_era_contemporaneous",
+        "px_ret_20_tercile_parent"
+      ]
+    },
+    "asof_trade_date": { "type": "string" },
+    "horizon": { "const": 10 },
+    "n_eligible": { "type": "integer", "minimum": 0 },
+    "n_symbols": { "type": "integer" },
+    "n_dates": { "type": "integer" },
+    "mean_ret_t10": { "type": ["number", "null"] },
+    "median_ret_t10": { "type": ["number", "null"] },
+    "win_rate_t10": { "type": ["number", "null"] },
+    "parent_condition": {
+      "type": ["object", "null"],
+      "description": "Filled only for parent-condition baselines (price controls)."
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "dataset_hash_or_version": { "type": "string" },
+    "protocol_hash": { "type": "string" }
+  }
+}

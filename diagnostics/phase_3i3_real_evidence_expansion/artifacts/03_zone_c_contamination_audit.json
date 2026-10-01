@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "zone_c_populated": true,
+  "forbidden_pattern_hits_in_generator": [],
+  "generator_imports_zone_c": false
+}
