@@ -1,0 +1,431 @@
+{
+  "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+  "case_count": 12,
+  "aggregate_occurrence_counts": {
+    "confirmation_loops": 0,
+    "horizon_shopping": 0,
+    "slice_shopping": 0,
+    "null_cycling": 0,
+    "evidence_recycling": 0,
+    "dependence_undercounting": 0,
+    "unjustified_confidence_escalation": 2,
+    "ignored_contradiction": 0,
+    "premature_stop": 8,
+    "unnecessary_continuation": 4
+  },
+  "cases_with_any_finding": 12,
+  "per_case": [
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 101,
+      "blind_class": "BLIND-A",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 102,
+      "blind_class": "BLIND-A",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 201,
+      "blind_class": "BLIND-B",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [
+          "repeated_SUPPORTED_on_BLIND-B"
+        ],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 1,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 2
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 202,
+      "blind_class": "BLIND-B",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [
+          "repeated_SUPPORTED_on_BLIND-B"
+        ],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 1,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 2
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 301,
+      "blind_class": "BLIND-C",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 302,
+      "blind_class": "BLIND-C",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 401,
+      "blind_class": "BLIND-D",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 402,
+      "blind_class": "BLIND-D",
+      "lifecycle_outcome": "SCIENTIFIC_STOP",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [
+          "scientific_stop_at_exp_2_budget_4"
+        ],
+        "unnecessary_continuation": []
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 1,
+        "unnecessary_continuation": 0
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 501,
+      "blind_class": "BLIND-E",
+      "lifecycle_outcome": "FAILED_CLOSED",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [],
+        "unnecessary_continuation": [
+          "attempted_execution_on_NO_FAITHFUL_ordinal_3_package"
+        ]
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 0,
+        "unnecessary_continuation": 1
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 502,
+      "blind_class": "BLIND-E",
+      "lifecycle_outcome": "FAILED_CLOSED",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [],
+        "unnecessary_continuation": [
+          "attempted_execution_on_NO_FAITHFUL_ordinal_3_package"
+        ]
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 0,
+        "unnecessary_continuation": 1
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 601,
+      "blind_class": "BLIND-F",
+      "lifecycle_outcome": "FAILED_CLOSED",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [],
+        "unnecessary_continuation": [
+          "attempted_execution_on_NO_FAITHFUL_ordinal_3_package"
+        ]
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 0,
+        "unnecessary_continuation": 1
+      },
+      "total_occurrences": 1
+    },
+    {
+      "audit_version": "bb_capability_gap_audit_longer_journey_safety_v1_3j14",
+      "seed": 602,
+      "blind_class": "BLIND-F",
+      "lifecycle_outcome": "FAILED_CLOSED",
+      "experiments_completed": 2,
+      "findings": {
+        "confirmation_loops": [],
+        "horizon_shopping": [],
+        "slice_shopping": [],
+        "null_cycling": [],
+        "evidence_recycling": [],
+        "dependence_undercounting": [],
+        "unjustified_confidence_escalation": [],
+        "ignored_contradiction": [],
+        "premature_stop": [],
+        "unnecessary_continuation": [
+          "attempted_execution_on_NO_FAITHFUL_ordinal_3_package"
+        ]
+      },
+      "occurrence_counts": {
+        "confirmation_loops": 0,
+        "horizon_shopping": 0,
+        "slice_shopping": 0,
+        "null_cycling": 0,
+        "evidence_recycling": 0,
+        "dependence_undercounting": 0,
+        "unjustified_confidence_escalation": 0,
+        "ignored_contradiction": 0,
+        "premature_stop": 0,
+        "unnecessary_continuation": 1
+      },
+      "total_occurrences": 1
+    }
+  ]
+}

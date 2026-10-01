@@ -1,0 +1,137 @@
+{
+  "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+  "prior_tool": "partition_group_compare",
+  "data_cutoff": "2026-08-17",
+  "focal_date": "2026-08-02",
+  "candidate_sketches": [
+    {
+      "candidate_id": "FC-01",
+      "strategy": "confirmatory_retest",
+      "tool_name": "partition_group_compare",
+      "population_change": "none \u2014 identical to 3I.7",
+      "spec_hash_would_equal_prior": true,
+      "relationship": "NOT_ACTUALLY_FALSIFICATION",
+      "rationale": "Exact rerun of supportive comparison",
+      "generator_source": "executability_adapter (existing)",
+      "proposition_scoped": true,
+      "interpreter_compatible": true,
+      "counterfactual_falsifiable": false
+    },
+    {
+      "candidate_id": "FC-02",
+      "strategy": "exclude_focal_date_partition",
+      "tool_name": "partition_group_compare",
+      "population_change": "filter trade_date != 2026-08-02",
+      "spec_hash_would_equal_prior": false,
+      "relationship": "INDEPENDENT_FALSIFICATION",
+      "rationale": "Tests episode instability \u2014 null explanation cites market-wide level effects on 2026-08-02; if quintile spread reverses without focal date, proposition weakens",
+      "generator_source": "MISSING \u2014 requires FalsificationCandidateGenerator",
+      "proposition_scoped": true,
+      "interpreter_compatible": true,
+      "counterfactual_falsifiable": true,
+      "vulnerability": "episode_instability"
+    },
+    {
+      "candidate_id": "FC-03",
+      "strategy": "leave_one_date_sensitivity",
+      "tool_name": "sensitivity_analysis",
+      "population_change": "none \u2014 sensitivity on cohort",
+      "inputs": {
+        "horizon": "T5",
+        "tests": [
+          "leave_one_date"
+        ]
+      },
+      "relationship": "RELATED_FALSIFICATION",
+      "rationale": "Robustness against date artifact per null explanation",
+      "generator_source": "research_actions FALSIFY_DATE (GAP-code gated, NOT proposition-scoped)",
+      "proposition_scoped": false,
+      "interpreter_compatible": false,
+      "counterfactual_falsifiable": false,
+      "gap": "No FalsificationInterpretationContract for sensitivity_analysis metrics"
+    },
+    {
+      "candidate_id": "FC-04",
+      "strategy": "leave_one_symbol_sensitivity",
+      "tool_name": "sensitivity_analysis",
+      "inputs": {
+        "horizon": "T5",
+        "tests": [
+          "leave_one_symbol"
+        ]
+      },
+      "relationship": "RELATED_FALSIFICATION",
+      "rationale": "Tests symbol dominance / small-sample artifact",
+      "generator_source": "research_actions FALSIFY_SYMBOL (GAP-code gated)",
+      "proposition_scoped": false,
+      "interpreter_compatible": false,
+      "counterfactual_falsifiable": false
+    },
+    {
+      "candidate_id": "FC-05",
+      "strategy": "supportive_population_narrow",
+      "tool_name": "partition_group_compare",
+      "population_change": "REFINE to high-dispersion subset only",
+      "relationship": "NOT_ACTUALLY_FALSIFICATION",
+      "rationale": "Rescue temptation \u2014 seeks favorable slice",
+      "anti_rescue": "REJECT",
+      "generator_source": "research_actions grammar REFRAME (would mutate population)"
+    },
+    {
+      "candidate_id": "FC-06",
+      "strategy": "horizon_mutation",
+      "tool_name": "horizon_comparison",
+      "population_change": "horizon T10 instead of 0",
+      "relationship": "NOT_ACTUALLY_FALSIFICATION",
+      "rationale": "Changes proposition horizon \u2014 new proposition not falsification",
+      "anti_rescue": "REJECT"
+    },
+    {
+      "candidate_id": "FC-07",
+      "strategy": "same_question_different_tool",
+      "tool_name": "date_decomposition",
+      "relationship": "NOT_ACTUALLY_FALSIFICATION",
+      "rationale": "Does not operationalize disconfirming_observation_spec quintile contrast",
+      "interpreter_compatible": false
+    },
+    {
+      "candidate_id": "FC-08",
+      "strategy": "neighborhood_stability",
+      "tool_name": "neighborhood_stability",
+      "relationship": "SAME_FALSIFICATION_DIFFERENT_INSTRUMENT",
+      "rationale": "Threshold perturbation near partition boundary",
+      "generator_source": "tool registry exists; no proposition-scoped generator",
+      "interpreter_compatible": false
+    }
+  ],
+  "viable_under_current_interpreter": [
+    "FC-02"
+  ],
+  "reusable_components": [
+    "PropositionRecord.disconfirming_observation_spec (birth commitment)",
+    "ExperimentSpec + compute_experiment_content_hash (dedup vs prior)",
+    "executability_adapter (confirmatory spec only)",
+    "research_grammar PopulationSpec FILTER (legal date exclusion)",
+    "partition_group_compare tool + lifecycle_execution quintile extraction",
+    "proposition_experiment_interpreter (partition metrics only)",
+    "3I.7 interpretation contract rules (reusable for same-tool falsification)",
+    "scientific_identity / cores_same_question (rescue detection)",
+    "3I.5 EvidenceLineage (22 pre-emission events for independence context)"
+  ],
+  "missing_capabilities": [
+    "FalsificationCandidateGenerator \u2014 proposition-scoped, reads disconfirming_observation_spec",
+    "SEEK_FALSIFICATION \u2192 candidate set wire in lifecycle_runner",
+    "FalsificationCandidateRecord append-only type",
+    "FalsificationSelector \u2014 lexicographic ranking without result knowledge",
+    "Pre-registered candidate-set hash before selection",
+    "FalsificationInterpretationContract variant for non-partition tools (deferred)",
+    "proposition_id on post-emission experiment lineage join"
+  ],
+  "disconnected_template_bound": [
+    "research_actions FALSIFY_* \u2014 GAP-code triggers, not proposition vulnerability",
+    "research_planner \u2014 fixed weights, template candidates",
+    "challenger.run_challenger \u2014 Phase 2 ledger, ignores disconfirming_observation_spec"
+  ],
+  "gap_code_required_for_template_falsify": true,
+  "autonomous_generation_today": false
+}

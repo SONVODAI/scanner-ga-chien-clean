@@ -1,0 +1,53 @@
+{
+  "t1_knew": {
+    "evidence_count": 1,
+    "state": "SUPPORTED",
+    "covered": [
+      "directional_effect_full_universe"
+    ],
+    "unresolved": [
+      "episode_robustness",
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "priority": "SEEK_FALSIFICATION"
+  },
+  "t2_knew": {
+    "evidence_count": 2,
+    "state": "SUPPORTED",
+    "covered": [
+      "directional_effect_full_universe",
+      "episode_robustness"
+    ],
+    "unresolved": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "priority": "SEEK_FALSIFICATION",
+    "relationship_e2": "PARTIAL_REPLICATION",
+    "redundant_axes": [
+      "episode_robustness"
+    ]
+  },
+  "what_changed": {
+    "episode_robustness_covered": true,
+    "state_unchanged": true,
+    "e2_material_independent_support": false,
+    "generic_holdout_redundant": true
+  },
+  "action_disposition": "ACTION_RECORDED_ONLY"
+}

@@ -1,0 +1,68 @@
+{
+  "chain": [
+    {
+      "transition": "ledger \u2192 synthesis",
+      "input_fields": [
+        "evidence_ids",
+        "relationship_map (E2=PARTIAL_REPLICATION)",
+        "independence_profiles (E2 population_independence=LOW, cohort_overlap_ratio=0.977)",
+        "uncertainty_axis_tested per entry"
+      ],
+      "output_fields": [
+        "synthesized_epistemic_state=SUPPORTED",
+        "uncertainty_covered=['directional_effect_full_universe', 'episode_robustness']",
+        "uncertainty_unresolved includes population_robustness",
+        "redundant_test_axes=['episode_robustness']"
+      ]
+    },
+    {
+      "transition": "synthesis \u2192 ResearchPriorityDecision",
+      "input_fields": [
+        "major_uncertainty_dimensions_remaining",
+        "saturation_assessment.level=PARTIAL",
+        "marginal_information=low",
+        "synthesized_epistemic_state=SUPPORTED"
+      ],
+      "output_fields": [
+        "chosen_priority_action=SEEK_FALSIFICATION"
+      ]
+    },
+    {
+      "transition": "priority + unresolved \u2192 ScientificObjective",
+      "input_fields": [
+        "uncertainty_unresolved (includes population_robustness)",
+        "major_uncertainty_dimensions_remaining",
+        "redundant_test_axes (excludes population_robustness)",
+        "priority=SEEK_FALSIFICATION"
+      ],
+      "output_fields": [
+        "target_uncertainty=population_robustness",
+        "scientific_vulnerability=population_specificity"
+      ]
+    },
+    {
+      "transition": "objective \u2192 candidate action",
+      "input_fields": [
+        "target_uncertainty=population_robustness",
+        "FalsificationOperator._cohort_strategies_for_axis",
+        "low_population_independence implicit via axis choice"
+      ],
+      "output_fields": [
+        "cohort_strategy=population_subgroup_contrast",
+        "population_spec filter research_market_state in [NORMAL]"
+      ]
+    },
+    {
+      "transition": "candidates \u2192 dedup \u2192 rank \u2192 select",
+      "input_fields": [
+        "_rank_key: exec, redundant, major, falsify, contra, independence, axis",
+        "expected_independence_profile.sample_independence=HIGH for population_subgroup"
+      ],
+      "output_fields": [
+        "selected_core_hash=efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f"
+      ]
+    }
+  ],
+  "hook_synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+  "matches_package": true
+}
