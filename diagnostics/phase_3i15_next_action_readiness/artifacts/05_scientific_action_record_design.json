@@ -1,0 +1,39 @@
+{
+  "record_type": "ScientificActionCandidateRecord",
+  "immutable": true,
+  "required_fields": {
+    "action_id": "sac-{uuid12}",
+    "objective_ref": "objective_id + objective_hash",
+    "action_scientific_semantics": "human-auditable description of what is tested",
+    "evidence_cohort_strategy": "full | holdout | regime_split | population_contrast | counterexample_search",
+    "variable_population_outcome_commitments": "must match proposition \u2014 no rescue",
+    "relationship_to_prior_experiments": "REPLICATION | PARTIAL_REPLICATION | INDEPENDENT | REDUNDANT",
+    "expected_new_uncertainty_coverage": "axis name if informative",
+    "expected_independence_profile": "7-dimension profile estimate",
+    "possible_informative_outcomes": "list of evidence classes + uncertainty updates",
+    "possible_non_informative_outcome": "NON_INFORMATIVE + what remains unknown",
+    "falsification_capability": "bool",
+    "contradiction_resolution_capability": "bool",
+    "rescue_risk": "pass | population_narrowing | horizon_mutation | outcome_mutation",
+    "redundancy_classification": "REDUNDANT | MARGINAL | NOVEL",
+    "executability_status": "see tool compatibility taxonomy",
+    "experiment_spec_ref": "optional \u2014 populated only after action selected for packaging",
+    "provenance": "operator_id, objective_ref, ledger_refs",
+    "scientific_action_core_hash": "hash of ScientificActionCore only",
+    "record_hash": "hash of full record"
+  },
+  "scientific_action_core": {
+    "fields": [
+      "objective_ref.target_uncertainty",
+      "evidence_cohort_strategy",
+      "proposition_commitment_challenged",
+      "causal_contrast_relation",
+      "expected_epistemic_consequence_summary"
+    ],
+    "excludes": [
+      "tool_name",
+      "tool_version",
+      "parameterization_syntax"
+    ]
+  }
+}
