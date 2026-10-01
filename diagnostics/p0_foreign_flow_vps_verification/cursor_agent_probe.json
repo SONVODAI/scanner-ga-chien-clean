@@ -1,0 +1,144 @@
+{
+  "verdict": "P0_PRODUCTION_VERIFICATION_BLOCKED",
+  "historical_capability": "UNRESOLVED",
+  "production_result": {
+    "vps_tested": "NO",
+    "provider_reachable": "NO",
+    "exact_result_or_error": {
+      "http": {
+        "status": 403,
+        "server": "cloudflare",
+        "cf_ray": "a30342494ac1b18c-PDX",
+        "error": null,
+        "body_prefix": "<!doctype html> <html lang=\"en\"> <head> <meta charset=\"utf-8\"> <meta name=\"robots\" content=\"noindex, nofollow\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"> <title>Security Check - SSI</title> <style>body{background-color:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;margin:0}.container{margin:50px auto;max-width:600"
+      },
+      "fr_trade_heatmap": {
+        "ok": false,
+        "error": "null_dataframe",
+        "n_rows": null,
+        "columns": null,
+        "stdout_stderr": "Error: 403 when getting data. Details: <!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"robots\" content=\"noindex, nofollow\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n<title>Security Check - SSI</title>\n<style>body{background-color:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;margin:0}.container{margin:50px auto;max-width:600px;padding:0 24px;text-align:center}.captcha-box{display:inli"
+      },
+      "analysis_error": "null_dataframe"
+    },
+    "tested_trade_date": "2026-08-22",
+    "market_scope": "HOSE",
+    "units": "UNPROVEN"
+  },
+  "runtime": {
+    "is_production_vps": false,
+    "hostname": "cursor",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
+    "python_executable": "/usr/bin/python3",
+    "python_version": "3.12.3",
+    "cwd": "/workspace",
+    "repo_root_guess": "/workspace",
+    "prod_repo_exists": false,
+    "vnstock_version": "0.2.9.2",
+    "vnstock_file": "/home/ubuntu/.local/lib/python3.12/site-packages/vnstock/__init__.py",
+    "has_fr_trade_heatmap": true,
+    "observed_at": "2026-08-24T15:06:05Z"
+  },
+  "http_probe": {
+    "url": "https://iboard-query.ssi.com.vn/stock/exchange/HOSE",
+    "provider_call": "GET iboard-query.ssi.com.vn/stock/exchange/HOSE",
+    "observed_at": "2026-08-24T15:06:05Z",
+    "reachable": false,
+    "http_status": 403,
+    "server": "cloudflare",
+    "cf_ray": "a30342494ac1b18c-PDX",
+    "content_type": "text/html; charset=UTF-8",
+    "body_prefix": "<!doctype html> <html lang=\"en\"> <head> <meta charset=\"utf-8\"> <meta name=\"robots\" content=\"noindex, nofollow\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"> <title>Security Check - SSI</title> <style>body{background-color:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;margin:0}.container{margin:50px auto;max-width:600"
+  },
+  "heatmap_call": {
+    "provider_call": "vnstock.fr_trade_heatmap(symbol='HOSE', report_type='FrBuyVal')",
+    "observed_at": "2026-08-24T15:06:05Z",
+    "stdout_stderr": "Error: 403 when getting data. Details: <!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"robots\" content=\"noindex, nofollow\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n<title>Security Check - SSI</title>\n<style>body{background-color:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;margin:0}.container{margin:50px auto;max-width:600px;padding:0 24px;text-align:center}.captcha-box{display:inli",
+    "ok": false,
+    "error": "null_dataframe"
+  },
+  "analysis": {
+    "ok": false,
+    "status": "SOURCE_ERROR",
+    "error": "null_dataframe",
+    "foreign_flow_scope": "HOSE",
+    "units": "UNPROVEN",
+    "historical_semantics": "UNSUPPORTED_NO_DATE_PARAM"
+  },
+  "alternative_sources": [
+    {
+      "source": "SSI iboard fr_trade_heatmap (current P0)",
+      "foreign_buy": "YES (value cols when reachable)",
+      "foreign_sell": "YES",
+      "net": "DERIVED buy-sell",
+      "historical": "NO (no date param; live snapshot)",
+      "scope": "HOSE exchange listing (or HNX/UPCOM/All if symbol changed)",
+      "pit_suitable": "FORWARD_ONLY after close if reachable",
+      "reliability": "Cloudflare 403 in Cursor/dev; PRODUCTION UNKNOWN",
+      "already_installed": "YES (vnstock 0.2.9.2 app path); NO on vnstock 4.x collector",
+      "implement_now": false
+    },
+    {
+      "source": "EMS earning_money_snapshots",
+      "foreign_buy": "NO",
+      "foreign_sell": "NO",
+      "net": "NO",
+      "historical": "N/A",
+      "scope": "EMS research universe 142",
+      "pit_suitable": "N/A \u2014 no foreign fields",
+      "reliability": "Trusted for universe turnover only",
+      "already_installed": "YES",
+      "implement_now": false
+    },
+    {
+      "source": "market_daily_t0",
+      "foreign_buy": "NO",
+      "foreign_sell": "NO",
+      "net": "NO",
+      "historical": "N/A",
+      "scope": "Market First canonical T0",
+      "pit_suitable": "N/A \u2014 no foreign fields",
+      "reliability": "Trusted for VNI OHLCV/volume",
+      "already_installed": "YES",
+      "implement_now": false
+    },
+    {
+      "source": "vnstock 4.x VCI Trading.price_board",
+      "foreign_buy": "NO (ownership room/volume, not session buy value)",
+      "foreign_sell": "NO",
+      "net": "NO",
+      "historical": "UNCLEAR",
+      "scope": "Per-symbol board",
+      "pit_suitable": "NO for P0 foreign flow contract",
+      "reliability": "Wrong semantics (room/holding \u2260 flow)",
+      "already_installed": "Collector venv docs (vnstock>=4.0.5)",
+      "implement_now": false
+    },
+    {
+      "source": "vnstock 4.x KBS price board / foreignTotal ranking",
+      "foreign_buy": "VOLUME only (mapped FB)",
+      "foreign_sell": "VOLUME only (mapped FS)",
+      "net": "VOLUME only; value unknown",
+      "historical": "UNPROVEN",
+      "scope": "Broker board; exchange scope unclear",
+      "pit_suitable": "UNCERTAIN",
+      "reliability": "Not used by this project; auth/headers unknown; value fields absent",
+      "already_installed": "API present in vnstock 4.x package; not wired in Mr.BOT",
+      "implement_now": false
+    },
+    {
+      "source": "Official HOSE / public exchange prints",
+      "foreign_buy": "POSSIBLE via official publications",
+      "foreign_sell": "POSSIBLE",
+      "net": "POSSIBLE",
+      "historical": "Often YES in official archives",
+      "scope": "Exchange-defined",
+      "pit_suitable": "If dated official close prints",
+      "reliability": "No existing project adapter; would be new integration",
+      "already_installed": "NO",
+      "implement_now": false
+    }
+  ],
+  "automation_note": "P0 foreign collection is hooked fail-safe via market_t0_capture \u2192 maybe_freeze_after_market_daily \u2192 maybe_collect_p0_after_market_daily and CLI --p0-collect. Streamlit need not stay open if an equivalent \u226518:00 VN host process runs market_t0_capture / daily_entrypoint on the app Python that has vnstock.fr_trade_heatmap (legacy 0.2.9.2). Collector vnstock 4.x lacks that symbol.",
+  "observed_at": "2026-08-24T15:06:05Z"
+}

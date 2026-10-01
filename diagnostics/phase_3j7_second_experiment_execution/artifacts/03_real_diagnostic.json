@@ -1,0 +1,138 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "research_decision_id": "dec-4c5eef9ff644",
+  "research_decision_hash": "ce0701b917fc15a7c311b06306c5785355ddab5123de94c01078bc2cf3b57ebf",
+  "second_experiment_package_id": "sefp-ef0593efdb17",
+  "second_experiment_package_hash": "67a17238ed7b370a12b6899f04e6cb1e9cd2f90a7d07724c0d0cd2c680735616",
+  "scientific_action_core_hash": "58ee7b6d5cf9052c6f80b9e1edd54e7f2cd813198766a1b20d62b8aa231340b5",
+  "target_null": "directional_reversal",
+  "target_uncertainty": "directional_effect_full_universe",
+  "novelty_decomposition": {
+    "ROW_OVERLAP": 0.9772727272727273,
+    "POPULATION_OVERLAP": 0.9772727272727273,
+    "CONTRAST_OVERLAP": 0.0,
+    "OUTCOME_OVERLAP": 1.0,
+    "NULL_TARGET_OVERLAP": 0.0,
+    "SCIENTIFIC_QUESTION_OVERLAP": 0.0,
+    "INFORMATION_NOVELTY": "CONTRAST_SHIFT_ON_SUPERSET",
+    "SAMPLE_NOVELTY": "LOW",
+    "SCIENTIFIC_CONTRAST_NOVELTY": "HIGH",
+    "coarse_redundancy_interpretation": "HIGH_SAMPLE_REUSE_NEW_QUESTION",
+    "decomposition_hash": "5c25e1494ae8af7f9b8194118738f61072fda416c42a62ee3903f10f9af6ca07"
+  },
+  "population_spec": {
+    "kind": "all",
+    "grammar_version": "research_grammar_v1"
+  },
+  "outcome_spec": {
+    "kind": "compare",
+    "field": "t5_return",
+    "operator": ">",
+    "value": 0.0,
+    "grammar_version": "research_grammar_v1"
+  },
+  "horizon": 0,
+  "tool": "partition_group_compare",
+  "binding_audit": {
+    "scientific_spec_hash": "58ed4a7b9997fc41991cb41b2fe628f5345a8cab5b4c14f2c9ebe4c0872d497f",
+    "execution_spec_hash": "65a641bae1a96205a2e01d776216cd1c0ccf4315e0e1c38ad847cd0e421c8a72",
+    "scientific_action_core_hash": "58ee7b6d5cf9052c6f80b9e1edd54e7f2cd813198766a1b20d62b8aa231340b5",
+    "population_spec": {
+      "kind": "all",
+      "grammar_version": "research_grammar_v1"
+    },
+    "outcome_spec": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "observation_horizon": 0,
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "binding_notes": [
+      "binding_version=first_experiment_execution_binding_v1_3j3",
+      "executed_question_equals_selected_question",
+      "cohort_strategy=full_panel_contrast"
+    ]
+  },
+  "eligibility": {
+    "eligibility": "IDEMPOTENT_REPLAY",
+    "reasons": [
+      "identical_execution_already_completed"
+    ],
+    "checks": {
+      "package_exists": true,
+      "experiment_ordinal_two": true,
+      "disposition_selected": true,
+      "execution_status_not_executed": true,
+      "selected_spec_present": true,
+      "selected_candidate_present": true,
+      "proposition_id_matches": true,
+      "proposition_hash_matches": true,
+      "research_decision_hash_matches": true,
+      "decision_envelope_id_matches": true,
+      "target_null_matches_objective": true,
+      "package_null_matches_decision_intent": true,
+      "falsification_action_preserved": true,
+      "candidate_record_found": true,
+      "target_null_candidate_matches": true,
+      "novelty_decomposition_present": true,
+      "not_scientific_redundancy": true,
+      "null_target_overlap_zero_or_allowed": true,
+      "package_hash_valid": true,
+      "candidate_executable": true,
+      "candidate_spec_matches_package": true,
+      "tool_in_registry": true,
+      "no_fallback_tool_substitution": true,
+      "population_representable": true,
+      "outcome_spec_present": true,
+      "population_spec_present": true,
+      "no_binding_mutation": true,
+      "idempotent_identity_match": true
+    },
+    "gate_version": "second_experiment_execution_gate_v1_3j7"
+  },
+  "execution_status": "IDEMPOTENT_REPLAY",
+  "tool_result_identity": "3a8df080cd3dc01d6c08db0a605ecc98fc65540d1beb23303033757969af72ac",
+  "execution_envelope_id": "sefx-afb1b59c434c",
+  "execution_identity_hash": "e514d5a39a8d540442a62e3471b29cdd734a11ee4eb8748f5df3705a6ac87d4c",
+  "sample_size": 6106,
+  "raw_quintile_metrics": {
+    "quintile_means": [
+      -0.417532745719201,
+      -0.06763937231746465,
+      0.04048012119072728,
+      0.6013393454050148,
+      1.9343427937275541
+    ],
+    "quintile_ns": [
+      1222,
+      1221,
+      1221,
+      1221,
+      1221
+    ],
+    "low_quintile_mean": -0.417532745719201,
+    "high_quintile_mean": 1.9343427937275541,
+    "quintile_mean_spread": 2.351875539446755,
+    "low_high_delta": 2.351875539446755,
+    "sample_size": 6106
+  },
+  "tool_result_status": "OK",
+  "provenance": {
+    "panel_provenance_hash": "ff537aaacda385fc290e80d852d55f0a3c43148b7ad768117276173c6e9c2349",
+    "package_hash": "67a17238ed7b370a12b6899f04e6cb1e9cd2f90a7d07724c0d0cd2c680735616"
+  },
+  "scientific_identity_survived": true,
+  "substitution_occurred": false,
+  "interpretation_occurred": false,
+  "research_decision_occurred": false,
+  "stop_boundary": "STOP_SECOND_EXPERIMENT_EXECUTED",
+  "idempotent_replay": true
+}

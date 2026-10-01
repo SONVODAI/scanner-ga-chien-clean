@@ -1,0 +1,143 @@
+{
+  "schema_version": "p0_market_memory_v1",
+  "written": 0,
+  "n": 17,
+  "results": [
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-07-31",
+      "completeness_status": "PARTIAL",
+      "record_hash": "c33b2bd1a28d37a6df91c522e9e4e7ba520fe8401b67540dfbc23debaae61628"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-03",
+      "completeness_status": "PARTIAL",
+      "record_hash": "e4d16b4061c1d2272b5a2ec36ce0d26d19b07178683e7f3b5595e4672cbdc8ee"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-04",
+      "completeness_status": "PARTIAL",
+      "record_hash": "e66ffbbd32ba742e112f99772f13dcf479f1449abccfc899ccec06d9a4e1a66d"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-05",
+      "completeness_status": "PARTIAL",
+      "record_hash": "f95e4b4a7fb3e6fb32b4a94d0cab9568ef45677b2bc68f64f8c3d58db022720e"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-06",
+      "completeness_status": "PARTIAL",
+      "record_hash": "a1011531cfe366b3b69918685e751742b84fa8878792aa5195ed902fe7e840b3"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-07",
+      "completeness_status": "PARTIAL",
+      "record_hash": "c01ec82e4dd1747d5680e108b07aa413fbe262e07faef7c2b1f2c0b9a59b34fb"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-10",
+      "completeness_status": "PARTIAL",
+      "record_hash": "b4f47aacc37ffedca608d84f66e7d7129a53029c53355f557a58153c2c1efb69"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-11",
+      "completeness_status": "PARTIAL",
+      "record_hash": "baef46fb3c10d2b2cb9dfbfd2f0a375a07c43baadd7c7e73dafaf10f4e323ad5"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-12",
+      "completeness_status": "PARTIAL",
+      "record_hash": "7a05ce8f872139128bea9d1f876f9bf0de4ee23a4ec5ab4e0f536a57946ec11d"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-13",
+      "completeness_status": "PARTIAL",
+      "record_hash": "d07278ce6e04a50df52ac7b258d8e9253fad424f3b443e8d3587999c0186ebcc"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-14",
+      "completeness_status": "PARTIAL",
+      "record_hash": "fdd8622f83792ed9eae37a5b00033240279b171845de5b875c2be7841d6126f4"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-17",
+      "completeness_status": "PARTIAL",
+      "record_hash": "948b1e1248facc7f6dc6d19b413048586afee8053ae4ec97945565d5294f8fd6"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-18",
+      "completeness_status": "PARTIAL",
+      "record_hash": "1fbeca71e1b0b98adddc51964ced560faf18e5936834f6e2ce7030ecfc732a5d"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-19",
+      "completeness_status": "PARTIAL",
+      "record_hash": "6e596fcbb8556cf72b33ceb7dd67bc2e3c4c615a9ebfb18302b7ff418997b6fd"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-20",
+      "completeness_status": "PARTIAL",
+      "record_hash": "fd394fcd4ec117adaae4b4f2ef7a60c0fe34ce5887f85f05071170ca971ff4a2"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-21",
+      "completeness_status": "PARTIAL",
+      "record_hash": "4157b6d35afb714d5d520850609dae5fd94fcce35b73825a8a6a00d8eb4adc81"
+    },
+    {
+      "ok": true,
+      "written": false,
+      "reason": "ALREADY_PRESENT",
+      "trade_date": "2026-08-24",
+      "completeness_status": "PARTIAL",
+      "record_hash": "33528f3ef2e634eb8fdfa01aad5d268dea7cfcae1fa69bfb3844609249e204cc"
+    }
+  ]
+}

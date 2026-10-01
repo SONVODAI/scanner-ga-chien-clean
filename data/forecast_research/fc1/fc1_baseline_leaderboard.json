@@ -1,0 +1,782 @@
+{
+  "T3": {
+    "prediction_dates": [
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-26",
+      "2026-07-27",
+      "2026-07-28",
+      "2026-07-29",
+      "2026-07-30",
+      "2026-07-31",
+      "2026-08-01",
+      "2026-08-02",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-05",
+      "2026-08-06",
+      "2026-08-07",
+      "2026-08-08",
+      "2026-08-10",
+      "2026-08-11",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-08-17",
+      "2026-08-18",
+      "2026-08-19"
+    ],
+    "n_prediction_dates": 24,
+    "episode_summary": {
+      "date_count": 24,
+      "episode_count": 7,
+      "concentration_by_episode": {
+        "0": 14,
+        "1": 1,
+        "2": 1,
+        "3": 4,
+        "4": 1,
+        "5": 1,
+        "6": 2
+      },
+      "regime_switches": 6,
+      "regimes_present": [
+        "MID",
+        "WEAK"
+      ]
+    },
+    "unconditional": {
+      "baseline": "unconditional",
+      "n_rows": 24,
+      "n_ok": 16,
+      "n_insufficient": 8,
+      "binary": {
+        "n": 16,
+        "base_rate": 0.4375,
+        "hit_rate": 0.4375,
+        "brier": 0.2616908461219996,
+        "brier_base_rate": 0.24609375,
+        "brier_lift": -0.01559709612199961,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 16,
+        "mae": 1.3461937996500368,
+        "median_ae": 1.4095426245210707,
+        "spearman": -0.2732582301264228
+      },
+      "downside": {
+        "n": 16,
+        "spearman_pred_vs_downside": -0.13037051343822767
+      },
+      "episodes_in_ok": 7,
+      "status": "OK"
+    },
+    "persistence": {
+      "baseline": "persistence",
+      "n_rows": 24,
+      "n_ok": 20,
+      "n_insufficient": 4,
+      "binary": {
+        "n": 20,
+        "base_rate": 0.5,
+        "hit_rate": 0.5,
+        "brier": 0.5,
+        "brier_base_rate": 0.25,
+        "brier_lift": -0.25,
+        "calibration_table": [
+          {
+            "bin": "0.0-0.2",
+            "n": 12,
+            "mean_prob": 0.0,
+            "mean_outcome": 0.5
+          },
+          {
+            "bin": "0.8-1.0",
+            "n": 8,
+            "mean_prob": 1.0,
+            "mean_outcome": 0.5
+          }
+        ]
+      },
+      "continuous": {
+        "n": 20,
+        "mae": 1.7808505316308287,
+        "median_ae": 1.4192548408922563,
+        "spearman": -0.02483070680351954
+      },
+      "downside": {
+        "n": 20,
+        "spearman_pred_vs_downside": 0.05332038002921059
+      },
+      "episodes_in_ok": 7,
+      "status": "OK"
+    },
+    "real_only": {
+      "baseline": "real_only",
+      "n_rows": 24,
+      "n_ok": 5,
+      "n_insufficient": 19,
+      "binary": {
+        "n": 1,
+        "base_rate": 1.0,
+        "hit_rate": 0.0,
+        "brier": 1.0,
+        "brier_base_rate": 0.0,
+        "brier_lift": -1.0,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 1,
+        "mae": 4.129206631039439,
+        "median_ae": 4.129206631039439,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 1,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 4,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "live_only": {
+      "baseline": "live_only",
+      "n_rows": 24,
+      "n_ok": 5,
+      "n_insufficient": 19,
+      "binary": {
+        "n": 1,
+        "base_rate": 1.0,
+        "hit_rate": 0.0,
+        "brier": 1.0,
+        "brier_base_rate": 0.0,
+        "brier_lift": -1.0,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 1,
+        "mae": 4.129206631039439,
+        "median_ae": 4.129206631039439,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 1,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 4,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "real_live": {
+      "baseline": "real_live",
+      "n_rows": 24,
+      "n_ok": 5,
+      "n_insufficient": 19,
+      "binary": {
+        "n": 1,
+        "base_rate": 1.0,
+        "hit_rate": 0.0,
+        "brier": 1.0,
+        "brier_base_rate": 0.0,
+        "brier_lift": -1.0,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 1,
+        "mae": 4.129206631039439,
+        "median_ae": 4.129206631039439,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 1,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 4,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "breadth_only": {
+      "baseline": "breadth_only",
+      "n_rows": 24,
+      "n_ok": 12,
+      "n_insufficient": 12,
+      "binary": {
+        "n": 12,
+        "base_rate": 0.4166666666666667,
+        "hit_rate": 0.4166666666666667,
+        "brier": 0.24441836519541446,
+        "brier_base_rate": 0.24305555555555555,
+        "brier_lift": -0.0013628096398589085,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 12,
+        "mae": 1.4639735004963195,
+        "median_ae": 1.2725628952198016,
+        "spearman": 0.3426573426573427
+      },
+      "downside": {
+        "n": 12,
+        "spearman_pred_vs_downside": -0.30388882299548997
+      },
+      "episodes_in_ok": 7,
+      "status": "OK"
+    },
+    "legacy_fc_only": {
+      "baseline": "legacy_fc_only",
+      "n_rows": 24,
+      "n_ok": 11,
+      "n_insufficient": 13,
+      "binary": {
+        "n": 10,
+        "base_rate": 0.4,
+        "hit_rate": 0.6,
+        "brier": 0.24570325602019616,
+        "brier_base_rate": 0.24,
+        "brier_lift": -0.005703256020196168,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 10,
+        "mae": 2.3635975324633565,
+        "median_ae": 1.4966779540614557,
+        "spearman": 0.32121212121212117
+      },
+      "downside": {
+        "n": 10,
+        "spearman_pred_vs_downside": -0.23833939001105517
+      },
+      "episodes_in_ok": 6,
+      "status": "OK"
+    },
+    "regime_pit": {
+      "baseline": "regime_pit",
+      "n_rows": 24,
+      "n_ok": 10,
+      "n_insufficient": 14,
+      "binary": {
+        "n": 10,
+        "base_rate": 0.6,
+        "hit_rate": 0.6,
+        "brier": 0.22584084467120183,
+        "brier_base_rate": 0.24000000000000005,
+        "brier_lift": 0.014159155328798217,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 10,
+        "mae": 1.2379608410113452,
+        "median_ae": 1.1906111903594612,
+        "spearman": 0.2202826826810636
+      },
+      "downside": {
+        "n": 10,
+        "spearman_pred_vs_downside": -0.240583439192569
+      },
+      "episodes_in_ok": 4,
+      "status": "OK"
+    },
+    "composition_early_share": {
+      "baseline": "composition_early_share",
+      "n_rows": 24,
+      "n_ok": 12,
+      "n_insufficient": 12,
+      "binary": {
+        "n": 12,
+        "base_rate": 0.4166666666666667,
+        "hit_rate": 0.6666666666666666,
+        "brier": 0.18817131829700343,
+        "brier_base_rate": 0.24305555555555555,
+        "brier_lift": 0.05488423725855213,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 12,
+        "mae": 1.344879133857373,
+        "median_ae": 1.3455318429330136,
+        "spearman": 0.37762237762237766
+      },
+      "downside": {
+        "n": 12,
+        "spearman_pred_vs_downside": -0.6175476611238034
+      },
+      "episodes_in_ok": 7,
+      "status": "OK"
+    }
+  },
+  "T5": {
+    "prediction_dates": [
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-26",
+      "2026-07-27",
+      "2026-07-28",
+      "2026-07-29",
+      "2026-07-30",
+      "2026-07-31",
+      "2026-08-01",
+      "2026-08-02",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-05",
+      "2026-08-06",
+      "2026-08-07",
+      "2026-08-08",
+      "2026-08-10",
+      "2026-08-11",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-08-17"
+    ],
+    "n_prediction_dates": 22,
+    "episode_summary": {
+      "date_count": 22,
+      "episode_count": 6,
+      "concentration_by_episode": {
+        "0": 14,
+        "1": 1,
+        "2": 1,
+        "3": 4,
+        "4": 1,
+        "5": 1
+      },
+      "regime_switches": 5,
+      "regimes_present": [
+        "MID",
+        "WEAK"
+      ]
+    },
+    "unconditional": {
+      "baseline": "unconditional",
+      "n_rows": 22,
+      "n_ok": 12,
+      "n_insufficient": 10,
+      "binary": {
+        "n": 12,
+        "base_rate": 0.4166666666666667,
+        "hit_rate": 0.4166666666666667,
+        "brier": 0.54658777962525,
+        "brier_base_rate": 0.24305555555555555,
+        "brier_lift": -0.3035322240696944,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 12,
+        "mae": 2.218872732256853,
+        "median_ae": 1.8305012008055286,
+        "spearman": -0.16579127880355324
+      },
+      "downside": {
+        "n": 12,
+        "spearman_pred_vs_downside": -0.2031033073847718
+      },
+      "episodes_in_ok": 6,
+      "status": "OK"
+    },
+    "persistence": {
+      "baseline": "persistence",
+      "n_rows": 22,
+      "n_ok": 16,
+      "n_insufficient": 6,
+      "binary": {
+        "n": 16,
+        "base_rate": 0.5625,
+        "hit_rate": 0.5625,
+        "brier": 0.4375,
+        "brier_base_rate": 0.24609375,
+        "brier_lift": -0.19140625,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 16,
+        "mae": 2.2100042784998806,
+        "median_ae": 2.2467247735887983,
+        "spearman": -0.1472755647281311
+      },
+      "downside": {
+        "n": 16,
+        "spearman_pred_vs_downside": 0.020543367886679466
+      },
+      "episodes_in_ok": 6,
+      "status": "OK"
+    },
+    "real_only": {
+      "baseline": "real_only",
+      "n_rows": 22,
+      "n_ok": 3,
+      "n_insufficient": 19,
+      "binary": {
+        "n": 0,
+        "status": "NO_DATA"
+      },
+      "continuous": {
+        "n": 0,
+        "status": "NO_DATA"
+      },
+      "downside": {
+        "n": 0,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 3,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "live_only": {
+      "baseline": "live_only",
+      "n_rows": 22,
+      "n_ok": 3,
+      "n_insufficient": 19,
+      "binary": {
+        "n": 0,
+        "status": "NO_DATA"
+      },
+      "continuous": {
+        "n": 0,
+        "status": "NO_DATA"
+      },
+      "downside": {
+        "n": 0,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 3,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "real_live": {
+      "baseline": "real_live",
+      "n_rows": 22,
+      "n_ok": 3,
+      "n_insufficient": 19,
+      "binary": {
+        "n": 0,
+        "status": "NO_DATA"
+      },
+      "continuous": {
+        "n": 0,
+        "status": "NO_DATA"
+      },
+      "downside": {
+        "n": 0,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 3,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "breadth_only": {
+      "baseline": "breadth_only",
+      "n_rows": 22,
+      "n_ok": 8,
+      "n_insufficient": 14,
+      "binary": {
+        "n": 8,
+        "base_rate": 0.25,
+        "hit_rate": 0.375,
+        "brier": 0.46216582761372543,
+        "brier_base_rate": 0.1875,
+        "brier_lift": -0.27466582761372543,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 8,
+        "mae": 3.402959001829621,
+        "median_ae": 3.12694372413626,
+        "spearman": 0.1666666666666667
+      },
+      "downside": {
+        "n": 8,
+        "spearman_pred_vs_downside": -0.19162020190612142
+      },
+      "episodes_in_ok": 5,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "legacy_fc_only": {
+      "baseline": "legacy_fc_only",
+      "n_rows": 22,
+      "n_ok": 7,
+      "n_insufficient": 15,
+      "binary": {
+        "n": 6,
+        "base_rate": 0.3333333333333333,
+        "hit_rate": 0.5,
+        "brier": 0.41508657725059833,
+        "brier_base_rate": 0.22222222222222224,
+        "brier_lift": -0.1928643550283761,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 6,
+        "mae": 2.494906944935164,
+        "median_ae": 2.307532548378998,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 6,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 4,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "regime_pit": {
+      "baseline": "regime_pit",
+      "n_rows": 22,
+      "n_ok": 6,
+      "n_insufficient": 16,
+      "binary": {
+        "n": 6,
+        "base_rate": 0.6666666666666666,
+        "hit_rate": 0.6666666666666666,
+        "brier": 0.33418367346938777,
+        "brier_base_rate": 0.22222222222222224,
+        "brier_lift": -0.11196145124716553,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 6,
+        "mae": 0.9672255626420737,
+        "median_ae": 0.7301607864238804,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 6,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 3,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "composition_early_share": {
+      "baseline": "composition_early_share",
+      "n_rows": 22,
+      "n_ok": 8,
+      "n_insufficient": 14,
+      "binary": {
+        "n": 8,
+        "base_rate": 0.25,
+        "hit_rate": 0.25,
+        "brier": 0.5825547145822377,
+        "brier_base_rate": 0.1875,
+        "brier_lift": -0.39505471458223773,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 8,
+        "mae": 2.8623675598251648,
+        "median_ae": 3.3957324677343093,
+        "spearman": 0.2142857142857143
+      },
+      "downside": {
+        "n": 8,
+        "spearman_pred_vs_downside": -0.19162020190612142
+      },
+      "episodes_in_ok": 5,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    }
+  },
+  "T10": {
+    "prediction_dates": [
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-26",
+      "2026-07-27",
+      "2026-07-28",
+      "2026-07-29",
+      "2026-07-30",
+      "2026-07-31",
+      "2026-08-01",
+      "2026-08-02",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-05",
+      "2026-08-06",
+      "2026-08-07",
+      "2026-08-08",
+      "2026-08-10"
+    ],
+    "n_prediction_dates": 17,
+    "episode_summary": {
+      "date_count": 17,
+      "episode_count": 4,
+      "concentration_by_episode": {
+        "0": 14,
+        "1": 1,
+        "2": 1,
+        "3": 1
+      },
+      "regime_switches": 3,
+      "regimes_present": [
+        "MID",
+        "WEAK"
+      ]
+    },
+    "unconditional": {
+      "baseline": "unconditional",
+      "n_rows": 17,
+      "n_ok": 2,
+      "n_insufficient": 15,
+      "binary": {
+        "n": 2,
+        "base_rate": 0.5,
+        "hit_rate": 0.5,
+        "brier": 0.5,
+        "brier_base_rate": 0.25,
+        "brier_lift": -0.25,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 2,
+        "mae": 2.477397926624919,
+        "median_ae": 2.477397926624919,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 2,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 2,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "persistence": {
+      "baseline": "persistence",
+      "n_rows": 17,
+      "n_ok": 6,
+      "n_insufficient": 11,
+      "binary": {
+        "n": 6,
+        "base_rate": 0.16666666666666666,
+        "hit_rate": 0.16666666666666666,
+        "brier": 0.8333333333333334,
+        "brier_base_rate": 0.1388888888888889,
+        "brier_lift": -0.6944444444444444,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 6,
+        "mae": 4.3061980459713505,
+        "median_ae": 3.9492980239389133,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 6,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 4,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "real_only": {
+      "baseline": "real_only",
+      "n_rows": 17,
+      "n_ok": 0,
+      "n_insufficient": 17,
+      "status": "INSUFFICIENT_EVIDENCE"
+    },
+    "live_only": {
+      "baseline": "live_only",
+      "n_rows": 17,
+      "n_ok": 0,
+      "n_insufficient": 17,
+      "status": "INSUFFICIENT_EVIDENCE"
+    },
+    "real_live": {
+      "baseline": "real_live",
+      "n_rows": 17,
+      "n_ok": 0,
+      "n_insufficient": 17,
+      "status": "INSUFFICIENT_EVIDENCE"
+    },
+    "breadth_only": {
+      "baseline": "breadth_only",
+      "n_rows": 17,
+      "n_ok": 0,
+      "n_insufficient": 17,
+      "status": "INSUFFICIENT_EVIDENCE"
+    },
+    "legacy_fc_only": {
+      "baseline": "legacy_fc_only",
+      "n_rows": 17,
+      "n_ok": 0,
+      "n_insufficient": 17,
+      "status": "INSUFFICIENT_EVIDENCE"
+    },
+    "regime_pit": {
+      "baseline": "regime_pit",
+      "n_rows": 17,
+      "n_ok": 1,
+      "n_insufficient": 16,
+      "binary": {
+        "n": 1,
+        "base_rate": 1.0,
+        "hit_rate": 1.0,
+        "brier": 0.0,
+        "brier_base_rate": 0.0,
+        "brier_lift": 0.0,
+        "calibration_table": null,
+        "calibration_note": "n<20"
+      },
+      "continuous": {
+        "n": 1,
+        "mae": 2.061817218620865,
+        "median_ae": 2.061817218620865,
+        "spearman": null,
+        "spearman_note": "n<8"
+      },
+      "downside": {
+        "n": 1,
+        "spearman_pred_vs_downside": null,
+        "note": "n<8"
+      },
+      "episodes_in_ok": 1,
+      "status": "OK",
+      "interpretation": "TINY_N_DO_NOT_RANK_AS_SIGNIFICANT"
+    },
+    "composition_early_share": {
+      "baseline": "composition_early_share",
+      "n_rows": 17,
+      "n_ok": 0,
+      "n_insufficient": 17,
+      "status": "INSUFFICIENT_EVIDENCE"
+    },
+    "verdict": "INSUFFICIENT_EVIDENCE",
+    "note": "T10 explicitly INSUFFICIENT_EVIDENCE for ranking (n_prediction_dates=17, max_baseline_ok=6)"
+  }
+}

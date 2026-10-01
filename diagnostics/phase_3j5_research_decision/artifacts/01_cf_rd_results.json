@@ -1,0 +1,46 @@
+{
+  "benchmark_version": "bb_first_experiment_research_decision_01_v1_3j5",
+  "counterfactuals": {
+    "CF-RD1": {
+      "passed": true,
+      "description": "Supportive evidence does not default to confirmatory replication"
+    },
+    "CF-RD2": {
+      "passed": true,
+      "description": "Different surviving null structures may yield different decisions"
+    },
+    "CF-RD3": {
+      "passed": true,
+      "description": "Exhausted budget yields STOP not continuation"
+    },
+    "CF-RD4": {
+      "passed": true,
+      "description": "Weak evidence may still justify continuation or hold"
+    },
+    "CF-RD5": {
+      "passed": true,
+      "description": "Negative evidence does not mechanically continue confirmation"
+    },
+    "CF-RD6": {
+      "passed": true,
+      "description": "Redundant confirmatory actions penalized/rejected"
+    },
+    "CF-RD7": {
+      "passed": true,
+      "description": "Decision invariant to session ordering"
+    },
+    "CF-RD8": {
+      "passed": true,
+      "description": "Scientific falsification prioritized over convenient replication"
+    },
+    "CF-RD9": {
+      "passed": true,
+      "description": "When no informative action, STOP"
+    },
+    "CF-RD10": {
+      "passed": true,
+      "description": "No second experiment package or execution"
+    }
+  },
+  "all_passed": true
+}

@@ -1,0 +1,58 @@
+{
+  "CF-FG1": {
+    "passed": true,
+    "description": "Ordinal 3 design uses history-aware generator",
+    "disposition": "NO_FAITHFUL_EXPERIMENT",
+    "generator_version": "follow_on_experiment_generator_v1_3j13"
+  },
+  "CF-FG2": {
+    "passed": true,
+    "description": "Ordinal 4 design path is generic (no ord-3-only branch)",
+    "ord4_reached": false
+  },
+  "CF-FG3": {
+    "passed": true,
+    "description": "Exhausted strategies yield NO_FAITHFUL_EXPERIMENT silence",
+    "disposition": "NO_FAITHFUL_EXPERIMENT"
+  },
+  "CF-FG4": {
+    "passed": true,
+    "description": "Tool-convenient wrong-null audit candidate rejected"
+  },
+  "CF-FG5": {
+    "passed": true,
+    "description": "High row novelty with same scientific question classified as redundant",
+    "classification": "B_HIGH_ROWS_SAME_CONTRAST_REJECT"
+  },
+  "CF-FG6": {
+    "passed": true,
+    "description": "New null with high row reuse may remain admissible",
+    "admissible_count": 1
+  },
+  "CF-FG7": {
+    "passed": true,
+    "description": "Fake replication / alias candidates rejected under SEEK_REPLICATION"
+  },
+  "CF-FG8": {
+    "passed": true,
+    "description": "Replication path does not force selection when independence unavailable",
+    "disposition": "SELECTED"
+  },
+  "CF-FG9": {
+    "passed": true,
+    "description": "Does not enumerate multiple horizons for outcome shopping",
+    "horizon_count": 1
+  },
+  "CF-FG10": {
+    "passed": true,
+    "description": "Null cycling A\u2192B\u2192A detected and rejected"
+  },
+  "CF-FG11": {
+    "passed": true,
+    "description": "High search burden can reject low-information designs"
+  },
+  "CF-FG12": {
+    "passed": true,
+    "description": "Candidate enumeration order does not change selection"
+  }
+}

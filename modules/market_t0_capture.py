@@ -471,10 +471,36 @@ def _persist_canonical_daily_t0(
             ),
         )
 
+    # Forecast Data Contract V1: derived PIT freeze + maturity (fail-safe observer).
+    # Reuses EMS + MDT0; does not train models or touch Edge Research authority.
+    # When data_dir is set (headless / isolated repo root), keep FM paths co-located.
+    forecast_hook: Dict[str, Any] = {"ok": False, "reason": "not_attempted"}
+    try:
+        from pathlib import Path as _Path
+
+        from modules.forecast_research.daily_entrypoint import maybe_freeze_after_market_daily
+
+        hook_kwargs: Dict[str, Any] = {}
+        if data_dir:
+            el_root = _Path(data_dir)
+            data_root = el_root.parent
+            hook_kwargs["data_dir"] = data_root / "forecast_research"
+            hook_kwargs["ems_path"] = data_root / "earning_money_snapshots.csv"
+            hook_kwargs["md_path"] = el_root / MARKET_DAILY_T0_FILE
+
+        forecast_hook = maybe_freeze_after_market_daily(
+            str(trade_date)[:10],
+            **hook_kwargs,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Forecast T0 freeze hook failed safely: %s", exc)
+        forecast_hook = {"ok": False, "reason": f"hook_error:{exc}"}
+
     return {
         "canonical_added": added,
         "daily_snapshot_id": daily_row.get("daily_snapshot_id"),
         "canonical_skipped_reason": None if added > 0 else "ALREADY_FROZEN",
+        "forecast_t0_hook": forecast_hook,
     }
 
 
