@@ -1,0 +1,214 @@
+{
+  "reassessor_content_hash": "bd0c4a0231bced2518f3e2febbe8ffc376154cb40f9c1a98c5c30cc30bc0834b",
+  "execution_status": "NOT_EXECUTED",
+  "316_legacy_selection": {
+    "disposition": "SELECTED",
+    "selected_candidate_id": "sac-124864640518",
+    "selected_core_hash": "ca388af652d39b0c1e07b21ae908a22d7051c83d51dd8bed803cc77a9cfe7757",
+    "ranked_count": 5,
+    "eligible_count": 5,
+    "rejected_count": 5,
+    "ambiguous_tie_ids": [],
+    "reason": "Lexicographic winner: Falsify temporal_regime_robustness: Complementary temporal robustness via rollin",
+    "selector_version": "lexicographic_scientific_action_selector_v1_3i16"
+  },
+  "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+  "frontier_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+  "silence_rationale": "Epistemic state remains SUPPORTED with 9 unresolved dimensions. Cohort-dependent routes blocked for: temporal_regime_robustness, population_robustness, horizon_robustness, effect_stability, regime_context_robustness. Remaining non-cohort candidates fail redundancy, rescue, or marginal-information gates. Silence is rational: further investigation requires new evidence structure or capability change. Priority marginal_information=low and no eligible action addresses major unresolved dimensions.",
+  "uncertainty_frontier": [
+    {
+      "uncertainty": "temporal_regime_robustness",
+      "researchability": "COHORT_UNAVAILABLE",
+      "cohort_binding_impact": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "uncertainty": "population_robustness",
+      "researchability": "COHORT_UNAVAILABLE",
+      "cohort_binding_impact": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "uncertainty": "horizon_robustness",
+      "researchability": "COHORT_UNAVAILABLE",
+      "cohort_binding_impact": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "uncertainty": "effect_stability",
+      "researchability": "COHORT_UNAVAILABLE",
+      "cohort_binding_impact": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "uncertainty": "concentration_dominance",
+      "researchability": "RESEARCHABLE_NOW",
+      "cohort_binding_impact": "none"
+    },
+    {
+      "uncertainty": "measurement_robustness",
+      "researchability": "RESEARCHABLE_NOW",
+      "cohort_binding_impact": "none"
+    },
+    {
+      "uncertainty": "counterexample_exposure",
+      "researchability": "RESEARCHABLE_NOW",
+      "cohort_binding_impact": "none"
+    },
+    {
+      "uncertainty": "alternative_explanation_exposure",
+      "researchability": "RESEARCHABLE_NOW",
+      "cohort_binding_impact": "none"
+    },
+    {
+      "uncertainty": "regime_context_robustness",
+      "researchability": "COHORT_UNAVAILABLE",
+      "cohort_binding_impact": "NO_DEFENSIBLE_COHORT"
+    }
+  ],
+  "action_frontier_table": [
+    {
+      "uncertainty": "temporal_regime_robustness",
+      "candidate_scientific_action": "regime_separated_contrast",
+      "identity": "34dae4d4109695aadd21897d2d38a335bb27208df4a7f07233f362523c5bb5c8",
+      "redundancy": "REDUNDANT",
+      "independence": "LOW",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "EXECUTABLE_BUT_LOW_INFORMATION",
+      "disposition": "UNAVAILABLE",
+      "reason": "Cohort binding NO_DEFENSIBLE \u2014 action unavailable (3I.17b constraint)"
+    },
+    {
+      "uncertainty": "temporal_regime_robustness",
+      "candidate_scientific_action": "rolling_stability_contrast",
+      "identity": "ca388af652d39b0c1e07b21ae908a22d7051c83d51dd8bed803cc77a9cfe7757",
+      "redundancy": "NOVEL",
+      "independence": "MEDIUM",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+      "disposition": "UNAVAILABLE",
+      "reason": "Cohort binding NO_DEFENSIBLE \u2014 action unavailable (3I.17b constraint)"
+    },
+    {
+      "uncertainty": "population_robustness",
+      "candidate_scientific_action": "population_subgroup_contrast",
+      "identity": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+      "redundancy": "REDUNDANT",
+      "independence": "LOW",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "EXECUTABLE_BUT_LOW_INFORMATION",
+      "disposition": "UNAVAILABLE",
+      "reason": "Cohort binding NO_DEFENSIBLE \u2014 action unavailable (3I.17b constraint)"
+    },
+    {
+      "uncertainty": "horizon_robustness",
+      "candidate_scientific_action": "regime_separated_contrast",
+      "identity": "c73ae60042215854057b1312e6edb3f06b3400004864f2ad4141d1d08fb476a2",
+      "redundancy": "REDUNDANT",
+      "independence": "LOW",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "EXECUTABLE_BUT_LOW_INFORMATION",
+      "disposition": "UNAVAILABLE",
+      "reason": "Cohort binding NO_DEFENSIBLE \u2014 action unavailable (3I.17b constraint)"
+    },
+    {
+      "uncertainty": "effect_stability",
+      "candidate_scientific_action": "regime_separated_contrast",
+      "identity": "f1d224ff137f2d0c07396b63ae1dce80abf118ae611c6b7a08d8bb8b79bad6e9",
+      "redundancy": "REDUNDANT",
+      "independence": "LOW",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "EXECUTABLE_BUT_LOW_INFORMATION",
+      "disposition": "UNAVAILABLE",
+      "reason": "Cohort binding NO_DEFENSIBLE \u2014 action unavailable (3I.17b constraint)"
+    },
+    {
+      "uncertainty": "concentration_dominance",
+      "candidate_scientific_action": "concentration_decomposition",
+      "identity": "e2da956960eb7794c034bf371257d95de9f268504ea605521701fd471022aca3",
+      "redundancy": "NOVEL",
+      "independence": "MEDIUM",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+      "disposition": "AVAILABLE",
+      "reason": "Available non-cohort or defensible cohort-bound action"
+    },
+    {
+      "uncertainty": "measurement_robustness",
+      "candidate_scientific_action": "measurement_robustness_check",
+      "identity": "e6a28c04a2b9b0f3d5ad63a7743cd56099b35a6332d77aeedfd6e6dd8a47f3b4",
+      "redundancy": "NOVEL",
+      "independence": "UNKNOWN",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+      "disposition": "AVAILABLE",
+      "reason": "Available non-cohort or defensible cohort-bound action"
+    },
+    {
+      "uncertainty": "counterexample_exposure",
+      "candidate_scientific_action": "counterexample_period_search",
+      "identity": "6fa40d4f5c6e05523760ce873c52b143c274d6045bfd166b37c47b81c693ff96",
+      "redundancy": "NOVEL",
+      "independence": "UNKNOWN",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+      "disposition": "UNAVAILABLE",
+      "reason": "Counterexample search uses temporal cohort exclusion \u2014 blocked by 3I.17b temporal constraint"
+    },
+    {
+      "uncertainty": "alternative_explanation_exposure",
+      "candidate_scientific_action": "counterexample_period_search",
+      "identity": "d999bc7d69fb2e01eb2503e8db8a4a47fa4006d06693476c90554e675bc038c6",
+      "redundancy": "NOVEL",
+      "independence": "UNKNOWN",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+      "disposition": "UNAVAILABLE",
+      "reason": "Counterexample search uses temporal cohort exclusion \u2014 blocked by 3I.17b temporal constraint"
+    },
+    {
+      "uncertainty": "regime_context_robustness",
+      "candidate_scientific_action": "regime_separated_contrast",
+      "identity": "5aa48f99bdc21a220b6c7bbac53d3de524ca3f0ad85c8ecf194799d305432349",
+      "redundancy": "REDUNDANT",
+      "independence": "LOW",
+      "epistemic_consequence": "MATERIAL",
+      "executability": "EXECUTABLE_BUT_LOW_INFORMATION",
+      "disposition": "UNAVAILABLE",
+      "reason": "Cohort binding NO_DEFENSIBLE \u2014 action unavailable (3I.17b constraint)"
+    }
+  ],
+  "counterexample_audit": {
+    "capability_available": true,
+    "derives_from_proposition_null": true,
+    "uses_future_outcome": false,
+    "panel_subgroup_mining": false,
+    "valid_pre_result": true,
+    "gap_if_invalid": null
+  },
+  "concentration_audit": {
+    "specifiable_pre_result": true,
+    "preserves_proposition": true,
+    "scientifically_valid": true
+  },
+  "measurement_audit": {
+    "tests_same_proposition": true,
+    "representation_only_count": 0,
+    "creates_new_proposition": false,
+    "classification": "A_legitimate_robustness"
+  },
+  "alternative_explanation_audit": {
+    "can_formulate_without_human": true,
+    "requires_proposition_null": true,
+    "hardcoded_alternative_injected": false,
+    "candidate_count": 1,
+    "honest_gap": false
+  },
+  "learning_vs_answer_leakage": {
+    "passed": true,
+    "violations": [],
+    "uses_lexicographic_rank_only": true,
+    "no_strategy_name_preference": true
+  },
+  "frozen_package": null,
+  "future_result_blindness": {
+    "experiment_executed": false,
+    "tool_result_accessed": false
+  }
+}

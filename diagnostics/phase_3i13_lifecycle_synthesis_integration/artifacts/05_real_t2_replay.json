@@ -1,0 +1,221 @@
+{
+  "integration_version": "lifecycle_synthesis_integration_v1_3i13",
+  "integration_status": "SUCCESS",
+  "action_disposition": "ACTION_RECORDED_ONLY",
+  "synthesis_history_index": 1,
+  "evidence_cutoff_count": 2,
+  "error": null,
+  "synthesis": {
+    "synthesis_id": "syn-668415e243a8",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "evidence_ids": [
+      "epu-5a7bec6e47ec",
+      "epu-e75a6e8362a8"
+    ],
+    "evidence_hashes": [
+      "c6eff09988aef69f7838093531d05668ee93b90ceba4991e0d95e8ff96d44b34",
+      "cd783fae9077a9a746dc43f0127c40a14cea368a18776f6be83cfcea1c1e7ac7"
+    ],
+    "relationship_map": {
+      "epu-5a7bec6e47ec": "INITIAL",
+      "epu-e75a6e8362a8": "PARTIAL_REPLICATION"
+    },
+    "independence_profiles": {
+      "epu-5a7bec6e47ec": {
+        "sample_independence": "HIGH",
+        "episode_independence": "HIGH",
+        "temporal_independence": "HIGH",
+        "population_independence": "HIGH",
+        "measurement_independence": "HIGH",
+        "methodological_independence": "HIGH",
+        "semantic_independence": "HIGH",
+        "rationale": [
+          "Initial evidence \u2014 no prior ledger entries."
+        ]
+      },
+      "epu-e75a6e8362a8": {
+        "sample_independence": "NONE",
+        "episode_independence": "UNKNOWN",
+        "temporal_independence": "NONE",
+        "population_independence": "LOW",
+        "measurement_independence": "NONE",
+        "methodological_independence": "NONE",
+        "semantic_independence": "HIGH",
+        "rationale": [
+          "cohort_overlap_ratio=0.977"
+        ]
+      }
+    },
+    "supporting_structure": [
+      {
+        "evidence_id": "epu-5a7bec6e47ec",
+        "evidence_class": "SUPPORTING",
+        "relationship": "INITIAL",
+        "uncertainty_axis": "directional_effect_full_universe",
+        "effect_magnitude": "strong",
+        "independence_profile": {
+          "sample_independence": "HIGH",
+          "episode_independence": "HIGH",
+          "temporal_independence": "HIGH",
+          "population_independence": "HIGH",
+          "measurement_independence": "HIGH",
+          "methodological_independence": "HIGH",
+          "semantic_independence": "HIGH",
+          "rationale": [
+            "Initial evidence \u2014 no prior ledger entries."
+          ]
+        }
+      },
+      {
+        "evidence_id": "epu-e75a6e8362a8",
+        "evidence_class": "SUPPORTING",
+        "relationship": "PARTIAL_REPLICATION",
+        "uncertainty_axis": "episode_robustness",
+        "effect_magnitude": "strong",
+        "independence_profile": {
+          "sample_independence": "NONE",
+          "episode_independence": "UNKNOWN",
+          "temporal_independence": "NONE",
+          "population_independence": "LOW",
+          "measurement_independence": "NONE",
+          "methodological_independence": "NONE",
+          "semantic_independence": "HIGH",
+          "rationale": [
+            "cohort_overlap_ratio=0.977"
+          ]
+        }
+      }
+    ],
+    "disconfirming_structure": [],
+    "contradiction_structure": [],
+    "invalid_non_informative": [],
+    "uncertainty_covered": [
+      "directional_effect_full_universe",
+      "episode_robustness"
+    ],
+    "uncertainty_unresolved": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "saturation_assessment": {
+      "level": "PARTIAL",
+      "unresolved_contradictions": false,
+      "major_uncertainty_dimensions_remaining": [
+        "temporal_regime_robustness",
+        "population_robustness",
+        "horizon_robustness",
+        "effect_stability"
+      ],
+      "independence_obtained": [
+        "epu-5a7bec6e47ec",
+        "epu-e75a6e8362a8"
+      ],
+      "redundant_test_axes": [
+        "episode_robustness"
+      ],
+      "executable_high_info_opportunities": [
+        "temporal_regime_robustness",
+        "population_robustness",
+        "horizon_robustness",
+        "effect_stability",
+        "concentration_dominance",
+        "measurement_robustness",
+        "counterexample_exposure",
+        "alternative_explanation_exposure",
+        "regime_context_robustness"
+      ],
+      "marginal_information": "low",
+      "rationale": [
+        "Evidence predominantly redundant \u2014 PARTIAL saturation on tested axes."
+      ]
+    },
+    "synthesized_epistemic_state": "SUPPORTED",
+    "prior_epistemic_state": "HYPOTHESIS",
+    "scientific_rationale": [
+      "Informative supporting evidence \u2014 SUPPORTED.",
+      "Evidence predominantly redundant \u2014 PARTIAL saturation on tested axes.",
+      "Major uncertainty dimensions remain ['temporal_regime_robustness', 'population_robustness', 'horizon_robustness', 'effect_stability'] \u2014 SEEK_FALSIFICATION despite low marginal on redundant axes."
+    ],
+    "counterfactual_causality_refs": [
+      "epu-5a7bec6e47ec:SUPPORTING:INITIAL",
+      "epu-e75a6e8362a8:SUPPORTING:PARTIAL_REPLICATION"
+    ],
+    "synthesis_engine_version": "evidence_synthesis_v1_3i12",
+    "created_at": "1970-01-01T00:00:00+00:00",
+    "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923"
+  },
+  "research_priority_decision": {
+    "decision_id": "rpd-121c4cec7e2e",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "synthesis_id": "syn-668415e243a8",
+    "synthesized_epistemic_state": "SUPPORTED",
+    "unresolved_uncertainty": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "saturation_level": "PARTIAL",
+    "marginal_information": "low",
+    "contradiction_status": "NONE",
+    "independence_summary": "predominantly_independent",
+    "chosen_priority_action": "SEEK_FALSIFICATION",
+    "rationale": [
+      "Major uncertainty dimensions remain ['temporal_regime_robustness', 'population_robustness', 'horizon_robustness', 'effect_stability'] \u2014 SEEK_FALSIFICATION despite low marginal on redundant axes."
+    ],
+    "rejected_alternatives": [
+      {
+        "action": "SEEK_REPLICATION",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "SEEK_CONTRADICTION_RESOLUTION",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "HOLD_PROVISIONALLY",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "HOLD_UNRESOLVED",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      },
+      {
+        "action": "ABANDON",
+        "reason": "Not selected over SEEK_FALSIFICATION"
+      }
+    ],
+    "created_at": "1970-01-01T00:00:00+00:00",
+    "synthesis_engine_version": "evidence_synthesis_v1_3i12",
+    "record_hash": "e67fe77926fc94ce8887575e727e4653a393113a4c66b218f448212d6693ab4d"
+  },
+  "lineage_extension": {
+    "integration_version": "lifecycle_synthesis_integration_v1_3i13",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "synthesis_id": "syn-668415e243a8",
+    "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+    "priority_decision_id": "rpd-121c4cec7e2e",
+    "priority_record_hash": "e67fe77926fc94ce8887575e727e4653a393113a4c66b218f448212d6693ab4d",
+    "evidence_update_ids": [
+      "epu-5a7bec6e47ec",
+      "epu-e75a6e8362a8"
+    ],
+    "synthesis_history_index": 1,
+    "action_disposition": "ACTION_RECORDED_ONLY",
+    "engine_hash": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+    "lineage_extension_hash": "a5506e49e1d48c34b6a8aaaac327b79d23f4c22280ed17a72b1f6052c3791538"
+  }
+}

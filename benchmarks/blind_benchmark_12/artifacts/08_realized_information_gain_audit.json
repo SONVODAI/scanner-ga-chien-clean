@@ -1,0 +1,247 @@
+{
+  "realized_information_gain_version": "research_realized_information_gain_v1",
+  "history_entries": [
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-bb9f68a055ea",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "LOW",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "uncertainties_unchanged": [],
+      "component_explanations": {
+        "new_observations": "New observation codes: ['HORIZON_HETEROGENEOUS']"
+      },
+      "built_at": "2026-08-22T01:02:05Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-63e997a510b1",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "ZERO",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [],
+      "uncertainties_unchanged": [
+        "HORIZON_STABILITY"
+      ],
+      "component_explanations": {
+        "no_distinction": "Repeated experiment produced no new distinction"
+      },
+      "built_at": "2026-08-22T01:02:05Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-0f05213c5cdc",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "HIGH",
+      "gaps_resolved": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "gaps_narrowed": [],
+      "falsification_resolved": [
+        "EXTREME_WINNER"
+      ],
+      "new_observations": [
+        "EXTREME_WINNER_ROBUST"
+      ],
+      "uncertainties_unchanged": [],
+      "component_explanations": {
+        "gaps_resolved": "Resolved gaps: ['EPISODE_REPLICATION', 'MARKET_DEPENDENCE', 'SYMBOL_DISTRIBUTION', 'TIME_DISTRIBUTION']",
+        "falsification_resolved": "Falsification targets addressed: ['EXTREME_WINNER']",
+        "new_observations": "New observation codes: ['EXTREME_WINNER_ROBUST']"
+      },
+      "built_at": "2026-08-22T01:02:05Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-9a1dfac0f573",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "ZERO",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [],
+      "uncertainties_unchanged": [
+        "HORIZON_STABILITY"
+      ],
+      "component_explanations": {
+        "no_distinction": "Repeated experiment produced no new distinction"
+      },
+      "built_at": "2026-08-22T01:02:05Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-debe629d436b",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "MEDIUM",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "uncertainties_unchanged": [],
+      "component_explanations": {
+        "new_observations": "New observation codes: ['SHAPE_STEP_CHANGE', 'TRAJECTORY_GROUP_DIFFERENCE']"
+      },
+      "built_at": "2026-08-22T01:02:06Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-f23c8a5e8608",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "MEDIUM",
+      "gaps_resolved": [
+        "THRESHOLD_EXPLORATION"
+      ],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [],
+      "uncertainties_unchanged": [
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "component_explanations": {
+        "gaps_resolved": "Resolved gaps: ['THRESHOLD_EXPLORATION']"
+      },
+      "built_at": "2026-08-22T01:02:06Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-5b512fad2330",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "HIGH",
+      "gaps_resolved": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "gaps_narrowed": [],
+      "falsification_resolved": [
+        "EXTREME_WINNER"
+      ],
+      "new_observations": [
+        "SYMBOL_BROAD"
+      ],
+      "uncertainties_unchanged": [],
+      "component_explanations": {
+        "gaps_resolved": "Resolved gaps: ['EPISODE_REPLICATION', 'MARKET_DEPENDENCE', 'NEIGHBORHOOD_STABILITY', 'SYMBOL_DISTRIBUTION', 'TIME_DISTRIBUTION', 'TRAJECTORY_ROLE']",
+        "falsification_resolved": "Falsification targets addressed: ['EXTREME_WINNER']",
+        "new_observations": "New observation codes: ['SYMBOL_BROAD']"
+      },
+      "built_at": "2026-08-22T01:02:06Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-03c90fff4e44",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "ZERO",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [],
+      "uncertainties_unchanged": [
+        "HORIZON_STABILITY"
+      ],
+      "component_explanations": {
+        "no_distinction": "Repeated experiment produced no new distinction"
+      },
+      "built_at": "2026-08-22T01:02:06Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-13c2386cfa16",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "MEDIUM",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "uncertainties_unchanged": [],
+      "component_explanations": {
+        "new_observations": "New observation codes: ['SHAPE_STEP_CHANGE', 'TRAJECTORY_GROUP_DIFFERENCE']"
+      },
+      "built_at": "2026-08-22T01:02:07Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-ab05ac779507",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "MEDIUM",
+      "gaps_resolved": [
+        "THRESHOLD_EXPLORATION"
+      ],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [],
+      "uncertainties_unchanged": [
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "component_explanations": {
+        "gaps_resolved": "Resolved gaps: ['THRESHOLD_EXPLORATION']"
+      },
+      "built_at": "2026-08-22T01:02:07Z"
+    },
+    {
+      "version": "research_realized_information_gain_v1",
+      "experiment_node_id": "exp-9cc356840473",
+      "branch_root_id": "obs-a67ced09803a",
+      "gain_level": "ZERO",
+      "gaps_resolved": [],
+      "gaps_narrowed": [],
+      "falsification_resolved": [],
+      "new_observations": [],
+      "uncertainties_unchanged": [
+        "HORIZON_STABILITY"
+      ],
+      "component_explanations": {
+        "no_distinction": "Repeated experiment produced no new distinction"
+      },
+      "built_at": "2026-08-22T01:02:07Z"
+    }
+  ],
+  "gain_level_counts": {
+    "LOW": 1,
+    "ZERO": 4,
+    "HIGH": 2,
+    "MEDIUM": 4
+  },
+  "by_branch_gain_levels": {
+    "obs-a67ced09803a": [
+      "LOW",
+      "ZERO",
+      "HIGH",
+      "ZERO",
+      "MEDIUM",
+      "MEDIUM",
+      "HIGH",
+      "ZERO",
+      "MEDIUM",
+      "MEDIUM",
+      "ZERO"
+    ]
+  },
+  "branch_marginal_realized_levels": {
+    "LOW": 6,
+    "ZERO": 17,
+    "HIGH": 11,
+    "MEDIUM": 17
+  },
+  "high_or_medium_count": 6,
+  "zero_or_unresolved_count": 4
+}

@@ -1,0 +1,64 @@
+{
+  "outcome": "SESSION_CREATED",
+  "session_id": "opr-prod-prop-efb650d9bd5c451f-sess-b41",
+  "authoritative_state": {
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "epistemic_state": "SUPPORTED",
+    "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+    "priority_action": "SEEK_FALSIFICATION",
+    "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+    "research_activity_state": "DORMANT",
+    "is_dormant": true,
+    "dormancy_hash": "7ddd600a5b5d6fb024ab118a8eeefe5d3f48b976b87648a535e0994f97061624",
+    "dormancy_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+    "unresolved_uncertainties": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "reopening_conditions_count": 8,
+    "latest_reopening_outcome": null,
+    "evidence_event_count": 2
+  },
+  "stop_boundaries": [
+    "STOP_PROPOSITION_PERSISTED",
+    "STOP_NO_AUTO_EXPERIMENT",
+    "STOP_FROZEN_LINEAGE_REPLAY",
+    "STOP_ACTION_RECORDED_ONLY",
+    "STOP_PACKAGE_NOT_EXECUTED"
+  ],
+  "restart_authoritative_state": {
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "epistemic_state": "SUPPORTED",
+    "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+    "priority_action": "SEEK_FALSIFICATION",
+    "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+    "research_activity_state": "DORMANT",
+    "is_dormant": true,
+    "dormancy_hash": "7ddd600a5b5d6fb024ab118a8eeefe5d3f48b976b87648a535e0994f97061624",
+    "dormancy_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+    "unresolved_uncertainties": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "reopening_conditions_count": 8,
+    "latest_reopening_outcome": null,
+    "evidence_event_count": 2,
+    "session_id": "opr-prod-prop-efb650d9bd5c451f-sess-b41",
+    "opportunity_identity": "b236c350b320240628ca2f51603bb172620a2377a6e8ed2c564defa3580de6da"
+  },
+  "passed": true
+}
