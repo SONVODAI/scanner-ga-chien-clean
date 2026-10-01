@@ -1,0 +1,9 @@
+{
+  "information_value_version": "research_information_value_v1",
+  "planner_module": "research_planner.py",
+  "stop_session_score_unchanged": true,
+  "iv_formulas_unchanged_marker": true,
+  "exit_valuation_version": "research_exit_valuation_v1",
+  "branch_marginal_version": "research_branch_marginal_state_v1",
+  "bb11_not_run": true
+}
