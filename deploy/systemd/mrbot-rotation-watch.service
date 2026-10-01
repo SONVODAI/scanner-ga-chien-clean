@@ -1,0 +1,20 @@
+[Unit]
+Description=Mr.BOT Rotation Watch isolated 5m sidecar
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/mrbot/rotation-watch.env
+WorkingDirectory=/opt/mrbot-rotation-watch
+ExecStart=/opt/mrbot-camera-venv/bin/python /opt/mrbot-rotation-watch/scripts/run_rotation_watch.py --live --loop
+Restart=on-failure
+RestartSec=30
+StartLimitBurst=5
+StartLimitIntervalSec=600
+TimeoutStopSec=30
+KillMode=control-group
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
