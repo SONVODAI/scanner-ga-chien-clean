@@ -1,0 +1,32 @@
+{
+  "diagnosis_confidence": "HIGH",
+  "primary_bottleneck": "B7 \u2014 PLANNER VALUATION",
+  "evidence_chain": [
+    "BB09 competence correctly inferred research needs in 11/11 transitions (0 B2 failures).",
+    "Grammar generated candidates for decomposition/falsification/context needs (minimal B5).",
+    "Competence did not add/remove/filter candidates (0% behavioral effect).",
+    "Competence-relevant candidates scored below selected winner in 4/8 scored decisions.",
+    "Non-relevant candidate selected despite relevant alternatives in 4 decisions.",
+    "search_complexity_penalty (~-6.7) systematically depressed decomposition candidates.",
+    "Late-session partition/threshold cycling continued on negative planner scores when all alternatives scored worse.",
+    "Global allocator showed 0 cases of ignoring clearly superior global alternatives."
+  ],
+  "secondary_bottleneck": "B10 \u2014 BRANCH-DEPTH / SATURATION",
+  "what_NOT_to_change": [
+    "Competence inference mappings (accurately mirror assessment)",
+    "Operational Awareness (legal capability set correctly applied pre-audit)",
+    "Global Allocator (no systematic superior-alternative ignore)",
+    "Exposure governance (zero violations in BB09)",
+    "Experiment identity / deduplication"
+  ],
+  "recommended_next_phase": "Phase 3H.6 \u2014 Valuation bridge: connect competence-identified research needs to planner/ERV inputs WITHOUT changing BB09 weights blindly. Target B7/B8 so scientifically-relevant candidates compete on evidence merit rather than being dominated by search_complexity_penalty on decomposition tools.",
+  "answers": {
+    "Q1_bot_understands_research_needs": "YES",
+    "Q2_translate_need_to_experiment": "YES",
+    "Q3_valuation_selects_appropriately": "PARTIAL",
+    "Q4_why_3h4_no_bb09_improvement": "Phase 3H.4 competence is audit-only post candidate-generation. Grammar already emits candidates from the same information_gaps. Planner/ERV/global allocator unchanged \u2192 identical aggregate tool distribution vs BB08.",
+    "Q5_primary_bottleneck": "B7",
+    "Q6_secondary_bottleneck": "B10",
+    "Q7_next_phase_target": "Planner/ERV valuation bridge for competence-matched candidates (not competence inference, not grammar expansion)"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "bb09": {
+    "available": true,
+    "session_id": "bb09-autonomous-001",
+    "experiments_used": 12,
+    "session_status": "BUDGET_EXHAUSTED",
+    "falsification_need_events": 10,
+    "falsification_executed": 1,
+    "late_mechanical_cycling": 4,
+    "branch_count": 1,
+    "planning_entries": 12
+  },
+  "bb10": {
+    "experiments_used": 12,
+    "session_status": "BUDGET_EXHAUSTED",
+    "tool_distribution": {
+      "horizon_comparison": 6,
+      "sensitivity_analysis": 1,
+      "adaptive_partition_compare": 2,
+      "threshold_exploration": 2,
+      "symbol_decomposition": 1
+    },
+    "falsification_need_events": 9,
+    "falsification_executed": 1,
+    "late_mechanical_cycling": 2,
+    "branch_roots": 1,
+    "bridge_changed_decisions": 2,
+    "need_to_execution_rate": 0.09090909090909091
+  },
+  "comparison_table": {
+    "experiments_executed": {
+      "bb09": 12,
+      "bb10": 12
+    },
+    "terminal_status": {
+      "bb09": "BUDGET_EXHAUSTED",
+      "bb10": "BUDGET_EXHAUSTED"
+    },
+    "falsification_need_events": {
+      "bb09": 10,
+      "bb10": 9
+    },
+    "falsification_executed": {
+      "bb09": 1,
+      "bb10": 1
+    },
+    "late_mechanical_cycling": {
+      "bb09": 4,
+      "bb10": 2
+    },
+    "branch_roots": {
+      "bb09": 1,
+      "bb10": 1
+    },
+    "bridge_changed_decisions": {
+      "bb09": "NOT_APPLICABLE",
+      "bb10": 2
+    },
+    "need_to_execution_rate": {
+      "bb09": "NOT_COMPARABLE",
+      "bb10": 0.09090909090909091
+    },
+    "tool_distribution": {
+      "bb09": null,
+      "bb10": {
+        "horizon_comparison": 6,
+        "sensitivity_analysis": 1,
+        "adaptive_partition_compare": 2,
+        "threshold_exploration": 2,
+        "symbol_decomposition": 1
+      }
+    }
+  },
+  "not_comparable_fields": [
+    "need_to_execution_rate_bb09",
+    "bridge_metrics_bb09"
+  ]
+}

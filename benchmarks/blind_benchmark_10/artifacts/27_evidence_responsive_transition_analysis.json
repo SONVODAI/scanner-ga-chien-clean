@@ -1,0 +1,89 @@
+{
+  "transition_count": 11,
+  "evidence_responsive_transitions": 11,
+  "transition_class_counts": {
+    "COMPARE_OUTCOME/HORIZON": 5,
+    "FALSIFY_CURRENT_LINE": 1,
+    "OTHER_JUSTIFIED": 4,
+    "DECOMPOSE_HETEROGENEITY": 1
+  },
+  "transitions": [
+    {
+      "from_experiment": "exp-1b163c2078b0",
+      "to_experiment": "exp-d2e781b13246",
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-d2e781b13246",
+      "to_experiment": "exp-76e1a836a5bc",
+      "selected_next_tool": "sensitivity_analysis",
+      "transition_class": "FALSIFY_CURRENT_LINE",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-76e1a836a5bc",
+      "to_experiment": "exp-310e6edee836",
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-310e6edee836",
+      "to_experiment": "exp-7dc0eb0c8fb0",
+      "selected_next_tool": "adaptive_partition_compare",
+      "transition_class": "OTHER_JUSTIFIED",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-7dc0eb0c8fb0",
+      "to_experiment": "exp-e0d883184cab",
+      "selected_next_tool": "threshold_exploration",
+      "transition_class": "OTHER_JUSTIFIED",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-e0d883184cab",
+      "to_experiment": "exp-82504efb7e41",
+      "selected_next_tool": "symbol_decomposition",
+      "transition_class": "DECOMPOSE_HETEROGENEITY",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-82504efb7e41",
+      "to_experiment": "exp-38879aba5554",
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-38879aba5554",
+      "to_experiment": "exp-03165d3a7dec",
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-03165d3a7dec",
+      "to_experiment": "exp-37b8e05cc4bd",
+      "selected_next_tool": "adaptive_partition_compare",
+      "transition_class": "OTHER_JUSTIFIED",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-37b8e05cc4bd",
+      "to_experiment": "exp-3e90dbf9a738",
+      "selected_next_tool": "threshold_exploration",
+      "transition_class": "OTHER_JUSTIFIED",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-3e90dbf9a738",
+      "to_experiment": "exp-3f17dab233c5",
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    }
+  ]
+}

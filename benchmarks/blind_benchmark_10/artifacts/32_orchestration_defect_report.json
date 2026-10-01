@@ -1,0 +1,16 @@
+{
+  "report_type": "ORCHESTRATION_DEFECT",
+  "recorded_at": "2026-08-21T15:42:00Z",
+  "defects": [
+    {
+      "id": "GATE_J_FALSE_FAIL",
+      "location": "benchmarks/blind_benchmark_10/run_benchmark.py evaluate_bb10_capability_gates gate J",
+      "symptom": "Gate J reported FAIL despite valid research tree at b28cf8ae6",
+      "cause": "Gate J checks git HEAD prefix against FROZEN_RESEARCH_COMMIT; orchestration commit 6e5aed265 is descended from b28cf8ae6 with zero research diff",
+      "impact_on_benchmark": "None — session ran correctly; research modules unchanged from b28cf8ae6",
+      "manual_assessment": "PASS",
+      "rerun_required": false
+    }
+  ],
+  "policy": "Defect recorded separately; BB10 run artifacts not modified or rerun"
+}

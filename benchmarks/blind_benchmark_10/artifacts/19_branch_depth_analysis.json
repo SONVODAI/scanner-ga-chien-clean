@@ -1,0 +1,32 @@
+{
+  "branch_roots_explored": 1,
+  "branches": [
+    {
+      "branch_root": "obs-b08a47b141fd",
+      "experiments_count": 12,
+      "tools_sequence": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "sensitivity_analysis",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration",
+        "symbol_decomposition",
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration",
+        "horizon_comparison"
+      ],
+      "unique_tools": 5,
+      "repeated_tool_use": 7,
+      "justified_depth": true,
+      "unjustified_persistence": true,
+      "weakly_justified_persistence": false
+    }
+  ],
+  "branch_switches": 0,
+  "revisits": 2,
+  "unjustified_persistence_count": 1,
+  "b10_secondary_hypothesis": "INDIRECT_EVALUATION_ONLY"
+}

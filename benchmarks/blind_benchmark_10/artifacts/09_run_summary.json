@@ -1,0 +1,45 @@
+{
+  "benchmark_id": "blind_benchmark_10",
+  "benchmark_version": "bb10_v1",
+  "completed_at": "2026-08-21T15:40:14Z",
+  "session_id": "bb10-autonomous-001",
+  "frozen_research_commit": "b28cf8ae6",
+  "git_commit": "6e5aed26598bb0e7bb718611fd9cbdcaadd0a747",
+  "session_status": "BUDGET_EXHAUSTED",
+  "experiments_used": 12,
+  "step_count": 12,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "information_value_audit_entries": 11,
+  "bridge_changed_decisions": 2,
+  "capability_gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "PARTIAL",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "FAIL",
+    "K": "PASS"
+  },
+  "final_verdicts": {
+    "primary_verdict": "VALUATION_BRIDGE_PARTIALLY_CONFIRMED",
+    "b7_status": "MATERIAL_IMPROVEMENT",
+    "b10_status": "IMPROVED_INDIRECTLY",
+    "bridge_changed_planner_decisions": 2,
+    "justified_changes": 2,
+    "pathological_overcorrections": 0,
+    "bb09_late_mechanical_cycling": 4,
+    "bb10_late_mechanical_cycling": 2,
+    "need_to_execution_rate": 0.09090909090909091,
+    "information_gain_aggregate": {
+      "LOW_INFORMATION_GAIN": 3,
+      "REDUNDANT": 2,
+      "HIGH_INFORMATION_GAIN": 5,
+      "MODERATE_INFORMATION_GAIN": 2
+    },
+    "rationale": "Bridge changed 2 planner-layer decisions with 2 scientifically justified. Late-session mechanical cycling: BB09=4 BB10=2."
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "instances": [
+    {
+      "transition": 1,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 1,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": 8.625,
+      "outcome": "GENERATED_BUT_LOST",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 2,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 1,
+      "bridge_positive_contribution": true,
+      "selected": true,
+      "selected_tool": "sensitivity_analysis",
+      "best_falsification_planner_score": 6.5375,
+      "outcome": "EXECUTED",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 3,
+      "falsification_need_present": false,
+      "legally_constructible": false,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": false,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 4,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 5,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 6,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 7,
+      "falsification_need_present": false,
+      "legally_constructible": false,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": false,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 8,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 9,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 10,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 11,
+      "falsification_need_present": true,
+      "legally_constructible": true,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": true,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    },
+    {
+      "transition": 12,
+      "falsification_need_present": false,
+      "legally_constructible": false,
+      "candidates_generated": 0,
+      "bridge_positive_contribution": false,
+      "selected": false,
+      "selected_tool": null,
+      "best_falsification_planner_score": null,
+      "outcome": "NOT_CONSTRUCTIBLE",
+      "correctly_unselected_by_bridge": false
+    }
+  ],
+  "falsification_need_events": 9,
+  "legally_constructible_events": 9,
+  "generated_count": 2,
+  "selected_count": 1,
+  "executed_count": 1,
+  "useful_falsification_results": 1,
+  "redundant_falsification_attempts": 0,
+  "correctly_lost_to_better_experiment": 0,
+  "correctly_unselected_by_bridge": 0,
+  "falsification_events": [
+    {
+      "experiment_node_id": "exp-76e1a836a5bc",
+      "tool": "sensitivity_analysis",
+      "observation_codes": [
+        "EXTREME_WINNER_ROBUST"
+      ]
+    }
+  ]
+}
