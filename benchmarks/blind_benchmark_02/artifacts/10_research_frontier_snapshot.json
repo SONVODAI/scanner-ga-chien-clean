@@ -1,0 +1,3568 @@
+{
+  "frontier_version": "research_frontier_v1",
+  "total_items": 28,
+  "status_counts": {
+    "DUPLICATE": 8,
+    "UNEXPLORED": 12,
+    "INVALID": 4,
+    "SELECTED": 4
+  },
+  "unexplored_count": 12,
+  "executed_count": 0,
+  "invalid_count": 4,
+  "duplicate_count": 8,
+  "items": [
+    {
+      "frontier_id": "frontier-00001",
+      "action_id": "e8415614d364331f",
+      "action_code": "DECOMPOSE_DATE",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "DECOMPOSITION",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "TIME_DISTRIBUTION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 5.35,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Is the observed relationship broadly distributed across dates or concentrated?",
+      "draft_spec": {
+        "tool_name": "date_decomposition",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00002",
+      "action_id": "288ef208675e4c25",
+      "action_code": "DECOMPOSE_SYMBOL",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "DECOMPOSITION",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "SYMBOL_DISTRIBUTION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 5.35,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Is the observed relationship broadly distributed across symbols or dominated by few names?",
+      "draft_spec": {
+        "tool_name": "symbol_decomposition",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00003",
+      "action_id": "0fbabdc2926b2f1b",
+      "action_code": "DECOMPOSE_EPISODE",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REPLICATION",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "EPISODE_REPLICATION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 2.85,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Does the relationship replicate across independent market episodes?",
+      "draft_spec": {
+        "tool_name": "episode_decomposition",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00004",
+      "action_id": "ee012fa331168e78",
+      "action_code": "CONDITION_MARKET",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "CONDITIONING",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "MARKET_DEPENDENCE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 3.85,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "How does the relationship differ across market states?",
+      "draft_spec": {
+        "tool_name": "market_conditioning",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5",
+          "partition_by": "research_market_state"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00005",
+      "action_id": "ea37630b08516f35",
+      "action_code": "FALSIFY_EXTREME",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "FALSIFICATION",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "EXTREME_WINNER",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 2.025,
+      "complexity_cost": 0.0,
+      "planner_score": 6.375,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does the result survive removal of the largest positive outcome?",
+      "draft_spec": {
+        "tool_name": "sensitivity_analysis",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5",
+          "tests": [
+            "remove_largest_positive"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00006",
+      "action_id": "92659f2bb46315f2",
+      "action_code": "REFRAME_OUTCOME",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REFRAME",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 0.6,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 4.2,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does an alternative outcome specification (compare) reveal a stable relationship?",
+      "draft_spec": {
+        "tool_name": "horizon_comparison",
+        "tool_version": "v1",
+        "inputs": {
+          "horizons": [
+            "T3",
+            "T5",
+            "T10"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "field": "t10_return",
+            "operator": ">",
+            "value": 0.0
+          },
+          "outcome_spec_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t10_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "research_depth": 1,
+            "search_complexity": 1,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 1,
+              "outcome_complexity": 1,
+              "population_complexity": 0,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REFRAME_OUTCOME",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00007",
+      "action_id": "05137400f094233b",
+      "action_code": "REFRAME_OUTCOME",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REFRAME",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 0.6,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 4.2,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does an alternative outcome specification (compare) reveal a stable relationship?",
+      "draft_spec": {
+        "tool_name": "horizon_comparison",
+        "tool_version": "v1",
+        "inputs": {
+          "horizons": [
+            "T3",
+            "T5",
+            "T10"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "field": "t3_return",
+            "operator": ">",
+            "value": 0.0
+          },
+          "outcome_spec_hash": "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t3_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "research_depth": 1,
+            "search_complexity": 1,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 1,
+              "outcome_complexity": 1,
+              "population_complexity": 0,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REFRAME_OUTCOME",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00008",
+      "action_id": "6679b08d653bc22e",
+      "action_code": "REFRAME_OUTCOME",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REFRAME",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 0.6,
+      "falsification_value": 0.0,
+      "complexity_cost": 1.5749999999999997,
+      "planner_score": 2.6250000000000004,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does an alternative outcome specification (persist) reveal a stable relationship?",
+      "draft_spec": {
+        "tool_name": "horizon_comparison",
+        "tool_version": "v1",
+        "inputs": {
+          "horizons": [
+            "T3",
+            "T5",
+            "T10"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "persist",
+            "field": "t5_return",
+            "operator": ">",
+            "horizons": [
+              "T5",
+              "T10"
+            ],
+            "threshold": 0.0
+          },
+          "outcome_spec_hash": "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "persist",
+              "field": "t5_return",
+              "operator": ">",
+              "horizons": [
+                "T5",
+                "T10"
+              ],
+              "threshold": 0.0
+            },
+            "research_depth": 1,
+            "search_complexity": 4,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 4,
+              "outcome_complexity": 4,
+              "population_complexity": 0,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REFRAME_OUTCOME",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00009",
+      "action_id": "173c22c23302c597",
+      "action_code": "REFRAME_OUTCOME",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REFRAME",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 0.6,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.5249999999999999,
+      "planner_score": 3.6750000000000003,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does an alternative outcome specification (continuation) reveal a stable relationship?",
+      "draft_spec": {
+        "tool_name": "horizon_comparison",
+        "tool_version": "v1",
+        "inputs": {
+          "horizons": [
+            "T3",
+            "T5",
+            "T10"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "continuation",
+            "operator": ">",
+            "threshold": 0.0,
+            "early_horizon": "T3",
+            "late_horizon": "T5"
+          },
+          "outcome_spec_hash": "90a3e561442d95e6e3e5d265315ad0c9af69541e18c093700f40bae101052cb5",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "continuation",
+              "operator": ">",
+              "threshold": 0.0,
+              "early_horizon": "T3",
+              "late_horizon": "T5"
+            },
+            "research_depth": 1,
+            "search_complexity": 2,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 2,
+              "outcome_complexity": 2,
+              "population_complexity": 0,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REFRAME_OUTCOME",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00010",
+      "action_id": "ca75dac2ca89009a",
+      "action_code": "REFRAME_OUTCOME",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REFRAME",
+      "target_feature": "",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 0.6,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.5249999999999999,
+      "planner_score": 3.6750000000000003,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does an alternative outcome specification (continuation) reveal a stable relationship?",
+      "draft_spec": {
+        "tool_name": "horizon_comparison",
+        "tool_version": "v1",
+        "inputs": {
+          "horizons": [
+            "T3",
+            "T5",
+            "T10"
+          ]
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "continuation",
+            "operator": ">",
+            "threshold": 0.0,
+            "early_horizon": "T5",
+            "late_horizon": "T10"
+          },
+          "outcome_spec_hash": "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "continuation",
+              "operator": ">",
+              "threshold": 0.0,
+              "early_horizon": "T5",
+              "late_horizon": "T10"
+            },
+            "research_depth": 1,
+            "search_complexity": 2,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 2,
+              "outcome_complexity": 2,
+              "population_complexity": 0,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REFRAME_OUTCOME",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00011",
+      "action_id": "1ebc6a5d5d7759c5",
+      "action_code": "REPOPULATE_REFINE",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REPOPULATE",
+      "target_feature": "",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "",
+      "triggering_evidence": {},
+      "expected_information": "",
+      "novelty_score": 0.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 0.0,
+      "status": "INVALID",
+      "invalid_reason": "field_absent_from_panel:partition_group",
+      "question_text": "Does the relationship hold within a refined conditional population?",
+      "draft_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5",
+          "partition_column": "partition_group",
+          "partition_type": "categorical"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "refine",
+            "children": [
+              {
+                "grammar_version": "research_grammar_v1",
+                "kind": "filter",
+                "field": "rs10",
+                "operator": ">",
+                "value": 0.0
+              }
+            ],
+            "parent": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+            "triggering_evidence": {
+              "source_experiment": "exp-e3be413bd48b",
+              "interesting": true,
+              "strength": "NO_CLEAR_DIFFERENCE"
+            }
+          },
+          "population_spec_hash": "736a756acd483edae92755c9b6a50389023977a2712198b35ea4e3903ba69578",
+          "condition_clauses": [
+            {
+              "feature": "rs10",
+              "operator": "lt",
+              "threshold_lo": 0.0,
+              "threshold_hi": null,
+              "bucket_id": "rs10_grammar"
+            }
+          ],
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          },
+          "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "refine",
+              "children": [
+                {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "filter",
+                  "field": "rs10",
+                  "operator": ">",
+                  "value": 0.0
+                }
+              ],
+              "parent": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "research_depth": 1,
+            "search_complexity": 3,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 3,
+              "outcome_complexity": 1,
+              "population_complexity": 2,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REPOPULATE_REFINE",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00012",
+      "action_id": "f37b236bb871c450",
+      "action_code": "REPOPULATE_REFINE",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REPOPULATE",
+      "target_feature": "",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "",
+      "triggering_evidence": {},
+      "expected_information": "",
+      "novelty_score": 0.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 0.0,
+      "status": "INVALID",
+      "invalid_reason": "field_absent_from_panel:partition_group",
+      "question_text": "Does the relationship hold within a refined conditional population?",
+      "draft_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5",
+          "partition_column": "partition_group",
+          "partition_type": "categorical"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "refine",
+            "children": [
+              {
+                "grammar_version": "research_grammar_v1",
+                "kind": "filter",
+                "field": "rsi14",
+                "operator": ">",
+                "value": 0.0
+              }
+            ],
+            "parent": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+            "triggering_evidence": {
+              "source_experiment": "exp-e3be413bd48b",
+              "interesting": true,
+              "strength": "NO_CLEAR_DIFFERENCE"
+            }
+          },
+          "population_spec_hash": "a2266d3e21a465ca4af6b21287de3d496f91ec70a8ddc443117c3c53b780027b",
+          "condition_clauses": [
+            {
+              "feature": "rsi14",
+              "operator": "lt",
+              "threshold_lo": 0.0,
+              "threshold_hi": null,
+              "bucket_id": "rsi14_grammar"
+            }
+          ],
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          },
+          "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "refine",
+              "children": [
+                {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "filter",
+                  "field": "rsi14",
+                  "operator": ">",
+                  "value": 0.0
+                }
+              ],
+              "parent": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "research_depth": 1,
+            "search_complexity": 3,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 3,
+              "outcome_complexity": 1,
+              "population_complexity": 2,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REPOPULATE_REFINE",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00013",
+      "action_id": "45295be1aecd6704",
+      "action_code": "REPOPULATE_REFINE",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "REPOPULATE",
+      "target_feature": "",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "",
+      "triggering_evidence": {},
+      "expected_information": "",
+      "novelty_score": 0.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 0.0,
+      "status": "INVALID",
+      "invalid_reason": "field_absent_from_panel:partition_group",
+      "question_text": "Does the relationship hold within a refined conditional population?",
+      "draft_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5",
+          "partition_column": "partition_group",
+          "partition_type": "categorical"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "refine",
+            "children": [
+              {
+                "grammar_version": "research_grammar_v1",
+                "kind": "filter",
+                "field": "health_rank",
+                "operator": ">",
+                "value": 0.0
+              }
+            ],
+            "parent": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+            "triggering_evidence": {
+              "source_experiment": "exp-e3be413bd48b",
+              "interesting": true,
+              "strength": "NO_CLEAR_DIFFERENCE"
+            }
+          },
+          "population_spec_hash": "ef69c374183e595bed40482df3a3ef687c84051aa562a5ae1fa193f138d4ee8d",
+          "condition_clauses": [
+            {
+              "feature": "health_rank",
+              "operator": "lt",
+              "threshold_lo": 0.0,
+              "threshold_hi": null,
+              "bucket_id": "health_rank_grammar"
+            }
+          ],
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          },
+          "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "pending_question_context": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "refine",
+              "children": [
+                {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "filter",
+                  "field": "health_rank",
+                  "operator": ">",
+                  "value": 0.0
+                }
+              ],
+              "parent": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            },
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "research_depth": 1,
+            "search_complexity": 3,
+            "population_n": null,
+            "search_accounting": {
+              "branch_depth": 1,
+              "predicate_count": 3,
+              "outcome_complexity": 1,
+              "population_complexity": 2,
+              "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "alternatives_considered": 0
+            },
+            "population_change": {
+              "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+              "reason_code": "REPOPULATE_REFINE",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            }
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00014",
+      "action_id": "a5e6a03dd8497469",
+      "action_code": "ADAPTIVE_PARTITION_close",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "SLICING",
+      "target_feature": "close",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "ADAPTIVE_PARTITION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 6.85,
+      "status": "SELECTED",
+      "invalid_reason": "",
+      "question_text": "Does partitioning close by data-derived quantiles reveal outcome structure?",
+      "draft_spec": {
+        "tool_name": "adaptive_partition_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "close",
+          "max_bins": 4,
+          "min_bin_n": 5,
+          "min_total_n": 20
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00015",
+      "action_id": "b122f5c882fdf389",
+      "action_code": "ADAPTIVE_PARTITION_rs5",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "SLICING",
+      "target_feature": "rs5",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "ADAPTIVE_PARTITION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 6.85,
+      "status": "SELECTED",
+      "invalid_reason": "",
+      "question_text": "Does partitioning rs5 by data-derived quantiles reveal outcome structure?",
+      "draft_spec": {
+        "tool_name": "adaptive_partition_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rs5",
+          "max_bins": 4,
+          "min_bin_n": 5,
+          "min_total_n": 20
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00016",
+      "action_id": "5001c4d3def13df5",
+      "action_code": "ADAPTIVE_PARTITION_rs_spread",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "SLICING",
+      "target_feature": "rs_spread",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "ADAPTIVE_PARTITION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 6.85,
+      "status": "SELECTED",
+      "invalid_reason": "",
+      "question_text": "Does partitioning rs_spread by data-derived quantiles reveal outcome structure?",
+      "draft_spec": {
+        "tool_name": "adaptive_partition_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rs_spread",
+          "max_bins": 4,
+          "min_bin_n": 5,
+          "min_total_n": 20
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00017",
+      "action_id": "7257d42aeca9be34",
+      "action_code": "ADAPTIVE_PARTITION_rsi14",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "SLICING",
+      "target_feature": "rsi14",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "reason_generated": "ADAPTIVE_PARTITION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-e3be413bd48b"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 6.85,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does partitioning rsi14 by data-derived quantiles reveal outcome structure?",
+      "draft_spec": {
+        "tool_name": "adaptive_partition_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rsi14",
+          "max_bins": 4,
+          "min_bin_n": 5,
+          "min_total_n": 20
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00018",
+      "action_id": "91e3c14726008468",
+      "action_code": "TEST_MARKET_INTERACTION",
+      "parent_experiment_node_id": "exp-e3be413bd48b",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "CONDITIONING",
+      "target_feature": "",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "",
+      "triggering_evidence": {},
+      "expected_information": "",
+      "novelty_score": 0.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 0.0,
+      "status": "INVALID",
+      "invalid_reason": "field_absent_from_panel:feature_x",
+      "question_text": "Does market context interact with feature_x for outcomes?",
+      "draft_spec": {
+        "tool_name": "interaction_partition",
+        "tool_version": "v1",
+        "inputs": {
+          "primary_feature": "feature_x",
+          "secondary_feature": "research_market_state"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "complexity_increment": 2
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00019",
+      "action_id": "deec807a33e59266",
+      "action_code": "TRAJECTORY_COMPARE",
+      "parent_experiment_node_id": "exp-b4a4e361e196",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "EXPLORATION",
+      "target_feature": "",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "TRAJECTORY_ROLE",
+      "triggering_evidence": {
+        "parent_experiment": "exp-b4a4e361e196"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 5.3375,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Does an explicit T0-safe temporal feature partition explain outcome differences?",
+      "draft_spec": {
+        "tool_name": "trajectory_partition_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "temporal_feature": "rs10_delta_3",
+          "bins": [
+            {
+              "lo": null,
+              "hi": 0.0,
+              "label": "neg_delta"
+            },
+            {
+              "lo": 0.0,
+              "hi": null,
+              "label": "pos_delta"
+            }
+          ],
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00020",
+      "action_id": "3bb961b5fc80b3da",
+      "action_code": "EXPLORE_THRESHOLD",
+      "parent_experiment_node_id": "exp-b4a4e361e196",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "EXPLORE_THRESHOLD",
+      "target_feature": "rs10",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "THRESHOLD_EXPLORATION",
+      "triggering_evidence": {
+        "parent_experiment": "exp-b4a4e361e196"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 8.8375,
+      "status": "SELECTED",
+      "invalid_reason": "",
+      "question_text": "Which data-derived cut on rs10 best separates outcomes?",
+      "draft_spec": {
+        "tool_name": "threshold_exploration",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rs10",
+          "candidate_cuts": [
+            -6.9350000000000005,
+            -0.795,
+            4.06
+          ],
+          "direction": "high",
+          "parent_experiment_id": "exp-b4a4e361e196"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "pending_lineage": {
+            "triggering_experiment": "exp-b4a4e361e196",
+            "triggering_observation": "SHAPE_GRADIENT",
+            "reason_code": "EXPLORE_THRESHOLD",
+            "discovered_boundaries": [
+              -6.9350000000000005,
+              -0.795,
+              4.06
+            ]
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00021",
+      "action_id": "8472be392119f0e8",
+      "action_code": "TEST_MARKET_INTERACTION",
+      "parent_experiment_node_id": "exp-b4a4e361e196",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "CONDITIONING",
+      "target_feature": "rs10",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "INTERACTION_FOLLOWUP",
+      "triggering_evidence": {
+        "parent_experiment": "exp-b4a4e361e196"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": 0.33750000000000036,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Does market context interact with rs10 for outcomes?",
+      "draft_spec": {
+        "tool_name": "interaction_partition",
+        "tool_version": "v1",
+        "inputs": {
+          "primary_feature": "rs10",
+          "secondary_feature": "research_market_state"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "complexity_increment": 2
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00022",
+      "action_id": "f6001d9c9823de74",
+      "action_code": "TEST_NEIGHBORHOOD",
+      "parent_experiment_node_id": "exp-9ed77d309e42",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "TEST_NEIGHBORHOOD",
+      "target_feature": "rs10",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+      "triggering_evidence": {
+        "parent_experiment": "exp-9ed77d309e42"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -4.7124999999999995,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Is the threshold region around 4.06 on rs10 stable?",
+      "draft_spec": {
+        "tool_name": "threshold_neighborhood",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rs10",
+          "center_threshold": 4.06,
+          "direction": "high"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "pending_lineage": {
+            "triggering_experiment": "exp-9ed77d309e42",
+            "reason_code": "TEST_NEIGHBORHOOD",
+            "center_threshold": 4.06
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00023",
+      "action_id": "2200117d21e98856",
+      "action_code": "TEST_MARKET_INTERACTION",
+      "parent_experiment_node_id": "exp-488a0fbf1b60",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "CONDITIONING",
+      "target_feature": "close",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "INTERACTION_FOLLOWUP",
+      "triggering_evidence": {
+        "parent_experiment": "exp-488a0fbf1b60"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -4.725,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Does market context interact with close for outcomes?",
+      "draft_spec": {
+        "tool_name": "interaction_partition",
+        "tool_version": "v1",
+        "inputs": {
+          "primary_feature": "close",
+          "secondary_feature": "research_market_state"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "complexity_increment": 2
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00024",
+      "action_id": "21a215cfe2321270",
+      "action_code": "TEST_NEIGHBORHOOD",
+      "parent_experiment_node_id": "exp-d33361c4b98a",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "TEST_NEIGHBORHOOD",
+      "target_feature": "close",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+      "triggering_evidence": {
+        "parent_experiment": "exp-d33361c4b98a"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -7.074999999999999,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Is the threshold region around 21850.0 on close stable?",
+      "draft_spec": {
+        "tool_name": "threshold_neighborhood",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "close",
+          "center_threshold": 21850.0,
+          "direction": "high"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "pending_lineage": {
+            "triggering_experiment": "exp-d33361c4b98a",
+            "reason_code": "TEST_NEIGHBORHOOD",
+            "center_threshold": 21850.0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00025",
+      "action_id": "232e88811e368d5f",
+      "action_code": "TEST_MARKET_INTERACTION",
+      "parent_experiment_node_id": "exp-2b781eca7601",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "CONDITIONING",
+      "target_feature": "rs5",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "INTERACTION_FOLLOWUP",
+      "triggering_evidence": {
+        "parent_experiment": "exp-2b781eca7601"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -6.387499999999999,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Does market context interact with rs5 for outcomes?",
+      "draft_spec": {
+        "tool_name": "interaction_partition",
+        "tool_version": "v1",
+        "inputs": {
+          "primary_feature": "rs5",
+          "secondary_feature": "research_market_state"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "complexity_increment": 2
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00026",
+      "action_id": "9b140a26bda7243d",
+      "action_code": "TEST_NEIGHBORHOOD",
+      "parent_experiment_node_id": "exp-1ae224f9e6b9",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "TEST_NEIGHBORHOOD",
+      "target_feature": "rs5",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+      "triggering_evidence": {
+        "parent_experiment": "exp-1ae224f9e6b9"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -8.737499999999999,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Is the threshold region around 3.3925 on rs5 stable?",
+      "draft_spec": {
+        "tool_name": "threshold_neighborhood",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rs5",
+          "center_threshold": 3.3925,
+          "direction": "high"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "pending_lineage": {
+            "triggering_experiment": "exp-1ae224f9e6b9",
+            "reason_code": "TEST_NEIGHBORHOOD",
+            "center_threshold": 3.3925
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00027",
+      "action_id": "8be17f06d2f70192",
+      "action_code": "TEST_MARKET_INTERACTION",
+      "parent_experiment_node_id": "exp-fb3a022e85c7",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "CONDITIONING",
+      "target_feature": "rs_spread",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "INTERACTION_FOLLOWUP",
+      "triggering_evidence": {
+        "parent_experiment": "exp-fb3a022e85c7"
+      },
+      "expected_information": "MEDIUM",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -8.049999999999999,
+      "status": "DUPLICATE",
+      "invalid_reason": "",
+      "question_text": "Does market context interact with rs_spread for outcomes?",
+      "draft_spec": {
+        "tool_name": "interaction_partition",
+        "tool_version": "v1",
+        "inputs": {
+          "primary_feature": "rs_spread",
+          "secondary_feature": "research_market_state"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "complexity_increment": 2
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    },
+    {
+      "frontier_id": "frontier-00028",
+      "action_id": "f797f5e817659672",
+      "action_code": "TEST_NEIGHBORHOOD",
+      "parent_experiment_node_id": "exp-61af2c1c784f",
+      "branch_root_id": "obs-2c8c26263853",
+      "action_type": "TEST_NEIGHBORHOOD",
+      "target_feature": "rs_spread",
+      "population_spec": {},
+      "outcome_spec": {},
+      "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+      "triggering_evidence": {
+        "parent_experiment": "exp-61af2c1c784f"
+      },
+      "expected_information": "HIGH",
+      "novelty_score": 2.0,
+      "falsification_value": 0.0,
+      "complexity_cost": 0.0,
+      "planner_score": -10.399999999999999,
+      "status": "UNEXPLORED",
+      "invalid_reason": "",
+      "question_text": "Is the threshold region around 5.640000000000001 on rs_spread stable?",
+      "draft_spec": {
+        "tool_name": "threshold_neighborhood",
+        "tool_version": "v1",
+        "inputs": {
+          "feature_column": "rs_spread",
+          "center_threshold": 5.640000000000001,
+          "direction": "high"
+        },
+        "research_scope": {
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "all"
+          },
+          "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "pending_lineage": {
+            "triggering_experiment": "exp-61af2c1c784f",
+            "reason_code": "TEST_NEIGHBORHOOD",
+            "center_threshold": 5.640000000000001
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      }
+    }
+  ],
+  "serialized_frontier": {
+    "version": "research_frontier_v1",
+    "items": {
+      "frontier-00001": {
+        "frontier_id": "frontier-00001",
+        "action_id": "e8415614d364331f",
+        "action_code": "DECOMPOSE_DATE",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "DECOMPOSITION",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "TIME_DISTRIBUTION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 5.35,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Is the observed relationship broadly distributed across dates or concentrated?",
+        "draft_spec": {
+          "tool_name": "date_decomposition",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00002": {
+        "frontier_id": "frontier-00002",
+        "action_id": "288ef208675e4c25",
+        "action_code": "DECOMPOSE_SYMBOL",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "DECOMPOSITION",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "SYMBOL_DISTRIBUTION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 5.35,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Is the observed relationship broadly distributed across symbols or dominated by few names?",
+        "draft_spec": {
+          "tool_name": "symbol_decomposition",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00003": {
+        "frontier_id": "frontier-00003",
+        "action_id": "0fbabdc2926b2f1b",
+        "action_code": "DECOMPOSE_EPISODE",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REPLICATION",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "EPISODE_REPLICATION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 2.85,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Does the relationship replicate across independent market episodes?",
+        "draft_spec": {
+          "tool_name": "episode_decomposition",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00004": {
+        "frontier_id": "frontier-00004",
+        "action_id": "ee012fa331168e78",
+        "action_code": "CONDITION_MARKET",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "CONDITIONING",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "MARKET_DEPENDENCE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 3.85,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "How does the relationship differ across market states?",
+        "draft_spec": {
+          "tool_name": "market_conditioning",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5",
+            "partition_by": "research_market_state"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00005": {
+        "frontier_id": "frontier-00005",
+        "action_id": "ea37630b08516f35",
+        "action_code": "FALSIFY_EXTREME",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "FALSIFICATION",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "EXTREME_WINNER",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 2.025,
+        "complexity_cost": 0.0,
+        "planner_score": 6.375,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does the result survive removal of the largest positive outcome?",
+        "draft_spec": {
+          "tool_name": "sensitivity_analysis",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5",
+            "tests": [
+              "remove_largest_positive"
+            ]
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00006": {
+        "frontier_id": "frontier-00006",
+        "action_id": "92659f2bb46315f2",
+        "action_code": "REFRAME_OUTCOME",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REFRAME",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 0.6,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 4.2,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does an alternative outcome specification (compare) reveal a stable relationship?",
+        "draft_spec": {
+          "tool_name": "horizon_comparison",
+          "tool_version": "v1",
+          "inputs": {
+            "horizons": [
+              "T3",
+              "T5",
+              "T10"
+            ]
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t10_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "outcome_spec_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "compare",
+                "field": "t10_return",
+                "operator": ">",
+                "value": 0.0
+              },
+              "research_depth": 1,
+              "search_complexity": 1,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 1,
+                "outcome_complexity": 1,
+                "population_complexity": 0,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REFRAME_OUTCOME",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00007": {
+        "frontier_id": "frontier-00007",
+        "action_id": "05137400f094233b",
+        "action_code": "REFRAME_OUTCOME",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REFRAME",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 0.6,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 4.2,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does an alternative outcome specification (compare) reveal a stable relationship?",
+        "draft_spec": {
+          "tool_name": "horizon_comparison",
+          "tool_version": "v1",
+          "inputs": {
+            "horizons": [
+              "T3",
+              "T5",
+              "T10"
+            ]
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t3_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "outcome_spec_hash": "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "compare",
+                "field": "t3_return",
+                "operator": ">",
+                "value": 0.0
+              },
+              "research_depth": 1,
+              "search_complexity": 1,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 1,
+                "outcome_complexity": 1,
+                "population_complexity": 0,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REFRAME_OUTCOME",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00008": {
+        "frontier_id": "frontier-00008",
+        "action_id": "6679b08d653bc22e",
+        "action_code": "REFRAME_OUTCOME",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REFRAME",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 0.6,
+        "falsification_value": 0.0,
+        "complexity_cost": 1.5749999999999997,
+        "planner_score": 2.6250000000000004,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does an alternative outcome specification (persist) reveal a stable relationship?",
+        "draft_spec": {
+          "tool_name": "horizon_comparison",
+          "tool_version": "v1",
+          "inputs": {
+            "horizons": [
+              "T3",
+              "T5",
+              "T10"
+            ]
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "persist",
+              "field": "t5_return",
+              "operator": ">",
+              "horizons": [
+                "T5",
+                "T10"
+              ],
+              "threshold": 0.0
+            },
+            "outcome_spec_hash": "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "persist",
+                "field": "t5_return",
+                "operator": ">",
+                "horizons": [
+                  "T5",
+                  "T10"
+                ],
+                "threshold": 0.0
+              },
+              "research_depth": 1,
+              "search_complexity": 4,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 4,
+                "outcome_complexity": 4,
+                "population_complexity": 0,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REFRAME_OUTCOME",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00009": {
+        "frontier_id": "frontier-00009",
+        "action_id": "173c22c23302c597",
+        "action_code": "REFRAME_OUTCOME",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REFRAME",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 0.6,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.5249999999999999,
+        "planner_score": 3.6750000000000003,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does an alternative outcome specification (continuation) reveal a stable relationship?",
+        "draft_spec": {
+          "tool_name": "horizon_comparison",
+          "tool_version": "v1",
+          "inputs": {
+            "horizons": [
+              "T3",
+              "T5",
+              "T10"
+            ]
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "continuation",
+              "operator": ">",
+              "threshold": 0.0,
+              "early_horizon": "T3",
+              "late_horizon": "T5"
+            },
+            "outcome_spec_hash": "90a3e561442d95e6e3e5d265315ad0c9af69541e18c093700f40bae101052cb5",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "continuation",
+                "operator": ">",
+                "threshold": 0.0,
+                "early_horizon": "T3",
+                "late_horizon": "T5"
+              },
+              "research_depth": 1,
+              "search_complexity": 2,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 2,
+                "outcome_complexity": 2,
+                "population_complexity": 0,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REFRAME_OUTCOME",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00010": {
+        "frontier_id": "frontier-00010",
+        "action_id": "ca75dac2ca89009a",
+        "action_code": "REFRAME_OUTCOME",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REFRAME",
+        "target_feature": "",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "OUTCOME_SPEC_ALTERNATIVE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 0.6,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.5249999999999999,
+        "planner_score": 3.6750000000000003,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does an alternative outcome specification (continuation) reveal a stable relationship?",
+        "draft_spec": {
+          "tool_name": "horizon_comparison",
+          "tool_version": "v1",
+          "inputs": {
+            "horizons": [
+              "T3",
+              "T5",
+              "T10"
+            ]
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "continuation",
+              "operator": ">",
+              "threshold": 0.0,
+              "early_horizon": "T5",
+              "late_horizon": "T10"
+            },
+            "outcome_spec_hash": "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "continuation",
+                "operator": ">",
+                "threshold": 0.0,
+                "early_horizon": "T5",
+                "late_horizon": "T10"
+              },
+              "research_depth": 1,
+              "search_complexity": 2,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 2,
+                "outcome_complexity": 2,
+                "population_complexity": 0,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REFRAME_OUTCOME",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00011": {
+        "frontier_id": "frontier-00011",
+        "action_id": "1ebc6a5d5d7759c5",
+        "action_code": "REPOPULATE_REFINE",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REPOPULATE",
+        "target_feature": "",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "",
+        "triggering_evidence": {},
+        "expected_information": "",
+        "novelty_score": 0.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 0.0,
+        "status": "INVALID",
+        "invalid_reason": "field_absent_from_panel:partition_group",
+        "question_text": "Does the relationship hold within a refined conditional population?",
+        "draft_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5",
+            "partition_column": "partition_group",
+            "partition_type": "categorical"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "refine",
+              "children": [
+                {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "filter",
+                  "field": "rs10",
+                  "operator": ">",
+                  "value": 0.0
+                }
+              ],
+              "parent": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            },
+            "population_spec_hash": "736a756acd483edae92755c9b6a50389023977a2712198b35ea4e3903ba69578",
+            "condition_clauses": [
+              {
+                "feature": "rs10",
+                "operator": "lt",
+                "threshold_lo": 0.0,
+                "threshold_hi": null,
+                "bucket_id": "rs10_grammar"
+              }
+            ],
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "refine",
+                "children": [
+                  {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "filter",
+                    "field": "rs10",
+                    "operator": ">",
+                    "value": 0.0
+                  }
+                ],
+                "parent": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0
+              },
+              "research_depth": 1,
+              "search_complexity": 3,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 3,
+                "outcome_complexity": 1,
+                "population_complexity": 2,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REPOPULATE_REFINE",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00012": {
+        "frontier_id": "frontier-00012",
+        "action_id": "f37b236bb871c450",
+        "action_code": "REPOPULATE_REFINE",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REPOPULATE",
+        "target_feature": "",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "",
+        "triggering_evidence": {},
+        "expected_information": "",
+        "novelty_score": 0.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 0.0,
+        "status": "INVALID",
+        "invalid_reason": "field_absent_from_panel:partition_group",
+        "question_text": "Does the relationship hold within a refined conditional population?",
+        "draft_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5",
+            "partition_column": "partition_group",
+            "partition_type": "categorical"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "refine",
+              "children": [
+                {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "filter",
+                  "field": "rsi14",
+                  "operator": ">",
+                  "value": 0.0
+                }
+              ],
+              "parent": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            },
+            "population_spec_hash": "a2266d3e21a465ca4af6b21287de3d496f91ec70a8ddc443117c3c53b780027b",
+            "condition_clauses": [
+              {
+                "feature": "rsi14",
+                "operator": "lt",
+                "threshold_lo": 0.0,
+                "threshold_hi": null,
+                "bucket_id": "rsi14_grammar"
+              }
+            ],
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "refine",
+                "children": [
+                  {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "filter",
+                    "field": "rsi14",
+                    "operator": ">",
+                    "value": 0.0
+                  }
+                ],
+                "parent": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0
+              },
+              "research_depth": 1,
+              "search_complexity": 3,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 3,
+                "outcome_complexity": 1,
+                "population_complexity": 2,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REPOPULATE_REFINE",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00013": {
+        "frontier_id": "frontier-00013",
+        "action_id": "45295be1aecd6704",
+        "action_code": "REPOPULATE_REFINE",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "REPOPULATE",
+        "target_feature": "",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "",
+        "triggering_evidence": {},
+        "expected_information": "",
+        "novelty_score": 0.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 0.0,
+        "status": "INVALID",
+        "invalid_reason": "field_absent_from_panel:partition_group",
+        "question_text": "Does the relationship hold within a refined conditional population?",
+        "draft_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "horizon": "T5",
+            "partition_column": "partition_group",
+            "partition_type": "categorical"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "refine",
+              "children": [
+                {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "filter",
+                  "field": "health_rank",
+                  "operator": ">",
+                  "value": 0.0
+                }
+              ],
+              "parent": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "all"
+              },
+              "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+              "triggering_evidence": {
+                "source_experiment": "exp-e3be413bd48b",
+                "interesting": true,
+                "strength": "NO_CLEAR_DIFFERENCE"
+              }
+            },
+            "population_spec_hash": "ef69c374183e595bed40482df3a3ef687c84051aa562a5ae1fa193f138d4ee8d",
+            "condition_clauses": [
+              {
+                "feature": "health_rank",
+                "operator": "lt",
+                "threshold_lo": 0.0,
+                "threshold_hi": null,
+                "bucket_id": "health_rank_grammar"
+              }
+            ],
+            "outcome_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0
+            },
+            "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+            "pending_question_context": {
+              "population_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "refine",
+                "children": [
+                  {
+                    "grammar_version": "research_grammar_v1",
+                    "kind": "filter",
+                    "field": "health_rank",
+                    "operator": ">",
+                    "value": 0.0
+                  }
+                ],
+                "parent": {
+                  "grammar_version": "research_grammar_v1",
+                  "kind": "all"
+                },
+                "reason_code": "EVIDENCE_CONDITIONAL_COHORT",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              },
+              "outcome_spec": {
+                "grammar_version": "research_grammar_v1",
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0
+              },
+              "research_depth": 1,
+              "search_complexity": 3,
+              "population_n": null,
+              "search_accounting": {
+                "branch_depth": 1,
+                "predicate_count": 3,
+                "outcome_complexity": 1,
+                "population_complexity": 2,
+                "parent_branch_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "alternatives_considered": 0
+              },
+              "population_change": {
+                "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+                "reason_code": "REPOPULATE_REFINE",
+                "triggering_evidence": {
+                  "source_experiment": "exp-e3be413bd48b",
+                  "interesting": true,
+                  "strength": "NO_CLEAR_DIFFERENCE"
+                }
+              }
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00014": {
+        "frontier_id": "frontier-00014",
+        "action_id": "a5e6a03dd8497469",
+        "action_code": "ADAPTIVE_PARTITION_close",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "SLICING",
+        "target_feature": "close",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "ADAPTIVE_PARTITION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 6.85,
+        "status": "SELECTED",
+        "invalid_reason": "",
+        "question_text": "Does partitioning close by data-derived quantiles reveal outcome structure?",
+        "draft_spec": {
+          "tool_name": "adaptive_partition_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "close",
+            "max_bins": 4,
+            "min_bin_n": 5,
+            "min_total_n": 20
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00015": {
+        "frontier_id": "frontier-00015",
+        "action_id": "b122f5c882fdf389",
+        "action_code": "ADAPTIVE_PARTITION_rs5",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "SLICING",
+        "target_feature": "rs5",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "ADAPTIVE_PARTITION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 6.85,
+        "status": "SELECTED",
+        "invalid_reason": "",
+        "question_text": "Does partitioning rs5 by data-derived quantiles reveal outcome structure?",
+        "draft_spec": {
+          "tool_name": "adaptive_partition_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rs5",
+            "max_bins": 4,
+            "min_bin_n": 5,
+            "min_total_n": 20
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00016": {
+        "frontier_id": "frontier-00016",
+        "action_id": "5001c4d3def13df5",
+        "action_code": "ADAPTIVE_PARTITION_rs_spread",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "SLICING",
+        "target_feature": "rs_spread",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "ADAPTIVE_PARTITION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 6.85,
+        "status": "SELECTED",
+        "invalid_reason": "",
+        "question_text": "Does partitioning rs_spread by data-derived quantiles reveal outcome structure?",
+        "draft_spec": {
+          "tool_name": "adaptive_partition_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rs_spread",
+            "max_bins": 4,
+            "min_bin_n": 5,
+            "min_total_n": 20
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00017": {
+        "frontier_id": "frontier-00017",
+        "action_id": "7257d42aeca9be34",
+        "action_code": "ADAPTIVE_PARTITION_rsi14",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "SLICING",
+        "target_feature": "rsi14",
+        "population_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "outcome_spec": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        },
+        "reason_generated": "ADAPTIVE_PARTITION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-e3be413bd48b"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 6.85,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does partitioning rsi14 by data-derived quantiles reveal outcome structure?",
+        "draft_spec": {
+          "tool_name": "adaptive_partition_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rsi14",
+            "max_bins": 4,
+            "min_bin_n": 5,
+            "min_total_n": 20
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00018": {
+        "frontier_id": "frontier-00018",
+        "action_id": "91e3c14726008468",
+        "action_code": "TEST_MARKET_INTERACTION",
+        "parent_experiment_node_id": "exp-e3be413bd48b",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "CONDITIONING",
+        "target_feature": "",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "",
+        "triggering_evidence": {},
+        "expected_information": "",
+        "novelty_score": 0.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 0.0,
+        "status": "INVALID",
+        "invalid_reason": "field_absent_from_panel:feature_x",
+        "question_text": "Does market context interact with feature_x for outcomes?",
+        "draft_spec": {
+          "tool_name": "interaction_partition",
+          "tool_version": "v1",
+          "inputs": {
+            "primary_feature": "feature_x",
+            "secondary_feature": "research_market_state"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "complexity_increment": 2
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00019": {
+        "frontier_id": "frontier-00019",
+        "action_id": "deec807a33e59266",
+        "action_code": "TRAJECTORY_COMPARE",
+        "parent_experiment_node_id": "exp-b4a4e361e196",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "EXPLORATION",
+        "target_feature": "",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "TRAJECTORY_ROLE",
+        "triggering_evidence": {
+          "parent_experiment": "exp-b4a4e361e196"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 5.3375,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Does an explicit T0-safe temporal feature partition explain outcome differences?",
+        "draft_spec": {
+          "tool_name": "trajectory_partition_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "temporal_feature": "rs10_delta_3",
+            "bins": [
+              {
+                "lo": null,
+                "hi": 0.0,
+                "label": "neg_delta"
+              },
+              {
+                "lo": 0.0,
+                "hi": null,
+                "label": "pos_delta"
+              }
+            ],
+            "horizon": "T5"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00020": {
+        "frontier_id": "frontier-00020",
+        "action_id": "3bb961b5fc80b3da",
+        "action_code": "EXPLORE_THRESHOLD",
+        "parent_experiment_node_id": "exp-b4a4e361e196",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "EXPLORE_THRESHOLD",
+        "target_feature": "rs10",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "THRESHOLD_EXPLORATION",
+        "triggering_evidence": {
+          "parent_experiment": "exp-b4a4e361e196"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 8.8375,
+        "status": "SELECTED",
+        "invalid_reason": "",
+        "question_text": "Which data-derived cut on rs10 best separates outcomes?",
+        "draft_spec": {
+          "tool_name": "threshold_exploration",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rs10",
+            "candidate_cuts": [
+              -6.9350000000000005,
+              -0.795,
+              4.06
+            ],
+            "direction": "high",
+            "parent_experiment_id": "exp-b4a4e361e196"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "pending_lineage": {
+              "triggering_experiment": "exp-b4a4e361e196",
+              "triggering_observation": "SHAPE_GRADIENT",
+              "reason_code": "EXPLORE_THRESHOLD",
+              "discovered_boundaries": [
+                -6.9350000000000005,
+                -0.795,
+                4.06
+              ]
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00021": {
+        "frontier_id": "frontier-00021",
+        "action_id": "8472be392119f0e8",
+        "action_code": "TEST_MARKET_INTERACTION",
+        "parent_experiment_node_id": "exp-b4a4e361e196",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "CONDITIONING",
+        "target_feature": "rs10",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "INTERACTION_FOLLOWUP",
+        "triggering_evidence": {
+          "parent_experiment": "exp-b4a4e361e196"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": 0.33750000000000036,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Does market context interact with rs10 for outcomes?",
+        "draft_spec": {
+          "tool_name": "interaction_partition",
+          "tool_version": "v1",
+          "inputs": {
+            "primary_feature": "rs10",
+            "secondary_feature": "research_market_state"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "complexity_increment": 2
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00022": {
+        "frontier_id": "frontier-00022",
+        "action_id": "f6001d9c9823de74",
+        "action_code": "TEST_NEIGHBORHOOD",
+        "parent_experiment_node_id": "exp-9ed77d309e42",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "TEST_NEIGHBORHOOD",
+        "target_feature": "rs10",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+        "triggering_evidence": {
+          "parent_experiment": "exp-9ed77d309e42"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -4.7124999999999995,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Is the threshold region around 4.06 on rs10 stable?",
+        "draft_spec": {
+          "tool_name": "threshold_neighborhood",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rs10",
+            "center_threshold": 4.06,
+            "direction": "high"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "pending_lineage": {
+              "triggering_experiment": "exp-9ed77d309e42",
+              "reason_code": "TEST_NEIGHBORHOOD",
+              "center_threshold": 4.06
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00023": {
+        "frontier_id": "frontier-00023",
+        "action_id": "2200117d21e98856",
+        "action_code": "TEST_MARKET_INTERACTION",
+        "parent_experiment_node_id": "exp-488a0fbf1b60",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "CONDITIONING",
+        "target_feature": "close",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "INTERACTION_FOLLOWUP",
+        "triggering_evidence": {
+          "parent_experiment": "exp-488a0fbf1b60"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -4.725,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Does market context interact with close for outcomes?",
+        "draft_spec": {
+          "tool_name": "interaction_partition",
+          "tool_version": "v1",
+          "inputs": {
+            "primary_feature": "close",
+            "secondary_feature": "research_market_state"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "complexity_increment": 2
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00024": {
+        "frontier_id": "frontier-00024",
+        "action_id": "21a215cfe2321270",
+        "action_code": "TEST_NEIGHBORHOOD",
+        "parent_experiment_node_id": "exp-d33361c4b98a",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "TEST_NEIGHBORHOOD",
+        "target_feature": "close",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+        "triggering_evidence": {
+          "parent_experiment": "exp-d33361c4b98a"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -7.074999999999999,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Is the threshold region around 21850.0 on close stable?",
+        "draft_spec": {
+          "tool_name": "threshold_neighborhood",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "close",
+            "center_threshold": 21850.0,
+            "direction": "high"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "pending_lineage": {
+              "triggering_experiment": "exp-d33361c4b98a",
+              "reason_code": "TEST_NEIGHBORHOOD",
+              "center_threshold": 21850.0
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00025": {
+        "frontier_id": "frontier-00025",
+        "action_id": "232e88811e368d5f",
+        "action_code": "TEST_MARKET_INTERACTION",
+        "parent_experiment_node_id": "exp-2b781eca7601",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "CONDITIONING",
+        "target_feature": "rs5",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "INTERACTION_FOLLOWUP",
+        "triggering_evidence": {
+          "parent_experiment": "exp-2b781eca7601"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -6.387499999999999,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Does market context interact with rs5 for outcomes?",
+        "draft_spec": {
+          "tool_name": "interaction_partition",
+          "tool_version": "v1",
+          "inputs": {
+            "primary_feature": "rs5",
+            "secondary_feature": "research_market_state"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "complexity_increment": 2
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00026": {
+        "frontier_id": "frontier-00026",
+        "action_id": "9b140a26bda7243d",
+        "action_code": "TEST_NEIGHBORHOOD",
+        "parent_experiment_node_id": "exp-1ae224f9e6b9",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "TEST_NEIGHBORHOOD",
+        "target_feature": "rs5",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+        "triggering_evidence": {
+          "parent_experiment": "exp-1ae224f9e6b9"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -8.737499999999999,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Is the threshold region around 3.3925 on rs5 stable?",
+        "draft_spec": {
+          "tool_name": "threshold_neighborhood",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rs5",
+            "center_threshold": 3.3925,
+            "direction": "high"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "pending_lineage": {
+              "triggering_experiment": "exp-1ae224f9e6b9",
+              "reason_code": "TEST_NEIGHBORHOOD",
+              "center_threshold": 3.3925
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00027": {
+        "frontier_id": "frontier-00027",
+        "action_id": "8be17f06d2f70192",
+        "action_code": "TEST_MARKET_INTERACTION",
+        "parent_experiment_node_id": "exp-fb3a022e85c7",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "CONDITIONING",
+        "target_feature": "rs_spread",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "INTERACTION_FOLLOWUP",
+        "triggering_evidence": {
+          "parent_experiment": "exp-fb3a022e85c7"
+        },
+        "expected_information": "MEDIUM",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -8.049999999999999,
+        "status": "DUPLICATE",
+        "invalid_reason": "",
+        "question_text": "Does market context interact with rs_spread for outcomes?",
+        "draft_spec": {
+          "tool_name": "interaction_partition",
+          "tool_version": "v1",
+          "inputs": {
+            "primary_feature": "rs_spread",
+            "secondary_feature": "research_market_state"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "complexity_increment": 2
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      },
+      "frontier-00028": {
+        "frontier_id": "frontier-00028",
+        "action_id": "f797f5e817659672",
+        "action_code": "TEST_NEIGHBORHOOD",
+        "parent_experiment_node_id": "exp-61af2c1c784f",
+        "branch_root_id": "obs-2c8c26263853",
+        "action_type": "TEST_NEIGHBORHOOD",
+        "target_feature": "rs_spread",
+        "population_spec": {},
+        "outcome_spec": {},
+        "reason_generated": "NEIGHBORHOOD_THRESHOLD",
+        "triggering_evidence": {
+          "parent_experiment": "exp-61af2c1c784f"
+        },
+        "expected_information": "HIGH",
+        "novelty_score": 2.0,
+        "falsification_value": 0.0,
+        "complexity_cost": 0.0,
+        "planner_score": -10.399999999999999,
+        "status": "UNEXPLORED",
+        "invalid_reason": "",
+        "question_text": "Is the threshold region around 5.640000000000001 on rs_spread stable?",
+        "draft_spec": {
+          "tool_name": "threshold_neighborhood",
+          "tool_version": "v1",
+          "inputs": {
+            "feature_column": "rs_spread",
+            "center_threshold": 5.640000000000001,
+            "direction": "high"
+          },
+          "research_scope": {
+            "population_spec": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "population_spec_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+            "pending_lineage": {
+              "triggering_experiment": "exp-61af2c1c784f",
+              "reason_code": "TEST_NEIGHBORHOOD",
+              "center_threshold": 5.640000000000001
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      }
+    },
+    "_counter": 28
+  }
+}
