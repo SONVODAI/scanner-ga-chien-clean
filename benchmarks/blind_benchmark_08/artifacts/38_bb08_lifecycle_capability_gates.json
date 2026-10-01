@@ -1,0 +1,53 @@
+{
+  "gate_A_twelve_experiments_executed": {
+    "result": "PASS",
+    "evidence": 12
+  },
+  "gate_B_budget_exhausted_terminal_status": {
+    "result": "PASS",
+    "evidence": {
+      "session_status": "BUDGET_EXHAUSTED",
+      "experiments_used": 12,
+      "stop_code": "BUDGET_EXHAUSTED",
+      "terminal_status": "BUDGET_EXHAUSTED",
+      "experiment_budget": 12,
+      "experiments_executed": 12,
+      "remaining_budget": 0,
+      "final_experiment_id": "exp-50dc1b98089b",
+      "unexplored_frontier_count": 37,
+      "unresolved_promising_deferred_count": 1
+    }
+  },
+  "gate_C_no_research_graph_error": {
+    "result": "PASS",
+    "evidence": "BUDGET_EXHAUSTED"
+  },
+  "gate_D_final_experiment_persisted_once": {
+    "result": "PASS",
+    "evidence": {
+      "final_id": "exp-50dc1b98089b",
+      "index_occurrences": 1
+    }
+  },
+  "gate_E_no_post_final_selected_opportunities": {
+    "result": "PASS",
+    "evidence": []
+  },
+  "gate_F_research_semantics_parity_bb07": {
+    "result": "FAIL",
+    "evidence": {
+      "experiment_mismatches": 12,
+      "decision_mismatches": 12
+    }
+  },
+  "gate_G_lifecycle_repair_confirmed": {
+    "result": "PASS",
+    "evidence": {
+      "bb07_post_budget_error_eliminated": true,
+      "bb08_completed_12_experiments": true,
+      "bb08_budget_exhausted_status": true,
+      "bb08_no_research_graph_error": true,
+      "causal_narrow_conclusion": "REPAIR_CONFIRMED"
+    }
+  }
+}

@@ -1,0 +1,410 @@
+[
+  {
+    "child_frame_id": "frame-00007",
+    "parent_frame_id": "frame-00001",
+    "transition_category": "outcome_to_population_transformation",
+    "planner_action": "REFRAME_OUTCOME_TO_POPULATION_frame-00007",
+    "planner_score": 10.15,
+    "triggering_experiment": "exp-613134d9e401",
+    "triggering_evidence": {
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "39f918bd83930c43",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      }
+    },
+    "plain_language": "Bot observed OUTCOME_TO_POPULATION (evidence: ['observation_codes', 'metrics']) and transitioned from frame frame-00001 (horizon 0) to frame frame-00007 (horizon 5) via OUTCOME_TO_POPULATION.",
+    "old_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "old_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "new_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "refine",
+      "children": [
+        {
+          "grammar_version": "research_grammar_v1",
+          "kind": "filter",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        }
+      ],
+      "parent": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "reason_code": "OUTCOME_TO_POPULATION",
+      "triggering_evidence": {
+        "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+      }
+    },
+    "new_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t10_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "temporal_legal": true,
+    "sequence_order": 0
+  },
+  {
+    "child_frame_id": "frame-00003",
+    "parent_frame_id": "frame-00007",
+    "transition_category": "structural_observation_reframe",
+    "planner_action": "REFRAME_STRUCTURAL_TRIGGER_frame-00003",
+    "planner_score": null,
+    "triggering_experiment": "exp-613134d9e401",
+    "triggering_evidence": {
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "39f918bd83930c43",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      }
+    },
+    "plain_language": "Bot observed STRUCTURAL_TRIGGER (evidence: ['observation_codes', 'metrics']) and transitioned from frame frame-00007 (horizon 5) to frame frame-00003 (horizon 0) via STRUCTURAL_TRIGGER.",
+    "old_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "refine",
+      "children": [
+        {
+          "grammar_version": "research_grammar_v1",
+          "kind": "filter",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0
+        }
+      ],
+      "parent": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "reason_code": "OUTCOME_TO_POPULATION",
+      "triggering_evidence": {
+        "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+      }
+    },
+    "old_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t10_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "new_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "new_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t3_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "temporal_legal": true,
+    "sequence_order": 1
+  },
+  {
+    "child_frame_id": "frame-00006",
+    "parent_frame_id": "frame-00003",
+    "transition_category": "structural_observation_reframe",
+    "planner_action": "REFRAME_STRUCTURAL_TRIGGER_frame-00006",
+    "planner_score": null,
+    "triggering_experiment": "exp-613134d9e401",
+    "triggering_evidence": {
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "39f918bd83930c43",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      }
+    },
+    "plain_language": "Bot observed STRUCTURAL_TRIGGER (evidence: ['observation_codes', 'metrics']) and transitioned from frame frame-00003 (horizon 0) to frame frame-00006 (horizon 0) via STRUCTURAL_TRIGGER.",
+    "old_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "old_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t3_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "new_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "new_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "continuation",
+      "operator": ">",
+      "threshold": 0.0,
+      "early_horizon": "T5",
+      "late_horizon": "T10"
+    },
+    "temporal_legal": true,
+    "sequence_order": 2
+  },
+  {
+    "child_frame_id": "frame-00004",
+    "parent_frame_id": "frame-00006",
+    "transition_category": "structural_observation_reframe",
+    "planner_action": "REFRAME_STRUCTURAL_TRIGGER_frame-00004",
+    "planner_score": null,
+    "triggering_experiment": "exp-613134d9e401",
+    "triggering_evidence": {
+      "observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "39f918bd83930c43",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      }
+    },
+    "plain_language": "Bot observed STRUCTURAL_TRIGGER (evidence: ['observation_codes', 'metrics']) and transitioned from frame frame-00006 (horizon 0) to frame frame-00004 (horizon 0) via STRUCTURAL_TRIGGER.",
+    "old_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "old_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "continuation",
+      "operator": ">",
+      "threshold": 0.0,
+      "early_horizon": "T5",
+      "late_horizon": "T10"
+    },
+    "new_population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "new_outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "persist",
+      "field": "t5_return",
+      "operator": ">",
+      "horizons": [
+        "T5",
+        "T10"
+      ],
+      "threshold": 0.0
+    },
+    "temporal_legal": true,
+    "sequence_order": 3
+  }
+]
