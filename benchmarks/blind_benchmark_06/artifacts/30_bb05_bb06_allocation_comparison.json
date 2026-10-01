@@ -1,0 +1,80 @@
+{
+  "comparison_type": "research_allocation_quality_bb05_vs_bb06",
+  "bb05_frozen_commit": "61b669927",
+  "bb06_frozen_commit": "94bde8807",
+  "primary_question": "Does global research allocation materially improve allocation of scarce research budget relative to BB05?",
+  "rows": [
+    {
+      "metric": "experiments_executed",
+      "bb05": 12,
+      "bb06": 4,
+      "allocation_note": ""
+    },
+    {
+      "metric": "features_touched",
+      "bb05": 2,
+      "bb06": 0,
+      "allocation_note": "Breadth alone is not success criterion"
+    },
+    {
+      "metric": "frames_executed",
+      "bb05": 2,
+      "bb06": 3,
+      "allocation_note": ""
+    },
+    {
+      "metric": "global_context_switches",
+      "bb05": 0,
+      "bb06": 1,
+      "allocation_note": "BB05 had no global allocator; switches only via STOP_BRANCH\u2192frontier"
+    },
+    {
+      "metric": "portfolio_decisions_audited",
+      "bb05": 11,
+      "bb06": 4,
+      "allocation_note": ""
+    },
+    {
+      "metric": "negative_local_selections",
+      "bb05": 4,
+      "bb06": 0,
+      "allocation_note": "BB06 target: fewer negative-local picks when positive global alternative exists"
+    },
+    {
+      "metric": "high_value_unexplored_at_end_historical",
+      "bb05": 13,
+      "bb06": 14,
+      "allocation_note": "Uses historical planner_score threshold >2.0"
+    },
+    {
+      "metric": "revisit_count",
+      "bb05": 0,
+      "bb06": 0,
+      "allocation_note": ""
+    },
+    {
+      "metric": "mean_opportunity_cost",
+      "bb05": 0.0,
+      "bb06": 0.0,
+      "allocation_note": ""
+    },
+    {
+      "metric": "strong_local_protected",
+      "bb05": "N/A",
+      "bb06": 2,
+      "allocation_note": "Local continuation when local current ERV genuinely highest"
+    },
+    {
+      "metric": "frontier_interrupts_viable_local",
+      "bb05": "N/A",
+      "bb06": 1,
+      "allocation_note": "Frontier selected while viable local branch existed"
+    }
+  ],
+  "bb05_session_status": "BUDGET_EXHAUSTED",
+  "bb06_selection_sources": {
+    "LOCAL": 2,
+    "FRONTIER": 2
+  },
+  "interpretation_guidance": "Switching more is not inherently better. Staying local is correct when local current ERV is genuinely highest. Compare on allocation quality metrics."
+}

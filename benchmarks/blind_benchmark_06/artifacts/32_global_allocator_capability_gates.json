@@ -1,0 +1,31 @@
+{
+  "gate_A_global_decisions_audited": {
+    "result": true,
+    "evidence": "4 global allocation decisions with full audit fields"
+  },
+  "gate_B_source_and_erv_recorded": {
+    "result": true,
+    "evidence": {
+      "LOCAL": 2,
+      "FRONTIER": 2
+    }
+  },
+  "gate_C_no_forced_diversity": {
+    "result": true,
+    "evidence": {
+      "switches": 1,
+      "decisions": 4
+    }
+  },
+  "gate_D_strong_local_can_win": {
+    "result": true,
+    "evidence": 2
+  },
+  "gate_E_limitation_diagnostics_documented": {
+    "result": true,
+    "evidence": [
+      "15.2",
+      "15.3"
+    ]
+  }
+}
