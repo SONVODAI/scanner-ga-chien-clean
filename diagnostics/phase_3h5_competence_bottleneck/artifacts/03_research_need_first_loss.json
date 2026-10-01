@@ -1,0 +1,832 @@
+{
+  "records": [
+    {
+      "transition": 1,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 1,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 1,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 1,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 1,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 1,
+      "uncertainty_code": "",
+      "research_need": "COMPARE_OUTCOMES",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 1,
+      "uncertainty_code": "",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "EXECUTED",
+      "first_loss_layer": "B14",
+      "first_loss_name": "NO DEMONSTRATED BOTTLENECK"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "",
+      "research_need": "COMPARE_OUTCOMES",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 2,
+      "uncertainty_code": "",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 3,
+      "uncertainty_code": "",
+      "research_need": "REDIRECT_OR_ABANDON",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "",
+      "research_need": "COMPARE_OUTCOMES",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 4,
+      "uncertainty_code": "",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+      "research_need": "TEST_ROBUSTNESS",
+      "eligible_tools": [
+        "neighborhood_stability"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "THRESHOLD_EXPLORATION",
+      "research_need": "REFINE_BOUNDARY",
+      "eligible_tools": [
+        "threshold_exploration"
+      ],
+      "terminal_status": "EXECUTED",
+      "first_loss_layer": "B14",
+      "first_loss_name": "NO DEMONSTRATED BOTTLENECK"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 5,
+      "uncertainty_code": "TRAJECTORY_ROLE",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [
+        "trajectory_partition_compare"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+      "research_need": "TEST_ROBUSTNESS",
+      "eligible_tools": [
+        "neighborhood_stability"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "TRAJECTORY_ROLE",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [
+        "trajectory_partition_compare"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 6,
+      "uncertainty_code": "",
+      "research_need": "REVISIT_UNRESOLVED_BRANCH",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "",
+      "research_need": "COMPARE_OUTCOMES",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 7,
+      "uncertainty_code": "",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+      "research_need": "TEST_ROBUSTNESS",
+      "eligible_tools": [
+        "neighborhood_stability"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "THRESHOLD_EXPLORATION",
+      "research_need": "REFINE_BOUNDARY",
+      "eligible_tools": [
+        "threshold_exploration"
+      ],
+      "terminal_status": "EXECUTED",
+      "first_loss_layer": "B14",
+      "first_loss_name": "NO DEMONSTRATED BOTTLENECK"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 8,
+      "uncertainty_code": "TRAJECTORY_ROLE",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [
+        "trajectory_partition_compare"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+      "research_need": "TEST_ROBUSTNESS",
+      "eligible_tools": [
+        "neighborhood_stability"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "TRAJECTORY_ROLE",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [
+        "trajectory_partition_compare"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 9,
+      "uncertainty_code": "",
+      "research_need": "REVISIT_UNRESOLVED_BRANCH",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "",
+      "research_need": "COMPARE_OUTCOMES",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 10,
+      "uncertainty_code": "",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "EPISODE_REPLICATION",
+      "research_need": "REPLICATE",
+      "eligible_tools": [
+        "episode_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "EXTREME_WINNER",
+      "research_need": "SEEK_FALSIFICATION",
+      "eligible_tools": [
+        "sensitivity_analysis"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "MARKET_DEPENDENCE",
+      "research_need": "CONDITION_ON_CONTEXT",
+      "eligible_tools": [
+        "market_conditioning"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+      "research_need": "TEST_ROBUSTNESS",
+      "eligible_tools": [
+        "neighborhood_stability"
+      ],
+      "terminal_status": "NOT_CONSTRUCTIBLE",
+      "first_loss_layer": "B5",
+      "first_loss_name": "CANDIDATE-GENERATION / GRAMMAR"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "SYMBOL_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "symbol_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "THRESHOLD_EXPLORATION",
+      "research_need": "REFINE_BOUNDARY",
+      "eligible_tools": [
+        "threshold_exploration"
+      ],
+      "terminal_status": "EXECUTED",
+      "first_loss_layer": "B14",
+      "first_loss_name": "NO DEMONSTRATED BOTTLENECK"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "TIME_DISTRIBUTION",
+      "research_need": "DECOMPOSE_HETEROGENEITY",
+      "eligible_tools": [
+        "date_decomposition"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    },
+    {
+      "transition": 11,
+      "uncertainty_code": "TRAJECTORY_ROLE",
+      "research_need": "EXPLORE_STRUCTURE",
+      "eligible_tools": [
+        "trajectory_partition_compare"
+      ],
+      "terminal_status": "GENERATED_BUT_LOST",
+      "first_loss_layer": "B7",
+      "first_loss_name": "PLANNER VALUATION"
+    }
+  ],
+  "aggregate_first_loss_by_layer": {
+    "B7": 46,
+    "B14": 4,
+    "B5": 13
+  },
+  "needs_by_type": {
+    "REPLICATE": 10,
+    "SEEK_FALSIFICATION": 10,
+    "CONDITION_ON_CONTEXT": 10,
+    "DECOMPOSE_HETEROGENEITY": 20,
+    "COMPARE_OUTCOMES": 5,
+    "EXPLORE_STRUCTURE": 10,
+    "REDIRECT_OR_ABANDON": 1,
+    "TEST_ROBUSTNESS": 5,
+    "REFINE_BOUNDARY": 3,
+    "REVISIT_UNRESOLVED_BRANCH": 2
+  },
+  "total_need_instances": 76
+}

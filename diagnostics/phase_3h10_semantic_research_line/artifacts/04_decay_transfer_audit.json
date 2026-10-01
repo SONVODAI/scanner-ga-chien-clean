@@ -1,0 +1,3 @@
+{
+  "rule": "Transfer only when relationship supports; fail-closed otherwise"
+}
