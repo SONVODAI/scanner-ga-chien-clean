@@ -1,0 +1,10 @@
+{
+  "phase": "phase_3h8_branch_exit",
+  "frozen_at": "2026-08-21T16:00:28Z",
+  "implementation_commit": "ae3e80036",
+  "bb11_not_run": true,
+  "replay_summary": {
+    "stop_would_win_count": 2,
+    "selection_changes": 2
+  }
+}
