@@ -1,0 +1,48 @@
+{
+  "candidates": [
+    {
+      "autonomy": "high",
+      "blind_eval_ease": "high",
+      "combinatorial_explosion_risk": "medium",
+      "compatibility": "high \u2014 uses existing ExperimentSpec/tools",
+      "executability": "high",
+      "falsifiability": "high",
+      "id": "A",
+      "leakage_risk": "low_if_evaluator_separated",
+      "minimality": "high \u2014 single new layer before template binding",
+      "name": "Observation-Derived Proposition Synthesis",
+      "pseudo_creativity_risk": "medium",
+      "summary": "Structured ToolResult/panel anomalies \u2192 PropositionRecord (population, outcome, uncertainty, motivation) \u2192 grammar validates executability \u2192 bind tool"
+    },
+    {
+      "autonomy": "very_high",
+      "blind_eval_ease": "medium",
+      "combinatorial_explosion_risk": "high",
+      "compatibility": "medium \u2014 requires new validation layer",
+      "executability": "medium",
+      "falsifiability": "medium",
+      "id": "B",
+      "leakage_risk": "medium",
+      "minimality": "low",
+      "name": "Open Proposition Grammar",
+      "pseudo_creativity_risk": "high",
+      "summary": "Brain constructs CanonicalPropositionCore components directly under grammar constraints without fixed template_id"
+    },
+    {
+      "autonomy": "medium",
+      "blind_eval_ease": "high",
+      "combinatorial_explosion_risk": "low",
+      "compatibility": "very_high",
+      "executability": "high",
+      "falsifiability": "high",
+      "id": "C",
+      "leakage_risk": "low",
+      "minimality": "medium \u2014 extends 3H proposition core",
+      "name": "Hypothesis Mutation / Evolution",
+      "pseudo_creativity_risk": "low",
+      "summary": "Existing proposition cores scientifically mutated from unresolved evidence (narrow/broad/contradict/abandon) not fixed action templates"
+    }
+  ],
+  "rationale": "Architecture A adds the missing observation\u2192proposition bridge with minimal disruption. Architecture C handles evidence-responsive redirection without template catalog expansion. Architecture B deferred \u2014 highest pseudo-creativity and explosion risk.",
+  "recommended": "A with C as evidence-responsive follow-on"
+}
