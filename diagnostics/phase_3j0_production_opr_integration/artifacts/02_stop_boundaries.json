@@ -1,0 +1,26 @@
+[
+  {
+    "code": "STOP_PROPOSITION_PERSISTED",
+    "description": "After proposition birth; no auto experiment"
+  },
+  {
+    "code": "STOP_ACTION_RECORDED_ONLY",
+    "description": "After synthesis priority; no auto execution (3I.13)"
+  },
+  {
+    "code": "STOP_NO_AUTO_EXPERIMENT",
+    "description": "No new ToolResult in 3J.0 production cycle"
+  },
+  {
+    "code": "STOP_REOPEN_CANDIDATE_ONLY",
+    "description": "Reopening records REOPEN_CANDIDATE only (3I.19/20)"
+  },
+  {
+    "code": "STOP_PACKAGE_NOT_EXECUTED",
+    "description": "Action package boundary preserved (3I.16/17)"
+  },
+  {
+    "code": "STOP_FROZEN_LINEAGE_REPLAY",
+    "description": "Historical events replayed from artifacts only"
+  }
+]

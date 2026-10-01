@@ -1,0 +1,53 @@
+{
+  "metrics": [
+    {
+      "definition": "Unique scientific_question_key count / session",
+      "name": "semantic_proposition_diversity"
+    },
+    {
+      "definition": "Propositions with linked OBS_* or structural evidence vs ungrounded",
+      "name": "observational_grounding_rate"
+    },
+    {
+      "definition": "GENUINELY_INDEPENDENT classifications / total generated",
+      "name": "scientific_independence_rate"
+    },
+    {
+      "definition": "Propositions with explicit comparison/contrast executable via tools",
+      "name": "falsifiability_score"
+    },
+    {
+      "definition": "Generated propositions that pass grammar + tool validation",
+      "name": "executability_rate"
+    },
+    {
+      "definition": "Proposition changes attributable to new evidence not template progression",
+      "name": "evidence_responsiveness"
+    },
+    {
+      "definition": "Propositions explicitly abandoned after falsifying evidence",
+      "name": "abandoned_hypothesis_rate"
+    },
+    {
+      "definition": "NEAR_DUPLICATE or IDENTICAL / total generated",
+      "name": "duplicate_rate"
+    },
+    {
+      "definition": "Propositions receiving further investigation after initial test",
+      "name": "useful_survivor_rate"
+    },
+    {
+      "definition": "Blind evaluator class distribution",
+      "name": "hidden_benchmark_convergence"
+    },
+    {
+      "definition": "Independent scientific lines explored per experiment",
+      "name": "research_budget_efficiency"
+    },
+    {
+      "definition": "Penalize high generation volume with low grounding + low survivor rate",
+      "name": "hypothesis_spam_penalty"
+    }
+  ],
+  "primary_not_raw_count": true
+}
