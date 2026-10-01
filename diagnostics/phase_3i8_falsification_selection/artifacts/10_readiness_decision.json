@@ -1,0 +1,13 @@
+{
+  "verdict": "PARTIALLY_READY",
+  "reason": "3I.7 closed TEST\u2192INTERPRET\u2192UPDATE\u2192DECIDE through SEEK_FALSIFICATION label. Infrastructure exists to execute legal ExperimentSpecs and interpret partition results, but no proposition-scoped module transforms disconfirming_observation_spec + evidence state into ranked falsification candidates. Template FALSIFY_* path requires GAP codes.",
+  "highest_leverage_missing_capability": "FalsificationCandidateGenerator",
+  "missing_capability_detail": "Map frozen PropositionRecord + EpistemicUpdateRecord + disconfirming_observation_spec \u2192 bounded FalsificationCandidateRecord set using grammar/tools only. Must differ from prior experiment content hash. Must pass anti-rescue gates. Must not require GAP codes or research_interpreter assessment.",
+  "secondary_gaps_deferred": [
+    "FalsificationInterpretationContract for sensitivity_analysis tools",
+    "proposition_id post-emission lineage join",
+    "Contract hash provenance fix in lifecycle_runner"
+  ],
+  "ready_for_one_shot_package": false,
+  "proposed_next_phase": "Phase 3I.9 \u2014 Implement FalsificationCandidateGenerator + lexicographic selector; freeze one-shot package; execute once"
+}
