@@ -1,0 +1,7 @@
+{
+  "bb12_run_this_phase": false,
+  "limitations": [
+    "Offline replay only; no live BB11 rerun"
+  ],
+  "ready_for_bb12_consideration": true
+}

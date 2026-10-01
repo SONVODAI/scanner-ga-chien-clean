@@ -1,0 +1,45 @@
+{
+  "benchmark_id": "blind_benchmark_14",
+  "benchmark_version": "bb14_v1",
+  "session_id": "bb14-autonomous-001",
+  "experiment_budget": 12,
+  "research_cutoff": "2026-08-17",
+  "frozen_research_commit": "48114b4bd",
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "autonomous_research_config": {
+    "initial_observation": "Autonomous benchmark seed: scan the canonical historical Edge Research universe for non-trivial relationships.",
+    "initial_question": "What non-trivial, statistically and economically interesting relationships can be discovered in the currently available historical data?",
+    "population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "initial_tool_name": "horizon_comparison",
+    "initial_tool_inputs": {
+      "horizons": [
+        "T3",
+        "T5",
+        "T10"
+      ]
+    },
+    "experiment_budget": 12,
+    "max_steps": 12
+  },
+  "phase_versions": {
+    "research_exit_valuation": "research_exit_valuation_v1",
+    "research_branch_marginal_state": "research_branch_marginal_state_v1",
+    "research_realized_information_gain": "research_realized_information_gain_v1",
+    "research_information_value": "research_information_value_v1",
+    "research_competence": "research_competence_v1",
+    "operational_awareness": "research_operational_awareness_v1",
+    "research_novelty_valuation_bridge": "research_novelty_valuation_bridge_v1"
+  },
+  "modification_policy": "NO_RESEARCH_LOGIC_CHANGES_BEFORE_DURING_OR_AFTER_BB14",
+  "configured_at": "2026-08-22T01:23:08Z"
+}
