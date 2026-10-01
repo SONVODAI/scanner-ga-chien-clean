@@ -1,0 +1,63 @@
+{
+  "artifact_id": "04_research_decision_record_contract",
+  "phase": "3I.6",
+  "status": "DESIGN_ONLY",
+  "record_version": "research_decision_record_v1",
+  "purpose": "Auditable closure of: evidence considered → interpretation → epistemic update → next action",
+  "required_fields": {
+    "decision_id": "uuid",
+    "proposition_id": "string — proposition under evaluation",
+    "proposition_identity_key": "string — semantic identity from 3I.5",
+    "prior_epistemic_state": "enum",
+    "evidence_considered": [
+      {
+        "experiment_node_id": "string",
+        "evidence_class": "SUPPORTING|DISCONFIRMING|CONTRADICTORY|NON_INFORMATIVE|INVALID",
+        "quality_tier": "HIGH|MEDIUM|LOW",
+        "summary": "string"
+      }
+    ],
+    "evidence_excluded": [
+      {
+        "ref": "string",
+        "reason": "leakage|insufficient_sample|duplicate_correlated|stale|invalid_comparison"
+      }
+    ],
+    "epistemic_interpretation": {
+      "comparison_to_falsifiable_expectation": "string",
+      "comparison_to_disconfirm_spec": "string",
+      "contradiction_status": "NONE|PARTIAL|FULL",
+      "falsification_status": "NOT_TESTED|ATTEMPTED|THRESHOLD_CROSSED|NOT_CROSSED"
+    },
+    "unresolved_uncertainty": "string — what remains unknown",
+    "candidate_next_actions": [
+      {
+        "action_code": "CONTINUE|SEEK_REPLICATION|SEEK_CONTRADICTION|SEEK_FALSIFICATION|NARROW|BROADEN|FORK|ABANDON|SILENCE",
+        "scientific_justification": "string"
+      }
+    ],
+    "chosen_next_action": {
+      "action_code": "string",
+      "experiment_spec_draft_if_any": "optional ExperimentSpec",
+      "reason": "string — must cite specific evidence"
+    },
+    "rejected_actions": [
+      {
+        "action_code": "string",
+        "rejection_reason": "string"
+      }
+    ],
+    "lineage": {
+      "parent_decision_id": "optional",
+      "triggered_by_experiment_id": "string",
+      "resulting_epistemic_state": "enum"
+    },
+    "created_at": "ISO8601",
+    "research_step": "integer"
+  },
+  "forbidden_fields": [
+    "expected_profit",
+    "hidden_phenomenon_match_score",
+    "template_progression_index"
+  ]
+}
