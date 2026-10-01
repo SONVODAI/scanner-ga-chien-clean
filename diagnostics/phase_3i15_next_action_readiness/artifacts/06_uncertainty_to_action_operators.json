@@ -1,0 +1,85 @@
+{
+  "operators": [
+    {
+      "operator": "seek_independent_cohort",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "LOW if cohort derived from ledger overlap",
+      "notes": "Reusable; must vary cohort semantics not just dates arbitrarily"
+    },
+    {
+      "operator": "seek_counterexample",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "MEDIUM",
+      "notes": "Generic if search strategy adapts to proposition null; TEMPLATE if fixed period scan"
+    },
+    {
+      "operator": "test_concentration_dominance",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "MEDIUM",
+      "notes": "Requires symbol-level decomposition \u2014 tool may constrain"
+    },
+    {
+      "operator": "test_temporal_stability",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "HIGH",
+      "notes": "Must support multiple distinct strategies (holdout, rolling, regime) \u2014 single holdout only = TEMPLATE_TRANSLATION"
+    },
+    {
+      "operator": "test_population_robustness",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "MEDIUM",
+      "notes": "Generic if population contrasts derived from ledger independence gaps"
+    },
+    {
+      "operator": "test_measurement_robustness",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "HIGH",
+      "notes": "Outcome reframe only valid if proposition permits; else FORK territory"
+    },
+    {
+      "operator": "resolve_contradiction",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "LOW",
+      "notes": "Only when contradiction_structure non-empty; targets discriminating evidence"
+    },
+    {
+      "operator": "test_alternative_explanation",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "MEDIUM",
+      "notes": "Must bind to proposition null_competing_explanation text"
+    },
+    {
+      "operator": "seek_replication",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "LOW",
+      "notes": "Independent replication operator \u2014 not identical retest"
+    },
+    {
+      "operator": "hold_no_high_information_action",
+      "classification": "GENERIC_SCIENTIFIC_OPERATOR",
+      "template_risk": "NONE",
+      "notes": "Valid silence emission"
+    },
+    {
+      "operator": "independent_episode_holdout",
+      "classification": "SPECIALIZED_FALSIFICATION_OPERATOR",
+      "template_risk": "TEMPLATE_TRANSLATION for temporal axis",
+      "notes": "3I.9 implementation \u2014 one fixed mapping episode\u2192holdout"
+    },
+    {
+      "operator": "GAP_TIME_DISTRIBUTION \u2192 date_decomposition",
+      "classification": "GAP_BOUND_TEMPLATE",
+      "template_risk": "TEMPLATE_TRANSLATION",
+      "notes": "Fixed GAP\u2192tool mapping in research_actions.py"
+    },
+    {
+      "operator": "GAP_HORIZON_STABILITY \u2192 horizon tool",
+      "classification": "GAP_BOUND_TEMPLATE",
+      "template_risk": "TEMPLATE_TRANSLATION",
+      "notes": "Fixed GAP\u2192tool mapping"
+    }
+  ],
+  "genuinely_generic_count": 10,
+  "template_bound_count": 2,
+  "design_rule": "Operator + proposition/ledger context must instantiate multiple distinct actions per broad uncertainty type"
+}
