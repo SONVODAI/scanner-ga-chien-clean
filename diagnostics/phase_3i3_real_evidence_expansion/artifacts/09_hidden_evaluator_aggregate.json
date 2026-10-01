@@ -1,0 +1,12 @@
+{
+  "evaluator": "zone_d_v1",
+  "aggregate": {
+    "hidden_convergence_class": "PARTIAL",
+    "propositions_evaluated": 3,
+    "exact_rediscovery_count": 0,
+    "partial_convergence_count": 0,
+    "adjacent_independent_count": 3,
+    "unrelated_count": 0,
+    "abstract_summary": "Evaluated 3 frozen proposition(s) against 10 hidden phenomena. Convergence class: PARTIAL."
+  }
+}
