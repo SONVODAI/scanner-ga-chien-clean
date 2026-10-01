@@ -471,10 +471,22 @@ def _persist_canonical_daily_t0(
             ),
         )
 
+    # Forecast Data Contract V1: derived PIT freeze + maturity (fail-safe observer).
+    # Reuses EMS + MDT0; does not train models or touch Edge Research authority.
+    forecast_hook: Dict[str, Any] = {"ok": False, "reason": "not_attempted"}
+    try:
+        from modules.forecast_research.daily_entrypoint import maybe_freeze_after_market_daily
+
+        forecast_hook = maybe_freeze_after_market_daily(str(trade_date)[:10])
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Forecast T0 freeze hook failed safely: %s", exc)
+        forecast_hook = {"ok": False, "reason": f"hook_error:{exc}"}
+
     return {
         "canonical_added": added,
         "daily_snapshot_id": daily_row.get("daily_snapshot_id"),
         "canonical_skipped_reason": None if added > 0 else "ALREADY_FROZEN",
+        "forecast_t0_hook": forecast_hook,
     }
 
 

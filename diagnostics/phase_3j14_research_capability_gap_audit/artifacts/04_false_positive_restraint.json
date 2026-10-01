@@ -1,0 +1,17 @@
+{
+  "audit_version": "bb_capability_gap_audit_fp_restraint_v1_3j14",
+  "critical_false_positive_count": 0,
+  "elevated_false_positive_count": 2,
+  "supported_on_blind_d": 0,
+  "supported_on_artifact_classes": 2,
+  "restraint_components": [
+    "genuinely_good_scientific_discrimination",
+    "conservative_fail_closed_behavior",
+    "no_supported_on_pure_noise"
+  ],
+  "mixture_explanation": "Critical FP = 0 is a mixture: no BLIND-D SUPPORTED discoveries, appropriate STOP/SILENCE on most cases, and conservative FAILED_CLOSED when ordinal>=3 silence packages are execution-attempted. Zero alone does not prove robust edge discovery.",
+  "inability_to_continue_count": 0,
+  "conservative_fail_closed_count": 4,
+  "genuine_discrimination_count": 8,
+  "flag_fp_zero_from_inability_only": false
+}

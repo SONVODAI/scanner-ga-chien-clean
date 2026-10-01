@@ -1,0 +1,24 @@
+{
+  "phase": "phase_3h11_novelty_valuation_bridge",
+  "preregistered_at": "2026-08-22T00:00:00Z",
+  "baseline_commit": "2792eb06dae022c530b56ed6bee7eae336fe3820",
+  "baseline_branch": "cursor/phase-3h10-semantic-research-line-aad2",
+  "frozen_subsystems": {
+    "phase_3h8_exit_valuation": "5c62fc334",
+    "phase_3h10_semantic_line": "2792eb06d",
+    "planner_base_weights": "unchanged",
+    "erv_formula_scales": "unchanged",
+    "information_value_bridge_3h6": "unchanged",
+    "experiment_spec_dedup": "unchanged",
+    "grammar_templates": "unchanged"
+  },
+  "scope": "Evidence-gated portfolio novelty_component only",
+  "non_goals": [
+    "planner redesign",
+    "weight retuning",
+    "autonomous proposition generation",
+    "challenger in loop",
+    "market-specific predicates",
+    "BB12 tuning from outcomes"
+  ]
+}

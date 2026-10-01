@@ -1,0 +1,235 @@
+{
+  "phase": "3J.0",
+  "mode": "PRODUCTION_OPR_INTEGRATION_WIRING_ONLY",
+  "git_head": "2da0ad2e2119059d1472fcd5b1aea5502b0717be",
+  "authority_map": {
+    "authority_version": "production_opr_authority_v1_3j0",
+    "canonical_authority": "OPR_LIFECYCLE",
+    "legacy_parallel_paths": [
+      "research_actions.generate_action_candidates",
+      "research_planner.plan_next_action",
+      "autonomous_research.bootstrap_research_graph"
+    ],
+    "execution_utilities": [
+      "research_tools.execute_research_experiment",
+      "research_tools.ToolRegistry"
+    ],
+    "path_classifications": {
+      "opr_bridge.prioritized_pipeline": "OPR_AUTHORITY",
+      "opr_bridge.lifecycle_runner": "OPR_AUTHORITY",
+      "opr_bridge.lifecycle_synthesis_hook": "OPR_AUTHORITY",
+      "opr_bridge.lifecycle_dormancy_integration": "OPR_AUTHORITY",
+      "opr_bridge.scientific_action_generator": "OPR_AUTHORITY",
+      "research_actions.generate_action_candidates": "DEPRECATED_PARALLEL_AUTHORITY",
+      "research_planner.plan_next_action": "DEPRECATED_PARALLEL_AUTHORITY",
+      "research_interpreter.interpret_tool_result": "LEGACY_SUPPORT_ONLY",
+      "research_tools.execute_research_experiment": "EXECUTION_UTILITY",
+      "research_tools.ToolRegistry": "EXECUTION_UTILITY",
+      "research_graph.ResearchGraph": "LEGACY_SUPPORT_ONLY",
+      "autonomous_research.bootstrap_research_graph": "DEPRECATED_PARALLEL_AUTHORITY",
+      "diagnostics.run_phase_3i": "LEGACY_DIAGNOSTIC_ONLY"
+    }
+  },
+  "stop_boundaries": [
+    {
+      "code": "STOP_PROPOSITION_PERSISTED",
+      "description": "After proposition birth; no auto experiment"
+    },
+    {
+      "code": "STOP_ACTION_RECORDED_ONLY",
+      "description": "After synthesis priority; no auto execution (3I.13)"
+    },
+    {
+      "code": "STOP_NO_AUTO_EXPERIMENT",
+      "description": "No new ToolResult in 3J.0 production cycle"
+    },
+    {
+      "code": "STOP_REOPEN_CANDIDATE_ONLY",
+      "description": "Reopening records REOPEN_CANDIDATE only (3I.19/20)"
+    },
+    {
+      "code": "STOP_PACKAGE_NOT_EXECUTED",
+      "description": "Action package boundary preserved (3I.16/17)"
+    },
+    {
+      "code": "STOP_FROZEN_LINEAGE_REPLAY",
+      "description": "Historical events replayed from artifacts only"
+    }
+  ],
+  "bb_production_autonomy_01": {
+    "benchmark": "BB-ProductionAutonomy-01",
+    "passed": 8,
+    "case_count": 8,
+    "all_passed": true,
+    "results": [
+      {
+        "case_id": "BBPA-01-autonomous-session-start",
+        "passed": true,
+        "checks": {
+          "session_created": true,
+          "stop_boundary": true
+        }
+      },
+      {
+        "case_id": "BBPA-02-legitimate-silence",
+        "passed": true,
+        "checks": {
+          "silent": true
+        }
+      },
+      {
+        "case_id": "BBPA-03-deterministic-opportunity-identity",
+        "passed": true,
+        "checks": {
+          "deterministic": true
+        }
+      },
+      {
+        "case_id": "BBPA-04-duplicate-suppression",
+        "passed": true,
+        "checks": {
+          "first_created": true,
+          "second_suppressed": true,
+          "idempotent": true
+        }
+      },
+      {
+        "case_id": "BBPA-05-persistence-restart",
+        "passed": true,
+        "checks": {
+          "created": true,
+          "reconstructed": true,
+          "has_auth_state": true
+        }
+      },
+      {
+        "case_id": "BBPA-06-authority-conflict",
+        "passed": true,
+        "checks": {
+          "legacy_blocked": true
+        }
+      },
+      {
+        "case_id": "BBPA-07-stop-boundary-enforcement",
+        "passed": true,
+        "checks": {
+          "stop_present": true
+        }
+      },
+      {
+        "case_id": "BBPA-08-failure-isolation",
+        "passed": true,
+        "checks": {
+          "frozen_integrity": true
+        }
+      }
+    ]
+  },
+  "counterfactuals": {
+    "CF-J1": {
+      "passed": true
+    },
+    "CF-J2": {
+      "passed": true
+    },
+    "CF-J3": {
+      "passed": true
+    },
+    "CF-J4": {
+      "passed": true
+    },
+    "CF-J5": {
+      "passed": true
+    },
+    "CF-J6": {
+      "passed": true
+    },
+    "CF-J7": {
+      "passed": true
+    },
+    "CF-J8": {
+      "passed": true
+    },
+    "all_passed": true
+  },
+  "t2_production_replay": {
+    "outcome": "SESSION_CREATED",
+    "session_id": "opr-prod-prop-efb650d9bd5c451f-sess-b41",
+    "authoritative_state": {
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "epistemic_state": "SUPPORTED",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_action": "SEEK_FALSIFICATION",
+      "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+      "research_activity_state": "DORMANT",
+      "is_dormant": true,
+      "dormancy_hash": "7ddd600a5b5d6fb024ab118a8eeefe5d3f48b976b87648a535e0994f97061624",
+      "dormancy_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+      "unresolved_uncertainties": [
+        "temporal_regime_robustness",
+        "population_robustness",
+        "horizon_robustness",
+        "effect_stability",
+        "concentration_dominance",
+        "measurement_robustness",
+        "counterexample_exposure",
+        "alternative_explanation_exposure",
+        "regime_context_robustness"
+      ],
+      "reopening_conditions_count": 8,
+      "latest_reopening_outcome": null,
+      "evidence_event_count": 2
+    },
+    "stop_boundaries": [
+      "STOP_PROPOSITION_PERSISTED",
+      "STOP_NO_AUTO_EXPERIMENT",
+      "STOP_FROZEN_LINEAGE_REPLAY",
+      "STOP_ACTION_RECORDED_ONLY",
+      "STOP_PACKAGE_NOT_EXECUTED"
+    ],
+    "restart_authoritative_state": {
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "epistemic_state": "SUPPORTED",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_action": "SEEK_FALSIFICATION",
+      "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+      "research_activity_state": "DORMANT",
+      "is_dormant": true,
+      "dormancy_hash": "7ddd600a5b5d6fb024ab118a8eeefe5d3f48b976b87648a535e0994f97061624",
+      "dormancy_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+      "unresolved_uncertainties": [
+        "temporal_regime_robustness",
+        "population_robustness",
+        "horizon_robustness",
+        "effect_stability",
+        "concentration_dominance",
+        "measurement_robustness",
+        "counterexample_exposure",
+        "alternative_explanation_exposure",
+        "regime_context_robustness"
+      ],
+      "reopening_conditions_count": 8,
+      "latest_reopening_outcome": null,
+      "evidence_event_count": 2,
+      "session_id": "opr-prod-prop-efb650d9bd5c451f-sess-b41",
+      "opportunity_identity": "b236c350b320240628ca2f51603bb172620a2377a6e8ed2c564defa3580de6da"
+    },
+    "passed": true
+  },
+  "frozen_hash_audit": {
+    "passed": true,
+    "checks": {
+      "evidence_synthesis_engine": true,
+      "scientific_action_generator": true,
+      "dormancy_module": true,
+      "lifecycle_integration": true
+    }
+  },
+  "verdicts": {
+    "PRODUCTION_OPR_INTEGRATION": "PASS",
+    "SINGLE_RESEARCH_AUTHORITY": "PASS",
+    "PRODUCTION_RESEARCH_MEMORY": "PASS",
+    "END_TO_END_AUTONOMY_REPLAY": "PASS",
+    "PHASE_3I_GRADUATION": "PHASE_3I_GRADUATED"
+  }
+}

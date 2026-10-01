@@ -1,0 +1,9 @@
+{
+  "interpreter_modules_checked": [
+    "proposition_experiment_interpreter.py",
+    "interpretation_contract.py",
+    "lifecycle_runner.py"
+  ],
+  "zone_c_forbidden": true,
+  "passed": true
+}

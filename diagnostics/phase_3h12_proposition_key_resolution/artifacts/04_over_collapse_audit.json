@@ -1,0 +1,9 @@
+{
+  "pairs_sampled": 28,
+  "newly_merged_core_pairs": 0,
+  "legitimate_representation_duplicates": [],
+  "ambiguous_merges": [],
+  "old_same_new_distinct": [],
+  "over_collapse_risk": 0,
+  "verdict": "PASS"
+}

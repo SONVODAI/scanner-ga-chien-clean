@@ -1,0 +1,120 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "resulting_epistemic_state": "SUPPORTED",
+  "null_ledger": [
+    {
+      "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+      "null_key": "directional_reversal",
+      "state_before": "STILL_PLAUSIBLE",
+      "state_after": "WEAKENED",
+      "rationale": "Directional commitment holds on full panel \u2014 directional_reversal less plausible"
+    },
+    {
+      "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+      "null_key": "episode_artifact",
+      "state_before": "STILL_PLAUSIBLE",
+      "state_after": "WEAKENED",
+      "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+    }
+  ],
+  "evidence_1_contribution": {
+    "experiment_ordinal": 1,
+    "assessment": {
+      "experiment_intent_summary": "Does the effect survive excluding motivating periods?",
+      "cohort_strategy": "counterexample_period_search",
+      "target_uncertainty": "episode_robustness",
+      "evidence_relevance": "HIGH",
+      "evidence_direction": "SUPPORTS",
+      "evidence_strength": "MODERATE",
+      "remaining_uncertainty": [
+        "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "unresolved_null:directional_reversal"
+      ],
+      "other_nulls_still_alive": [
+        "directional_reversal"
+      ],
+      "null_accounting": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+        }
+      ],
+      "base_evidence_class": "SUPPORTING",
+      "condition_matched": "high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5",
+      "limitations": [],
+      "tool_semantic_labels_ignored": []
+    }
+  },
+  "evidence_2_raw_strength": "MODERATE",
+  "evidence_2_incremental_strength": "WEAK",
+  "row_overlap": 0.9772727272727273,
+  "counted_as_independent_replication": false,
+  "search_accounting": {
+    "experiments_attempted": 2,
+    "search_complexity_score": 8.5,
+    "search_cardinality": 2,
+    "evidence_burden_assessment": "HIGH",
+    "budget_exhausted": false
+  },
+  "surviving_nulls": [
+    "directional_reversal",
+    "episode_artifact"
+  ],
+  "candidate_action_families": [
+    "TEST_NEXT_NULL",
+    "TEST_NEXT_NULL",
+    "TEST_NEXT_NULL",
+    "TEST_NEXT_NULL",
+    "SEEK_REPLICATION",
+    "CONTINUE_FALSIFICATION",
+    "STOP_LOW_INCREMENTAL",
+    "STOP_NO_MATERIAL_NULL",
+    "STOP_NO_INFORMATIVE_ACTION"
+  ],
+  "rejected_actions": [
+    {
+      "action_family": "TEST_NEXT_NULL",
+      "rejection_reasons": [
+        "null_already_materially_addressed_by_cumulative_evidence",
+        "weakened_null_low_incremental_gain",
+        "null_already_addressed_by_second_experiment"
+      ]
+    },
+    {
+      "action_family": "TEST_NEXT_NULL",
+      "rejection_reasons": [
+        "null_already_materially_addressed_by_cumulative_evidence",
+        "weakened_null_low_incremental_gain"
+      ]
+    },
+    {
+      "action_family": "SEEK_REPLICATION",
+      "rejection_reasons": [
+        "independent_replication_not_earned",
+        "high_overlap_blocks_independent_replication",
+        "confirmation_addiction_guard_weak_incremental_support",
+        "dependent_support_history_not_replication"
+      ]
+    },
+    {
+      "action_family": "CONTINUE_FALSIFICATION",
+      "rejection_reasons": [
+        "mechanical_falsification_after_exhausted_major_nulls",
+        "mechanical_sequencing_decision1_falsification"
+      ]
+    }
+  ],
+  "decision_kind": "STOP",
+  "stop_reason": "STOP_LOW_INCREMENTAL",
+  "chosen_next_action": "HOLD_UNRESOLVED",
+  "confirmation_bias_guard_applied": true,
+  "mechanical_sequencing_blocked": true,
+  "third_experiment_generated": false,
+  "decision_envelope_id": "iefd2-1bfd7b6369bc",
+  "decision_ordinal": 2,
+  "stop_boundary": "STOP_SECOND_RESEARCH_DECISION_FROZEN",
+  "idempotent_replay": true
+}

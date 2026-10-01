@@ -1,0 +1,23 @@
+{
+  "merged_research_stack": {
+    "research_state_ExperimentSpec": true,
+    "research_tools_execution": true,
+    "research_assessment": true,
+    "research_interpreter": true,
+    "research_graph": true,
+    "research_planner": true,
+    "research_controller": true,
+    "research_actions_templates": true,
+    "challenger": true,
+    "hypothesis_derive_scientific_status": true
+  },
+  "opr_branch_present": {
+    "proposition_record": true,
+    "prioritized_pipeline": true,
+    "executability_adapter": true,
+    "scientific_identity": true,
+    "research_proposition_core": true
+  },
+  "opr_on_main": false,
+  "design_artifact_12_evidence_lineage": true
+}

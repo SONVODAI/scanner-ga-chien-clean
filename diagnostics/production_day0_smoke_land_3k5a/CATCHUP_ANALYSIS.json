@@ -1,0 +1,16 @@
+{
+  "current_eod_cutoff": "2026-08-24",
+  "earning_status_trade_date": "2026-08-24",
+  "research_panel_max_trade_date": "2026-08-19",
+  "panel_lag_calendar_days": 5,
+  "last_durable_autonomous_observation": "day0_smoke_namespace only; no production LIVE/BACKFILL index on main data dir",
+  "catch_up_required_for_activation": true,
+  "safe_catch_up_policy": "Do NOT auto-replay 2026-08-20..2026-08-24. Daily runner is single-date; blind multi-day backfill can birth artificial sessions. Wait until research panel includes target date, then run one BACKFILL_NON_FORWARD or LIVE_FORWARD for that date only after timer activation approval.",
+  "dates_in_gap_not_in_panel": [
+    "2026-08-20",
+    "2026-08-21",
+    "2026-08-24"
+  ],
+  "day0_smoke_target_used": "2026-08-19",
+  "day0_smoke_for_current_eod": "WAITING_FOR_DATA \u2014 target_date_not_in_panel_sessions"
+}
