@@ -1,0 +1,29 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "evaluator_classification": "SCIENTIFICALLY_NOVEL",
+    "audit_classification": "SCIENTIFICALLY_NOVEL",
+    "agreement": true,
+    "best_template_match": "THRESHOLD_EXPLORATION",
+    "semantic_similarity_to_adaptive_partition": 0.0,
+    "reason": "Agreement \u2014 low semantic overlap but structural family is partition-comparison"
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "evaluator_classification": "SCIENTIFICALLY_NOVEL",
+    "audit_classification": "SCIENTIFICALLY_NOVEL",
+    "agreement": true,
+    "best_template_match": "THRESHOLD_EXPLORATION",
+    "semantic_similarity_to_adaptive_partition": 0.0,
+    "reason": "Agreement \u2014 low semantic overlap but structural family is partition-comparison"
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "evaluator_classification": "SCIENTIFICALLY_NOVEL",
+    "audit_classification": "SCIENTIFICALLY_NOVEL",
+    "agreement": true,
+    "best_template_match": "THRESHOLD_EXPLORATION",
+    "semantic_similarity_to_adaptive_partition": 0.0,
+    "reason": "Agreement \u2014 low semantic overlap but structural family is partition-comparison"
+  }
+]
