@@ -1,0 +1,43 @@
+{
+  "gate_A_global_decisions_audited": {
+    "result": true,
+    "evidence": "12 global allocation decisions with full audit fields"
+  },
+  "gate_B_source_and_erv_recorded": {
+    "result": true,
+    "evidence": {
+      "LOCAL": 9,
+      "FRONTIER": 1,
+      "REVISIT": 2
+    }
+  },
+  "gate_C_no_forced_diversity": {
+    "result": true,
+    "evidence": {
+      "switches": 3,
+      "decisions": 12
+    }
+  },
+  "gate_D_strong_local_can_win": {
+    "result": true,
+    "evidence": 9
+  },
+  "gate_E_limitation_diagnostics_documented": {
+    "result": true,
+    "evidence": [
+      "15.2",
+      "15.3"
+    ]
+  },
+  "gate_F_no_spawn_duplicate_experiment_error": {
+    "result": true,
+    "evidence": 0
+  },
+  "gate_G_identity_dedup_audited": {
+    "result": true,
+    "evidence": {
+      "already_executed": 9,
+      "same_cycle": 22
+    }
+  }
+}

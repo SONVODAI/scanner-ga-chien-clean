@@ -1,0 +1,36 @@
+{
+  "benchmark_id": "blind_benchmark_07",
+  "benchmark_version": "bb07_v1",
+  "freeze_type": "post_run_artifact_freeze",
+  "frozen_at": "2026-08-21T13:35:00Z",
+  "frozen_research_commit": "dd027b3da",
+  "experiment_identity_version": "research_experiment_identity_v1",
+  "global_allocator_version": "research_global_allocator_v1_1",
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "experiments_completed": 12,
+  "experiments_budget": 12,
+  "session_id": "bb07-autonomous-001",
+  "session_status_at_freeze": "ERROR",
+  "session_stop_reason_code": "DOWNSTREAM_FAILURE",
+  "session_stop_detail": "Experiment budget exhausted: 12/12 on post-final plan_after_experiment",
+  "duplicate_experiment_error_at_spawn": false,
+  "research_logic_modified_after_run": false,
+  "prior_benchmarks_immutable": [
+    "blind_benchmark_01",
+    "blind_benchmark_02",
+    "blind_benchmark_03",
+    "blind_benchmark_04",
+    "blind_benchmark_05",
+    "blind_benchmark_06"
+  ],
+  "identity_repair_primary_verdict": "REPAIR_CONFIRMED",
+  "identity_repair_notes": [
+    "BB06 Decision 4 selected FRONTIER ea37630b08516f35 (ERV 8.39) and crashed with DuplicateExperimentError.",
+    "BB07 Decision 4 selected LOCAL (ERV 5.49); duplicate frontier item no longer competed (best_frontier_erv 0.97).",
+    "BB07 executed experiment ea37630b08516f35 via LOCAL at Decision 2 (exp-9cf285b6f847); frontier-00005 marked DUPLICATE.",
+    "9 duplicate_experiment_already_executed and 22 duplicate_same_cycle_representative exclusions recorded in artifact 33.",
+    "spawn_duplicate_experiment_error_count: 0 across all 12 planning decisions."
+  ],
+  "artifact_count": 36,
+  "modification_policy": "IMMUTABLE_HISTORICAL_EVIDENCE_NO_RERUN"
+}

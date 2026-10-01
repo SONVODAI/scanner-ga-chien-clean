@@ -1,0 +1,113 @@
+{
+  "benchmark_id": "blind_benchmark_07",
+  "completed_at": "2026-08-21T13:33:41Z",
+  "session_id": "bb07-autonomous-001",
+  "session_status": "ERROR",
+  "session_stop_reason": {
+    "code": "DOWNSTREAM_FAILURE",
+    "operation": "plan_after_experiment",
+    "experiment_node_id": "exp-c28713c14af3",
+    "frame_id": "",
+    "error_type": "ResearchGraphError",
+    "error_message": "Experiment budget exhausted: 12/12",
+    "experiment_executed": true
+  },
+  "experiments_used": 12,
+  "step_count": 12,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "artifact_dir": "benchmarks/blind_benchmark_07/artifacts",
+  "research_capability_score": 79,
+  "reframing_capability_score": 15,
+  "reframe_survivability_score": 8,
+  "HORIZON_ADVANCED_FRAME_SURVIVED_FOLLOW_ON": true,
+  "capability_gates": {
+    "gate_A_exploration": "PASS",
+    "gate_B_reframing": "PASS",
+    "gate_C_reframe_survivability": "PASS",
+    "gate_D_evidence_driven_transition": "PASS",
+    "gate_E_temporal_legality": "PASS",
+    "gate_F_audit_durability": "PASS",
+    "gate_G_scientific_discipline": "PASS",
+    "gate_H_discovery": "PASS"
+  },
+  "portfolio_session_metrics": {
+    "experiments_executed": 12,
+    "unique_frames_executed": 4,
+    "unique_explanatory_dimensions": 3,
+    "unique_outcomes_executed": 6,
+    "unique_populations_executed": 2,
+    "unique_horizons_executed": 2,
+    "max_same_frame_depth": 5,
+    "independent_branch_count": 1,
+    "revisit_count": 2,
+    "successful_branch_returns": 2,
+    "redundant_experiment_count": 1,
+    "dominated_opportunities_skipped": 0,
+    "high_value_unexplored_at_end": 12,
+    "exploration_debt_at_end": 6.25,
+    "candidate_yield": 0,
+    "anti_edge_yield": 0,
+    "falsification_yield": 1,
+    "mean_marginal_information_gain": 0.6749999999999999,
+    "median_marginal_information_gain": 0.5,
+    "research_value_consumed_per_experiment": 0.6749999999999999,
+    "unresolved_research_value_at_termination": 2.0,
+    "viable_frontier_size": 47,
+    "high_value_opportunities": 12,
+    "stale_opportunities": 17
+  },
+  "portfolio_capability_gates": {
+    "gate_A_budget_exhausted": "PASS",
+    "gate_B_portfolio_decisions_audited": "PASS",
+    "gate_C_opportunity_cost_stored": "PASS",
+    "gate_D_marginal_gain_tracking": "PASS",
+    "gate_E_temporal_legality": "PASS",
+    "gate_F_no_runtime_failure": "FAIL",
+    "gate_G_revisit_tracking_active": "PASS",
+    "gate_H_discovery_optional": "PASS",
+    "gate_I_frontier_quality_measured": "PASS",
+    "gate_J_unresolved_value_at_termination": "PASS"
+  },
+  "allocation_comparison_note": {
+    "primary_question": "Did BB05 allocate scarce experiments better than BB04?",
+    "breadth_alone_is_not_success": true,
+    "bb04_limitation_observed": "BB04 executed 12 experiments but touched only 1/8 eligible features; 41 frontier items remained unexplored; allocation was not portfolio-aware.",
+    "bb05_portfolio_awareness": true,
+    "bb05_has_opportunity_cost_audit": true,
+    "comparison_basis": "architectural_allocation_quality_not_human_edge",
+    "no_bb04_relationship_encoding": true
+  },
+  "global_allocation_metrics": {
+    "global_context_switch_count": 3,
+    "frontier_interrupts_viable_local": 1,
+    "strong_local_beats_frontier_count": 9,
+    "negative_local_with_positive_global_alternative": 0,
+    "genuine_revisit_count": 2,
+    "selection_source_counts": {
+      "LOCAL": 9,
+      "FRONTIER": 1,
+      "REVISIT": 2
+    },
+    "unresolved_high_value_count": 12
+  },
+  "experiment_identity_dedup_audit": {
+    "already_executed_exclusions": 9,
+    "same_cycle_exclusions": 22,
+    "spawn_duplicate_experiment_error_count": 0
+  },
+  "identity_repair_verdict": {
+    "bb06_duplicate_failure_eliminated": false,
+    "bb07_completed_12_experiments": true,
+    "decision_4_duplicate_excluded_before_selection": false,
+    "causal_narrow_conclusion": "REPAIR_NOT_CONFIRMED"
+  },
+  "global_allocator_capability_gates": {
+    "gate_A_global_decisions_audited": true,
+    "gate_B_source_and_erv_recorded": true,
+    "gate_C_no_forced_diversity": true,
+    "gate_D_strong_local_can_win": true,
+    "gate_E_limitation_diagnostics_documented": true,
+    "gate_F_no_spawn_duplicate_experiment_error": true,
+    "gate_G_identity_dedup_audited": true
+  }
+}

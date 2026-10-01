@@ -1,0 +1,962 @@
+[
+  {
+    "old_frame": {
+      "frame_id": "frame-00001",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 0,
+      "experiments_performed": 0,
+      "features_explored": [],
+      "status": "SUPERSEDED",
+      "candidate_yield": 0,
+      "saturation_evidence": {}
+    },
+    "trigger": {
+      "prior_experiment": null,
+      "prior_metrics": {},
+      "prior_observations": [],
+      "trigger_code": "OUTCOME_TO_POPULATION",
+      "saturation_evidence": {},
+      "planner_alternatives": []
+    },
+    "new_frame": {
+      "frame_id": "frame-00007",
+      "transformation_type": "OUTCOME_TO_POPULATION",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 5,
+      "temporal_legal": true,
+      "sample_n": null
+    },
+    "execution": {
+      "was_researched": true,
+      "experiments_run": 1,
+      "results": [
+        {
+          "experiment_node_id": "exp-1c44480d4769",
+          "tool": "horizon_comparison",
+          "observation_codes": [
+            "HORIZON_HETEROGENEOUS"
+          ],
+          "metrics": {
+            "toolbox_version": "research_toolbox_v1",
+            "tool_status": "OK",
+            "input_hash": "f2c78700338752d3",
+            "sample_size": 3124,
+            "horizons_requested": [
+              "T3",
+              "T5",
+              "T10"
+            ],
+            "median_spread": 2.0598843825094466,
+            "groups": {
+              "T3": {
+                "cohort_n": 3124,
+                "cohort_mean": 0.3748427373718639,
+                "cohort_median": 0.12989663938837154,
+                "cohort_win_rate": 50.256081946222785,
+                "cohort_rate_ge_3": 17.221510883482715,
+                "cohort_rate_ge_5": 8.386683738796414,
+                "cohort_rate_le_minus_3": 11.45966709346991,
+                "cohort_rate_le_minus_5": 3.585147247119078
+              },
+              "T5": {
+                "cohort_n": 2840,
+                "cohort_mean": 0.9299008188204332,
+                "cohort_median": 0.8701059917802234,
+                "cohort_win_rate": 58.90845070422536,
+                "cohort_rate_ge_3": 25.915492957746476,
+                "cohort_rate_ge_5": 13.133802816901408,
+                "cohort_rate_le_minus_3": 12.922535211267604,
+                "cohort_rate_le_minus_5": 4.929577464788732
+              },
+              "T10": {
+                "cohort_n": 2130,
+                "cohort_mean": 2.439927187752218,
+                "cohort_median": 2.189781021897818,
+                "cohort_win_rate": 66.43192488262912,
+                "cohort_rate_ge_3": 43.47417840375587,
+                "cohort_rate_ge_5": 28.544600938967136,
+                "cohort_rate_le_minus_3": 13.661971830985916,
+                "cohort_rate_le_minus_5": 6.197183098591549
+              }
+            },
+            "diagnostics": {
+              "cutoff": {
+                "data_cutoff_date": "2026-08-17",
+                "rows_before_cutoff_filter": 3124,
+                "rows_excluded_after_t0_cutoff": 0,
+                "rows_after_t0_cutoff": 3124
+              },
+              "cohort_n": 3124
+            },
+            "limitations": []
+          },
+          "research_status": "EXPLORATORY"
+        }
+      ]
+    }
+  },
+  {
+    "old_frame": {
+      "frame_id": "frame-00007",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 5,
+      "experiments_performed": 1,
+      "features_explored": [],
+      "status": "SUPERSEDED",
+      "candidate_yield": 0,
+      "saturation_evidence": {}
+    },
+    "trigger": {
+      "prior_experiment": "exp-1c44480d4769",
+      "prior_metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "f2c78700338752d3",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      },
+      "prior_observations": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "trigger_code": "STRUCTURAL_TRIGGER",
+      "saturation_evidence": {},
+      "planner_alternatives": [
+        {
+          "action_code": "DECOMPOSE_DATE",
+          "score": 1.2625000000000002
+        },
+        {
+          "action_code": "DECOMPOSE_SYMBOL",
+          "score": 1.2625000000000002
+        },
+        {
+          "action_code": "DECOMPOSE_EPISODE",
+          "score": -1.2374999999999998
+        },
+        {
+          "action_code": "CONDITION_MARKET",
+          "score": -0.23749999999999982
+        },
+        {
+          "action_code": "FALSIFY_EXTREME",
+          "score": 4.2875
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "score": 4.0875
+        },
+        {
+          "action_code": "REPOPULATE_WIDEN",
+          "score": -1000.0
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_close",
+          "score": 2.7625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs10",
+          "score": 2.7625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs5",
+          "score": 2.7625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs_spread",
+          "score": 2.7625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rsi14",
+          "score": 2.7625
+        },
+        {
+          "action_code": "TEST_MARKET_INTERACTION",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00011",
+          "score": 3.5875000000000004
+        },
+        {
+          "action_code": "REFRAME_HORIZON_ADVANCE_frame-00012",
+          "score": -0.38749999999999984
+        },
+        {
+          "action_code": "HORIZON_ADVANCE_frame-00013",
+          "score": -0.8874999999999998
+        },
+        {
+          "action_code": "STOP_BRANCH",
+          "score": -4.2375
+        },
+        {
+          "action_code": "ABANDON_BRANCH",
+          "score": -0.9874999999999998
+        },
+        {
+          "action_code": "STOP_SESSION",
+          "score": -107.1375
+        }
+      ]
+    },
+    "new_frame": {
+      "frame_id": "frame-00006",
+      "transformation_type": "STRUCTURAL_TRIGGER",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "continuation",
+        "operator": ">",
+        "threshold": 0.0,
+        "early_horizon": "T5",
+        "late_horizon": "T10"
+      },
+      "observation_horizon": 0,
+      "temporal_legal": true,
+      "sample_n": null
+    },
+    "execution": {
+      "was_researched": true,
+      "experiments_run": 1,
+      "results": [
+        {
+          "experiment_node_id": "exp-1f130c904254",
+          "tool": "horizon_comparison",
+          "observation_codes": [
+            "HORIZON_HETEROGENEOUS"
+          ],
+          "metrics": {
+            "toolbox_version": "research_toolbox_v1",
+            "tool_status": "OK",
+            "input_hash": "29d99ec72ff7e8d0",
+            "sample_size": 3124,
+            "horizons_requested": [
+              "T3",
+              "T5",
+              "T10"
+            ],
+            "median_spread": 2.0598843825094466,
+            "groups": {
+              "T3": {
+                "cohort_n": 3124,
+                "cohort_mean": 0.3748427373718639,
+                "cohort_median": 0.12989663938837154,
+                "cohort_win_rate": 50.256081946222785,
+                "cohort_rate_ge_3": 17.221510883482715,
+                "cohort_rate_ge_5": 8.386683738796414,
+                "cohort_rate_le_minus_3": 11.45966709346991,
+                "cohort_rate_le_minus_5": 3.585147247119078
+              },
+              "T5": {
+                "cohort_n": 2840,
+                "cohort_mean": 0.9299008188204332,
+                "cohort_median": 0.8701059917802234,
+                "cohort_win_rate": 58.90845070422536,
+                "cohort_rate_ge_3": 25.915492957746476,
+                "cohort_rate_ge_5": 13.133802816901408,
+                "cohort_rate_le_minus_3": 12.922535211267604,
+                "cohort_rate_le_minus_5": 4.929577464788732
+              },
+              "T10": {
+                "cohort_n": 2130,
+                "cohort_mean": 2.439927187752218,
+                "cohort_median": 2.189781021897818,
+                "cohort_win_rate": 66.43192488262912,
+                "cohort_rate_ge_3": 43.47417840375587,
+                "cohort_rate_ge_5": 28.544600938967136,
+                "cohort_rate_le_minus_3": 13.661971830985916,
+                "cohort_rate_le_minus_5": 6.197183098591549
+              }
+            },
+            "diagnostics": {
+              "cutoff": {
+                "data_cutoff_date": "2026-08-17",
+                "rows_before_cutoff_filter": 3124,
+                "rows_excluded_after_t0_cutoff": 0,
+                "rows_after_t0_cutoff": 3124
+              },
+              "cohort_n": 3124
+            },
+            "limitations": []
+          },
+          "research_status": "EXPLORATORY"
+        }
+      ]
+    }
+  },
+  {
+    "old_frame": {
+      "frame_id": "frame-00006",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "continuation",
+        "operator": ">",
+        "threshold": 0.0,
+        "early_horizon": "T5",
+        "late_horizon": "T10"
+      },
+      "observation_horizon": 0,
+      "experiments_performed": 1,
+      "features_explored": [
+        "rs10"
+      ],
+      "status": "SUPERSEDED",
+      "candidate_yield": 2,
+      "saturation_evidence": {}
+    },
+    "trigger": {
+      "prior_experiment": "exp-1f130c904254",
+      "prior_metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "29d99ec72ff7e8d0",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      },
+      "prior_observations": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "trigger_code": "STRUCTURAL_TRIGGER",
+      "saturation_evidence": {},
+      "planner_alternatives": [
+        {
+          "action_code": "DECOMPOSE_DATE",
+          "score": -3.0999999999999996
+        },
+        {
+          "action_code": "DECOMPOSE_SYMBOL",
+          "score": -3.0999999999999996
+        },
+        {
+          "action_code": "DECOMPOSE_EPISODE",
+          "score": -5.6
+        },
+        {
+          "action_code": "CONDITION_MARKET",
+          "score": -4.6
+        },
+        {
+          "action_code": "FALSIFY_EXTREME",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "score": -1000.0
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_close",
+          "score": -1.5999999999999996
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs10",
+          "score": -1.5999999999999996
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs5",
+          "score": -1.5999999999999996
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs_spread",
+          "score": -1.5999999999999996
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rsi14",
+          "score": -1.5999999999999996
+        },
+        {
+          "action_code": "TEST_MARKET_INTERACTION",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REFRAME_HORIZON_ADVANCE_frame-00014",
+          "score": -4.75
+        },
+        {
+          "action_code": "HORIZON_ADVANCE_frame-00015",
+          "score": -5.25
+        },
+        {
+          "action_code": "STOP_BRANCH",
+          "score": -6.6
+        },
+        {
+          "action_code": "ABANDON_BRANCH",
+          "score": -3.3499999999999996
+        },
+        {
+          "action_code": "STOP_SESSION",
+          "score": -109.5
+        }
+      ]
+    },
+    "new_frame": {
+      "frame_id": "frame-00002",
+      "transformation_type": "STRUCTURAL_TRIGGER",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t3_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 0,
+      "temporal_legal": true,
+      "sample_n": null
+    },
+    "execution": {
+      "was_researched": true,
+      "experiments_run": 1,
+      "results": [
+        {
+          "experiment_node_id": "exp-1b658a62e480",
+          "tool": "horizon_comparison",
+          "observation_codes": [
+            "HORIZON_HETEROGENEOUS"
+          ],
+          "metrics": {
+            "toolbox_version": "research_toolbox_v1",
+            "tool_status": "OK",
+            "input_hash": "4a11b1caef7a559b",
+            "sample_size": 3124,
+            "horizons_requested": [
+              "T3",
+              "T5",
+              "T10"
+            ],
+            "median_spread": 2.0598843825094466,
+            "groups": {
+              "T3": {
+                "cohort_n": 3124,
+                "cohort_mean": 0.3748427373718639,
+                "cohort_median": 0.12989663938837154,
+                "cohort_win_rate": 50.256081946222785,
+                "cohort_rate_ge_3": 17.221510883482715,
+                "cohort_rate_ge_5": 8.386683738796414,
+                "cohort_rate_le_minus_3": 11.45966709346991,
+                "cohort_rate_le_minus_5": 3.585147247119078
+              },
+              "T5": {
+                "cohort_n": 2840,
+                "cohort_mean": 0.9299008188204332,
+                "cohort_median": 0.8701059917802234,
+                "cohort_win_rate": 58.90845070422536,
+                "cohort_rate_ge_3": 25.915492957746476,
+                "cohort_rate_ge_5": 13.133802816901408,
+                "cohort_rate_le_minus_3": 12.922535211267604,
+                "cohort_rate_le_minus_5": 4.929577464788732
+              },
+              "T10": {
+                "cohort_n": 2130,
+                "cohort_mean": 2.439927187752218,
+                "cohort_median": 2.189781021897818,
+                "cohort_win_rate": 66.43192488262912,
+                "cohort_rate_ge_3": 43.47417840375587,
+                "cohort_rate_ge_5": 28.544600938967136,
+                "cohort_rate_le_minus_3": 13.661971830985916,
+                "cohort_rate_le_minus_5": 6.197183098591549
+              }
+            },
+            "diagnostics": {
+              "cutoff": {
+                "data_cutoff_date": "2026-08-17",
+                "rows_before_cutoff_filter": 3124,
+                "rows_excluded_after_t0_cutoff": 0,
+                "rows_after_t0_cutoff": 3124
+              },
+              "cohort_n": 3124
+            },
+            "limitations": []
+          },
+          "research_status": "EXPLORATORY"
+        }
+      ]
+    }
+  },
+  {
+    "old_frame": {
+      "frame_id": "frame-00002",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t3_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 0,
+      "experiments_performed": 1,
+      "features_explored": [
+        "rs_spread"
+      ],
+      "status": "SUPERSEDED",
+      "candidate_yield": 2,
+      "saturation_evidence": {}
+    },
+    "trigger": {
+      "prior_experiment": "exp-1b658a62e480",
+      "prior_metrics": {
+        "toolbox_version": "research_toolbox_v1",
+        "tool_status": "OK",
+        "input_hash": "4a11b1caef7a559b",
+        "sample_size": 3124,
+        "horizons_requested": [
+          "T3",
+          "T5",
+          "T10"
+        ],
+        "median_spread": 2.0598843825094466,
+        "groups": {
+          "T3": {
+            "cohort_n": 3124,
+            "cohort_mean": 0.3748427373718639,
+            "cohort_median": 0.12989663938837154,
+            "cohort_win_rate": 50.256081946222785,
+            "cohort_rate_ge_3": 17.221510883482715,
+            "cohort_rate_ge_5": 8.386683738796414,
+            "cohort_rate_le_minus_3": 11.45966709346991,
+            "cohort_rate_le_minus_5": 3.585147247119078
+          },
+          "T5": {
+            "cohort_n": 2840,
+            "cohort_mean": 0.9299008188204332,
+            "cohort_median": 0.8701059917802234,
+            "cohort_win_rate": 58.90845070422536,
+            "cohort_rate_ge_3": 25.915492957746476,
+            "cohort_rate_ge_5": 13.133802816901408,
+            "cohort_rate_le_minus_3": 12.922535211267604,
+            "cohort_rate_le_minus_5": 4.929577464788732
+          },
+          "T10": {
+            "cohort_n": 2130,
+            "cohort_mean": 2.439927187752218,
+            "cohort_median": 2.189781021897818,
+            "cohort_win_rate": 66.43192488262912,
+            "cohort_rate_ge_3": 43.47417840375587,
+            "cohort_rate_ge_5": 28.544600938967136,
+            "cohort_rate_le_minus_3": 13.661971830985916,
+            "cohort_rate_le_minus_5": 6.197183098591549
+          }
+        },
+        "diagnostics": {
+          "cutoff": {
+            "data_cutoff_date": "2026-08-17",
+            "rows_before_cutoff_filter": 3124,
+            "rows_excluded_after_t0_cutoff": 0,
+            "rows_after_t0_cutoff": 3124
+          },
+          "cohort_n": 3124
+        },
+        "limitations": []
+      },
+      "prior_observations": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "trigger_code": "STRUCTURAL_TRIGGER",
+      "saturation_evidence": {},
+      "planner_alternatives": [
+        {
+          "action_code": "DECOMPOSE_DATE",
+          "score": -7.125
+        },
+        {
+          "action_code": "DECOMPOSE_SYMBOL",
+          "score": -7.125
+        },
+        {
+          "action_code": "DECOMPOSE_EPISODE",
+          "score": -9.625
+        },
+        {
+          "action_code": "CONDITION_MARKET",
+          "score": -8.625
+        },
+        {
+          "action_code": "FALSIFY_EXTREME",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "score": -6.775
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "score": -6.775
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "score": -5.35
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "score": -4.3
+        },
+        {
+          "action_code": "REFRAME_OUTCOME",
+          "score": -7.3
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REPOPULATE_REFINE",
+          "score": -1000.0
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_close",
+          "score": -5.625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs10",
+          "score": -1000.0
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs5",
+          "score": -5.625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rs_spread",
+          "score": -5.625
+        },
+        {
+          "action_code": "ADAPTIVE_PARTITION_rsi14",
+          "score": -5.625
+        },
+        {
+          "action_code": "TEST_MARKET_INTERACTION",
+          "score": -1000.0
+        },
+        {
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00016",
+          "score": -7.275
+        },
+        {
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00017",
+          "score": -7.275
+        },
+        {
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00018",
+          "score": -5.85
+        },
+        {
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00019",
+          "score": -4.8
+        },
+        {
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00020",
+          "score": -7.8
+        },
+        {
+          "action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00021",
+          "score": -5.325
+        },
+        {
+          "action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00022",
+          "score": -5.325
+        },
+        {
+          "action_code": "REFRAME_HORIZON_ADVANCE_frame-00023",
+          "score": -8.775
+        },
+        {
+          "action_code": "HORIZON_ADVANCE_frame-00024",
+          "score": -7.325
+        },
+        {
+          "action_code": "HORIZON_ADVANCE_frame-00025",
+          "score": -7.325
+        },
+        {
+          "action_code": "HORIZON_ADVANCE_frame-00026",
+          "score": -9.275
+        },
+        {
+          "action_code": "STOP_BRANCH",
+          "score": -10.625
+        },
+        {
+          "action_code": "ABANDON_BRANCH",
+          "score": -7.375
+        },
+        {
+          "action_code": "STOP_SESSION",
+          "score": -113.525
+        }
+      ]
+    },
+    "new_frame": {
+      "frame_id": "frame-00004",
+      "transformation_type": "STRUCTURAL_TRIGGER",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "persist",
+        "field": "t5_return",
+        "operator": ">",
+        "horizons": [
+          "T5",
+          "T10"
+        ],
+        "threshold": 0.0
+      },
+      "observation_horizon": 0,
+      "temporal_legal": true,
+      "sample_n": null
+    },
+    "execution": {
+      "was_researched": true,
+      "experiments_run": 1,
+      "results": [
+        {
+          "experiment_node_id": "exp-ff494e4c3435",
+          "tool": "horizon_comparison",
+          "observation_codes": [
+            "HORIZON_HETEROGENEOUS"
+          ],
+          "metrics": {
+            "toolbox_version": "research_toolbox_v1",
+            "tool_status": "OK",
+            "input_hash": "1b06d092ef3a0093",
+            "sample_size": 3124,
+            "horizons_requested": [
+              "T3",
+              "T5",
+              "T10"
+            ],
+            "median_spread": 2.0598843825094466,
+            "groups": {
+              "T3": {
+                "cohort_n": 3124,
+                "cohort_mean": 0.3748427373718639,
+                "cohort_median": 0.12989663938837154,
+                "cohort_win_rate": 50.256081946222785,
+                "cohort_rate_ge_3": 17.221510883482715,
+                "cohort_rate_ge_5": 8.386683738796414,
+                "cohort_rate_le_minus_3": 11.45966709346991,
+                "cohort_rate_le_minus_5": 3.585147247119078
+              },
+              "T5": {
+                "cohort_n": 2840,
+                "cohort_mean": 0.9299008188204332,
+                "cohort_median": 0.8701059917802234,
+                "cohort_win_rate": 58.90845070422536,
+                "cohort_rate_ge_3": 25.915492957746476,
+                "cohort_rate_ge_5": 13.133802816901408,
+                "cohort_rate_le_minus_3": 12.922535211267604,
+                "cohort_rate_le_minus_5": 4.929577464788732
+              },
+              "T10": {
+                "cohort_n": 2130,
+                "cohort_mean": 2.439927187752218,
+                "cohort_median": 2.189781021897818,
+                "cohort_win_rate": 66.43192488262912,
+                "cohort_rate_ge_3": 43.47417840375587,
+                "cohort_rate_ge_5": 28.544600938967136,
+                "cohort_rate_le_minus_3": 13.661971830985916,
+                "cohort_rate_le_minus_5": 6.197183098591549
+              }
+            },
+            "diagnostics": {
+              "cutoff": {
+                "data_cutoff_date": "2026-08-17",
+                "rows_before_cutoff_filter": 3124,
+                "rows_excluded_after_t0_cutoff": 0,
+                "rows_after_t0_cutoff": 3124
+              },
+              "cohort_n": 3124
+            },
+            "limitations": []
+          },
+          "research_status": "EXPLORATORY"
+        }
+      ]
+    }
+  }
+]
