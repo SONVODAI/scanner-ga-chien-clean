@@ -1,0 +1,17 @@
+{
+  "record_version": "unresolved_uncertainty_v1_3i11",
+  "dimensions_examples": [
+    "episode_robustness",
+    "temporal_robustness",
+    "population_robustness",
+    "horizon_robustness",
+    "effect_stability",
+    "concentration_dominance",
+    "alternative_explanations",
+    "measurement_robustness",
+    "regime_dependence",
+    "statistical_resolution"
+  ],
+  "derivation": "From proposition canonical core + disconfirming_observation_spec + ledger coverage map",
+  "representation": "Set of uncovered dimensions with executability hints \u2014 not scalar"
+}
