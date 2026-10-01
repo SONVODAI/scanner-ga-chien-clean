@@ -1,0 +1,13 @@
+{
+  "head": "57837cd0c8bbf2cf71710abd0b0ba54a205ff2fa",
+  "phase": "3K.2",
+  "stop_boundary": "STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY",
+  "cf_run_pass": true,
+  "simulation_sessions": 15,
+  "counts_as_forward_evidence": false,
+  "duplicate_idempotent": true,
+  "scheduling_activated": false,
+  "trading_isolation_pass": true,
+  "regressions_pass": true,
+  "phase_pass": true
+}

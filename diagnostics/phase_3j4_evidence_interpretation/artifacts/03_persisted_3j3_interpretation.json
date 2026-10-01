@@ -1,0 +1,60 @@
+{
+  "diagnostic_mode": "PERSISTED_3J3_EXECUTION",
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "package_id": "iefp-b18094e5669f",
+  "package_hash": "b61daf4dc6742fa04e47e57c661f9660b74086f3203472d5dbea6627f2308e2f",
+  "selected_candidate_id": "fec-642ea1c70c47",
+  "execution_identity_hash": "82ac3a49f72803bccdc38be92e031453d7750d51f3020990bbd0d995ca81f15b",
+  "execution_id": "iefx-8fccf6e59b73",
+  "matches_3j3_diagnostic": {
+    "package_id": true,
+    "selected_candidate_id": true,
+    "tool_result_hash": true,
+    "execution_identity_hash": true,
+    "scientific_action_core_hash": true
+  },
+  "frozen_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "frozen_contract_source": "3I.7_historical_artifact",
+  "tool_result_hash": "30a9f15dcc793afd7d578cb4207cfa546250b0aec4975d678c4561d755bf1c52",
+  "evidence_relevance": "HIGH",
+  "evidence_direction": "SUPPORTS",
+  "evidence_strength": "MODERATE",
+  "null_accounting": [
+    {
+      "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+      "null_key": "episode_artifact",
+      "state_before": "STILL_PLAUSIBLE",
+      "state_after": "WEAKENED",
+      "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+    }
+  ],
+  "other_nulls_still_alive": [
+    "directional_reversal"
+  ],
+  "prior_epistemic_state": "HYPOTHESIS",
+  "resulting_epistemic_state": "SUPPORTED",
+  "interpretation_outcome": "INTERPRETED",
+  "research_decision_generated": false,
+  "stop_boundary": "STOP_FIRST_EVIDENCE_INTERPRETED",
+  "eligibility": {
+    "eligible": true,
+    "idempotent_replay": false,
+    "reasons": [],
+    "checks": {
+      "execution_envelope_present": true,
+      "frozen_contract_present": true,
+      "package_present": true,
+      "tool_result_present": true,
+      "tool_result_hash_present": true,
+      "proposition_hash_matches": true,
+      "package_hash_matches": true,
+      "package_id_matches": true,
+      "scientific_action_hash_matches": true,
+      "experiment_hash_matches": true,
+      "frozen_contract_integrity": true,
+      "no_post_result_contract_substitution": true
+    },
+    "interpretation_identity_hash": "cf9a0ecfb0a0616a2cc9b697e9705a2ce20a5345c23ed8c3544c4b62eb198068",
+    "gate_version": "first_experiment_interpretation_gate_v1_3j4"
+  }
+}
