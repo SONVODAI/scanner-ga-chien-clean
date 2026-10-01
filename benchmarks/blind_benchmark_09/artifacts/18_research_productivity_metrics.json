@@ -1,0 +1,23 @@
+{
+  "experiments_executed": 12,
+  "experiment_budget": 12,
+  "budget_utilization": 1.0,
+  "unique_experiment_identities": 12,
+  "duplicate_executions": 0,
+  "evidence_responsive_transition_rate": 1.0,
+  "unexplained_transition_rate": 0.0,
+  "session_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "remaining_budget": 0,
+    "unexplored_frontier_count": 37,
+    "features_touched": 3,
+    "eligible_features": 8,
+    "terminal_status": "BUDGET_EXHAUSTED",
+    "experiment_budget": 12,
+    "experiments_executed": 12,
+    "final_experiment_id": "exp-931c120bb21d",
+    "unresolved_promising_deferred_count": 1
+  },
+  "frontier_items_remaining": 54
+}

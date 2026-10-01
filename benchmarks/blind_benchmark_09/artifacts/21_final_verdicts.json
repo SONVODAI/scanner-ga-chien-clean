@@ -1,0 +1,8 @@
+{
+  "verdict_1_phase_3h4_integrity": "PASS",
+  "verdict_2_autonomous_laboratory_competence": "PASS",
+  "verdict_3_improvement_over_previous_bot": "PARTIAL",
+  "verdict_4_next_architectural_bottleneck": "no demonstrated architectural bottleneck",
+  "counterfactual_question_answer": "Phase 3H.4 adds auditable evidence\u2192need\u2192capability chain without changing planner/ERV. Competent session behavior with accurate audit supports outcome A. If behavior matches BB08 with only richer audit, outcome C.",
+  "improvement_question_answer": "PARTIAL"
+}

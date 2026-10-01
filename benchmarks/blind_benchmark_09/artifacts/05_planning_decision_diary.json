@@ -1,0 +1,5373 @@
+[
+  {
+    "step_index": 1,
+    "experiment_node_id": "exp-264bcac5f747",
+    "assessment": {
+      "source_experiment_node_id": "exp-264bcac5f747",
+      "tool_name": "horizon_comparison",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "unresolved_uncertainties": [
+        "HORIZON_STABILITY"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [
+        "HORIZON"
+      ],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "observation_kind": "STRUCTURAL_OBSERVATION",
+      "conditional_candidate": false
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:14Z",
+      "source_experiment_node_id": "exp-264bcac5f747",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "1546513c8254481f",
+    "selected_tool": "horizon_comparison",
+    "selected_action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00007",
+    "candidate_count": 28,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": 5.35,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": 5.35,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": 2.85,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": 3.85,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": 6.375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 2.025,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 4.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "a8b4c0987f57130d": {
+        "total": 8.7,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "07a12336521a685f": {
+        "total": 8.7,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "66cd5c39abfdcba8": {
+        "total": 7.125,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -1.5749999999999997,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "f4548fb3d71490b6": {
+        "total": 8.175,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "b5cbc28fd8459d0b": {
+        "total": 8.175,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "a5e6a03dd8497469": {
+        "total": 6.85,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1cd8543301912be7": {
+        "total": 6.85,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "b122f5c882fdf389": {
+        "total": 6.85,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "5001c4d3def13df5": {
+        "total": 6.85,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "7257d42aeca9be34": {
+        "total": 6.85,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "91e3c14726008468": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "294794538da87a3b": {
+        "total": 8.2,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "380d6b066fba1184": {
+        "total": 8.2,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "9f863f39276d3025": {
+        "total": 6.625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -1.5749999999999997,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ae6ed0a837b1d031": {
+        "total": 7.675,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "49022f03695315b8": {
+        "total": 7.675,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1546513c8254481f": {
+        "total": 10.15,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_information_horizon_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "new_population_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -1.0499999999999998,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "3bd0567dabf64b1d": {
+        "total": 3.7,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "11e2217be7ac6585": {
+        "total": 8.15,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "independent_branch_bonus": 2.0,
+          "new_information_horizon_bonus": 3.5,
+          "new_outcome_bonus": 3.0,
+          "new_population_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -1.0499999999999998,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "d8ae00e4c2500467": {
+        "total": 3.2,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "independent_branch_bonus": 2.0,
+          "new_information_horizon_bonus": 3.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -7.65,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -3.65,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -103.05,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -3.15,
+          "branch_complexity_penalty": -0.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 2,
+    "experiment_node_id": "exp-79c5e46f983c",
+    "assessment": {
+      "source_experiment_node_id": "exp-79c5e46f983c",
+      "tool_name": "horizon_comparison",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "unresolved_uncertainties": [
+        "HORIZON_STABILITY"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [
+        "HORIZON"
+      ],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "observation_kind": "STRUCTURAL_OBSERVATION",
+      "conditional_candidate": false
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:14Z",
+      "source_experiment_node_id": "exp-79c5e46f983c",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "ea37630b08516f35",
+    "selected_tool": "sensitivity_analysis",
+    "selected_action_code": "FALSIFY_EXTREME",
+    "candidate_count": 18,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": 1.2625000000000002,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": 1.2625000000000002,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -1.2374999999999998,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -0.23749999999999982,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": 4.2875,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 2.025,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 6.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "22fc3eb711b39082": {
+        "total": 4.0875,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "a5e6a03dd8497469": {
+        "total": 2.7625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1cd8543301912be7": {
+        "total": 2.7625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "b122f5c882fdf389": {
+        "total": 2.7625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "5001c4d3def13df5": {
+        "total": 2.7625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "7257d42aeca9be34": {
+        "total": 2.7625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "independent_branch_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "91e3c14726008468": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "d4e83e1b6b8dda53": {
+        "total": 3.5875000000000004,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "c8e6db8250089435": {
+        "total": -0.38749999999999984,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "independent_branch_bonus": 2.0,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "4f219ee6ee39f4c4": {
+        "total": -0.8874999999999998,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "independent_branch_bonus": 2.0,
+          "new_information_horizon_bonus": 3.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -4.2375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -0.9874999999999998,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -107.1375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -6.7375,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 3,
+    "experiment_node_id": "exp-ce4706215fe5",
+    "assessment": {
+      "source_experiment_node_id": "exp-ce4706215fe5",
+      "tool_name": "sensitivity_analysis",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "EXTREME_WINNER_ROBUST"
+      ],
+      "unresolved_uncertainties": [],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [],
+      "possible_falsification_targets": [],
+      "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": false,
+      "interesting": false,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "sensitivity_analysis"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "EXTREME_WINNER_ROBUST"
+      ],
+      "observation_kind": "DESCRIPTIVE_OBSERVATION",
+      "conditional_candidate": false
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:14Z",
+      "source_experiment_node_id": "exp-ce4706215fe5",
+      "active_uncertainties": [],
+      "inferred_research_needs": [
+        "REDIRECT_OR_ABANDON"
+      ],
+      "need_matches": [],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [],
+        "falsification_targets": [],
+        "interesting": false,
+        "additional_investigation_warranted": false,
+        "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison",
+          "sensitivity_analysis"
+        ]
+      }
+    },
+    "decision_type": "SWITCH_OPPORTUNITY",
+    "selected_action_id": "380d6b066fba1184",
+    "selected_tool": "horizon_comparison",
+    "selected_action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00003",
+    "candidate_count": 3,
+    "candidate_scores": {
+      "fd0876343b97f1d0": {
+        "total": 4.562500000000001,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 10.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -7.437499999999999,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -2.187499999999999,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -7.437499999999999,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -108.3375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -7.437499999999999,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 4,
+    "experiment_node_id": "exp-b0965e3ee876",
+    "assessment": {
+      "source_experiment_node_id": "exp-b0965e3ee876",
+      "tool_name": "horizon_comparison",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "unresolved_uncertainties": [
+        "HORIZON_STABILITY"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [
+        "HORIZON"
+      ],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "observation_kind": "STRUCTURAL_OBSERVATION",
+      "conditional_candidate": false
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:14Z",
+      "source_experiment_node_id": "exp-b0965e3ee876",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "1cd8543301912be7",
+    "selected_tool": "adaptive_partition_compare",
+    "selected_action_code": "ADAPTIVE_PARTITION_rs10",
+    "candidate_count": 30,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -3.0999999999999996,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -3.0999999999999996,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -5.6,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -4.6,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "289f2f536c20b295": {
+        "total": -2.7499999999999996,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "89bf14de996c8491": {
+        "total": -2.7499999999999996,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "09480b5b993e4490": {
+        "total": -1.3249999999999993,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -1.5749999999999997,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "43f4616486c5b307": {
+        "total": -0.2749999999999996,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fc78056ae00befec": {
+        "total": -0.2749999999999996,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "a5e6a03dd8497469": {
+        "total": -1.5999999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1cd8543301912be7": {
+        "total": -1.5999999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "b122f5c882fdf389": {
+        "total": -1.5999999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "5001c4d3def13df5": {
+        "total": -1.5999999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "7257d42aeca9be34": {
+        "total": -1.5999999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "91e3c14726008468": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "798b451e67bd0b82": {
+        "total": -3.2499999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "c8ac0aaf36030a0b": {
+        "total": -3.2499999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "51215c2965e9e6ad": {
+        "total": -1.8249999999999993,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -1.5749999999999997,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "45f1bbcde49148b8": {
+        "total": -0.7749999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "cc3c106eacfcf5d4": {
+        "total": -0.7749999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "frame_novelty_bonus": 2.0,
+          "new_outcome_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.5249999999999999,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "efc531c2e38c44b6": {
+        "total": -1.2999999999999994,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "new_information_horizon_bonus": 2.0,
+          "new_population_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -1.0499999999999998,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "7b134d9b39f931a2": {
+        "total": -1.2999999999999994,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "unexplored_outcome_bonus": 1.5,
+          "new_information_horizon_bonus": 2.0,
+          "new_population_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -1.0499999999999998,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "93110045e00e9bf0": {
+        "total": -4.75,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1e75151208f695d7": {
+        "total": -3.2999999999999994,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "new_information_horizon_bonus": 3.5,
+          "new_population_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -1.0499999999999998,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "da1679b8bbb2b1c0": {
+        "total": -3.2999999999999994,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "new_information_horizon_bonus": 3.5,
+          "new_population_bonus": 3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -1.0499999999999998,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "3e052dbaf3d27ee8": {
+        "total": -5.25,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "new_information_horizon_bonus": 3.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -6.6,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -3.3499999999999996,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -109.5,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -9.1,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 5,
+    "experiment_node_id": "exp-4fe3d9448d71",
+    "assessment": {
+      "source_experiment_node_id": "exp-4fe3d9448d71",
+      "tool_name": "adaptive_partition_compare",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "unresolved_uncertainties": [
+        "SHAPE_GRADIENT",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "GROUP_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "observation_kind": "CONDITIONAL_CANDIDATE",
+      "conditional_candidate": true
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:14Z",
+      "source_experiment_node_id": "exp-4fe3d9448d71",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+          "research_need": "TEST_ROBUSTNESS",
+          "operation_classes": [
+            "falsification",
+            "neighborhood",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "neighborhood_stability"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "THRESHOLD_EXPLORATION",
+          "research_need": "REFINE_BOUNDARY",
+          "operation_classes": [
+            "threshold"
+          ],
+          "eligible_tools": [
+            "threshold_exploration"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TRAJECTORY_ROLE",
+          "research_need": "EXPLORE_STRUCTURE",
+          "operation_classes": [
+            "decomposition",
+            "partition"
+          ],
+          "eligible_tools": [
+            "trajectory_partition_compare"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "NEIGHBORHOOD_STABILITY",
+          "SYMBOL_DISTRIBUTION",
+          "THRESHOLD_EXPLORATION",
+          "TIME_DISTRIBUTION",
+          "TRAJECTORY_ROLE"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "GROUP_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison",
+          "adaptive_partition_compare"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "a9c8658650c229cd",
+    "selected_tool": "threshold_exploration",
+    "selected_action_code": "EXPLORE_THRESHOLD",
+    "candidate_count": 11,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -1.9124999999999996,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -1.9124999999999996,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -4.4125,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -3.4124999999999996,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "deec807a33e59266": {
+        "total": -2.4124999999999996,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "a9c8658650c229cd": {
+        "total": 1.0875000000000004,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 8.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "8472be392119f0e8": {
+        "total": -7.4125,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.5,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -15.9125,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -11.9125,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -108.3125,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -10.4125,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 6,
+    "experiment_node_id": "exp-f68bc15d7d0e",
+    "assessment": {
+      "source_experiment_node_id": "exp-f68bc15d7d0e",
+      "tool_name": "threshold_exploration",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "unresolved_uncertainties": [
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "GROUP_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "observation_kind": "CONDITIONAL_CANDIDATE",
+      "conditional_candidate": true
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:15Z",
+      "source_experiment_node_id": "exp-f68bc15d7d0e",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "REVISIT_UNRESOLVED_BRANCH",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+          "research_need": "TEST_ROBUSTNESS",
+          "operation_classes": [
+            "falsification",
+            "neighborhood",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "neighborhood_stability"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TRAJECTORY_ROLE",
+          "research_need": "EXPLORE_STRUCTURE",
+          "operation_classes": [
+            "decomposition",
+            "partition"
+          ],
+          "eligible_tools": [
+            "trajectory_partition_compare"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "NEIGHBORHOOD_STABILITY",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION",
+          "TRAJECTORY_ROLE"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "GROUP_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison",
+          "adaptive_partition_compare",
+          "threshold_exploration"
+        ]
+      }
+    },
+    "decision_type": "SWITCH_OPPORTUNITY",
+    "selected_action_id": "49022f03695315b8",
+    "selected_tool": "horizon_comparison",
+    "selected_action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00006",
+    "candidate_count": 11,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -6.462499999999999,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -6.462499999999999,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -8.962499999999999,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -7.962499999999999,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "deec807a33e59266": {
+        "total": -6.962499999999999,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "959ae5413bc87b63": {
+        "total": -10.462499999999999,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 4.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "8472be392119f0e8": {
+        "total": -11.962499999999999,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.5,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -9.962499999999999,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -6.712499999999999,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -112.8625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -11.462499999999999,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 7,
+    "experiment_node_id": "exp-c596642e125e",
+    "assessment": {
+      "source_experiment_node_id": "exp-c596642e125e",
+      "tool_name": "horizon_comparison",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "unresolved_uncertainties": [
+        "HORIZON_STABILITY"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [
+        "HORIZON"
+      ],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "observation_kind": "STRUCTURAL_OBSERVATION",
+      "conditional_candidate": false
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:15Z",
+      "source_experiment_node_id": "exp-c596642e125e",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "5001c4d3def13df5",
+    "selected_tool": "adaptive_partition_compare",
+    "selected_action_code": "ADAPTIVE_PARTITION_rs_spread",
+    "candidate_count": 16,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -7.125,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -7.125,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -9.625,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -8.625,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "a5e6a03dd8497469": {
+        "total": -5.625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1cd8543301912be7": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "b122f5c882fdf389": {
+        "total": -5.625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "5001c4d3def13df5": {
+        "total": -5.625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "7257d42aeca9be34": {
+        "total": -5.625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "91e3c14726008468": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "e27fe255d0da5d2f": {
+        "total": -8.775,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "4fa68b92fcedc1d9": {
+        "total": -9.275,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "new_information_horizon_bonus": 3.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -10.625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -7.375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -113.525,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -13.125,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 8,
+    "experiment_node_id": "exp-39a4fd3320ca",
+    "assessment": {
+      "source_experiment_node_id": "exp-39a4fd3320ca",
+      "tool_name": "adaptive_partition_compare",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "unresolved_uncertainties": [
+        "SHAPE_GRADIENT",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "GROUP_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "observation_kind": "CONDITIONAL_CANDIDATE",
+      "conditional_candidate": true
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:15Z",
+      "source_experiment_node_id": "exp-39a4fd3320ca",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+          "research_need": "TEST_ROBUSTNESS",
+          "operation_classes": [
+            "falsification",
+            "neighborhood",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "neighborhood_stability"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "THRESHOLD_EXPLORATION",
+          "research_need": "REFINE_BOUNDARY",
+          "operation_classes": [
+            "threshold"
+          ],
+          "eligible_tools": [
+            "threshold_exploration"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TRAJECTORY_ROLE",
+          "research_need": "EXPLORE_STRUCTURE",
+          "operation_classes": [
+            "decomposition",
+            "partition"
+          ],
+          "eligible_tools": [
+            "trajectory_partition_compare"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "NEIGHBORHOOD_STABILITY",
+          "SYMBOL_DISTRIBUTION",
+          "THRESHOLD_EXPLORATION",
+          "TIME_DISTRIBUTION",
+          "TRAJECTORY_ROLE"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "GROUP_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison",
+          "adaptive_partition_compare"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "9efaca993e326ae5",
+    "selected_tool": "threshold_exploration",
+    "selected_action_code": "EXPLORE_THRESHOLD",
+    "candidate_count": 11,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -5.937499999999998,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -5.937499999999998,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -8.437499999999998,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -7.437499999999998,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "deec807a33e59266": {
+        "total": -6.437499999999998,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "9efaca993e326ae5": {
+        "total": -2.9374999999999982,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 8.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "8be17f06d2f70192": {
+        "total": -11.437499999999998,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.5,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -19.9375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -15.937499999999998,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -112.33749999999999,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -14.437499999999998,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 9,
+    "experiment_node_id": "exp-30694825cb95",
+    "assessment": {
+      "source_experiment_node_id": "exp-30694825cb95",
+      "tool_name": "threshold_exploration",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "unresolved_uncertainties": [
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "GROUP_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "observation_kind": "CONDITIONAL_CANDIDATE",
+      "conditional_candidate": true
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:15Z",
+      "source_experiment_node_id": "exp-30694825cb95",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "REVISIT_UNRESOLVED_BRANCH",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+          "research_need": "TEST_ROBUSTNESS",
+          "operation_classes": [
+            "falsification",
+            "neighborhood",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "neighborhood_stability"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TRAJECTORY_ROLE",
+          "research_need": "EXPLORE_STRUCTURE",
+          "operation_classes": [
+            "decomposition",
+            "partition"
+          ],
+          "eligible_tools": [
+            "trajectory_partition_compare"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "NEIGHBORHOOD_STABILITY",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION",
+          "TRAJECTORY_ROLE"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "GROUP_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison",
+          "adaptive_partition_compare",
+          "threshold_exploration"
+        ]
+      }
+    },
+    "decision_type": "SWITCH_OPPORTUNITY",
+    "selected_action_id": "9f863f39276d3025",
+    "selected_tool": "horizon_comparison",
+    "selected_action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00004",
+    "candidate_count": 11,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -9.7875,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -9.7875,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -12.2875,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -11.2875,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "deec807a33e59266": {
+        "total": -10.2875,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "45a8f7a79113c113": {
+        "total": -13.7875,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 4.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "8be17f06d2f70192": {
+        "total": -15.2875,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.5,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -13.2875,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -10.0375,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -116.1875,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -14.7875,
+          "branch_complexity_penalty": -2.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 10,
+    "experiment_node_id": "exp-09c12d97750c",
+    "assessment": {
+      "source_experiment_node_id": "exp-09c12d97750c",
+      "tool_name": "horizon_comparison",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "unresolved_uncertainties": [
+        "HORIZON_STABILITY"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [
+        "HORIZON"
+      ],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS"
+      ],
+      "observation_kind": "STRUCTURAL_OBSERVATION",
+      "conditional_candidate": false
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:15Z",
+      "source_experiment_node_id": "exp-09c12d97750c",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "SYMBOL_DISTRIBUTION",
+          "TIME_DISTRIBUTION"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "NO_CLEAR_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "7257d42aeca9be34",
+    "selected_tool": "adaptive_partition_compare",
+    "selected_action_code": "ADAPTIVE_PARTITION_rsi14",
+    "candidate_count": 16,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -10.45,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -10.45,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -12.95,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -11.95,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "a5e6a03dd8497469": {
+        "total": -8.95,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "1cd8543301912be7": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "b122f5c882fdf389": {
+        "total": -8.95,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "5001c4d3def13df5": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "7257d42aeca9be34": {
+        "total": -8.95,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_feature_bonus": 2.5,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "91e3c14726008468": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "c35f34d4278edadf": {
+        "total": -12.1,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 2.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "frame_novelty_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "2b34bfeb53b1ef84": {
+        "total": -12.6,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "unexplored_population_bonus": 0.75,
+          "new_information_horizon_bonus": 3.5,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -13.95,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": -4.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 7.5
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -10.7,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 6.75
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -116.85,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -16.45,
+          "branch_complexity_penalty": -1.0,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 11,
+    "experiment_node_id": "exp-3c48b621496c",
+    "assessment": {
+      "source_experiment_node_id": "exp-3c48b621496c",
+      "tool_name": "adaptive_partition_compare",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "unresolved_uncertainties": [
+        "SHAPE_GRADIENT",
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "GROUP_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "observation_kind": "CONDITIONAL_CANDIDATE",
+      "conditional_candidate": true
+    },
+    "competence_model": {
+      "version": "research_competence_v1",
+      "built_at": "2026-08-21T15:14:16Z",
+      "source_experiment_node_id": "exp-3c48b621496c",
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "need_matches": [
+        {
+          "uncertainty_code": "EPISODE_REPLICATION",
+          "research_need": "REPLICATE",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "episode_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "EXTREME_WINNER",
+          "research_need": "SEEK_FALSIFICATION",
+          "operation_classes": [
+            "falsification",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "sensitivity_analysis"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "MARKET_DEPENDENCE",
+          "research_need": "CONDITION_ON_CONTEXT",
+          "operation_classes": [
+            "decomposition",
+            "context"
+          ],
+          "eligible_tools": [
+            "market_conditioning"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "NEIGHBORHOOD_STABILITY",
+          "research_need": "TEST_ROBUSTNESS",
+          "operation_classes": [
+            "falsification",
+            "neighborhood",
+            "robustness"
+          ],
+          "eligible_tools": [
+            "neighborhood_stability"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "SYMBOL_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "symbol_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "THRESHOLD_EXPLORATION",
+          "research_need": "REFINE_BOUNDARY",
+          "operation_classes": [
+            "threshold"
+          ],
+          "eligible_tools": [
+            "threshold_exploration"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TIME_DISTRIBUTION",
+          "research_need": "DECOMPOSE_HETEROGENEITY",
+          "operation_classes": [
+            "decomposition"
+          ],
+          "eligible_tools": [
+            "date_decomposition"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        },
+        {
+          "uncertainty_code": "TRAJECTORY_ROLE",
+          "research_need": "EXPLORE_STRUCTURE",
+          "operation_classes": [
+            "decomposition",
+            "partition"
+          ],
+          "eligible_tools": [
+            "trajectory_partition_compare"
+          ],
+          "legally_constructible": true,
+          "branch_tools_closed": false,
+          "excluded_tools": [],
+          "exclusion_reasons": []
+        }
+      ],
+      "unaddressed_gaps": [],
+      "triggering_evidence": {
+        "information_gaps": [
+          "EPISODE_REPLICATION",
+          "MARKET_DEPENDENCE",
+          "NEIGHBORHOOD_STABILITY",
+          "SYMBOL_DISTRIBUTION",
+          "THRESHOLD_EXPLORATION",
+          "TIME_DISTRIBUTION",
+          "TRAJECTORY_ROLE"
+        ],
+        "falsification_targets": [
+          "EXTREME_WINNER"
+        ],
+        "interesting": true,
+        "additional_investigation_warranted": true,
+        "descriptive_strength": "GROUP_DIFFERENCE",
+        "fragility_evidence": [],
+        "branch_tools_attempted": [
+          "horizon_comparison",
+          "horizon_comparison",
+          "adaptive_partition_compare"
+        ]
+      }
+    },
+    "decision_type": "EXPERIMENT",
+    "selected_action_id": "0422aabb4bee5857",
+    "selected_tool": "threshold_exploration",
+    "selected_action_code": "EXPLORE_THRESHOLD",
+    "candidate_count": 11,
+    "candidate_scores": {
+      "e8415614d364331f": {
+        "total": -9.2625,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "288ef208675e4c25": {
+        "total": -9.2625,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "0fbabdc2926b2f1b": {
+        "total": -11.7625,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ee012fa331168e78": {
+        "total": -10.7625,
+        "components": {
+          "information_gap": 3.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "deec807a33e59266": {
+        "total": -9.7625,
+        "components": {
+          "information_gap": 2.5,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "information_gain_bonus": 2.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "ea37630b08516f35": {
+        "total": -1000.0,
+        "components": {
+          "blocked": -1000.0
+        }
+      },
+      "0422aabb4bee5857": {
+        "total": -6.262499999999999,
+        "components": {
+          "information_gap": 3.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 8.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "7c31d443af107a0d": {
+        "total": -14.7625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 2.0,
+          "grammar": 0.0,
+          "adaptive": 2.5,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "redundancy_penalty": -3.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fd0876343b97f1d0": {
+        "total": -19.2625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "fe3ab55226b9633f": {
+        "total": -19.2625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.0,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": 0.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 0.0,
+          "weak_complexity_stop": 0.0
+        }
+      },
+      "e0d6e94eb5336156": {
+        "total": -115.6625,
+        "components": {
+          "information_gap": 0.0,
+          "falsification_threat": 0.0,
+          "novelty": 0.6,
+          "grammar": 0.0,
+          "adaptive": 0.0,
+          "stop": 0.0,
+          "abandon": 0.0,
+          "stop_branch_penalty": 0.0,
+          "stop_session_block": -100.0,
+          "search_complexity_penalty": -17.7625,
+          "branch_complexity_penalty": -1.5,
+          "draft_complexity_penalty": -0.0,
+          "skepticism_escalation": 0.0,
+          "strong_evidence_exploration": 3.0,
+          "weak_complexity_stop": 0.0
+        }
+      }
+    }
+  },
+  {
+    "step_index": 12,
+    "experiment_node_id": "exp-931c120bb21d",
+    "assessment": {
+      "source_experiment_node_id": "exp-931c120bb21d",
+      "tool_name": "threshold_exploration",
+      "tool_status": "OK",
+      "empirical_findings": [
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "unresolved_uncertainties": [
+        "TRAJECTORY_OR_GROUP_DIFFERENCE"
+      ],
+      "contradictions": [],
+      "concentration_concerns": [],
+      "replication_concerns": [],
+      "fragility_evidence": [],
+      "context_dependence": [],
+      "horizon_dependence": [],
+      "information_gaps": [
+        "EPISODE_REPLICATION",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "possible_falsification_targets": [
+        "EXTREME_WINNER"
+      ],
+      "descriptive_strength": "GROUP_DIFFERENCE",
+      "interpretation_confidence": "HIGH",
+      "additional_investigation_warranted": true,
+      "interesting": true,
+      "validated": false,
+      "actionable": false,
+      "branch_tools_attempted": [
+        "horizon_comparison",
+        "horizon_comparison",
+        "adaptive_partition_compare",
+        "threshold_exploration"
+      ],
+      "branch_observation_codes": [
+        "HORIZON_HETEROGENEOUS",
+        "HORIZON_HETEROGENEOUS",
+        "SHAPE_STEP_CHANGE",
+        "TRAJECTORY_GROUP_DIFFERENCE",
+        "TRAJECTORY_GROUP_DIFFERENCE"
+      ],
+      "observation_kind": "CONDITIONAL_CANDIDATE",
+      "conditional_candidate": true
+    },
+    "competence_model": null,
+    "decision_type": "STOP_SESSION",
+    "selected_action_id": null,
+    "selected_tool": null,
+    "selected_action_code": null,
+    "candidate_count": 0,
+    "candidate_scores": {}
+  }
+]

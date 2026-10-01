@@ -1,0 +1,39 @@
+{
+  "benchmark_id": "blind_benchmark_09",
+  "benchmark_version": "bb09_v1",
+  "completed_at": "2026-08-21T15:14:17Z",
+  "session_id": "bb09-autonomous-001",
+  "frozen_research_commit": "0df4597b2",
+  "git_commit": "0df4597b2104036f1be984d438769c161f02812e",
+  "session_status": "BUDGET_EXHAUSTED",
+  "experiments_used": 12,
+  "step_count": 12,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "competence_audit_entries": 11,
+  "has_operational_awareness": true,
+  "capability_gates": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "PASS",
+    "G": "PASS",
+    "H": "PASS",
+    "I": "PASS",
+    "J": "INCONCLUSIVE",
+    "K": "INCONCLUSIVE",
+    "L": "PASS",
+    "M": "PASS",
+    "N": "INCONCLUSIVE",
+    "O": "FAIL"
+  },
+  "final_verdicts": {
+    "verdict_1_phase_3h4_integrity": "PASS",
+    "verdict_2_autonomous_laboratory_competence": "PASS",
+    "verdict_3_improvement_over_previous_bot": "PARTIAL",
+    "verdict_4_next_architectural_bottleneck": "no demonstrated architectural bottleneck",
+    "counterfactual_question_answer": "Phase 3H.4 adds auditable evidence\u2192need\u2192capability chain without changing planner/ERV. Competent session behavior with accurate audit supports outcome A. If behavior matches BB08 with only richer audit, outcome C.",
+    "improvement_question_answer": "PARTIAL"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "A": {
+    "gate": "Frozen research commit respected",
+    "result": "PASS",
+    "evidence": "0df4597b2104036f1be984d438769c161f02812e"
+  },
+  "B": {
+    "gate": "Dataset fingerprint unchanged",
+    "result": "PASS",
+    "evidence": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5"
+  },
+  "C": {
+    "gate": "Full allowed experiment budget handled correctly",
+    "result": "PASS",
+    "evidence": "12"
+  },
+  "D": {
+    "gate": "No runtime failure",
+    "result": "PASS",
+    "evidence": "none"
+  },
+  "E": {
+    "gate": "No duplicate experiment execution",
+    "result": "PASS",
+    "evidence": "0"
+  },
+  "F": {
+    "gate": "No illegal capability use",
+    "result": "PASS",
+    "evidence": "[]"
+  },
+  "G": {
+    "gate": "Competence audit matches actual behavior",
+    "result": "PASS",
+    "evidence": "divergences=0"
+  },
+  "H": {
+    "gate": "Researcher demonstrates selective tool use",
+    "result": "PASS",
+    "evidence": "used=4 available=14"
+  },
+  "I": {
+    "gate": "Investigation changes are evidence-responsive",
+    "result": "PASS",
+    "evidence": "11/11"
+  },
+  "J": {
+    "gate": "Promising lines can receive justified depth",
+    "result": "INCONCLUSIVE",
+    "evidence": "no fixed depth criterion in session"
+  },
+  "K": {
+    "gate": "Weak/contradicted lines can be redirected or abandoned",
+    "result": "INCONCLUSIVE",
+    "evidence": "requires explicit contradiction trajectory in session"
+  },
+  "L": {
+    "gate": "Falsification recognized when warranted",
+    "result": "PASS",
+    "evidence": "{\"falsification_needs_recognized_total\": 10, \"falsification_candidates_constructed_total\": 2, \"falsification_experiments_executed\": 1, \"falsification_events\": [{\"experiment_node_id\": \"exp-ce4706215fe5"
+  },
+  "M": {
+    "gate": "No forced capability/toolbox coverage",
+    "result": "PASS",
+    "evidence": "used 4 of 14"
+  },
+  "N": {
+    "gate": "Global allocator does not systematically ignore superior alternatives",
+    "result": "INCONCLUSIVE",
+    "evidence": "requires manual review of global diary"
+  },
+  "O": {
+    "gate": "Session termination lifecycle correct",
+    "result": "FAIL",
+    "evidence": "BUDGET_EXHAUSTED"
+  }
+}

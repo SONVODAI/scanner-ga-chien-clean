@@ -1,0 +1,41 @@
+{
+  "bb08": {
+    "available": true,
+    "session_id": "bb08-autonomous-001",
+    "experiments_used": 12,
+    "session_status": "BUDGET_EXHAUSTED",
+    "tool_distribution": {
+      "adaptive_partition_compare": 3,
+      "threshold_exploration": 3,
+      "horizon_comparison": 5,
+      "sensitivity_analysis": 1
+    },
+    "has_competence_audit": false,
+    "has_operational_awareness": false,
+    "note": "BB08 predates Phase 3H.4; behavioral comparison only where metrics align"
+  },
+  "bb09": {
+    "experiments_used": 12,
+    "tool_distribution": {
+      "horizon_comparison": 5,
+      "sensitivity_analysis": 1,
+      "adaptive_partition_compare": 3,
+      "threshold_exploration": 3
+    },
+    "evidence_responsive_transition_rate": 1.0,
+    "tools_used_count": 4,
+    "falsification_experiments": 1
+  },
+  "directly_comparable": [
+    "experiments_used",
+    "tool_distribution",
+    "session_status"
+  ],
+  "bb09_only_metrics": [
+    "competence_audit_entries",
+    "operational_awareness_snapshot",
+    "evidence_responsive_transition_rate",
+    "competence_fidelity"
+  ],
+  "interpretation": "Phase 3H.4 intentionally does not change planner/ERV for identical opportunity sets; path differences from equal-ERV ties are expected."
+}
