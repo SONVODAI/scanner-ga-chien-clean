@@ -1,0 +1,14 @@
+{
+  "tool_result_accessed": false,
+  "experiment_executed": false,
+  "selection_rerun_on_frozen_package": false,
+  "hidden_benchmark_outcome_accessed": false,
+  "profitability_outcome_accessed": false,
+  "audit_reads_only": [
+    "/workspace/diagnostics/phase_3i16_scientific_action_generator/artifacts/04_t2_one_shot_generation.json",
+    "/workspace/diagnostics/phase_3i14_automatic_synthesis_hook/artifacts/05_hook_t2_replay.json",
+    "modules/edge_research/opr_bridge/scientific_action_*.py (static code review)"
+  ],
+  "generator_has_no_execution_imports": true,
+  "passed": true
+}

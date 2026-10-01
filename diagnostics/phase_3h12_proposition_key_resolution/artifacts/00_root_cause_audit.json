@@ -1,0 +1,72 @@
+{
+  "phase": "3H.12",
+  "baseline_commit": "de4f9e3e0",
+  "audit_date": "2026-08-22",
+  "bb12_symptoms": {
+    "novelty_audit_entries": 300,
+    "gating_applied_count": 0,
+    "representation_novelty_only_count": 0,
+    "mechanical_cycling_bb11_bb12": "3 -> 3",
+    "unexplored_frontier_at_stop": "36 -> 36"
+  },
+  "root_causes": [
+    {
+      "id": "RC1",
+      "title": "Incomplete candidate scope — missing outcome_spec",
+      "evidence": "Mechanical-tool candidates (adaptive_partition_compare, threshold_exploration) carry population_spec at research_scope top level but omit outcome_spec. Branch parent experiments hold outcome in pending_question_context. Identity derivation reads scope.outcome_spec only, leaving candidate outcome empty.",
+      "effect": "same_out=false in relationship classifier even when branch resolves the same outcome. Candidates fall through to RELATED_BUT_DISTINCT via same_unc AND (same_out OR same_pop) instead of SAME_QUESTION_DIFFERENT_INSTRUMENT which requires same_out AND same_pop AND same_horizon.",
+      "component": "outcome_spec propagation"
+    },
+    {
+      "id": "RC2",
+      "title": "Feature slice baked into scientific proposition key",
+      "evidence": "scientific_proposition_key() hashes feature_slice (partition_column, feature_column) into key suffix. rs10 vs rs_spread produce different keys despite identical pop/out hash prefix (7001d054a1ad35e8).",
+      "effect": "same_proposition=false even when pop/out/horizon/uncertainty align. Blocks NEAR_DUPLICATE and SAME_QUESTION paths that depend on proposition key equality.",
+      "component": "proposition_key formula"
+    },
+    {
+      "id": "RC3",
+      "title": "Spec source asymmetry — pending_question_context ignored for top-level scope",
+      "evidence": "_scope_specs reads scope.population_spec OR pending.population_spec but mechanical candidates store pop at scope level without copying pending outcome. Portfolio _spec_hashes reads ONLY pending_question_context, creating inconsistency between portfolio hashes and identity derivation.",
+      "effect": "Identity and portfolio dimension accounting disagree on what constitutes the scientific question.",
+      "component": "scope normalization"
+    },
+    {
+      "id": "RC4",
+      "title": "Legacy path — draft_spec absent on some frontier/portfolio items",
+      "evidence": "36/300 BB12 novelty audits classified LEGACY_NO_SEMANTIC_CONTEXT (derive_identity_from_candidate returned None). Occurs early in session before full candidate draft specs materialize.",
+      "effect": "Fail-closed legacy path preserves raw novelty; no gating possible.",
+      "component": "early-session identity availability"
+    }
+  ],
+  "t4_t8_t9_decomposition": {
+    "T4": {
+      "tool": "adaptive_partition_compare",
+      "candidate_pop": {"kind": "all"},
+      "candidate_out": {},
+      "feature_slice": ["rs10"],
+      "branch_trigger_outcome": "t3_return compare",
+      "vs_registry_prior": "same_pop partial, same_out false (missing), same_unc true -> RELATED_BUT_DISTINCT or INSUFFICIENT_EVIDENCE",
+      "representational_vs_scientific": "Missing outcome is representational/incomplete metadata, not a new scientific question"
+    },
+    "T8": {
+      "tool": "adaptive_partition_compare",
+      "feature_slice": ["rs_spread"],
+      "note": "Different explanatory feature (rs_spread vs rs10) may be legitimately DISTINCT — not targeted for forced reclassification"
+    },
+    "T9": {
+      "tool": "threshold_exploration",
+      "feature_slice": ["rs_spread"],
+      "note": "Same feature as T8 candidate; tool change alone may be representation if core question matches"
+    }
+  },
+  "fix_strategy": {
+    "approach": "Canonical proposition core separating scientific question from representation envelope; branch-context enrichment for missing outcome/pop; core-based relationship classification",
+    "explicitly_not": [
+      "tool-pair rules",
+      "BB11 transition labels",
+      "planner weight changes",
+      "market-specific predicates"
+    ]
+  }
+}

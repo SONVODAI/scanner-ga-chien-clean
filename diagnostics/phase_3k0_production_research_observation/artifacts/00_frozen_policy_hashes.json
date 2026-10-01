@@ -1,0 +1,17 @@
+{
+  "frozen_at_head": "abd97dac9b70d814f1ae3423a24dfb9cfadb1146",
+  "policy_hashes": {
+    "bounded_lifecycle_controller.py": "ff078e346b174fdd63d07ec051677c8f75c394d773762a86d84a620a70bdfdba",
+    "bounded_lifecycle_records.py": "ba749a12e799b11d26eff8b8218f72654dd6b9dc122b27183469a5bac9ac5ca8",
+    "bounded_lifecycle_state.py": "a011c2d3052590fa3df8bddfd2bd64f052d0cfcecca9b1974a11f6353e1cef24",
+    "production_bounded_lifecycle.py": "236ad19f9156729438678e0685d8a9d767bf9df3c8d295cfd5b63fb67c943471",
+    "first_experiment_research_decider.py": "e04febd02446894265ea1bd0bb7fe6b5142ef388ce21736219dd7179041c559d",
+    "second_experiment_research_decider.py": "7650db3406adc1ebe7c9d3a61c813fca9c26cbec197c18ec0d815ad29a33b5c8",
+    "first_experiment_evidence_interpreter.py": "78e55b430e877e8f45eae41a7950cc88694d89f6b0e79e291958efa6e48c3296",
+    "second_experiment_evidence_interpreter.py": "e74c8529dfdc9e615c5d49aec2cedc7eac44ae9e96d637d4bb7abf440aeaceae",
+    "multi_evidence_accounting.py": "26bdd50e4b35127ace7c3c537032376fa1c2f49d4980150ebf8af49601550994",
+    "production_trigger.py": "bf02dacd1b8d82416aa5eb50e91a83bd2c2c66f56af90e45e79bb12a8e573912",
+    "prioritized_pipeline.py": "7b6f9896014d5de44c8f490c0534f7e1041d7686812f33e17ec8aed68d9df5ac",
+    "proposition_synthesizer.py": "25f51accd27a8ff6d4b1d2af8e3e9426defe600ad3897235451d81507ce11cf5"
+  }
+}
