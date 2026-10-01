@@ -1,0 +1,18 @@
+{
+  "silence_emission": "NO_HIGH_INFORMATION_ACTION",
+  "triggers": [
+    "major executable uncertainty axes saturated",
+    "remaining candidates all REDUNDANT",
+    "only representation changes remain",
+    "no interpretable experiment can materially update knowledge"
+  ],
+  "current_capability": {
+    "priority_level": "ResearchPriorityDecision can emit HOLD_PROVISIONALLY / HOLD_UNRESOLVED (3I.12)",
+    "action_candidate_level": "NOT IMPLEMENTED \u2014 no generator emits NO_HIGH_INFORMATION_ACTION"
+  },
+  "supports": [
+    "HOLD_PROVISIONALLY",
+    "HOLD_UNRESOLVED",
+    "ACTION_RECORDED_ONLY"
+  ]
+}

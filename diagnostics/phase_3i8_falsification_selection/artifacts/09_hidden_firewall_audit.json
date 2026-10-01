@@ -1,0 +1,11 @@
+{
+  "modules_checked": [
+    "modules/edge_research/opr_bridge/proposition_experiment_interpreter.py",
+    "modules/edge_research/opr_bridge/lifecycle_runner.py",
+    "modules/edge_research/research_actions.py"
+  ],
+  "forbidden_terms_found": [],
+  "zone_c_accessible": false,
+  "future_result_access_in_design": false,
+  "passed": true
+}

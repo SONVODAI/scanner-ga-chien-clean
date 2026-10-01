@@ -1,0 +1,81 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "package_id": "iefp-b18094e5669f",
+  "package_hash": "b61daf4dc6742fa04e47e57c661f9660b74086f3203472d5dbea6627f2308e2f",
+  "selected_candidate_id": "fec-642ea1c70c47",
+  "scientific_objective": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+  "population": {
+    "kind": "filter",
+    "field": "trade_date",
+    "operator": "not_in",
+    "values": [
+      "2026-08-02"
+    ],
+    "grammar_version": "research_grammar_v1"
+  },
+  "outcome_horizon": {
+    "outcome": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "horizon": 0
+  },
+  "selected_tool": "partition_group_compare",
+  "binding_summary": {
+    "scientific_spec_hash": "3ceceaaf55033c845f646114d17aae41e652d7460e590740a4df1dc0dddac8df",
+    "execution_spec_hash": "383e822e4c33a1eddf806200dbfd48013efc9bc88e947765526a9cfa1fae442d",
+    "scientific_action_core_hash": "7c36063645e4884ac7df42c1357e63e8b978a0658da862a9e3f95cc04b10f589",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "binding_notes": [
+      "binding_version=first_experiment_execution_binding_v1_3j3",
+      "executed_question_equals_selected_question",
+      "cohort_strategy=counterexample_period_search"
+    ]
+  },
+  "eligibility": {
+    "eligibility": "ELIGIBLE",
+    "reasons": [],
+    "checks": {
+      "package_exists": true,
+      "disposition_selected": true,
+      "selected_spec_present": true,
+      "selected_candidate_present": true,
+      "candidate_record_found": true,
+      "proposition_id_matches": true,
+      "proposition_hash_matches": true,
+      "package_hash_recomputed": true,
+      "execution_status_not_executed": true,
+      "candidate_executable": true,
+      "candidate_spec_matches_package": true,
+      "scientific_action_hash_intact": true,
+      "experiment_content_hash_matches": true,
+      "tool_in_registry": true,
+      "no_fallback_tool_substitution": true,
+      "population_representable": true,
+      "outcome_spec_present": true,
+      "population_spec_present": true,
+      "no_binding_mutation": true,
+      "no_confirmatory_substitution": true
+    },
+    "gate_version": "first_experiment_execution_gate_v1_3j3"
+  },
+  "execution_status": "SUCCESS",
+  "tool_result_identity": "30a9f15dcc793afd7d578cb4207cfa546250b0aec4975d678c4561d755bf1c52",
+  "execution_identity_hash": "82ac3a49f72803bccdc38be92e031453d7750d51f3020990bbd0d995ca81f15b",
+  "sample_size": 6106,
+  "provenance": {
+    "panel_provenance_hash": "ff537aaacda385fc290e80d852d55f0a3c43148b7ad768117276173c6e9c2349",
+    "package_hash": "b61daf4dc6742fa04e47e57c661f9660b74086f3203472d5dbea6627f2308e2f"
+  },
+  "scientific_action_identity_survived": true,
+  "fallback_or_substitution": false,
+  "stop_boundary": "STOP_FIRST_EXPERIMENT_EXECUTED",
+  "selected_experiment_spec_tool": "partition_group_compare"
+}

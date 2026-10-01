@@ -1,0 +1,151 @@
+{
+  "benchmark": "BB-Cohort-01",
+  "case_count": 18,
+  "passed": 18,
+  "all_passed": true,
+  "results": [
+    {
+      "case_id": "BBC-01",
+      "passed": true,
+      "checks": {
+        "disposition": true,
+        "not_redundant": true
+      },
+      "disposition": "SELECTED"
+    },
+    {
+      "case_id": "BBC-02",
+      "passed": true,
+      "checks": {
+        "disposition": true,
+        "row_diff_low_indep": true
+      },
+      "disposition": "SELECTED"
+    },
+    {
+      "case_id": "BBC-03",
+      "passed": true,
+      "checks": {},
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-04",
+      "passed": true,
+      "checks": {
+        "disposition": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-05",
+      "passed": true,
+      "checks": {
+        "fork": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-06",
+      "passed": true,
+      "checks": {
+        "rescue_blocked": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-07",
+      "passed": true,
+      "checks": {
+        "disposition_in": true,
+        "ordering_invariant": true
+      },
+      "disposition": "SELECTED"
+    },
+    {
+      "case_id": "BBC-08",
+      "passed": true,
+      "checks": {
+        "disposition": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-09",
+      "passed": true,
+      "checks": {},
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-10",
+      "passed": true,
+      "checks": {
+        "unknown_dim": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-11",
+      "passed": true,
+      "checks": {
+        "complement": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-12",
+      "passed": true,
+      "checks": {
+        "ctx_a_low": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-13",
+      "passed": true,
+      "checks": {
+        "temporal": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-14",
+      "passed": true,
+      "checks": {
+        "pop_diff": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-15",
+      "passed": true,
+      "checks": {
+        "tool_removal": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-16",
+      "passed": true,
+      "checks": {
+        "no_outcome_leak": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-17",
+      "passed": true,
+      "checks": {
+        "ordering_invariant": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    },
+    {
+      "case_id": "BBC-18",
+      "passed": true,
+      "checks": {
+        "cross_family": true
+      },
+      "disposition": "NO_DEFENSIBLE_COHORT"
+    }
+  ]
+}

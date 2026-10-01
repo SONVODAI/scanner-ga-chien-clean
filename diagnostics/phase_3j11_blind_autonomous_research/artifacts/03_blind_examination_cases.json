@@ -1,0 +1,2070 @@
+[
+  {
+    "anonymous_id": "CASE-0101",
+    "seed": 101,
+    "journey": {
+      "anonymous_case_id": "CASE-0101",
+      "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-7dc",
+      "proposition_id": "prop-9ef0ad5446c79fb8",
+      "proposition_summary": {
+        "proposition_id": "prop-9ef0ad5446c79fb8",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-e7e50d24cfb5",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-821a96ee2016",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "SUPPORTED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-3a14a81a273d",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-f79151dc5ed3",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-fe7ad5ce130f",
+        "proposition_id": "prop-9ef0ad5446c79fb8",
+        "proposition_hash": "c812572458a84811564fb428519dbcc920061b07b42c3f6818ff4839454593a3",
+        "session_id": "opr-prod-prop-9ef0ad5446c79fb8-sess-7dc",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-e7e50d24cfb5",
+          "sefp-3a14a81a273d"
+        ],
+        "tool_result_identities": [
+          "iefx-821a96ee2016",
+          "sefx-f79151dc5ed3"
+        ],
+        "interpretation_identities": [
+          "iefi-796089a93cca"
+        ],
+        "decision_identities": [
+          "iefd-a162dabcf82a"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:20:54.647451+00:00",
+        "audit_hash": "a7f933ace7fe78adb7ad7a8619ff591da2a5c6f8d58a23a1a4d88f09a216b9cb"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:20:52.857394+00:00",
+      "lifecycle_frozen_hash": "b9068e28fb7e95c8f6689db267998de1876ed394c0f47ffd4153b2c715374042",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0101",
+      "seed": 101,
+      "blind_class": "BLIND-A",
+      "ground_truth": {
+        "case_id": "BBE-BLINDA-0101",
+        "blind_class": "BLIND-A",
+        "seed": 101,
+        "mechanism": "quintile_monotonic_positive_across_multiple_dates",
+        "true_direction": "positive",
+        "stability_structure": "distributed_across_4_episodes",
+        "artifact_or_confound": "none",
+        "expected_scientific_risk": "low_if_evidence_sufficient",
+        "expected_behavior_notes": "May support if experiments encounter distributed structure.",
+        "panel_fingerprint": "271e5ec7aa5eab0ef912f5e55b30a1de567a4a80ca8aad614b32afc197a13dff",
+        "generation_config": {
+          "effect_dates": [
+            "2026-01-10",
+            "2026-01-15",
+            "2026-01-20",
+            "2026-01-30"
+          ],
+          "focal_date": "2026-01-30"
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "b9068e28fb7e95c8f6689db267998de1876ed394c0f47ffd4153b2c715374042",
+      "reveal_after_hash": "b9068e28fb7e95c8f6689db267998de1876ed394c0f47ffd4153b2c715374042",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0102",
+    "seed": 102,
+    "journey": {
+      "anonymous_case_id": "CASE-0102",
+      "session_id": "opr-prod-prop-392f25bf8af8e039-sess-dfb",
+      "proposition_id": "prop-392f25bf8af8e039",
+      "proposition_summary": {
+        "proposition_id": "prop-392f25bf8af8e039",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-9559f5614a01",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-9ca0a213c40d",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "SUPPORTED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-30a0ea30efc1",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-d088898b4d5a",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-588d3d2fe8ec",
+        "proposition_id": "prop-392f25bf8af8e039",
+        "proposition_hash": "8c27c4d4cc871ae5716a1396b19e5538c081012c3b48c545e853611c1d81637e",
+        "session_id": "opr-prod-prop-392f25bf8af8e039-sess-dfb",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-9559f5614a01",
+          "sefp-30a0ea30efc1"
+        ],
+        "tool_result_identities": [
+          "iefx-9ca0a213c40d",
+          "sefx-d088898b4d5a"
+        ],
+        "interpretation_identities": [
+          "iefi-22bd71d6093c"
+        ],
+        "decision_identities": [
+          "iefd-08457c2accfc"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:20:56.476829+00:00",
+        "audit_hash": "b188a3bd05a78df2b027971769d16453a00204b8c26e615e7acd0bdfeeaa2201"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:20:54.698679+00:00",
+      "lifecycle_frozen_hash": "66589d4e8905cf6c1c103a261af5ac900a2b2f3074448d08c9eab422080b6ecd",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0102",
+      "seed": 102,
+      "blind_class": "BLIND-A",
+      "ground_truth": {
+        "case_id": "BBE-BLINDA-0102",
+        "blind_class": "BLIND-A",
+        "seed": 102,
+        "mechanism": "quintile_monotonic_positive_across_multiple_dates",
+        "true_direction": "positive",
+        "stability_structure": "distributed_across_4_episodes",
+        "artifact_or_confound": "none",
+        "expected_scientific_risk": "low_if_evidence_sufficient",
+        "expected_behavior_notes": "May support if experiments encounter distributed structure.",
+        "panel_fingerprint": "9e5afb538478d7908cffdf97fe09ab6608a81426269c8b3f0e9c8d5454b9e8e4",
+        "generation_config": {
+          "effect_dates": [
+            "2026-01-10",
+            "2026-01-15",
+            "2026-01-20",
+            "2026-01-30"
+          ],
+          "focal_date": "2026-01-30"
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "66589d4e8905cf6c1c103a261af5ac900a2b2f3074448d08c9eab422080b6ecd",
+      "reveal_after_hash": "66589d4e8905cf6c1c103a261af5ac900a2b2f3074448d08c9eab422080b6ecd",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0201",
+    "seed": 201,
+    "journey": {
+      "anonymous_case_id": "CASE-0201",
+      "session_id": "opr-prod-prop-65e0692da41571e4-sess-04c",
+      "proposition_id": "prop-65e0692da41571e4",
+      "proposition_summary": {
+        "proposition_id": "prop-65e0692da41571e4",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-61720719eeba",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-39fe019138dc",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "SUPPORTED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-70e281779130",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-5093ad83c97e",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-5007fc60f2ba",
+        "proposition_id": "prop-65e0692da41571e4",
+        "proposition_hash": "7e56f2e3205d2482a4bea9b891646dd58656f5888c7f6984726362a12e21aeb3",
+        "session_id": "opr-prod-prop-65e0692da41571e4-sess-04c",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-61720719eeba",
+          "sefp-70e281779130"
+        ],
+        "tool_result_identities": [
+          "iefx-39fe019138dc",
+          "sefx-5093ad83c97e"
+        ],
+        "interpretation_identities": [
+          "iefi-51560221cac7"
+        ],
+        "decision_identities": [
+          "iefd-54495d5ec883"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:20:58.277872+00:00",
+        "audit_hash": "5e757f826f4d7b57bd22c9fce3c3bdd4be15c3a26a160bdd5d65b0edc02c0a81"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:20:56.521866+00:00",
+      "lifecycle_frozen_hash": "c219d25ab43a08da9dc1d8e6b6d324c323d3b0f89c3b788145efd5c05e8ca812",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0201",
+      "seed": 201,
+      "blind_class": "BLIND-B",
+      "ground_truth": {
+        "case_id": "BBE-BLINDB-0201",
+        "blind_class": "BLIND-B",
+        "seed": 201,
+        "mechanism": "single_episode_quintile_artifact",
+        "true_direction": "positive_focal_only",
+        "stability_structure": "unstable_outside_focal_episode",
+        "artifact_or_confound": "episode_specific_spurious_correlation",
+        "expected_scientific_risk": "artifact_overgeneralization",
+        "expected_behavior_notes": "Should not escalate focal artifact to general belief.",
+        "panel_fingerprint": "2b7603aca5cb51ab7f1568766d73237aa4e059e89131e4089762473de9e70977",
+        "generation_config": {
+          "focal_date": "2026-01-30"
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "c219d25ab43a08da9dc1d8e6b6d324c323d3b0f89c3b788145efd5c05e8ca812",
+      "reveal_after_hash": "c219d25ab43a08da9dc1d8e6b6d324c323d3b0f89c3b788145efd5c05e8ca812",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0202",
+    "seed": 202,
+    "journey": {
+      "anonymous_case_id": "CASE-0202",
+      "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-759",
+      "proposition_id": "prop-830d97c7f53dc12c",
+      "proposition_summary": {
+        "proposition_id": "prop-830d97c7f53dc12c",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-e92e7e01f449",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-35d3ce65ba83",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "SUPPORTED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-27c1b53f120b",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-c2269871a91d",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-743320984413",
+        "proposition_id": "prop-830d97c7f53dc12c",
+        "proposition_hash": "ecb8925556f4061c24975c87c933241161a96108e6d340e15f03de052d5f6599",
+        "session_id": "opr-prod-prop-830d97c7f53dc12c-sess-759",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-e92e7e01f449",
+          "sefp-27c1b53f120b"
+        ],
+        "tool_result_identities": [
+          "iefx-35d3ce65ba83",
+          "sefx-c2269871a91d"
+        ],
+        "interpretation_identities": [
+          "iefi-d9a476ec9089"
+        ],
+        "decision_identities": [
+          "iefd-39a676eb6fd2"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:00.064482+00:00",
+        "audit_hash": "d0ffc64f026852bf08adc5c8f4d23456d3c71d49024ed45af4fa9ae9742ab769"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Independent cohort supports directional commitment \u2014 episode artifact less plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:20:58.320069+00:00",
+      "lifecycle_frozen_hash": "aa8956adfed5c99c0bd722919d1ceb6d484f3bfab4b5c89ac621ac40877d8b5d",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0202",
+      "seed": 202,
+      "blind_class": "BLIND-B",
+      "ground_truth": {
+        "case_id": "BBE-BLINDB-0202",
+        "blind_class": "BLIND-B",
+        "seed": 202,
+        "mechanism": "single_episode_quintile_artifact",
+        "true_direction": "positive_focal_only",
+        "stability_structure": "unstable_outside_focal_episode",
+        "artifact_or_confound": "episode_specific_spurious_correlation",
+        "expected_scientific_risk": "artifact_overgeneralization",
+        "expected_behavior_notes": "Should not escalate focal artifact to general belief.",
+        "panel_fingerprint": "89905fe36bf6bad56ee6e5da9ef9fa6ceeadc0840df76ce31cd9c4a058afffb4",
+        "generation_config": {
+          "focal_date": "2026-01-30"
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "aa8956adfed5c99c0bd722919d1ceb6d484f3bfab4b5c89ac621ac40877d8b5d",
+      "reveal_after_hash": "aa8956adfed5c99c0bd722919d1ceb6d484f3bfab4b5c89ac621ac40877d8b5d",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0301",
+    "seed": 301,
+    "journey": {
+      "anonymous_case_id": "CASE-0301",
+      "session_id": "opr-prod-prop-7878538071c4a396-sess-001",
+      "proposition_id": "prop-7878538071c4a396",
+      "proposition_summary": {
+        "proposition_id": "prop-7878538071c4a396",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-90ab3f4facae",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-b183d39d6f5d",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "FALSIFIED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-e0f2cc15252a",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-ac8cb758bfd0",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-c6117ed4ae55",
+        "proposition_id": "prop-7878538071c4a396",
+        "proposition_hash": "9a536f2b29b99aa0fd4362069bc117d17686eb030025e522d932228f0ce1b43e",
+        "session_id": "opr-prod-prop-7878538071c4a396-sess-001",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-90ab3f4facae",
+          "sefp-e0f2cc15252a"
+        ],
+        "tool_result_identities": [
+          "iefx-b183d39d6f5d",
+          "sefx-ac8cb758bfd0"
+        ],
+        "interpretation_identities": [
+          "iefi-a43b9d8c4902"
+        ],
+        "decision_identities": [
+          "iefd-057fd5909ca6"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "ADDRESSED",
+            "rationale": "Falsification-oriented evidence under intended test"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:01.877091+00:00",
+        "audit_hash": "3aad29d170fb70ca661124de0317e634404cb0d74703c5f03986143e05e4b503"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "ADDRESSED",
+          "rationale": "Falsification-oriented evidence under intended test"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:00.114808+00:00",
+      "lifecycle_frozen_hash": "89938736552a528d917720113fd6ca8b92cfc86ee5247c92b2f5bec179c408a5",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0301",
+      "seed": 301,
+      "blind_class": "BLIND-C",
+      "ground_truth": {
+        "case_id": "BBE-BLINDC-0301",
+        "blind_class": "BLIND-C",
+        "seed": 301,
+        "mechanism": "focal_positive_broader_negative_reversal",
+        "true_direction": "contradictory",
+        "stability_structure": "birth_direction_reversed_in_broader_panel",
+        "artifact_or_confound": "directional_reversal",
+        "expected_scientific_risk": "confirmation_bias_defending_birth",
+        "expected_behavior_notes": "Should weaken/reject rather than defend birth direction.",
+        "panel_fingerprint": "8708917195dda3142907d29fd8937626563a745ce666dfcc4b442fe8731f1863",
+        "generation_config": {
+          "focal_date": "2026-01-30",
+          "reversal_dates": [
+            "2026-01-08",
+            "2026-01-12",
+            "2026-01-18",
+            "2026-01-22",
+            "2026-01-26"
+          ]
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "89938736552a528d917720113fd6ca8b92cfc86ee5247c92b2f5bec179c408a5",
+      "reveal_after_hash": "89938736552a528d917720113fd6ca8b92cfc86ee5247c92b2f5bec179c408a5",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0302",
+    "seed": 302,
+    "journey": {
+      "anonymous_case_id": "CASE-0302",
+      "session_id": "opr-prod-prop-967d98a1a6034bfc-sess-d70",
+      "proposition_id": "prop-967d98a1a6034bfc",
+      "proposition_summary": {
+        "proposition_id": "prop-967d98a1a6034bfc",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-4e761bf57202",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-2bb0ab2eac20",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "FALSIFIED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-a1b83c50b995",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-45590a47f9a4",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-eebfd32f13c2",
+        "proposition_id": "prop-967d98a1a6034bfc",
+        "proposition_hash": "ef697c16205fa12a5c18f957c89ef921055d9e4855ff2cd8c07aa3e2d42977b4",
+        "session_id": "opr-prod-prop-967d98a1a6034bfc-sess-d70",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-4e761bf57202",
+          "sefp-a1b83c50b995"
+        ],
+        "tool_result_identities": [
+          "iefx-2bb0ab2eac20",
+          "sefx-45590a47f9a4"
+        ],
+        "interpretation_identities": [
+          "iefi-cf2e129aa0bb"
+        ],
+        "decision_identities": [
+          "iefd-f82af053acb4"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "ADDRESSED",
+            "rationale": "Falsification-oriented evidence under intended test"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:03.675137+00:00",
+        "audit_hash": "5b4b1654382de134144c17cacdbd4093e51316aee995e14a78e2b1ca1d9138da"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "ADDRESSED",
+          "rationale": "Falsification-oriented evidence under intended test"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:01.928556+00:00",
+      "lifecycle_frozen_hash": "0c45f19a835ada5bc104dd7e3804501ea1e1fcb292a4c47e2f4c78594dc62234",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0302",
+      "seed": 302,
+      "blind_class": "BLIND-C",
+      "ground_truth": {
+        "case_id": "BBE-BLINDC-0302",
+        "blind_class": "BLIND-C",
+        "seed": 302,
+        "mechanism": "focal_positive_broader_negative_reversal",
+        "true_direction": "contradictory",
+        "stability_structure": "birth_direction_reversed_in_broader_panel",
+        "artifact_or_confound": "directional_reversal",
+        "expected_scientific_risk": "confirmation_bias_defending_birth",
+        "expected_behavior_notes": "Should weaken/reject rather than defend birth direction.",
+        "panel_fingerprint": "651294e80880877b3c86b3af308e0428b69f0103caf042962e52d35d12f6c048",
+        "generation_config": {
+          "focal_date": "2026-01-30",
+          "reversal_dates": [
+            "2026-01-08",
+            "2026-01-12",
+            "2026-01-18",
+            "2026-01-22",
+            "2026-01-26"
+          ]
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "0c45f19a835ada5bc104dd7e3804501ea1e1fcb292a4c47e2f4c78594dc62234",
+      "reveal_after_hash": "0c45f19a835ada5bc104dd7e3804501ea1e1fcb292a4c47e2f4c78594dc62234",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0401",
+    "seed": 401,
+    "journey": {
+      "anonymous_case_id": "CASE-0401",
+      "session_id": "opr-prod-prop-a5dadbd908bddf34-sess-a66",
+      "proposition_id": "prop-a5dadbd908bddf34",
+      "proposition_summary": {
+        "proposition_id": "prop-a5dadbd908bddf34",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-33391e80f70f",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-d72121ae3a83",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "WEAKENED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-be66ad5422bf",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-47eb3fed153c",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-c3304a8df158",
+        "proposition_id": "prop-a5dadbd908bddf34",
+        "proposition_hash": "0b1854de56fa731ef428f44f2fa6b396be19303c911c5555edda93154923d315",
+        "session_id": "opr-prod-prop-a5dadbd908bddf34-sess-a66",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-33391e80f70f",
+          "sefp-be66ad5422bf"
+        ],
+        "tool_result_identities": [
+          "iefx-d72121ae3a83",
+          "sefx-47eb3fed153c"
+        ],
+        "interpretation_identities": [
+          "iefi-df54b5c5a27c"
+        ],
+        "decision_identities": [
+          "iefd-3ad57081a63b"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-21.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Falsification-oriented evidence under intended test"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:05.451997+00:00",
+        "audit_hash": "a334e89c00210f306f4887cfb8988f957cdb97705624e8bed9a243d635f9d073"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-21.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Falsification-oriented evidence under intended test"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:03.717082+00:00",
+      "lifecycle_frozen_hash": "bbac57b0bd85b1ad170a5868c6d08b6102ecc059a9a867b9f227e597dd95646f",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0401",
+      "seed": 401,
+      "blind_class": "BLIND-D",
+      "ground_truth": {
+        "case_id": "BBE-BLINDD-0401",
+        "blind_class": "BLIND-D",
+        "seed": 401,
+        "mechanism": "no_stable_edge_beyond_chance",
+        "true_direction": null,
+        "stability_structure": "none",
+        "artifact_or_confound": "none",
+        "expected_scientific_risk": "false_discovery_on_noise",
+        "expected_behavior_notes": "Must not manufacture edge; HOLD/REJECT/STOP acceptable.",
+        "panel_fingerprint": "d5f354d630d5fc5278d16e5bac842ce43d7083b808ead34dd105212ac8ce34b8",
+        "generation_config": {
+          "focal_date": "2026-01-30"
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "bbac57b0bd85b1ad170a5868c6d08b6102ecc059a9a867b9f227e597dd95646f",
+      "reveal_after_hash": "bbac57b0bd85b1ad170a5868c6d08b6102ecc059a9a867b9f227e597dd95646f",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0402",
+    "seed": 402,
+    "journey": {
+      "anonymous_case_id": "CASE-0402",
+      "session_id": "opr-prod-prop-138e167cd0fdf2bd-sess-0b7",
+      "proposition_id": "prop-138e167cd0fdf2bd",
+      "proposition_summary": {
+        "proposition_id": "prop-138e167cd0fdf2bd",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-bcfe384fbf75",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-77b5b2f4ddfa",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "WEAKENED",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-bafd3536340d",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-93a7b7532f77",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-87b77dc7058f",
+        "proposition_id": "prop-138e167cd0fdf2bd",
+        "proposition_hash": "158c87b84f2593d4206c0fb3b09838f270888b845dcec96b60e2a393f8b2b7a5",
+        "session_id": "opr-prod-prop-138e167cd0fdf2bd-sess-0b7",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-bcfe384fbf75",
+          "sefp-bafd3536340d"
+        ],
+        "tool_result_identities": [
+          "iefx-77b5b2f4ddfa",
+          "sefx-93a7b7532f77"
+        ],
+        "interpretation_identities": [
+          "iefi-41740ec1c5a8"
+        ],
+        "decision_identities": [
+          "iefd-760ca0c7f7c9"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-29.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "WEAKENED",
+            "rationale": "Falsification-oriented evidence under intended test"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:07.254749+00:00",
+        "audit_hash": "c791e1f84881fbaabb8086dd1f159207dd7f50994cd0d048eebad2d3fdddfe79"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-29.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "WEAKENED",
+          "rationale": "Falsification-oriented evidence under intended test"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:05.492003+00:00",
+      "lifecycle_frozen_hash": "9b7b7f19dbe41fd02d9c33e46f94a3d90d2afd91110dd6a337ca7e7905c3bde8",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0402",
+      "seed": 402,
+      "blind_class": "BLIND-D",
+      "ground_truth": {
+        "case_id": "BBE-BLINDD-0402",
+        "blind_class": "BLIND-D",
+        "seed": 402,
+        "mechanism": "no_stable_edge_beyond_chance",
+        "true_direction": null,
+        "stability_structure": "none",
+        "artifact_or_confound": "none",
+        "expected_scientific_risk": "false_discovery_on_noise",
+        "expected_behavior_notes": "Must not manufacture edge; HOLD/REJECT/STOP acceptable.",
+        "panel_fingerprint": "cf0726beddb2222c9b45ff1f189971972af801c11a60d9a6583f0f4d6b7bd0ea",
+        "generation_config": {
+          "focal_date": "2026-01-30"
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "9b7b7f19dbe41fd02d9c33e46f94a3d90d2afd91110dd6a337ca7e7905c3bde8",
+      "reveal_after_hash": "9b7b7f19dbe41fd02d9c33e46f94a3d90d2afd91110dd6a337ca7e7905c3bde8",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0501",
+    "seed": 501,
+    "journey": {
+      "anonymous_case_id": "CASE-0501",
+      "session_id": "opr-prod-prop-5b1868e4258aa82a-sess-6ff",
+      "proposition_id": "prop-5b1868e4258aa82a",
+      "proposition_summary": {
+        "proposition_id": "prop-5b1868e4258aa82a",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-7d3c915a2237",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-e184e1f0ad4e",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "INSUFFICIENT_EVIDENCE",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-7f8acb7093bb",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-9e411ff7b026",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-4e41fc4d3280",
+        "proposition_id": "prop-5b1868e4258aa82a",
+        "proposition_hash": "47f48aed7af79de4a66f40d7937411d5f07c527c1dce58d3262d928b273d1a6f",
+        "session_id": "opr-prod-prop-5b1868e4258aa82a-sess-6ff",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-7d3c915a2237",
+          "sefp-7f8acb7093bb"
+        ],
+        "tool_result_identities": [
+          "iefx-e184e1f0ad4e",
+          "sefx-9e411ff7b026"
+        ],
+        "interpretation_identities": [
+          "iefi-41be715d258c"
+        ],
+        "decision_identities": [
+          "iefd-7b6b6e1a05e8"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "STILL_PLAUSIBLE",
+            "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:09.037789+00:00",
+        "audit_hash": "04a9d6b2a123c7ffe7fc933a55b0e5b6f37683f26143339d1df6306feda2556d"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "STILL_PLAUSIBLE",
+          "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:07.297600+00:00",
+      "lifecycle_frozen_hash": "31a5bd373a46c7154ccabc14253fdd446b0e7209dea8d7082bfbfc960c20565d",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0501",
+      "seed": 501,
+      "blind_class": "BLIND-E",
+      "ground_truth": {
+        "case_id": "BBE-BLINDE-0501",
+        "blind_class": "BLIND-E",
+        "seed": 501,
+        "mechanism": "confounded_regime_subpopulation_effect",
+        "true_direction": "positive_in_high_dispersion_regime_only",
+        "stability_structure": "regime_dependent_not_general",
+        "artifact_or_confound": "third_structure_regime_split",
+        "expected_scientific_risk": "confound_misattribution",
+        "expected_behavior_notes": "Should not treat confounded association as general edge.",
+        "panel_fingerprint": "5010e58ce7645c26f26d6173eeacfcb8ad183e1fe875f2266c1b11768b2d57b5",
+        "generation_config": {
+          "focal_date": "2026-01-30",
+          "confound_threshold": 8.379444781896883
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "31a5bd373a46c7154ccabc14253fdd446b0e7209dea8d7082bfbfc960c20565d",
+      "reveal_after_hash": "31a5bd373a46c7154ccabc14253fdd446b0e7209dea8d7082bfbfc960c20565d",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0502",
+    "seed": 502,
+    "journey": {
+      "anonymous_case_id": "CASE-0502",
+      "session_id": "opr-prod-prop-02658802b329edf4-sess-4d8",
+      "proposition_id": "prop-02658802b329edf4",
+      "proposition_summary": {
+        "proposition_id": "prop-02658802b329edf4",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-10fc8f747e99",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-55408c425ab1",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "INSUFFICIENT_EVIDENCE",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-04ba7c0c037c",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-0fe7fb4418dd",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-d4ada7f222c2",
+        "proposition_id": "prop-02658802b329edf4",
+        "proposition_hash": "1f376bd18ed6fca2918c288833927adaea9c8d28789f7d7959c4467135ebf2bc",
+        "session_id": "opr-prod-prop-02658802b329edf4-sess-4d8",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-10fc8f747e99",
+          "sefp-04ba7c0c037c"
+        ],
+        "tool_result_identities": [
+          "iefx-55408c425ab1",
+          "sefx-0fe7fb4418dd"
+        ],
+        "interpretation_identities": [
+          "iefi-88e9153d6d97"
+        ],
+        "decision_identities": [
+          "iefd-7104490748a4"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "STILL_PLAUSIBLE",
+            "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:10.806439+00:00",
+        "audit_hash": "bd997246416f176d0bbde6d808ef72ed9846602e657e4ae962dfce2afa46acd4"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "STILL_PLAUSIBLE",
+          "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:09.079928+00:00",
+      "lifecycle_frozen_hash": "77e51e0117db84ed3969e18586b629a4af1227e4b5174a6713df0f490c960abf",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0502",
+      "seed": 502,
+      "blind_class": "BLIND-E",
+      "ground_truth": {
+        "case_id": "BBE-BLINDE-0502",
+        "blind_class": "BLIND-E",
+        "seed": 502,
+        "mechanism": "confounded_regime_subpopulation_effect",
+        "true_direction": "positive_in_high_dispersion_regime_only",
+        "stability_structure": "regime_dependent_not_general",
+        "artifact_or_confound": "third_structure_regime_split",
+        "expected_scientific_risk": "confound_misattribution",
+        "expected_behavior_notes": "Should not treat confounded association as general edge.",
+        "panel_fingerprint": "07e37833c016908a72321c2c0de1a935bca41671b543adbf6a44e818e7a8f334",
+        "generation_config": {
+          "focal_date": "2026-01-30",
+          "confound_threshold": 8.82987254884672
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "77e51e0117db84ed3969e18586b629a4af1227e4b5174a6713df0f490c960abf",
+      "reveal_after_hash": "77e51e0117db84ed3969e18586b629a4af1227e4b5174a6713df0f490c960abf",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0601",
+    "seed": 601,
+    "journey": {
+      "anonymous_case_id": "CASE-0601",
+      "session_id": "opr-prod-prop-8163c5cab7855b21-sess-a3f",
+      "proposition_id": "prop-8163c5cab7855b21",
+      "proposition_summary": {
+        "proposition_id": "prop-8163c5cab7855b21",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-b3f38a3628f3",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-9a9debf87410",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "INSUFFICIENT_EVIDENCE",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-38745b9d3e4e",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-5f83e1e2f1bd",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-f2704c6f9934",
+        "proposition_id": "prop-8163c5cab7855b21",
+        "proposition_hash": "253099e006ce5e41a7fe0fdeabec25130b1f9c70c95d0865f7c127c3c8bacaf3",
+        "session_id": "opr-prod-prop-8163c5cab7855b21-sess-a3f",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-b3f38a3628f3",
+          "sefp-38745b9d3e4e"
+        ],
+        "tool_result_identities": [
+          "iefx-9a9debf87410",
+          "sefx-5f83e1e2f1bd"
+        ],
+        "interpretation_identities": [
+          "iefi-41323448f02d"
+        ],
+        "decision_identities": [
+          "iefd-62249283e0ef"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-23.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "STILL_PLAUSIBLE",
+            "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:12.623502+00:00",
+        "audit_hash": "068e7ab713c009b4af6152daa46d25625fcd70b688471f53963f87e5d6f6d27c"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-23.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "STILL_PLAUSIBLE",
+          "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:10.851252+00:00",
+      "lifecycle_frozen_hash": "66c618d6c2cc6b05a67119f1a71f8aee9aeed935abbfbbd18d299c7b7dbdf523",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0601",
+      "seed": 601,
+      "blind_class": "BLIND-F",
+      "ground_truth": {
+        "case_id": "BBE-BLINDF-0601",
+        "blind_class": "BLIND-F",
+        "seed": 601,
+        "mechanism": "weak_quintile_effect_insufficient_for_strong_conclusion",
+        "true_direction": "weak_positive",
+        "stability_structure": "distributed_but_weak",
+        "artifact_or_confound": "none",
+        "expected_scientific_risk": "overconfidence_on_weak_signal",
+        "expected_behavior_notes": "HOLD_UNRESOLVED / insufficient evidence preferred over discovery.",
+        "panel_fingerprint": "4ae4ab279db7ac44f34294255c103d9a70d8add5a085830939e61c535c977509",
+        "generation_config": {
+          "effect_dates": [
+            "2026-01-12",
+            "2026-01-18",
+            "2026-01-24",
+            "2026-01-30"
+          ],
+          "strength": 0.35
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "66c618d6c2cc6b05a67119f1a71f8aee9aeed935abbfbbd18d299c7b7dbdf523",
+      "reveal_after_hash": "66c618d6c2cc6b05a67119f1a71f8aee9aeed935abbfbbd18d299c7b7dbdf523",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  },
+  {
+    "anonymous_id": "CASE-0602",
+    "seed": 602,
+    "journey": {
+      "anonymous_case_id": "CASE-0602",
+      "session_id": "opr-prod-prop-eb30170c6a867832-sess-acf",
+      "proposition_id": "prop-eb30170c6a867832",
+      "proposition_summary": {
+        "proposition_id": "prop-eb30170c6a867832",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "observation_horizon": 0,
+        "outcome_field": "t5_return"
+      },
+      "lifecycle_outcome": "BUDGET_EXHAUSTED",
+      "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+      "lifecycle_phase": "BUDGET_EXHAUSTED",
+      "experiments_completed": 2,
+      "journey_rows": [
+        {
+          "ordinal": 1,
+          "epistemic_state_entering": "HYPOTHESIS",
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "iefp-b7e4e4361bdb",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "iefx-894ebd3cc2e7",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": "INSUFFICIENT_EVIDENCE",
+          "decision_leaving": "ACTION",
+          "chosen_action": "SEEK_FALSIFICATION",
+          "stop_reason": null,
+          "frozen_contract_id": null
+        },
+        {
+          "ordinal": 2,
+          "epistemic_state_entering": null,
+          "decision_entering": null,
+          "targeted_null": null,
+          "experiment_identity": "sefp-cb0b84392846",
+          "population": null,
+          "tool": null,
+          "dependence_novelty": null,
+          "tool_result_identity": "sefx-bca8e4d1f2b6",
+          "evidence_direction": null,
+          "evidence_strength": null,
+          "incremental_contribution": null,
+          "epistemic_state_leaving": null,
+          "decision_leaving": null,
+          "chosen_action": null,
+          "stop_reason": null,
+          "frozen_contract_id": null
+        }
+      ],
+      "audit": {
+        "lifecycle_run_id": "blc-3c39ec49f6a1",
+        "proposition_id": "prop-eb30170c6a867832",
+        "proposition_hash": "7e793e766fb75dbd31411a43b3a8c8dfde81698c6370a7c282bdca83fb32af82",
+        "session_id": "opr-prod-prop-eb30170c6a867832-sess-acf",
+        "start_phase": "PROPOSITION_PERSISTED",
+        "end_phase": "BUDGET_EXHAUSTED",
+        "termination_reason": "STOP_LIFECYCLE_BUDGET_EXHAUSTED",
+        "budget_initial": {
+          "max_experiment_iterations": 2,
+          "max_search_complexity": 15.0,
+          "max_search_cardinality": 20,
+          "max_execution_failures": 1,
+          "max_redundancy_burden": 0.95
+        },
+        "budget_used": {
+          "experiments_completed": 2,
+          "max_iterations": 2
+        },
+        "experiment_count": 2,
+        "experiment_identities": [
+          "iefp-b7e4e4361bdb",
+          "sefp-cb0b84392846"
+        ],
+        "tool_result_identities": [
+          "iefx-894ebd3cc2e7",
+          "sefx-bca8e4d1f2b6"
+        ],
+        "interpretation_identities": [
+          "iefi-80892f89bdbf"
+        ],
+        "decision_identities": [
+          "iefd-122275070fd9"
+        ],
+        "cumulative_null_ledger": [
+          {
+            "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+            "null_key": "episode_artifact",
+            "state_before": "STILL_PLAUSIBLE",
+            "state_after": "STILL_PLAUSIBLE",
+            "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+          }
+        ],
+        "dependence_summary": {},
+        "failures": [],
+        "warnings": [],
+        "controller_version": "bounded_lifecycle_controller_v1_3j10",
+        "created_at": "2026-08-22T07:21:14.404289+00:00",
+        "audit_hash": "24e669bce3c830b18c70728eb9856dfcb5cfefac0a95d2f46d2f596e34ea01a0"
+      },
+      "budget_initial": {
+        "max_experiment_iterations": 2,
+        "max_search_complexity": 15.0,
+        "max_search_cardinality": 20,
+        "max_execution_failures": 1,
+        "max_redundancy_burden": 0.95
+      },
+      "budget_used": {
+        "experiments_completed": 2,
+        "max_iterations": 2
+      },
+      "cumulative_null_ledger": [
+        {
+          "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+          "null_key": "episode_artifact",
+          "state_before": "STILL_PLAUSIBLE",
+          "state_after": "STILL_PLAUSIBLE",
+          "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+        }
+      ],
+      "dependence_summary": {},
+      "final_epistemic_state": null,
+      "final_decision_kind": "ACTION",
+      "final_chosen_action": "SEEK_FALSIFICATION",
+      "final_stop_reason": null,
+      "bootstrap_outcome": "SESSION_CREATED",
+      "errors": [],
+      "frozen_at": "2026-08-22T07:21:12.671040+00:00",
+      "lifecycle_frozen_hash": "469a8e512a18b7d58d16f180cdd2c68818c1eceadec554cecd73315849ddbb89",
+      "runner_version": "blind_research_examination_runner_v1_3j11"
+    },
+    "reveal": {
+      "anonymous_case_id": "CASE-0602",
+      "seed": 602,
+      "blind_class": "BLIND-F",
+      "ground_truth": {
+        "case_id": "BBE-BLINDF-0602",
+        "blind_class": "BLIND-F",
+        "seed": 602,
+        "mechanism": "weak_quintile_effect_insufficient_for_strong_conclusion",
+        "true_direction": "weak_positive",
+        "stability_structure": "distributed_but_weak",
+        "artifact_or_confound": "none",
+        "expected_scientific_risk": "overconfidence_on_weak_signal",
+        "expected_behavior_notes": "HOLD_UNRESOLVED / insufficient evidence preferred over discovery.",
+        "panel_fingerprint": "f9869ae7317e405fe3e0b2db4a817509416a995560b8fcbd84e44f681aa2bdec",
+        "generation_config": {
+          "effect_dates": [
+            "2026-01-12",
+            "2026-01-18",
+            "2026-01-24",
+            "2026-01-30"
+          ],
+          "strength": 0.35
+        },
+        "examiner_version": "bb_blind_exam_01_panel_generator_v1_3j11"
+      },
+      "lifecycle_frozen_hash": "469a8e512a18b7d58d16f180cdd2c68818c1eceadec554cecd73315849ddbb89",
+      "reveal_after_hash": "469a8e512a18b7d58d16f180cdd2c68818c1eceadec554cecd73315849ddbb89",
+      "reveal_order_valid": true,
+      "calibration_category": "SILENT",
+      "outcome_score": 0.5,
+      "process_integrity_score": 1.0,
+      "false_positive_risk": "LOW",
+      "notable_findings": [],
+      "examiner_version": "bb_blind_exam_01_lifecycle_examiner_v1_3j11"
+    }
+  }
+]
