@@ -1,0 +1,17 @@
+{
+  "purpose": "Pre-registration of interpretability \u2014 not prediction of result",
+  "per_candidate_required": {
+    "if_supporting": "which uncertainty axes move toward covered; saturation effect",
+    "if_disconfirming": "epistemic state transition; priority shift",
+    "if_conflicting": "contradiction_structure update",
+    "if_non_informative": "what remains unknown \u2014 no false progress",
+    "if_invalid": "ideally no scientific state change"
+  },
+  "matrix_example": {
+    "action": "regime-separated falsification contrast",
+    "supporting": "temporal_regime_robustness \u2192 covered; may reduce SEEK_FALSIFICATION urgency",
+    "disconfirming": "SUPPORTED \u2192 CONFLICTED or FALSIFIED depending on independence",
+    "non_informative": "temporal_regime_robustness remains unresolved",
+    "invalid": "no ledger entry / INVALID class only"
+  }
+}
