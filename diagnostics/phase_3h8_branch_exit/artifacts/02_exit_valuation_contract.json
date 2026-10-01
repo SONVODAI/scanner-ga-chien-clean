@@ -1,0 +1,10 @@
+{
+  "version": "research_exit_valuation_v1",
+  "competing_states": [
+    "LOW_MARGINAL_VALUE",
+    "EXHAUSTION_EVIDENCE"
+  ],
+  "comparison": "exit_value > best_experiment_erv",
+  "no_sign_shortcut": true,
+  "no_fixed_stop_score": true
+}
