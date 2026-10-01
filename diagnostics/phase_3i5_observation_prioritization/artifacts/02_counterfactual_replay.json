@@ -1,0 +1,1278 @@
+{
+  "old_pipeline": {
+    "selection_mode": "CHRONOLOGICAL_FIRST_COME",
+    "propositions_emitted": 3,
+    "unique_scientific_questions": 1,
+    "emitted_focal_dates": [
+      "2026-06-29",
+      "2026-06-30",
+      "2026-07-23"
+    ],
+    "quintile_spreads": [
+      2.495471011227899,
+      4.958937580569271,
+      3.248447191554795
+    ]
+  },
+  "new_pipeline": {
+    "selection_mode": "PRIORITIZED",
+    "propositions_emitted": 1,
+    "unique_scientific_questions": 1,
+    "observations_considered": 43,
+    "surprising_observations": 22,
+    "unique_proposition_groups": 1,
+    "representative_focal_date": "2026-08-02",
+    "representative_quintile_spread": 6.402072074074837,
+    "aggregated_evidence_count": 22
+  },
+  "improvements": {
+    "proposition_spam_decreased": true,
+    "higher_information_representative": true,
+    "duplicate_compression": 2,
+    "scientific_diversity_unchanged": true
+  },
+  "new_result_dict": {
+    "records": [
+      {
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "record_version": "proposition_record_v1",
+        "created_at": "2026-08-22T02:12:55.721115+00:00",
+        "research_step": 0,
+        "generator_version": "opr_generator_v1_3i2",
+        "observation_provenance": {
+          "evidence_anchor": {
+            "experiment_node_id": "opr_evidence_ingest",
+            "tool_name": "opr_dispersion_evidence",
+            "tool_version": "opr_generator_v1_3i2",
+            "data_cutoff_date": "2026-08-17",
+            "focal_date": "2026-08-02"
+          },
+          "empirical_artifacts": [
+            {
+              "name": "cross_sectional_dispersion",
+              "value": 4.518012974708727,
+              "date": "2026-08-02"
+            },
+            {
+              "name": "cross_sectional_n",
+              "value": 142,
+              "date": "2026-08-02"
+            },
+            {
+              "name": "quintile_return_spread",
+              "value": 6.402072074074837,
+              "date": "2026-08-02"
+            },
+            {
+              "name": "monotonicity_score",
+              "value": 0.0,
+              "date": "2026-08-02"
+            },
+            {
+              "name": "quintile_0_mean_t5_return",
+              "value": 1.3449737918885432,
+              "n": 29
+            },
+            {
+              "name": "quintile_1_mean_t5_return",
+              "value": 3.287514626891895,
+              "n": 28
+            },
+            {
+              "name": "quintile_2_mean_t5_return",
+              "value": 3.3590968233515164,
+              "n": 28
+            },
+            {
+              "name": "quintile_3_mean_t5_return",
+              "value": 2.5910055643407017,
+              "n": 28
+            },
+            {
+              "name": "quintile_4_mean_t5_return",
+              "value": 7.74704586596338,
+              "n": 29
+            }
+          ],
+          "structural_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0,
+            "feature_slice": "rs_spread",
+            "focal_date": "2026-08-02"
+          },
+          "surprise_basis": "Quintile spread of t5_return across rs_spread tiers is 6.4021 (threshold=1.5). Quintile outcome means break monotonicity: [1.345, 3.2875, 3.3591, 2.591, 7.747].",
+          "evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a",
+          "obs_codes_index": [],
+          "gap_codes_index": []
+        },
+        "motivating_observation": "On 2026-08-02, cross-sectional rs_spread std=4.5180 across 142 symbols; quintile t5_return spread=6.4021.",
+        "surprise_or_uncertainty": "Quintile spread of t5_return across rs_spread tiers is 6.4021 (threshold=1.5). Quintile outcome means break monotonicity: [1.345, 3.2875, 3.3591, 2.591, 7.747].",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "canonical_proposition_core": {
+          "version": "research_proposition_core_v1",
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "uncertainty_family": "CROSS_SECTIONAL_DISPERSION",
+          "conditioning_context": {
+            "dispersion_feature": "rs_spread",
+            "focal_date": "2026-08-02",
+            "contrast_direction": "positive"
+          },
+          "research_needs": [],
+          "completeness": "COMPLETE",
+          "enrichment_sources": [
+            "opr_contrast_to_proposition"
+          ],
+          "scientific_question_key": "q-CROSS_SECTIONAL_DISP-0-4922a6da1cdee946-462ee4176d03f0bd-8faaa86be63b8d6b-_"
+        },
+        "population_context": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "explanatory_relation": {
+          "feature_or_contrast": "rs_spread",
+          "relation_type": "modulates",
+          "comparison_groups": [
+            {
+              "label": "low_dispersion_quintile",
+              "quintile": 0,
+              "n": 29
+            },
+            {
+              "label": "high_dispersion_quintile",
+              "quintile": 4,
+              "n": 29
+            }
+          ],
+          "contrast_direction": "positive",
+          "empirical_delta": 6.402072074074837
+        },
+        "outcome": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0,
+        "falsifiable_expectation": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_group_compare.",
+        "null_competing_explanation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+        "disconfirming_observation_spec": {
+          "description": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+          "operational_test": "partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0",
+          "threshold": "median_spread <= 0 or group rank reversal",
+          "alternative_interpretation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
+        },
+        "evidence_required": "Partition-group compare experiment partitioning by rs_spread with outcome t5_return at horizon 0d, cohort n>=58.",
+        "execution_requirements": {
+          "required_tool_capabilities": [
+            "partition_group_compare"
+          ],
+          "min_sample": 58,
+          "legal_grammar_refs": [
+            "research_grammar_v1",
+            "research_frame_v1"
+          ],
+          "partition_column": "rs_spread"
+        },
+        "epistemic_status": "HYPOTHESIS",
+        "confidence": "LOW",
+        "semantic_parent_id": null,
+        "generation_lineage": [
+          "opr_evidence_ingest",
+          "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a"
+        ],
+        "birth_certificate": {
+          "answers": [
+            {
+              "question_id": "BC_Q1",
+              "passed": true,
+              "answer": "On 2026-08-02, cross-sectional rs_spread std=4.5180 across 142 symbols; quintile t5_return spread=6.4021."
+            },
+            {
+              "question_id": "BC_Q2",
+              "passed": true,
+              "answer": "Quintile spread of t5_return across rs_spread tiers is 6.4021 (threshold=1.5). Quintile outcome means break monotonicity: [1.345, 3.2875, 3.3591, 2.591, 7.747]."
+            },
+            {
+              "question_id": "BC_Q3",
+              "passed": true,
+              "answer": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?"
+            },
+            {
+              "question_id": "BC_Q4",
+              "passed": true,
+              "answer": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section? Population=all; relation=modulates; outcome=t5_return; horizon=0."
+            },
+            {
+              "question_id": "BC_Q5",
+              "passed": true,
+              "answer": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_group_compare."
+            },
+            {
+              "question_id": "BC_Q6",
+              "passed": true,
+              "answer": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile (partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0)"
+            },
+            {
+              "question_id": "BC_Q7",
+              "passed": true,
+              "answer": "Proposition derived from empirical quintile contrast on focal date, not from template catalog lookup."
+            },
+            {
+              "question_id": "BC_Q8",
+              "passed": true,
+              "answer": "partition_group_compare on rs_spread with outcome t5_return."
+            }
+          ],
+          "all_passed": true
+        },
+        "template_independence_audit": {
+          "classification": "SCIENTIFICALLY_NOVEL",
+          "structural_match_score": 0.7000000000000001,
+          "semantic_similarity": 0.029411764705882353,
+          "best_template_match": "ADAPTIVE_PARTITION",
+          "new_observational_axis_documented": true,
+          "rationale": "Scientific uncertainty not mapped to catalog (sem=0.03)"
+        },
+        "leakage_audit": null,
+        "executability_status": "EXECUTABLE",
+        "experiment_spec_draft": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0,
+            "pending_question_context": {
+              "population_spec": {
+                "kind": "all",
+                "grammar_version": "research_grammar_v1"
+              },
+              "outcome_spec": {
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0,
+                "grammar_version": "research_grammar_v1"
+              },
+              "observation_horizon": 0
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        }
+      }
+    ],
+    "silences": [
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 0 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "e4eedf0fae65c7f9be3b743409446d9a093e2b70ca565536e306c94c08b0fed1"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 1 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "54124a48cdf39202fe5600994f50f3548e19b313e3686026ebd9c06e9f7ea8c0"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 2 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "71d30d2bdbb8b3a58044e451be544df2f2ea354cb965fe19efae028288e88d20"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 3 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "9758bd23f406f25e7cddc9e309cd989b256a610e28d1ef1652127b7517171c91"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 4 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "20d2355c294297a568a1c297f4b9b8be0d4bae1cca1981043bcb2dd9b0313840"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 5 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "2285b61c7b3e62f6802dab67b112a44bacace3a81889f83b5bdf8015565f6230"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 6 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "420276850a5b66d93a491ffcffb942d33b1128729b57caedc2aea890bd112f0b"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 7 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "1412f14fff288d5805431ab8064a2ef957b20f46077bd98d17ee573cfad2fe31"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 8 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "2928f70764ded351f968866ed053920098aa6a8946ce88352394abc85b671d3d"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 9 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "901f93d7e4ddc319f5314815306a87808345ffeda3e4f1a3a40f4e25aa428698"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 10 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "496ae496e27e1d767f81c48434904dd36821dc1a7b9139e2eeea175576ea912a"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 11 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "65881f160d519bff701f243c47e23a93f3d913390d35923261d4d3bfaa1a2d50"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 12 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "abe2d956f8c046ac1b45388420b94917fa0f2fcc35c8a1de63be542e236d8db3"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 13 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "365195aceb96ba3ad75f1faf777717e8789dd34280ac1f60562dba1694f22802"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 14 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "6bcc55d5572201e8b772ea292ff11efb7fad18ba7129f0edc8483a088ba30da9"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 15 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "fd386dab86f1e8208d0d2297dce7bf79b1bf845bfe8f4315dd3b74b9bcfb0204"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 16 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "adfd6460403f8aea43ff21d6f9c758ee8073fc2a631ce7a07e614ac3355cff18"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 17 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "e96900139c668e13338bedda0da7a07441d9c3371778350dda7d2637f7629e3f"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 18 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "b971301db2576f24ff92a7475b2da0bd7196fef34c70851d6d4aa6f030f6d685"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Only 19 historical dates available; minimum 20 required for baseline.",
+        "evidence_hash": "513209852ecd7bf8ce9bdc71813143ac3018a322747f4e2d6beb163b688dc819"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "INSUFFICIENT_SURPRISE",
+        "detail": "Dispersion z=0.83 below threshold 2.0; quintile spread 0.6811 below 1.5.",
+        "evidence_hash": "2a5b5340182bc1853e788dd8abddf6995be4e33f1db01db773d4bd329c60c1c3"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "71b602cfc1064d03b01dcf43ca7ca1ad87bec4fa2411d397ba995f5822b71cea"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "41eb62efffaf3b37f8b0036c9f073e0d6688246d69a8acf7927f48afa5cd57c0"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "aa792b126b46f9163677e4b8e23e5e565f2bc0749922d8a98050e01e37cce65c"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "5a67f21ac65567ae13045474d40fffd78bdb694af7d40187a71910bfe7a86650"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "8dd46a4bda392616de7a064a3c9b0ba89de9ba88842f2818bd92584096ccfbd2"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "5e48c0f81981b3d26f53a911f288b8342c00ed6fb0653ff1df4b99c6a75c43c4"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "1c716e0ee04d9abf203bd69cce8df650dabdc4d5a0f61e3ffdff5484017bd16c"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "f3ef801d0a44f58cfcba64ce9850702c5270d7ba4bb71d2049a03f83226591cf"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "3b2bd7c6185c25756fa7227bcb494467322facd3bc7d59d1df63d5fab1e8faf0"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "4317ac1104eda766f5859ddb9bf9bda1e75ec790f30a2436b49cb932dd4c5252"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "33f24145ab4f437bb77e7317b7b92df99b4d9fef59185bef4d5e7d466ebd7cc6"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "f6ebfd5122ea5663f54a433e95b48a11adf2de47a81b9d0776500b43b5306793"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "4cb8ef0ba4c2311f14f54c8183239dbcb6824b1c83f95f61bcab73e78075e8a9"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "52c546a4139af2bd310e7a81cb683b550f8087a6cce7a543007a2ab29341a155"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "517348a3cc18dea1a498a7a44d2c845c4a59484d4b1c2ffa0b7fc74e9b3efa9a"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "b012455e2e1309e66b586b9a1fc21682fed67f2ea76d6c959675038db8c4bb6a"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "901907bacf9f7c5e58459ee821f4c97bc6feb5100987cf313070e8044f026a3c"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "7ead5f799a59b2b2b6daf66dd8f337ece3258d7f6bbca5d98350c64d09919c82"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "1a3aeb3e76c7125dba374df8fa094063b7d0b493f244f80c393ceeaecaab64a1"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "d0d0cc27843c93152438fa37777f27fc02adb2682daa34ffba7ec0fbc2575007"
+      },
+      {
+        "outcome": "NO_PROPOSITION_EMITTED",
+        "reason_code": "AGGREGATED_AS_EVIDENCE",
+        "detail": "Evidence for 9c5a6eecc6163aea aggregated; representative=2026-08-02",
+        "evidence_hash": "2ecfc080eff64fdf9468147744a9a3ad9d40e243b6674d01a3292a6e3f9041c1"
+      }
+    ],
+    "executability": [
+      {
+        "status": "EXECUTABLE",
+        "experiment_spec": {
+          "tool_name": "partition_group_compare",
+          "tool_version": "v1",
+          "inputs": {
+            "partition_column": "rs_spread",
+            "n_groups": 5
+          },
+          "research_scope": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0,
+            "pending_question_context": {
+              "population_spec": {
+                "kind": "all",
+                "grammar_version": "research_grammar_v1"
+              },
+              "outcome_spec": {
+                "kind": "compare",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0,
+                "grammar_version": "research_grammar_v1"
+              },
+              "observation_horizon": 0
+            }
+          },
+          "data_cutoff_date": "2026-08-17"
+        },
+        "detail": "ExperimentSpec passes grammar and panel column checks",
+        "adaptation_notes": [
+          "Syntax adaptation: partition_column=rs_spread, n_groups=5"
+        ]
+      }
+    ],
+    "laundering": [
+      {
+        "all_passed": true,
+        "tests": [
+          {
+            "test_id": "LAUNDER_01_CODE_ONLY_PROVENANCE",
+            "passed": true,
+            "detail": "empirical_artifacts=9, hash=True"
+          },
+          {
+            "test_id": "LAUNDER_02_DECODE_WITHOUT_READ",
+            "passed": true,
+            "detail": "Provenance not ontology-primary"
+          },
+          {
+            "test_id": "LAUNDER_03_PARAPHRASE_LABEL",
+            "passed": true,
+            "detail": "Numeric citation in motivating_observation: True"
+          },
+          {
+            "test_id": "LAUNDER_04_REVERSE_CAUSALITY",
+            "passed": true,
+            "detail": "Provenance hash present at birth"
+          },
+          {
+            "test_id": "LAUNDER_05_STATISTICALLY_EQUIVALENT_PATHS",
+            "passed": true,
+            "detail": "Raw evidence path produced record: True"
+          },
+          {
+            "test_id": "LAUNDER_06_GAP_FAMILY_LOCKIN",
+            "passed": true,
+            "detail": "Surprise cites empirical statistics beyond GAP definition"
+          }
+        ]
+      }
+    ],
+    "leakage_audit": null,
+    "eligible_observations": 43,
+    "focal_dates_scanned": [
+      "2026-06-01",
+      "2026-06-02",
+      "2026-06-03",
+      "2026-06-04",
+      "2026-06-05",
+      "2026-06-08",
+      "2026-06-09",
+      "2026-06-10",
+      "2026-06-11",
+      "2026-06-12",
+      "2026-06-15",
+      "2026-06-16",
+      "2026-06-17",
+      "2026-06-18",
+      "2026-06-19",
+      "2026-06-22",
+      "2026-06-23",
+      "2026-06-24",
+      "2026-06-25",
+      "2026-06-26",
+      "2026-06-29",
+      "2026-06-30",
+      "2026-07-23",
+      "2026-07-24",
+      "2026-07-26",
+      "2026-07-27",
+      "2026-07-28",
+      "2026-07-29",
+      "2026-07-30",
+      "2026-07-31",
+      "2026-08-01",
+      "2026-08-02",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-05",
+      "2026-08-06",
+      "2026-08-07",
+      "2026-08-08",
+      "2026-08-10",
+      "2026-08-11",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14"
+    ],
+    "propositions_emitted": 1,
+    "silence_rate": 0.9767441860465116,
+    "prioritizer_version": "opr_prioritizer_v1_3i5",
+    "selection_mode": "PRIORITIZED",
+    "observation_events_considered": 43,
+    "surprising_observation_events": 22,
+    "unique_proposition_groups": 1,
+    "proposition_groups": [
+      {
+        "entity_type": "SCIENTIFIC_PROPOSITION_GROUP",
+        "identity_key": "9c5a6eecc6163aea",
+        "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+        "uncertainty_family": "CROSS_SECTIONAL_DISPERSION",
+        "feature": "rs_spread",
+        "relation_type": "modulates",
+        "independent_evidence_count": 22,
+        "has_contradiction": true,
+        "representative_focal_date": "2026-08-02",
+        "evidence_events": [
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-06-29",
+            "evidence_hash": "71b602cfc1064d03b01dcf43ca7ca1ad87bec4fa2411d397ba995f5822b71cea",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.9293198267199665
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-06-30",
+            "evidence_hash": "41eb62efffaf3b37f8b0036c9f073e0d6688246d69a8acf7927f48afa5cd57c0",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -1.8417831073083226
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-23",
+            "evidence_hash": "aa792b126b46f9163677e4b8e23e5e565f2bc0749922d8a98050e01e37cce65c",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -2.0479169301564317
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-24",
+            "evidence_hash": "5a67f21ac65567ae13045474d40fffd78bdb694af7d40187a71910bfe7a86650",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.535997880210743
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-26",
+            "evidence_hash": "8dd46a4bda392616de7a064a3c9b0ba89de9ba88842f2818bd92584096ccfbd2",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.439361229801732
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-27",
+            "evidence_hash": "5e48c0f81981b3d26f53a911f288b8342c00ed6fb0653ff1df4b99c6a75c43c4",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 2.1897317812448085
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-28",
+            "evidence_hash": "1c716e0ee04d9abf203bd69cce8df650dabdc4d5a0f61e3ffdff5484017bd16c",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.005577326277310224
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-29",
+            "evidence_hash": "f3ef801d0a44f58cfcba64ce9850702c5270d7ba4bb71d2049a03f83226591cf",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 2.4524567585748707
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-30",
+            "evidence_hash": "3b2bd7c6185c25756fa7227bcb494467322facd3bc7d59d1df63d5fab1e8faf0",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 3.8352199747274485
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-31",
+            "evidence_hash": "4317ac1104eda766f5859ddb9bf9bda1e75ec790f30a2436b49cb932dd4c5252",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 4.938419829811208
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-01",
+            "evidence_hash": "33f24145ab4f437bb77e7317b7b92df99b4d9fef59185bef4d5e7d466ebd7cc6",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 4.715142342446688
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-02",
+            "evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 6.402072074074837
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-03",
+            "evidence_hash": "f6ebfd5122ea5663f54a433e95b48a11adf2de47a81b9d0776500b43b5306793",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.08507590355513922
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-04",
+            "evidence_hash": "4cb8ef0ba4c2311f14f54c8183239dbcb6824b1c83f95f61bcab73e78075e8a9",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.5067316628359471
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-06",
+            "evidence_hash": "52c546a4139af2bd310e7a81cb683b550f8087a6cce7a543007a2ab29341a155",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.4857829430224778
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-07",
+            "evidence_hash": "517348a3cc18dea1a498a7a44d2c845c4a59484d4b1c2ffa0b7fc74e9b3efa9a",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.47866854019954064
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-08",
+            "evidence_hash": "b012455e2e1309e66b586b9a1fc21682fed67f2ea76d6c959675038db8c4bb6a",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.882009721292943
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-10",
+            "evidence_hash": "901907bacf9f7c5e58459ee821f4c97bc6feb5100987cf313070e8044f026a3c",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 1.3806404876427818
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-11",
+            "evidence_hash": "7ead5f799a59b2b2b6daf66dd8f337ece3258d7f6bbca5d98350c64d09919c82",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 1.4568585021433416
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-12",
+            "evidence_hash": "1a3aeb3e76c7125dba374df8fa094063b7d0b493f244f80c393ceeaecaab64a1",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.16868046328100839
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-13",
+            "evidence_hash": "d0d0cc27843c93152438fa37777f27fc02adb2682daa34ffba7ec0fbc2575007",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.7075251755901035
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-14",
+            "evidence_hash": "2ecfc080eff64fdf9468147744a9a3ad9d40e243b6674d01a3292a6e3f9041c1",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.9586719373505486
+          }
+        ]
+      }
+    ],
+    "evidence_lineages": [
+      {
+        "proposition_identity_key": "9c5a6eecc6163aea",
+        "representative_focal_date": "2026-08-02",
+        "representative_evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a",
+        "aggregated_evidence_events": [
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-06-29",
+            "evidence_hash": "71b602cfc1064d03b01dcf43ca7ca1ad87bec4fa2411d397ba995f5822b71cea",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.9293198267199665
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-06-30",
+            "evidence_hash": "41eb62efffaf3b37f8b0036c9f073e0d6688246d69a8acf7927f48afa5cd57c0",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -1.8417831073083226
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-23",
+            "evidence_hash": "aa792b126b46f9163677e4b8e23e5e565f2bc0749922d8a98050e01e37cce65c",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -2.0479169301564317
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-24",
+            "evidence_hash": "5a67f21ac65567ae13045474d40fffd78bdb694af7d40187a71910bfe7a86650",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.535997880210743
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-26",
+            "evidence_hash": "8dd46a4bda392616de7a064a3c9b0ba89de9ba88842f2818bd92584096ccfbd2",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.439361229801732
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-27",
+            "evidence_hash": "5e48c0f81981b3d26f53a911f288b8342c00ed6fb0653ff1df4b99c6a75c43c4",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 2.1897317812448085
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-28",
+            "evidence_hash": "1c716e0ee04d9abf203bd69cce8df650dabdc4d5a0f61e3ffdff5484017bd16c",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.005577326277310224
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-29",
+            "evidence_hash": "f3ef801d0a44f58cfcba64ce9850702c5270d7ba4bb71d2049a03f83226591cf",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 2.4524567585748707
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-30",
+            "evidence_hash": "3b2bd7c6185c25756fa7227bcb494467322facd3bc7d59d1df63d5fab1e8faf0",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 3.8352199747274485
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-07-31",
+            "evidence_hash": "4317ac1104eda766f5859ddb9bf9bda1e75ec790f30a2436b49cb932dd4c5252",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 4.938419829811208
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-01",
+            "evidence_hash": "33f24145ab4f437bb77e7317b7b92df99b4d9fef59185bef4d5e7d466ebd7cc6",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 4.715142342446688
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-02",
+            "evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 6.402072074074837
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-03",
+            "evidence_hash": "f6ebfd5122ea5663f54a433e95b48a11adf2de47a81b9d0776500b43b5306793",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.08507590355513922
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-04",
+            "evidence_hash": "4cb8ef0ba4c2311f14f54c8183239dbcb6824b1c83f95f61bcab73e78075e8a9",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.5067316628359471
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-06",
+            "evidence_hash": "52c546a4139af2bd310e7a81cb683b550f8087a6cce7a543007a2ab29341a155",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.4857829430224778
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-07",
+            "evidence_hash": "517348a3cc18dea1a498a7a44d2c845c4a59484d4b1c2ffa0b7fc74e9b3efa9a",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.47866854019954064
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-08",
+            "evidence_hash": "b012455e2e1309e66b586b9a1fc21682fed67f2ea76d6c959675038db8c4bb6a",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.882009721292943
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-10",
+            "evidence_hash": "901907bacf9f7c5e58459ee821f4c97bc6feb5100987cf313070e8044f026a3c",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 1.3806404876427818
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-11",
+            "evidence_hash": "7ead5f799a59b2b2b6daf66dd8f337ece3258d7f6bbca5d98350c64d09919c82",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 1.4568585021433416
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-12",
+            "evidence_hash": "1a3aeb3e76c7125dba374df8fa094063b7d0b493f244f80c393ceeaecaab64a1",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.16868046328100839
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-13",
+            "evidence_hash": "d0d0cc27843c93152438fa37777f27fc02adb2682daa34ffba7ec0fbc2575007",
+            "role": "CONTRADICT",
+            "contrast_direction": "positive",
+            "empirical_delta": 0.7075251755901035
+          },
+          {
+            "entity_type": "EVIDENCE_EVENT",
+            "focal_date": "2026-08-14",
+            "evidence_hash": "2ecfc080eff64fdf9468147744a9a3ad9d40e243b6674d01a3292a6e3f9041c1",
+            "role": "SUPPORT",
+            "contrast_direction": "negative",
+            "empirical_delta": -0.9586719373505486
+          }
+        ],
+        "independent_evidence_count": 22
+      }
+    ],
+    "prioritization_audit": {
+      "prioritizer_version": "opr_prioritizer_v1_3i5",
+      "ranked_groups": [
+        {
+          "entity_type": "SCIENTIFIC_PROPOSITION_GROUP",
+          "identity_key": "9c5a6eecc6163aea",
+          "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+          "uncertainty_family": "CROSS_SECTIONAL_DISPERSION",
+          "feature": "rs_spread",
+          "relation_type": "modulates",
+          "independent_evidence_count": 22,
+          "has_contradiction": true,
+          "representative_focal_date": "2026-08-02",
+          "evidence_events": [
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-06-29",
+              "evidence_hash": "71b602cfc1064d03b01dcf43ca7ca1ad87bec4fa2411d397ba995f5822b71cea",
+              "role": "SUPPORT",
+              "contrast_direction": "negative",
+              "empirical_delta": -0.9293198267199665
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-06-30",
+              "evidence_hash": "41eb62efffaf3b37f8b0036c9f073e0d6688246d69a8acf7927f48afa5cd57c0",
+              "role": "SUPPORT",
+              "contrast_direction": "negative",
+              "empirical_delta": -1.8417831073083226
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-23",
+              "evidence_hash": "aa792b126b46f9163677e4b8e23e5e565f2bc0749922d8a98050e01e37cce65c",
+              "role": "SUPPORT",
+              "contrast_direction": "negative",
+              "empirical_delta": -2.0479169301564317
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-24",
+              "evidence_hash": "5a67f21ac65567ae13045474d40fffd78bdb694af7d40187a71910bfe7a86650",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.535997880210743
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-26",
+              "evidence_hash": "8dd46a4bda392616de7a064a3c9b0ba89de9ba88842f2818bd92584096ccfbd2",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.439361229801732
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-27",
+              "evidence_hash": "5e48c0f81981b3d26f53a911f288b8342c00ed6fb0653ff1df4b99c6a75c43c4",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 2.1897317812448085
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-28",
+              "evidence_hash": "1c716e0ee04d9abf203bd69cce8df650dabdc4d5a0f61e3ffdff5484017bd16c",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.005577326277310224
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-29",
+              "evidence_hash": "f3ef801d0a44f58cfcba64ce9850702c5270d7ba4bb71d2049a03f83226591cf",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 2.4524567585748707
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-30",
+              "evidence_hash": "3b2bd7c6185c25756fa7227bcb494467322facd3bc7d59d1df63d5fab1e8faf0",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 3.8352199747274485
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-07-31",
+              "evidence_hash": "4317ac1104eda766f5859ddb9bf9bda1e75ec790f30a2436b49cb932dd4c5252",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 4.938419829811208
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-01",
+              "evidence_hash": "33f24145ab4f437bb77e7317b7b92df99b4d9fef59185bef4d5e7d466ebd7cc6",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 4.715142342446688
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-02",
+              "evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 6.402072074074837
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-03",
+              "evidence_hash": "f6ebfd5122ea5663f54a433e95b48a11adf2de47a81b9d0776500b43b5306793",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.08507590355513922
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-04",
+              "evidence_hash": "4cb8ef0ba4c2311f14f54c8183239dbcb6824b1c83f95f61bcab73e78075e8a9",
+              "role": "SUPPORT",
+              "contrast_direction": "negative",
+              "empirical_delta": -0.5067316628359471
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-06",
+              "evidence_hash": "52c546a4139af2bd310e7a81cb683b550f8087a6cce7a543007a2ab29341a155",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.4857829430224778
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-07",
+              "evidence_hash": "517348a3cc18dea1a498a7a44d2c845c4a59484d4b1c2ffa0b7fc74e9b3efa9a",
+              "role": "SUPPORT",
+              "contrast_direction": "negative",
+              "empirical_delta": -0.47866854019954064
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-08",
+              "evidence_hash": "b012455e2e1309e66b586b9a1fc21682fed67f2ea76d6c959675038db8c4bb6a",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.882009721292943
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-10",
+              "evidence_hash": "901907bacf9f7c5e58459ee821f4c97bc6feb5100987cf313070e8044f026a3c",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 1.3806404876427818
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-11",
+              "evidence_hash": "7ead5f799a59b2b2b6daf66dd8f337ece3258d7f6bbca5d98350c64d09919c82",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 1.4568585021433416
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-12",
+              "evidence_hash": "1a3aeb3e76c7125dba374df8fa094063b7d0b493f244f80c393ceeaecaab64a1",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.16868046328100839
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-13",
+              "evidence_hash": "d0d0cc27843c93152438fa37777f27fc02adb2682daa34ffba7ec0fbc2575007",
+              "role": "CONTRADICT",
+              "contrast_direction": "positive",
+              "empirical_delta": 0.7075251755901035
+            },
+            {
+              "entity_type": "EVIDENCE_EVENT",
+              "focal_date": "2026-08-14",
+              "evidence_hash": "2ecfc080eff64fdf9468147744a9a3ad9d40e243b6674d01a3292a6e3f9041c1",
+              "role": "SUPPORT",
+              "contrast_direction": "negative",
+              "empirical_delta": -0.9586719373505486
+            }
+          ]
+        }
+      ],
+      "silenced_groups": [],
+      "gates_failed": [],
+      "rank_keys": [
+        {
+          "identity_key": "9c5a6eecc6163aea",
+          "rank_key": [
+            1,
+            22,
+            6.402072074074837,
+            6.402072074074837,
+            2.463425258902839
+          ],
+          "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?"
+        }
+      ]
+    },
+    "unique_propositions_emitted": 1
+  }
+}
