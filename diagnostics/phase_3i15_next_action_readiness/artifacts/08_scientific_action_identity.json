@@ -1,0 +1,45 @@
+{
+  "scientific_action_core": {
+    "includes": [
+      "scientific_objective.target_uncertainty",
+      "evidence_cohort_semantics (not raw date list \u2014 semantic class)",
+      "proposition_commitment_challenged",
+      "causal_contrast_relation",
+      "expected_epistemic_consequence_type"
+    ],
+    "excludes": [
+      "tool_name",
+      "tool_version",
+      "parameterization_syntax",
+      "grouping_implementation_details"
+    ]
+  },
+  "representation_envelope": {
+    "includes": [
+      "tool",
+      "parameterization",
+      "grouping_implementation",
+      "syntax"
+    ]
+  },
+  "identity_rule": "Same core hash \u2192 same scientific action regardless of tool",
+  "dedup_rule": "Reject candidate if core hash matches executed action in ledger",
+  "lessons_from_3h10_3h13": [
+    "Representation-only tool swap must not inflate novelty rank",
+    "Semantic valuation must precede executability packaging",
+    "Proposition-key resolution separates fork from reframe"
+  ],
+  "action_diversity_example": {
+    "uncertainty": "temporal_regime_robustness",
+    "distinct_actions": [
+      "episode_holdout excluding motivating dates",
+      "rolling_window stability contrast",
+      "regime-separated quintile contrast (STRESS vs NORMAL)",
+      "counterexample-period directional reversal search"
+    ],
+    "not_distinct": [
+      "partition_group_compare vs same cohort via different SQL syntax",
+      "same holdout dates via different tool_name with identical semantics"
+    ]
+  }
+}

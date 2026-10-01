@@ -1,0 +1,106 @@
+{
+  "audit_version": "phase_3i_graduation_audit_v1",
+  "frozen_at_branch": "cursor/phase-3i-graduation-audit-aad2",
+  "frozen_at_commit": "37546ef2716716f755422c2f5c00fd02c2707a92",
+  "freeze_policy": "No scientific component may change after this manifest during the audit",
+  "t2_canonical_proposition": {
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b"
+  },
+  "components": {
+    "opr_bridge": {
+      "module_path": "modules/edge_research/opr_bridge/",
+      "file_count": 63
+    },
+    "opr_generator": {
+      "version": "opr_generator_v1_3i2"
+    },
+    "prioritizer": {
+      "version": "opr_prioritizer_v1_3i5"
+    },
+    "evidence_ingest": {
+      "module": "evidence_ingest.py"
+    },
+    "surprise_detector": {
+      "module": "surprise_detector.py"
+    },
+    "proposition_synthesizer": {
+      "module": "proposition_synthesizer.py",
+      "synthesis_relation": "CONTRAST_TO_PROPOSITION"
+    },
+    "proposition_record": {
+      "module": "proposition_record.py"
+    },
+    "scientific_birth_certificate": {
+      "embedded_in": "proposition_record.py"
+    },
+    "template_independence_evaluator": {
+      "module": "template_independence.py"
+    },
+    "leakage_protections": {
+      "module": "leakage_audit.py"
+    },
+    "scientific_identity": {
+      "module": "scientific_identity.py"
+    },
+    "observation_prioritization": {
+      "module": "prioritization.py"
+    },
+    "evidence_lineage": {
+      "modules": [
+        "evidence_ledger.py",
+        "evidence_ledger_builder.py"
+      ]
+    },
+    "lifecycle_records": {
+      "module": "lifecycle_records.py"
+    },
+    "interpretation_contract": {
+      "module": "interpretation_contract.py"
+    },
+    "proposition_experiment_interpreter": {
+      "module": "proposition_experiment_interpreter.py"
+    },
+    "falsification_candidate_generator": {
+      "module": "falsification_candidate_generator.py"
+    },
+    "falsification_selector": {
+      "content_hash": "c23e41492ed64af9e0169c8994d775477956331b5ff284eac0facdd43292a4c7"
+    },
+    "evidence_synthesis_engine": {
+      "version": "evidence_synthesis_v1_3i12",
+      "content_hash": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a"
+    },
+    "lifecycle_synthesis_hooks": {
+      "modules": [
+        "lifecycle_synthesis_hook.py",
+        "synthesis_integration.py"
+      ]
+    },
+    "scientific_action_generator": {
+      "content_hash": "77e665c720b3f8c5050ff1113d076c38cd2c678db8df6773711e665e3fcc7eb9"
+    },
+    "evidence_derived_cohort_binder": {
+      "content_hash": "cfaf175de409fd2e893497bc8f68d4a6ddc081b3b17158e4dfd9c266ca788b51"
+    },
+    "scientific_frontier_reassessor": {
+      "content_hash": "bd0c4a0231bced2518f3e2febbe8ffc376154cb40f9c1a98c5c30cc30bc0834b"
+    },
+    "research_dormancy_mechanism": {
+      "content_hash": "a6a70005511d5894ec0fbcead9ad5b4589ce3162cbe01b7c761a12026b9adfa6"
+    },
+    "reopening_evaluator": {
+      "module": "dormant_research_reopening_evaluator.py"
+    },
+    "lifecycle_dormancy_integration": {
+      "content_hash": "409f55fd2490cd5f9635bc9c8e1bb946a02f37868591efa2dffd4691d07b1145"
+    }
+  },
+  "frozen_t2_terminal_state": {
+    "epistemic_state": "SUPPORTED",
+    "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+    "research_activity_state": "DORMANT",
+    "dormancy_hash": "a09db7b6868d11134836ecec419f8a626d1835795469d43f7c20f14b2bc15dc3",
+    "synthesis_hash": "4ead1c3af3324d0f0e0baf433ca9b3959f029d39cce5ad2154e5af2cd0e0194c"
+  }
+}
