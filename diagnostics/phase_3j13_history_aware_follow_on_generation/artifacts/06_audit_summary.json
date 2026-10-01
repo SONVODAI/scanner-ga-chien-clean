@@ -1,0 +1,11 @@
+{
+  "head": "46e4d8d0d576d9fc516135d0199f087423efddd9",
+  "phase": "3J.13",
+  "stop_boundary": "STOP_HISTORY_AWARE_FOLLOW_ON_GENERATION",
+  "cf_fg_pass": true,
+  "ordinal_ge3_diagnostic_pass": true,
+  "blind_critical_fp": 0,
+  "hidden_answer_audit_pass": true,
+  "regressions_pass": true,
+  "phase_pass": true
+}

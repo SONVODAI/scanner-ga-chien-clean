@@ -1,0 +1,9 @@
+{
+  "suspicious_hits_in_3j3_modules": [
+    {
+      "pattern": "episode.holdout",
+      "file": "/workspace/modules/edge_research/opr_bridge/first_experiment_execution_gate.py"
+    }
+  ],
+  "clean": false
+}

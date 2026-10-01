@@ -1,0 +1,121 @@
+{
+  "CF-CAL1": {
+    "passed": true,
+    "description": "BACKFILL inserted as forward evidence -> reject",
+    "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD"
+  },
+  "CF-CAL2": {
+    "passed": true,
+    "description": "Outcome predates BirthRecord -> reject",
+    "eligibility": {
+      "eligible": false,
+      "reason": "outcome_predates_birth_record",
+      "checks": [
+        "run_mode_live_forward",
+        "counts_as_forward_evidence_true",
+        "birth_mode_forward_capable",
+        "birth_temporal_order_violation"
+      ]
+    }
+  },
+  "CF-CAL3": {
+    "passed": true,
+    "description": "T5 not legally observable -> pending, not counted",
+    "reason": "early_outcome_rejected:T5:eligible_after_bday_offset"
+  },
+  "CF-CAL4": {
+    "passed": true,
+    "description": "Post-outcome assessment substituted for pre-outcome belief -> reject"
+  },
+  "CF-CAL5": {
+    "passed": true,
+    "description": "Duplicate outcome -> idempotent",
+    "first_created": [
+      "fwdev-c5997bc0eeb3296a"
+    ],
+    "second_created": []
+  },
+  "CF-CAL6": {
+    "passed": true,
+    "description": "Favorable tiny-N cohort presented as edge -> blocked",
+    "audit": {
+      "passed": false,
+      "reason": "tiny_n_cohort_blocked",
+      "n": 1,
+      "min_required": 3
+    }
+  },
+  "CF-CAL7": {
+    "passed": true,
+    "description": "Realized-return-selected cohort -> reject",
+    "reason": "return_selected_cohort_rejected"
+  },
+  "CF-CAL8": {
+    "passed": true,
+    "description": "Old calibration snapshot rewritten by later T10 -> reject",
+    "original_eligible_n": 1
+  },
+  "CF-CAL9": {
+    "passed": true,
+    "description": "NO_DISCOVERY scored as losing prediction -> reject",
+    "reason": "no_discovery_cannot_be_scored_as_prediction"
+  },
+  "CF-CAL10": {
+    "passed": true,
+    "description": "UNRESOLVED + positive return labeled correct -> reject",
+    "reason": "unresolved_plus_positive_not_labeled_correct"
+  },
+  "CF-CAL11": {
+    "passed": true,
+    "description": "Missing/suspended outcome silently treated as zero -> reject",
+    "reason": "missing_treated_as_zero_rejected"
+  },
+  "CF-CAL12": {
+    "passed": true,
+    "description": "Crash during ledger update -> safe resume (idempotent)",
+    "count": 2
+  },
+  "CF-CAL13": {
+    "passed": true,
+    "description": "Policy mutation based on calibration result -> blocked",
+    "reason": "policy_mutation_from_calibration_blocked"
+  },
+  "CF-CAL14": {
+    "passed": true,
+    "description": "Trading authority inferred from favorable results -> blocked",
+    "reason": "trading_authority_inference_blocked:EDGE_ACTIVE"
+  },
+  "CF-CAL15": {
+    "passed": true,
+    "description": "Replay evidence mixed with LIVE_FORWARD -> reject",
+    "reason": "replay_cannot_mix_with_live_forward_batch"
+  },
+  "CF-CAL16": {
+    "passed": true,
+    "description": "Same source records reordered -> identical ledger identity",
+    "identity": "c5997bc0eeb3296a"
+  },
+  "CF-CAL17": {
+    "passed": true,
+    "description": "Dependence ignored in calibration summary -> flagged",
+    "flags": [
+      "obs-83e6db2a7e367855:SHARED_PROPOSITION"
+    ]
+  },
+  "CF-CAL18": {
+    "passed": true,
+    "description": "Future outcome included in earlier snapshot -> reject",
+    "early_eligible_n": 0,
+    "total_entries": 2
+  },
+  "maturity_semantics": {
+    "passed": true,
+    "description": "Claim maturity labels are descriptive-only thresholds"
+  },
+  "trading_isolation": {
+    "passed": true,
+    "description": "3K.3 modules remain trading-isolated"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_forward_evidence_calibration_01_v1_3k3"
+}

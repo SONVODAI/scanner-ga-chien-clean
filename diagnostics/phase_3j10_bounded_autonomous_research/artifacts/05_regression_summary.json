@@ -1,0 +1,30 @@
+{
+  "tests/test_edge_research_opr_phase_3j10.py": {
+    "exit_code": 0,
+    "stdout_tail": "........                                                                 [100%]\n8 passed in 8.72s\n"
+  },
+  "tests/test_edge_research_opr_phase_3j9.py": {
+    "exit_code": 0,
+    "stdout_tail": "...........                                                              [100%]\n11 passed in 9.46s\n"
+  },
+  "tests/test_edge_research_opr_phase_3j8.py": {
+    "exit_code": 0,
+    "stdout_tail": ".......                                                                  [100%]\n7 passed in 9.23s\n"
+  },
+  "tests/test_edge_research_opr_phase_3j7.py": {
+    "exit_code": 0,
+    "stdout_tail": ".......                                                                  [100%]\n7 passed in 12.32s\n"
+  },
+  "tests/test_edge_research_opr_phase_3j6a.py": {
+    "exit_code": 0,
+    "stdout_tail": "...                                                                      [100%]\n3 passed in 1.01s\n"
+  },
+  "tests/test_edge_research_opr_phase_3j6.py": {
+    "exit_code": 0,
+    "stdout_tail": "...........                                                              [100%]\n11 passed in 2.27s\n"
+  },
+  "tests/test_edge_research_opr_phase_3j5.py": {
+    "exit_code": 0,
+    "stdout_tail": "..........                                                               [100%]\n10 passed in 2.05s\n"
+  }
+}
