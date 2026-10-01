@@ -1,0 +1,17 @@
+{
+  "existing_states_sufficient": true,
+  "recommended_additions": [],
+  "note": "Prefer CONFLICTED + rich ledger over new states like DOUBLY_SUPPORTED",
+  "missing_state": "HOLD_PROVISIONALLY is a ResearchPriorityDecision not epistemic state",
+  "current_vocabulary": [
+    "PROPOSED",
+    "UNDER_TEST",
+    "SUPPORTED",
+    "WEAKENED",
+    "CONFLICTED",
+    "FALSIFIED",
+    "UNRESOLVED",
+    "ABANDONED",
+    "INSUFFICIENT_EVIDENCE"
+  ]
+}

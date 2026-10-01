@@ -1,0 +1,18 @@
+{
+  "e2_cohort_overlap_ratio": 0.977,
+  "e2_population_independence": "LOW",
+  "e2_sample_independence": "NONE",
+  "selected_claims_sample_independence_HIGH": true,
+  "overlap_computed_for_subgroup": false,
+  "subgroup_filter": {
+    "kind": "filter",
+    "field": "research_market_state",
+    "operator": "in",
+    "values": [
+      "NORMAL"
+    ],
+    "grammar_version": "research_grammar_v1"
+  },
+  "scientific_concern": "NORMAL regime filter is not proven low-overlap vs prior full-universe tests; HIGH independence is operator-assigned not evidence-computed",
+  "different_rows_not_equivalent_to_independent_evidence": true
+}

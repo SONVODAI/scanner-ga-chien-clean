@@ -1,0 +1,28 @@
+{
+  "component": "FalsificationCandidateGenerator (3I.9)",
+  "genuinely_generic": [
+    "derive_proposition_vulnerabilities from proposition text",
+    "_check_anti_rescue",
+    "executability assessment pattern",
+    "FalsificationCandidateRecord structure (adapt to ScientificActionCandidateRecord)",
+    "InterpretationContract outcome text binding"
+  ],
+  "seek_falsification_tied": [
+    "Gate on ResearchDecisionRecord SEEK_FALSIFICATION",
+    "VulnerabilityKind enum scoped to falsification framing",
+    "counterfactual_falsifiable flag semantics"
+  ],
+  "partition_compatible_assumption": [
+    "Hard-coded partition_group_compare tool",
+    "_partition_inputs from rs_spread / feature_or_contrast",
+    "Quintile contrast disconfirmation interpretation only"
+  ],
+  "reusable_as_specialized_operator": [
+    "episode holdout cohort construction (when not redundant)",
+    "directional_reversal vulnerability derivation"
+  ],
+  "must_remain_specialized": [
+    "Full generator as standalone next-action path \u2014 too narrow for arbitrary uncertainty"
+  ],
+  "recommended_integration": "One operator: FalsificationOperator under ScientificActionGenerator when priority=SEEK_FALSIFICATION and axis compatible"
+}

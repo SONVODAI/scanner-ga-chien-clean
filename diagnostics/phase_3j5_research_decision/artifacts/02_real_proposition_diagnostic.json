@@ -1,0 +1,93 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "current_epistemic_state": "SUPPORTED",
+  "null_addressed_by_first_experiment": "episode_artifact",
+  "surviving_null_explanations": [
+    "directional_reversal"
+  ],
+  "interpretation_summary": {
+    "evidence_relevance": "HIGH",
+    "evidence_direction": "SUPPORTS",
+    "evidence_strength": "MODERATE"
+  },
+  "search_accounting": {
+    "experiments_attempted": 1,
+    "search_complexity_score": 3.0,
+    "search_cardinality": 1,
+    "evidence_burden_assessment": "MODERATE",
+    "budget_exhausted": false
+  },
+  "admissible_candidates": [
+    {
+      "action_family": "TEST_NEXT_NULL",
+      "mapped_action_code": "SEEK_FALSIFICATION",
+      "scientific_objective": "Test whether directional commitment holds on independent cohort",
+      "target_uncertainty": "directional_effect_full_universe",
+      "target_null_key": "directional_reversal",
+      "expected_information_contribution": "HIGH",
+      "independence_requirement": "HIGH",
+      "admissible": true,
+      "rejection_reasons": [],
+      "redundancy_score": 0.0,
+      "information_gain_rank": 0
+    },
+    {
+      "action_family": "CONTINUE_FALSIFICATION",
+      "mapped_action_code": "SEEK_FALSIFICATION",
+      "scientific_objective": "Continue falsification per frozen contract mapping",
+      "target_uncertainty": "episode_robustness",
+      "target_null_key": null,
+      "expected_information_contribution": "MODERATE",
+      "independence_requirement": "MEDIUM",
+      "admissible": true,
+      "rejection_reasons": [],
+      "redundancy_score": 0.0,
+      "information_gain_rank": 1
+    },
+    {
+      "action_family": "STOP_NO_INFORMATIVE_ACTION",
+      "mapped_action_code": "HOLD_UNRESOLVED",
+      "scientific_objective": "No admissible informative next action",
+      "target_uncertainty": "none",
+      "target_null_key": null,
+      "expected_information_contribution": "NONE",
+      "independence_requirement": "NONE",
+      "admissible": true,
+      "rejection_reasons": [],
+      "redundancy_score": 0.0,
+      "information_gain_rank": 99
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "action_family": "SEEK_REPLICATION",
+      "mapped_action_code": "SEEK_REPLICATION",
+      "scientific_objective": "Independent replication of partition contrast on new cohort",
+      "target_uncertainty": "episode_robustness",
+      "target_null_key": null,
+      "expected_information_contribution": "LOW",
+      "independence_requirement": "HIGH",
+      "admissible": false,
+      "rejection_reasons": [
+        "confirmation_addiction_guard_supportive_same_uncertainty",
+        "redundant_with_first_experiment_cohort"
+      ],
+      "redundancy_score": 0.9,
+      "information_gain_rank": 3
+    }
+  ],
+  "selected_next_action": "SEEK_FALSIFICATION",
+  "decision_kind": "ACTION",
+  "stop_reason": null,
+  "scientific_uncertainty_targeted": "directional_effect_full_universe",
+  "target_null_key": "directional_reversal",
+  "expected_information_contribution": "HIGH",
+  "confirmation_bias_guard_applied": true,
+  "tool_convenience_overridden": false,
+  "second_experiment_generated": false,
+  "second_experiment_executed": false,
+  "decision_rationale": "Evidence class SUPPORTING (high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5): direction matches pre-registered expectation; seek falsification before further confirmation (falsification-first). Selected TEST_NEXT_NULL targeting directional_effect_full_universe (null=directional_reversal); expected information=HIGH.",
+  "decision_id": "dec-4c5eef9ff644",
+  "epistemic_update_id": "epu-11add5a8ebad",
+  "stop_boundary": "STOP_RESEARCH_DECISION_FROZEN"
+}
