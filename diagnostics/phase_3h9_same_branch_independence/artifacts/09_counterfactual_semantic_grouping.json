@@ -1,0 +1,32 @@
+{
+  "counterfactuals": [
+    {
+      "transition": 4,
+      "CF1_apparent_alternatives": 6,
+      "CF1_after_semantic_grouping": 1,
+      "CF2_would_inherit_decay": false,
+      "CF4_independent_high_value": 0,
+      "CF5_only_defensible_continue_or_stop": true,
+      "CF6_stop_compensated_late": false
+    },
+    {
+      "transition": 8,
+      "CF1_apparent_alternatives": 6,
+      "CF1_after_semantic_grouping": 1,
+      "CF2_would_inherit_decay": false,
+      "CF4_independent_high_value": 0,
+      "CF5_only_defensible_continue_or_stop": true,
+      "CF6_stop_compensated_late": false
+    },
+    {
+      "transition": 9,
+      "CF1_apparent_alternatives": 6,
+      "CF1_after_semantic_grouping": 1,
+      "CF2_would_inherit_decay": false,
+      "CF4_independent_high_value": 0,
+      "CF5_only_defensible_continue_or_stop": true,
+      "CF6_stop_compensated_late": false
+    }
+  ],
+  "note": "Offline diagnostic only \u2014 no behavior changes"
+}

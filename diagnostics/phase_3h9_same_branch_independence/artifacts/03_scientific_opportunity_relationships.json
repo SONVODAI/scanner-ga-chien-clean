@@ -1,0 +1,26 @@
+{
+  "model": "ScientificOpportunityRelationship",
+  "classifications": [
+    "IDENTICAL",
+    "NEAR_DUPLICATE",
+    "SAME_QUESTION_DIFFERENT_INSTRUMENT",
+    "SAME_UNCERTAINTY_DIFFERENT_SLICE",
+    "SAME_BRANCH_NEW_EVIDENCE",
+    "RELATED_BUT_DISTINCT",
+    "GENUINELY_INDEPENDENT",
+    "INSUFFICIENT_EVIDENCE"
+  ],
+  "dimensions": [
+    "parent branch_root_id",
+    "frame lineage",
+    "PopulationSpec",
+    "OutcomeSpec",
+    "observation horizon",
+    "uncertainty codes",
+    "research needs",
+    "features",
+    "expected information",
+    "semantic question structure"
+  ],
+  "note": "Diagnostic only \u2014 NOT implemented in runtime"
+}

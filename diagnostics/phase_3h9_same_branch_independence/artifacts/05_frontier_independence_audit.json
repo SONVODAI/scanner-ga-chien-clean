@@ -1,0 +1,323 @@
+{
+  "late_frontier_candidates": [
+    {
+      "decision_index": 8,
+      "frontier_id": "frontier:frontier-00019",
+      "action_id": "9f863f39276d3025",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00004",
+      "tool_name": "",
+      "current_revalued_erv": -4.092125,
+      "historical_planner_score": 6.625,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 8,
+      "frontier_id": "frontier:frontier-00020",
+      "action_id": "ae6ed0a837b1d031",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00005",
+      "tool_name": "",
+      "current_revalued_erv": -4.092125,
+      "historical_planner_score": 7.675,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 8,
+      "frontier_id": "frontier:frontier-00008",
+      "action_id": "ac3d731c6b0dafff",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "tool_name": "",
+      "current_revalued_erv": -4.329625,
+      "historical_planner_score": 7.125,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 9,
+      "frontier_id": "frontier:frontier-00019",
+      "action_id": "9f863f39276d3025",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00004",
+      "tool_name": "",
+      "current_revalued_erv": -2.763562499999999,
+      "historical_planner_score": 6.625,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 9,
+      "frontier_id": "frontier:frontier-00020",
+      "action_id": "ae6ed0a837b1d031",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00005",
+      "tool_name": "",
+      "current_revalued_erv": -2.763562499999999,
+      "historical_planner_score": 7.675,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 9,
+      "frontier_id": "frontier:frontier-00008",
+      "action_id": "ac3d731c6b0dafff",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "tool_name": "",
+      "current_revalued_erv": -2.976062499999999,
+      "historical_planner_score": 7.125,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 9,
+      "frontier_id": "frontier:frontier-00009",
+      "action_id": "e6afc687fe0439be",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "tool_name": "",
+      "current_revalued_erv": -2.976062499999999,
+      "historical_planner_score": 8.175,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 9,
+      "frontier_id": "frontier:frontier-00036",
+      "action_id": "51215c2965e9e6ad",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00016",
+      "tool_name": "",
+      "current_revalued_erv": -3.188562499999999,
+      "historical_planner_score": -1.8249999999999993,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00020",
+      "action_id": "ae6ed0a837b1d031",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00005",
+      "tool_name": "",
+      "current_revalued_erv": -6.616499999999999,
+      "historical_planner_score": 7.675,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00009",
+      "action_id": "e6afc687fe0439be",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "tool_name": "",
+      "current_revalued_erv": -6.836499999999998,
+      "historical_planner_score": 8.175,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00036",
+      "action_id": "51215c2965e9e6ad",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00016",
+      "tool_name": "",
+      "current_revalued_erv": -7.166499999999999,
+      "historical_planner_score": -1.8249999999999993,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00037",
+      "action_id": "45f1bbcde49148b8",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00017",
+      "tool_name": "",
+      "current_revalued_erv": -7.166499999999999,
+      "historical_planner_score": -0.7749999999999996,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00039",
+      "action_id": "efc531c2e38c44b6",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00019",
+      "tool_name": "",
+      "current_revalued_erv": -7.166499999999999,
+      "historical_planner_score": -1.2999999999999994,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00040",
+      "action_id": "7b134d9b39f931a2",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "frame-00020",
+      "tool_name": "",
+      "current_revalued_erv": -7.166499999999999,
+      "historical_planner_score": -1.2999999999999994,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    },
+    {
+      "decision_index": 11,
+      "frontier_id": "frontier:frontier-00031",
+      "action_id": "4fd1a07e9f010e1e",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "tool_name": "",
+      "current_revalued_erv": -7.386499999999998,
+      "historical_planner_score": -1.3249999999999993,
+      "relationship_to_active_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "independence": "SAME_BRANCH_SEMANTIC_OVERLAP"
+    }
+  ],
+  "summary": {
+    "frontier_entries_audited": 15,
+    "same_branch_semantic_overlap": 15
+  }
+}

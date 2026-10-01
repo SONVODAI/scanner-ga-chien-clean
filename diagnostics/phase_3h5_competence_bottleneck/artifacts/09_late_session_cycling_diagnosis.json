@@ -1,0 +1,163 @@
+{
+  "late_session_decisions": [
+    {
+      "transition": 7,
+      "tool_selected": "adaptive_partition_compare",
+      "erv": 1.5318749999999997,
+      "planner_score": -5.625,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "symbol_decomposition"
+      ],
+      "classification": "MECHANICAL_CYCLING",
+      "marginal_info_expected": "LOW \u2014 repeated partition/threshold on same features after saturation signals",
+      "saturation_signal": false
+    },
+    {
+      "transition": 8,
+      "tool_selected": "threshold_exploration",
+      "erv": 4.815312500000003,
+      "planner_score": -2.9374999999999982,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "symbol_decomposition",
+        "threshold_exploration",
+        "trajectory_partition_compare"
+      ],
+      "classification": "MECHANICAL_CYCLING",
+      "marginal_info_expected": "LOW \u2014 repeated partition/threshold on same features after saturation signals",
+      "saturation_signal": false
+    },
+    {
+      "transition": 9,
+      "tool_selected": "horizon_comparison",
+      "erv": 0.9636874999999998,
+      "planner_score": null,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_needs": [
+        "EXPLORE_STRUCTURE",
+        "REVISIT_UNRESOLVED_BRANCH",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "symbol_decomposition",
+        "trajectory_partition_compare"
+      ],
+      "classification": "JUSTIFIED_BOUNDARY_REFINEMENT",
+      "marginal_info_expected": "LOW \u2014 repeated partition/threshold on same features after saturation signals",
+      "saturation_signal": true
+    },
+    {
+      "transition": 10,
+      "tool_selected": "adaptive_partition_compare",
+      "erv": -3.0982499999999993,
+      "planner_score": -8.95,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "symbol_decomposition"
+      ],
+      "classification": "MECHANICAL_CYCLING",
+      "marginal_info_expected": "LOW \u2014 repeated partition/threshold on same features after saturation signals",
+      "saturation_signal": false
+    },
+    {
+      "transition": 11,
+      "tool_selected": "threshold_exploration",
+      "erv": 1.552375000000001,
+      "planner_score": -6.262499999999999,
+      "uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "alternatives_constructible": [
+        "",
+        "date_decomposition",
+        "episode_decomposition",
+        "market_conditioning",
+        "symbol_decomposition",
+        "threshold_exploration",
+        "trajectory_partition_compare"
+      ],
+      "classification": "MECHANICAL_CYCLING",
+      "marginal_info_expected": "LOW \u2014 repeated partition/threshold on same features after saturation signals",
+      "saturation_signal": false
+    }
+  ],
+  "mechanical_cycling_count": 4,
+  "justified_refinement_count": 1,
+  "verdict": "MECHANICAL_CYCLING_DOMINANT",
+  "primary_layers": [
+    "B7",
+    "B10"
+  ],
+  "explanation": "Late session partition/threshold repeats selected despite negative planner scores because all scientifically-relevant alternatives (decomposition) scored even lower. ERV selected least-negative local continuation on saturated branch \u2014 valuation problem, not missing grammar."
+}
