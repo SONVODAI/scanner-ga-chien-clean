@@ -382,6 +382,18 @@ class PartitionGroupCompareTool(ResearchTool):
         cohort, diag = resolve_cohort(
             panel, research_scope, data_cutoff_date=data_cutoff_date, horizon=horizon
         )
+
+        from modules.edge_research.research_outcome_evaluator import (
+            compare_group_outcome_profiles,
+            resolve_outcome_spec_from_scope,
+            default_outcome_spec_for_horizon,
+        )
+
+        outcome_spec = resolve_outcome_spec_from_scope(research_scope)
+        use_outcome_spec = outcome_spec is not None
+        if outcome_spec is None:
+            outcome_spec = default_outcome_spec_for_horizon(horizon)
+
         if cohort.empty:
             return _base_result(
                 self,
@@ -426,6 +438,65 @@ class PartitionGroupCompareTool(ResearchTool):
             group_key = _assign_numeric_bins(cohort[part_col], bins)
         else:
             group_key = cohort[part_col].astype(str)
+
+        if use_outcome_spec:
+            groups_raw, baseline = compare_group_outcome_profiles(
+                cohort,
+                group_key,
+                outcome_spec,
+                data_cutoff_date=data_cutoff_date,
+            )
+            groups = {
+                k: {
+                    "n": v.get("n_eligible", 0),
+                    "median": v.get("median_primary_return"),
+                    "mean": v.get("mean_primary_return"),
+                    "success_rate": v.get("success_rate"),
+                    "incremental_success_rate": v.get("incremental_success_rate"),
+                }
+                for k, v in groups_raw.items()
+            }
+            spread_vals = [v.get("incremental_success_rate") for v in groups_raw.values() if v.get("incremental_success_rate") is not None]
+            spread = max(spread_vals) - min(spread_vals) if len(spread_vals) >= 2 else 0.0
+            obs: List[StructuredResearchObservation] = []
+            if len(groups) < 2:
+                status = ToolStatus.NO_VARIATION
+                obs.append(_obs(OBS_NO_VARIATION, {"group_count": len(groups)}))
+            else:
+                status = ToolStatus.OK
+                if spread < 0.01:
+                    obs.append(_obs(OBS_NO_CLEAR_DIFFERENCE, {"outcome_spread": spread}))
+                else:
+                    obs.append(
+                        _obs(
+                            OBS_TRAJECTORY_GROUP_DIFFERENCE,
+                            {
+                                "outcome_spread": spread,
+                                "outcome_spec_hash": outcome_spec.content_hash(),
+                                "groups": len(groups),
+                            },
+                        )
+                    )
+            sample_size = int(baseline.n_eligible)
+            return _base_result(
+                self,
+                inputs=inputs,
+                research_scope=research_scope,
+                data_cutoff_date=data_cutoff_date,
+                status=status,
+                sample_size=sample_size,
+                metrics={
+                    "horizon": horizon,
+                    "group_count": len(groups),
+                    "outcome_spread": spread,
+                    "outcome_spec_hash": outcome_spec.content_hash(),
+                    "baseline_success_rate": baseline.success_rate,
+                    "uses_outcome_spec": True,
+                },
+                groups=groups,
+                diagnostics=diag,
+                observations=obs,
+            )
 
         matured = cohort[group_key.notna() & cohort[col].notna()].copy()
         matured["_group"] = group_key[group_key.notna() & cohort[col].notna()]
@@ -978,6 +1049,10 @@ def build_default_tool_registry() -> ToolRegistry:
         NeighborhoodStabilityTool(),
         TrajectoryPartitionCompareTool(),
     ):
+        registry.register(tool)
+    from modules.edge_research.research_adaptive_tools import build_adaptive_tool_registry
+
+    for tool in build_adaptive_tool_registry():
         registry.register(tool)
     return registry
 
