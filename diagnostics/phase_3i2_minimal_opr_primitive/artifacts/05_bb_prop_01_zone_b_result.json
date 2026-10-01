@@ -1,0 +1,72 @@
+{
+  "records": [],
+  "silences": [
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 0 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "52c546a4139af2bd310e7a81cb683b550f8087a6cce7a543007a2ab29341a155"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 1 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "517348a3cc18dea1a498a7a44d2c845c4a59484d4b1c2ffa0b7fc74e9b3efa9a"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 2 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "b012455e2e1309e66b586b9a1fc21682fed67f2ea76d6c959675038db8c4bb6a"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 3 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "901907bacf9f7c5e58459ee821f4c97bc6feb5100987cf313070e8044f026a3c"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 4 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "7ead5f799a59b2b2b6daf66dd8f337ece3258d7f6bbca5d98350c64d09919c82"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 5 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "1a3aeb3e76c7125dba374df8fa094063b7d0b493f244f80c393ceeaecaab64a1"
+    },
+    {
+      "outcome": "NO_PROPOSITION_EMITTED",
+      "reason_code": "INSUFFICIENT_SURPRISE",
+      "detail": "Only 6 historical dates available; minimum 20 required for baseline.",
+      "evidence_hash": "d0d0cc27843c93152438fa37777f27fc02adb2682daa34ffba7ec0fbc2575007"
+    }
+  ],
+  "executability": [],
+  "laundering": [],
+  "leakage_audit": {
+    "passed": true,
+    "zone_c_populated": false,
+    "zone_c_accessible_to_generator": false,
+    "forbidden_paths_found": [],
+    "generator_module_scan": {
+      "opr_module_count": 9,
+      "forbidden_pattern_hits": []
+    },
+    "detail": "Zone C populated: False; Zone C accessible to generator: False; Zone C not yet populated \u2014 blind hidden convergence will be INDETERMINATE"
+  },
+  "eligible_observations": 7,
+  "focal_dates_scanned": [
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-08",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13"
+  ],
+  "propositions_emitted": 0,
+  "silence_rate": 1.0
+}
