@@ -1,0 +1,241 @@
+{
+  "decisions": [
+    {
+      "transition": 1,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": 16.83,
+      "best_local_erv": 16.83,
+      "best_frontier_erv": 0.0,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 2.6,
+        "exploitation_component": 1.5,
+        "falsification_component": 0.0,
+        "novelty_component": 0.6,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 4.199999999999999,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 2,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": 14.635625,
+      "best_local_erv": 14.635625,
+      "best_frontier_erv": 6.73875,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 0.0,
+        "exploitation_component": 2.5,
+        "falsification_component": 2.025,
+        "novelty_component": 2.0,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 6.7375,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 3,
+      "selected_source": "FRONTIER",
+      "context_switch": false,
+      "selected_erv": 4.968750000000002,
+      "best_local_erv": 0.0,
+      "best_frontier_erv": 4.968750000000002,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": false,
+      "erv_components": {
+        "exploration_component": 1.3,
+        "exploitation_component": 1.5,
+        "falsification_component": 0.0,
+        "novelty_component": 0.6,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 7.437499999999999,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 4,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": 5.49,
+      "best_local_erv": 5.49,
+      "best_frontier_erv": 0.9733333333333335,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 2.0,
+        "exploitation_component": 1.5,
+        "falsification_component": 0.0,
+        "novelty_component": 2.0,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 9.1,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 5,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": 12.19018675,
+      "best_local_erv": 12.19018675,
+      "best_frontier_erv": 2.029583333333333,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 0.0,
+        "exploitation_component": 7.64393675,
+        "falsification_component": 0.0,
+        "novelty_component": 2.0,
+        "redundancy_penalty": 3.0,
+        "complexity_penalty": 10.4125,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 6,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": 4.3616875,
+      "best_local_erv": 4.3616875,
+      "best_frontier_erv": 4.2508541666666675,
+      "best_deferred_erv": 4.2508541666666675,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 0.6,
+        "exploitation_component": 5.0,
+        "falsification_component": 0.0,
+        "novelty_component": 2.0,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 11.462499999999999,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 7,
+      "selected_source": "REVISIT",
+      "context_switch": false,
+      "selected_erv": 1.1443541666666666,
+      "best_local_erv": 0.0,
+      "best_frontier_erv": 1.1443541666666666,
+      "best_deferred_erv": 1.1443541666666666,
+      "local_beats_frontier": false,
+      "erv_components": {
+        "exploration_component": 1.7333333333333334,
+        "exploitation_component": 2.5,
+        "falsification_component": 0.0,
+        "novelty_component": 0.6,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 12.1625,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 8,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": -1.0782499999999995,
+      "best_local_erv": -1.0782499999999995,
+      "best_frontier_erv": -4.092125,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 0.8,
+        "exploitation_component": 1.5,
+        "falsification_component": 0.0,
+        "novelty_component": 0.6,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 14.35,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 9,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": -2.1133124999999993,
+      "best_local_erv": -2.1133124999999993,
+      "best_frontier_erv": -4.365812499999999,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 1.75,
+        "exploitation_component": 2.5,
+        "falsification_component": 0.0,
+        "novelty_component": 2.0,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 15.487499999999999,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 10,
+      "selected_source": "LOCAL",
+      "context_switch": false,
+      "selected_erv": 3.799500000000002,
+      "best_local_erv": 3.799500000000002,
+      "best_frontier_erv": -4.317999999999997,
+      "best_deferred_erv": 0.0,
+      "local_beats_frontier": true,
+      "erv_components": {
+        "exploration_component": 0.0,
+        "exploitation_component": 7.75,
+        "falsification_component": 0.0,
+        "novelty_component": 2.0,
+        "redundancy_penalty": 3.0,
+        "complexity_penalty": 16.799999999999997,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    },
+    {
+      "transition": 11,
+      "selected_source": "REVISIT",
+      "context_switch": false,
+      "selected_erv": -1.6114999999999993,
+      "best_local_erv": -2.2714999999999996,
+      "best_frontier_erv": -1.6114999999999993,
+      "best_deferred_erv": -1.6114999999999993,
+      "local_beats_frontier": false,
+      "erv_components": {
+        "exploration_component": 1.65,
+        "exploitation_component": 5.0,
+        "falsification_component": 0.0,
+        "novelty_component": 0.6,
+        "redundancy_penalty": 0.0,
+        "complexity_penalty": 17.15,
+        "sample_burden_penalty": 0.0
+      },
+      "branch_before": "obs-b08a47b141fd",
+      "branch_after": "obs-b08a47b141fd"
+    }
+  ],
+  "branch_switches": 0,
+  "frontier_selections": 1,
+  "revisit_selections": 2,
+  "late_local_beats_frontier_count": 3,
+  "primary_mechanism": "Local branch ERV consistently exceeds revalued frontier ERV in late session (T8\u2013T11). No context-switch to different branch_root occurred. REVISIT returns to same root.",
+  "switching_friction_evidence": "context_switch_occurred=false for all 12 transitions"
+}

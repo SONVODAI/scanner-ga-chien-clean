@@ -1,0 +1,99 @@
+{
+  "redundancy_mechanism": "UNCERTAINTY_RESOLUTION_TOOLS topology \u2014 counts prior tools addressing same uncertainty code on branch",
+  "captures_same_scientific_question": "PARTIAL \u2014 same uncertainty yes, cross-tool alternation may evade per-tool topology",
+  "captures_branch_level_saturation": false,
+  "captures_low_realized_gain": false,
+  "resets_after_reframe": "NOT EVIDENCED in BB10 \u2014 single frame throughout",
+  "horizon_partition_threshold_evade": "YES \u2014 different tools (horizon/partition/threshold) attack different uncertainty codes; branch_tools_attempted tracks tools but IV redundancy is uncertainty-specific",
+  "bb10_examples": [
+    {
+      "transition": 1,
+      "tool_selected": "horizon_comparison",
+      "positive_iv_candidates": 5,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 2,
+      "tool_selected": "horizon_comparison",
+      "positive_iv_candidates": 5,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 3,
+      "tool_selected": "sensitivity_analysis",
+      "positive_iv_candidates": 0,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": false,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 4,
+      "tool_selected": "horizon_comparison",
+      "positive_iv_candidates": 5,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 5,
+      "tool_selected": "adaptive_partition_compare",
+      "positive_iv_candidates": 7,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 6,
+      "tool_selected": "threshold_exploration",
+      "positive_iv_candidates": 6,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 7,
+      "tool_selected": "symbol_decomposition",
+      "positive_iv_candidates": 0,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": false,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 8,
+      "tool_selected": "horizon_comparison",
+      "positive_iv_candidates": 5,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 9,
+      "tool_selected": "horizon_comparison",
+      "positive_iv_candidates": 5,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 10,
+      "tool_selected": "adaptive_partition_compare",
+      "positive_iv_candidates": 7,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    },
+    {
+      "transition": 11,
+      "tool_selected": "threshold_exploration",
+      "positive_iv_candidates": 6,
+      "candidates_with_redundancy_burden": 0,
+      "iv_still_positive_for_heterogeneity": true,
+      "topology_not_branch_level": true
+    }
+  ],
+  "finding": "B10-J CONFIRMED \u2014 IV decay operates at uncertainty-tool level, not branch cumulative marginal decay"
+}

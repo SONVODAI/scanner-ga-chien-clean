@@ -1,0 +1,33 @@
+{
+  "primary_causal_bottleneck": "B10-G STOP LOGIC PROBLEM + B10-B SATURATION NOT VALUED AS EXIT",
+  "secondary_causal_bottleneck": "B10-H REVISIT SAME BRANCH + B10-J IV DECAY MISMATCH",
+  "recommended_next_treatment": "Branch-exit valuation: make STOP/budget-preservation compete against negative-ERV continuations using revalued opportunity set; branch-level marginal decay signal (diagnostic flag first)",
+  "must_not_change": [
+    "Phase 3H.6 Information Value scales and pathways",
+    "Grammar / candidate generation",
+    "Competence layer (audit-only)",
+    "Global allocator semantics (without evidence-based exit treatment)",
+    "Forced exploration / branch quotas",
+    "BB01\u2013BB10 frozen artifacts"
+  ],
+  "hypothesis_evaluation": {
+    "B10-A": "REJECTED \u2014 saturation signals exist in assessment/portfolio",
+    "B10-B": "CONFIRMED \u2014 signals exist but do not trigger exit valuation",
+    "B10-C": "REJECTED \u2014 exit alternatives generated (decomposition, frontier, revisit)",
+    "B10-D": "PARTIAL \u2014 alternatives exist but lose to least-bad local continuation",
+    "B10-E": "PARTIAL \u2014 no context switches but local ERV beats frontier (not friction alone)",
+    "B10-F": "PARTIAL \u2014 late frontier also negative ERV; staying is least-bad not clearly superior",
+    "B10-G": "CONFIRMED \u2014 STOP non-competitive; historical frontier blocks global stop",
+    "B10-H": "CONFIRMED \u2014 REVISIT returns to same branch_root",
+    "B10-I": "CONFIRMED \u2014 structural single branch; semantic tool diversity within root",
+    "B10-J": "CONFIRMED \u2014 IV redundancy is uncertainty-topology not branch cumulative"
+  },
+  "first_loss_aggregate": {
+    "L12": 1,
+    "L9": 3,
+    "L11": 1
+  },
+  "verdict": "DIAGNOSIS_COMPLETE",
+  "confidence": "HIGH for STOP and saturation-not-valued; MEDIUM for frontier quality",
+  "bb11_recommendation": "DO NOT RUN \u2014 treatment phase required first"
+}
