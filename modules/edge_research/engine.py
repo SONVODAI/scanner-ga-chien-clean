@@ -1,7 +1,9 @@
 """
-Edge Research Engine V1 — orchestrator (Phase 0–3).
+Edge Research Engine V1 — orchestrator (Phase 0–4 / Phase A + Phase B).
 
-No production coupling. Stops at robustness — no OOS or EDGE ACTIVE.
+No production BUY/execution coupling. Discovery → Challenger → freeze →
+prospective OOS → ACTIVE memory → isolated future recognition (LIVE_FORWARD
+research births). Phase C maturity/decay is out of scope.
 """
 
 from __future__ import annotations
@@ -21,6 +23,11 @@ from modules.edge_research.adapters import (
 from modules.edge_research.challenger import ChallengerRunResult, run_challenger
 from modules.edge_research.contracts import ENGINE_VERSION, ROBUSTNESS_FRAGILE, ROBUSTNESS_PASS, ROBUSTNESS_REJECT
 from modules.edge_research.discovery import DiscoveryRunResult, run_discovery
+from modules.edge_research.edge_memory import count_active_edges, promote_evaluations
+from modules.edge_research.freeze import freeze_eligible_candidates, load_all_frozen_specs
+from modules.edge_research.migration import audit_existing_candidates
+from modules.edge_research.oos import OOSLeakageError
+from modules.edge_research.oos_eval import evaluate_all_frozen_oos
 from modules.edge_research.persistence import publish_durable, try_restore_durable
 from modules.edge_research.storage import (
     append_candidates,
@@ -89,7 +96,7 @@ class FoundationStatus:
 
 
 class EdgeResearchEngine:
-    """Research-only engine — foundation, discovery, challenger."""
+    """Research-only engine — foundation, discovery, challenger, freeze, OOS, memory, recognition."""
 
     def __init__(self, data_dir: Optional[Path] = None) -> None:
         self.data_dir = resolve_data_dir(data_dir)
@@ -124,7 +131,7 @@ class EdgeResearchEngine:
                 obs_count = int(len(lifecycle))
 
         candidates = count_ledger_rows("edge_hypothesis_ledger.csv", self.data_dir)
-        validated = count_ledger_rows("edge_memory.csv", self.data_dir)
+        validated = count_active_edges(self.data_dir)
 
         last_event = str(stored.get("last_research_event", "NONE"))
         discovery_summary = None
@@ -151,6 +158,10 @@ class EdgeResearchEngine:
                 "episodes_segmented": challenger.get("episodes_segmented", 0),
             }
             observed_episodes = challenger.get("episodes_segmented", 0)
+        if load_all_frozen_specs(self.data_dir):
+            phase = "oos"
+        if validated > 0:
+            phase = "qualified_memory"
 
         status = FoundationStatus(
             engine_version=ENGINE_VERSION,
@@ -188,6 +199,7 @@ class EdgeResearchEngine:
         *,
         enable_three_feature: bool = False,
         max_candidates: int = 20,
+        apply_chronological_holdout: bool = True,
     ) -> DiscoveryRunResult:
         self.initialize()
         panel = self.build_panel(start=start, end=end)
@@ -196,6 +208,7 @@ class EdgeResearchEngine:
             panel,
             enable_three_feature=enable_three_feature,
             max_candidates=max_candidates,
+            apply_chronological_holdout=apply_chronological_holdout,
         )
         new_count = append_candidates(
             result.candidates,
@@ -224,6 +237,17 @@ class EdgeResearchEngine:
         publish_durable(self.data_dir)
         return result
 
+    def _challenger_panel(self) -> pd.DataFrame:
+        """Challenger must not see OOS holdout when discovery used a chronological split."""
+        panel = self.build_panel()
+        discovery = read_discovery_run(self.data_dir)
+        if discovery.get("holdout_applied") and discovery.get("discovery_end_date"):
+            end = pd.Timestamp(discovery["discovery_end_date"])
+            work = panel.copy()
+            work["_td"] = pd.to_datetime(work["trade_date"], errors="coerce")
+            panel = work[work["_td"] <= end].drop(columns=["_td"])
+        return panel
+
     def run_challenger(self, *, force: bool = False) -> ChallengerRunResult:
         """Explicit Phase 3 robustness run — not on every UI rerender."""
         self.initialize()
@@ -233,7 +257,7 @@ class EdgeResearchEngine:
         if cohort.empty:
             raise ValueError("No Phase 2 candidates found for the latest discovery cohort. Run discovery first.")
 
-        panel = self.build_panel()
+        panel = self._challenger_panel()
         existing = read_challenger_run(self.data_dir)
         existing_hash = existing.get("candidate_ledger_hash") or existing.get("ledger_hash") if existing else None
 
@@ -280,13 +304,110 @@ class EdgeResearchEngine:
             voice = self._format_challenger_voice(top)
             write_status({**self.get_foundation_status().to_dict(), "last_research_event": voice}, data_dir=self.data_dir)
 
+        try:
+            freeze_eligible_candidates(data_dir=self.data_dir, panel=panel)
+        except Exception:
+            # Freeze is isolated from challenger persistence success.
+            pass
+
         publish_durable(self.data_dir)
+        return result
+
+    def freeze_eligible(self, panel: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        self.initialize()
+        if panel is None:
+            try:
+                panel = self._challenger_panel()
+            except Exception:
+                panel = None
+        result = freeze_eligible_candidates(data_dir=self.data_dir, panel=panel)
+        try:
+            publish_durable(self.data_dir)
+        except Exception:
+            pass
+        return result.to_dict()
+
+    def evaluate_oos(self, panel: Optional[pd.DataFrame] = None) -> List[Dict[str, Any]]:
+        self.initialize()
+        if panel is None:
+            panel = self.build_panel()
+        evaluations = evaluate_all_frozen_oos(panel, data_dir=self.data_dir)
+        specs = {s.hypothesis_id: s for s in load_all_frozen_specs(self.data_dir)}
+        promote_evaluations(evaluations, specs, data_dir=self.data_dir)
+        try:
+            publish_durable(self.data_dir)
+        except Exception:
+            pass
+        return [e.to_dict() for e in evaluations]
+
+    def run_qualification_cycle(self, panel: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        """
+        Isolated freeze → OOS → promote cycle.
+
+        Failures here must never corrupt earning-learning canonical truth.
+        Does not run discovery/challenger, matcher, or execution.
+        """
+        self.initialize()
+        audit = audit_existing_candidates(self.data_dir)
+        freeze_result: Dict[str, Any] = {}
+        oos_result: List[Dict[str, Any]] = []
+        errors: List[str] = []
+        try:
+            freeze_result = self.freeze_eligible(panel=panel)
+        except Exception as exc:
+            errors.append(f"freeze: {exc}")
+        try:
+            oos_result = self.evaluate_oos(panel=panel)
+        except OOSLeakageError as exc:
+            errors.append(f"oos_leakage: {exc}")
+        except Exception as exc:
+            errors.append(f"oos: {exc}")
+        return {
+            "freeze": freeze_result,
+            "oos": oos_result,
+            "active_edges": count_active_edges(self.data_dir),
+            "migration_audit": audit.get("counts", {}),
+            "errors": errors,
+        }
+
+    def run_future_recognition(
+        self,
+        *,
+        trade_date: Optional[str] = None,
+        freeze_df: Optional[pd.DataFrame] = None,
+        freeze_path: Optional[Path] = None,
+        market_context: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Isolated Phase B recognition session.
+
+        Failures here must never corrupt earning-learning canonical truth or
+        Phase A qualification artifacts. Does not place orders or mature
+        forward outcomes.
+        """
+        from modules.edge_research.future_recognition import run_future_recognition as _run_fr
+
+        self.initialize()
+        result = _run_fr(
+            trade_date=trade_date,
+            data_dir=self.data_dir,
+            freeze_df=freeze_df,
+            freeze_path=freeze_path,
+            market_context=market_context,
+        )
+        try:
+            publish_durable(self.data_dir)
+        except Exception:
+            pass
         return result
 
     @staticmethod
     def _format_challenger_voice(cr: Any) -> str:
         if cr.robustness_status == ROBUSTNESS_PASS:
-            return f"EDGE CANDIDATE — ROBUSTNESS PASS — {cr.edge_id} | {cr.condition_text}"
+            return (
+                f"EDGE CANDIDATE — ROBUSTNESS PASS — {cr.edge_id} | {cr.condition_text} "
+                f"— READY_FOR_OOS (not validated; OOS still required)"
+            )
         if cr.robustness_status == ROBUSTNESS_FRAGILE:
             return f"EDGE FRAGILE — {cr.edge_id} | Main issue: {cr.main_fragility_flag}"
         return f"EDGE REJECTED — {cr.edge_id} | Reason: {cr.rejection_reasons[0] if cr.rejection_reasons else 'robustness_failed'}"
