@@ -1,0 +1,219 @@
+{
+  "audit_version": "phase_3i15_capability_inventory_v1",
+  "mechanism_count": 11,
+  "mechanisms": [
+    {
+      "name": "FalsificationCandidateGenerator",
+      "path": "modules/edge_research/opr_bridge/falsification_candidate_generator.py",
+      "trigger": "ResearchDecisionRecord.chosen_next_action == SEEK_FALSIFICATION",
+      "inputs": [
+        "PropositionRecord",
+        "EpistemicUpdateRecord",
+        "ResearchDecisionRecord",
+        "prior ExperimentSpec",
+        "panel"
+      ],
+      "outputs": [
+        "FalsificationCandidateRecord[] with embedded ExperimentSpec"
+      ],
+      "classification": [
+        "PROPOSITION_SCOPED_REASONING",
+        "TOOL_BOUND",
+        "TEMPLATE_BOUND"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Derives vulnerabilities from proposition commitments; emits at most one real candidate (independent_episode_holdout) plus audit sketches. Hard-wired to partition_group_compare. Does not read EvidenceSynthesisRecord or ResearchPriorityDecision."
+    },
+    {
+      "name": "FalsificationSelector",
+      "path": "modules/edge_research/opr_bridge/falsification_selector.py",
+      "trigger": "Non-empty FalsificationCandidateRecord set",
+      "inputs": [
+        "FalsificationCandidateRecord[]"
+      ],
+      "outputs": [
+        "SelectionResult"
+      ],
+      "classification": [
+        "EXECUTION_ONLY"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Lexicographic selection among pre-generated candidates \u2014 not generation."
+    },
+    {
+      "name": "FalsificationExecutionRunner",
+      "path": "modules/edge_research/opr_bridge/falsification_execution_runner.py",
+      "trigger": "Frozen OneShotPackage",
+      "inputs": [
+        "OneShotPackage",
+        "panel"
+      ],
+      "outputs": [
+        "ToolResult",
+        "EpistemicUpdateRecord",
+        "LifecycleKnowledgeState"
+      ],
+      "classification": [
+        "EXECUTION_ONLY"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Executes frozen package; auto-synthesis hook records priority only."
+    },
+    {
+      "name": "generate_action_candidates",
+      "path": "modules/edge_research/research_actions.py",
+      "trigger": "ResearchAssessment + ResearchGraph + completed experiment node",
+      "inputs": [
+        "ResearchAssessment.information_gaps (GAP codes)",
+        "ResearchGraph",
+        "ToolRegistry"
+      ],
+      "outputs": [
+        "ResearchActionCandidate[] with question_template_id and draft ExperimentSpec"
+      ],
+      "classification": [
+        "GAP_BOUND",
+        "TEMPLATE_BOUND",
+        "TOOL_BOUND"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Requires Phase-2 assessment stack with GAP codes from interpreter. Maps each GAP to fixed action templates and tools. Disconnected from OPR lifecycle and ResearchPriorityDecision."
+    },
+    {
+      "name": "ResearchGrammar proposers",
+      "path": "modules/edge_research/research_grammar.py",
+      "trigger": "ResearchQuestionContext from prior experiment",
+      "inputs": [
+        "population_spec",
+        "outcome_spec",
+        "horizon"
+      ],
+      "outputs": [
+        "PopulationSpec / OutcomeSpec reframes"
+      ],
+      "classification": [
+        "GENERIC_SCIENTIFIC_REASONING",
+        "REUSABLE_WITHOUT_SCIENTIFIC_PRIOR"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Domain-general reframing operators (filter, refine, widen, outcome reframe). Requires question context \u2014 cannot cold-start from synthesis alone."
+    },
+    {
+      "name": "EvidenceSynthesisEngine",
+      "path": "modules/edge_research/opr_bridge/evidence_synthesis_engine.py",
+      "trigger": "Evidence ledger entries",
+      "inputs": [
+        "PropositionRecord",
+        "EvidenceLedgerEntry[]"
+      ],
+      "outputs": [
+        "EvidenceSynthesisRecord",
+        "ResearchPriorityDecision"
+      ],
+      "classification": [
+        "PROPOSITION_SCOPED_REASONING"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": true,
+      "notes": "Emits priority enum and unresolved uncertainty axes \u2014 no ExperimentSpec or action candidates."
+    },
+    {
+      "name": "LifecycleSynthesisHook",
+      "path": "modules/edge_research/opr_bridge/lifecycle_synthesis_hook.py",
+      "trigger": "on_epistemic_update_completed",
+      "inputs": [
+        "evidence events"
+      ],
+      "outputs": [
+        "LifecycleKnowledgeState",
+        "ACTION_RECORDED_ONLY"
+      ],
+      "classification": [
+        "DISCONNECTED"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": true,
+      "notes": "Records priority; explicitly stops before action generation."
+    },
+    {
+      "name": "PropositionSynthesizer (OPR)",
+      "path": "modules/edge_research/opr_bridge/proposition_synthesizer.py",
+      "trigger": "ObservationRecord",
+      "inputs": [
+        "observation artifacts"
+      ],
+      "outputs": [
+        "PropositionRecord"
+      ],
+      "classification": [
+        "DISCONNECTED"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Observation \u2192 proposition \u2014 upstream of action layer."
+    },
+    {
+      "name": "ResearchPlanner / Frontier / Controller",
+      "path": "modules/edge_research/research_planner.py, research_controller.py",
+      "trigger": "ResearchActionCandidate pool",
+      "inputs": [
+        "candidates from generate_action_candidates"
+      ],
+      "outputs": [
+        "selected NextActionCandidate"
+      ],
+      "classification": [
+        "EXECUTION_ONLY"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Selects among GAP-bound candidates \u2014 not OPR synthesis path."
+    },
+    {
+      "name": "Discovery / Challenger",
+      "path": "modules/edge_research/discovery.py, challenger.py",
+      "trigger": "Phase-2 discovery session",
+      "inputs": [
+        "market scan state"
+      ],
+      "outputs": [
+        "observations, challenger hypotheses"
+      ],
+      "classification": [
+        "DISCONNECTED"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Separate discovery model; not wired to OPR lifecycle."
+    },
+    {
+      "name": "uncertainty_coverage.derive_uncertainty_dimensions",
+      "path": "modules/edge_research/opr_bridge/uncertainty_coverage.py",
+      "trigger": "PropositionRecord.proposition_type",
+      "inputs": [
+        "proposition_type"
+      ],
+      "outputs": [
+        "tuple of uncertainty axis names"
+      ],
+      "classification": [
+        "GENERIC_SCIENTIFIC_REASONING",
+        "REUSABLE_WITHOUT_SCIENTIFIC_PRIOR"
+      ],
+      "uncertainty_to_action": false,
+      "uses_research_priority_decision": false,
+      "notes": "Axis taxonomy only \u2014 no action derivation."
+    }
+  ],
+  "two_stacks_disconnected": true,
+  "stack_a": "Phase-3 controller: GAP \u2192 generate_action_candidates \u2192 planner",
+  "stack_b": "OPR lifecycle: synthesis \u2192 ResearchPriorityDecision \u2192 ACTION_RECORDED_ONLY",
+  "bridge_exists": false,
+  "can_transform_arbitrary_unresolved_uncertainty": false,
+  "answer": "No existing component transforms arbitrary unresolved uncertainty from ResearchPriorityDecision into scientifically meaningful candidate next actions."
+}
