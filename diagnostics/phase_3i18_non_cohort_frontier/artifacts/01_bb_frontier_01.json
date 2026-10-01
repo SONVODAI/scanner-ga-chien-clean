@@ -1,0 +1,168 @@
+{
+  "benchmark": "BB-Frontier-01",
+  "case_count": 20,
+  "passed": 20,
+  "all_passed": true,
+  "results": [
+    {
+      "case_id": "BBF-01",
+      "passed": true,
+      "checks": {
+        "decision_in": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-02",
+      "passed": true,
+      "checks": {
+        "decision_in": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-03",
+      "passed": true,
+      "checks": {
+        "counterexample": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-04",
+      "passed": true,
+      "checks": {
+        "no_outcome_mining": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-05",
+      "passed": true,
+      "checks": {
+        "concentration": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-06",
+      "passed": true,
+      "checks": {
+        "fork_blocked": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-07",
+      "passed": true,
+      "checks": {
+        "dedup": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-08",
+      "passed": true,
+      "checks": {
+        "measurement": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-09",
+      "passed": true,
+      "checks": {
+        "alt_blocked": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-10",
+      "passed": true,
+      "checks": {
+        "decision_in": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-11",
+      "passed": true,
+      "checks": {
+        "tool_dedup": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-12",
+      "passed": true,
+      "checks": {
+        "rename": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-13",
+      "passed": true,
+      "checks": {
+        "sci_survives": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-14",
+      "passed": true,
+      "checks": {
+        "low_info": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-15",
+      "passed": true,
+      "checks": {
+        "coverage": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-16",
+      "passed": true,
+      "checks": {
+        "decision": true
+      },
+      "decision": "HOLD_PROVISIONALLY"
+    },
+    {
+      "case_id": "BBF-17",
+      "passed": true,
+      "checks": {
+        "epistemic": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-18",
+      "passed": true,
+      "checks": {
+        "no_change": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-19",
+      "passed": true,
+      "checks": {
+        "ordering": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "case_id": "BBF-20",
+      "passed": true,
+      "checks": {
+        "cross": true
+      },
+      "decision": "NO_HIGH_INFORMATION_ACTION"
+    }
+  ]
+}

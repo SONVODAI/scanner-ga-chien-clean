@@ -1,0 +1,160 @@
+{
+  "stop_quality_labels": [
+    "DEFENSIBLE_STOP",
+    "INCONCLUSIVE",
+    "JUSTIFIED_STOP",
+    "MISVALUED_STOP",
+    "PREMATURE_STOP"
+  ],
+  "continue_quality_labels": [
+    "DEFENSIBLE_CONTINUE",
+    "INCONCLUSIVE",
+    "JUSTIFIED_CONTINUE",
+    "MECHANICAL_CYCLING",
+    "UNJUSTIFIED_PERSISTENCE"
+  ],
+  "decisions": [
+    {
+      "transition": 1,
+      "planning_sequence": 0,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "JUSTIFIED_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "INSUFFICIENT_EVIDENCE",
+      "selected_tool": "horizon_comparison",
+      "best_experiment_erv": 16.83,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 2,
+      "planning_sequence": 1,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "JUSTIFIED_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "INSUFFICIENT_EVIDENCE",
+      "selected_tool": "sensitivity_analysis",
+      "best_experiment_erv": 14.635625,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 3,
+      "planning_sequence": 2,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "JUSTIFIED_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "DIMINISHING",
+      "selected_tool": "horizon_comparison",
+      "best_experiment_erv": 4.968750000000002,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 4,
+      "planning_sequence": 3,
+      "stop_won": false,
+      "stop_competed": true,
+      "decision_quality": "MECHANICAL_CYCLING",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "LOW_MARGINAL_VALUE",
+      "selected_tool": "adaptive_partition_compare",
+      "best_experiment_erv": 5.49,
+      "exit_value": 3.325
+    },
+    {
+      "transition": 5,
+      "planning_sequence": 4,
+      "stop_won": false,
+      "stop_competed": true,
+      "decision_quality": "JUSTIFIED_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "LOW_MARGINAL_VALUE",
+      "selected_tool": "threshold_exploration",
+      "best_experiment_erv": 12.19018675,
+      "exit_value": 3.090625
+    },
+    {
+      "transition": 6,
+      "planning_sequence": 5,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "DEFENSIBLE_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "DIMINISHING",
+      "selected_tool": "symbol_decomposition",
+      "best_experiment_erv": 4.3616875,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 7,
+      "planning_sequence": 6,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "JUSTIFIED_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "PRODUCTIVE",
+      "selected_tool": "horizon_comparison",
+      "best_experiment_erv": 1.1443541666666666,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 8,
+      "planning_sequence": 7,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "MECHANICAL_CYCLING",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "DIMINISHING",
+      "selected_tool": "adaptive_partition_compare",
+      "best_experiment_erv": -1.0996249999999994,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 9,
+      "planning_sequence": 8,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "MECHANICAL_CYCLING",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "DIMINISHING",
+      "selected_tool": "threshold_exploration",
+      "best_experiment_erv": 5.7789375,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 10,
+      "planning_sequence": 9,
+      "stop_won": false,
+      "stop_competed": false,
+      "decision_quality": "JUSTIFIED_CONTINUE",
+      "decision_family": "CONTINUE",
+      "branch_marginal_state": "DIMINISHING",
+      "selected_tool": "horizon_comparison",
+      "best_experiment_erv": 0.30918750000000017,
+      "exit_value": -Infinity
+    },
+    {
+      "transition": 11,
+      "planning_sequence": 10,
+      "stop_won": true,
+      "stop_competed": true,
+      "decision_quality": "JUSTIFIED_STOP",
+      "decision_family": "STOP",
+      "branch_marginal_state": "LOW_MARGINAL_VALUE",
+      "selected_tool": "",
+      "best_experiment_erv": -3.591499999999999,
+      "exit_value": 2.04375
+    }
+  ],
+  "stop_quality_counts": {
+    "JUSTIFIED_STOP": 1
+  },
+  "continue_quality_counts": {
+    "JUSTIFIED_CONTINUE": 6,
+    "MECHANICAL_CYCLING": 3,
+    "DEFENSIBLE_CONTINUE": 1
+  },
+  "stop_won_count": 1,
+  "stop_competed_count": 3
+}

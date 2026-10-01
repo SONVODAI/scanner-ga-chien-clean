@@ -1,0 +1,27 @@
+{
+  "artifact_path": "/workspace/diagnostics/phase_3i16_scientific_action_generator/artifacts/04_t2_one_shot_generation.json",
+  "user_cited_package_hash": "32377898803d348f317c92be57bf6ed6350230c9a179db5d1e4e3e42256efe",
+  "artifact_package_hash": "db7b869ab18dc156a59f91fed3766232411853cf8efd1db43892e0ffc381cd70",
+  "package_hash_match_user_citation": false,
+  "package_hash_note": "package_hash includes package_id and created_at \u2014 may differ across 3I.16 runs while scientific identity hashes remain stable",
+  "execution_status": "NOT_EXECUTED",
+  "execution_status_not_executed": true,
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+  "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+  "objective_hash": "18dcf18d1195e6f0bd398f9daa82f6832bab85a0fef3bbe88c0234a4bf7377f2",
+  "selected_candidate_record_hash": "0790193e3d35b5652c636831f939180a17c6277c6334e4916629f7c48029479b",
+  "scientific_action_core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+  "generator_content_hash": "77e665c720b3f8c5050ff1113d076c38cd2c678db8df6773711e665e3fcc7eb9",
+  "operator_set_hash": "1afd6e0206008216f0d521cfcbbc7b84f2ff25c2333ff15a7b0501935af9dce8",
+  "selector_version": "lexicographic_scientific_action_selector_v1_3i16",
+  "selected_strategy": "population_subgroup_contrast",
+  "selected_axis": "population_robustness",
+  "scientific_identity_stable": {
+    "core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+    "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b"
+  },
+  "regeneration_occurred_in_audit": false,
+  "integrity_pass": true
+}
