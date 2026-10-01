@@ -15,6 +15,16 @@ from modules.edge_research.research_assessment import (
 )
 from modules.edge_research.research_graph import ResearchGraph
 from modules.edge_research.research_state import NodeType
+from modules.edge_research.research_shape import (
+    OBS_SHAPE_EXTREME_BIN,
+    OBS_SHAPE_FLAT,
+    OBS_SHAPE_GRADIENT,
+    OBS_SHAPE_MONOTONIC_DECREASING,
+    OBS_SHAPE_MONOTONIC_INCREASING,
+    OBS_SHAPE_NOISY,
+    OBS_SHAPE_STEP_CHANGE,
+    shape_suggests_threshold_exploration,
+)
 from modules.edge_research.research_tools import (
     OBS_DATE_BROAD,
     OBS_DATE_CONCENTRATED,
@@ -47,6 +57,20 @@ GAP_HORIZON_STABILITY = "HORIZON_STABILITY"
 GAP_NEIGHBORHOOD_STABILITY = "NEIGHBORHOOD_STABILITY"
 GAP_TRAJECTORY_ROLE = "TRAJECTORY_ROLE"
 GAP_SUBGROUP_ARTIFACT = "SUBGROUP_ARTIFACT"
+GAP_THRESHOLD_EXPLORATION = "THRESHOLD_EXPLORATION"
+GAP_NEIGHBORHOOD_THRESHOLD = "NEIGHBORHOOD_THRESHOLD"
+GAP_CATEGORY_REFINEMENT = "CATEGORY_REFINEMENT"
+GAP_INTERACTION_FOLLOWUP = "INTERACTION_FOLLOWUP"
+
+SHAPE_CODES = (
+    OBS_SHAPE_MONOTONIC_INCREASING,
+    OBS_SHAPE_MONOTONIC_DECREASING,
+    OBS_SHAPE_GRADIENT,
+    OBS_SHAPE_STEP_CHANGE,
+    OBS_SHAPE_EXTREME_BIN,
+    OBS_SHAPE_FLAT,
+    OBS_SHAPE_NOISY,
+)
 
 FALSIFY_EXTREME_WINNER = "EXTREME_WINNER"
 FALSIFY_DATE_ARTIFACT = "DATE_ARTIFACT"
@@ -137,6 +161,29 @@ def interpret_tool_result(
     if OBS_TRAJECTORY_GROUP_DIFFERENCE in codes:
         uncertainties.append("TRAJECTORY_OR_GROUP_DIFFERENCE")
 
+    # Phase 3F shape observations from adaptive partition tools.
+    shape_detected = any(c in codes for c in SHAPE_CODES)
+    shape_metrics = tool_result.metrics.get("shape") or {}
+    if shape_detected or shape_metrics:
+        if OBS_SHAPE_FLAT in codes or shape_metrics.get("shape_code") == OBS_SHAPE_FLAT:
+            findings = findings  # flat recorded
+        elif any(c in codes for c in SHAPE_CODES if c not in (OBS_SHAPE_FLAT, OBS_SHAPE_NOISY)):
+            uncertainties.append("SHAPE_GRADIENT")
+            if shape_suggests_threshold_exploration(_shape_from_metrics(shape_metrics)):
+                gaps.append(GAP_THRESHOLD_EXPLORATION)
+        if OBS_SHAPE_NOISY in codes:
+            uncertainties.append("SHAPE_INCONCLUSIVE")
+
+    if "CATEGORY_SEPARATION_DETECTED" in codes:
+        uncertainties.append("CATEGORY_SEPARATION")
+        gaps.append(GAP_CATEGORY_REFINEMENT)
+
+    if tool_result.metrics.get("stability_class") == "UNSTABLE_THRESHOLD":
+        fragility.append("UNSTABLE_THRESHOLD")
+    if tool_result.metrics.get("stability_class") == "POINT_ESTIMATE_ONLY":
+        uncertainties.append("THRESHOLD_POINT_ONLY")
+        gaps.append(GAP_NEIGHBORHOOD_THRESHOLD)
+
     # Descriptive strength (computed before gap derivation).
     if tool_result.status == ToolStatus.INSUFFICIENT_DATA:
         strength = DescriptiveStrength.INSUFFICIENT
@@ -144,13 +191,15 @@ def interpret_tool_result(
         strength = DescriptiveStrength.NO_VARIATION
     elif OBS_NO_CLEAR_DIFFERENCE in codes:
         strength = DescriptiveStrength.NO_CLEAR_DIFFERENCE
-    elif OBS_TRAJECTORY_GROUP_DIFFERENCE in codes:
+    elif OBS_TRAJECTORY_GROUP_DIFFERENCE in codes or shape_detected:
         strength = DescriptiveStrength.GROUP_DIFFERENCE
     else:
         strength = DescriptiveStrength.NO_CLEAR_DIFFERENCE
 
     interesting = strength == DescriptiveStrength.GROUP_DIFFERENCE and not fragility
     if OBS_MARKET_HETEROGENEOUS in codes or OBS_HORIZON_HETEROGENEOUS in codes:
+        interesting = True
+    if shape_detected and OBS_SHAPE_FLAT not in codes and OBS_SHAPE_NOISY not in codes:
         interesting = True
     if fragility and (OBS_EXTREME_WINNER_SENSITIVE in codes or OBS_SENSITIVITY_FRAGILE in codes):
         interesting = False
@@ -222,6 +271,29 @@ def interpret_tool_result(
         actionable=False,
         branch_tools_attempted=branch_tools,
         branch_observation_codes=branch_obs,
+    )
+
+
+def _shape_from_metrics(shape_metrics: dict):
+    from modules.edge_research.research_shape import ShapeInterpretation
+
+    if not shape_metrics:
+        return ShapeInterpretation(
+            shape_code=OBS_SHAPE_NOISY,
+            strength=0.0,
+            valid_bins=0,
+            direction_consistency=0.0,
+            effect_spread=0.0,
+            sample_sufficient=False,
+        )
+    return ShapeInterpretation(
+        shape_code=str(shape_metrics.get("shape_code", OBS_SHAPE_NOISY)),
+        strength=float(shape_metrics.get("strength", 0.0)),
+        valid_bins=int(shape_metrics.get("valid_bins", 0)),
+        direction_consistency=float(shape_metrics.get("direction_consistency", 0.0)),
+        effect_spread=float(shape_metrics.get("effect_spread", 0.0)),
+        sample_sufficient=bool(shape_metrics.get("sample_sufficient", False)),
+        evidence=dict(shape_metrics.get("evidence") or {}),
     )
 
 

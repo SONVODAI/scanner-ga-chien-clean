@@ -94,6 +94,47 @@ class QuestionRationale:
 
 
 @dataclass(frozen=True)
+class ResearchQuestionContext:
+    """
+    Structured question frame — population + outcome specs and search accounting hooks.
+
+    Answers: why did Bot ask this question?
+    """
+
+    population_spec: Dict[str, Any]
+    outcome_spec: Dict[str, Any]
+    research_depth: int = 0
+    search_complexity: int = 0
+    population_n: Optional[int] = None
+    search_accounting: Dict[str, Any] = field(default_factory=dict)
+    population_change: Optional[Dict[str, Any]] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "population_spec": dict(self.population_spec),
+            "outcome_spec": dict(self.outcome_spec),
+            "research_depth": self.research_depth,
+            "search_complexity": self.search_complexity,
+            "population_n": self.population_n,
+            "search_accounting": dict(self.search_accounting),
+            "population_change": dict(self.population_change) if self.population_change else None,
+        }
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "ResearchQuestionContext":
+        pc = payload.get("population_change")
+        return cls(
+            population_spec=dict(payload.get("population_spec") or {}),
+            outcome_spec=dict(payload.get("outcome_spec") or {}),
+            research_depth=int(payload.get("research_depth", 0)),
+            search_complexity=int(payload.get("search_complexity", 0)),
+            population_n=payload.get("population_n"),
+            search_accounting=dict(payload.get("search_accounting") or {}),
+            population_change=dict(pc) if pc else None,
+        )
+
+
+@dataclass(frozen=True)
 class ExperimentSpec:
     """Immutable experiment identity for deduplication and audit."""
 
@@ -325,6 +366,7 @@ class ResearchNode:
     trigger: Optional[ResearchTrigger] = None
     question_text: str = ""
     rationale: Optional[QuestionRationale] = None
+    question_context: Optional[ResearchQuestionContext] = None
     experiment_spec: Optional[ExperimentSpec] = None
     experiment_content_hash: Optional[str] = None
     experiment_result: Optional[ExperimentResult] = None
@@ -350,6 +392,7 @@ class ResearchNode:
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "question_text": self.question_text,
             "rationale": self.rationale.to_dict() if self.rationale else None,
+            "question_context": self.question_context.to_dict() if self.question_context else None,
             "experiment_spec": self.experiment_spec.to_dict() if self.experiment_spec else None,
             "experiment_content_hash": self.experiment_content_hash,
             "experiment_result": self.experiment_result.to_dict() if self.experiment_result else None,
@@ -369,6 +412,7 @@ class ResearchNode:
     def from_dict(cls, payload: Dict[str, Any]) -> "ResearchNode":
         trigger = payload.get("trigger")
         rationale = payload.get("rationale")
+        qctx = payload.get("question_context")
         spec = payload.get("experiment_spec")
         result = payload.get("experiment_result")
         selected = payload.get("selected_next_action")
@@ -385,6 +429,7 @@ class ResearchNode:
             trigger=ResearchTrigger.from_dict(trigger) if trigger else None,
             question_text=str(payload.get("question_text", "")),
             rationale=QuestionRationale.from_dict(rationale) if rationale else None,
+            question_context=ResearchQuestionContext.from_dict(qctx) if qctx else None,
             experiment_spec=ExperimentSpec.from_dict(spec) if spec else None,
             experiment_content_hash=payload.get("experiment_content_hash"),
             experiment_result=ExperimentResult.from_dict(result) if result else None,
