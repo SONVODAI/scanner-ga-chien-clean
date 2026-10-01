@@ -1,0 +1,7 @@
+{
+  "zone_c_used": false,
+  "hidden_evaluator_used": false,
+  "post_cutoff_data_beyond_policy": false,
+  "future_result_before_execution": false,
+  "passed": true
+}

@@ -1,0 +1,22 @@
+{
+  "scientific_choices_remaining": [
+    {
+      "locus": "Lexicographic criteria ordering",
+      "classification": "REPRESENTATIONAL_CHOICE",
+      "frozen_pre_selection": true,
+      "blocks_pass": false
+    },
+    {
+      "locus": "Grammar trade_date filter for episode holdout",
+      "classification": "EXECUTION_CONSTRAINT",
+      "blocks_pass": false
+    },
+    {
+      "locus": "Falsification strategy selection",
+      "classification": "AUTONOMOUS",
+      "blocks_pass": false
+    }
+  ],
+  "gap_template_used": false,
+  "human_selected_strategy": false
+}

@@ -1,0 +1,74 @@
+{
+  "execution_id": "fex-91a2102242c0",
+  "package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+  "experiment_content_hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e",
+  "executed_at": "2026-08-22T02:43:56.362247+00:00",
+  "data_cutoff_date": "2026-08-17",
+  "tool_name": "partition_group_compare",
+  "tool_version": "v1",
+  "sample_size": 5964,
+  "status": "OK",
+  "metrics": {
+    "horizon": "T5",
+    "group_count": 4926,
+    "outcome_spread": 100.0,
+    "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+    "baseline_success_rate": 49.74849094567404,
+    "uses_outcome_spec": true
+  },
+  "result_hash": "8308ed833bf0e72cc030cd1eb385946d79ad8db445b0845b59de7be96431afff",
+  "raw": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "data_cutoff_date": "2026-08-17",
+    "input_hash": "624e91d23ea6ec56",
+    "sample_size": 5964,
+    "status": "OK",
+    "metrics": {
+      "horizon": "T5",
+      "group_count": 4926,
+      "outcome_spread": 100.0,
+      "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+      "baseline_success_rate": 49.74849094567404,
+      "uses_outcome_spec": true
+    },
+    "groups": {
+      "truncated": true,
+      "keys": [
+        "-0.080479504552855",
+        "-0.0900000000000003",
+        "-0.0909099892291487",
+        "-0.0915687572670354",
+        "-0.0999999999999996",
+        "-0.1047761911850519",
+        "-0.1095274604391516",
+        "-0.1099999999999994",
+        "-0.1100000000000012",
+        "-0.1114304805191258"
+      ]
+    },
+    "diagnostics": {
+      "cutoff": {
+        "data_cutoff_date": "2026-08-17",
+        "rows_before_cutoff_filter": 6248,
+        "rows_excluded_after_t0_cutoff": 0,
+        "rows_after_t0_cutoff": 6248
+      },
+      "population_spec_applied": true,
+      "population_spec_n": 6106,
+      "cohort_n": 6106
+    },
+    "limitations": [],
+    "structured_observations": [
+      {
+        "code": "TRAJECTORY_GROUP_DIFFERENCE",
+        "severity": "MEDIUM",
+        "evidence": {
+          "outcome_spread": 100.0,
+          "outcome_spec_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "groups": 4926
+        }
+      }
+    ]
+  }
+}
