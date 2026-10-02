@@ -35,6 +35,61 @@
       "symbol": "F88",
       "entry_price": 54380.0,
       "entry_date": "2026-09-24"
+    },
+    {
+      "symbol": "NT2",
+      "entry_price": 20800.0,
+      "entry_date": "2026-09-28"
+    },
+    {
+      "symbol": "VGT",
+      "entry_price": 10900.0,
+      "entry_date": "2026-09-28"
+    },
+    {
+      "symbol": "GMD",
+      "entry_price": 77200.0,
+      "entry_date": "2026-09-29"
+    },
+    {
+      "symbol": "TPB",
+      "entry_price": 14500.0,
+      "entry_date": "2026-09-29"
+    },
+    {
+      "symbol": "DPM",
+      "entry_price": 23000.0,
+      "entry_date": "2026-09-29"
+    },
+    {
+      "symbol": "MSN",
+      "entry_price": 69400.0,
+      "entry_date": "2026-09-29"
+    },
+    {
+      "symbol": "DGC",
+      "entry_price": 36000.0,
+      "entry_date": "2026-09-30"
+    },
+    {
+      "symbol": "PHR",
+      "entry_price": 33500.0,
+      "entry_date": "2026-09-30"
+    },
+    {
+      "symbol": "HAG",
+      "entry_price": 14100.0,
+      "entry_date": "2026-10-01"
+    },
+    {
+      "symbol": "TVN",
+      "entry_price": 9100.0,
+      "entry_date": "2026-10-01"
+    },
+    {
+      "symbol": "POW",
+      "entry_price": 13000.0,
+      "entry_date": "2026-10-01"
     }
   ]
 }
