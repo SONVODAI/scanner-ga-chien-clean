@@ -83,13 +83,18 @@
     },
     {
       "symbol": "TVN",
-      "entry_price": 9100.0,
-      "entry_date": "2026-10-01"
+      "entry_price": 9000.0,
+      "entry_date": "2026-10-02"
     },
     {
       "symbol": "POW",
       "entry_price": 13000.0,
       "entry_date": "2026-10-01"
+    },
+    {
+      "symbol": "ORS",
+      "entry_price": 13250.0,
+      "entry_date": "2026-10-02"
     }
   ]
 }
