@@ -68,8 +68,8 @@
     },
     {
       "symbol": "DGC",
-      "entry_price": 36000.0,
-      "entry_date": "2026-09-30"
+      "entry_price": 35600.0,
+      "entry_date": "2026-10-05"
     },
     {
       "symbol": "PHR",
@@ -95,6 +95,21 @@
       "symbol": "ORS",
       "entry_price": 13250.0,
       "entry_date": "2026-10-02"
+    },
+    {
+      "symbol": "MCH",
+      "entry_price": 141000.0,
+      "entry_date": "2026-10-05"
+    },
+    {
+      "symbol": "TCH",
+      "entry_price": 11250.0,
+      "entry_date": "2026-09-26"
+    },
+    {
+      "symbol": "BVS",
+      "entry_price": 26200.0,
+      "entry_date": "2026-10-05"
     }
   ]
 }
