@@ -22,10 +22,10 @@
     "status",
     "eligible_from"
   ],
-  "session": "2026-10-08",
-  "observed_at": "2026-10-08T19:41:14.166375+07:00",
-  "generated_at": "2026-10-08T19:41:14.166375+07:00",
-  "market_real": 5.8,
+  "session": "2026-10-09",
+  "observed_at": "2026-10-09T10:40:03.767994+07:00",
+  "generated_at": "2026-10-09T10:40:03.767994+07:00",
+  "market_real": 5.6,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
     "Candidate != BUY.",
@@ -1960,10 +1960,10 @@
   "rows": [],
   "brain_b": {
     "source": "market_aware_sweetspot",
-    "status": "UNAVAILABLE",
-    "session": "2026-10-08",
-    "predecessor": "2026-10-07",
-    "reason": "PREDECESSOR_SWEET_FREEZE_MISSING",
+    "status": "VALID_EMPTY",
+    "session": "2026-10-09",
+    "predecessor": "2026-10-08",
+    "reason": "PREDECESSOR_SWEET_ZERO_OR_INSUFFICIENT",
     "n_nominations": 0
   }
 }
