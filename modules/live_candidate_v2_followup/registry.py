@@ -2,12 +2,15 @@
 
 Atomic local JSON writes. Optional GitHub mirror via earning_learning storage.
 Never rewrites historical ledger lines. Restart-safe.
+Corrupt files are quarantined — never silently reset to empty.
 """
 
 from __future__ import annotations
 
 import json
+import logging
 import os
+import shutil
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +25,11 @@ from modules.live_candidate_v2_followup.contract import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+logger = logging.getLogger(__name__)
+
+
+class RegistryCorruptError(RuntimeError):
+    """Raised when an on-disk registry exists but cannot be trusted."""
 
 
 def _utc_now() -> str:
@@ -77,19 +85,55 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
     os.replace(temp_name, path)
 
 
+def _quarantine_corrupt(path: Path, reason: str) -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    dest = path.with_name(f"{path.name}.corrupt.{stamp}")
+    try:
+        shutil.move(str(path), str(dest))
+        logger.error(
+            "followup registry quarantined src=%s dest=%s reason=%s",
+            path,
+            dest,
+            reason,
+        )
+    except OSError as exc:
+        logger.error(
+            "followup registry quarantine failed src=%s reason=%s err=%s",
+            path,
+            reason,
+            exc,
+        )
+        dest = path
+    return dest
+
+
 def load_registry(directory: Path | None = None) -> dict[str, Any]:
+    """Load registry. Missing file → empty. Corrupt file → quarantine + raise."""
     path = registry_path(directory)
     if not path.exists():
         return empty_registry()
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return empty_registry()
+        text = path.read_text(encoding="utf-8")
+        data = json.loads(text)
+    except (OSError, json.JSONDecodeError) as exc:
+        quarantined = _quarantine_corrupt(path, f"json_error:{exc}")
+        raise RegistryCorruptError(
+            f"followup registry corrupt at {path}; quarantined to {quarantined}: {exc}"
+        ) from exc
     if not isinstance(data, dict):
-        return empty_registry()
+        quarantined = _quarantine_corrupt(path, "not_a_dict")
+        raise RegistryCorruptError(
+            f"followup registry corrupt at {path}; quarantined to {quarantined}: not a dict"
+        )
     candidates = data.get("candidates")
-    if not isinstance(candidates, dict):
+    if candidates is None:
         data["candidates"] = {}
+    elif not isinstance(candidates, dict):
+        quarantined = _quarantine_corrupt(path, "candidates_not_dict")
+        raise RegistryCorruptError(
+            f"followup registry corrupt at {path}; quarantined to {quarantined}: "
+            "candidates is not a dict"
+        )
     data.setdefault("schema", SCHEMA_REGISTRY)
     return data
 
@@ -107,7 +151,7 @@ def save_registry(registry: Mapping[str, Any], directory: Path | None = None) ->
 
 
 def _maybe_mirror_github(local_path: Path) -> None:
-    """Best-effort durable mirror. Failures never raise to callers."""
+    """Best-effort durable mirror. Failures are logged, never silent."""
     try:
         from modules.earning_learning import (
             DEFAULT_GITHUB_BRANCH,
@@ -139,7 +183,12 @@ def _maybe_mirror_github(local_path: Path) -> None:
             local_path.read_text(encoding="utf-8"),
             commit_message=f"Mr.BOT followup registry {_utc_now()}",
         )
-    except Exception:
+    except Exception as exc:  # noqa: BLE001 — mirror must not break local save
+        logger.warning(
+            "followup registry github mirror failed path=%s err=%s",
+            local_path,
+            exc,
+        )
         return
 
 
@@ -167,6 +216,10 @@ def upsert_candidate(
     for field, value in fields.items():
         if field == "status_history":
             continue
+        # Never clobber terminal status via blind field overwrite from ingest.
+        if field == "status" and existing.get("status") and existing.get("status") != STATUS_ACTIVE:
+            if value == STATUS_ACTIVE and existing.get("status") != STATUS_ACTIVE:
+                continue
         existing[field] = value
     candidates[key] = existing
     return key
@@ -181,8 +234,16 @@ def append_status_history(
     extra: Mapping[str, Any] | None = None,
 ) -> None:
     history = list(candidate.get("status_history") or [])
+    sess = str(session)[:10]
+    # Restart/retry: do not duplicate identical session+status+reason rows.
+    for prev in reversed(history):
+        if str(prev.get("session") or "")[:10] != sess:
+            continue
+        if str(prev.get("status") or "") == status and str(prev.get("reason") or "") == reason:
+            return
+        break
     row = {
-        "session": str(session)[:10],
+        "session": sess,
         "status": status,
         "reason": reason,
         "at": _utc_now(),
@@ -211,6 +272,7 @@ def active_candidates(registry: Mapping[str, Any]) -> list[dict[str, Any]]:
 
 
 __all__ = [
+    "RegistryCorruptError",
     "active_candidates",
     "append_status_history",
     "candidate_key",

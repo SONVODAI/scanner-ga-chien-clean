@@ -14,6 +14,7 @@ from modules.live_candidate_v2_followup.measure import (
     record_baseline_action_rows,
     summarize_arms,
 )
+from modules.live_candidate_v2_followup.runtime import run_followup_runtime_cycle
 from modules.live_candidate_v2_followup.session import run_followup_session
 
 __all__ = [
@@ -23,6 +24,7 @@ __all__ = [
     "mature_buy_ready_outcomes",
     "merge_followup_into_actionable",
     "record_baseline_action_rows",
+    "run_followup_runtime_cycle",
     "run_followup_session",
     "summarize_arms",
 ]

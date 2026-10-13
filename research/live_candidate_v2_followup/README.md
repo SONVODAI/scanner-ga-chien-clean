@@ -7,14 +7,29 @@ when the feature flag is OFF.
 ## Feature flag (default OFF)
 
 ```bash
-# enable research cycle
 export MRBOT_V2_FOLLOWUP_WATCH=1
-
-# optional override directory
 export MRBOT_V2_FOLLOWUP_DIR=/path/to/research/live_candidate_v2_followup
 ```
 
 Unset / `0` / `false` / `off` keeps the feature fully inert.
+
+See [ACTIVATION.md](./ACTIVATION.md) for post-approval enablement (no VPS scheduler
+changes are applied by this PR).
+
+## Automatic SHADOW path (flag ON only)
+
+1. **Observe hook** (`observe_store.observe_from_collected_session`)
+   - Records arm-A baseline
+   - Ingests WAIT nominations into durable registry
+   - Re-evaluates ACTIVE candidates (Setup / Market First / Candidate Guardian / TTL)
+   - Writes `followup_camera_queue.json`
+   - Best-effort as-of T3/T5/T10 maturity (no future prices)
+2. **Camera 5m hook** (`LiveShadowFeed` WHEN cycle)
+   - Merges Follow-up camera rows into actionable universe under existing cap
+   - Strips any stale BUY_READY / buy rights before observation
+3. **Manual / scheduled scripts**
+   - `scripts/run_v2_followup_watch.py`
+   - `scripts/run_v2_followup_mature.py`
 
 ## Runtime files (gitignored)
 
@@ -22,48 +37,26 @@ Unset / `0` / `false` / `off` keeps the feature fully inert.
 |------|------|
 | `followup_registry.json` | Durable ACTIVE / BUY_READY / EXPIRED / REJECTED registry |
 | `followup_ledger.jsonl` | Append-only measurement arms A/B/C |
-| `followup_session_log.jsonl` | Optional session diagnostics |
+| `followup_camera_queue.json` | Current-session Camera fill rows |
+| `followup_session_lock.json` | Per-session idempotency marker |
 
-## TTL
+Corrupt registries are **quarantined** (`.corrupt.<timestamp>`), never silently reset.
 
-Maximum **5 VNIndex trading sessions inclusive** of `original_session`.
-No infinite extension. Each session re-reads Setup / Market permission /
-Candidate Guardian / WHEN from current inputs. Prior WAIT state and prior Setup
-are never inherited as buy rights.
+## TTL / Candidate Guardian
 
-## Candidate Guardian (quality layer)
+- TTL = **5 VNIndex sessions inclusive** of `original_session`
+- Quality: STRONGER / STABLE / WEAKENING / REJECTED
+- Market Real &lt; 6 blocks BUY only; never rejects a still-strong name
+- Position Guardian SELL is soft metadata only
 
-Classifies ACTIVE candidates each session:
+## Arms
 
-| Label | Meaning |
-|-------|---------|
-| `STRONGER` | Trend + flow improving — continue WAIT for WHEN (never auto BUY_READY) |
-| `STABLE` | Holds base / healthy pullback — keep watching |
-| `WEAKENING` | Soft deterioration — arm C blocks BUY_READY |
-| `REJECTED` | Confirmed trend break or setup collapse — leave Follow-up Watch |
-
-Rules:
-
-- Inspired by Position Guardian factors (EMA9 / MA20 / OBV / RS) but **not** a
-  mechanical copy of held-position SELL → reject.
-- Healthy pullback (price soft under EMA9, EMA9 ≥ MA20, OBV not broken) stays
-  `STABLE`.
-- **Market Real < 6** blocks BUY via Market Permission only; never rejects a
-  still-strong candidate.
-- Position Guardian `BÁN` is soft metadata only.
-- Rejection reasons + post-reject T3/T5/T10 are ledgered to measure false rejects.
-
-## Arms (parallel measurement)
-
-- **A_BASELINE_V2** — ordinary V2 Action snapshot (no multi-session follow-up)
-- **B_FOLLOWUP_WATCH** — follow-up 5 sessions **without** Candidate Guardian gates
-- **C_FOLLOWUP_GUARDIAN** — follow-up + Candidate Guardian (registry / camera path)
-
-Compare C vs B vs A for false-signal reduction, drawdown, and whether large winners
-are retained.
+- **A_BASELINE_V2** — ordinary V2 Action snapshot
+- **B_FOLLOWUP_WATCH** — follow-up without Candidate Guardian gates
+- **C_FOLLOWUP_GUARDIAN** — follow-up + Candidate Guardian (registry path)
 
 ## Rollback
 
 1. Leave `MRBOT_V2_FOLLOWUP_WATCH` unset (default).
-2. Do not schedule `scripts/run_v2_followup_watch.py`.
-3. Registry/ledger files are additive under this directory only.
+2. Do not schedule the research scripts.
+3. Artifacts under this directory only.

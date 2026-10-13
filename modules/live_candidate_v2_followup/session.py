@@ -131,13 +131,21 @@ def _num(value: object) -> float | None:
         return None
 
 
+_TERMINAL_STATUSES = frozenset({STATUS_BUY_READY, STATUS_EXPIRED, STATUS_REJECTED})
+
+
 def ingest_sidecar_rows(
     registry: dict[str, Any],
     rows: Sequence[Mapping[str, Any]] | None,
     *,
     session: str,
 ) -> list[str]:
-    """Register new Brain A / Sweet B nominations that are not yet BUY_READY."""
+    """Register new Brain A / Sweet B nominations that are not yet BUY_READY.
+
+    Does not revive terminal candidates. Does not wipe status_history.
+    """
+    from modules.live_candidate_v2_followup.registry import candidate_key as make_key
+
     ingested: list[str] = []
     for raw in rows or ():
         if not isinstance(raw, Mapping):
@@ -150,37 +158,53 @@ def ingest_sidecar_rows(
         if state == STATE_BUY_READY:
             continue
         original_session = str(raw.get("session") or session)[:10]
+        key = make_key(symbol, source, original_session)
+        existing = registry.get("candidates", {}).get(key)
+        if isinstance(existing, dict) and str(existing.get("status") or "") in _TERMINAL_STATUSES:
+            continue
         first_seen = str(raw.get("candidate_first_seen_ts") or "")
+        fields: dict[str, Any] = {
+            "first_seen": first_seen or (existing or {}).get("first_seen") or "",
+            "original_setup": (existing or {}).get("original_setup") or _setup_of(raw),
+            "current_setup": _setup_of(raw),
+            "first_seen_price": (existing or {}).get("first_seen_price")
+            if existing
+            else _num(raw.get("price_at_first_seen")),
+            "frozen_ema9": (existing or {}).get("frozen_ema9")
+            if existing
+            else _num(raw.get("ema9_at_first_seen")),
+            "frozen_breakout_ref": (existing or {}).get("frozen_breakout_ref")
+            if existing
+            else _num(raw.get("breakout_ref_at_first_seen")),
+            "observation_reference": str(raw.get("observation_reference") or ""),
+            "market_real": _num(raw.get("market_real")),
+            "market_permission": str(raw.get("market_permission") or ""),
+            "candidate_is_buy": FOLLOWUP_CANDIDATE_IS_BUY,
+            "pxv_implies_buy": FOLLOWUP_PXV_IMPLIES_BUY,
+            "alert_eligible": FOLLOWUP_ALERT_ELIGIBLE,
+            "mode": MODE,
+            "slice": SLICE,
+        }
+        if not existing:
+            fields.update(
+                {
+                    "last_evaluated_session": "",
+                    "status": STATUS_ACTIVE,
+                    "expiry_session": "",
+                    "rejection_reason": "",
+                    "guardian_status": "",
+                    "candidate_quality": "",
+                    "candidate_quality_reason": "",
+                    "weakening_streak": 0,
+                    "prior_quality_snapshot": {},
+                }
+            )
         key = upsert_candidate(
             registry,
             symbol=symbol,
             source=source,
             original_session=original_session,
-            fields={
-                "first_seen": first_seen,
-                "original_setup": _setup_of(raw),
-                "current_setup": _setup_of(raw),
-                "first_seen_price": _num(raw.get("price_at_first_seen")),
-                "frozen_ema9": _num(raw.get("ema9_at_first_seen")),
-                "frozen_breakout_ref": _num(raw.get("breakout_ref_at_first_seen")),
-                "observation_reference": str(raw.get("observation_reference") or ""),
-                "last_evaluated_session": "",
-                "status": STATUS_ACTIVE,
-                "expiry_session": "",
-                "rejection_reason": "",
-                "market_real": _num(raw.get("market_real")),
-                "market_permission": str(raw.get("market_permission") or ""),
-                "guardian_status": "",
-                "candidate_quality": "",
-                "candidate_quality_reason": "",
-                "weakening_streak": 0,
-                "prior_quality_snapshot": {},
-                "candidate_is_buy": FOLLOWUP_CANDIDATE_IS_BUY,
-                "pxv_implies_buy": FOLLOWUP_PXV_IMPLIES_BUY,
-                "alert_eligible": FOLLOWUP_ALERT_ELIGIBLE,
-                "mode": MODE,
-                "slice": SLICE,
-            },
+            fields=fields,
         )
         cand = registry["candidates"][key]
         if not any(
@@ -360,9 +384,23 @@ def evaluate_active_candidate(
     Position Guardian SELL is recorded but never hard-rejects.
     """
     eval_fn = evaluate or evaluate_shadow_action
+    sess = str(session)[:10]
+    # Restart/retry within the same VNIndex session: do not re-count.
+    if str(candidate.get("last_evaluated_session") or "")[:10] == sess:
+        return {
+            "candidate_key": candidate.get("candidate_key"),
+            "status": candidate.get("status") or STATUS_ACTIVE,
+            "reason": "ALREADY_EVALUATED_THIS_SESSION",
+            "status_b": candidate.get("status") or STATUS_ACTIVE,
+            "reason_b": "ALREADY_EVALUATED_THIS_SESSION",
+            "camera_row": None,
+            "action_state": "",
+            "idempotent_skip": True,
+            "candidate_quality": candidate.get("candidate_quality") or "",
+        }
     current_setup = _scan_setup(scan_row)
     candidate["current_setup"] = current_setup
-    candidate["last_evaluated_session"] = str(session)[:10]
+    candidate["last_evaluated_session"] = sess
     candidate["market_real"] = _num(market_real)
     perm = market_permission(market_real)
     candidate["market_permission"] = perm

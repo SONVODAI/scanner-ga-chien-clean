@@ -152,6 +152,17 @@ def _base_row(
     }
 
 
+def _ledger_fingerprint(row: Mapping[str, Any]) -> tuple[str, ...]:
+    return (
+        str(row.get("arm") or ""),
+        str(row.get("session") or "")[:10],
+        str(row.get("candidate_key") or ""),
+        str(row.get("status") or ""),
+        str(row.get("reason") or ""),
+        str(row.get("record_kind") or ""),
+    )
+
+
 def append_ledger_rows(
     *,
     session: str,
@@ -164,10 +175,26 @@ def append_ledger_rows(
 
     Arm B uses ``status_b`` / ``reason_b`` (Follow-up without Candidate Guardian).
     Arm C uses registry path status (Follow-up + Candidate Guardian).
+    Restart/retry safe: skips fingerprints already present for the session.
     """
     candidates = registry.get("candidates") or {}
+    existing = {
+        _ledger_fingerprint(r)
+        for r in load_ledger(directory)
+        if str(r.get("session") or "")[:10] == str(session)[:10]
+    }
     rows: list[dict[str, Any]] = []
+
+    def _maybe(row: dict[str, Any]) -> None:
+        fp = _ledger_fingerprint(row)
+        if fp in existing:
+            return
+        existing.add(fp)
+        rows.append(row)
+
     for result in results:
+        if result.get("idempotent_skip"):
+            continue
         key = str(result.get("candidate_key") or "")
         cand = candidates.get(key) or {}
         if not cand:
@@ -178,7 +205,7 @@ def append_ledger_rows(
         action_b = str(result.get("action_state_b") or result.get("action_state") or "")
         # Arm B: follow-up path without Candidate Guardian gates.
         if status_b in {STATUS_WAIT, STATUS_BUY_READY, STATUS_EXPIRED, STATUS_REJECTED}:
-            rows.append(
+            _maybe(
                 _base_row(
                     arm=ARM_FOLLOWUP,
                     session=session,
@@ -191,7 +218,7 @@ def append_ledger_rows(
             )
         # Arm C: Follow-up + Candidate Guardian.
         if status_c in {STATUS_WAIT, STATUS_BUY_READY, STATUS_EXPIRED, STATUS_REJECTED}:
-            rows.append(
+            _maybe(
                 _base_row(
                     arm=ARM_FOLLOWUP_GUARDIAN,
                     session=session,
@@ -204,7 +231,7 @@ def append_ledger_rows(
         cand = candidates.get(key) or {}
         if not cand:
             continue
-        rows.append(
+        _maybe(
             _base_row(
                 arm=ARM_FOLLOWUP,
                 session=session,
@@ -212,7 +239,7 @@ def append_ledger_rows(
                 result={"status": STATUS_WAIT, "reason": "INGESTED", "action_state": ""},
             )
         )
-        rows.append(
+        _maybe(
             _base_row(
                 arm=ARM_FOLLOWUP_GUARDIAN,
                 session=session,
@@ -315,25 +342,42 @@ def mature_buy_ready_outcomes(
     symbol_session_prices: Mapping[str, Mapping[str, float]] | None = None,
     vnindex_session_prices: Mapping[str, float] | None = None,
     trading_dates: Sequence[str] | None = None,
+    as_of_session: str | None = None,
 ) -> dict[str, Any]:
     """Fill T3/T5/T10 (+ excess vs VNIndex) on terminal research rows.
 
     Matures BUY_READY, REJECTED, and EXPIRED so false rejects are measurable.
-    symbol_session_prices: {symbol: {session_date: close}}
-    vnindex_session_prices: {session_date: close}
+    ``as_of_session`` forbids using prices / trading dates after that day
+    (no future peek into decision-time T).
     Appends NEW matured lines (never rewrites prior JSONL rows).
     """
     dates = [str(d)[:10] for d in (trading_dates or [])]
     dates = sorted(set(dates))
+    as_of = str(as_of_session or "")[:10]
+    if as_of:
+        dates = [d for d in dates if d <= as_of]
     sym_px = symbol_session_prices or {}
     vni_px = vnindex_session_prices or {}
     existing = load_ledger(directory)
     matured: list[dict[str, Any]] = []
     mature_statuses = {STATUS_BUY_READY, STATUS_REJECTED, STATUS_EXPIRED}
+    # Dedup: skip if a matured line already exists for same arm+key+status+anchor.
+    already = {
+        (
+            str(r.get("arm") or ""),
+            str(r.get("candidate_key") or ""),
+            str(r.get("status") or ""),
+            str(r.get("outcome_anchor_session") or r.get("session") or "")[:10],
+        )
+        for r in existing
+        if r.get("record_kind") == "OUTCOME_MATURED" or r.get("outcome_matured_at")
+    }
 
     for row in existing:
         status = str(row.get("status") or "")
         if status not in mature_statuses:
+            continue
+        if row.get("record_kind") == "OUTCOME_MATURED":
             continue
         if row.get("outcome_matured_at"):
             continue
@@ -343,41 +387,63 @@ def mature_buy_ready_outcomes(
         anchor_session, entry_f = _entry_anchor(row)
         if not symbol or not anchor_session or entry_f is None or entry_f <= 0:
             continue
+        if as_of and anchor_session > as_of:
+            continue
         if anchor_session not in dates:
+            continue
+        dedup_key = (
+            str(row.get("arm") or ""),
+            str(row.get("candidate_key") or ""),
+            status,
+            anchor_session,
+        )
+        if dedup_key in already:
             continue
         idx = dates.index(anchor_session)
         path = sym_px.get(symbol) or {}
+        # As-of filter on price path: ignore future session keys.
+        if as_of:
+            path = {d: px for d, px in path.items() if str(d)[:10] <= as_of}
         vni_entry = vni_px.get(anchor_session)
         new_row = dict(row)
-        complete = True
+        filled_any = False
         for horizon in HORIZONS:
+            # Skip horizons already filled on a prior partial mature line.
+            if new_row.get(f"t{horizon}_return_pct") is not None:
+                filled_any = True
+                continue
             target_idx = idx + horizon
             if target_idx >= len(dates):
-                complete = False
-                break
+                continue
+            target_day = dates[target_idx]
+            if as_of and target_day > as_of:
+                continue
             window = dates[idx + 1 : target_idx + 1]
             prices = [float(path[d]) for d in window if d in path]
             if len(prices) < horizon:
-                complete = False
-                break
+                continue
             ret, dd = _return_and_dd(entry_f, prices)
             new_row[f"t{horizon}_return_pct"] = ret
             new_row[f"t{horizon}_max_drawdown_pct"] = dd
-            if vni_entry and vni_entry > 0 and dates[target_idx] in vni_px:
-                vni_ret = (float(vni_px[dates[target_idx]]) / float(vni_entry) - 1.0) * 100.0
+            if vni_entry and vni_entry > 0 and target_day in vni_px:
+                vni_ret = (float(vni_px[target_day]) / float(vni_entry) - 1.0) * 100.0
                 new_row[f"t{horizon}_excess_vnindex_pct"] = (
                     None if ret is None else float(ret) - vni_ret
                 )
-        if not complete:
+            filled_any = True
+        # Require at least T3 before emitting a matured research line.
+        if new_row.get("t3_return_pct") is None or not filled_any:
             continue
         new_row["outcome_matured_at"] = _utc_now()
         new_row["record_kind"] = "OUTCOME_MATURED"
         new_row["outcome_anchor_session"] = anchor_session
         new_row["outcome_anchor_price"] = entry_f
+        new_row["as_of_session"] = as_of or None
         matured.append(new_row)
+        already.add(dedup_key)
 
     added = _append_jsonl(ledger_path(directory), matured)
-    return {"ok": True, "matured": added, "scanned": len(existing)}
+    return {"ok": True, "matured": added, "scanned": len(existing), "as_of_session": as_of or None}
 
 
 def summarize_arms(directory: Path | None = None) -> dict[str, Any]:
