@@ -88,7 +88,19 @@ def _base_row(
     session: str,
     candidate: Mapping[str, Any],
     result: Mapping[str, Any],
+    status_override: str | None = None,
+    reason_override: str | None = None,
+    action_state_override: str | None = None,
 ) -> dict[str, Any]:
+    status = status_override if status_override is not None else (
+        result.get("status") or candidate.get("status")
+    )
+    reason = reason_override if reason_override is not None else (result.get("reason") or "")
+    action_state = (
+        action_state_override
+        if action_state_override is not None
+        else (result.get("action_state") or "")
+    )
     return {
         "schema": SCHEMA_LEDGER,
         "arm": arm,
@@ -102,17 +114,31 @@ def _base_row(
         "first_seen_price": candidate.get("first_seen_price"),
         "original_setup": candidate.get("original_setup"),
         "current_setup": candidate.get("current_setup"),
-        "status": result.get("status") or candidate.get("status"),
-        "reason": result.get("reason") or "",
-        "action_state": result.get("action_state") or "",
+        "status": status,
+        "reason": reason,
+        "action_state": action_state,
         "market_real": candidate.get("market_real"),
         "market_permission": candidate.get("market_permission"),
         "guardian_status": candidate.get("guardian_status"),
+        "candidate_quality": result.get("candidate_quality")
+        or candidate.get("candidate_quality")
+        or "",
+        "candidate_quality_reason": result.get("candidate_quality_reason")
+        or candidate.get("candidate_quality_reason")
+        or "",
         "guardian_filtered": bool(result.get("guardian_filtered")),
+        "candidate_guardian_filtered": bool(result.get("candidate_guardian_filtered")),
+        "position_guardian_sell": bool(result.get("position_guardian_sell")),
         "sessions_elapsed": candidate.get("sessions_elapsed"),
         "buy_ready_session": candidate.get("buy_ready_session"),
         "buy_ready_at": candidate.get("buy_ready_at"),
         "buy_ready_price": candidate.get("buy_ready_price"),
+        "reject_session": candidate.get("last_evaluated_session")
+        if status == STATUS_REJECTED
+        else "",
+        "reject_price": candidate.get("prior_quality_snapshot", {}).get("price")
+        if isinstance(candidate.get("prior_quality_snapshot"), Mapping)
+        else None,
         "t3_return_pct": None,
         "t5_return_pct": None,
         "t10_return_pct": None,
@@ -134,7 +160,11 @@ def append_ledger_rows(
     ingested: Sequence[str],
     directory: Path | None = None,
 ) -> int:
-    """Write arm B/C rows for this session. Arm A is recorded separately."""
+    """Write arm B/C rows for this session. Arm A is recorded separately.
+
+    Arm B uses ``status_b`` / ``reason_b`` (Follow-up without Candidate Guardian).
+    Arm C uses registry path status (Follow-up + Candidate Guardian).
+    """
     candidates = registry.get("candidates") or {}
     rows: list[dict[str, Any]] = []
     for result in results:
@@ -142,18 +172,33 @@ def append_ledger_rows(
         cand = candidates.get(key) or {}
         if not cand:
             continue
-        status = str(result.get("status") or "")
-        # Arm B: follow-up path (all terminal and wait outcomes).
-        if status in {STATUS_WAIT, STATUS_BUY_READY, STATUS_EXPIRED, STATUS_REJECTED}:
-            rows.append(_base_row(arm=ARM_FOLLOWUP, session=session, candidate=cand, result=result))
-        # Arm C: same universe tagged with Guardian filter outcome.
-        row_c = _base_row(
-            arm=ARM_FOLLOWUP_GUARDIAN,
-            session=session,
-            candidate=cand,
-            result=result,
-        )
-        rows.append(row_c)
+        status_c = str(result.get("status") or "")
+        status_b = str(result.get("status_b") or status_c)
+        reason_b = str(result.get("reason_b") or result.get("reason") or "")
+        action_b = str(result.get("action_state_b") or result.get("action_state") or "")
+        # Arm B: follow-up path without Candidate Guardian gates.
+        if status_b in {STATUS_WAIT, STATUS_BUY_READY, STATUS_EXPIRED, STATUS_REJECTED}:
+            rows.append(
+                _base_row(
+                    arm=ARM_FOLLOWUP,
+                    session=session,
+                    candidate=cand,
+                    result=result,
+                    status_override=status_b,
+                    reason_override=reason_b,
+                    action_state_override=action_b,
+                )
+            )
+        # Arm C: Follow-up + Candidate Guardian.
+        if status_c in {STATUS_WAIT, STATUS_BUY_READY, STATUS_EXPIRED, STATUS_REJECTED}:
+            rows.append(
+                _base_row(
+                    arm=ARM_FOLLOWUP_GUARDIAN,
+                    session=session,
+                    candidate=cand,
+                    result=result,
+                )
+            )
     # Ingest markers (still WAIT / ACTIVE start) for opportunity counting.
     for key in ingested:
         cand = candidates.get(key) or {}
@@ -162,6 +207,14 @@ def append_ledger_rows(
         rows.append(
             _base_row(
                 arm=ARM_FOLLOWUP,
+                session=session,
+                candidate=cand,
+                result={"status": STATUS_WAIT, "reason": "INGESTED", "action_state": ""},
+            )
+        )
+        rows.append(
+            _base_row(
+                arm=ARM_FOLLOWUP_GUARDIAN,
                 session=session,
                 candidate=cand,
                 result={"status": STATUS_WAIT, "reason": "INGESTED", "action_state": ""},
@@ -231,6 +284,31 @@ def _return_and_dd(
     return ret, dd
 
 
+def _entry_anchor(row: Mapping[str, Any]) -> tuple[str, float | None]:
+    """Session + price used as T0 for outcome maturation.
+
+    BUY_READY → buy_ready_session / buy_ready_price
+    REJECTED / EXPIRED → reject/eval session / reject_price or first_seen_price
+    (measures false rejects / expired opportunity cost).
+    """
+    status = str(row.get("status") or "")
+    if status == STATUS_BUY_READY:
+        session = str(row.get("buy_ready_session") or row.get("session") or "")[:10]
+        entry = row.get("buy_ready_price")
+    else:
+        session = str(
+            row.get("reject_session") or row.get("session") or row.get("original_session") or ""
+        )[:10]
+        entry = row.get("reject_price")
+        if entry is None:
+            entry = row.get("first_seen_price")
+    try:
+        entry_f = float(entry) if entry is not None else None
+    except (TypeError, ValueError):
+        entry_f = None
+    return session, entry_f
+
+
 def mature_buy_ready_outcomes(
     *,
     directory: Path | None = None,
@@ -238,8 +316,9 @@ def mature_buy_ready_outcomes(
     vnindex_session_prices: Mapping[str, float] | None = None,
     trading_dates: Sequence[str] | None = None,
 ) -> dict[str, Any]:
-    """Fill T3/T5/T10 (+ excess vs VNIndex) on BUY_READY rows lacking outcomes.
+    """Fill T3/T5/T10 (+ excess vs VNIndex) on terminal research rows.
 
+    Matures BUY_READY, REJECTED, and EXPIRED so false rejects are measurable.
     symbol_session_prices: {symbol: {session_date: close}}
     vnindex_session_prices: {session_date: close}
     Appends NEW matured lines (never rewrites prior JSONL rows).
@@ -250,28 +329,25 @@ def mature_buy_ready_outcomes(
     vni_px = vnindex_session_prices or {}
     existing = load_ledger(directory)
     matured: list[dict[str, Any]] = []
+    mature_statuses = {STATUS_BUY_READY, STATUS_REJECTED, STATUS_EXPIRED}
 
     for row in existing:
-        if str(row.get("status") or "") != STATUS_BUY_READY:
+        status = str(row.get("status") or "")
+        if status not in mature_statuses:
             continue
         if row.get("outcome_matured_at"):
             continue
         if row.get("t3_return_pct") is not None:
             continue
         symbol = str(row.get("symbol") or "").upper()
-        buy_session = str(row.get("buy_ready_session") or row.get("session") or "")[:10]
-        entry = row.get("buy_ready_price")
-        try:
-            entry_f = float(entry) if entry is not None else None
-        except (TypeError, ValueError):
-            entry_f = None
-        if not symbol or not buy_session or entry_f is None or entry_f <= 0:
+        anchor_session, entry_f = _entry_anchor(row)
+        if not symbol or not anchor_session or entry_f is None or entry_f <= 0:
             continue
-        if buy_session not in dates:
+        if anchor_session not in dates:
             continue
-        idx = dates.index(buy_session)
+        idx = dates.index(anchor_session)
         path = sym_px.get(symbol) or {}
-        vni_entry = vni_px.get(buy_session)
+        vni_entry = vni_px.get(anchor_session)
         new_row = dict(row)
         complete = True
         for horizon in HORIZONS:
@@ -296,6 +372,8 @@ def mature_buy_ready_outcomes(
             continue
         new_row["outcome_matured_at"] = _utc_now()
         new_row["record_kind"] = "OUTCOME_MATURED"
+        new_row["outcome_anchor_session"] = anchor_session
+        new_row["outcome_anchor_price"] = entry_f
         matured.append(new_row)
 
     added = _append_jsonl(ledger_path(directory), matured)
@@ -314,7 +392,16 @@ def summarize_arms(directory: Path | None = None) -> dict[str, Any]:
         waits = [r for r in arm_rows if r.get("status") == STATUS_WAIT]
         expired = [r for r in arm_rows if r.get("status") == STATUS_EXPIRED]
         rejected = [r for r in arm_rows if r.get("status") == STATUS_REJECTED]
-        guardian_kills = [r for r in arm_rows if r.get("guardian_filtered")]
+        guardian_kills = [
+            r
+            for r in arm_rows
+            if r.get("guardian_filtered") or r.get("candidate_guardian_filtered")
+        ]
+        rejected_matured = [
+            r
+            for r in rejected
+            if r.get("t5_return_pct") is not None
+        ]
         matured = [r for r in buy if r.get("t5_return_pct") is not None]
         def _stats(values: list[float]) -> dict[str, float | None]:
             if not values:
@@ -338,6 +425,11 @@ def summarize_arms(directory: Path | None = None) -> dict[str, Any]:
             for r in matured
             if r.get("t5_max_drawdown_pct") is not None
         ]
+        rej_t5 = [
+            float(r["t5_return_pct"])
+            for r in rejected_matured
+            if r.get("t5_return_pct") is not None
+        ]
         summary[arm] = {
             "n_rows": len(arm_rows),
             "n_buy_ready": len(buy),
@@ -348,6 +440,7 @@ def summarize_arms(directory: Path | None = None) -> dict[str, Any]:
             "t5": _stats(t5),
             "t5_excess_vnindex": _stats(t5x),
             "t5_max_drawdown_mean": statistics.fmean(dd) if dd else None,
+            "rejected_t5": _stats(rej_t5),
         }
     return summary
 

@@ -2,9 +2,12 @@
 
 Rules:
 - Never inherit WAIT / BUY rights / old setup into a new evaluation episode.
-- Re-read Setup, Market First, Guardian, and WHEN from current inputs.
+- Re-read Setup, Market First, Candidate Guardian, and WHEN from current inputs.
 - Empty setup or weak market → continue ACTIVE wait (no BUY_READY).
-- Guardian SELL → REJECTED (arm C evidence); still ledgered.
+- Market Real < 6 blocks BUY via Market Permission only — never rejects.
+- Position Guardian SELL is soft evidence only; Candidate Guardian decides reject.
+- Candidate Guardian WEAKENING blocks BUY_READY in the arm-C research path.
+- STRONGER continues WAIT until fresh WHEN + Setup + Market Permission.
 - TTL inclusive of original_session, max 5 VNIndex sessions → EXPIRED.
 """
 
@@ -24,6 +27,13 @@ from modules.live_candidate_v2_action.state import (
     evaluate_shadow_action,
     nomination_from_mapping,
 )
+from modules.live_candidate_v2_followup.candidate_guardian import (
+    QUALITY_REJECTED,
+    QUALITY_STRONGER,
+    QUALITY_WEAKENING,
+    classify_candidate_quality,
+    snapshot_from_scan,
+)
 from modules.live_candidate_v2_followup.contract import (
     ALLOWED_SOURCES,
     FOLLOWUP_ALERT_ELIGIBLE,
@@ -31,10 +41,13 @@ from modules.live_candidate_v2_followup.contract import (
     FOLLOWUP_PXV_IMPLIES_BUY,
     MODE,
     REASON_BUY_READY,
+    REASON_CANDIDATE_GUARDIAN_REJECT,
+    REASON_CANDIDATE_WEAKENING_BLOCK,
     REASON_FLAG_OFF,
     REASON_GUARDIAN_SELL,
     REASON_INGESTED,
     REASON_MARKET_NOT_OK,
+    REASON_QUALITY_STRONGER_WAIT,
     REASON_SETUP_EMPTY,
     REASON_TTL_EXPIRED,
     REASON_WHEN_NOT_MET,
@@ -158,6 +171,10 @@ def ingest_sidecar_rows(
                 "market_real": _num(raw.get("market_real")),
                 "market_permission": str(raw.get("market_permission") or ""),
                 "guardian_status": "",
+                "candidate_quality": "",
+                "candidate_quality_reason": "",
+                "weakening_streak": 0,
+                "prior_quality_snapshot": {},
                 "candidate_is_buy": FOLLOWUP_CANDIDATE_IS_BUY,
                 "pxv_implies_buy": FOLLOWUP_PXV_IMPLIES_BUY,
                 "alert_eligible": FOLLOWUP_ALERT_ELIGIBLE,
@@ -235,6 +252,95 @@ def _fresh_nomination_dict(
     }
 
 
+def _action_eval(
+    candidate: Mapping[str, Any],
+    *,
+    session: str,
+    current_setup: str,
+    scan_row: Mapping[str, Any] | None,
+    market_real: object,
+    observed_at: datetime,
+    legal_bars: Sequence[Any],
+    evaluate: ActionEvaluator,
+) -> tuple[str, Any, dict[str, Any] | None]:
+    """Fresh Action WHEN evaluation. Returns (action_state, result, camera_row)."""
+    fresh = _fresh_nomination_dict(
+        candidate,
+        session=session,
+        current_setup=current_setup,
+        scan_row=scan_row,
+        market_real=market_real,
+        observed_at=observed_at,
+    )
+    result = evaluate(
+        nomination_from_mapping(fresh),
+        legal_bars,
+        now=as_vn(observed_at),
+        observed=True,
+        prior_action_state=None,
+        prior_session=None,
+    )
+    action_state = str(getattr(result, "action_state", "") or "") or STATE_WAIT
+    return action_state, result, fresh
+
+
+def _path_without_guardian(
+    *,
+    current_setup: str,
+    perm: str,
+    candidate: Mapping[str, Any],
+    session: str,
+    scan_row: Mapping[str, Any] | None,
+    market_real: object,
+    observed_at: datetime,
+    legal_bars: Sequence[Any],
+    evaluate: ActionEvaluator,
+) -> dict[str, Any]:
+    """Arm B counterfactual: Follow-up Watch without Candidate Guardian gates."""
+    if current_setup not in ACTIONABLE_LIVE_SETUPS:
+        reason = REASON_SETUP_EMPTY if not current_setup else REASON_WHEN_NOT_MET
+        return {
+            "status": STATUS_WAIT,
+            "reason": reason,
+            "action_state": STATE_WAIT,
+            "camera_row": None,
+            "action_result": None,
+        }
+    if perm != "OK":
+        return {
+            "status": STATUS_WAIT,
+            "reason": REASON_MARKET_NOT_OK,
+            "action_state": STATE_WAIT,
+            "camera_row": None,
+            "action_result": None,
+        }
+    action_state, result, fresh = _action_eval(
+        candidate,
+        session=session,
+        current_setup=current_setup,
+        scan_row=scan_row,
+        market_real=market_real,
+        observed_at=observed_at,
+        legal_bars=legal_bars,
+        evaluate=evaluate,
+    )
+    if action_state == STATE_BUY_READY:
+        return {
+            "status": STATUS_BUY_READY,
+            "reason": REASON_BUY_READY,
+            "action_state": STATE_BUY_READY,
+            "camera_row": fresh,
+            "action_result": result,
+        }
+    return {
+        "status": STATUS_WAIT,
+        "reason": REASON_WHEN_NOT_MET,
+        "action_state": action_state or STATE_WAIT,
+        "camera_row": fresh,
+        "action_result": result,
+    }
+
+
 def evaluate_active_candidate(
     candidate: dict[str, Any],
     *,
@@ -247,7 +353,12 @@ def evaluate_active_candidate(
     legal_bars: Sequence[Any] = (),
     evaluate: ActionEvaluator | None = None,
 ) -> dict[str, Any]:
-    """Re-evaluate one ACTIVE candidate for the current session."""
+    """Re-evaluate one ACTIVE candidate for the current session.
+
+    Registry / camera follow arm C (Follow-up + Candidate Guardian).
+    ``status_b`` / ``reason_b`` record the arm-B counterfactual without CG gates.
+    Position Guardian SELL is recorded but never hard-rejects.
+    """
     eval_fn = evaluate or evaluate_shadow_action
     current_setup = _scan_setup(scan_row)
     candidate["current_setup"] = current_setup
@@ -256,6 +367,7 @@ def evaluate_active_candidate(
     perm = market_permission(market_real)
     candidate["market_permission"] = perm
     candidate["guardian_status"] = str(guardian_signal or "")
+    position_guardian_sell = is_guardian_sell(guardian_signal)
 
     elapsed = sessions_elapsed_inclusive(
         str(candidate.get("original_session") or ""),
@@ -278,46 +390,113 @@ def evaluate_active_candidate(
             "candidate_key": candidate.get("candidate_key"),
             "status": STATUS_EXPIRED,
             "reason": REASON_TTL_EXPIRED,
+            "status_b": STATUS_EXPIRED,
+            "reason_b": REASON_TTL_EXPIRED,
             "camera_row": None,
             "action_state": "",
+            "candidate_quality": "",
+            "position_guardian_sell": position_guardian_sell,
         }
 
-    if is_guardian_sell(guardian_signal):
+    prior_snap = candidate.get("prior_quality_snapshot")
+    if not isinstance(prior_snap, Mapping):
+        prior_snap = None
+    streak = int(candidate.get("weakening_streak") or 0)
+    quality = classify_candidate_quality(
+        scan_row,
+        original_setup=str(candidate.get("original_setup") or ""),
+        prior_snapshot=prior_snap,
+        weakening_streak=streak,
+        market_real=market_real,
+    )
+    candidate["candidate_quality"] = quality.label
+    candidate["candidate_quality_reason"] = quality.reason
+    candidate["prior_quality_snapshot"] = snapshot_from_scan(scan_row)
+    if quality.label == QUALITY_WEAKENING:
+        candidate["weakening_streak"] = streak + 1
+    elif quality.label == QUALITY_REJECTED:
+        candidate["weakening_streak"] = streak + 1
+    else:
+        candidate["weakening_streak"] = 0
+
+    # Arm B counterfactual (no Candidate Guardian reject / weakening block).
+    path_b = _path_without_guardian(
+        current_setup=current_setup,
+        perm=perm,
+        candidate=candidate,
+        session=session,
+        scan_row=scan_row,
+        market_real=market_real,
+        observed_at=observed_at,
+        legal_bars=legal_bars,
+        evaluate=eval_fn,
+    )
+
+    soft_pg = {
+        "position_guardian_sell": position_guardian_sell,
+        "position_guardian_signal": str(guardian_signal or ""),
+        "position_guardian_note": REASON_GUARDIAN_SELL if position_guardian_sell else "",
+        "candidate_quality": quality.as_dict(),
+    }
+
+    # --- Arm C: Candidate Guardian hard reject ---
+    if quality.reject or quality.label == QUALITY_REJECTED:
         candidate["status"] = STATUS_REJECTED
-        candidate["rejection_reason"] = REASON_GUARDIAN_SELL
+        candidate["rejection_reason"] = REASON_CANDIDATE_GUARDIAN_REJECT
+        candidate["rejection_detail"] = quality.reason
         append_status_history(
             candidate,
             session=session,
             status=STATUS_REJECTED,
-            reason=REASON_GUARDIAN_SELL,
-            extra={"guardian_status": guardian_signal},
+            reason=REASON_CANDIDATE_GUARDIAN_REJECT,
+            extra={
+                "quality_reason": quality.reason,
+                "quality_label": quality.label,
+                **soft_pg,
+            },
         )
         return {
             "candidate_key": candidate.get("candidate_key"),
             "status": STATUS_REJECTED,
-            "reason": REASON_GUARDIAN_SELL,
+            "reason": REASON_CANDIDATE_GUARDIAN_REJECT,
+            "status_b": path_b["status"],
+            "reason_b": path_b["reason"],
             "camera_row": None,
             "action_state": "",
+            "action_state_b": path_b.get("action_state") or "",
+            "candidate_quality": quality.label,
+            "candidate_quality_reason": quality.reason,
             "guardian_filtered": True,
+            "candidate_guardian_filtered": True,
+            "position_guardian_sell": position_guardian_sell,
+            "action_result_b": path_b.get("action_result"),
         }
 
+    # --- Empty / non-actionable setup: continue wait (both arms) ---
     if current_setup not in ACTIONABLE_LIVE_SETUPS:
+        reason = REASON_SETUP_EMPTY if not current_setup else REASON_WHEN_NOT_MET
         candidate["status"] = STATUS_ACTIVE
         append_status_history(
             candidate,
             session=session,
             status=STATUS_WAIT,
-            reason=REASON_SETUP_EMPTY if not current_setup else REASON_WHEN_NOT_MET,
-            extra={"current_setup": current_setup},
+            reason=reason,
+            extra={"current_setup": current_setup, **soft_pg},
         )
         return {
             "candidate_key": candidate.get("candidate_key"),
             "status": STATUS_WAIT,
-            "reason": REASON_SETUP_EMPTY if not current_setup else REASON_WHEN_NOT_MET,
+            "reason": reason,
+            "status_b": STATUS_WAIT,
+            "reason_b": reason,
             "camera_row": None,
             "action_state": STATE_WAIT,
+            "candidate_quality": quality.label,
+            "candidate_quality_reason": quality.reason,
+            "position_guardian_sell": position_guardian_sell,
         }
 
+    # --- Market First: block BUY only; never reject healthy candidates ---
     if perm != "OK":
         candidate["status"] = STATUS_ACTIVE
         append_status_history(
@@ -325,70 +504,128 @@ def evaluate_active_candidate(
             session=session,
             status=STATUS_WAIT,
             reason=REASON_MARKET_NOT_OK,
-            extra={"market_permission": perm},
+            extra={"market_permission": perm, **soft_pg},
         )
         return {
             "candidate_key": candidate.get("candidate_key"),
             "status": STATUS_WAIT,
             "reason": REASON_MARKET_NOT_OK,
+            "status_b": STATUS_WAIT,
+            "reason_b": REASON_MARKET_NOT_OK,
             "camera_row": None,
             "action_state": STATE_WAIT,
+            "candidate_quality": quality.label,
+            "candidate_quality_reason": quality.reason,
+            "position_guardian_sell": position_guardian_sell,
         }
 
-    fresh = _fresh_nomination_dict(
-        candidate,
-        session=session,
-        current_setup=current_setup,
-        scan_row=scan_row,
-        market_real=market_real,
-        observed_at=observed_at,
-    )
-    # Fresh episode: never pass prior WAIT/WEAKENED into Action.
-    result = eval_fn(
-        nomination_from_mapping(fresh),
-        legal_bars,
-        now=as_vn(observed_at),
-        observed=True,
-        prior_action_state=None,
-        prior_session=None,
-    )
-    action_state = str(getattr(result, "action_state", "") or "")
+    # --- WEAKENING: arm C blocks BUY_READY; arm B may still reach BUY_READY ---
+    if quality.block_buy_ready or quality.label == QUALITY_WEAKENING:
+        candidate["status"] = STATUS_ACTIVE
+        append_status_history(
+            candidate,
+            session=session,
+            status=STATUS_WAIT,
+            reason=REASON_CANDIDATE_WEAKENING_BLOCK,
+            extra={
+                "action_state_raw": path_b.get("action_state") or "",
+                "quality_reason": quality.reason,
+                **soft_pg,
+            },
+        )
+        return {
+            "candidate_key": candidate.get("candidate_key"),
+            "status": STATUS_WAIT,
+            "reason": REASON_CANDIDATE_WEAKENING_BLOCK,
+            "status_b": path_b["status"],
+            "reason_b": path_b["reason"],
+            "camera_row": path_b.get("camera_row"),
+            "action_state": STATE_WAIT,
+            "action_state_b": path_b.get("action_state") or "",
+            "action_result": path_b.get("action_result"),
+            "action_result_b": path_b.get("action_result"),
+            "candidate_quality": quality.label,
+            "candidate_quality_reason": quality.reason,
+            "position_guardian_sell": position_guardian_sell,
+        }
+
+    # --- Fresh Action WHEN (arm C = arm B when CG not blocking) ---
+    action_state = str(path_b.get("action_state") or STATE_WAIT)
+    result = path_b.get("action_result")
+    fresh = path_b.get("camera_row")
+    if result is None:
+        action_state, result, fresh = _action_eval(
+            candidate,
+            session=session,
+            current_setup=current_setup,
+            scan_row=scan_row,
+            market_real=market_real,
+            observed_at=observed_at,
+            legal_bars=legal_bars,
+            evaluate=eval_fn,
+        )
+
     if action_state == STATE_BUY_READY:
         candidate["status"] = STATUS_BUY_READY
         candidate["buy_ready_session"] = str(session)[:10]
-        candidate["buy_ready_at"] = getattr(result, "first_met_at", None) or as_vn(observed_at).isoformat()
+        candidate["buy_ready_at"] = getattr(result, "first_met_at", None) or as_vn(
+            observed_at
+        ).isoformat()
         candidate["buy_ready_price"] = getattr(result, "price_at_first_met", None)
         append_status_history(
             candidate,
             session=session,
             status=STATUS_BUY_READY,
             reason=REASON_BUY_READY,
-            extra={"action_reason": getattr(result, "action_reason", "")},
+            extra={
+                "action_reason": getattr(result, "action_reason", ""),
+                "quality_label": quality.label,
+                **soft_pg,
+            },
         )
         return {
             "candidate_key": candidate.get("candidate_key"),
             "status": STATUS_BUY_READY,
             "reason": REASON_BUY_READY,
+            "status_b": STATUS_BUY_READY,
+            "reason_b": REASON_BUY_READY,
             "camera_row": fresh,
             "action_state": STATE_BUY_READY,
             "action_result": result,
+            "candidate_quality": quality.label,
+            "candidate_quality_reason": quality.reason,
+            "position_guardian_sell": position_guardian_sell,
         }
 
+    wait_reason = (
+        REASON_QUALITY_STRONGER_WAIT
+        if quality.label == QUALITY_STRONGER
+        else REASON_WHEN_NOT_MET
+    )
     candidate["status"] = STATUS_ACTIVE
     append_status_history(
         candidate,
         session=session,
         status=STATUS_WAIT,
-        reason=REASON_WHEN_NOT_MET,
-        extra={"action_state": action_state, "action_reason": getattr(result, "action_reason", "")},
+        reason=wait_reason,
+        extra={
+            "action_state": action_state,
+            "action_reason": getattr(result, "action_reason", "") if result else "",
+            **soft_pg,
+        },
     )
     return {
         "candidate_key": candidate.get("candidate_key"),
         "status": STATUS_WAIT,
-        "reason": REASON_WHEN_NOT_MET,
+        "reason": wait_reason,
+        "status_b": STATUS_WAIT,
+        "reason_b": REASON_WHEN_NOT_MET if quality.label != QUALITY_STRONGER else wait_reason,
         "camera_row": fresh,
         "action_state": action_state or STATE_WAIT,
         "action_result": result,
+        "candidate_quality": quality.label,
+        "candidate_quality_reason": quality.reason,
+        "position_guardian_sell": position_guardian_sell,
     }
 
 
