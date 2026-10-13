@@ -137,6 +137,27 @@ def observe_from_collected_session(
         except Exception:
             pass
         items.append((nom, history, result))
+    # Follow-up Watch V1 — SHADOW/RESEARCH only. Default OFF.
+    # Observe path only records baseline + ingests registry; full re-eval
+    # (Setup/Market/Guardian/WHEN/TTL) runs via scripts/run_v2_followup_watch.py
+    # when market_real + trading_dates are supplied. Never changes Action rows.
+    try:
+        from modules.live_candidate_v2_followup.contract import followup_enabled
+        from modules.live_candidate_v2_followup.measure import record_baseline_action_rows
+        from modules.live_candidate_v2_followup.registry import (
+            load_registry,
+            save_registry,
+        )
+        from modules.live_candidate_v2_followup.session import ingest_sidecar_rows
+
+        if followup_enabled():
+            baseline_rows = [result.as_dict() for _nom, _hist, result in items]
+            record_baseline_action_rows(session=sess_s, action_rows=baseline_rows)
+            registry = load_registry()
+            ingest_sidecar_rows(registry, list(sidecar.rows), session=sess_s)
+            save_registry(registry)
+    except Exception:
+        pass
     if items:
         persist_cycle(
             session=sess,
