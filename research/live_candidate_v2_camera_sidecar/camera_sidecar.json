@@ -23,8 +23,8 @@
     "eligible_from"
   ],
   "session": "2026-10-13",
-  "observed_at": "2026-10-13T14:12:45.580760+07:00",
-  "generated_at": "2026-10-13T14:12:45.580760+07:00",
+  "observed_at": "2026-10-13T14:13:28.949401+07:00",
+  "generated_at": "2026-10-13T14:13:28.949401+07:00",
   "market_real": 4.7,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
@@ -1963,7 +1963,7 @@
       "symbol": "FPT",
       "session": "2026-10-13",
       "candidate_first_seen_ts": "2026-10-12T12:43:58Z",
-      "candidate_updated_ts": "2026-10-13T14:12:45.580760+07:00",
+      "candidate_updated_ts": "2026-10-13T14:13:28.949401+07:00",
       "eligible_from": "2026-10-13T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -2040,7 +2040,7 @@
       "symbol": "TVS",
       "session": "2026-10-13",
       "candidate_first_seen_ts": "2026-10-12T12:43:58Z",
-      "candidate_updated_ts": "2026-10-13T14:12:45.580760+07:00",
+      "candidate_updated_ts": "2026-10-13T14:13:28.949401+07:00",
       "eligible_from": "2026-10-13T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
