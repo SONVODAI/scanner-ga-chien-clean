@@ -23,9 +23,9 @@
     "eligible_from"
   ],
   "session": "2026-10-14",
-  "observed_at": "2026-10-14T02:22:20.271701+07:00",
-  "generated_at": "2026-10-14T02:22:20.271701+07:00",
-  "market_real": 3.9,
+  "observed_at": "2026-10-14T09:45:25.473025+07:00",
+  "generated_at": "2026-10-14T09:45:25.473025+07:00",
+  "market_real": 4.0,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
     "Candidate != BUY.",
@@ -1960,10 +1960,10 @@
   "rows": [],
   "brain_b": {
     "source": "market_aware_sweetspot",
-    "status": "NOT_TRADING_SESSION",
+    "status": "UNAVAILABLE",
     "session": "2026-10-14",
-    "predecessor": "",
-    "reason": "T_NOT_VNINDEX_TRADING_SESSION",
+    "predecessor": "2026-10-13",
+    "reason": "PREDECESSOR_SWEET_FREEZE_MISSING",
     "n_nominations": 0
   }
 }
