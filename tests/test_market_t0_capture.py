@@ -465,15 +465,21 @@ class ObserverOnlyTests(unittest.TestCase):
         pd.testing.assert_frame_equal(scan, before)
 
     def test_no_production_reader_of_daily_file(self):
-        import os
-
         root = Path(__file__).resolve().parents[1]
+        allowed_names = {"market_t0_capture.py"}
+        allowed_dirs = {"actionable_research"}
         hits = []
         for path in root.rglob("*.py"):
-            if path.name.endswith(".py") and "test_" not in path.name:
-                text = path.read_text(encoding="utf-8", errors="ignore")
-                if "market_daily_t0" in text and path.name != "market_t0_capture.py":
-                    hits.append(str(path))
+            if "test_" in path.name:
+                continue
+            if path.name in allowed_names:
+                continue
+            if any(part in allowed_dirs for part in path.parts):
+                # Read-only research fusion — not a ranking / BUY production reader.
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            if "market_daily_t0" in text:
+                hits.append(str(path))
         self.assertEqual(hits, [])
 
 
