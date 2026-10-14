@@ -1,0 +1,115 @@
+{
+  "generated_from_git": "research/setup_intraday_pxv_forward/run_study.py",
+  "camera": {
+    "found": [],
+    "missing": [
+      "/var/lib/mrbot/intraday_memory",
+      "/workspace/intraday_memory",
+      "/workspace/data/intraday_pxv_v1"
+    ],
+    "canonical_5m_available": false,
+    "verdict": "UNSAFE FOR THIS STUDY"
+  },
+  "pxv_defaults_documented_not_changed": {
+    "RESEARCH_DEFAULT_EXPANSION_X": 2.0,
+    "RESEARCH_DEFAULT_CONTRACTION_X": 0.7,
+    "RESEARCH_DEFAULT_PACE_AHEAD_X": 1.5,
+    "RESEARCH_DEFAULT_SESSION_MEDIAN_BARS": 6
+  },
+  "outcome_definitions": {
+    "win_rule": "is_win = return_pct > 0 (strictly positive close-to-close)",
+    "return": "(target_price / entry_price - 1) * 100",
+    "MFE": "max_gain_pct = max(forward slice prices)/entry - 1, percent",
+    "MAE": "max_drawdown_pct = min(forward slice prices)/entry - 1, percent (negative)",
+    "horizon_index": "+n observation rows of the same symbol in observations.csv, DEFAULT_HORIZONS=(3,5,10)",
+    "not": "Not independent trials; T3 ⊂ T5 ⊂ T10 on the same observation",
+    "leader": "is_leader if max_gain_pct >= 5/8/12 for T3/T5/T10",
+    "daily_ohlcv_panel": "absent — cannot independently recompute trading-session T+n in this workspace"
+  },
+  "observation_unit": {
+    "preferred_scientific_unit": "symbol × session_date × setup_asof × 5m_bar_asof",
+    "preferred_status": "NOT TESTABLE in this workspace",
+    "fallback_daily_unit": "symbol × trade_date × setup_label_with_chronology_class",
+    "fallback_status": "PARTIAL / QUARANTINE for EOD freeze group; UNSAFE for last-wins / T+1 observation group",
+    "do_not_use": "later saved group as though it were known earlier; daily volume_ratio as 5m P×V",
+    "production_contracts": "unchanged"
+  },
+  "leak_pattern_history": {
+    "symbol_date_pairs": 3046,
+    "pairs_with_multiple_snapshots": 1102,
+    "pairs_with_group_change_any_clock": 77,
+    "pairs_with_intra_session_group_change": 29,
+    "first_clock": {
+      "POST_CLOSE": 1767,
+      "AM_SESSION": 502,
+      "LUNCH": 301,
+      "PM_SESSION": 253,
+      "PRE_OPEN": 107,
+      "OPEN_AUCTION": 94,
+      "ATC": 22
+    },
+    "last_clock": {
+      "POST_CLOSE": 2300,
+      "PM_SESSION": 291,
+      "AM_SESSION": 260,
+      "LUNCH": 115,
+      "PRE_OPEN": 41,
+      "ATC": 34,
+      "OPEN_AUCTION": 5
+    }
+  },
+  "freeze_duplicates_observation_id": 0,
+  "freeze_clock": {
+    "POST_CLOSE": 2575,
+    "LUNCH": 127
+  },
+  "asof_disagree_freeze_vs_ph": {
+    "freeze_vs_ph_first_disagree": 70,
+    "freeze_vs_ph_last_disagree": 56,
+    "n_joined": 417,
+    "freeze_vs_ph_first_rate": 0.16786570743405277,
+    "freeze_vs_ph_last_rate": 0.1342925659472422
+  },
+  "weekend_row_counts": {
+    "pattern_history": 2972,
+    "freeze": 0,
+    "observations": 568,
+    "evolution": 326,
+    "elite": 0
+  },
+  "weekend_unique_dates": {
+    "pattern_history": 11,
+    "freeze": 0,
+    "observations": 4,
+    "evolution": 2,
+    "elite": 0
+  },
+  "weekday_union_n": 76,
+  "weekend_union_n": 14,
+  "pattern_history_tn_fill": {
+    "t1_return": {
+      "n_non_null": 0,
+      "n_rows": 35616
+    },
+    "t3_return": {
+      "n_non_null": 0,
+      "n_rows": 35616
+    },
+    "t5_return": {
+      "n_non_null": 0,
+      "n_rows": 35616
+    },
+    "t10_return": {
+      "n_non_null": 0,
+      "n_rows": 35616
+    }
+  },
+  "elite_conclusions": {
+    "WATCHLIST - MARKET YẾU": 353,
+    "MUA NHỎ / ƯU TIÊN": 327,
+    "WATCHLIST": 208,
+    "BUY ELITE": 78,
+    "CHƯA ĐỦ ĐỒNG THUẬN": 30
+  },
+  "union_n_dates": 90
+}
