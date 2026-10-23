@@ -1,0 +1,4 @@
+horizon,N,median_calendar_days,p90_calendar_days,max_calendar_days,unique_symbols,unique_entry_dates
+3,4974,4.0,6.0,11.0,142,36
+5,4690,7.0,13.0,14.0,142,34
+10,3980,13.0,21.0,22.0,142,29
