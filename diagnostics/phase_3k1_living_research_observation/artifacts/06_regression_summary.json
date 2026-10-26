@@ -1,0 +1,37 @@
+{
+  "suites": {
+    "tests/test_edge_research_opr_phase_3k1.py": {
+      "passed": true,
+      "tail": "11 passed in 397.73s (0:06:37)"
+    },
+    "tests/test_edge_research_opr_phase_3k0.py": {
+      "passed": true,
+      "tail": "10 passed in 201.51s (0:03:21)"
+    },
+    "tests/test_edge_research_opr_phase_3j14a.py": {
+      "passed": true,
+      "tail": "13 passed in 192.18s (0:03:12)"
+    },
+    "tests/test_edge_research_opr_phase_3j14.py::test_cf_cg_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 0.52s"
+    },
+    "tests/test_edge_research_opr_phase_3j13.py::test_cf_fg_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 5.10s"
+    },
+    "tests/test_edge_research_opr_phase_3j12.py::test_cf_nx_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 4.99s"
+    },
+    "tests/test_edge_research_opr_phase_3j11.py::test_cf_br_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 1.12s"
+    },
+    "tests/test_edge_research_opr_phase_3j10.py::test_cf_arl1_arl12_pass": {
+      "passed": true,
+      "tail": "1 passed in 3.57s"
+    }
+  },
+  "all_passed": true
+}

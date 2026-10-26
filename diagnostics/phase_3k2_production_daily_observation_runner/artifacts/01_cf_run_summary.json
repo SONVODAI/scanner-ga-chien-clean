@@ -1,0 +1,140 @@
+{
+  "CF-RUN1": {
+    "passed": true,
+    "description": "Duplicate same-day run -> idempotent",
+    "run_id": "pdrun-dc0190c09122f4b9"
+  },
+  "CF-RUN2": {
+    "passed": true,
+    "description": "Weekend/non-session -> SKIP",
+    "eligibility": {
+      "target_trade_date": "2026-02-01",
+      "eligible": false,
+      "disposition": "SKIPPED_NON_TRADING_DAY",
+      "reason": "weekend_non_session",
+      "is_weekend": true,
+      "in_panel_sessions": false
+    }
+  },
+  "CF-RUN3": {
+    "passed": true,
+    "description": "Missing EOD -> WAITING_FOR_DATA",
+    "readiness": {
+      "ready": false,
+      "disposition": "WAITING_FOR_DATA",
+      "reason": "target_date_not_in_panel_sessions",
+      "source_max_trade_date": "2026-01-30",
+      "researcher_visible_max_trade_date": null,
+      "source_dataset_identity": "research_panel:6b7af74d81ef9861",
+      "source_dataset_hash": "6b7af74d81ef98619098ee23463826960c7c331c951781f3c01139c1078e15a5",
+      "temporal_provenance_established": false,
+      "market_context_available": false,
+      "market_context_classification": "UNAVAILABLE",
+      "errors": [
+        "target_date_not_in_panel_sessions"
+      ]
+    }
+  },
+  "CF-RUN4": {
+    "passed": true,
+    "description": "Future row excluded by cutoff",
+    "future_rows_in_source": 601
+  },
+  "CF-RUN5": {
+    "passed": true,
+    "description": "Crash after BirthRecord -> resume without duplicate"
+  },
+  "CF-RUN6": {
+    "passed": true,
+    "description": "Outcome idempotency via 3K.1 assessment layer"
+  },
+  "CF-RUN7": {
+    "passed": true,
+    "description": "Assessment idempotency via 3K.1 identity hash"
+  },
+  "CF-RUN8": {
+    "passed": true,
+    "description": "No discovery -> summary still persisted",
+    "summary_id": "dysum-35b0886076cf692e"
+  },
+  "CF-RUN9": {
+    "passed": true,
+    "description": "Prior active observation reassessed without rediscovery",
+    "reassessed_count": 4
+  },
+  "CF-RUN10": {
+    "passed": true,
+    "description": "T5 before eligible session -> reject",
+    "reason": "early_outcome_rejected:T5:eligible_after_bday_offset"
+  },
+  "CF-RUN11": {
+    "passed": true,
+    "description": "BACKFILL never counts as forward evidence",
+    "backfill": false,
+    "live_forward": true
+  },
+  "CF-RUN12": {
+    "passed": true,
+    "description": "Completed run mutation rejected"
+  },
+  "CF-RUN13": {
+    "passed": true,
+    "description": "Scientific records preserved independent of narrator"
+  },
+  "CF-RUN14": {
+    "passed": true,
+    "description": "Trading write blocked",
+    "audit": {
+      "passed": true,
+      "import_hits": [],
+      "write_hits": [],
+      "modules_audited": [
+        "production_research_observation.py",
+        "production_observation_records.py",
+        "production_observation_cutoff.py",
+        "production_observation_persistence.py",
+        "production_observation_narrative.py",
+        "production_observation_isolation.py",
+        "production_living_observation_records.py",
+        "production_living_observation_persistence.py",
+        "production_market_delta.py",
+        "production_forward_outcome_evaluator.py",
+        "production_observation_lifecycle.py",
+        "production_daily_assessment.py",
+        "production_daily_voice.py",
+        "production_living_read_model.py",
+        "production_living_research_observation.py",
+        "production_daily_run_records.py",
+        "production_trading_session_eligibility.py",
+        "production_data_readiness_gate.py",
+        "production_forward_clock.py",
+        "production_daily_run_persistence.py",
+        "production_daily_run_observability.py",
+        "production_daily_manifest.py",
+        "production_scheduling_contract.py",
+        "production_notification_contract.py",
+        "production_daily_run_orchestrator.py",
+        "production_daily_run_entrypoint.py"
+      ]
+    }
+  },
+  "CF-RUN15": {
+    "passed": true,
+    "description": "Ambiguous provenance -> fail closed"
+  },
+  "CF-RUN16": {
+    "passed": true,
+    "description": "Fresh daily explanation enforced by 3K.1 why_belief_changed_or_not"
+  },
+  "CF-RUN17": {
+    "passed": true,
+    "description": "Artificial belief change rejected"
+  },
+  "CF-RUN18": {
+    "passed": true,
+    "description": "Run mode conversion rejected",
+    "reason": "mode_conversion_rejected:BACKFILL_NON_FORWARD->LIVE_FORWARD"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_production_daily_run_01_v1_3k2"
+}

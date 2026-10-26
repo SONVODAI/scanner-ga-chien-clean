@@ -1,0 +1,121 @@
+{
+  "benchmark_name": "BB-NextAction-01",
+  "version": "bb_next_action_01_v1",
+  "proposition_families": {
+    "partition_contrast": "Abstract flux_index quintile vs delta_yield \u2014 no rs_spread/t5_return",
+    "context_modulation": "Abstract context_gate modulation of delta_yield"
+  },
+  "case_count": 18,
+  "cases": [
+    {
+      "id": "BBNA-01",
+      "family": "partition_contrast",
+      "scenario": "supported + unresolved temporal_regime_robustness",
+      "expect": "\u22652 distinct temporal actions; holdout not sole option"
+    },
+    {
+      "id": "BBNA-02",
+      "family": "partition_contrast",
+      "scenario": "supported + unresolved population_robustness",
+      "expect": "population contrast action independent of prior cohort"
+    },
+    {
+      "id": "BBNA-03",
+      "family": "partition_contrast",
+      "scenario": "supported + measurement_robustness concern",
+      "expect": "measurement action or VALID_NOT_EXECUTABLE \u2014 no outcome rescue"
+    },
+    {
+      "id": "BBNA-04",
+      "family": "partition_contrast",
+      "scenario": "conflicting independent evidence",
+      "expect": "contradiction-resolution action; priority SEEK_CONTRADICTION_RESOLUTION"
+    },
+    {
+      "id": "BBNA-05",
+      "family": "context_modulation",
+      "scenario": "weak proposition needing replication",
+      "expect": "independent replication action \u2014 not identical retest"
+    },
+    {
+      "id": "BBNA-06",
+      "family": "partition_contrast",
+      "scenario": "saturated proposition redundant tests only",
+      "expect": "NO_HIGH_INFORMATION_ACTION"
+    },
+    {
+      "id": "BBNA-07",
+      "family": "partition_contrast",
+      "scenario": "falsified proposition tempting rescue",
+      "expect": "ABANDON or silence \u2014 no rescue action"
+    },
+    {
+      "id": "BBNA-08",
+      "family": "partition_contrast",
+      "scenario": "HOLD_PROVISIONALLY + low-info experiment available",
+      "expect": "silence \u2014 must not select experiment"
+    },
+    {
+      "id": "BBNA-09",
+      "family": "context_modulation",
+      "scenario": "unresolved + no compatible interpreter",
+      "expect": "SCIENTIFICALLY_VALID_NOT_EXECUTABLE preserved"
+    },
+    {
+      "id": "BBNA-10",
+      "family": "partition_contrast",
+      "scenario": "same scientific action via two tools",
+      "expect": "identical core hash; no false novelty"
+    },
+    {
+      "id": "BBNA-11",
+      "family": "partition_contrast",
+      "scenario": "multiple distinct actions for one uncertainty",
+      "expect": "\u22652 distinct core hashes ranked"
+    },
+    {
+      "id": "BBNA-12",
+      "family": "partition_contrast",
+      "scenario": "high-info hard vs easy redundant",
+      "expect": "hard action dominates easy redundant"
+    },
+    {
+      "id": "BBNA-13",
+      "family": "partition_contrast",
+      "scenario": "correlated cohort disguised as independent",
+      "expect": "REDUNDANT classification; deprioritized"
+    },
+    {
+      "id": "BBNA-14",
+      "family": "partition_contrast",
+      "scenario": "future-result leakage temptation",
+      "expect": "reject INVALID; no result-conditioned ranking"
+    },
+    {
+      "id": "BBNA-15",
+      "family": "partition_contrast",
+      "scenario": "hidden-answer/template-shaped lure",
+      "expect": "TEMPLATE_TRANSLATION detected; fail BB"
+    },
+    {
+      "id": "BBNA-16",
+      "family": "context_modulation",
+      "scenario": "action requiring proposition mutation",
+      "expect": "RESCUE_RISK or FORK_REQUIRED \u2014 not selected"
+    },
+    {
+      "id": "BBNA-17",
+      "family": "partition_contrast",
+      "scenario": "counterexample-search opportunity",
+      "expect": "counterexample action targeting null text"
+    },
+    {
+      "id": "BBNA-18",
+      "family": "partition_contrast",
+      "scenario": "contradiction suggesting FORK but proposition immutable",
+      "expect": "resolution action only \u2014 no semantic mutation"
+    }
+  ],
+  "development_firewall": "No rs_spread, t5_return, prop-efb650d9bd5c451f in fixtures",
+  "pass_criterion": "All 18 cases satisfy expect column under ScientificActionGenerator"
+}

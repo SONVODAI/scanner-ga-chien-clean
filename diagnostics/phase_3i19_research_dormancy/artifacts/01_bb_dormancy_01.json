@@ -1,0 +1,153 @@
+{
+  "benchmark": "BB-Dormancy-01",
+  "case_count": 20,
+  "passed": 20,
+  "all_passed": true,
+  "results": [
+    {
+      "case_id": "BBD-01",
+      "passed": true,
+      "checks": {
+        "dormancy_created": true,
+        "should_enter": true,
+        "activity_state": true
+      }
+    },
+    {
+      "case_id": "BBD-02",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-03",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-04",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-05",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-06",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-07",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-08",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-09",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-10",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-11",
+      "passed": true,
+      "checks": {
+        "reopening_in": true
+      }
+    },
+    {
+      "case_id": "BBD-12",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-13",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-14",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-15",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-16",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-17",
+      "passed": true,
+      "checks": {
+        "reopening": true
+      }
+    },
+    {
+      "case_id": "BBD-18",
+      "passed": true,
+      "checks": {
+        "reopening_first": true,
+        "reopening_second": true
+      }
+    },
+    {
+      "case_id": "BBD-19",
+      "passed": true,
+      "checks": {
+        "reopening": true,
+        "multiple_conditions": true
+      }
+    },
+    {
+      "case_id": "BBD-20",
+      "passed": true,
+      "checks": {
+        "dormancy_created": true,
+        "should_enter": true
+      }
+    }
+  ]
+}

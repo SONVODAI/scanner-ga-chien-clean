@@ -1,0 +1,12 @@
+{
+  "head": "e057bdf3a39bafa22021df328204b37d82b7831d",
+  "phase": "3K.4",
+  "stop_boundary": "STOP_LIVING_RESEARCH_UI_READY",
+  "ui_fixtures_pass": true,
+  "preview_generated": true,
+  "preview_not_live_forward": true,
+  "trading_isolation_pass": true,
+  "insight_recommendation": "RETAIN_AS_LEGACY",
+  "regressions_pass": true,
+  "phase_pass": true
+}

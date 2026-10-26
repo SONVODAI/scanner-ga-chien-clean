@@ -1,0 +1,718 @@
+{
+  "lineage_integrity": {
+    "proposition_hash_match": true,
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "decision_action": "SEEK_FALSIFICATION",
+    "resulting_state": "SUPPORTED",
+    "decision_cites_update": true,
+    "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+    "passed": true
+  },
+  "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "candidates": [
+    {
+      "candidate_id": "fc-audit_confirmatory_retest",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "directional_reversal",
+      "scientific_rationale": "Audit sketch: exact confirmatory retest",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "evidence_independence_class": "NOT_ACTUALLY_FALSIFICATION",
+      "independence_rationale": "Identical ExperimentSpec to prior supportive test",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": false,
+      "counterfactual_falsifiable": false,
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Cohort n=6248 passes grammar and sample gates",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.231497+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "051ecbb72af9ae8558d4c7533b2476d559911fa66b63f04c535525db48e2be4c"
+    },
+    {
+      "candidate_id": "fc-independent_episode_holdout",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "episode_instability",
+      "scientific_rationale": "Vulnerability: Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates. Operational test: direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 on independent episodes.",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "trade_date",
+            "operator": "in",
+            "values": [
+              "2026-06-01",
+              "2026-06-02",
+              "2026-06-03",
+              "2026-06-04",
+              "2026-06-05",
+              "2026-06-08",
+              "2026-06-09",
+              "2026-06-10",
+              "2026-06-11",
+              "2026-06-12",
+              "2026-06-15",
+              "2026-06-16",
+              "2026-06-17",
+              "2026-06-18",
+              "2026-06-19",
+              "2026-06-22",
+              "2026-06-23",
+              "2026-06-24",
+              "2026-06-25",
+              "2026-06-26",
+              "2026-06-29",
+              "2026-06-30",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28",
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31",
+              "2026-08-01",
+              "2026-08-03",
+              "2026-08-04",
+              "2026-08-05",
+              "2026-08-06",
+              "2026-08-07",
+              "2026-08-08",
+              "2026-08-10",
+              "2026-08-11",
+              "2026-08-12",
+              "2026-08-13",
+              "2026-08-14",
+              "2026-08-17"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "experiment_content_hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e",
+      "evidence_independence_class": "INDEPENDENT_FALSIFICATION",
+      "independence_rationale": "Partition contrast on 43 holdout dates excluding motivating episodes ['2026-08-02'] \u2014 new evidence cohort, same proposition semantics",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": true,
+      "counterfactual_falsifiable": true,
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Cohort n=6106 passes grammar and sample gates",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.236228+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb"
+    },
+    {
+      "candidate_id": "fc-audit_population_narrow",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "directional_reversal",
+      "scientific_rationale": "Audit sketch: supportive population narrowing",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "refine",
+            "parent": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "children": [
+              {
+                "kind": "filter",
+                "field": "research_market_state",
+                "operator": "in",
+                "values": [
+                  "STRESS"
+                ],
+                "grammar_version": "research_grammar_v1"
+              }
+            ],
+            "reason_code": "AUDIT_NARROW",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "experiment_content_hash": "2e33a0dac76c86cd432f4ebf4813da936db239d7b1811b4cdd0715d9ae7f448a",
+      "evidence_independence_class": "NOT_ACTUALLY_FALSIFICATION",
+      "independence_rationale": "Population narrowing \u2014 rescue temptation",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": true,
+      "counterfactual_falsifiable": false,
+      "rescue_risk_status": "population_refine_rescue",
+      "executability_status": "RESCUE_REJECTED",
+      "executability_detail": "population_refine_rescue",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.240210+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "16564cde1fe8ce31cf4202a4b7950b28a8c5be5b2e118b154e0ff4fc1dfeb289"
+    },
+    {
+      "candidate_id": "fc-audit_horizon_mutation",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "directional_reversal",
+      "scientific_rationale": "Audit sketch: horizon mutation disguised as falsification",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5,
+          "horizon": "T10"
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 5,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "experiment_content_hash": "23c1e24c5714f0ba7b425349c361ff2df210d82284271edb995e58e36c1ca0da",
+      "evidence_independence_class": "NOT_ACTUALLY_FALSIFICATION",
+      "independence_rationale": "Horizon mutation changes proposition meaning",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": true,
+      "counterfactual_falsifiable": false,
+      "rescue_risk_status": "horizon_mutation",
+      "executability_status": "RESCUE_REJECTED",
+      "executability_detail": "horizon_mutation",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.240344+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "3f4150b04d6276e94133759083a7a48010d87fc1aff1e3d6a0836e11abf867e1"
+    },
+    {
+      "candidate_id": "fc-audit_same_question_different_tool",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "directional_reversal",
+      "scientific_rationale": "Audit sketch: same question via different tool only",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "date_decomposition",
+        "tool_version": "v1",
+        "inputs": {
+          "horizon": "T5"
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "experiment_content_hash": "40e8815b5de992e62d6e65ab2dd340eecd460d53a366c27ea6680604c45ea966",
+      "evidence_independence_class": "NOT_ACTUALLY_FALSIFICATION",
+      "independence_rationale": "Different tool does not operationalize quintile disconfirm test",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": true,
+      "counterfactual_falsifiable": false,
+      "rescue_risk_status": "pass",
+      "executability_status": "NOT_EXECUTABLE",
+      "executability_detail": "Missing columns: [None]",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.240439+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "844f939290ab3ebffeae5724dbcec6aa8f33c4866ccf066bb08ceb0a58a16ea5"
+    },
+    {
+      "candidate_id": "fc-audit_invalid_leaky",
+      "record_version": "falsification_candidate_record_v1_3i9",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "source_epistemic_update_id": "epu-5a7bec6e47ec",
+      "source_research_decision_id": "dec-c92fb28fdc13",
+      "vulnerability_tested": "directional_reversal",
+      "scientific_rationale": "Audit sketch: invalid leaky candidate",
+      "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+      "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+      "proposed_experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0,
+          "pending_question_context": {
+            "population_spec": {
+              "kind": "all",
+              "grammar_version": "research_grammar_v1"
+            },
+            "outcome_spec": {
+              "kind": "compare",
+              "field": "t5_return",
+              "operator": ">",
+              "value": 0.0,
+              "grammar_version": "research_grammar_v1"
+            },
+            "observation_horizon": 0
+          }
+        },
+        "data_cutoff_date": "2099-12-31"
+      },
+      "experiment_content_hash": "a53eb7ef89fc9772f175f02e1c0d843974d1d1ee696918a2782c239d4fcba51b",
+      "evidence_independence_class": "NOT_ACTUALLY_FALSIFICATION",
+      "independence_rationale": "Invalid cutoff / leakage",
+      "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+      "content_hash_differs_from_prior": true,
+      "counterfactual_falsifiable": false,
+      "rescue_risk_status": "pass",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Cohort n=6248 passes grammar and sample gates",
+      "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+      "lineage_refs": {
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+        "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+        "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+      },
+      "created_at": "2026-08-22T02:37:35.243449+00:00",
+      "generator_version": "falsification_candidate_generator_v1_3i9",
+      "record_hash": "10e76749b9c6c50670935a7a7f156407354cbfb880abb2633290e17e20d0acae"
+    }
+  ],
+  "candidate_set_hash": "126db563085474fa51906ff7b74d341b2beb5b6df61920fdde0ff4847d182f9a",
+  "selection": {
+    "outcome": "SELECTED",
+    "selected_candidate_id": "fc-independent_episode_holdout",
+    "selected_record_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb",
+    "eligible_count": 1,
+    "rejected_count": 5,
+    "ambiguous_tie_ids": [],
+    "reason": "Selected fc-independent_episode_holdout: episode_instability / INDEPENDENT_FALSIFICATION \u2014 Vulnerability: Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates.",
+    "selector_version": "lexicographic_falsification_selector_v1_3i9"
+  },
+  "selected_candidate": {
+    "candidate_id": "fc-independent_episode_holdout",
+    "record_version": "falsification_candidate_record_v1_3i9",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "source_epistemic_update_id": "epu-5a7bec6e47ec",
+    "source_research_decision_id": "dec-c92fb28fdc13",
+    "vulnerability_tested": "episode_instability",
+    "scientific_rationale": "Vulnerability: Proposition may hold only on motivating/supporting episodes; test on evidence independent of those dates. Operational test: direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 on independent episodes.",
+    "possible_disconfirming_outcome": "direction_violation OR outcome_spread <= 0.0 OR median_spread <= 0.0 \u2192 DISCONFIRMING; direction_violation AND quintile_mean_spread >= 0.5 \u2192 DISCONFIRMING_STRONG/FALSIFIED",
+    "possible_non_informative_outcome": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0 \u2192 NON_INFORMATIVE",
+    "proposed_experiment_spec": {
+      "tool_name": "partition_group_compare",
+      "tool_version": "v1",
+      "inputs": {
+        "partition_column": "rs_spread",
+        "n_groups": 5
+      },
+      "research_scope": {
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "in",
+          "values": [
+            "2026-06-01",
+            "2026-06-02",
+            "2026-06-03",
+            "2026-06-04",
+            "2026-06-05",
+            "2026-06-08",
+            "2026-06-09",
+            "2026-06-10",
+            "2026-06-11",
+            "2026-06-12",
+            "2026-06-15",
+            "2026-06-16",
+            "2026-06-17",
+            "2026-06-18",
+            "2026-06-19",
+            "2026-06-22",
+            "2026-06-23",
+            "2026-06-24",
+            "2026-06-25",
+            "2026-06-26",
+            "2026-06-29",
+            "2026-06-30",
+            "2026-07-23",
+            "2026-07-24",
+            "2026-07-26",
+            "2026-07-27",
+            "2026-07-28",
+            "2026-07-29",
+            "2026-07-30",
+            "2026-07-31",
+            "2026-08-01",
+            "2026-08-03",
+            "2026-08-04",
+            "2026-08-05",
+            "2026-08-06",
+            "2026-08-07",
+            "2026-08-08",
+            "2026-08-10",
+            "2026-08-11",
+            "2026-08-12",
+            "2026-08-13",
+            "2026-08-14",
+            "2026-08-17"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0,
+        "pending_question_context": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        }
+      },
+      "data_cutoff_date": "2026-08-17"
+    },
+    "experiment_content_hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e",
+    "evidence_independence_class": "INDEPENDENT_FALSIFICATION",
+    "independence_rationale": "Partition contrast on 43 holdout dates excluding motivating episodes ['2026-08-02'] \u2014 new evidence cohort, same proposition semantics",
+    "prior_experiment_content_hash": "8555087ee603a832f0791023d995a30588973c7aed6ad762c6ac84dd55f5f2ff",
+    "content_hash_differs_from_prior": true,
+    "counterfactual_falsifiable": true,
+    "rescue_risk_status": "pass",
+    "executability_status": "EXECUTABLE",
+    "executability_detail": "Cohort n=6106 passes grammar and sample gates",
+    "leakage_cutoff_requirements": "data_cutoff_date=2026-08-17; no rows after cutoff",
+    "lineage_refs": {
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+      "prior_tool_result_hash": "0051e5c7703e185e5351463e6f0f6f1cc10ac8c015bc60d377d4d474e10cfa66",
+      "lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b"
+    },
+    "created_at": "2026-08-22T02:37:35.236228+00:00",
+    "generator_version": "falsification_candidate_generator_v1_3i9",
+    "record_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb"
+  },
+  "one_shot_package": {
+    "package_version": "falsification_one_shot_v1_3i9",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "prior_lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+    "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+    "interpretation_contract_ref": "diagnostics/phase_3i7_minimal_lifecycle/artifacts/03_interpretation_contract.json",
+    "generator_version": "falsification_candidate_generator_v1_3i9",
+    "generator_hash": "1a43b449ba729955569f9411bcc94c6245140ca8a42a3e16858314871d9a3326",
+    "candidate_set_hash": "126db563085474fa51906ff7b74d341b2beb5b6df61920fdde0ff4847d182f9a",
+    "selector_version": "c23e41492ed64af9e0169c8994d775477956331b5ff284eac0facdd43292a4c7",
+    "selected_candidate_id": "fc-independent_episode_holdout",
+    "selected_candidate_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb",
+    "selected_experiment_spec": {
+      "tool_name": "partition_group_compare",
+      "tool_version": "v1",
+      "inputs": {
+        "partition_column": "rs_spread",
+        "n_groups": 5
+      },
+      "research_scope": {
+        "population_spec": {
+          "kind": "filter",
+          "field": "trade_date",
+          "operator": "in",
+          "values": [
+            "2026-06-01",
+            "2026-06-02",
+            "2026-06-03",
+            "2026-06-04",
+            "2026-06-05",
+            "2026-06-08",
+            "2026-06-09",
+            "2026-06-10",
+            "2026-06-11",
+            "2026-06-12",
+            "2026-06-15",
+            "2026-06-16",
+            "2026-06-17",
+            "2026-06-18",
+            "2026-06-19",
+            "2026-06-22",
+            "2026-06-23",
+            "2026-06-24",
+            "2026-06-25",
+            "2026-06-26",
+            "2026-06-29",
+            "2026-06-30",
+            "2026-07-23",
+            "2026-07-24",
+            "2026-07-26",
+            "2026-07-27",
+            "2026-07-28",
+            "2026-07-29",
+            "2026-07-30",
+            "2026-07-31",
+            "2026-08-01",
+            "2026-08-03",
+            "2026-08-04",
+            "2026-08-05",
+            "2026-08-06",
+            "2026-08-07",
+            "2026-08-08",
+            "2026-08-10",
+            "2026-08-11",
+            "2026-08-12",
+            "2026-08-13",
+            "2026-08-14",
+            "2026-08-17"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0,
+        "pending_question_context": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        }
+      },
+      "data_cutoff_date": "2026-08-17"
+    },
+    "selected_experiment_content_hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e",
+    "cutoff_policy": "data_cutoff_date=2026-08-17; no rows after cutoff",
+    "interpretation_requirements": "Reuse frozen 3I.7 InterpretationContract quintile rules",
+    "anti_rescue_constraints": "pass",
+    "execution_status": "NOT_EXECUTED",
+    "created_at": "2026-08-22T02:37:35.243546+00:00",
+    "package_hash": "12acd50cf18c11e3f685c1cc9dfd8d88fc6c4b3fb7a17c963431998207471d88"
+  },
+  "second_experiment_executed": false,
+  "created_at": "2026-08-22T02:37:35.243546+00:00"
+}

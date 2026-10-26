@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "import_hits": [],
+  "write_hits": [],
+  "modules_audited": [
+    "production_research_observation.py",
+    "production_observation_records.py",
+    "production_observation_cutoff.py",
+    "production_observation_persistence.py",
+    "production_observation_narrative.py",
+    "production_observation_isolation.py"
+  ]
+}
