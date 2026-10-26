@@ -1,0 +1,21 @@
+{
+  "suites": {
+    "tests/test_edge_research_opr_phase_3j14.py": {
+      "passed": true,
+      "tail": "4 passed in 59.46s"
+    },
+    "tests/test_edge_research_opr_phase_3j13.py::test_cf_fg_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 5.02s"
+    },
+    "tests/test_edge_research_opr_phase_3j12.py::test_cf_nx_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 4.98s"
+    },
+    "tests/test_edge_research_opr_phase_3j11.py::test_cf_br_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 1.10s"
+    }
+  },
+  "all_passed": true
+}

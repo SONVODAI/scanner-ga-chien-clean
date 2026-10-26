@@ -1,0 +1,321 @@
+{
+  "execution_status": "NOT_EXECUTED",
+  "frozen_integrity": {
+    "synthesis_engine": {
+      "expected_hash": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+      "current_hash": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+      "engine_version": "evidence_synthesis_v1_3i12",
+      "passed": true
+    },
+    "dormancy_module_hash": "a6a70005511d5894ec0fbcead9ad5b4589ce3162cbe01b7c761a12026b9adfa6",
+    "dormancy_version": "research_dormancy_v1_3i19",
+    "integration_version": "lifecycle_dormancy_integration_v1_3i20",
+    "passed": true
+  },
+  "integration_content_hash": "409f55fd2490cd5f9635bc9c8e1bb946a02f37868591efa2dffd4691d07b1145",
+  "epistemic_state": "SUPPORTED",
+  "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+  "research_activity_state": "DORMANT",
+  "dormancy_hash": "a09db7b6868d11134836ecec419f8a626d1835795469d43f7c20f14b2bc15dc3",
+  "reopening_conditions_count": 8,
+  "authoritative_state": {
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "epistemic_state": "SUPPORTED",
+    "synthesis_hash": "4ead1c3af3324d0f0e0baf433ca9b3959f029d39cce5ad2154e5af2cd0e0194c",
+    "priority_action": "SEEK_FALSIFICATION",
+    "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+    "research_activity_state": "DORMANT",
+    "is_dormant": true,
+    "dormancy_hash": "a09db7b6868d11134836ecec419f8a626d1835795469d43f7c20f14b2bc15dc3",
+    "dormancy_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+    "unresolved_uncertainties": [
+      "temporal_regime_robustness",
+      "population_robustness",
+      "horizon_robustness",
+      "effect_stability",
+      "concentration_dominance",
+      "measurement_robustness",
+      "counterexample_exposure",
+      "alternative_explanation_exposure",
+      "regime_context_robustness"
+    ],
+    "reopening_conditions_count": 8,
+    "latest_reopening_outcome": null,
+    "evidence_event_count": 2
+  },
+  "pipeline": {
+    "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+    "research_activity_state": "DORMANT",
+    "epistemic_state": "SUPPORTED",
+    "dormancy": {
+      "status": "SUCCESS",
+      "idempotent_skip": false,
+      "error": null,
+      "dormancy_record": {
+        "dormancy_id": "dorm-e4d94b158ea9",
+        "record_version": "research_dormancy_v1_3i19",
+        "proposition_id": "prop-efb650d9bd5c451f",
+        "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+        "synthesis_hash": "4ead1c3af3324d0f0e0baf433ca9b3959f029d39cce5ad2154e5af2cd0e0194c",
+        "frontier_assessment_hash": "368cf3a63199f80bfea53de756e656cbe04142644c7fe592c472a9a8ec9dc5ca",
+        "epistemic_state_at_dormancy": "SUPPORTED",
+        "research_activity_state": "DORMANT",
+        "dormancy_trigger": "NO_HIGH_INFORMATION_ACTION",
+        "unresolved_uncertainties": [
+          "temporal_regime_robustness",
+          "population_robustness",
+          "horizon_robustness",
+          "effect_stability",
+          "concentration_dominance",
+          "measurement_robustness",
+          "counterexample_exposure",
+          "alternative_explanation_exposure",
+          "regime_context_robustness"
+        ],
+        "blocked_axes": [
+          "temporal_regime_robustness",
+          "population_robustness",
+          "horizon_robustness",
+          "effect_stability",
+          "regime_context_robustness"
+        ],
+        "redundant_axes": [
+          "episode_robustness"
+        ],
+        "dormancy_reason": "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes",
+        "evidence_coverage": [
+          "directional_effect_full_universe",
+          "episode_robustness"
+        ],
+        "independence_limitations": [
+          "max_cohort_overlap=0.9767",
+          "population_independence=LOW",
+          "evidence_epu-e75a6e8362a8_overlap=0.9767"
+        ],
+        "reopening_conditions": [
+          {
+            "condition_id": "rc-f28f12fe57a5",
+            "target_uncertainty": "temporal_regime_robustness",
+            "blocking_reason": "COHORT_INDEPENDENCE_DEFICIT",
+            "required_scientific_change": "MATERIAL_INDEPENDENCE_IMPROVEMENT",
+            "measurable_criterion": {
+              "max_row_overlap_ceiling": 0.5,
+              "relation_to_prior_must_not_be": "subset",
+              "requires_measured_overlap_change": true
+            },
+            "independence_requirement": "sample_independence>=MEDIUM",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY",
+              "ROW_COUNT_ONLY",
+              "CLOCK_ELAPSED"
+            ],
+            "provenance": [
+              "frontier:COHORT_UNAVAILABLE",
+              "3I.17b binder: All candidates rejected: redundant, rescue, fork, or insufficient sample"
+            ],
+            "record_hash": "a3ca57ed9faad1c237017811a2e94644bc1a3261c9fe95e1f7438ba8d243a71b"
+          },
+          {
+            "condition_id": "rc-ee08f2af11d7",
+            "target_uncertainty": "population_robustness",
+            "blocking_reason": "COHORT_INDEPENDENCE_DEFICIT",
+            "required_scientific_change": "MATERIAL_INDEPENDENCE_IMPROVEMENT",
+            "measurable_criterion": {
+              "max_row_overlap_ceiling": 0.5,
+              "relation_to_prior_must_not_be": "subset",
+              "requires_measured_overlap_change": true
+            },
+            "independence_requirement": "sample_independence>=MEDIUM",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY",
+              "ROW_COUNT_ONLY",
+              "CLOCK_ELAPSED"
+            ],
+            "provenance": [
+              "frontier:COHORT_UNAVAILABLE",
+              "3I.17b binder: All candidates rejected: redundant, rescue, fork, or insufficient sample"
+            ],
+            "record_hash": "fd01c99a2620001546a44db2b4716d8cd0c61b8329233bc7051afe6b5b3cc4c6"
+          },
+          {
+            "condition_id": "rc-08fb7b7f5e18",
+            "target_uncertainty": "horizon_robustness",
+            "blocking_reason": "COHORT_INDEPENDENCE_DEFICIT",
+            "required_scientific_change": "MATERIAL_INDEPENDENCE_IMPROVEMENT",
+            "measurable_criterion": {
+              "max_row_overlap_ceiling": 0.5,
+              "relation_to_prior_must_not_be": "subset",
+              "requires_measured_overlap_change": true
+            },
+            "independence_requirement": "sample_independence>=MEDIUM",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY",
+              "ROW_COUNT_ONLY",
+              "CLOCK_ELAPSED"
+            ],
+            "provenance": [
+              "frontier:COHORT_UNAVAILABLE",
+              "3I.17b binder: All candidates rejected: redundant, rescue, fork, or insufficient sample"
+            ],
+            "record_hash": "b470d873649c8aafb5c8973fa24d098a8ed06d611925fa9010295b11254f3caa"
+          },
+          {
+            "condition_id": "rc-eadd4efb010b",
+            "target_uncertainty": "effect_stability",
+            "blocking_reason": "COHORT_INDEPENDENCE_DEFICIT",
+            "required_scientific_change": "MATERIAL_INDEPENDENCE_IMPROVEMENT",
+            "measurable_criterion": {
+              "max_row_overlap_ceiling": 0.5,
+              "relation_to_prior_must_not_be": "subset",
+              "requires_measured_overlap_change": true
+            },
+            "independence_requirement": "sample_independence>=MEDIUM",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY",
+              "ROW_COUNT_ONLY",
+              "CLOCK_ELAPSED"
+            ],
+            "provenance": [
+              "frontier:COHORT_UNAVAILABLE",
+              "3I.17b binder: All candidates rejected: redundant, rescue, fork, or insufficient sample"
+            ],
+            "record_hash": "df135d8c6e602fe4ea47cc6a8926e18512feb97b283c89bd0d5f8044786ca72f"
+          },
+          {
+            "condition_id": "rc-773fb7244bf3",
+            "target_uncertainty": "regime_context_robustness",
+            "blocking_reason": "COHORT_INDEPENDENCE_DEFICIT",
+            "required_scientific_change": "MATERIAL_INDEPENDENCE_IMPROVEMENT",
+            "measurable_criterion": {
+              "max_row_overlap_ceiling": 0.5,
+              "relation_to_prior_must_not_be": "subset",
+              "requires_measured_overlap_change": true
+            },
+            "independence_requirement": "sample_independence>=MEDIUM",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY",
+              "ROW_COUNT_ONLY",
+              "CLOCK_ELAPSED"
+            ],
+            "provenance": [
+              "frontier:COHORT_UNAVAILABLE",
+              "3I.17b binder: All candidates rejected: redundant, rescue, fork, or insufficient sample"
+            ],
+            "record_hash": "d54151aaa03bf7cd4b3be8f4fa1b03cca66257ddfce81b4f2397093927156b08"
+          },
+          {
+            "condition_id": "rc-0bc83e99c430",
+            "target_uncertainty": "counterexample_exposure",
+            "blocking_reason": "CAPABILITY_GAP",
+            "required_scientific_change": "NEW_RELEVANT_OPERATOR",
+            "measurable_criterion": {
+              "operator_must_address_axis": "counterexample_exposure",
+              "candidate_strategy": "counterexample_period_search",
+              "must_be_non_redundant": true
+            },
+            "independence_requirement": "non_redundant_information_path",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY"
+            ],
+            "provenance": [
+              "action_blocked:counterexample_period_search",
+              "Counterexample search uses temporal cohort exclusion \u2014 blocked by 3I.17b temporal constraint"
+            ],
+            "record_hash": "5e8fe0e32f0533be5cbeae2406ea60f5542e25d10e694e1bf7fae6cd2b880b60"
+          },
+          {
+            "condition_id": "rc-f630af4a06fb",
+            "target_uncertainty": "alternative_explanation_exposure",
+            "blocking_reason": "CAPABILITY_GAP",
+            "required_scientific_change": "NEW_RELEVANT_OPERATOR",
+            "measurable_criterion": {
+              "operator_must_address_axis": "alternative_explanation_exposure",
+              "candidate_strategy": "counterexample_period_search",
+              "must_be_non_redundant": true
+            },
+            "independence_requirement": "non_redundant_information_path",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "LABEL_RENAME_ONLY"
+            ],
+            "provenance": [
+              "action_blocked:counterexample_period_search",
+              "Counterexample search uses temporal cohort exclusion \u2014 blocked by 3I.17b temporal constraint"
+            ],
+            "record_hash": "6dc81538bcecda255cf25d9fb5b15b2e2663cc8bc249bfc9b1838dc598fd8602"
+          },
+          {
+            "condition_id": "rc-d58896196428",
+            "target_uncertainty": "major_unresolved_bundle",
+            "blocking_reason": "MARGINAL_INFORMATION_GATE",
+            "required_scientific_change": "MAJOR_UNRESOLVED_ADDRESSABLE",
+            "measurable_criterion": {
+              "must_address_major_unresolved": [
+                "effect_stability",
+                "horizon_robustness",
+                "population_robustness",
+                "temporal_regime_robustness"
+              ],
+              "marginal_information_must_exceed": "low"
+            },
+            "independence_requirement": "addresses_major_vulnerability",
+            "minimum_semantic_continuity": "same_proposition_hash_and_semantics",
+            "does_not_qualify": [
+              "ROW_COUNT_ONLY",
+              "OUTCOME_PROFITABILITY"
+            ],
+            "provenance": [
+              "frontier:marginal_information_gate",
+              "Major unresolved vulnerabilities require cohort independence unavailable after 3I.17b; marginal information too low for peripheral axes"
+            ],
+            "record_hash": "66e6b59bb150c6a0be38706f45995847ddb29b24fd7e699f333d0217a8038c8e"
+          }
+        ],
+        "forbidden_reopening_triggers": [
+          "OUTCOME_PROFITABILITY",
+          "FUTURE_RETURN_MAGNITUDE",
+          "ZONE_C_MATCH",
+          "HUMAN_REVIEW_REQUEST",
+          "LABEL_RENAME_ONLY",
+          "ROW_COUNT_ONLY",
+          "CLOCK_ELAPSED",
+          "SUBGROUP_OUTCOME_MINING",
+          "KNOWN_HIDDEN_EDGE"
+        ],
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "record_hash": "a09db7b6868d11134836ecec419f8a626d1835795469d43f7c20f14b2bc15dc3"
+      }
+    }
+  },
+  "synthetic_opportunity_demos": {
+    "A_redundant_data": "REMAIN_DORMANT",
+    "B_independent_structure": "REOPEN_RESEARCH",
+    "C_relevant_capability": "REOPEN_RESEARCH",
+    "D_irrelevant_capability": "REMAIN_DORMANT",
+    "E_semantic_drift": "NEW_PROPOSITION_REQUIRED"
+  },
+  "learning_vs_answer_leakage": {
+    "passed": true,
+    "violations": [],
+    "evidence_derived_reopening": true,
+    "no_clock_reopening": true,
+    "no_outcome_triggers": true
+  },
+  "lifecycle_integration_leakage": {
+    "passed": true,
+    "violations": [],
+    "has_dormancy_hook": true,
+    "has_reopening_hook": true,
+    "no_auto_experiment_in_reopening_hook": true
+  },
+  "future_result_blindness": {
+    "experiment_executed": false,
+    "tool_result_accessed": false
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "version": "calibration_self_knowledge_v1_3k3",
+  "live_forward_observation_count": 0,
+  "ledger_entry_count": 0,
+  "eligible_forward_evidence_n": 0,
+  "maturity_label": "NO_FORWARD_EVIDENCE",
+  "t5_reached_count": 0,
+  "t5_pending_count": 0,
+  "weakened_or_challenged_count": 0,
+  "statements": [
+    "I currently have no authoritative LIVE_FORWARD forward evidence in the calibration ledger.",
+    "Only 0 observation(s) have reached T5; this is too little evidence for a reliable conclusion.",
+    "My SUPPORTED observations have not accumulated enough independent forward evidence for a reliable conclusion.",
+    "Forward evidence maturity: NO_FORWARD_EVIDENCE \u2014 measurement infrastructure ready but no LIVE_FORWARD outcomes yet."
+  ],
+  "latest_snapshot_id": null,
+  "shadow_authority": {
+    "research_only": true,
+    "trading_authority": false,
+    "edge_active": false
+  },
+  "no_profitability_claim": true,
+  "no_buy_sell": true
+}

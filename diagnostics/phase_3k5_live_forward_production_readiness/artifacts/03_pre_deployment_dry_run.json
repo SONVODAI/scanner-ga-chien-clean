@@ -1,0 +1,50 @@
+{
+  "test_kind": "PRE_DEPLOYMENT_DRY_RUN",
+  "version": "pre_deployment_dry_run_v1_3k5",
+  "label": "NON_FORWARD / PRE_DEPLOYMENT_DRY_RUN \u2014 NEVER PROMOTABLE",
+  "target_trade_date": "2026-08-18",
+  "isolated_namespace": "/workspace/data/edge_research/production_observations/pre_deployment_dry_run",
+  "run_disposition": "SUCCESS",
+  "counts_as_forward_evidence": false,
+  "calibration_updated": false,
+  "calibration_reason": "rejected_non_forward_mode:PRE_DEPLOYMENT_DRY_RUN",
+  "ui_trade_date": "2026-08-18",
+  "ui_snapshot_preview": "============================================================\nMR.BOT \u2014 H\u00d4M NAY T\u00d4I \u0110ANG NGH\u0128 G\u00cc?\nVersion: living_research_ui_v1_3k4\nAuthority: RESEARCH ONLY\nTrade date: 2026-08-18\n\n--- TODAY'S VOICE ---\nH\u00f4m nay (2026-08-18) t\u00f4i th\u1ea5y epistemic state l\u00e0 FALSIFIED. Lifecycle: BORN. Research status: ACTIVE.\n\n\u0110\u00e2y l\u00e0 assessment \u0111\u1ea7u ti\u00ean sau birth \u2014 ch\u01b0a c\u00f3 phi\u00ean tr\u01b0\u1edbc \u0111\u1ec3 so s\u00e1nh.\n\nMarket delta: breadth:UNKNOWN, transition:CHANGED, dispersion:changed, cohort_relative:changed. Breadth: UNKNOWN. Transition: CHANGED. Compatibility: UNKNOWN.\n\nQuan \u0111i\u1ec3m kh\u00f4ng thay \u0111\u1ed5i (FALSIFIED \u2192 FALSIFIED).\n\nEpistemic state remains FALSIFIED. Market context changed (breadth:UNKNOWN; transition:CHANGED; dispersion:changed; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.\n\n\u0110i\u1ec1u ch\u1ed1ng l\u1ea1i hypothesis: kh\u00f4ng c\u00f3.\n\nCh\u01b0a bi\u1ebft: kh\u00f4ng c\u00f3. Limitations: kh\u00f4ng c\u00f3.\n\nWaiting for T3 eligible on 2026-08-21\n\n--- H\u00d4M NAY vs H\u00d4M QUA ---\nPrevious session: None\nSilence/no discovery: False\nNew discovery: False\nBelief changes: 0\n  \u2022 Unchanged despite market: obs-e94ec26557fe696b \u2014 Epistemic state remains FALSIFIED. Market context changed (breadth:UNKNOWN; tran\n\n--- OBSERVATIONS \u0110ANG S\u1ed0NG (1) ---\n  \u2022 obs-e94ec265\u2026 | FALSIFIED | BORN | age=0 | NON-FORWARD\n\n--- FORWARD EVIDENCE ---\nMaturity: NO_FORWARD_EVIDENCE\nEligible N: 0\n\u26a0 M\u1eabu forward qu\u00e1 nh\u1ecf \u2014 kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 k\u1ebft lu\u1eadn.\n\u2139 Ch\u1ec9 c\u00f3 d\u1eef li\u1ec7u historical/backfill \u2014 KH\u00d4NG ph\u1ea3i forward evidence th\u1eadt.\n  \u2022 I currently have no authoritative LIVE_FORW",
+  "health": {
+    "version": "operational_health_v1_3k5",
+    "runner_started_today": true,
+    "latest_successful_research_date": "2026-08-18",
+    "latest_run_id": "pdrun-1487b6a61590da35",
+    "latest_run_mode": "PRE_DEPLOYMENT_DRY_RUN",
+    "data_ready_last_run": true,
+    "research_completed": true,
+    "birth_records_persisted": true,
+    "observations_reassessed": true,
+    "outcomes_released": false,
+    "calibration_ledger_entries": 0,
+    "calibration_snapshots": 0,
+    "summary_completed": true,
+    "manifest_available": true,
+    "ui_reading_latest": true,
+    "system_stale": false,
+    "waiting_for_data_runs": 0,
+    "failed_runs": 0,
+    "live_forward_runs": 0,
+    "genesis_exists": false,
+    "genesis_first_eligible": null,
+    "lock_active": false,
+    "lock_holder": null,
+    "fail_closed_events": 0,
+    "shadow_authority": {
+      "research_only": true,
+      "trading_authority": false,
+      "edge_active": false
+    }
+  },
+  "pipeline_stages": {
+    "data_ready": true,
+    "research": true,
+    "manifest": true,
+    "calibration": true
+  }
+}

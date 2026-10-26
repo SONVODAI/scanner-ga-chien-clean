@@ -1,0 +1,134 @@
+{
+  "test_kind": "PRODUCTION_SIMULATION_15_SESSIONS",
+  "run_mode": "HISTORICAL_REPLAY_TEST",
+  "replay_dates": [
+    "2026-07-23",
+    "2026-07-24",
+    "2026-07-26",
+    "2026-07-27",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-01",
+    "2026-08-02",
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-05",
+    "2026-08-06",
+    "2026-08-07"
+  ],
+  "num_sessions": 15,
+  "daily_runs": [
+    {
+      "trade_date": "2026-07-23",
+      "run_id": "pdrun-efd7b436020e5bf2",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-24",
+      "run_id": "pdrun-5aadbe29db7c5613",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-26",
+      "run_id": "pdrun-57f38ba7871675db",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-27",
+      "run_id": "pdrun-03c65e7b1105de14",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-28",
+      "run_id": "pdrun-a25499df33429e35",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-29",
+      "run_id": "pdrun-35bc0c30879be2e3",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-30",
+      "run_id": "pdrun-2be95f945518f1d3",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-07-31",
+      "run_id": "pdrun-d24b4c5c8c67a7b5",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-01",
+      "run_id": "pdrun-680b8e5170582cc3",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-02",
+      "run_id": "pdrun-fbf0d80d65f01ced",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-03",
+      "run_id": "pdrun-3fdafaddb1314085",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-04",
+      "run_id": "pdrun-04b4b9c9f69d3f05",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-05",
+      "run_id": "pdrun-a23d8a35bf682bb2",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-06",
+      "run_id": "pdrun-844931411dbfa035",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    },
+    {
+      "trade_date": "2026-08-07",
+      "run_id": "pdrun-90c16462e824314d",
+      "disposition": "SUCCESS",
+      "idempotent_replay": false
+    }
+  ],
+  "crash_recovery_tests": [
+    {
+      "phase": "BIRTHS_PERSISTED",
+      "crashed": true,
+      "resumed": true
+    },
+    {
+      "phase": "OUTCOMES_RELEASED",
+      "crashed": true,
+      "resumed": true
+    },
+    {
+      "phase": "SUMMARY_COMPLETED",
+      "crashed": true,
+      "resumed": true
+    }
+  ],
+  "duplicate_invocation_idempotent": true,
+  "counts_as_forward_evidence": false,
+  "stop_boundary": "STOP_PRODUCTION_DAILY_OBSERVATION_RUNNER_READY"
+}

@@ -1,0 +1,27 @@
+{
+  "head": "a40049752a6eba886764bb13962c9eed74709690",
+  "phase": "3K.5A",
+  "stop_boundary": "STOP_PRODUCTION_PREREQUISITES_CLOSED",
+  "cf_pr_pass": true,
+  "go_no_go": {
+    "EOD authoritative completion": "PASS",
+    "Vietnam trading calendar": "PASS",
+    "Timezone semantics": "PASS",
+    "Scheduler artifacts": "PASS",
+    "Single-writer safety": "PASS",
+    "Persistence": "PASS",
+    "Backup": "PASS_WITH_OPERATOR_ACTION",
+    "Restore verification": "PASS_WITH_OPERATOR_ACTION",
+    "Operational health": "PASS",
+    "DAY_0_SMOKE": "PASS",
+    "Temporal integrity": "PASS",
+    "Trading isolation": "PASS"
+  },
+  "recommendation": "READY_FOR_DEPLOYMENT_DAY_0",
+  "any_fail": false,
+  "regressions_pass": true,
+  "live_forward_activated": false,
+  "genesis_exists": false,
+  "scheduler_activated": false,
+  "phase_pass": true
+}

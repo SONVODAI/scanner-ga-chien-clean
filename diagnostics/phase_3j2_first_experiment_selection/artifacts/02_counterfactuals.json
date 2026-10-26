@@ -1,0 +1,37 @@
+{
+  "CF-FE1": {
+    "passed": true,
+    "description": "Remove motivating evidence \u2192 rationale changes"
+  },
+  "CF-FE2": {
+    "passed": true,
+    "description": "Increase birth overlap \u2192 independence falls",
+    "overlap_small_panel": 1.0,
+    "overlap_large_panel": 0.3333333333333333
+  },
+  "CF-FE3": {
+    "passed": true,
+    "description": "Resolve central uncertainty \u2192 experiment disappears"
+  },
+  "CF-FE4": {
+    "passed": true,
+    "description": "Rename/reorder tools \u2192 scientific winner unchanged"
+  },
+  "CF-FE5": {
+    "passed": true,
+    "description": "Representation change only \u2192 identity unchanged"
+  },
+  "CF-FE6": {
+    "passed": true,
+    "description": "Redundant cohort \u2192 alternate or silence"
+  },
+  "CF-FE7": {
+    "passed": true,
+    "description": "Best candidate non-executable \u2192 no silent inferior substitution"
+  },
+  "CF-FE8": {
+    "passed": true,
+    "description": "Rescue mutation \u2192 reject"
+  },
+  "all_passed": true
+}

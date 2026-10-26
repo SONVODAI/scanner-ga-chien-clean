@@ -1,0 +1,104 @@
+{
+  "artifact_id": "04_template_independence_evaluator",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY_FROZEN_EVALUATOR",
+  "purpose": "Semantic isomorphism audit against the 24-template catalog and GAP/action families. NOT for generator optimization.",
+  "reference_catalogs": {
+    "template_families": "modules/edge_research/research_actions.py::generate_action_candidates (24 families)",
+    "gap_codes": "modules/edge_research/research_interpreter.py::GAP_* set",
+    "obs_codes": "modules/edge_research/research_interpreter.py::OBS_* set",
+    "proposition_core_patterns": "modules/edge_research/research_proposition_core.py"
+  },
+  "classifications": {
+    "TEMPLATE_INSTANCE": {
+      "definition": "Direct parameterization of an existing template family with same scientific uncertainty, population axis, outcome, and relation type.",
+      "counts_toward_autonomous_creativity": false,
+      "examples": [
+        "T8 dispersion template with different horizon only",
+        "GAP_STABILITY candidate with standard stability question text"
+      ]
+    },
+    "TEMPLATE_REFRAME": {
+      "definition": "Same underlying scientific uncertainty under another frame, population label, or outcome representation without new observational axis.",
+      "counts_toward_autonomous_creativity": false,
+      "examples": [
+        "Same dispersion question with pop=high_vol renamed to pop=elevated_realized_vol",
+        "Outcome switched from return_5d to return_10d without new motivating observation"
+      ]
+    },
+    "TEMPLATE_ADJACENT": {
+      "definition": "Meaningfully related to encoded catalog but extends beyond the implicit scientific question — new contrast, interaction, or conditional structure motivated by observation.",
+      "counts_toward_autonomous_creativity": true,
+      "report_separately_from": "SCIENTIFICALLY_NOVEL",
+      "examples": [
+        "Observation of joint tail concentration motivates conditional dispersion within liquidity tier — not in base T8 text",
+        "Temporal regime shift in spread-residual correlation — adjacent to stability family but new axis"
+      ]
+    },
+    "SCIENTIFICALLY_NOVEL": {
+      "definition": "Scientific uncertainty not implicitly specified by existing template catalog or GAP semantics.",
+      "counts_toward_autonomous_creativity": true,
+      "examples": [
+        "Cross-sectional interaction between two empirical residuals not mapped to any GAP family",
+        "Observation-driven question about transition asymmetry between market states with no template family"
+      ]
+    },
+    "INSUFFICIENT_EVIDENCE": {
+      "definition": "Cannot establish observational grounding or answer birth certificate from recorded evidence.",
+      "counts_toward_autonomous_creativity": false,
+      "action": "REJECT from autonomous set; may log for diagnostics"
+    }
+  },
+  "evaluation_pipeline": {
+    "step_1": "Normalize proposition to canonical_proposition_core + population + outcome + horizon + relation",
+    "step_2": "Embed proposition and each template family core question (offline, frozen embeddings v1)",
+    "step_3": "Compute semantic similarity matrix + structural feature match (GAP family, action type, tool path)",
+    "step_4": "Apply decision tree (frozen thresholds, see below)",
+    "step_5": "Human adjudication sample 10% for calibration — never fed back to generator during BB-Prop-01"
+  },
+  "decision_tree_frozen_v1": {
+    "note": "Thresholds chosen from template catalog structure analysis, NOT from BB-Prop-01 outcomes",
+    "rules": [
+      {
+        "if": "structural_match_score >= 0.95 AND semantic_similarity >= 0.92 AND no new_observational_axis_documented",
+        "then": "TEMPLATE_INSTANCE"
+      },
+      {
+        "if": "structural_match_score >= 0.85 AND semantic_similarity >= 0.85 AND same_gap_family AND new_observational_axis_documented == false",
+        "then": "TEMPLATE_REFRAME"
+      },
+      {
+        "if": "same_gap_family OR semantic_similarity >= 0.70 AND new_observational_axis_documented == true",
+        "then": "TEMPLATE_ADJACENT"
+      },
+      {
+        "if": "semantic_similarity < 0.70 AND no_gap_family_match AND birth_certificate_complete",
+        "then": "SCIENTIFICALLY_NOVEL"
+      },
+      {
+        "if": "birth_certificate incomplete OR observation_provenance fails minimum payload",
+        "then": "INSUFFICIENT_EVIDENCE"
+      }
+    ],
+    "new_observational_axis_documented": "birth_certificate BC_Q2 cites empirical statistic not reducible to template default motivation"
+  },
+  "autonomous_evidence_rule": {
+    "eligible_classes": [
+      "TEMPLATE_ADJACENT",
+      "SCIENTIFICALLY_NOVEL"
+    ],
+    "ineligible_classes": [
+      "TEMPLATE_INSTANCE",
+      "TEMPLATE_REFRAME",
+      "INSUFFICIENT_EVIDENCE"
+    ]
+  },
+  "anti_optimization": {
+    "generator_must_not": [
+      "Read evaluator thresholds during candidate generation",
+      "Tune phrasing to land just below semantic_similarity cutoff",
+      "Use evaluator feedback loops during development except abstract capability buckets"
+    ],
+    "evaluator_runs": "Once per frozen commit for blind benchmark; development set uses separate non-blind diagnostics only"
+  }
+}
