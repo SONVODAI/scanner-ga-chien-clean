@@ -1,0 +1,121 @@
+{
+  "artifact_id": "06_executability_boundary",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "principle": "Execution constraints make a scientific proposition testable; they must NOT prescribe which scientific proposition should be generated.",
+  "allowed_execution_constraints": {
+    "purpose": "Bound the hypothesis space to falsifiable, runnable experiments",
+    "includes": [
+      {
+        "category": "AVAILABLE_COLUMNS_FEATURES",
+        "examples": [
+          "realized_vol",
+          "spread",
+          "return_*",
+          "volume",
+          "sector"
+        ],
+        "use": "Define what measurements exist — not which relationships are scientifically interesting"
+      },
+      {
+        "category": "LEGAL_POPULATION_EXPRESSIONS",
+        "source": "ExperimentSpec grammar + research grammar",
+        "use": "Ensure population is parseable and executable"
+      },
+      {
+        "category": "LEGAL_OUTCOME_EXPRESSIONS",
+        "use": "Ensure outcome is measurable on panel"
+      },
+      {
+        "category": "AVAILABLE_HORIZONS",
+        "examples": [
+          "1d",
+          "5d",
+          "10d",
+          "20d"
+        ],
+        "use": "Horizon must be selectable for test — not pre-selected to match hidden edge"
+      },
+      {
+        "category": "TOOL_CAPABILITIES",
+        "source": "research_tools.py registry",
+        "use": "Map proposition to runnable tool path"
+      },
+      {
+        "category": "EXPERIMENTSPEC_SCHEMA",
+        "use": "Validate executability_status before queueing"
+      },
+      {
+        "category": "BUDGET_LIMITS",
+        "source": "07_generation_budget_policy.json",
+        "use": "Cap candidate volume — not content"
+      }
+    ]
+  },
+  "forbidden_as_generative_priors": {
+    "purpose": "These tell the generator WHAT should be interesting — excluded from OPR synthesis inputs",
+    "includes": [
+      {
+        "category": "GAP_* SEMANTICS",
+        "reason": "Human scientific prior encoding which uncertainty types matter"
+      },
+      {
+        "category": "OBS_* LABEL MEANINGS",
+        "reason": "Developer ontology, not independent observation"
+      },
+      {
+        "category": "TEMPLATE CATALOG QUESTION TEXT",
+        "reason": "Human-seeded hypothesis space"
+      },
+      {
+        "category": "PLANNER SCORING WEIGHTS",
+        "reason": "Encodes preferred research directions"
+      },
+      {
+        "category": "NOVELTY BONUS RULES",
+        "reason": "Optimizes for template-distance, not observational surprise"
+      },
+      {
+        "category": "HIDDEN BENCHMARK PHENOMENA",
+        "reason": "Contamination"
+      },
+      {
+        "category": "ROOT_CONFIG / BB07 SEED QUESTIONS",
+        "reason": "Human bootstrap prior"
+      },
+      {
+        "category": "PREFERRED POPULATIONS/HORIZONS FROM PRIOR BB RUNS",
+        "reason": "Leakage from evaluation"
+      }
+    ]
+  },
+  "boundary_tests": {
+    "TEST_EXEC_01": {
+      "scenario": "Generator receives only execution metadata, no raw evidence",
+      "expected": "Zero autonomous propositions OR all INSUFFICIENT_EVIDENCE"
+    },
+    "TEST_EXEC_02": {
+      "scenario": "Same raw evidence + full GAP catalog vs raw evidence + execution metadata only",
+      "expected": "GAP-enriched run must NOT show higher SCIENTIFICALLY_NOVEL rate unless raw-grounded; any excess likely TEMPLATE_INSTANCE"
+    },
+    "TEST_EXEC_03": {
+      "scenario": "Strong anomaly with no legal population/outcome expression",
+      "expected": "Proposition may be drafted but executability_status=NOT_EXECUTABLE; must not force illegal ExperimentSpec"
+    },
+    "TEST_EXEC_04": {
+      "scenario": "Execution validator rejects proposition",
+      "expected": "Record retained with executability_status=REJECTED; does not count toward useful survivors"
+    }
+  },
+  "executability_status_enum": [
+    "EXECUTABLE",
+    "NOT_EXECUTABLE",
+    "REJECTED_BY_GRAMMAR",
+    "PENDING_VALIDATION"
+  ],
+  "separation_rule": {
+    "scientific_synthesis_module": "Uses raw evidence + surprise only",
+    "executability_adapter_module": "Maps accepted proposition to legal ExperimentSpec using execution constraints",
+    "order": "Synthesis first, executability second — never filter observations to match template tool paths before synthesis"
+  }
+}
