@@ -1,0 +1,10 @@
+{
+  "propositions_emitted": 0,
+  "silence_rate": 1.0,
+  "grounding_rate": 0.0,
+  "falsifiability_rate": 0.0,
+  "executability_rate": 0.0,
+  "eligible_observations": 7,
+  "zone": "B",
+  "hidden_convergence_class": "INDETERMINATE"
+}

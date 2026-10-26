@@ -1,0 +1,59 @@
+{
+  "phase": "3I.5",
+  "prioritizer_version": "opr_prioritizer_v1_3i5",
+  "generator_version_frozen": "opr_generator_v1_3i2",
+  "ranking_mechanism": "LEXICOGRAPHIC",
+  "rank_key_order": [
+    "contradiction_presence",
+    "independent_repeated_evidence",
+    "surprise_magnitude_max_quintile_spread",
+    "contrast_magnitude_max_abs_empirical_delta",
+    "historical_rarity_max_abs_zscore"
+  ],
+  "selected_signals": [
+    "evidence_quality_gate",
+    "surprise_gate",
+    "executability_gate",
+    "contradiction_presence",
+    "independent_repeated_evidence",
+    "surprise_magnitude",
+    "contrast_magnitude",
+    "historical_rarity"
+  ],
+  "rejected_signals": [
+    "chronological_order",
+    "hidden_phenomenon_similarity",
+    "known_edge_similarity",
+    "profitability_labels",
+    "template_ids",
+    "hard_coded_preferred_feature"
+  ],
+  "gates": [
+    "evidence_quality_gate",
+    "surprise_gate",
+    "executability_gate"
+  ],
+  "budget_semantics": {
+    "max_unique_propositions": 3,
+    "budget_unit": "unique_scientific_proposition",
+    "observation_processing": "all_eligible_dates"
+  },
+  "forbidden_signals": [
+    "hidden_phenomenon_similarity",
+    "chronological_order",
+    "profitability"
+  ],
+  "evaluation_metrics": [
+    "unique_scientific_propositions_emitted",
+    "duplicate_evidence_compression",
+    "representative_evidence_quality",
+    "research_worthiness_rate",
+    "scientific_diversity",
+    "grounding",
+    "falsifiability",
+    "executability",
+    "silence_behavior",
+    "budget_efficiency"
+  ],
+  "hidden_convergence_axis": "POST_HOC_ONLY"
+}
