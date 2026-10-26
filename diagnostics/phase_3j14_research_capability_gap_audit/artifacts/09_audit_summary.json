@@ -1,0 +1,15 @@
+{
+  "head": "a4b223b8706dcf77601aa3b74d794daeb02792cd",
+  "branch": "cursor/phase-3j14-research-capability-gap-audit-aad2",
+  "phase": "3J.14",
+  "stop_boundary": "STOP_RESEARCH_CAPABILITY_GAP_AUDITED",
+  "cf_cg_pass": true,
+  "avg_process_integrity_baseline": 1.0,
+  "avg_process_integrity_longer_budget": 0.917,
+  "process_integrity_changed_cases": 2,
+  "critical_false_positives": 0,
+  "silence_audit_count": 5,
+  "hidden_answer_audit_pass": true,
+  "regressions_pass": true,
+  "phase_pass": true
+}

@@ -1,0 +1,99 @@
+{
+  "phase": "3H.5",
+  "title": "Competence-to-Action Bottleneck Diagnosis",
+  "created_at": "2026-08-21T15:21:40Z",
+  "bb09_session": "bb09-autonomous-001",
+  "frozen_research_commit": "0df4597b2",
+  "bb09_benchmark_commit": "15912659c",
+  "dataset_fingerprint": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "modification_policy": "DIAGNOSIS_ONLY",
+  "artifact_index": [
+    "00_diagnosis_manifest.json",
+    "01_bb09_source_integrity.json",
+    "02_decision_pipeline_reconstruction.json",
+    "03_research_need_first_loss.json",
+    "04_decision_funnel.json",
+    "05_candidate_set_competence_impact.json",
+    "06_planner_valuation_diagnosis.json",
+    "07_global_allocator_diagnosis.json",
+    "08_branch_depth_diagnosis.json",
+    "09_late_session_cycling_diagnosis.json",
+    "10_falsification_gap_diagnosis.json",
+    "11_frontier_debt_diagnosis.json",
+    "12_counterfactual_replay.json",
+    "13_bottleneck_taxonomy_summary.json",
+    "14_root_cause_report.json",
+    "15_diagnosis_freeze_manifest.json"
+  ],
+  "completed_at": "2026-08-21T15:21:40Z",
+  "quantitative_summary": {
+    "total_research_needs_inferred": 76,
+    "needs_by_type": {
+      "REPLICATE": 10,
+      "SEEK_FALSIFICATION": 10,
+      "CONDITION_ON_CONTEXT": 10,
+      "DECOMPOSE_HETEROGENEITY": 20,
+      "COMPARE_OUTCOMES": 5,
+      "EXPLORE_STRUCTURE": 10,
+      "REDIRECT_OR_ABANDON": 1,
+      "TEST_ROBUSTNESS": 5,
+      "REFINE_BOUNDARY": 3,
+      "REVISIT_UNRESOLVED_BRANCH": 2
+    },
+    "needs_matched_legal_capability": 73,
+    "needs_constructible": 63,
+    "needs_not_constructible": 13,
+    "generated_candidates": 150,
+    "filtered_candidates": 0,
+    "valued_candidates": 166,
+    "competence_candidate_overlap_pct": 90.45,
+    "competence_added_candidates": 0,
+    "competence_removed_candidates": 0,
+    "winner_changed_by_competence": 0,
+    "falsification_needs_events": 10,
+    "falsification_executed": 1,
+    "falsification_generated_but_lost": 1,
+    "repeated_tool_experiments": 8,
+    "justified_depth": 4,
+    "unjustified_persistence": 4,
+    "negative_local_positive_global": 0,
+    "frontier_unresolved_high_value": 38,
+    "first_loss_by_layer": {
+      "B7": 46,
+      "B14": 4,
+      "B5": 13
+    }
+  },
+  "root_cause_verdict": {
+    "diagnosis_confidence": "HIGH",
+    "primary_bottleneck": "B7 \u2014 PLANNER VALUATION",
+    "evidence_chain": [
+      "BB09 competence correctly inferred research needs in 11/11 transitions (0 B2 failures).",
+      "Grammar generated candidates for decomposition/falsification/context needs (minimal B5).",
+      "Competence did not add/remove/filter candidates (0% behavioral effect).",
+      "Competence-relevant candidates scored below selected winner in 4/8 scored decisions.",
+      "Non-relevant candidate selected despite relevant alternatives in 4 decisions.",
+      "search_complexity_penalty (~-6.7) systematically depressed decomposition candidates.",
+      "Late-session partition/threshold cycling continued on negative planner scores when all alternatives scored worse.",
+      "Global allocator showed 0 cases of ignoring clearly superior global alternatives."
+    ],
+    "secondary_bottleneck": "B10 \u2014 BRANCH-DEPTH / SATURATION",
+    "what_NOT_to_change": [
+      "Competence inference mappings (accurately mirror assessment)",
+      "Operational Awareness (legal capability set correctly applied pre-audit)",
+      "Global Allocator (no systematic superior-alternative ignore)",
+      "Exposure governance (zero violations in BB09)",
+      "Experiment identity / deduplication"
+    ],
+    "recommended_next_phase": "Phase 3H.6 \u2014 Valuation bridge: connect competence-identified research needs to planner/ERV inputs WITHOUT changing BB09 weights blindly. Target B7/B8 so scientifically-relevant candidates compete on evidence merit rather than being dominated by search_complexity_penalty on decomposition tools.",
+    "answers": {
+      "Q1_bot_understands_research_needs": "YES",
+      "Q2_translate_need_to_experiment": "YES",
+      "Q3_valuation_selects_appropriately": "PARTIAL",
+      "Q4_why_3h4_no_bb09_improvement": "Phase 3H.4 competence is audit-only post candidate-generation. Grammar already emits candidates from the same information_gaps. Planner/ERV/global allocator unchanged \u2192 identical aggregate tool distribution vs BB08.",
+      "Q5_primary_bottleneck": "B7",
+      "Q6_secondary_bottleneck": "B10",
+      "Q7_next_phase_target": "Planner/ERV valuation bridge for competence-matched candidates (not competence inference, not grammar expansion)"
+    }
+  }
+}

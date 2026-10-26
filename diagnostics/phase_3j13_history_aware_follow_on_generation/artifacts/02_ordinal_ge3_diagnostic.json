@@ -1,0 +1,345 @@
+{
+  "passed": true,
+  "frozen_decision_ordinal_2": {
+    "decision_envelope_id": "iefd2-c8880166c732",
+    "record_version": "second_experiment_research_decision_envelope_v1_3j9",
+    "decision_ordinal": 2,
+    "interpretation_id": "iefi2-aa827283ff01",
+    "interpretation_identity_hash": "fc3876bf83af2aeca139a568eceb5399617ef2ae11d39b5a0f18b09285cf96f3",
+    "epistemic_update_id": "epu-04c486f48783",
+    "epistemic_update_hash": "9bf8c4e9ec628629072405a68720d5582cb1abb061c2ee2be7941f690916e5f4",
+    "first_decision_envelope_id": "iefd-6e6850b893ff",
+    "first_decision_hash": "2ace0915ca18d6eb4911445fc11139701f1dd37303d496e217672dd1d3253049",
+    "first_interpretation_id": "iefi-0b0c57c29d90",
+    "proposition_id": "prop-6c642dbbd601d942",
+    "proposition_hash": "07969f34646696d3bc86c0d53b02c495af2ed1b77e1ba92a0cc9b61a57da1c0f",
+    "session_id": "opr-prod-prop-6c642dbbd601d942-sess-201",
+    "cumulative_research_state_identity": "d9240d4d74708c1efe99e3c36e335ce8819a98dae02d22898d1cb629b3fa3013",
+    "research_decision": {
+      "decision_id": "dec-687623bae946",
+      "proposition_id": "prop-6c642dbbd601d942",
+      "epistemic_update_id": "epu-04c486f48783",
+      "prior_epistemic_state": "INSUFFICIENT_EVIDENCE",
+      "resulting_epistemic_state": "INSUFFICIENT_EVIDENCE",
+      "evidence_considered": [
+        {
+          "experiment_ref": "sefx-10787ece16ec",
+          "evidence_class": "NON_INFORMATIVE",
+          "metrics_used": {
+            "quintile_means": [
+              -0.09694709406515152,
+              -0.008190996211673433,
+              0.03967124410342235,
+              -0.03207390836630178,
+              0.36338310923628836
+            ],
+            "low_quintile_mean": -0.09694709406515152,
+            "high_quintile_mean": 0.36338310923628836,
+            "quintile_mean_spread": 0.46033020330143987,
+            "low_high_delta": 0.46033020330143987,
+            "outcome_spread": 100.0,
+            "tool_status": "OK",
+            "sample_size": 1200,
+            "contrast_direction": "positive"
+          },
+          "condition_matched": "quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0"
+        }
+      ],
+      "unresolved_uncertainty": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+      "candidate_next_actions": [
+        {
+          "action_code": "SEEK_FALSIFICATION",
+          "scientific_justification": "Falsification-first"
+        },
+        {
+          "action_code": "SEEK_REPLICATION",
+          "scientific_justification": "Replication"
+        },
+        {
+          "action_code": "HOLD_UNRESOLVED",
+          "scientific_justification": "Hold"
+        },
+        {
+          "action_code": "ABANDON",
+          "scientific_justification": "Abandon"
+        }
+      ],
+      "chosen_next_action": "SEEK_FALSIFICATION",
+      "reason": "Non-informative experiment (quintile_mean_spread < 0.5 AND NOT direction_violation AND outcome_spread > 0.0): hold unresolved. Selected TEST_NEXT_NULL targeting episode_robustness (null=episode_artifact); expected information=HIGH; incremental strength=WEAK.",
+      "rejected_alternatives": [
+        {
+          "action_code": "SEEK_FALSIFICATION",
+          "action_family": "TEST_NEXT_NULL",
+          "scientific_justification": "Test whether directional commitment holds on independent cohort",
+          "rejection_reasons": [
+            "null_already_addressed_by_second_experiment"
+          ]
+        },
+        {
+          "action_code": "SEEK_REPLICATION",
+          "action_family": "SEEK_REPLICATION",
+          "scientific_justification": "Independent replication of partition contrast on new cohort",
+          "rejection_reasons": [
+            "independent_replication_not_earned",
+            "high_overlap_blocks_independent_replication",
+            "dependent_support_history_not_replication"
+          ]
+        },
+        {
+          "action_code": "SEEK_FALSIFICATION",
+          "action_family": "CONTINUE_FALSIFICATION",
+          "scientific_justification": "Continue falsification per frozen contract mapping",
+          "rejection_reasons": []
+        },
+        {
+          "action_code": "HOLD_UNRESOLVED",
+          "action_family": "STOP_LOW_INCREMENTAL",
+          "scientific_justification": "Latest experiment added weak incremental evidence \u2014 further search not justified",
+          "rejection_reasons": []
+        },
+        {
+          "action_code": "HOLD_UNRESOLVED",
+          "action_family": "STOP_NO_MATERIAL_NULL",
+          "scientific_justification": "No material STILL_PLAUSIBLE null remains after cumulative testing",
+          "rejection_reasons": [
+            "still_plausible_nulls_remain"
+          ]
+        },
+        {
+          "action_code": "HOLD_UNRESOLVED",
+          "action_family": "STOP_NO_INFORMATIVE_ACTION",
+          "scientific_justification": "No admissible informative next action",
+          "rejection_reasons": []
+        }
+      ],
+      "created_at": "2026-08-22T07:52:19.906759+00:00",
+      "lifecycle_version": "opr_lifecycle_v1_3i7",
+      "record_hash": "19c8a2b13168aaacd2d2f339b1c42584f2b194af591960794bc99c4bc284f530"
+    },
+    "decision_kind": "ACTION",
+    "stop_reason": null,
+    "cumulative_null_ledger": [
+      {
+        "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+        "null_key": "directional_reversal",
+        "state_before": "STILL_PLAUSIBLE",
+        "state_after": "STILL_PLAUSIBLE",
+        "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+      },
+      {
+        "null_explanation_text": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-01-30.",
+        "null_key": "episode_artifact",
+        "state_before": "STILL_PLAUSIBLE",
+        "state_after": "STILL_PLAUSIBLE",
+        "rationale": "Non-informative under frozen contract \u2014 null remains plausible"
+      }
+    ],
+    "surviving_nulls": [
+      "directional_reversal",
+      "episode_artifact"
+    ],
+    "candidate_evaluations": [
+      {
+        "action_family": "TEST_NEXT_NULL",
+        "mapped_action_code": "SEEK_FALSIFICATION",
+        "scientific_objective": "Test whether directional commitment holds on independent cohort",
+        "target_uncertainty": "directional_effect_full_universe",
+        "target_null_key": "directional_reversal",
+        "expected_information_contribution": "HIGH",
+        "independence_requirement": "HIGH",
+        "admissible": false,
+        "rejection_reasons": [
+          "null_already_addressed_by_second_experiment"
+        ],
+        "redundancy_score": 0.92,
+        "information_gain_rank": 0
+      },
+      {
+        "action_family": "TEST_NEXT_NULL",
+        "mapped_action_code": "SEEK_FALSIFICATION",
+        "scientific_objective": "Test whether effect survives independent of motivating episode",
+        "target_uncertainty": "episode_robustness",
+        "target_null_key": "episode_artifact",
+        "expected_information_contribution": "HIGH",
+        "independence_requirement": "HIGH",
+        "admissible": true,
+        "rejection_reasons": [],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 0
+      },
+      {
+        "action_family": "TEST_NEXT_NULL",
+        "mapped_action_code": "SEEK_FALSIFICATION",
+        "scientific_objective": "Test whether effect generalizes beyond concentrated subpopulation",
+        "target_uncertainty": "population_generalization",
+        "target_null_key": "population_concentration",
+        "expected_information_contribution": "MODERATE",
+        "independence_requirement": "MEDIUM",
+        "admissible": true,
+        "rejection_reasons": [],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 2
+      },
+      {
+        "action_family": "TEST_NEXT_NULL",
+        "mapped_action_code": "SEEK_FALSIFICATION",
+        "scientific_objective": "Test whether effect is stable across market contexts",
+        "target_uncertainty": "context_stability",
+        "target_null_key": "context_instability",
+        "expected_information_contribution": "MODERATE",
+        "independence_requirement": "MEDIUM",
+        "admissible": true,
+        "rejection_reasons": [],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 2
+      },
+      {
+        "action_family": "SEEK_REPLICATION",
+        "mapped_action_code": "SEEK_REPLICATION",
+        "scientific_objective": "Independent replication of partition contrast on new cohort",
+        "target_uncertainty": "directional_effect_full_universe",
+        "target_null_key": null,
+        "expected_information_contribution": "LOW",
+        "independence_requirement": "HIGH",
+        "admissible": false,
+        "rejection_reasons": [
+          "independent_replication_not_earned",
+          "high_overlap_blocks_independent_replication",
+          "dependent_support_history_not_replication"
+        ],
+        "redundancy_score": 0.9666666666666667,
+        "information_gain_rank": 5
+      },
+      {
+        "action_family": "CONTINUE_FALSIFICATION",
+        "mapped_action_code": "SEEK_FALSIFICATION",
+        "scientific_objective": "Continue falsification per frozen contract mapping",
+        "target_uncertainty": "directional_effect_full_universe",
+        "target_null_key": null,
+        "expected_information_contribution": "MODERATE",
+        "independence_requirement": "MEDIUM",
+        "admissible": true,
+        "rejection_reasons": [],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 4
+      },
+      {
+        "action_family": "STOP_LOW_INCREMENTAL",
+        "mapped_action_code": "HOLD_UNRESOLVED",
+        "scientific_objective": "Latest experiment added weak incremental evidence \u2014 further search not justified",
+        "target_uncertainty": "none",
+        "target_null_key": null,
+        "expected_information_contribution": "NONE",
+        "independence_requirement": "NONE",
+        "admissible": true,
+        "rejection_reasons": [],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 0
+      },
+      {
+        "action_family": "STOP_NO_MATERIAL_NULL",
+        "mapped_action_code": "HOLD_UNRESOLVED",
+        "scientific_objective": "No material STILL_PLAUSIBLE null remains after cumulative testing",
+        "target_uncertainty": "none",
+        "target_null_key": null,
+        "expected_information_contribution": "NONE",
+        "independence_requirement": "NONE",
+        "admissible": false,
+        "rejection_reasons": [
+          "still_plausible_nulls_remain"
+        ],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 1
+      },
+      {
+        "action_family": "STOP_NO_INFORMATIVE_ACTION",
+        "mapped_action_code": "HOLD_UNRESOLVED",
+        "scientific_objective": "No admissible informative next action",
+        "target_uncertainty": "none",
+        "target_null_key": null,
+        "expected_information_contribution": "NONE",
+        "independence_requirement": "NONE",
+        "admissible": true,
+        "rejection_reasons": [],
+        "redundancy_score": 0.0,
+        "information_gain_rank": 99
+      }
+    ],
+    "search_accounting": {
+      "experiments_attempted": 2,
+      "search_complexity_score": 8.5,
+      "search_cardinality": 2,
+      "evidence_burden_assessment": "HIGH",
+      "budget_exhausted": false
+    },
+    "dependence_summary": {
+      "row_overlap_fraction": 0.9666666666666667,
+      "null_target_overlap": 0.0,
+      "scientific_question_overlap": 0.0,
+      "sample_dependence_level": "HIGH",
+      "question_novelty": "HIGH",
+      "evidence_relationship": "NON_INFORMATIVE",
+      "counted_as_independent_replication": false,
+      "independence_rationale": [
+        "cohort_overlap_ratio=0.967"
+      ]
+    },
+    "incremental_evidence_summary": {
+      "raw_evidence_strength": "WEAK",
+      "incremental_strength": "WEAK",
+      "incremental_direction": "NEUTRAL",
+      "double_counting_blocked": false,
+      "conflict_detected": false,
+      "conflict_description": "",
+      "rationale": [
+        "cohort_overlap_ratio=0.967",
+        "new_null_high_sample_reuse:not_independent_replication"
+      ]
+    },
+    "confirmation_bias_guard_applied": false,
+    "mechanical_sequencing_blocked": false,
+    "third_experiment_generated": false,
+    "third_experiment_executed": false,
+    "decider_version": "second_experiment_research_decider_v1_3j9",
+    "created_at": "2026-08-22T07:52:19.906796+00:00",
+    "envelope_hash": "1c249b8c12b07911aa4d837963d6fe5a8febf8e16432565a1374bd0e0bf87d55"
+  },
+  "ord3_package": {
+    "disposition": "NO_FAITHFUL_EXPERIMENT",
+    "generator_version": "follow_on_experiment_generator_v1_3j13",
+    "selector_version": "follow_on_experiment_selector_lex_v1_3j13",
+    "experiment_ordinal": 3,
+    "selected_candidate_id": null,
+    "candidate_count": 2,
+    "rejected_count": 2
+  },
+  "experiments_completed": 2,
+  "termination_reason": "experiment_3_execution_failed",
+  "outcome": "FAILED_CLOSED",
+  "journey": [
+    {
+      "ordinal": 1,
+      "has_package": true,
+      "has_execution": true,
+      "has_decision": true,
+      "experiment_ordinal": null,
+      "disposition": "SELECTED"
+    },
+    {
+      "ordinal": 2,
+      "has_package": true,
+      "has_execution": true,
+      "has_decision": true,
+      "experiment_ordinal": 2,
+      "disposition": "SELECTED"
+    },
+    {
+      "ordinal": 3,
+      "has_package": true,
+      "has_execution": false,
+      "has_decision": false,
+      "experiment_ordinal": 3,
+      "disposition": "NO_FAITHFUL_EXPERIMENT"
+    }
+  ]
+}

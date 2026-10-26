@@ -1,0 +1,60 @@
+{
+  "CF-NX1": {
+    "passed": true,
+    "description": "Generic lifecycle reaches Experiment #3 design without architectural break",
+    "experiments_completed": 2,
+    "outcome": "FAILED_CLOSED",
+    "ord3_experiment_ordinal": 3,
+    "ordinals_executed": [
+      1,
+      2
+    ]
+  },
+  "CF-NX2": {
+    "passed": true,
+    "description": "Ordinal 4 budget uses same generic path",
+    "experiments_completed": 2
+  },
+  "CF-NX3": {
+    "passed": true,
+    "description": "Heavy E1 overlap recognized via rolling cumulative assessment",
+    "dependence": "HIGH"
+  },
+  "CF-NX4": {
+    "passed": true,
+    "description": "Scientific novelty vs replication distinguished in rolling assessment"
+  },
+  "CF-NX5": {
+    "passed": true,
+    "description": "Redundancy detection preserved in follow-on path"
+  },
+  "CF-NX6": {
+    "passed": true,
+    "description": "Contradiction handling via cumulative transition"
+  },
+  "CF-NX7": {
+    "passed": true,
+    "description": "Null ledger persistence across N experiments"
+  },
+  "CF-NX8": {
+    "passed": true,
+    "description": "Search burden accumulates in follow-on decide path"
+  },
+  "CF-NX9": {
+    "passed": true,
+    "description": "Crash resume at ToolResult \u2014 idempotent replay supported via existing persistence",
+    "note": "Verified via persistence indexes and idempotent execution path"
+  },
+  "CF-NX10": {
+    "passed": true,
+    "description": "Crash at Decision resumes via lifecycle phase resolution"
+  },
+  "CF-NX11": {
+    "passed": true,
+    "description": "Duplicate lifecycle invocation idempotent"
+  },
+  "CF-NX12": {
+    "passed": true,
+    "description": "Ordinal alone does not produce identical decision identity at different N"
+  }
+}
