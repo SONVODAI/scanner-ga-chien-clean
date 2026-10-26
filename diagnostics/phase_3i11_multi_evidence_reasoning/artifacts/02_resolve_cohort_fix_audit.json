@@ -1,0 +1,35 @@
+{
+  "change_summary": "resolve_cohort now applies research_scope.population_spec via apply_population_spec",
+  "commit_phase": "3I.10",
+  "questions": {
+    "A_execution_correctness_only": {
+      "answer": true,
+      "rationale": "Frozen 3I.9 ExperimentSpec already encoded holdout population_spec; 3I.9 executability checks used apply_population_spec but tool execution path ignored it. Fix honors pre-frozen spec \u2014 no new scientific choice."
+    },
+    "B_new_scientific_choice_after_result": {
+      "answer": false,
+      "rationale": "Patch landed before accepted 3I.10 artifacts; candidate/package frozen in 3I.9 pre-result."
+    },
+    "C_holdout_cohort_preserved": {
+      "answer": true,
+      "rationale": "43 holdout dates excluding 2026-08-02 unchanged; post-fix cohort n=5964 vs pre-fix erroneous n=6106."
+    },
+    "D_changed_selection_or_interpretation": {
+      "answer": false,
+      "rationale": "Selection frozen in 3I.9; interpretation contract artifact 03 unchanged."
+    },
+    "E_toolresult_unavailable_before_fix": {
+      "answer": "Partial \u2014 execution ran but cohort was wrong without filter; not absence of ToolResult.",
+      "note": "Pre-fix path would have duplicated full-panel cohort (PROCESS_CONTAMINATION risk); fixed before final verdict artifacts."
+    }
+  },
+  "classification": "EXECUTION_CORRECTNESS_ONLY",
+  "contamination_in_accepted_run": false,
+  "historical_note": "Early 3I.10 development run without filter produced metrics identical to Evidence 1; not used as accepted AUTONOMOUS_FALSIFICATION_PASS artifacts.",
+  "metric_evidence": {
+    "evidence_1_sample_size": 6106,
+    "evidence_2_sample_size_correct": 5964,
+    "evidence_2_spread": 2.0887694594595527,
+    "evidence_1_spread": 2.351875539446755
+  }
+}

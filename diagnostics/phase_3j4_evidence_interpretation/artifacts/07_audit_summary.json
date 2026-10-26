@@ -1,0 +1,19 @@
+{
+  "git_head": "47025b0c7eefc0a05e10df1ce91d1c1a27f49e8e",
+  "phase": "3J.4",
+  "cf_int_all_passed": true,
+  "3i7_rule_content_identical": true,
+  "historical_contract_ref_integrity_ok": true,
+  "persisted_3j3_interpretation_outcome": "INTERPRETED",
+  "persisted_3j3_matches_3j3_diagnostic": {
+    "package_id": true,
+    "selected_candidate_id": true,
+    "tool_result_hash": true,
+    "execution_identity_hash": true,
+    "scientific_action_core_hash": true
+  },
+  "pre_execution_interpretation_outcome": "INTERPRETED",
+  "frozen_hashes_unchanged": true,
+  "hidden_answer_clean": true,
+  "stop_boundary": "STOP_FIRST_EVIDENCE_INTERPRETED"
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "classification": "RESEARCH_WORTHY",
+    "rationale": "First emission of unique dispersion-return proposition"
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "classification": "DUPLICATE_EVIDENCE",
+    "rationale": "Grounded, falsifiable, executable \u2014 but same scientific question as siblings"
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "classification": "DUPLICATE_EVIDENCE",
+    "rationale": "Grounded, falsifiable, executable \u2014 but same scientific question as siblings"
+  }
+]

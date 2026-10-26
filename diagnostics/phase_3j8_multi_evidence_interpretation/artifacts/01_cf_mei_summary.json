@@ -1,0 +1,51 @@
+{
+  "CF-MEI1": {
+    "passed": true,
+    "description": "Two supportive highly overlapping experiments not treated as independent confirmations"
+  },
+  "CF-MEI2": {
+    "passed": true,
+    "description": "Low overlap allows stronger incremental contribution than CF-MEI1",
+    "incremental_strength": "MODERATE"
+  },
+  "CF-MEI3": {
+    "passed": true,
+    "description": "New null with high sample reuse \u2014 informative but not independent replication"
+  },
+  "CF-MEI4": {
+    "passed": true,
+    "description": "Same null + high overlap \u2192 redundancy penalty / limited incremental contribution"
+  },
+  "CF-MEI5": {
+    "passed": true,
+    "description": "Supportive #1 + contradictory independent #2 \u2192 conflict handling"
+  },
+  "CF-MEI6": {
+    "passed": true,
+    "description": "Dependent contradictory evidence handled explicitly"
+  },
+  "CF-MEI7": {
+    "passed": true,
+    "description": "Attractive statistic with wrong scientific question \u2192 insufficient relevance"
+  },
+  "CF-MEI8": {
+    "passed": true,
+    "description": "No envelope \u2014 gate rejected execution",
+    "skipped": true
+  },
+  "CF-MEI9": {
+    "passed": true,
+    "description": "Unrelated nulls remain in cumulative ledger",
+    "ledger_keys": [
+      "directional_reversal",
+      "episode_artifact"
+    ]
+  },
+  "CF-MEI10": {
+    "passed": true,
+    "description": "Synthetic panel \u2014 interpreter not attempted",
+    "skipped": true
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_multi_evidence_interpretation_01_v1_3j8"
+}
