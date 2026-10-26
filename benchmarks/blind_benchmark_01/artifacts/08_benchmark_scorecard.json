@@ -1,0 +1,21 @@
+{
+  "dimension_scores": {
+    "A_autonomy": 6,
+    "B_breadth": 2,
+    "C_depth": 4,
+    "D_shape_discovery": 2,
+    "E_scientific_skepticism": 4,
+    "F_simplicity_preference": 6,
+    "G_research_productivity": 5,
+    "H_novelty": 5,
+    "I_auditability": 9,
+    "J_restraint": 8
+  },
+  "overall_research_capability_score": 51,
+  "evidence_notes": {
+    "diary_steps": 2,
+    "unique_tools": 2,
+    "has_falsification": true,
+    "session_status": "ACTIVE"
+  }
+}
