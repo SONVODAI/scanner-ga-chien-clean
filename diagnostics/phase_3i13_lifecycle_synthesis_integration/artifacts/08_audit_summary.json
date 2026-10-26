@@ -1,0 +1,15 @@
+{
+  "phase": "3I.13",
+  "git_head": "89f11aae74372a0190c6aa6d1ac947e6d8b49481",
+  "verdict": "LIFECYCLE_SYNTHESIS_INTEGRATION_PASS",
+  "engine_hash": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+  "expected_engine_hash": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+  "bb_regression_passed": true,
+  "action_disposition": "ACTION_RECORDED_ONLY",
+  "new_experiment_executed": false,
+  "t2_matches_3i12": {
+    "state_match": true,
+    "action_match": true,
+    "saturation_match": true
+  }
+}

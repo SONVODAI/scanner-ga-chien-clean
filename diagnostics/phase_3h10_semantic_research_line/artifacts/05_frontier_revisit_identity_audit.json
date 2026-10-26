@@ -1,0 +1,7 @@
+{
+  "frontier_fields": [
+    "research_line_id",
+    "research_line_identity",
+    "defer_evidence_snapshot"
+  ]
+}

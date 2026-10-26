@@ -1,0 +1,57 @@
+{
+  "phase": "3I.7",
+  "artifact_id": "01_synthetic_expectations",
+  "status": "PRE_REGISTERED_BEFORE_REAL_RESULT",
+  "bb_life_01_subset": [
+    "LIFE-01_support",
+    "LIFE-03_falsification",
+    "LIFE-05_non_informative",
+    "LIFE-06_invalid",
+    "LIFE-07_rescue_temptation"
+  ],
+  "synthetic_cases": {
+    "A_clear_support": {
+      "expected_evidence_class": "SUPPORTING",
+      "expected_epistemic_state": "SUPPORTED",
+      "expected_decision": "SEEK_FALSIFICATION"
+    },
+    "B_clear_disconfirm": {
+      "expected_evidence_class": "DISCONFIRMING",
+      "expected_epistemic_state": "WEAKENED",
+      "expected_decision": "SEEK_REPLICATION"
+    },
+    "C_contradictory": {
+      "expected_evidence_class": "CONTRADICTORY",
+      "expected_epistemic_state": "WEAKENED",
+      "expected_decision": "SEEK_FALSIFICATION"
+    },
+    "D_non_informative": {
+      "expected_evidence_class": "NON_INFORMATIVE",
+      "expected_epistemic_state": "INSUFFICIENT_EVIDENCE",
+      "expected_decision": "HOLD_UNRESOLVED"
+    },
+    "E_invalid": {
+      "expected_evidence_class": "INVALID",
+      "expected_epistemic_state": "HYPOTHESIS",
+      "expected_decision": "HOLD_UNRESOLVED"
+    },
+    "F_strong_falsification": {
+      "expected_evidence_class": "DISCONFIRMING",
+      "expected_epistemic_state": "FALSIFIED",
+      "expected_decision": "ABANDON"
+    },
+    "G_rescue_temptation": {
+      "note": "Post-hoc population/outcome change forbidden — interpreter has no mutation path",
+      "expected_behavior": "classification_unchanged_if_proposition_immutable"
+    }
+  },
+  "ordering_discipline": "contract_frozen → synthetic_tests → real_tool_result → single_interpretation",
+  "forbidden_post_hoc": [
+    "threshold_change",
+    "direction_change",
+    "population_change",
+    "outcome_change",
+    "horizon_change",
+    "statistic_substitution"
+  ]
+}
