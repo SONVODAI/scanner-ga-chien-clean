@@ -104,6 +104,28 @@ def _abandon_score(assessment: ResearchAssessment, candidate: ResearchActionCand
     return base
 
 
+def _grammar_bonus(candidate: ResearchActionCandidate) -> float:
+    hints = candidate.priority_hints
+    return (
+        hints.get("grammar_reframe", 0.0)
+        + hints.get("grammar_repopulate", 0.0)
+        + hints.get("grammar_widen", 0.0)
+    )
+
+
+def _adaptive_bonus(candidate: ResearchActionCandidate) -> float:
+    hints = candidate.priority_hints
+    return (
+        hints.get("threshold_explore", 0.0)
+        + hints.get("shape_followup", 0.0)
+        + hints.get("neighborhood_test", 0.0)
+        + hints.get("slicing_explore", 0.0)
+        + hints.get("category_refinement", 0.0)
+        + hints.get("region_refinement", 0.0)
+        + hints.get("interaction_followup", 0.0)
+    )
+
+
 def score_candidate(
     candidate: ResearchActionCandidate,
     assessment: ResearchAssessment,
@@ -117,6 +139,8 @@ def score_candidate(
     components["information_gap"] = _gap_match(assessment, candidate)
     components["falsification_threat"] = _falsification_match(assessment, candidate)
     components["novelty"] = _novelty_bonus(assessment, candidate)
+    components["grammar"] = _grammar_bonus(candidate)
+    components["adaptive"] = _adaptive_bonus(candidate)
     components["stop"] = _stop_score(assessment, candidate)
     components["abandon"] = _abandon_score(assessment, candidate)
 
