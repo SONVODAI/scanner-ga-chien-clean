@@ -1,0 +1,43 @@
+{
+  "phase": "3H.13",
+  "version": "pre_registration_v1",
+  "registered_before_implementation": true,
+  "scenarios": {
+    "A_representation_vs_independent": {
+      "description": "Two otherwise equal candidates: same proposition/different tool vs genuinely independent proposition. Raw tool novelty makes candidate 1 slightly higher.",
+      "expected": "After reconciliation, candidate 1 loses only false novelty reward; candidate 2 can win."
+    },
+    "B_genuine_scientific_novelty": {
+      "description": "GENUINELY_INDEPENDENT or SCIENTIFIC_NOVELTY classification.",
+      "expected": "Ranking contribution unchanged from pre-3H.13."
+    },
+    "C_same_proposition_fresh_evidence": {
+      "description": "Same proposition with EVIDENCE_NOVELTY / fresh evidence.",
+      "expected": "Legitimate evidence value retained; novelty preserved."
+    },
+    "D_insufficient_semantic_evidence": {
+      "description": "INSUFFICIENT_EVIDENCE valuation class.",
+      "expected": "Fail-closed; preserve existing behavior (no gating)."
+    },
+    "E_legacy_no_semantic_context": {
+      "description": "derive_identity_from_candidate returns None.",
+      "expected": "Deterministic legacy behavior unchanged."
+    },
+    "F_representation_strong_non_novelty_value": {
+      "description": "REPRESENTATION_NOVELTY_ONLY but high exploitation/MIG.",
+      "expected": "Remains eligible; may still win; no disqualification or negative penalty."
+    },
+    "G_ranking_ties": {
+      "description": "Equal reconciled scores.",
+      "expected": "Deterministic tie-break by action_id (existing rule)."
+    },
+    "H_no_negative_novelty": {
+      "description": "Any reconciliation path.",
+      "expected": "Gated novelty >= 0; never negative penalty for representation redundancy."
+    },
+    "I_scientific_evidence_unchanged": {
+      "description": "Candidates with SCIENTIFIC or EVIDENCE novelty.",
+      "expected": "No global ranking change vs pre-reconciliation baseline."
+    }
+  }
+}
