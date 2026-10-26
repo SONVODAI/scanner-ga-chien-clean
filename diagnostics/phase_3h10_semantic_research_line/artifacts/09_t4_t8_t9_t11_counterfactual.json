@@ -1,0 +1,520 @@
+{
+  "T11": {
+    "counterfactual_selection_after": "",
+    "decision_index": 11,
+    "freshness": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "classification": "REVALUED_ONLY",
+      "component_explanations": {
+        "revalued_only": "ERV/revaluation changed without evidence delta"
+      },
+      "conditioning_context_changed": false,
+      "current_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "defer_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "evidence_added_since_last_attempt": false,
+      "horizon_changed": false,
+      "last_attempt_sequence": 0,
+      "new_observation_count": 0,
+      "outcome_changed": false,
+      "population_changed": false,
+      "prior_attempt_count": 0,
+      "prior_realized_gain": "",
+      "research_line_id": "prop-HORIZON-7001d054a1ad35e8-4f53cda1",
+      "uncertainty_changed_since_last_attempt": false,
+      "version": "research_line_freshness_v1"
+    },
+    "inherited_realized_gain_evidence": [],
+    "new_semantic_line_identity": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "conditioning_context": {},
+      "evidence_lineage": [],
+      "feature_slice": [],
+      "metadata": {
+        "action_id": null,
+        "branch_root_id": "",
+        "frame_id": "",
+        "tool_name": ""
+      },
+      "observation_horizon": 0,
+      "outcome_spec": {},
+      "parent_proposition_key": "",
+      "population_spec": {},
+      "research_needs": [],
+      "scientific_proposition_key": "prop-HORIZON-7001d054a1ad35e8-4f53cda1",
+      "uncertainty_codes": [
+        "HORIZON_STABILITY"
+      ],
+      "version": "research_line_identity_v1"
+    },
+    "new_valuation_context": {
+      "representation_novelty_risk": false,
+      "semantic_proposition_key": "prop-HORIZON-7001d054a1ad35e8-4f53cda1",
+      "would_see_prior_low_gain": false,
+      "would_see_prior_zero_gain": false
+    },
+    "old_structural_identity": {
+      "action_id": null,
+      "branch_root_id": "",
+      "frame_id": "",
+      "resulting_experiment": null,
+      "tool_name": "",
+      "triggering_experiment": "exp-7b6aee39ee66"
+    },
+    "old_valuation_context": {
+      "branch_marginal_state": "",
+      "erv": 0.0,
+      "exit_value": null,
+      "stop_won": null
+    },
+    "overcorrection_check": "No forced STOP except T11 evidence-based exit",
+    "relationship_to_prior": {
+      "audit_questions": {
+        "could_resolve_prior_gap": false,
+        "new_evidence_available": false,
+        "same_conditioning_context": true,
+        "same_evidence_lineage": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_uncertainty": true
+      },
+      "built_at": "2026-08-21T16:22:10Z",
+      "candidate_proposition_key": "prop-HORIZON-7001d054a1ad35e8-4f53cda1",
+      "classification": "INSUFFICIENT_EVIDENCE",
+      "component_evidence": {
+        "new_evidence_available": false,
+        "same_action_id": false,
+        "same_conditioning_context": true,
+        "same_feature_slice": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_tool_metadata": false,
+        "same_uncertainty": true
+      },
+      "prior_line_id": "",
+      "prior_proposition_key": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "version": "research_line_relationship_v1"
+    },
+    "scientific_reason": "T11 STOP correct under 3H.8; semantic line would show accumulated low/zero gain",
+    "selection_before": "STOP",
+    "selection_changed": false,
+    "transition_id": "T11"
+  },
+  "T4": {
+    "counterfactual_selection_after": "adaptive_partition_compare",
+    "decision_index": 4,
+    "freshness": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "classification": "REVALUED_ONLY",
+      "component_explanations": {
+        "revalued_only": "ERV/revaluation changed without evidence delta"
+      },
+      "conditioning_context_changed": false,
+      "current_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "defer_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "evidence_added_since_last_attempt": false,
+      "horizon_changed": false,
+      "last_attempt_sequence": 0,
+      "new_observation_count": 0,
+      "outcome_changed": false,
+      "population_changed": false,
+      "prior_attempt_count": 0,
+      "prior_realized_gain": "",
+      "research_line_id": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "uncertainty_changed_since_last_attempt": false,
+      "version": "research_line_freshness_v1"
+    },
+    "inherited_realized_gain_evidence": [],
+    "new_semantic_line_identity": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "conditioning_context": {},
+      "evidence_lineage": [],
+      "feature_slice": [
+        "rs10"
+      ],
+      "metadata": {
+        "action_id": "1cd8543301912be7",
+        "branch_root_id": "obs-4692b6a8949d",
+        "frame_id": "",
+        "tool_name": "adaptive_partition_compare"
+      },
+      "observation_horizon": 0,
+      "outcome_spec": {},
+      "parent_proposition_key": "",
+      "population_spec": {},
+      "research_needs": [],
+      "scientific_proposition_key": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "uncertainty_codes": [
+        "HORIZON_STABILITY"
+      ],
+      "version": "research_line_identity_v1"
+    },
+    "new_valuation_context": {
+      "representation_novelty_risk": false,
+      "semantic_proposition_key": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "would_see_prior_low_gain": false,
+      "would_see_prior_zero_gain": false
+    },
+    "old_structural_identity": {
+      "action_id": "1cd8543301912be7",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "resulting_experiment": "exp-89220f993c0b",
+      "tool_name": "adaptive_partition_compare",
+      "triggering_experiment": "exp-a4cc06bf2c24"
+    },
+    "old_valuation_context": {
+      "branch_marginal_state": "",
+      "erv": 5.49,
+      "exit_value": null,
+      "stop_won": null
+    },
+    "overcorrection_check": "No forced STOP except T11 evidence-based exit",
+    "relationship_to_prior": {
+      "audit_questions": {
+        "could_resolve_prior_gap": false,
+        "new_evidence_available": false,
+        "same_conditioning_context": true,
+        "same_evidence_lineage": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_uncertainty": false
+      },
+      "built_at": "2026-08-21T16:22:10Z",
+      "candidate_proposition_key": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "classification": "INSUFFICIENT_EVIDENCE",
+      "component_evidence": {
+        "new_evidence_available": false,
+        "same_action_id": false,
+        "same_conditioning_context": true,
+        "same_feature_slice": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_tool_metadata": false,
+        "same_uncertainty": false
+      },
+      "prior_line_id": "",
+      "prior_proposition_key": "prop-HORIZON_HETEROGENEITY_CO-c662974bb85668fd-4f53cda1",
+      "version": "research_line_relationship_v1"
+    },
+    "scientific_reason": "Same-question tool switch \u2014 3H.10 would transfer prior marginal evidence",
+    "selection_before": "adaptive_partition_compare",
+    "selection_changed": false,
+    "transition_id": "T4"
+  },
+  "T8": {
+    "counterfactual_selection_after": "adaptive_partition_compare",
+    "decision_index": 8,
+    "freshness": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "classification": "REVALUED_ONLY",
+      "component_explanations": {
+        "revalued_only": "ERV/revaluation changed without evidence delta"
+      },
+      "conditioning_context_changed": false,
+      "current_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "defer_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "evidence_added_since_last_attempt": false,
+      "horizon_changed": false,
+      "last_attempt_sequence": 0,
+      "new_observation_count": 0,
+      "outcome_changed": false,
+      "population_changed": false,
+      "prior_attempt_count": 0,
+      "prior_realized_gain": "",
+      "research_line_id": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "uncertainty_changed_since_last_attempt": false,
+      "version": "research_line_freshness_v1"
+    },
+    "inherited_realized_gain_evidence": [],
+    "new_semantic_line_identity": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "conditioning_context": {},
+      "evidence_lineage": [],
+      "feature_slice": [
+        "rs_spread"
+      ],
+      "metadata": {
+        "action_id": "5001c4d3def13df5",
+        "branch_root_id": "obs-4692b6a8949d",
+        "frame_id": "",
+        "tool_name": "adaptive_partition_compare"
+      },
+      "observation_horizon": 0,
+      "outcome_spec": {},
+      "parent_proposition_key": "",
+      "population_spec": {},
+      "research_needs": [],
+      "scientific_proposition_key": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "uncertainty_codes": [
+        "HORIZON_STABILITY"
+      ],
+      "version": "research_line_identity_v1"
+    },
+    "new_valuation_context": {
+      "representation_novelty_risk": false,
+      "semantic_proposition_key": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "would_see_prior_low_gain": false,
+      "would_see_prior_zero_gain": false
+    },
+    "old_structural_identity": {
+      "action_id": "5001c4d3def13df5",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "resulting_experiment": "exp-26a7fee4b696",
+      "tool_name": "adaptive_partition_compare",
+      "triggering_experiment": "exp-ae7f34cac835"
+    },
+    "old_valuation_context": {
+      "branch_marginal_state": "",
+      "erv": -1.0996249999999994,
+      "exit_value": null,
+      "stop_won": null
+    },
+    "overcorrection_check": "No forced STOP except T11 evidence-based exit",
+    "relationship_to_prior": {
+      "audit_questions": {
+        "could_resolve_prior_gap": false,
+        "new_evidence_available": false,
+        "same_conditioning_context": true,
+        "same_evidence_lineage": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_uncertainty": true
+      },
+      "built_at": "2026-08-21T16:22:10Z",
+      "candidate_proposition_key": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "classification": "INSUFFICIENT_EVIDENCE",
+      "component_evidence": {
+        "new_evidence_available": false,
+        "same_action_id": false,
+        "same_conditioning_context": true,
+        "same_feature_slice": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_tool_metadata": true,
+        "same_uncertainty": true
+      },
+      "prior_line_id": "",
+      "prior_proposition_key": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "version": "research_line_relationship_v1"
+    },
+    "scientific_reason": "Same-question tool switch \u2014 3H.10 would transfer prior marginal evidence",
+    "selection_before": "adaptive_partition_compare",
+    "selection_changed": false,
+    "transition_id": "T8"
+  },
+  "T9": {
+    "counterfactual_selection_after": "threshold_exploration",
+    "decision_index": 9,
+    "freshness": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "classification": "REVALUED_ONLY",
+      "component_explanations": {
+        "revalued_only": "ERV/revaluation changed without evidence delta"
+      },
+      "conditioning_context_changed": false,
+      "current_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "defer_snapshot": {
+        "conditioning_context": {},
+        "data_horizon": 0,
+        "observation_count": 0,
+        "observation_horizon": 0,
+        "outcome_spec": {},
+        "planning_sequence": 0,
+        "population_spec": {},
+        "uncertainty_codes": [
+          "HORIZON_STABILITY"
+        ]
+      },
+      "evidence_added_since_last_attempt": false,
+      "horizon_changed": false,
+      "last_attempt_sequence": 0,
+      "new_observation_count": 0,
+      "outcome_changed": false,
+      "population_changed": false,
+      "prior_attempt_count": 0,
+      "prior_realized_gain": "",
+      "research_line_id": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "uncertainty_changed_since_last_attempt": false,
+      "version": "research_line_freshness_v1"
+    },
+    "inherited_realized_gain_evidence": [],
+    "new_semantic_line_identity": {
+      "built_at": "2026-08-21T16:22:10Z",
+      "conditioning_context": {},
+      "evidence_lineage": [],
+      "feature_slice": [
+        "rs_spread"
+      ],
+      "metadata": {
+        "action_id": "1b0a96d2a37ac857",
+        "branch_root_id": "obs-4692b6a8949d",
+        "frame_id": "",
+        "tool_name": "threshold_exploration"
+      },
+      "observation_horizon": 0,
+      "outcome_spec": {},
+      "parent_proposition_key": "",
+      "population_spec": {},
+      "research_needs": [],
+      "scientific_proposition_key": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "uncertainty_codes": [
+        "HORIZON_STABILITY"
+      ],
+      "version": "research_line_identity_v1"
+    },
+    "new_valuation_context": {
+      "representation_novelty_risk": false,
+      "semantic_proposition_key": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "would_see_prior_low_gain": false,
+      "would_see_prior_zero_gain": false
+    },
+    "old_structural_identity": {
+      "action_id": "1b0a96d2a37ac857",
+      "branch_root_id": "obs-4692b6a8949d",
+      "frame_id": "",
+      "resulting_experiment": "exp-e3011e694cac",
+      "tool_name": "threshold_exploration",
+      "triggering_experiment": "exp-26a7fee4b696"
+    },
+    "old_valuation_context": {
+      "branch_marginal_state": "",
+      "erv": 5.7789375,
+      "exit_value": null,
+      "stop_won": null
+    },
+    "overcorrection_check": "No forced STOP except T11 evidence-based exit",
+    "relationship_to_prior": {
+      "audit_questions": {
+        "could_resolve_prior_gap": false,
+        "new_evidence_available": false,
+        "same_conditioning_context": true,
+        "same_evidence_lineage": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_uncertainty": true
+      },
+      "built_at": "2026-08-21T16:22:10Z",
+      "candidate_proposition_key": "prop-HORIZON-7001d054a1ad35e8-eafa71de",
+      "classification": "INSUFFICIENT_EVIDENCE",
+      "component_evidence": {
+        "new_evidence_available": false,
+        "same_action_id": false,
+        "same_conditioning_context": true,
+        "same_feature_slice": false,
+        "same_horizon": true,
+        "same_outcome": false,
+        "same_population": false,
+        "same_proposition": false,
+        "same_research_need": false,
+        "same_tool_metadata": false,
+        "same_uncertainty": true
+      },
+      "prior_line_id": "",
+      "prior_proposition_key": "prop-HORIZON-7001d054a1ad35e8-8d5b7214",
+      "version": "research_line_relationship_v1"
+    },
+    "scientific_reason": "Same-question tool switch \u2014 3H.10 would transfer prior marginal evidence",
+    "selection_before": "threshold_exploration",
+    "selection_changed": false,
+    "transition_id": "T9"
+  }
+}
