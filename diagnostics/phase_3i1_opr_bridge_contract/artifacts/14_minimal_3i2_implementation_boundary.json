@@ -1,0 +1,100 @@
+{
+  "artifact_id": "14_minimal_3i2_implementation_boundary",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "principle": "Smallest path to first real OPR candidate: one narrow observation class → one general synthesis mechanism → PropositionRecord → existing execution validation",
+  "observation_class_selection": {
+    "chosen_class": "CROSS_SECTIONAL_DISPERSION_ANOMALY",
+    "rationale": [
+      "Already observable via existing tools (median_spread, dispersion statistics in research_tools.py)",
+      "Raw metrics available without OBS/GAP label as synthesis input",
+      "Supports falsifiable population/outcome/horizon experiments via existing grammar",
+      "Generic market structure — NOT selected because of any known hidden edge in zone C"
+    ],
+    "explicitly_not_chosen_because": [
+      "Hidden benchmark phenomena",
+      "Template family gaps in BB07-14 convergence",
+      "ChatGPT discovery narratives"
+    ],
+    "raw_inputs": [
+      "cross_sectional dispersion distribution per date",
+      "quintile spread of forward returns conditional on dispersion tier",
+      "temporal drift of dispersion-return correlation",
+      "concentration vs dispersion interaction residuals"
+    ],
+    "surprise_detector_v1": {
+      "signals": [
+        "dispersion_return_correlation exceeds rolling 252d band by 2 sigma",
+        "quintile spread monotonicity break",
+        "regime shift in dispersion distribution KS test p < 0.01"
+      ],
+      "threshold_source": "Zone A development calibration — frozen before zone B"
+    }
+  },
+  "synthesis_mechanism_v1": {
+    "name": "CONTRAST_TO_PROPOSITION",
+    "description": "Single general mechanism: empirical contrast → surprise statement → canonical proposition core",
+    "steps": [
+      "1. Ingest raw dispersion evidence payload (no OBS/GAP primary input)",
+      "2. Compute surprise_or_uncertainty from contrast vs baseline",
+      "3. Populate birth certificate BC_Q1-Q6",
+      "4. Synthesize canonical_proposition_core via bounded relation templates (NOT 24-family catalog)",
+      "5. Run template_independence audit offline",
+      "6. Pass through executability adapter → ExperimentSpec validation"
+    ],
+    "bounded_relation_templates": {
+      "note": "Structural slots only — population, relation, outcome, horizon filled from evidence",
+      "allowed_relations": [
+        "predicts",
+        "modulates",
+        "interacts_with",
+        "regime_conditional",
+        "contrasts_with"
+      ],
+      "not_allowed": "Free-form unconstrained NL hypothesis generator"
+    }
+  },
+  "integration_points": {
+    "reuse_existing": [
+      "research_proposition_core.py — canonical core normalization",
+      "ExperimentSpec grammar validation",
+      "research_tools.py — dispersion/spread tools for evidence fetch",
+      "research_portfolio.py — queue validated experiments only"
+    ],
+    "new_modules_3i2": [
+      "opr_bridge/evidence_ingest.py",
+      "opr_bridge/surprise_detector.py",
+      "opr_bridge/proposition_synthesizer.py",
+      "opr_bridge/proposition_record.py",
+      "opr_bridge/executability_adapter.py"
+    ],
+    "no_changes_3i2": [
+      "research_actions.py templates",
+      "research_interpreter.py OBS/GAP semantics",
+      "planner/scoring",
+      "novelty logic",
+      "Challenger",
+      "discovery engine"
+    ]
+  },
+  "first_candidate_success_criteria": {
+    "minimum": [
+      "One PropositionRecord emitted from raw dispersion evidence",
+      "Passes birth certificate + grounding + LAUNDER tests",
+      "executability_status=EXECUTABLE or NOT_EXECUTABLE with documented reason",
+      "Classified TEMPLATE_ADJACENT or SCIENTIFICALLY_NOVEL OR honestly TEMPLATE_INSTANCE with no false autonomous claim"
+    ],
+    "not_required_in_3i2": [
+      "Multiple observation classes",
+      "Full lineage engine",
+      "Challenger integration",
+      "Zone B blind benchmark pass"
+    ]
+  },
+  "out_of_scope_3i2": [
+    "Unrestricted open grammar hypothesis generator",
+    "OBS/GAP-primary synthesis path",
+    "Multi-class observation fusion",
+    "Hidden benchmark tuning"
+  ]
+}

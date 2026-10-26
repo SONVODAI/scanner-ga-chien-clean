@@ -1,0 +1,55 @@
+{
+  "all_passed": true,
+  "results": [
+    {
+      "test": "tests/test_edge_research_opr_phase_3k3.py",
+      "passed": true,
+      "output": "...........                                                              [100%]\n11 passed in 217.79s (0:03:37)\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k2.py::test_cf_run_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 1.74s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k1.py::test_cf_live_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 1.47s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k0.py",
+      "passed": true,
+      "output": "..........                                                               [100%]\n10 passed in 201.06s (0:03:21)\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j14a.py",
+      "passed": true,
+      "output": ".............                                                            [100%]\n13 passed in 192.83s (0:03:12)\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j14.py::test_cf_cg_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 0.52s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j13.py::test_cf_fg_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 5.10s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j12.py::test_cf_nx_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 5.07s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j11.py::test_cf_br_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 1.10s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j10.py::test_cf_arl1_arl12_pass",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 3.61s\n"
+    }
+  ]
+}

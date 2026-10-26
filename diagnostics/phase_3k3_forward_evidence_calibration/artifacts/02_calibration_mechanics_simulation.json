@@ -1,0 +1,148 @@
+{
+  "test_kind": "CALIBRATION_MECHANICS_SIMULATION",
+  "replay_dates": [
+    "2026-07-23",
+    "2026-07-24",
+    "2026-07-26",
+    "2026-07-27",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-01",
+    "2026-08-02",
+    "2026-08-03",
+    "2026-08-04"
+  ],
+  "num_sessions": 12,
+  "daily_runs": [
+    {
+      "date": "2026-07-23",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-24",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-26",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-27",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-28",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-29",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-30",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-07-31",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-08-01",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-08-02",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-08-03",
+      "disposition": "SUCCESS"
+    },
+    {
+      "date": "2026-08-04",
+      "disposition": "SUCCESS"
+    }
+  ],
+  "backfill_rejection_checks": [
+    {
+      "date": "2026-07-23",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-24",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-26",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-27",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-28",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-29",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-30",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-07-31",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-08-01",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-08-02",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-08-03",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    },
+    {
+      "date": "2026-08-04",
+      "rejected": true,
+      "reason": "rejected_non_forward_mode:BACKFILL_NON_FORWARD",
+      "cal_updated": false
+    }
+  ],
+  "forward_ledger_entry_count": 0,
+  "all_backfill_rejected_from_forward_ledger": true,
+  "snapshot_count": 0,
+  "idempotent_rebuild": true,
+  "counts_as_forward_evidence": false,
+  "stop_boundary": "STOP_FORWARD_EVIDENCE_CALIBRATION_READY"
+}

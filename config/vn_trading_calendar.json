@@ -1,0 +1,21 @@
+{
+  "version": "vn_trading_calendar_v1_2026",
+  "calendar_id": "vn_hose_hnx_v1",
+  "provenance": "Repository-maintained Vietnam exchange holiday calendar (HOSE/HNX). No runtime network fetch.",
+  "update_procedure": "Edit config/vn_trading_calendar.json, bump version and calendar_id suffix, run tests/test_edge_research_opr_phase_3k5a.py calendar tests, commit with release note.",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "holidays": [
+    "2026-01-01",
+    "2026-02-16",
+    "2026-02-17",
+    "2026-02-18",
+    "2026-02-19",
+    "2026-02-20",
+    "2026-04-27",
+    "2026-04-30",
+    "2026-05-01",
+    "2026-09-02",
+    "2026-12-25"
+  ],
+  "closure_overrides": {}
+}
