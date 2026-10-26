@@ -1,0 +1,183 @@
+{
+  "benchmark_id": "blind_benchmark_02",
+  "benchmark_version": "bb02_v1",
+  "prior_benchmark": "blind_benchmark_01",
+  "freeze_timestamp": "2026-08-21T12:03:10Z",
+  "git_commit": "1b7eb132f2d6429878821a91d732b037364d4e46",
+  "git_branch": "cursor/phase-3g1-exploration-policy-aad2",
+  "research_cutoff": "2026-08-17",
+  "discovery_range": {
+    "start": "2026-07-23",
+    "end": "2026-08-17"
+  },
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "fingerprint_verified_against_bb01": true,
+  "frozen_panel_path": "benchmarks/blind_benchmark_02/artifacts/frozen_panel_snapshot.csv",
+  "bb01_frozen_panel_source": "benchmarks/blind_benchmark_01/artifacts/frozen_panel_snapshot.csv",
+  "data_source_fingerprints": {
+    "pattern_lifecycle.csv": "12f3334bad4804b15f9ca8b5295ab7237cbada8e0e929844df317673f9218799",
+    "outcomes.csv": "5a6e90d10359a510fde78d62441e746b043e1af4527045b97cb62bf75c009fb0",
+    "market_t0_snapshot.csv": "3b7324a762e33f862109833a62ebfed689c3fb53d365ca25023ef5838691f962",
+    "pattern_history.csv": "dd727ecd7141d43264aef246d6ed1d627f91eae23e4bb29c2b29ef2bdb882cbd",
+    "earning_learning_digests": {
+      "pattern_lifecycle.csv": "12f3334bad4804b15f9ca8b5295ab7237cbada8e0e929844df317673f9218799",
+      "verified_decisions.csv": "399c4e9fbf883e17633809d2ff27729b874192fa472e8658339e9ee8f1fb5723",
+      "observations.csv": "4d89d446d3b444a1f0d93586b71b714eacf4b1991e7db0b923fc371d9d2826f1",
+      "t0_observation_freeze.csv": "5288e064d645c5331c831167f8c78c6bf3a88596341c6d3e0569038dd7f397a2",
+      "decision_archive.csv": "fbbfe7769690a3bfcc6466c384a6d11cf469b1b4be149e0eaee2d93d6859a43a",
+      "pattern_knowledge.csv": "8470ad2aa61370465e53789345bffdcc4ca2e519c93d1e1fa346556d936e41c6",
+      "continuation_knowledge.csv": "83ba15afb7b832dae01d99b4b812bebfb2c42f4ee41ab57382097daf3eade454"
+    }
+  },
+  "grammar_version": "research_grammar_v1",
+  "tool_registry_version": "research_toolbox_v1",
+  "search_accounting_version": "search_accounting_v1",
+  "research_frontier_version": "research_frontier_v1",
+  "temporal_availability_rules": "feature_eligibility_v1",
+  "panel_preflight": {
+    "version": "panel_preflight_v1",
+    "panel_columns": [
+      "breadth_score",
+      "breadth_t0",
+      "close",
+      "delta_breadth_1",
+      "delta_breadth_3",
+      "delta_mr_1",
+      "delta_mr_3",
+      "market_forecast",
+      "market_real",
+      "market_snapshot_ambiguous",
+      "market_snapshot_count",
+      "market_snapshot_time",
+      "median_rs10",
+      "median_rs5",
+      "mr_t0",
+      "mr_t_minus_1",
+      "mr_t_minus_2",
+      "mr_t_minus_3",
+      "outcome_missing_reason",
+      "outcome_source",
+      "pct_rs10_negative",
+      "pct_rs5_positive",
+      "pct_rsi_le_40",
+      "research_market_level",
+      "research_market_state",
+      "research_market_trajectory",
+      "research_market_transition",
+      "rs10",
+      "rs5",
+      "rs_spread",
+      "rsi14",
+      "symbol",
+      "t10_return",
+      "t3_return",
+      "t5_return",
+      "trade_date"
+    ],
+    "eligible_explanatory": [
+      "breadth_score",
+      "close",
+      "research_market_state",
+      "research_market_transition",
+      "rs10",
+      "rs5",
+      "rs_spread",
+      "rsi14"
+    ],
+    "registry_numeric": [
+      "rs5",
+      "rs10",
+      "rsi14",
+      "rs_spread",
+      "close",
+      "rsi_slope",
+      "volume_ratio20",
+      "health_score"
+    ],
+    "registry_categorical": [
+      "health_group",
+      "obv_status"
+    ],
+    "registry_rank": [
+      "health_rank",
+      "group_rank"
+    ],
+    "registry_missing_from_panel": [
+      "group_rank",
+      "health_group",
+      "health_rank",
+      "health_score",
+      "obv_status",
+      "rsi_slope",
+      "volume_ratio20"
+    ],
+    "partition_columns_available": [
+      "breadth_score",
+      "close",
+      "research_market_state",
+      "research_market_transition",
+      "rs10",
+      "rs5",
+      "rs_spread",
+      "rsi14"
+    ]
+  },
+  "planner_weights": {
+    "WEIGHT_INFORMATION_GAP": 3.0,
+    "WEIGHT_FALSIFICATION_THREAT": 4.0,
+    "WEIGHT_NOVELTY": 2.0,
+    "WEIGHT_STOP": 5.0,
+    "WEIGHT_ABANDON": 4.5,
+    "WEIGHT_STRONG_EVIDENCE_EXPLORATION": 3.0,
+    "WEIGHT_UNEXPLORED_FEATURE": 2.5,
+    "WEIGHT_UNEXPLORED_OUTCOME": 1.5,
+    "WEIGHT_UNEXPLORED_POPULATION": 1.5,
+    "WEIGHT_INDEPENDENT_BRANCH": 2.0,
+    "WEIGHT_INFORMATION_GAIN": 2.0,
+    "WEIGHT_REDUNDANCY_PENALTY": 3.0,
+    "EARLY_SESSION_FALSIFICATION_DAMPEN": 0.45,
+    "LOW_COVERAGE_STOP_PENALTY": 4.0
+  },
+  "complexity_weights": {
+    "WEIGHT_BRANCH_DEPTH": 2.0,
+    "WEIGHT_PREDICATE": 1.5,
+    "COMPLEXITY_PENALTY_SCALE": 0.35
+  },
+  "experiment_budget": 12,
+  "deterministic_seed": null,
+  "autonomous_research_config": {
+    "initial_observation": "Autonomous benchmark seed: scan the canonical historical Edge Research universe for non-trivial relationships.",
+    "initial_question": "What non-trivial, statistically and economically interesting relationships can be discovered in the currently available historical data?",
+    "population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "outcome_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0
+    },
+    "initial_tool_name": "horizon_comparison",
+    "initial_tool_inputs": {
+      "horizons": [
+        "T3",
+        "T5",
+        "T10"
+      ]
+    },
+    "experiment_budget": 12,
+    "max_steps": 12
+  },
+  "autonomous_flag": "EDGE_RESEARCH_AUTONOMOUS=1",
+  "inventory_row_count": 3124,
+  "phases_frozen": [
+    "3D",
+    "3E",
+    "3F",
+    "3G",
+    "3G.1"
+  ],
+  "modification_policy": "NO_RESEARCH_LOGIC_CHANGES_AFTER_FREEZE"
+}
