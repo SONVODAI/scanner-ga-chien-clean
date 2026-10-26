@@ -1,0 +1,134 @@
+{
+  "comparison_type": "architectural_behavior_bb01_through_bb04",
+  "no_human_edge_comparison": true,
+  "metrics_table": [
+    {
+      "metric": "experiments",
+      "bb01": 2,
+      "bb02": 12,
+      "bb03_partial": 2,
+      "bb04": 12
+    },
+    {
+      "metric": "pct_budget_used",
+      "bb01": 16.67,
+      "bb02": 100.0,
+      "bb03_partial": 8.33,
+      "bb04": 100.0
+    },
+    {
+      "metric": "features_touched",
+      "bb01": 0,
+      "bb02": 4,
+      "bb03_partial": 0,
+      "bb04": 3
+    },
+    {
+      "metric": "tools",
+      "bb01": 2,
+      "bb02": 6,
+      "bb03_partial": 1,
+      "bb04": 4
+    },
+    {
+      "metric": "research_frames_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03_partial": 2,
+      "bb04": 5
+    },
+    {
+      "metric": "outcome_specs_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03_partial": 2,
+      "bb04": 6
+    },
+    {
+      "metric": "population_specs_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03_partial": 2,
+      "bb04": 2
+    },
+    {
+      "metric": "observation_horizons_executed",
+      "bb01": 1,
+      "bb02": 1,
+      "bb03_partial": 2,
+      "bb04": 2
+    },
+    {
+      "metric": "frame_transitions",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03_partial": 0,
+      "bb04": 4
+    },
+    {
+      "metric": "outcome_to_population_executed",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03_partial": 0,
+      "bb04": 1
+    },
+    {
+      "metric": "successful_post_reframe_follow_on",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03_partial": 0,
+      "bb04": 1
+    },
+    {
+      "metric": "falsifications",
+      "bb01": 1,
+      "bb02": 3,
+      "bb03_partial": 0,
+      "bb04": 1
+    },
+    {
+      "metric": "conditional_candidates",
+      "bb01": 0,
+      "bb02": 1,
+      "bb03_partial": 1,
+      "bb04": 6
+    },
+    {
+      "metric": "runtime_errors",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03_partial": 1,
+      "bb04": 1
+    },
+    {
+      "metric": "terminal_status",
+      "bb01": "ACTIVE",
+      "bb02": "BUDGET_EXHAUSTED",
+      "bb03_partial": "ACTIVE",
+      "bb04": "ERROR"
+    },
+    {
+      "metric": "research_capability_score",
+      "bb01": 51,
+      "bb02": 87,
+      "bb03_partial": 44,
+      "bb04": 79
+    },
+    {
+      "metric": "reframing_capability_score",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03_partial": 10,
+      "bb04": 15
+    },
+    {
+      "metric": "reframe_survivability_score",
+      "bb01": 0,
+      "bb02": 0,
+      "bb03_partial": 0,
+      "bb04": 8
+    }
+  ],
+  "bb03_note": "BB03 metrics are partial-run (crashed at experiment 2/12).",
+  "bb04_primary_question": "Can horizon-advanced frames survive follow-on research after 3G.2.1 repair?"
+}
