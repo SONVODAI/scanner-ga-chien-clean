@@ -1,0 +1,41 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "focal_date": "2026-06-29",
+    "spread_margin_above_threshold": 0.995,
+    "cross_sectional_n": 142,
+    "quintile_ns_balanced": true,
+    "surprise_informative": true,
+    "primarily_threshold_driven": true,
+    "structural_coherence": "moderate \u2014 non-monotonic pattern present but direction unstable across dates",
+    "persistence": "not assessed across dates \u2014 transient per focal date",
+    "single_group_dependence_risk": "low \u2014 quintiles balanced ~28-29 each",
+    "classification": "STATISTICALLY_ABOVE_THRESHOLD_WITH_STRUCTURE"
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "focal_date": "2026-06-30",
+    "spread_margin_above_threshold": 3.459,
+    "cross_sectional_n": 142,
+    "quintile_ns_balanced": true,
+    "surprise_informative": true,
+    "primarily_threshold_driven": false,
+    "structural_coherence": "moderate \u2014 non-monotonic pattern present but direction unstable across dates",
+    "persistence": "not assessed across dates \u2014 transient per focal date",
+    "single_group_dependence_risk": "low \u2014 quintiles balanced ~28-29 each",
+    "classification": "STATISTICALLY_ABOVE_THRESHOLD_WITH_STRUCTURE"
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "focal_date": "2026-07-23",
+    "spread_margin_above_threshold": 1.748,
+    "cross_sectional_n": 142,
+    "quintile_ns_balanced": true,
+    "surprise_informative": true,
+    "primarily_threshold_driven": false,
+    "structural_coherence": "moderate \u2014 non-monotonic pattern present but direction unstable across dates",
+    "persistence": "not assessed across dates \u2014 transient per focal date",
+    "single_group_dependence_risk": "low \u2014 quintiles balanced ~28-29 each",
+    "classification": "STATISTICALLY_ABOVE_THRESHOLD_WITH_STRUCTURE"
+  }
+]

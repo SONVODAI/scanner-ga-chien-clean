@@ -1,0 +1,119 @@
+{
+  "benchmark_id": "BB-Falsify-01",
+  "mode": "design_only \u2014 adversarial fixture classification",
+  "cases": [
+    {
+      "case_id": "BF-01",
+      "name": "obvious_confirmatory_retest",
+      "expected_class": "NOT_ACTUALLY_FALSIFICATION",
+      "expected_selector": "REJECT"
+    },
+    {
+      "case_id": "BF-02",
+      "name": "same_question_different_tool",
+      "expected_class": "NOT_ACTUALLY_FALSIFICATION",
+      "expected_selector": "REJECT unless interpretation contract exists"
+    },
+    {
+      "case_id": "BF-03",
+      "name": "independent_episode_test",
+      "expected_class": "INDEPENDENT_FALSIFICATION",
+      "expected_selector": "ELIGIBLE"
+    },
+    {
+      "case_id": "BF-04",
+      "name": "supportive_population_narrowing",
+      "expected_class": "NOT_ACTUALLY_FALSIFICATION",
+      "expected_selector": "REJECT anti_rescue"
+    },
+    {
+      "case_id": "BF-05",
+      "name": "horizon_mutation_disguised",
+      "expected_class": "NOT_ACTUALLY_FALSIFICATION",
+      "expected_selector": "REJECT anti_rescue"
+    },
+    {
+      "case_id": "BF-06",
+      "name": "valid_directional_reversal_test",
+      "expected_class": "INDEPENDENT_FALSIFICATION",
+      "expected_selector": "PREFERRED if executable"
+    },
+    {
+      "case_id": "BF-07",
+      "name": "non_informative_candidate",
+      "expected_class": "RELATED_FALSIFICATION",
+      "expected_selector": "LOWER_RANK \u2014 may not weaken if spread uninformative"
+    },
+    {
+      "case_id": "BF-08",
+      "name": "invalid_leaky_candidate",
+      "expected_class": "INVALID",
+      "expected_selector": "REJECT validity_gate"
+    },
+    {
+      "case_id": "BF-09",
+      "name": "two_genuine_strategies",
+      "expected_class": "AMBIGUOUS_TIE or lexicographic winner",
+      "expected_selector": "report_ambiguity if tied after rank 3"
+    },
+    {
+      "case_id": "BF-10",
+      "name": "no_viable_falsification",
+      "expected_class": "NO_VALID_FALSIFICATION_CANDIDATE",
+      "expected_selector": "HOLD \u2014 all candidates fail gates"
+    }
+  ],
+  "fixture_results": {
+    "BF-01": {
+      "mapped_to": "FC-01",
+      "selector_outcome": "REJECT",
+      "pass": true
+    },
+    "BF-02": {
+      "mapped_to": "FC-07",
+      "selector_outcome": "REJECT",
+      "pass": true
+    },
+    "BF-03": {
+      "mapped_to": "FC-02",
+      "selector_outcome": "ELIGIBLE_PREFERRED",
+      "pass": true
+    },
+    "BF-04": {
+      "mapped_to": "FC-05",
+      "selector_outcome": "REJECT",
+      "pass": true
+    },
+    "BF-05": {
+      "mapped_to": "FC-06",
+      "selector_outcome": "REJECT",
+      "pass": true
+    },
+    "BF-06": {
+      "mapped_to": "FC-02",
+      "selector_outcome": "ELIGIBLE_PREFERRED",
+      "pass": true
+    },
+    "BF-07": {
+      "mapped_to": "FC-08",
+      "selector_outcome": "LOWER_RANK interpreter_incompatible",
+      "pass": true
+    },
+    "BF-08": {
+      "mapped_to": "synthetic_cutoff_mismatch",
+      "selector_outcome": "REJECT",
+      "pass": true
+    },
+    "BF-09": {
+      "mapped_to": "FC-02 vs FC-03",
+      "selector_outcome": "FC-02 wins rank 3 directness + interpreter compatible",
+      "pass": true
+    },
+    "BF-10": {
+      "mapped_to": "only FC-01 available",
+      "selector_outcome": "NO_VALID_FALSIFICATION_CANDIDATE",
+      "pass": true
+    }
+  },
+  "hidden_answer_protection": "Fixtures classify candidate structure only \u2014 no future ToolResult encoded"
+}
