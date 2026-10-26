@@ -1,0 +1,1611 @@
+{
+  "today": {
+    "section": "TODAY",
+    "trade_date": "2026-07-23",
+    "version": "living_observation_read_model_v1_3k1",
+    "daily_summary": {
+      "summary_id": "dysum-64ac9ea0f20e003b",
+      "trade_date": "2026-07-23",
+      "summary_timestamp": "2026-08-22T09:26:01.410009+00:00",
+      "market_state_summary": {
+        "market_real": 1.1,
+        "market_forecast": 0.0,
+        "research_market_state": "UNKNOWN",
+        "research_market_transition": "UNKNOWN -> UNKNOWN",
+        "research_market_level": "LOW",
+        "research_market_trajectory": "IMPROVING"
+      },
+      "most_meaningful_market_delta": "breadth:UNKNOWN",
+      "new_observations_born": [],
+      "active_observations_reassessed": [
+        "obs-4ebd08ab86313faf"
+      ],
+      "strengthened_count": 0,
+      "weakened_or_challenged_count": 0,
+      "resolved_or_rejected_count": 0,
+      "silence_or_no_discovery": false,
+      "newly_arrived_forward_evidence": [],
+      "most_important_unresolved_question": null,
+      "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+      "provenance_hash": "70480e53167d41948985a278b324ce60a799a9f0e8220349e528972e9a19d76d",
+      "shadow_authority": {
+        "research_only": true,
+        "trading_authority": false,
+        "buy_signal": false,
+        "sell_signal": false,
+        "edge_active": false
+      },
+      "record_version": "daily_research_summary_v1_3k1"
+    },
+    "daily_voices": [
+      {
+        "assessment_id": "asmt-d9946f9ffc57e8aa",
+        "observation_id": "obs-4ebd08ab86313faf",
+        "assessment_trade_date": "2026-07-23",
+        "q1_today_i_see_vi": "H\u00f4m nay (2026-07-23) t\u00f4i th\u1ea5y epistemic state l\u00e0 UNRESOLVED. Lifecycle: SILENCE. Research status: ACTIVE.",
+        "q2_vs_prior_session_vi": "\u0110\u00e2y l\u00e0 assessment \u0111\u1ea7u ti\u00ean sau birth \u2014 ch\u01b0a c\u00f3 phi\u00ean tr\u01b0\u1edbc \u0111\u1ec3 so s\u00e1nh.",
+        "q3_market_change_vi": "Market delta: breadth:UNKNOWN. Breadth: UNKNOWN. Transition: UNKNOWN. Compatibility: UNKNOWN.",
+        "q4_new_evidence_vi": "Evidence m\u1edbi: kh\u00f4ng c\u00f3. Forward outcomes m\u1edbi: kh\u00f4ng c\u00f3.",
+        "q5_belief_changed_vi": "Quan \u0111i\u1ec3m kh\u00f4ng thay \u0111\u1ed5i (UNRESOLVED \u2192 UNRESOLVED).",
+        "q6_if_not_why_vi": "Epistemic state remains None. Market context changed (breadth:UNKNOWN), but no relevant new evidence arrived to justify changing belief.",
+        "q7_counter_hypothesis_vi": "\u0110i\u1ec1u ch\u1ed1ng l\u1ea1i hypothesis: kh\u00f4ng c\u00f3.",
+        "q8_still_unknown_vi": "Ch\u01b0a bi\u1ebft: kh\u00f4ng c\u00f3. Limitations: kh\u00f4ng c\u00f3.",
+        "q9_waiting_for_vi": "Waiting for T3 eligible on 2026-07-28",
+        "q10_old_observations_vi": "Observation obs-4ebd08ab86313faf age 0 trading days. Next eligible: T3 on 2026-07-28.",
+        "structured_trace": {
+          "assessment_id": "asmt-d9946f9ffc57e8aa",
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "market_delta_hash": "5e2b2105674e20dd840d2a19fb406a15c9f77d2a1a3a21dba8d7620b1b21adc8",
+          "stale_copy_risk": false,
+          "structured_trace_only": true
+        },
+        "narrative_authority": "STRUCTURED_STATE_ONLY",
+        "record_version": "daily_voice_contract_v1_3k1"
+      }
+    ],
+    "market_deltas": [
+      {
+        "regime_changed": false,
+        "breadth_direction": "UNKNOWN",
+        "transition_direction": "UNKNOWN",
+        "dispersion_changed": false,
+        "cohort_relative_changed": false,
+        "compatibility_direction": "UNKNOWN",
+        "summary_keys": [
+          "breadth:UNKNOWN"
+        ],
+        "previous_context_hash": "d5a89beacb114c155c07d4d87d5114244180c5624314ca8958f7cf280c9177bc",
+        "current_context_hash": "cc2223a1c35f76a0d311660accdcf91aac23bfab84e0502e6b2bda7882f8c1d1",
+        "delta_hash": "5e2b2105674e20dd840d2a19fb406a15c9f77d2a1a3a21dba8d7620b1b21adc8"
+      }
+    ],
+    "belief_deltas": [
+      {
+        "previous_state": null,
+        "current_state": null,
+        "changed": false,
+        "change_kind": "UNCHANGED",
+        "rationale_keys": [
+          "no_relevant_new_evidence"
+        ]
+      }
+    ],
+    "active_observations": [
+      {
+        "observation_id": "obs-4ebd08ab86313faf",
+        "lifecycle": "SILENCE",
+        "epistemic_state": null,
+        "what_changed": [
+          "breadth:UNKNOWN"
+        ]
+      }
+    ],
+    "new_forward_evidence": [],
+    "unresolved_questions": [],
+    "shadow_authority": {
+      "research_only": true,
+      "trading_authority": false
+    }
+  },
+  "observations": [
+    {
+      "section": "OBSERVATION_DETAIL",
+      "observation_id": "obs-4ebd08ab86313faf",
+      "version": "living_observation_read_model_v1_3k1",
+      "at_birth": {
+        "original_belief": null,
+        "original_evidence": null,
+        "original_limitations": [],
+        "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+        "birth_timestamp": "2026-08-22T09:26:01.397799+00:00"
+      },
+      "today": {
+        "current_assessment": {
+          "assessment_id": "asmt-f7661319c6f217ff",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-08-02",
+          "assessment_timestamp": "2026-08-22T09:26:01.551125+00:00",
+          "previous_assessment_id": "asmt-9069b8015f0c6351",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-08-02",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 1420,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "847330997bfad3c88b74eb29bf652cd971f8f2dd106e0062648fabce0c3c1939",
+          "current_market_context_hash": "a7837e1dcbda50a91cffd194a0a514942fb8c4c0d63ea5436646f2835516ba0d",
+          "previous_market_context_identity": "5153e335d185f3fe8cf27d43321f82d4dabc7b69ea52f08a50baa5513a8dff2a",
+          "previous_market_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": false,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:EARLY_RECOVERY->STRESS",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+            "current_context_hash": "a7837e1dcbda50a91cffd194a0a514942fb8c4c0d63ea5436646f2835516ba0d",
+            "delta_hash": "a05f14ee717e0368a0456f125c60917f20e678cbcc9b0d4a62fb81b64aaaacbd"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "epistemic_delta": {
+            "previous_state": "UNRESOLVED",
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:EARLY_RECOVERY->STRESS",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market context changed (regime:EARLY_RECOVERY->STRESS; breadth:UNKNOWN; transition:CHANGED; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 9,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "f7661319c6f217ff32e91733b3dec16e79a8a1ad8e5cc13da7d0cf3f2743691e",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        "what_changed": [
+          "regime:EARLY_RECOVERY->STRESS",
+          "breadth:UNKNOWN",
+          "transition:CHANGED",
+          "cohort_relative:changed"
+        ],
+        "why": "Epistemic state remains UNRESOLVED. Market context changed (regime:EARLY_RECOVERY->STRESS; breadth:UNKNOWN; transition:CHANGED; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief."
+      },
+      "forward": {
+        "T3": {
+          "status": "PENDING_FUTURE",
+          "eligible_date": "2026-07-28",
+          "realized_outcome": null
+        },
+        "T5": {
+          "status": "PENDING_FUTURE",
+          "eligible_date": "2026-07-30",
+          "realized_outcome": null
+        },
+        "T10": {
+          "status": "PENDING_FUTURE",
+          "eligible_date": "2026-08-06",
+          "realized_outcome": null
+        }
+      },
+      "outcome_records": [
+        {
+          "outcome_record_id": "out-3bfa5541fa99c77a",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "horizon": "T3",
+          "eligible_evaluation_date": "2026-07-28",
+          "actual_evaluation_timestamp": "2026-08-22T09:26:01.463303+00:00",
+          "realized_outcomes": {
+            "horizon": "T3",
+            "return_field": "t3_return",
+            "cohort_mean_return": -2.565465678342947,
+            "cohort_median_return": -1.9371482176360257,
+            "cohort_size": 142,
+            "positive_fraction": 0.13380281690140844,
+            "symbols_evaluated": [
+              "ACB",
+              "ACV",
+              "AGR",
+              "ANV",
+              "BAF",
+              "BFC",
+              "BID",
+              "BMP",
+              "BSI",
+              "BSR",
+              "BVH",
+              "BVS",
+              "C4G",
+              "CEO",
+              "CII",
+              "CMG",
+              "CSV",
+              "CTD",
+              "CTG",
+              "CTR",
+              "DBC",
+              "DCM",
+              "DDV",
+              "DGC",
+              "DGW",
+              "DIG",
+              "DPG",
+              "DPM",
+              "DPR",
+              "DRI",
+              "DXG",
+              "DXS",
+              "EIB",
+              "EVF",
+              "FCN",
+              "FOX",
+              "FPT",
+              "FRT",
+              "FTS",
+              "GAS",
+              "GEE",
+              "GEG",
+              "GEX",
+              "GIL",
+              "GMD",
+              "GVR",
+              "HAG",
+              "HAH",
+              "HCM",
+              "HDB"
+            ]
+          },
+          "evaluation_status": "EVALUATED",
+          "data_identity": "a884c96b0bd60d8aeb150a1b69772046e6b12500d53ef1575a7ee0cd20baa250",
+          "missing_handling": null,
+          "contract_id": "fwdc-32b1d2090658",
+          "contract_hash": "f4718ab091f9bd47fec138dfc403e8294588643c288d3706f0c86cec12a6fc39",
+          "provenance": {
+            "assessment_trade_date": "2026-07-28",
+            "birth_trade_date": "2026-07-23",
+            "outcome_identity_hash": "3bfa5541fa99c77ac086293a34551be0c6c76aa11903d84a4d95613750192ecf"
+          },
+          "record_version": "research_observation_outcome_v1_3k0"
+        },
+        {
+          "outcome_record_id": "out-8e8c21b90311479f",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "horizon": "T5",
+          "eligible_evaluation_date": "2026-07-30",
+          "actual_evaluation_timestamp": "2026-08-22T09:26:01.496220+00:00",
+          "realized_outcomes": {
+            "horizon": "T5",
+            "return_field": "t5_return",
+            "cohort_mean_return": 0.4887065221336558,
+            "cohort_median_return": 0.34686402466589383,
+            "cohort_size": 142,
+            "positive_fraction": 0.5140845070422535,
+            "symbols_evaluated": [
+              "ACB",
+              "ACV",
+              "AGR",
+              "ANV",
+              "BAF",
+              "BFC",
+              "BID",
+              "BMP",
+              "BSI",
+              "BSR",
+              "BVH",
+              "BVS",
+              "C4G",
+              "CEO",
+              "CII",
+              "CMG",
+              "CSV",
+              "CTD",
+              "CTG",
+              "CTR",
+              "DBC",
+              "DCM",
+              "DDV",
+              "DGC",
+              "DGW",
+              "DIG",
+              "DPG",
+              "DPM",
+              "DPR",
+              "DRI",
+              "DXG",
+              "DXS",
+              "EIB",
+              "EVF",
+              "FCN",
+              "FOX",
+              "FPT",
+              "FRT",
+              "FTS",
+              "GAS",
+              "GEE",
+              "GEG",
+              "GEX",
+              "GIL",
+              "GMD",
+              "GVR",
+              "HAG",
+              "HAH",
+              "HCM",
+              "HDB"
+            ]
+          },
+          "evaluation_status": "EVALUATED",
+          "data_identity": "2504b68c2a3ac3cb2ef43ed3469a70d0933729ada98689af0c912f12b5960844",
+          "missing_handling": null,
+          "contract_id": "fwdc-32b1d2090658",
+          "contract_hash": "f4718ab091f9bd47fec138dfc403e8294588643c288d3706f0c86cec12a6fc39",
+          "provenance": {
+            "assessment_trade_date": "2026-07-30",
+            "birth_trade_date": "2026-07-23",
+            "outcome_identity_hash": "8e8c21b90311479f05a3e351caa934802f33766a95f67ef0db9f8b2e8c4f3eb6"
+          },
+          "record_version": "research_observation_outcome_v1_3k0"
+        }
+      ],
+      "assessment_timeline": [
+        {
+          "assessment_id": "asmt-d9946f9ffc57e8aa",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-23",
+          "assessment_timestamp": "2026-08-22T09:26:01.409157+00:00",
+          "previous_assessment_id": null,
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-23",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 142,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "16f00c606067d3c8dd320c3d41b08dd2bd95d7ae36423f7afe25b72d922d75cc",
+          "current_market_context_hash": "cc2223a1c35f76a0d311660accdcf91aac23bfab84e0502e6b2bda7882f8c1d1",
+          "previous_market_context_identity": "16f00c606067d3c8dd320c3d41b08dd2bd95d7ae36423f7afe25b72d922d75cc",
+          "previous_market_context_hash": "cc2223a1c35f76a0d311660accdcf91aac23bfab84e0502e6b2bda7882f8c1d1",
+          "market_delta": {
+            "regime_changed": false,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "UNKNOWN",
+            "dispersion_changed": false,
+            "cohort_relative_changed": false,
+            "compatibility_direction": "UNKNOWN",
+            "summary_keys": [
+              "breadth:UNKNOWN"
+            ],
+            "previous_context_hash": "d5a89beacb114c155c07d4d87d5114244180c5624314ca8958f7cf280c9177bc",
+            "current_context_hash": "cc2223a1c35f76a0d311660accdcf91aac23bfab84e0502e6b2bda7882f8c1d1",
+            "delta_hash": "5e2b2105674e20dd840d2a19fb406a15c9f77d2a1a3a21dba8d7620b1b21adc8"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": null,
+          "previous_epistemic_state": null,
+          "epistemic_delta": {
+            "previous_state": null,
+            "current_state": null,
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "breadth:UNKNOWN"
+          ],
+          "what_did_not_change": [
+            "epistemic:None"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains None. Market context changed (breadth:UNKNOWN), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 0,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "d9946f9ffc57e8aac1e9b72d1c6657b9bc92a8bd7db83daeca46335abbf46590",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-d6e18fe2e40f6cd8",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-24",
+          "assessment_timestamp": "2026-08-22T09:26:01.422736+00:00",
+          "previous_assessment_id": "asmt-d9946f9ffc57e8aa",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-24",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 284,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "d8a4e99afd705c0381a2de09239e26e8b5d7873cddae6971c22bb72dd3347ad9",
+          "current_market_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+          "previous_market_context_identity": "16f00c606067d3c8dd320c3d41b08dd2bd95d7ae36423f7afe25b72d922d75cc",
+          "previous_market_context_hash": "cc2223a1c35f76a0d311660accdcf91aac23bfab84e0502e6b2bda7882f8c1d1",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": false,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:UNKNOWN->STRESS",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "cc2223a1c35f76a0d311660accdcf91aac23bfab84e0502e6b2bda7882f8c1d1",
+            "current_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+            "delta_hash": "f792c62b6793d33734224b4ff36ac37906cf41a3a8ee6b8c75f635f177bd46c7"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": null,
+          "previous_epistemic_state": null,
+          "epistemic_delta": {
+            "previous_state": null,
+            "current_state": null,
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:UNKNOWN->STRESS",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:None"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains None. Market context changed (regime:UNKNOWN->STRESS; breadth:UNKNOWN; transition:CHANGED; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 1,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "d6e18fe2e40f6cd8aeaaf8137ed895293a79c1466781ce4373fde022392352af",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-15f81395206397e7",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-26",
+          "assessment_timestamp": "2026-08-22T09:26:01.436691+00:00",
+          "previous_assessment_id": "asmt-d6e18fe2e40f6cd8",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-26",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 426,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "d8a4e99afd705c0381a2de09239e26e8b5d7873cddae6971c22bb72dd3347ad9",
+          "current_market_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+          "previous_market_context_identity": "d8a4e99afd705c0381a2de09239e26e8b5d7873cddae6971c22bb72dd3347ad9",
+          "previous_market_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+          "market_delta": {
+            "regime_changed": false,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": false,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "UNKNOWN",
+            "summary_keys": [
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+            "current_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+            "delta_hash": "3fa5a0a3067bb526fd131bfe405ef4ee519df938fd3a531461281fcbd3a3ddae"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": null,
+          "previous_epistemic_state": null,
+          "epistemic_delta": {
+            "previous_state": null,
+            "current_state": null,
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:None"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains None. Market context changed (breadth:UNKNOWN; transition:CHANGED; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 2,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "15f81395206397e764aa7ae43cfebdffba4ed9d43ddbf5ffac7aa90f2a91c518",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-2056c5f0973a8724",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-27",
+          "assessment_timestamp": "2026-08-22T09:26:01.450924+00:00",
+          "previous_assessment_id": "asmt-15f81395206397e7",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-27",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 568,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "c6c807051ed060091f7b9f8246f1bb6e1d836570c61690dafed8de6c49980213",
+          "current_market_context_hash": "0a4494a291a0bae3036373e47826e2a87dd52573d25e45564f195699bb71b0f0",
+          "previous_market_context_identity": "d8a4e99afd705c0381a2de09239e26e8b5d7873cddae6971c22bb72dd3347ad9",
+          "previous_market_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+          "market_delta": {
+            "regime_changed": false,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "UNCHANGED",
+            "dispersion_changed": true,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "UNKNOWN",
+            "summary_keys": [
+              "breadth:UNKNOWN",
+              "dispersion:changed",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "283aa276b8353a2b338109853acc6f96c252a38405deb1a8db73799e96be3d52",
+            "current_context_hash": "0a4494a291a0bae3036373e47826e2a87dd52573d25e45564f195699bb71b0f0",
+            "delta_hash": "70da6d9366cad04a4a377b0b3ffe45196c964b4cda32294f8d6ea22fe2ba0cf6"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": null,
+          "previous_epistemic_state": null,
+          "epistemic_delta": {
+            "previous_state": null,
+            "current_state": null,
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "breadth:UNKNOWN",
+            "dispersion:changed",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:None"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains None. Market context changed (breadth:UNKNOWN; dispersion:changed; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 3,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "2056c5f0973a87247c814ecd3f29bff6e995cf1f5d7a514f26130beea81674ea",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-82ea39742992b03b",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-28",
+          "assessment_timestamp": "2026-08-22T09:26:01.466841+00:00",
+          "previous_assessment_id": "asmt-2056c5f0973a8724",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-28",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 710,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "eff02b0d7eb3c2673274fb7309d2331517730d19ca246738c4cfd60b235f1598",
+          "current_market_context_hash": "f00b1a8d62a3b49399be451b597ab11c2b48313b6d18eb7aef24bacc83b38fd0",
+          "previous_market_context_identity": "c6c807051ed060091f7b9f8246f1bb6e1d836570c61690dafed8de6c49980213",
+          "previous_market_context_hash": "0a4494a291a0bae3036373e47826e2a87dd52573d25e45564f195699bb71b0f0",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": true,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:STRESS->UNKNOWN",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "dispersion:changed",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "0a4494a291a0bae3036373e47826e2a87dd52573d25e45564f195699bb71b0f0",
+            "current_context_hash": "f00b1a8d62a3b49399be451b597ab11c2b48313b6d18eb7aef24bacc83b38fd0",
+            "delta_hash": "fa5c13f056797c43eb13dd0f56a9efbaa123461032cc9bcad5d9ff0a02829a13"
+          },
+          "new_evidence_since_prior": [
+            "forward_outcome:T3:out-3bfa5541fa99c77a"
+          ],
+          "forward_outcomes_newly_available": [
+            "out-3bfa5541fa99c77a"
+          ],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": null,
+          "epistemic_delta": {
+            "previous_state": null,
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "EVIDENCE_CHANGED",
+            "rationale_keys": [
+              "forward_outcome:T3:out-3bfa5541fa99c77a"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:STRESS->UNKNOWN",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "dispersion:changed",
+            "cohort_relative:changed",
+            "forward_outcome:T3:out-3bfa5541fa99c77a"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market changed (regime:STRESS->UNKNOWN; breadth:UNKNOWN; transition:CHANGED; dispersion:changed; cohort_relative:changed) and new evidence arrived (forward_outcome:T3:out-3bfa5541fa99c77a), but it does not materially address the surviving null; therefore the scientific conclusion is unchanged.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 4,
+          "change_flags": [
+            "MARKET_CHANGED",
+            "EVIDENCE_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "82ea39742992b03b23e5117d84aeac2b36fac7e6119e5e19a014056509a3ac5e",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-abe707e4bd704029",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-29",
+          "assessment_timestamp": "2026-08-22T09:26:01.482322+00:00",
+          "previous_assessment_id": "asmt-82ea39742992b03b",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-29",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 852,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "4fc211fbcfe6854405ba07073107310c6a843a68ca0f52c58476f5d92515970c",
+          "current_market_context_hash": "8b716ed46259f1aec75acb1919fc0419b9b053cbc4cdba5a3f855bdaf69045f2",
+          "previous_market_context_identity": "eff02b0d7eb3c2673274fb7309d2331517730d19ca246738c4cfd60b235f1598",
+          "previous_market_context_hash": "f00b1a8d62a3b49399be451b597ab11c2b48313b6d18eb7aef24bacc83b38fd0",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": true,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:UNKNOWN->EARLY_RECOVERY",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "dispersion:changed",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "f00b1a8d62a3b49399be451b597ab11c2b48313b6d18eb7aef24bacc83b38fd0",
+            "current_context_hash": "8b716ed46259f1aec75acb1919fc0419b9b053cbc4cdba5a3f855bdaf69045f2",
+            "delta_hash": "dc78355116d1934d80e7543317da904c5266f4e27326a9c7bd7996021ab9b83c"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "epistemic_delta": {
+            "previous_state": "UNRESOLVED",
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:UNKNOWN->EARLY_RECOVERY",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "dispersion:changed",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market context changed (regime:UNKNOWN->EARLY_RECOVERY; breadth:UNKNOWN; transition:CHANGED; dispersion:changed; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 5,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "abe707e4bd704029d1920a943a4f80eef24abf2513142239a7d1907b2953a159",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-31303d35e579b5e8",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-30",
+          "assessment_timestamp": "2026-08-22T09:26:01.499838+00:00",
+          "previous_assessment_id": "asmt-abe707e4bd704029",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-30",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 994,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "fb87ee581e5e92fe5dd4fc7a44f260c4eda10380fbf699b192c82b28c2790f2f",
+          "current_market_context_hash": "91365aceb451500c47bf6317a5993fc0ebaffcb8295c9f70837a0a52fb3b9f2d",
+          "previous_market_context_identity": "4fc211fbcfe6854405ba07073107310c6a843a68ca0f52c58476f5d92515970c",
+          "previous_market_context_hash": "8b716ed46259f1aec75acb1919fc0419b9b053cbc4cdba5a3f855bdaf69045f2",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": true,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:EARLY_RECOVERY->BROAD_RECOVERY",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "dispersion:changed",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "8b716ed46259f1aec75acb1919fc0419b9b053cbc4cdba5a3f855bdaf69045f2",
+            "current_context_hash": "91365aceb451500c47bf6317a5993fc0ebaffcb8295c9f70837a0a52fb3b9f2d",
+            "delta_hash": "e127e022b9a8424a1e13367d7c29bf38d7de58a44380de467e1adb067e45eda8"
+          },
+          "new_evidence_since_prior": [
+            "forward_outcome:T5:out-8e8c21b90311479f"
+          ],
+          "forward_outcomes_newly_available": [
+            "out-8e8c21b90311479f"
+          ],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "epistemic_delta": {
+            "previous_state": "UNRESOLVED",
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "EVIDENCE_CHANGED",
+            "rationale_keys": [
+              "forward_outcome:T5:out-8e8c21b90311479f"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:EARLY_RECOVERY->BROAD_RECOVERY",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "dispersion:changed",
+            "cohort_relative:changed",
+            "forward_outcome:T5:out-8e8c21b90311479f"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market changed (regime:EARLY_RECOVERY->BROAD_RECOVERY; breadth:UNKNOWN; transition:CHANGED; dispersion:changed; cohort_relative:changed) and new evidence arrived (forward_outcome:T5:out-8e8c21b90311479f), but it does not materially address the surviving null; therefore the scientific conclusion is unchanged.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 6,
+          "change_flags": [
+            "MARKET_CHANGED",
+            "EVIDENCE_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "31303d35e579b5e89582aa020f60e29c4d13779bc6bbe79caa15c9dc79066952",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-4e818010115af490",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-07-31",
+          "assessment_timestamp": "2026-08-22T09:26:01.516636+00:00",
+          "previous_assessment_id": "asmt-31303d35e579b5e8",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-07-31",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 1136,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "5153e335d185f3fe8cf27d43321f82d4dabc7b69ea52f08a50baa5513a8dff2a",
+          "current_market_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+          "previous_market_context_identity": "fb87ee581e5e92fe5dd4fc7a44f260c4eda10380fbf699b192c82b28c2790f2f",
+          "previous_market_context_hash": "91365aceb451500c47bf6317a5993fc0ebaffcb8295c9f70837a0a52fb3b9f2d",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": true,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:BROAD_RECOVERY->EARLY_RECOVERY",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "dispersion:changed",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "91365aceb451500c47bf6317a5993fc0ebaffcb8295c9f70837a0a52fb3b9f2d",
+            "current_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+            "delta_hash": "fb401ca71c794da0a7a7d2142f91faeccfa1a22788403ebfca49f610965b752a"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "epistemic_delta": {
+            "previous_state": "UNRESOLVED",
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:BROAD_RECOVERY->EARLY_RECOVERY",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "dispersion:changed",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market context changed (regime:BROAD_RECOVERY->EARLY_RECOVERY; breadth:UNKNOWN; transition:CHANGED; dispersion:changed; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 7,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "4e818010115af4907ca33d1799f20cced1a8a5ed346a211ecf239cfa9c7b5f0a",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-9069b8015f0c6351",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-08-01",
+          "assessment_timestamp": "2026-08-22T09:26:01.533784+00:00",
+          "previous_assessment_id": "asmt-4e818010115af490",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-08-01",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 1278,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "5153e335d185f3fe8cf27d43321f82d4dabc7b69ea52f08a50baa5513a8dff2a",
+          "current_market_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+          "previous_market_context_identity": "5153e335d185f3fe8cf27d43321f82d4dabc7b69ea52f08a50baa5513a8dff2a",
+          "previous_market_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+          "market_delta": {
+            "regime_changed": false,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": false,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "UNKNOWN",
+            "summary_keys": [
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+            "current_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+            "delta_hash": "346b916b353553ffaebc2d9ad12edda895aea992bb8b97f3da68bb5e9de81a8e"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "epistemic_delta": {
+            "previous_state": "UNRESOLVED",
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market context changed (breadth:UNKNOWN; transition:CHANGED; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 8,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "9069b8015f0c63519ea64a407acea64804cb6b300e7d92b27523aed91d5da53f",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        },
+        {
+          "assessment_id": "asmt-f7661319c6f217ff",
+          "observation_id": "obs-4ebd08ab86313faf",
+          "assessment_trade_date": "2026-08-02",
+          "assessment_timestamp": "2026-08-22T09:26:01.551125+00:00",
+          "previous_assessment_id": "asmt-9069b8015f0c6351",
+          "birth_record_hash": "4440717b8c6b7fab9e45dc099ff5cff2a34dd6b6c193b088b519a9fec8da5bc6",
+          "cutoff_provenance": {
+            "assessment_trade_date": "2026-08-02",
+            "temporal_provenance_hash": "c93b3b9d032332f3c466e4d566fcc08b74628274b226f224a599476514fbb7cd",
+            "panel_row_count": 1420,
+            "replay_mode": "HISTORICAL_MULTI_DAY_REPLAY"
+          },
+          "current_market_context_identity": "847330997bfad3c88b74eb29bf652cd971f8f2dd106e0062648fabce0c3c1939",
+          "current_market_context_hash": "a7837e1dcbda50a91cffd194a0a514942fb8c4c0d63ea5436646f2835516ba0d",
+          "previous_market_context_identity": "5153e335d185f3fe8cf27d43321f82d4dabc7b69ea52f08a50baa5513a8dff2a",
+          "previous_market_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+          "market_delta": {
+            "regime_changed": true,
+            "breadth_direction": "UNKNOWN",
+            "transition_direction": "CHANGED",
+            "dispersion_changed": false,
+            "cohort_relative_changed": true,
+            "compatibility_direction": "MORE_COMPATIBLE",
+            "summary_keys": [
+              "regime:EARLY_RECOVERY->STRESS",
+              "breadth:UNKNOWN",
+              "transition:CHANGED",
+              "cohort_relative:changed"
+            ],
+            "previous_context_hash": "400ba5b26b89e6e1fda4c9527c7ca8c1796e4fab081bef5e528518658a70ef87",
+            "current_context_hash": "a7837e1dcbda50a91cffd194a0a514942fb8c4c0d63ea5436646f2835516ba0d",
+            "delta_hash": "a05f14ee717e0368a0456f125c60917f20e678cbcc9b0d4a62fb81b64aaaacbd"
+          },
+          "new_evidence_since_prior": [],
+          "forward_outcomes_newly_available": [],
+          "current_epistemic_state": "UNRESOLVED",
+          "previous_epistemic_state": "UNRESOLVED",
+          "epistemic_delta": {
+            "previous_state": "UNRESOLVED",
+            "current_state": "UNRESOLVED",
+            "changed": false,
+            "change_kind": "UNCHANGED",
+            "rationale_keys": [
+              "no_relevant_new_evidence"
+            ]
+          },
+          "null_ledger_current": [],
+          "null_ledger_delta": [],
+          "contradictions": [],
+          "dependence_warnings": [],
+          "unresolved_uncertainties": [],
+          "current_limitations": [],
+          "current_research_status": "ACTIVE",
+          "current_lifecycle_status": "SILENCE",
+          "observation_lifecycle_state": "SILENCE",
+          "what_changed": [
+            "regime:EARLY_RECOVERY->STRESS",
+            "breadth:UNKNOWN",
+            "transition:CHANGED",
+            "cohort_relative:changed"
+          ],
+          "what_did_not_change": [
+            "epistemic:UNRESOLVED"
+          ],
+          "why_belief_changed_or_not": "Epistemic state remains UNRESOLVED. Market context changed (regime:EARLY_RECOVERY->STRESS; breadth:UNKNOWN; transition:CHANGED; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.",
+          "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+          "next_eligible_evaluation_horizon": "T3",
+          "next_eligible_evaluation_date": "2026-07-28",
+          "observation_age_trading_days": 9,
+          "change_flags": [
+            "MARKET_CHANGED"
+          ],
+          "shadow_authority": {
+            "research_only": true,
+            "trading_authority": false,
+            "buy_signal": false,
+            "sell_signal": false,
+            "edge_active": false
+          },
+          "assessment_identity_hash": "f7661319c6f217ff32e91733b3dec16e79a8a1ad8e5cc13da7d0cf3f2743691e",
+          "stale_copy_risk": false,
+          "record_version": "daily_research_assessment_v1_3k1"
+        }
+      ],
+      "current_state": {
+        "epistemic": "UNRESOLVED",
+        "lifecycle": "SILENCE"
+      },
+      "evidence_null_history": {
+        "null_ledger": [],
+        "surviving_nulls": []
+      }
+    }
+  ],
+  "history": {
+    "section": "HISTORY",
+    "version": "living_observation_read_model_v1_3k1",
+    "daily_summaries": [
+      {
+        "summary_id": "dysum-64ac9ea0f20e003b",
+        "trade_date": "2026-07-23",
+        "summary_timestamp": "2026-08-22T09:26:01.410009+00:00",
+        "market_state_summary": {
+          "market_real": 1.1,
+          "market_forecast": 0.0,
+          "research_market_state": "UNKNOWN",
+          "research_market_transition": "UNKNOWN -> UNKNOWN",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "IMPROVING"
+        },
+        "most_meaningful_market_delta": "breadth:UNKNOWN",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "70480e53167d41948985a278b324ce60a799a9f0e8220349e528972e9a19d76d",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-0bdb8133858b2d29",
+        "trade_date": "2026-07-24",
+        "summary_timestamp": "2026-08-22T09:26:01.423758+00:00",
+        "market_state_summary": {
+          "market_real": 1.1,
+          "market_forecast": 0.0,
+          "research_market_state": "STRESS",
+          "research_market_transition": "UNKNOWN -> STRESS",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "FLAT"
+        },
+        "most_meaningful_market_delta": "regime:UNKNOWN->STRESS",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "878ef65bcd4330e89058311aea65784a7407792cc9e09bf4e6ec66d0fad7addc",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-e39f411f3b19833b",
+        "trade_date": "2026-07-26",
+        "summary_timestamp": "2026-08-22T09:26:01.437799+00:00",
+        "market_state_summary": {
+          "market_real": 1.1,
+          "market_forecast": 0.0,
+          "research_market_state": "STRESS",
+          "research_market_transition": "STRESS -> STRESS",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "FLAT"
+        },
+        "most_meaningful_market_delta": "breadth:UNKNOWN",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "7a52d7758731eab435e514b4458c86ff57a7303eeef3c5eede52c655a6342646",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-4df2374acd40677b",
+        "trade_date": "2026-07-27",
+        "summary_timestamp": "2026-08-22T09:26:01.451980+00:00",
+        "market_state_summary": {
+          "market_real": 0.5,
+          "market_forecast": 0.0,
+          "research_market_state": "STRESS",
+          "research_market_transition": "STRESS -> STRESS",
+          "research_market_level": "VERY_LOW",
+          "research_market_trajectory": "DETERIORATING"
+        },
+        "most_meaningful_market_delta": "breadth:UNKNOWN",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "93919710ef7b6d4b58b74f1533870377be20a5d2c72e9fc9e4044e7794f46955",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-1462480c4735d6ae",
+        "trade_date": "2026-07-28",
+        "summary_timestamp": "2026-08-22T09:26:01.467931+00:00",
+        "market_state_summary": {
+          "market_real": 1.2,
+          "market_forecast": 0.0,
+          "research_market_state": "UNKNOWN",
+          "research_market_transition": "STRESS -> UNKNOWN",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "IMPROVING"
+        },
+        "most_meaningful_market_delta": "regime:STRESS->UNKNOWN",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [
+          "out-3bfa5541fa99c77a"
+        ],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "d24369a03b38bf2a5dbe0b66b531ea4c53962206ecbaf9eafbb852d745414685",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-1b8fb8fce588a835",
+        "trade_date": "2026-07-29",
+        "summary_timestamp": "2026-08-22T09:26:01.483519+00:00",
+        "market_state_summary": {
+          "market_real": 2.1,
+          "market_forecast": 0.0,
+          "research_market_state": "EARLY_RECOVERY",
+          "research_market_transition": "UNKNOWN -> EARLY_RECOVERY",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "IMPROVING"
+        },
+        "most_meaningful_market_delta": "regime:UNKNOWN->EARLY_RECOVERY",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "a4d132b0db650e7f4facba8b30ac73e61f3a8a702740606bdd4994a50f732481",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-b01492dc915d07e0",
+        "trade_date": "2026-07-30",
+        "summary_timestamp": "2026-08-22T09:26:01.500953+00:00",
+        "market_state_summary": {
+          "market_real": 4.3,
+          "market_forecast": 0.0,
+          "research_market_state": "BROAD_RECOVERY",
+          "research_market_transition": "EARLY_RECOVERY -> BROAD_RECOVERY",
+          "research_market_level": "MID",
+          "research_market_trajectory": "IMPROVING"
+        },
+        "most_meaningful_market_delta": "regime:EARLY_RECOVERY->BROAD_RECOVERY",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [
+          "out-8e8c21b90311479f"
+        ],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "861919b6576e2250823d9aed06f9e24f8eb71dca43714133270623b1addf667b",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-5216ccad864115ee",
+        "trade_date": "2026-07-31",
+        "summary_timestamp": "2026-08-22T09:26:01.517771+00:00",
+        "market_state_summary": {
+          "market_real": 3.0,
+          "market_forecast": 0.0,
+          "research_market_state": "EARLY_RECOVERY",
+          "research_market_transition": "BROAD_RECOVERY -> EARLY_RECOVERY",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "IMPROVING"
+        },
+        "most_meaningful_market_delta": "regime:BROAD_RECOVERY->EARLY_RECOVERY",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "a207d6c1209687f740157878ac1e985942124ba883e29e788d28d8a7fd94c96f",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-552dfe6a3b4608ba",
+        "trade_date": "2026-08-01",
+        "summary_timestamp": "2026-08-22T09:26:01.534933+00:00",
+        "market_state_summary": {
+          "market_real": 3.0,
+          "market_forecast": 0.0,
+          "research_market_state": "EARLY_RECOVERY",
+          "research_market_transition": "EARLY_RECOVERY -> EARLY_RECOVERY",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "IMPROVING"
+        },
+        "most_meaningful_market_delta": "breadth:UNKNOWN",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "4935b98ed5c8e9a5e527a6480214082af5cccd296ba1db6e2c65f418c1bb8a20",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      },
+      {
+        "summary_id": "dysum-d952840287fa09cb",
+        "trade_date": "2026-08-02",
+        "summary_timestamp": "2026-08-22T09:26:01.552236+00:00",
+        "market_state_summary": {
+          "market_real": 3.0,
+          "market_forecast": 0.0,
+          "research_market_state": "STRESS",
+          "research_market_transition": "EARLY_RECOVERY -> STRESS",
+          "research_market_level": "LOW",
+          "research_market_trajectory": "DETERIORATING"
+        },
+        "most_meaningful_market_delta": "regime:EARLY_RECOVERY->STRESS",
+        "new_observations_born": [],
+        "active_observations_reassessed": [
+          "obs-4ebd08ab86313faf"
+        ],
+        "strengthened_count": 0,
+        "weakened_or_challenged_count": 0,
+        "resolved_or_rejected_count": 0,
+        "silence_or_no_discovery": false,
+        "newly_arrived_forward_evidence": [],
+        "most_important_unresolved_question": null,
+        "what_bot_is_waiting_for": "Waiting for T3 eligible on 2026-07-28",
+        "provenance_hash": "b14eb0c95163ace2a3fbe91033e9e84cf39034ad293145036b1373fc42bc8f13",
+        "shadow_authority": {
+          "research_only": true,
+          "trading_authority": false,
+          "buy_signal": false,
+          "sell_signal": false,
+          "edge_active": false
+        },
+        "record_version": "daily_research_summary_v1_3k1"
+      }
+    ],
+    "silence_days": [],
+    "calibration_placeholders": {
+      "note": "Calibration data not yet populated \u2014 Phase 3K.2 boundary",
+      "forward_outcome_count": 2
+    },
+    "rejected_or_negative": []
+  },
+  "version": "living_observation_read_model_v1_3k1"
+}

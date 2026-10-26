@@ -1,0 +1,7 @@
+{
+  "verdict": "FIRST_AUTONOMOUS_ACTION_AUDIT_PARTIAL",
+  "rationale": "High-level action (falsify population_robustness) is evidence-motivated by E2 LOW population independence and unresolved axis. Selection over temporal_regime is NARROWLY_DOMINANT on hardcoded sample_independence=HIGH. Subgroup construction (research_market_state=NORMAL) is human-prescribed, not evidence-derived; package not execution-ready for subgroup semantics.",
+  "exactly_one_defect": "Subgroup/cohort construction and independence ranking use human-prescribed category bindings (NORMAL filter, hardcoded HIGH independence) without pre-result overlap analysis \u2014 material autonomy and execution-readiness limitation",
+  "execution_ready": false,
+  "proposed_next_phase": "3I.18 \u2014 Controlled one-shot execution protocol ONLY after subgroup semantics audit OR 3I.17b subgroup derivation fix (separate phase)"
+}
