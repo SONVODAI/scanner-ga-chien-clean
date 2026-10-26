@@ -1,0 +1,78 @@
+{
+  "search_accounting_version": "search_accounting_v1",
+  "session_ledger": {
+    "experiments_executed": 11,
+    "questions_generated": 11,
+    "candidate_actions_considered": 158,
+    "unique_outcome_specs": [
+      "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+      "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+      "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+      "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+      "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679"
+    ],
+    "unique_population_specs": [
+      "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+      "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+    ],
+    "unique_research_frames": [
+      "frame-00003",
+      "frame-00004",
+      "frame-00006",
+      "frame-00007"
+    ],
+    "explanatory_features_tested": [
+      "rs10",
+      "rs_spread"
+    ],
+    "partitions_evaluated": 2,
+    "threshold_candidates_evaluated": 2,
+    "neighborhood_cuts_evaluated": 0,
+    "categorical_levels_evaluated": 8,
+    "interactions_attempted": 0,
+    "branch_depth_max": 5,
+    "refinements_reframes": 4,
+    "duplicate_experiments_blocked": 0,
+    "abandoned_branches": 0,
+    "falsification_experiments_executed": 2
+  },
+  "branch_ledgers": {
+    "obs-49d9a334bcfe": {
+      "experiments_executed": 11,
+      "questions_generated": 11,
+      "candidate_actions_considered": 158,
+      "unique_outcome_specs": [
+        "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+        "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+        "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+        "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+        "fced4245530483acfedec9caffc60151885e07a99155c19ae2854fe5bf0ec679"
+      ],
+      "unique_population_specs": [
+        "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+        "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+      ],
+      "unique_research_frames": [
+        "frame-00003",
+        "frame-00004",
+        "frame-00006",
+        "frame-00007"
+      ],
+      "explanatory_features_tested": [
+        "rs10",
+        "rs_spread"
+      ],
+      "partitions_evaluated": 2,
+      "threshold_candidates_evaluated": 2,
+      "neighborhood_cuts_evaluated": 0,
+      "categorical_levels_evaluated": 8,
+      "interactions_attempted": 0,
+      "branch_depth_max": 5,
+      "refinements_reframes": 4,
+      "duplicate_experiments_blocked": 0,
+      "abandoned_branches": 0,
+      "falsification_experiments_executed": 2
+    }
+  },
+  "experiments_executed": 11
+}
