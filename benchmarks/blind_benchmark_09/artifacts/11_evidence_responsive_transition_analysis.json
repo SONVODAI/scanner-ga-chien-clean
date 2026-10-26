@@ -1,0 +1,519 @@
+{
+  "transition_count": 11,
+  "evidence_responsive_transitions": 11,
+  "unexplained_transitions": 0,
+  "transition_class_counts": {
+    "COMPARE_OUTCOME/HORIZON": 4,
+    "FALSIFY_CURRENT_LINE": 1,
+    "REFINE_BOUNDARY": 6
+  },
+  "transitions": [
+    {
+      "from_experiment": "exp-264bcac5f747",
+      "to_experiment": "exp-79c5e46f983c",
+      "previous_evidence": {
+        "observation_codes": [
+          "HORIZON_HETEROGENEOUS"
+        ],
+        "metrics_keys": [
+          "diagnostics",
+          "groups",
+          "horizons_requested",
+          "input_hash",
+          "limitations",
+          "median_spread",
+          "sample_size",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY"
+      ],
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-79c5e46f983c",
+      "to_experiment": "exp-ce4706215fe5",
+      "previous_evidence": {
+        "observation_codes": [
+          "HORIZON_HETEROGENEOUS"
+        ],
+        "metrics_keys": [
+          "diagnostics",
+          "groups",
+          "horizons_requested",
+          "input_hash",
+          "limitations",
+          "median_spread",
+          "sample_size",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY"
+      ],
+      "selected_next_tool": "sensitivity_analysis",
+      "transition_class": "FALSIFY_CURRENT_LINE",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-ce4706215fe5",
+      "to_experiment": "exp-b0965e3ee876",
+      "previous_evidence": {
+        "observation_codes": [
+          "EXTREME_WINNER_ROBUST"
+        ],
+        "metrics_keys": [
+          "baseline_median",
+          "diagnostics",
+          "fragile",
+          "groups",
+          "horizon",
+          "input_hash",
+          "limitations",
+          "sample_size",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [],
+      "inferred_research_needs": [
+        "REDIRECT_OR_ABANDON"
+      ],
+      "legally_constructible_needs": [],
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-b0965e3ee876",
+      "to_experiment": "exp-4fe3d9448d71",
+      "previous_evidence": {
+        "observation_codes": [
+          "HORIZON_HETEROGENEOUS"
+        ],
+        "metrics_keys": [
+          "diagnostics",
+          "groups",
+          "horizons_requested",
+          "input_hash",
+          "limitations",
+          "median_spread",
+          "sample_size",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY"
+      ],
+      "selected_next_tool": "adaptive_partition_compare",
+      "transition_class": "REFINE_BOUNDARY",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-4fe3d9448d71",
+      "to_experiment": "exp-f68bc15d7d0e",
+      "previous_evidence": {
+        "observation_codes": [
+          "SHAPE_STEP_CHANGE",
+          "TRAJECTORY_GROUP_DIFFERENCE"
+        ],
+        "metrics_keys": [
+          "adaptive_toolbox_version",
+          "baseline_success_rate",
+          "bin_count",
+          "boundaries_record",
+          "diagnostics",
+          "discovered_boundaries",
+          "feature_column",
+          "groups",
+          "input_hash",
+          "limitations",
+          "outcome_spec_hash",
+          "partition_method",
+          "partitions_considered",
+          "sample_size",
+          "shape",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "TEST_ROBUSTNESS",
+        "DECOMPOSE_HETEROGENEITY",
+        "REFINE_BOUNDARY",
+        "DECOMPOSE_HETEROGENEITY",
+        "EXPLORE_STRUCTURE"
+      ],
+      "selected_next_tool": "threshold_exploration",
+      "transition_class": "REFINE_BOUNDARY",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-f68bc15d7d0e",
+      "to_experiment": "exp-c596642e125e",
+      "previous_evidence": {
+        "observation_codes": [
+          "TRAJECTORY_GROUP_DIFFERENCE"
+        ],
+        "metrics_keys": [
+          "best_threshold",
+          "candidates_tested",
+          "diagnostics",
+          "direction",
+          "feature_column",
+          "groups",
+          "input_hash",
+          "limitations",
+          "outcome_spec_hash",
+          "sample_size",
+          "thresholds_considered",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "REVISIT_UNRESOLVED_BRANCH",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "TEST_ROBUSTNESS",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY",
+        "EXPLORE_STRUCTURE"
+      ],
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-c596642e125e",
+      "to_experiment": "exp-39a4fd3320ca",
+      "previous_evidence": {
+        "observation_codes": [
+          "HORIZON_HETEROGENEOUS"
+        ],
+        "metrics_keys": [
+          "diagnostics",
+          "groups",
+          "horizons_requested",
+          "input_hash",
+          "limitations",
+          "median_spread",
+          "sample_size",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY"
+      ],
+      "selected_next_tool": "adaptive_partition_compare",
+      "transition_class": "REFINE_BOUNDARY",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-39a4fd3320ca",
+      "to_experiment": "exp-30694825cb95",
+      "previous_evidence": {
+        "observation_codes": [
+          "SHAPE_STEP_CHANGE",
+          "TRAJECTORY_GROUP_DIFFERENCE"
+        ],
+        "metrics_keys": [
+          "adaptive_toolbox_version",
+          "baseline_success_rate",
+          "bin_count",
+          "boundaries_record",
+          "diagnostics",
+          "discovered_boundaries",
+          "feature_column",
+          "groups",
+          "input_hash",
+          "limitations",
+          "outcome_spec_hash",
+          "partition_method",
+          "partitions_considered",
+          "sample_size",
+          "shape",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "TEST_ROBUSTNESS",
+        "DECOMPOSE_HETEROGENEITY",
+        "REFINE_BOUNDARY",
+        "DECOMPOSE_HETEROGENEITY",
+        "EXPLORE_STRUCTURE"
+      ],
+      "selected_next_tool": "threshold_exploration",
+      "transition_class": "REFINE_BOUNDARY",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-30694825cb95",
+      "to_experiment": "exp-09c12d97750c",
+      "previous_evidence": {
+        "observation_codes": [
+          "TRAJECTORY_GROUP_DIFFERENCE"
+        ],
+        "metrics_keys": [
+          "best_threshold",
+          "candidates_tested",
+          "diagnostics",
+          "direction",
+          "feature_column",
+          "groups",
+          "input_hash",
+          "limitations",
+          "outcome_spec_hash",
+          "sample_size",
+          "thresholds_considered",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "REVISIT_UNRESOLVED_BRANCH",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "TEST_ROBUSTNESS",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY",
+        "EXPLORE_STRUCTURE"
+      ],
+      "selected_next_tool": "horizon_comparison",
+      "transition_class": "COMPARE_OUTCOME/HORIZON",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-09c12d97750c",
+      "to_experiment": "exp-3c48b621496c",
+      "previous_evidence": {
+        "observation_codes": [
+          "HORIZON_HETEROGENEOUS"
+        ],
+        "metrics_keys": [
+          "diagnostics",
+          "groups",
+          "horizons_requested",
+          "input_hash",
+          "limitations",
+          "median_spread",
+          "sample_size",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "SYMBOL_DISTRIBUTION",
+        "TIME_DISTRIBUTION"
+      ],
+      "inferred_research_needs": [
+        "COMPARE_OUTCOMES",
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "DECOMPOSE_HETEROGENEITY",
+        "DECOMPOSE_HETEROGENEITY"
+      ],
+      "selected_next_tool": "adaptive_partition_compare",
+      "transition_class": "REFINE_BOUNDARY",
+      "evidence_responsive": true
+    },
+    {
+      "from_experiment": "exp-3c48b621496c",
+      "to_experiment": "exp-931c120bb21d",
+      "previous_evidence": {
+        "observation_codes": [
+          "SHAPE_STEP_CHANGE",
+          "TRAJECTORY_GROUP_DIFFERENCE"
+        ],
+        "metrics_keys": [
+          "adaptive_toolbox_version",
+          "baseline_success_rate",
+          "bin_count",
+          "boundaries_record",
+          "diagnostics",
+          "discovered_boundaries",
+          "feature_column",
+          "groups",
+          "input_hash",
+          "limitations",
+          "outcome_spec_hash",
+          "partition_method",
+          "partitions_considered",
+          "sample_size",
+          "shape",
+          "tool_status",
+          "toolbox_version"
+        ]
+      },
+      "active_uncertainties": [
+        "EPISODE_REPLICATION",
+        "EXTREME_WINNER",
+        "MARKET_DEPENDENCE",
+        "NEIGHBORHOOD_STABILITY",
+        "SYMBOL_DISTRIBUTION",
+        "THRESHOLD_EXPLORATION",
+        "TIME_DISTRIBUTION",
+        "TRAJECTORY_ROLE"
+      ],
+      "inferred_research_needs": [
+        "EXPLORE_STRUCTURE",
+        "SEEK_FALSIFICATION"
+      ],
+      "legally_constructible_needs": [
+        "REPLICATE",
+        "SEEK_FALSIFICATION",
+        "CONDITION_ON_CONTEXT",
+        "TEST_ROBUSTNESS",
+        "DECOMPOSE_HETEROGENEITY",
+        "REFINE_BOUNDARY",
+        "DECOMPOSE_HETEROGENEITY",
+        "EXPLORE_STRUCTURE"
+      ],
+      "selected_next_tool": "threshold_exploration",
+      "transition_class": "REFINE_BOUNDARY",
+      "evidence_responsive": true
+    }
+  ]
+}
