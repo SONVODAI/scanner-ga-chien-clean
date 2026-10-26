@@ -1,0 +1,10 @@
+{
+  "bb14_t4_exploration_debt": 2.0,
+  "bb14_t8_exploration_debt": 1.75,
+  "bb14_t9_exploration_debt": 0.0,
+  "classification": "LEGITIMATE",
+  "code_ref": "modules/edge_research/research_portfolio.py:410-460",
+  "definition": "Under-examination of feature/outcome/pop/frame dimensions + branch deferral",
+  "double_count_risk": "INSUFFICIENT_EVIDENCE when feature slices share one proposition",
+  "ownership_level": "feature dimension / branch (NOT canonical proposition)"
+}
