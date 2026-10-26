@@ -1,0 +1,105 @@
+{
+  "package_version": "falsification_one_shot_v1_3i9",
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "prior_lineage_hash": "86b004538c1ab25d86b1b803a5d5970d6839bef37de467eb59b71052e2521b0b",
+  "interpretation_contract_hash": "3474a096aa6ee9c57ee1120f4a41398b08307038b23220016fa6bc9fddff77e2",
+  "interpretation_contract_ref": "diagnostics/phase_3i7_minimal_lifecycle/artifacts/03_interpretation_contract.json",
+  "generator_version": "falsification_candidate_generator_v1_3i9",
+  "generator_hash": "1a43b449ba729955569f9411bcc94c6245140ca8a42a3e16858314871d9a3326",
+  "candidate_set_hash": "0eb83024a6e21aade8692974b22e40a70cc52785feecdeaedaca66de1d76cbfe",
+  "selector_version": "c23e41492ed64af9e0169c8994d775477956331b5ff284eac0facdd43292a4c7",
+  "selected_candidate_id": "fc-independent_episode_holdout",
+  "selected_candidate_hash": "30ef242406f3371e211ee8ce00f9f35aab77f23df3c9b3925719be27631363eb",
+  "selected_experiment_spec": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "research_scope": {
+      "population_spec": {
+        "kind": "filter",
+        "field": "trade_date",
+        "operator": "in",
+        "values": [
+          "2026-06-01",
+          "2026-06-02",
+          "2026-06-03",
+          "2026-06-04",
+          "2026-06-05",
+          "2026-06-08",
+          "2026-06-09",
+          "2026-06-10",
+          "2026-06-11",
+          "2026-06-12",
+          "2026-06-15",
+          "2026-06-16",
+          "2026-06-17",
+          "2026-06-18",
+          "2026-06-19",
+          "2026-06-22",
+          "2026-06-23",
+          "2026-06-24",
+          "2026-06-25",
+          "2026-06-26",
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-23",
+          "2026-07-24",
+          "2026-07-26",
+          "2026-07-27",
+          "2026-07-28",
+          "2026-07-29",
+          "2026-07-30",
+          "2026-07-31",
+          "2026-08-01",
+          "2026-08-03",
+          "2026-08-04",
+          "2026-08-05",
+          "2026-08-06",
+          "2026-08-07",
+          "2026-08-08",
+          "2026-08-10",
+          "2026-08-11",
+          "2026-08-12",
+          "2026-08-13",
+          "2026-08-14",
+          "2026-08-17"
+        ],
+        "grammar_version": "research_grammar_v1"
+      },
+      "outcome_spec": {
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0,
+        "grammar_version": "research_grammar_v1"
+      },
+      "observation_horizon": 0,
+      "pending_question_context": {
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0
+      }
+    },
+    "data_cutoff_date": "2026-08-17"
+  },
+  "selected_experiment_content_hash": "624e91d23ea6ec56ee4f00d9346acc01475e999c6e891ece3e82b7a6c4396e6e",
+  "cutoff_policy": "data_cutoff_date=2026-08-17; no rows after cutoff",
+  "interpretation_requirements": "Reuse frozen 3I.7 InterpretationContract quintile rules",
+  "anti_rescue_constraints": "pass",
+  "execution_status": "NOT_EXECUTED",
+  "created_at": "2026-08-22T02:37:35.251074+00:00",
+  "package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46"
+}
