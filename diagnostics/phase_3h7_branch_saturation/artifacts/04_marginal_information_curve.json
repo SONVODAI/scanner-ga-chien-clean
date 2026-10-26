@@ -1,0 +1,140 @@
+{
+  "curve": [
+    {
+      "transition": 1,
+      "tool": "horizon_comparison",
+      "expected_iv_before": 0,
+      "planner_score_before": 10.15,
+      "erv_before": 16.83,
+      "realized_gain_after": "LOW_INFORMATION_GAIN",
+      "cumulative_branch_depth": 1,
+      "marginal_branch_value": "INCREASING_OR_STABLE",
+      "unresolved_gaps_count": 4
+    },
+    {
+      "transition": 2,
+      "tool": "horizon_comparison",
+      "expected_iv_before": 2.25,
+      "planner_score_before": 6.5375,
+      "erv_before": 14.635625,
+      "realized_gain_after": "REDUNDANT",
+      "cumulative_branch_depth": 2,
+      "marginal_branch_value": "INCREASING_OR_STABLE",
+      "unresolved_gaps_count": 4
+    },
+    {
+      "transition": 3,
+      "tool": "sensitivity_analysis",
+      "expected_iv_before": 0,
+      "planner_score_before": 0,
+      "erv_before": 4.968750000000002,
+      "realized_gain_after": "HIGH_INFORMATION_GAIN",
+      "cumulative_branch_depth": 3,
+      "marginal_branch_value": "INCREASING_OR_STABLE",
+      "unresolved_gaps_count": 0
+    },
+    {
+      "transition": 4,
+      "tool": "horizon_comparison",
+      "expected_iv_before": 0,
+      "planner_score_before": -1.5999999999999996,
+      "erv_before": 5.49,
+      "realized_gain_after": "LOW_INFORMATION_GAIN",
+      "cumulative_branch_depth": 4,
+      "marginal_branch_value": "INCREASING_OR_STABLE",
+      "unresolved_gaps_count": 4
+    },
+    {
+      "transition": 5,
+      "tool": "adaptive_partition_compare",
+      "expected_iv_before": 2.5,
+      "planner_score_before": 3.5875000000000004,
+      "erv_before": 12.19018675,
+      "realized_gain_after": "MODERATE_INFORMATION_GAIN",
+      "cumulative_branch_depth": 5,
+      "marginal_branch_value": "FLAT",
+      "unresolved_gaps_count": 7
+    },
+    {
+      "transition": 6,
+      "tool": "threshold_exploration",
+      "expected_iv_before": 2.5,
+      "planner_score_before": -3.9624999999999986,
+      "erv_before": 4.3616875,
+      "realized_gain_after": "HIGH_INFORMATION_GAIN",
+      "cumulative_branch_depth": 6,
+      "marginal_branch_value": "FLAT",
+      "unresolved_gaps_count": 6
+    },
+    {
+      "transition": 7,
+      "tool": "symbol_decomposition",
+      "expected_iv_before": 0,
+      "planner_score_before": 0,
+      "erv_before": 1.1443541666666666,
+      "realized_gain_after": "HIGH_INFORMATION_GAIN",
+      "cumulative_branch_depth": 7,
+      "marginal_branch_value": "FLAT",
+      "unresolved_gaps_count": 0
+    },
+    {
+      "transition": 8,
+      "tool": "horizon_comparison",
+      "expected_iv_before": 0,
+      "planner_score_before": -4.999999999999999,
+      "erv_before": -1.0782499999999995,
+      "realized_gain_after": "LOW_INFORMATION_GAIN",
+      "cumulative_branch_depth": 8,
+      "marginal_branch_value": "DECLINING",
+      "unresolved_gaps_count": 4
+    },
+    {
+      "transition": 9,
+      "tool": "horizon_comparison",
+      "expected_iv_before": 0,
+      "planner_score_before": -8.487499999999999,
+      "erv_before": -2.1133124999999993,
+      "realized_gain_after": "REDUNDANT",
+      "cumulative_branch_depth": 9,
+      "marginal_branch_value": "DECLINING",
+      "unresolved_gaps_count": 4
+    },
+    {
+      "transition": 10,
+      "tool": "adaptive_partition_compare",
+      "expected_iv_before": 2.5,
+      "planner_score_before": -3.299999999999997,
+      "erv_before": 3.799500000000002,
+      "realized_gain_after": "MODERATE_INFORMATION_GAIN",
+      "cumulative_branch_depth": 10,
+      "marginal_branch_value": "DECLINING",
+      "unresolved_gaps_count": 7
+    },
+    {
+      "transition": 11,
+      "tool": "threshold_exploration",
+      "expected_iv_before": 0,
+      "planner_score_before": 0,
+      "erv_before": -1.6114999999999993,
+      "realized_gain_after": "HIGH_INFORMATION_GAIN",
+      "cumulative_branch_depth": 11,
+      "marginal_branch_value": "FLAT",
+      "unresolved_gaps_count": 6
+    },
+    {
+      "transition": 12,
+      "tool": "horizon_comparison",
+      "expected_iv_before": 0,
+      "planner_score_before": 0,
+      "erv_before": 0,
+      "realized_gain_after": "HIGH_INFORMATION_GAIN",
+      "cumulative_branch_depth": 12,
+      "marginal_branch_value": "FLAT",
+      "unresolved_gaps_count": 4
+    }
+  ],
+  "deterioration_interval_start": 7,
+  "deterioration_interval_end": 12,
+  "interpretation": "Marginal ERV deteriorates from T7 onward. T8\u2013T11 show negative local ERV with continued selection. No hard saturation point \u2014 gradual decline with 'least bad' continuation.",
+  "audit_only": true
+}

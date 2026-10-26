@@ -1,0 +1,822 @@
+{
+  "Q1_saturation_recognizable_before_decision": {
+    "answer": "PARTIAL YES",
+    "evidence": "8 signals available; no unified branch-exhaustion gate"
+  },
+  "Q2_saturation_operationally_represented": {
+    "answer": "PARTIAL \u2014 local signals consumed by planner/ERV but not as exit trigger",
+    "evidence": "branch_tools_attempted, negative scores, MIG reduction; no branch marginal decay field"
+  },
+  "Q3_leaving_is_valid_action": {
+    "answer": "YES",
+    "evidence": "STOP_BRANCH, STOP_SESSION, ABANDON, FRONTIER, REVISIT candidates exist in grammar"
+  },
+  "Q4_can_construct_exit_alternatives": {
+    "answer": "YES",
+    "evidence": "Decomposition, falsification, frontier items generated throughout BB10"
+  },
+  "Q5_alternatives_scientifically_independent": {
+    "answer": "NO for REVISIT/FRONTIER in BB10",
+    "evidence": "All 12 experiments share branch_root obs-b08a47b141fd. Tool/intent diversity (5 tools, decomposition, falsification) occurs within one graph branch identity. REVISIT and FRONTIER selections return to or spawn from the same branch_root \u2014 not independent scientific branches."
+  },
+  "Q6_where_exit_alternatives_first_lose": {
+    "answer": "L9",
+    "evidence": {
+      "L12": 1,
+      "L9": 3,
+      "L11": 1
+    }
+  },
+  "Q7_persistence_rational_or_pathological": {
+    "answer": "MOSTLY LEAST_BAD_CONTINUATION (rational given all-negative ERV) with pathological STOP non-competition",
+    "evidence": [
+      {
+        "transition": 7,
+        "selected_type": "CONTINUE_CURRENT_BRANCH",
+        "selected_source": "REVISIT",
+        "selected_erv": 1.1443541666666666,
+        "best_frontier_erv": 1.1443541666666666,
+        "best_local_erv": 0.0,
+        "alternatives_count": 3,
+        "exit_alternatives": [
+          {
+            "action_id": "fd0876343b97f1d0",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -1.1624999999999996,
+            "information_value": 0.0,
+            "erv": -1.1624999999999996
+          },
+          {
+            "action_id": "fe3ab55226b9633f",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.9125,
+            "information_value": 0.0,
+            "erv": -7.9125
+          },
+          {
+            "action_id": "e0d6e94eb5336156",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -114.0625,
+            "information_value": 0.0,
+            "erv": -114.0625
+          }
+        ],
+        "top_exit_alternative": {
+          "action_id": "fd0876343b97f1d0",
+          "type": "STOP",
+          "tool": "",
+          "scientifically_relevant": true,
+          "legally_constructible": true,
+          "generated": true,
+          "planner_score": -1.1624999999999996,
+          "information_value": 0.0,
+          "erv": -1.1624999999999996
+        },
+        "nowhere_better": false,
+        "valuation_prevented_exit": false
+      },
+      {
+        "transition": 8,
+        "selected_type": "REFRAME",
+        "selected_source": "LOCAL",
+        "selected_erv": -1.0782499999999995,
+        "best_frontier_erv": -4.092125,
+        "best_local_erv": -1.0782499999999995,
+        "alternatives_count": 30,
+        "exit_alternatives": [
+          {
+            "action_id": "3a9a3206829541b2",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -4.999999999999999,
+            "information_value": 0.0,
+            "erv": -4.999999999999999
+          },
+          {
+            "action_id": "e8415614d364331f",
+            "type": "DECOMPOSITION",
+            "tool": "date_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -5.324999999999999,
+            "information_value": 2.5,
+            "erv": -5.324999999999999
+          },
+          {
+            "action_id": "8602512daa0c0c20",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -5.499999999999999,
+            "information_value": 0.0,
+            "erv": -5.499999999999999
+          },
+          {
+            "action_id": "68774cbe341e1305",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -6.0249999999999995,
+            "information_value": 0.0,
+            "erv": -6.0249999999999995
+          },
+          {
+            "action_id": "cbbaa3b05a85abe1",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -6.0249999999999995,
+            "information_value": 0.0,
+            "erv": -6.0249999999999995
+          },
+          {
+            "action_id": "351863fc1c3ceb91",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -6.049999999999999,
+            "information_value": 0.0,
+            "erv": -6.049999999999999
+          },
+          {
+            "action_id": "6f33bd7127d785bd",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -6.549999999999999,
+            "information_value": 0.0,
+            "erv": -6.549999999999999
+          },
+          {
+            "action_id": "ee012fa331168e78",
+            "type": "DECOMPOSITION",
+            "tool": "market_conditioning",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -6.824999999999999,
+            "information_value": 2.5,
+            "erv": -6.824999999999999
+          },
+          {
+            "action_id": "e2a36a36575fbc62",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.475,
+            "information_value": 0.0,
+            "erv": -7.475
+          },
+          {
+            "action_id": "2ea3fadd6649ed55",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.475,
+            "information_value": 0.0,
+            "erv": -7.475
+          },
+          {
+            "action_id": "0fbabdc2926b2f1b",
+            "type": "DECOMPOSITION",
+            "tool": "episode_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.824999999999999,
+            "information_value": 2.5,
+            "erv": -7.824999999999999
+          },
+          {
+            "action_id": "5558594c63a67ca3",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.975,
+            "information_value": 0.0,
+            "erv": -7.975
+          },
+          {
+            "action_id": "58870bb7a262adca",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.975,
+            "information_value": 0.0,
+            "erv": -7.975
+          },
+          {
+            "action_id": "8de6dc574b9e628d",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.999999999999999,
+            "information_value": 0.0,
+            "erv": -7.999999999999999
+          },
+          {
+            "action_id": "151b77b5c0fff3d5",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.024999999999999,
+            "information_value": 0.0,
+            "erv": -8.024999999999999
+          },
+          {
+            "action_id": "41fd2ce078613433",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.024999999999999,
+            "information_value": 0.0,
+            "erv": -8.024999999999999
+          },
+          {
+            "action_id": "fe3ab55226b9633f",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.075,
+            "information_value": 0.0,
+            "erv": -8.075
+          },
+          {
+            "action_id": "7a85258adb37b4d3",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.5,
+            "information_value": 0.0,
+            "erv": -8.5
+          },
+          {
+            "action_id": "ea64ba7874ea1ffa",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -9.475,
+            "information_value": 0.0,
+            "erv": -9.475
+          },
+          {
+            "action_id": "fb18eb7efce5b5b3",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -9.975,
+            "information_value": 0.0,
+            "erv": -9.975
+          },
+          {
+            "action_id": "fd0876343b97f1d0",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -11.325,
+            "information_value": 0.0,
+            "erv": -11.325
+          },
+          {
+            "action_id": "e0d6e94eb5336156",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -114.225,
+            "information_value": 0.0,
+            "erv": -114.225
+          }
+        ],
+        "top_exit_alternative": {
+          "action_id": "3a9a3206829541b2",
+          "type": "REFRAME",
+          "tool": "horizon_comparison",
+          "scientifically_relevant": false,
+          "legally_constructible": true,
+          "generated": true,
+          "planner_score": -4.999999999999999,
+          "information_value": 0.0,
+          "erv": -4.999999999999999
+        },
+        "nowhere_better": true,
+        "valuation_prevented_exit": true
+      },
+      {
+        "transition": 9,
+        "selected_type": "CONTINUE_CURRENT_BRANCH",
+        "selected_source": "LOCAL",
+        "selected_erv": -2.1133124999999993,
+        "best_frontier_erv": -4.365812499999999,
+        "best_local_erv": -2.1133124999999993,
+        "alternatives_count": 25,
+        "exit_alternatives": [
+          {
+            "action_id": "9dcc1c45f493cb26",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.137499999999999,
+            "information_value": 0.0,
+            "erv": -7.137499999999999
+          },
+          {
+            "action_id": "e8415614d364331f",
+            "type": "DECOMPOSITION",
+            "tool": "date_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.487499999999999,
+            "information_value": 2.5,
+            "erv": -7.487499999999999
+          },
+          {
+            "action_id": "da4b19502106ed5e",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.662499999999999,
+            "information_value": 0.0,
+            "erv": -7.662499999999999
+          },
+          {
+            "action_id": "8f558966e92222db",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.662499999999999,
+            "information_value": 0.0,
+            "erv": -7.662499999999999
+          },
+          {
+            "action_id": "a0dcb483bb8e976f",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.187499999999998,
+            "information_value": 0.0,
+            "erv": -8.187499999999998
+          },
+          {
+            "action_id": "ee012fa331168e78",
+            "type": "DECOMPOSITION",
+            "tool": "market_conditioning",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.987499999999999,
+            "information_value": 2.5,
+            "erv": -8.987499999999999
+          },
+          {
+            "action_id": "39b6261d460256c9",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -9.6625,
+            "information_value": 0.0,
+            "erv": -9.6625
+          },
+          {
+            "action_id": "ce097b7da42348ac",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -9.6625,
+            "information_value": 0.0,
+            "erv": -9.6625
+          },
+          {
+            "action_id": "0fbabdc2926b2f1b",
+            "type": "DECOMPOSITION",
+            "tool": "episode_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -9.987499999999999,
+            "information_value": 2.5,
+            "erv": -9.987499999999999
+          },
+          {
+            "action_id": "c3e935d9abf93269",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -10.1375,
+            "information_value": 0.0,
+            "erv": -10.1375
+          },
+          {
+            "action_id": "f4d0643770ee494a",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -10.1375,
+            "information_value": 0.0,
+            "erv": -10.1375
+          },
+          {
+            "action_id": "d87a17ad0add22de",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -10.1375,
+            "information_value": 0.0,
+            "erv": -10.1375
+          },
+          {
+            "action_id": "fe3ab55226b9633f",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -10.237499999999999,
+            "information_value": 0.0,
+            "erv": -10.237499999999999
+          },
+          {
+            "action_id": "1cfb7be9001f0062",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -11.6375,
+            "information_value": 0.0,
+            "erv": -11.6375
+          },
+          {
+            "action_id": "9cfda4a9c1b90a12",
+            "type": "REFRAME",
+            "tool": "horizon_comparison",
+            "scientifically_relevant": false,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -12.1375,
+            "information_value": 0.0,
+            "erv": -12.1375
+          },
+          {
+            "action_id": "fd0876343b97f1d0",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -13.487499999999999,
+            "information_value": 0.0,
+            "erv": -13.487499999999999
+          },
+          {
+            "action_id": "e0d6e94eb5336156",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -116.3875,
+            "information_value": 0.0,
+            "erv": -116.3875
+          }
+        ],
+        "top_exit_alternative": {
+          "action_id": "9dcc1c45f493cb26",
+          "type": "REFRAME",
+          "tool": "horizon_comparison",
+          "scientifically_relevant": false,
+          "legally_constructible": true,
+          "generated": true,
+          "planner_score": -7.137499999999999,
+          "information_value": 0.0,
+          "erv": -7.137499999999999
+        },
+        "nowhere_better": true,
+        "valuation_prevented_exit": true
+      },
+      {
+        "transition": 10,
+        "selected_type": "CONTINUE_CURRENT_BRANCH",
+        "selected_source": "LOCAL",
+        "selected_erv": 3.799500000000002,
+        "best_frontier_erv": -4.317999999999997,
+        "best_local_erv": 3.799500000000002,
+        "alternatives_count": 11,
+        "exit_alternatives": [
+          {
+            "action_id": "e8415614d364331f",
+            "type": "DECOMPOSITION",
+            "tool": "date_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -6.299999999999997,
+            "information_value": 2.5,
+            "erv": -6.299999999999997
+          },
+          {
+            "action_id": "ee012fa331168e78",
+            "type": "DECOMPOSITION",
+            "tool": "market_conditioning",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -7.799999999999997,
+            "information_value": 2.5,
+            "erv": -7.799999999999997
+          },
+          {
+            "action_id": "0fbabdc2926b2f1b",
+            "type": "DECOMPOSITION",
+            "tool": "episode_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -8.799999999999997,
+            "information_value": 2.5,
+            "erv": -8.799999999999997
+          },
+          {
+            "action_id": "fe3ab55226b9633f",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -18.799999999999997,
+            "information_value": 0.0,
+            "erv": -18.799999999999997
+          },
+          {
+            "action_id": "fd0876343b97f1d0",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -22.799999999999997,
+            "information_value": 0.0,
+            "erv": -22.799999999999997
+          },
+          {
+            "action_id": "e0d6e94eb5336156",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -115.2,
+            "information_value": 0.0,
+            "erv": -115.2
+          }
+        ],
+        "top_exit_alternative": {
+          "action_id": "e8415614d364331f",
+          "type": "DECOMPOSITION",
+          "tool": "date_decomposition",
+          "scientifically_relevant": true,
+          "legally_constructible": true,
+          "generated": true,
+          "planner_score": -6.299999999999997,
+          "information_value": 2.5,
+          "erv": -6.299999999999997
+        },
+        "nowhere_better": true,
+        "valuation_prevented_exit": false
+      },
+      {
+        "transition": 11,
+        "selected_type": "CONTINUE_CURRENT_BRANCH",
+        "selected_source": "REVISIT",
+        "selected_erv": -1.6114999999999993,
+        "best_frontier_erv": -1.6114999999999993,
+        "best_local_erv": -2.2714999999999996,
+        "alternatives_count": 11,
+        "exit_alternatives": [
+          {
+            "action_id": "e8415614d364331f",
+            "type": "DECOMPOSITION",
+            "tool": "date_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -10.149999999999999,
+            "information_value": 2.5,
+            "erv": -10.149999999999999
+          },
+          {
+            "action_id": "ee012fa331168e78",
+            "type": "DECOMPOSITION",
+            "tool": "market_conditioning",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -11.649999999999999,
+            "information_value": 2.5,
+            "erv": -11.649999999999999
+          },
+          {
+            "action_id": "fd0876343b97f1d0",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -12.149999999999999,
+            "information_value": 0.0,
+            "erv": -12.149999999999999
+          },
+          {
+            "action_id": "0fbabdc2926b2f1b",
+            "type": "DECOMPOSITION",
+            "tool": "episode_decomposition",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -12.649999999999999,
+            "information_value": 2.5,
+            "erv": -12.649999999999999
+          },
+          {
+            "action_id": "fe3ab55226b9633f",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -12.899999999999999,
+            "information_value": 0.0,
+            "erv": -12.899999999999999
+          },
+          {
+            "action_id": "e0d6e94eb5336156",
+            "type": "STOP",
+            "tool": "",
+            "scientifically_relevant": true,
+            "legally_constructible": true,
+            "generated": true,
+            "planner_score": -119.05,
+            "information_value": 0.0,
+            "erv": -119.05
+          }
+        ],
+        "top_exit_alternative": {
+          "action_id": "e8415614d364331f",
+          "type": "DECOMPOSITION",
+          "tool": "date_decomposition",
+          "scientifically_relevant": true,
+          "legally_constructible": true,
+          "generated": true,
+          "planner_score": -10.149999999999999,
+          "information_value": 2.5,
+          "erv": -10.149999999999999
+        },
+        "nowhere_better": false,
+        "valuation_prevented_exit": false
+      }
+    ]
+  },
+  "Q8_phase_3h6_effect": {
+    "answer": "BOTH \u2014 exposed saturation signals more clearly AND reduced mechanical cycling 4\u21922",
+    "evidence": "IV audit shows heterogeneity contributions; late cycling improved"
+  },
+  "Q9_limitation_15_2_contributes": {
+    "answer": "YES \u2014 materially",
+    "evidence": {
+      "description": "Frontier exploitation uses current-branch assessment not branch-origin reconstruction",
+      "materially_contributes": true,
+      "evidence": [
+        {
+          "transition": 3,
+          "source": "FRONTIER",
+          "selected_erv": 4.968750000000002,
+          "note_15_2": "Frontier revaluation uses current experiment assessment for exploitation/MIG"
+        },
+        {
+          "transition": 7,
+          "source": "REVISIT",
+          "selected_erv": 1.1443541666666666,
+          "note_15_2": "Frontier revaluation uses current experiment assessment for exploitation/MIG"
+        },
+        {
+          "transition": 11,
+          "source": "REVISIT",
+          "selected_erv": -1.6114999999999993,
+          "note_15_2": "Frontier revaluation uses current experiment assessment for exploitation/MIG"
+        }
+      ],
+      "bb10_impact": "T3 FRONTIER sensitivity selection; T7/T11 REVISIT \u2014 all same branch_root"
+    }
+  },
+  "Q10_limitation_15_3_contributes": {
+    "answer": "YES \u2014 materially",
+    "evidence": {
+      "description": "evaluate_global_stop uses historical planner_score via best_unexplored_score()",
+      "materially_contributes": true,
+      "historical_best_at_termination": 8.7,
+      "revalued_frontier_at_late": [
+        -4.092125,
+        -4.365812499999999,
+        -4.317999999999997,
+        -1.6114999999999993
+      ],
+      "bb10_impact": "Stop never triggered: historical frontier scores (8.7) exceed 0.5 threshold while revalued ERV at planning was negative. Session exhausted budget instead."
+    }
+  },
+  "Q11_stop_genuine_competitor": {
+    "answer": "NO",
+    "evidence": "STOP never competes effectively: STOP_SESSION hardcoded -100 planner penalty; evaluate_global_stop uses historical frontier scores (best=8.7) not revalued ERV (late revalued ~-4 to -1). Session continues until budget exhaustion despite negative marginal experiment value."
+  },
+  "Q12_primary_bottleneck": {
+    "answer": "B10-G STOP LOGIC PROBLEM + B10-B SATURATION NOT VALUED AS EXIT",
+    "evidence": "STOP -100 penalty; negative ERV continuations beat STOP; no branch-exit valuation"
+  },
+  "Q13_secondary_bottleneck": {
+    "answer": "B10-H REVISIT SAME BRANCH + B10-J IV DECAY MISMATCH",
+    "evidence": "REVISIT returns to obs-b08a47b141fd; IV redundancy is uncertainty-topology not branch-level"
+  },
+  "Q14_next_treatment_target": {
+    "answer": "Branch-exit valuation: make STOP/budget-preservation compete against negative-ERV continuations using revalued opportunity set; branch-level marginal decay signal (diagnostic flag first)",
+    "explicitly_not": "forced switching, branch quotas, diversity bonuses"
+  },
+  "Q15_must_not_change": {
+    "answer": [
+      "Phase 3H.6 Information Value scales and pathways",
+      "Grammar / candidate generation",
+      "Competence layer (audit-only)",
+      "Global allocator semantics (without evidence-based exit treatment)",
+      "Forced exploration / branch quotas",
+      "BB01\u2013BB10 frozen artifacts"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "evaluate_global_stop_location": "research_frontier.evaluate_global_stop",
+  "stop_uses_historical_planner_score": true,
+  "stop_threshold": 0.5,
+  "terminal_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "eligible_features": 8,
+    "experiment_budget": 12,
+    "experiments_executed": 12,
+    "features_touched": 2,
+    "final_experiment_id": "exp-3f17dab233c5",
+    "remaining_budget": 0,
+    "terminal_status": "BUDGET_EXHAUSTED",
+    "unexplored_frontier_count": 44,
+    "unresolved_promising_deferred_count": 0
+  },
+  "session_stopped_by": "BUDGET_EXHAUSTED not INSUFFICIENT_RESEARCH_VALUE",
+  "unexplored_frontier_at_end": 44,
+  "historical_best_unexplored_score": 8.7,
+  "revalued_best_at_late_decisions": [
+    -4.092125,
+    -4.365812499999999,
+    -4.317999999999997,
+    -1.6114999999999993
+  ],
+  "stop_session_planner_penalty": -100.0,
+  "stop_competes_in_global_allocation": true,
+  "stop_would_win_any_late_decision": false,
+  "counterfactual_revalued_stop_transitions": [
+    {
+      "transition": 8,
+      "best_frontier_erv_revalued": -4.092125,
+      "best_local_erv": -1.0782499999999995,
+      "would_stop_if_revalued_only": true,
+      "historical_frontier_best": 8.7
+    },
+    {
+      "transition": 9,
+      "best_frontier_erv_revalued": -4.365812499999999,
+      "best_local_erv": -2.1133124999999993,
+      "would_stop_if_revalued_only": true,
+      "historical_frontier_best": 8.7
+    },
+    {
+      "transition": 11,
+      "best_frontier_erv_revalued": -1.6114999999999993,
+      "best_local_erv": -2.2714999999999996,
+      "would_stop_if_revalued_only": true,
+      "historical_frontier_best": 8.7
+    }
+  ],
+  "finding": "STOP never competes effectively: STOP_SESSION hardcoded -100 planner penalty; evaluate_global_stop uses historical frontier scores (best=8.7) not revalued ERV (late revalued ~-4 to -1). Session continues until budget exhaustion despite negative marginal experiment value."
+}

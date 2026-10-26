@@ -1,0 +1,20 @@
+{
+  "structural_branch_roots": [
+    "obs-b08a47b141fd"
+  ],
+  "structural_single_branch": true,
+  "frontier_branch_roots": [
+    "obs-b08a47b141fd"
+  ],
+  "all_frontier_same_root_as_executed": true,
+  "frame_ids_observed": [],
+  "semantic_variation_within_root": {
+    "unique_tools": 5,
+    "horizon_experiments": 6,
+    "decomposition_executed": 1,
+    "revisit_selections": 2,
+    "frontier_selections": 1
+  },
+  "finding": "STRUCTURAL_SINGLE_BRANCH with SEMANTIC_TOOL_DIVERSITY",
+  "topology_explanation": "All 12 experiments share branch_root obs-b08a47b141fd. Tool/intent diversity (5 tools, decomposition, falsification) occurs within one graph branch identity. REVISIT and FRONTIER selections return to or spawn from the same branch_root \u2014 not independent scientific branches."
+}

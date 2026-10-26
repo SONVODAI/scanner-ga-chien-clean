@@ -1,0 +1,97 @@
+{
+  "late_session_decisions": [
+    {
+      "transition": 8,
+      "tool_selected": "horizon_comparison",
+      "bb10_cycling_class": "REDUNDANT",
+      "causal_classification": "LEAST_BAD_CONTINUATION",
+      "evidence_for_staying": {
+        "local_erv_beats_frontier": true,
+        "selected_erv": -1.0782499999999995,
+        "best_frontier_erv": -4.092125
+      },
+      "evidence_for_leaving": {
+        "negative_planner": true,
+        "unresolved_uncertainties": 4,
+        "exit_alts_exist": true
+      },
+      "alternatives_independent": false,
+      "positive_scientific_value": false,
+      "genuinely_best_vs_least_bad": "LEAST_BAD",
+      "stop_defensible": true,
+      "deciding_component": "LOCAL_ERV_DOMINANCE"
+    },
+    {
+      "transition": 9,
+      "tool_selected": "horizon_comparison",
+      "bb10_cycling_class": "MECHANICAL_CYCLING",
+      "causal_classification": "MECHANICAL_CYCLING",
+      "evidence_for_staying": {
+        "local_erv_beats_frontier": true,
+        "selected_erv": -2.1133124999999993,
+        "best_frontier_erv": -4.365812499999999
+      },
+      "evidence_for_leaving": {
+        "negative_planner": true,
+        "unresolved_uncertainties": 4,
+        "exit_alts_exist": true
+      },
+      "alternatives_independent": false,
+      "positive_scientific_value": false,
+      "genuinely_best_vs_least_bad": "LEAST_BAD",
+      "stop_defensible": true,
+      "deciding_component": "LOCAL_ERV_DOMINANCE"
+    },
+    {
+      "transition": 10,
+      "tool_selected": "adaptive_partition_compare",
+      "bb10_cycling_class": "MECHANICAL_CYCLING",
+      "causal_classification": "MECHANICAL_CYCLING",
+      "evidence_for_staying": {
+        "local_erv_beats_frontier": true,
+        "selected_erv": 3.799500000000002,
+        "best_frontier_erv": -4.317999999999997
+      },
+      "evidence_for_leaving": {
+        "negative_planner": true,
+        "unresolved_uncertainties": 7,
+        "exit_alts_exist": true
+      },
+      "alternatives_independent": false,
+      "positive_scientific_value": true,
+      "genuinely_best_vs_least_bad": "GENUINELY_BEST",
+      "stop_defensible": false,
+      "deciding_component": "LOCAL_ERV_DOMINANCE"
+    },
+    {
+      "transition": 11,
+      "tool_selected": "threshold_exploration",
+      "bb10_cycling_class": "JUSTIFIED_CONTINUATION",
+      "causal_classification": "LEAST_BAD_CONTINUATION",
+      "evidence_for_staying": {
+        "local_erv_beats_frontier": true,
+        "selected_erv": -1.6114999999999993,
+        "best_frontier_erv": -1.6114999999999993
+      },
+      "evidence_for_leaving": {
+        "negative_planner": false,
+        "unresolved_uncertainties": 6,
+        "exit_alts_exist": true
+      },
+      "alternatives_independent": false,
+      "positive_scientific_value": false,
+      "genuinely_best_vs_least_bad": "LEAST_BAD",
+      "stop_defensible": true,
+      "deciding_component": "REVISIT_ERV"
+    }
+  ],
+  "causal_classification_counts": {
+    "LEAST_BAD_CONTINUATION": 2,
+    "MECHANICAL_CYCLING": 2
+  },
+  "bb10_cycling_reference": {
+    "REDUNDANT": 1,
+    "MECHANICAL_CYCLING": 2,
+    "JUSTIFIED_CONTINUATION": 2
+  }
+}

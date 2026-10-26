@@ -1,0 +1,41 @@
+{
+  "late_session_counterfactuals": [
+    {
+      "transition": 8,
+      "CF1_remove_current_branch_winner": "e8415614d364331f",
+      "CF2_zero_switch_cost": "Same winner \u2014 no branch switch candidates with higher ERV at different root",
+      "CF3_revalued_erv_only_winner": "3a9a3206829541b2",
+      "CF4_stop_as_zero_competitor": "CONTINUE still wins \u2014 STOP at -115 to -119 vs continue at -3 to -8",
+      "CF5_branch_redundancy_zero_effect": "No change to candidate construction \u2014 redundancy affects scoring only",
+      "CF6_saturation_flag_diagnostic": "Selection explainably wrong as LEAST_BAD given all negative ERV; would be wrong if STOP were calibrated competitor"
+    },
+    {
+      "transition": 9,
+      "CF1_remove_current_branch_winner": "9dcc1c45f493cb26",
+      "CF2_zero_switch_cost": "Same winner \u2014 no branch switch candidates with higher ERV at different root",
+      "CF3_revalued_erv_only_winner": "9dcc1c45f493cb26",
+      "CF4_stop_as_zero_competitor": "CONTINUE still wins \u2014 STOP at -115 to -119 vs continue at -3 to -8",
+      "CF5_branch_redundancy_zero_effect": "No change to candidate construction \u2014 redundancy affects scoring only",
+      "CF6_saturation_flag_diagnostic": "Selection explainably wrong as LEAST_BAD given all negative ERV; would be wrong if STOP were calibrated competitor"
+    },
+    {
+      "transition": 10,
+      "CF1_remove_current_branch_winner": "e8415614d364331f",
+      "CF2_zero_switch_cost": "Same winner \u2014 no branch switch candidates with higher ERV at different root",
+      "CF3_revalued_erv_only_winner": "a88b152867f4eb26",
+      "CF4_stop_as_zero_competitor": "CONTINUE still wins \u2014 STOP at -115 to -119 vs continue at -3 to -8",
+      "CF5_branch_redundancy_zero_effect": "No change to candidate construction \u2014 redundancy affects scoring only",
+      "CF6_saturation_flag_diagnostic": "Selection explainably wrong as LEAST_BAD given all negative ERV; would be wrong if STOP were calibrated competitor"
+    },
+    {
+      "transition": 11,
+      "CF1_remove_current_branch_winner": "e8415614d364331f",
+      "CF2_zero_switch_cost": "Same winner \u2014 no branch switch candidates with higher ERV at different root",
+      "CF3_revalued_erv_only_winner": "e8415614d364331f",
+      "CF4_stop_as_zero_competitor": "STOP would win",
+      "CF5_branch_redundancy_zero_effect": "No change to candidate construction \u2014 redundancy affects scoring only",
+      "CF6_saturation_flag_diagnostic": "Selection explainably wrong as LEAST_BAD given all negative ERV; would be wrong if STOP were calibrated competitor"
+    }
+  ],
+  "diagnostic_only": true
+}
