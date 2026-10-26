@@ -1,0 +1,28 @@
+{
+  "REPRESENTATION_NOVELTY_ONLY": {
+    "novelty_component": 0,
+    "erv_delta": "decrease by raw portfolio novelty only",
+    "other_components": "unchanged"
+  },
+  "EVIDENCE_NOVELTY": {
+    "novelty_component": "unchanged from pre-3H.11",
+    "erv_delta": 0
+  },
+  "SCIENTIFIC_NOVELTY": {
+    "novelty_component": "unchanged from pre-3H.11",
+    "erv_delta": 0
+  },
+  "INSUFFICIENT_EVIDENCE": {
+    "novelty_component": "unchanged from pre-3H.11",
+    "erv_delta": 0
+  },
+  "LEGACY_NO_SEMANTIC_CONTEXT": {
+    "novelty_component": "unchanged from pre-3H.11",
+    "erv_delta": 0
+  },
+  "invariants": {
+    "never_negative_novelty_penalty": true,
+    "planner_novelty_score_unchanged": true,
+    "only_portfolio_novelty_component_gated": true
+  }
+}

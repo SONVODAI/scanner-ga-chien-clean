@@ -1,0 +1,27 @@
+{
+  "artifact_count": 16,
+  "artifact_hashes": {
+    "00_input_evidence_classification.json": "f56b1a0e18e4a341672babfd05058d6711a84ab65774457611a5d98a49980170",
+    "01_opr_source_of_truth_rule.json": "f247ba994e36e1be6460b2a135c696a1e832d9c277d94d939ae59efc4e07ce24",
+    "02_proposition_record_contract.json": "de8ef27252936038afd3ccb25eed329c8610ffe52ff3b9184af4786c09f99025",
+    "03_scientific_birth_certificate.json": "ab65f6fb92286905d21fae9be0a9c79453a543a42050c00e9697b7f9354f83ca",
+    "04_template_independence_evaluator.json": "ed8362847fc983ef78b4c149031605a7babb8e1c8e1c2c5b5fba0b17aef3798d",
+    "05_obs_gap_laundering_protection.json": "2f9f99ff1b8bb311c46f57ff9271b5d02d531f9ea3e17d287086b5a913d2179c",
+    "06_executability_boundary.json": "6f659a2b1d42bee4a6edd7366af66080779cb4049f645ff81730c896bd58ed98",
+    "07_generation_budget_policy.json": "8862f44492f47d596916411fbfa3ca1447fc1e3613cc56d555455d46b2ea38a0",
+    "08_bb_prop_01_frozen_manifest.json": "8164644fe07ba171b67ea1e1a362a0f9f66554ca12fd21ab1d03265297d709b1",
+    "09_hidden_benchmark_protection_policy.json": "8f8b5292fba04572b5045bf6b803318a5141dc7730aa89c71365501b87f18db8",
+    "10_creativity_metrics_preregistration.json": "ef19ba6c110cd087c2be064cc105226717c5c197a5ae11cb5e51e03fa63d8570",
+    "11_negative_adversarial_controls.json": "6f803ea87e23302d7db2bd2d298bffe73494437b6bcebc1a98a6486f671a26c2",
+    "12_evidence_responsive_lineage.json": "9beace2cc7c4c20d9defae00015da228f73668790d97a671008f86041f3853ff",
+    "13_falsification_birthright.json": "eab8122bd001cc24421b86cb4a655eac5403faf560d9ae43fa8646894cd3f2cc",
+    "14_minimal_3i2_implementation_boundary.json": "06667338c3ba09147a12b14075a83b8775a8dbfc250c20f95878ea73398a2fe9",
+    "15_readiness_gate.json": "b38f10294f31dbd89dc19c8062b2ad287ff002733cce5582fe4ad9c315f2e80b"
+  },
+  "bundle_hash": "d6bff9a335673f9d32744d3b0770b03f49359287ed103bbbeec165ac94371f88",
+  "frozen_at": "2026-08-22T01:40:11.876120+00:00",
+  "git_branch": "cursor/phase-3i1-opr-bridge-contract-aad2",
+  "git_head": "adadd7dc07a4b6de8c2807228ecde9a0c1b2527f",
+  "phase": "3I.1",
+  "readiness_verdict": "READY_FOR_MINIMAL_OPR"
+}
