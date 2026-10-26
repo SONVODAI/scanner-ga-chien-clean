@@ -1,0 +1,13 @@
+{
+  "phase": "3J.9",
+  "branch": "cursor/phase-3j9-cumulative-research-decision-aad2",
+  "git_head": "cfadbae8aee06cd8b0c9d5c50becbe60d8bd3c21",
+  "cf_cd_all_passed": true,
+  "hidden_answer_passed": true,
+  "real_diagnostic_proposition": "prop-efb650d9bd5c451f",
+  "decision_kind": "STOP",
+  "chosen_next_action": "HOLD_UNRESOLVED",
+  "stop_boundary": "STOP_SECOND_RESEARCH_DECISION_FROZEN",
+  "third_experiment_generated": false,
+  "regression_failures": []
+}

@@ -1,0 +1,675 @@
+{
+  "freeze_applied": {
+    "generator_version": "scientific_action_generator_v1_3i16",
+    "selector_version": "lexicographic_scientific_action_selector_v1_3i16",
+    "generator_content_hash": "77e665c720b3f8c5050ff1113d076c38cd2c678db8df6773711e665e3fcc7eb9",
+    "operator_set_hash": "1afd6e0206008216f0d521cfcbbc7b84f2ff25c2333ff15a7b0501935af9dce8",
+    "synthesis_engine_hash_unchanged": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+    "synthesis_engine_hash_expected": "ee00da71e38310af531631b4fbb79b5d2a6961107d47a1ee21ce1d91a358724a",
+    "synthesis_unchanged": true
+  },
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "synthesis_id": "syn-b6bfbc4959c6",
+  "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+  "priority": "SEEK_FALSIFICATION",
+  "redundant_axes": [
+    "episode_robustness"
+  ],
+  "objectives": [
+    {
+      "objective_id": "obj-ec0967e67df8",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "temporal_regime_robustness",
+      "scientific_vulnerability": "temporal_regime_instability",
+      "reason_this_uncertainty_matters": "Major unresolved uncertainty 'temporal_regime_robustness' remains after covering [directional_effect_full_universe, episode_robustness]; priority=SEEK_FALSIFICATION.",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "temporal_independence",
+        "episode_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "temporal_regime_robustness"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "688681f63b4830169806d750462bfed12d11196083e17d342a304e41b6498ac2"
+    },
+    {
+      "objective_id": "obj-97e5dc6e973a",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "population_robustness",
+      "scientific_vulnerability": "population_specificity",
+      "reason_this_uncertainty_matters": "Major unresolved uncertainty 'population_robustness' remains after covering [directional_effect_full_universe, episode_robustness]; priority=SEEK_FALSIFICATION.",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "population_independence",
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "population_robustness"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "18dcf18d1195e6f0bd398f9daa82f6832bab85a0fef3bbe88c0234a4bf7377f2"
+    },
+    {
+      "objective_id": "obj-cce551a49a43",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "horizon_robustness",
+      "scientific_vulnerability": "horizon_sensitivity",
+      "reason_this_uncertainty_matters": "Major unresolved uncertainty 'horizon_robustness' remains after covering [directional_effect_full_universe, episode_robustness]; priority=SEEK_FALSIFICATION.",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "horizon_robustness"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "c5d2613ca165c7d0e4bac36964e7dbc02b883fc5a2af714c7e8d01500eb7d244"
+    },
+    {
+      "objective_id": "obj-bae260adad8b",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "effect_stability",
+      "scientific_vulnerability": "effect_magnitude_instability",
+      "reason_this_uncertainty_matters": "Major unresolved uncertainty 'effect_stability' remains after covering [directional_effect_full_universe, episode_robustness]; priority=SEEK_FALSIFICATION.",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "temporal_independence",
+        "episode_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "effect_stability"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "17f03df5d59b05032f96c005b6f68f69cc6cb2cf73ad098b5a1599bc91082e05"
+    },
+    {
+      "objective_id": "obj-304cf975f7de",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "concentration_dominance",
+      "scientific_vulnerability": "symbol_concentration",
+      "reason_this_uncertainty_matters": "Unresolved uncertainty 'concentration_dominance' not yet covered; current coverage: [directional_effect_full_universe, episode_robustness].",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "concentration_dominance"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "b3576f6495438ddf1c761b38e2161469d3546b8a4e4c1889e724bac7a7baacd8"
+    },
+    {
+      "objective_id": "obj-12e6157ea448",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "measurement_robustness",
+      "scientific_vulnerability": "measurement_dependence",
+      "reason_this_uncertainty_matters": "Unresolved uncertainty 'measurement_robustness' not yet covered; current coverage: [directional_effect_full_universe, episode_robustness].",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "measurement_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "measurement_robustness"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "a4fe4d4358aa2008a974c8ccd40b27827879f23286abe29355d424a9c59dbb00"
+    },
+    {
+      "objective_id": "obj-9386fe739426",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "counterexample_exposure",
+      "scientific_vulnerability": "episode_counterexample",
+      "reason_this_uncertainty_matters": "Unresolved uncertainty 'counterexample_exposure' not yet covered; current coverage: [directional_effect_full_universe, episode_robustness].",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "counterexample_exposure"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "3d78cb81c55f8aa04eea485a1c2dcdc01c0c572cc43f39393e1eddd63fbd6c15"
+    },
+    {
+      "objective_id": "obj-1adaf1ad7046",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "alternative_explanation_exposure",
+      "scientific_vulnerability": "competing_explanation_from_null",
+      "reason_this_uncertainty_matters": "Unresolved uncertainty 'alternative_explanation_exposure' not yet covered; current coverage: [directional_effect_full_universe, episode_robustness].",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "alternative_explanation_exposure"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "640b134548100296587c18c29045d97e41dd771e36602aff94b5e25cc405a991"
+    },
+    {
+      "objective_id": "obj-4ab5e9768b0a",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "regime_context_robustness",
+      "scientific_vulnerability": "regime_context_dependence",
+      "reason_this_uncertainty_matters": "Unresolved uncertainty 'regime_context_robustness' not yet covered; current coverage: [directional_effect_full_universe, episode_robustness].",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "regime_context_robustness"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "1ac8069e7b1e4c68b01dd67cd77893400a76b21faa23241f3a25d8891719888b"
+    }
+  ],
+  "candidate_summary": [
+    {
+      "id": "sac-8d5834c5275f",
+      "core_hash": "34dae4d4109695aadd21897d2d38a335bb27208df4a7f07233f362523c5bb5c8",
+      "strategy": "regime_separated_contrast",
+      "axis": "temporal_regime_robustness",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-7811d9dab527",
+      "core_hash": "ca388af652d39b0c1e07b21ae908a22d7051c83d51dd8bed803cc77a9cfe7757",
+      "strategy": "rolling_stability_contrast",
+      "axis": "temporal_regime_robustness",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-4365621a8f8d",
+      "core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+      "strategy": "population_subgroup_contrast",
+      "axis": "population_robustness",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-929826fa8276",
+      "core_hash": "c73ae60042215854057b1312e6edb3f06b3400004864f2ad4141d1d08fb476a2",
+      "strategy": "regime_separated_contrast",
+      "axis": "horizon_robustness",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-9ee7c0a738ca",
+      "core_hash": "f1d224ff137f2d0c07396b63ae1dce80abf118ae611c6b7a08d8bb8b79bad6e9",
+      "strategy": "regime_separated_contrast",
+      "axis": "effect_stability",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-fed844ddfd00",
+      "core_hash": "e2da956960eb7794c034bf371257d95de9f268504ea605521701fd471022aca3",
+      "strategy": "concentration_decomposition",
+      "axis": "concentration_dominance",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-b0ddd781a864",
+      "core_hash": "e6a28c04a2b9b0f3d5ad63a7743cd56099b35a6332d77aeedfd6e6dd8a47f3b4",
+      "strategy": "measurement_robustness_check",
+      "axis": "measurement_robustness",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-1f3be1594ac8",
+      "core_hash": "6fa40d4f5c6e05523760ce873c52b143c274d6045bfd166b37c47b81c693ff96",
+      "strategy": "counterexample_period_search",
+      "axis": "counterexample_exposure",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-2721f2bfb52f",
+      "core_hash": "d999bc7d69fb2e01eb2503e8db8a4a47fa4006d06693476c90554e675bc038c6",
+      "strategy": "counterexample_period_search",
+      "axis": "alternative_explanation_exposure",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    },
+    {
+      "id": "sac-9c7b2ce8aaff",
+      "core_hash": "5aa48f99bdc21a220b6c7bbac53d3de524ca3f0ad85c8ecf194799d305432349",
+      "strategy": "regime_separated_contrast",
+      "axis": "regime_context_robustness",
+      "redundancy": "NOVEL",
+      "executability": "SCIENTIFICALLY_VALID_EXECUTABLE"
+    }
+  ],
+  "selection": {
+    "disposition": "SELECTED",
+    "selected_candidate_id": "sac-4365621a8f8d",
+    "selected_core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+    "ranked_count": 10,
+    "eligible_count": 10,
+    "rejected_count": 0,
+    "ambiguous_tie_ids": [],
+    "reason": "Lexicographic winner: Falsify population_robustness: Challenge population specificity with independent",
+    "selector_version": "lexicographic_scientific_action_selector_v1_3i16"
+  },
+  "package": {
+    "package_id": "nap-5eefce9a5d58",
+    "record_version": "next_action_package_v1_3i16",
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+    "synthesis_id": "syn-b6bfbc4959c6",
+    "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+    "priority_decision_id": "rpd-e487b541a7b1",
+    "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+    "disposition": "SELECTED",
+    "selected_objective": {
+      "objective_id": "obj-97e5dc6e973a",
+      "record_version": "scientific_objective_record_v1_3i16",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "synthesis_id": "syn-b6bfbc4959c6",
+      "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+      "priority_decision_id": "rpd-e487b541a7b1",
+      "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+      "target_uncertainty": "population_robustness",
+      "scientific_vulnerability": "population_specificity",
+      "reason_this_uncertainty_matters": "Major unresolved uncertainty 'population_robustness' remains after covering [directional_effect_full_universe, episode_robustness]; priority=SEEK_FALSIFICATION.",
+      "current_evidence_coverage": [
+        "directional_effect_full_universe",
+        "episode_robustness"
+      ],
+      "desired_information_contribution": "falsify_unresolved_claim",
+      "required_independence_characteristics": [
+        "population_independence",
+        "sample_independence"
+      ],
+      "falsification_relevant": true,
+      "contradiction_resolution_relevant": false,
+      "forbidden_rescue_mutations": [
+        "outcome_field",
+        "horizon",
+        "population_refine",
+        "population_widen",
+        "feature_change",
+        "relation_direction",
+        "threshold_change"
+      ],
+      "provenance": {
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923",
+        "priority_record_hash": "345dd48de1b1fcf0132e6eec4469db7eeb34c24991a6605f1deda27566b0cf29",
+        "generator_stage": "objective_generation",
+        "axis": "population_robustness"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "objective_hash": "18dcf18d1195e6f0bd398f9daa82f6832bab85a0fef3bbe88c0234a4bf7377f2"
+    },
+    "candidate_set_hash": "9724fc5c13094f209fb92817674c6b77d0ee0762c1094bdea66a88aa50ec76a8",
+    "generator_version": "scientific_action_generator_v1_3i16",
+    "generator_content_hash": "77e665c720b3f8c5050ff1113d076c38cd2c678db8df6773711e665e3fcc7eb9",
+    "operator_set_hash": "1afd6e0206008216f0d521cfcbbc7b84f2ff25c2333ff15a7b0501935af9dce8",
+    "selector_version": "lexicographic_scientific_action_selector_v1_3i16",
+    "selected_candidate": {
+      "action_candidate_id": "sac-4365621a8f8d",
+      "record_version": "scientific_action_candidate_v1_3i16",
+      "objective_id": "obj-97e5dc6e973a",
+      "objective_hash": "18dcf18d1195e6f0bd398f9daa82f6832bab85a0fef3bbe88c0234a4bf7377f2",
+      "action_scientific_semantics": "Falsify population_robustness: Challenge population specificity with independent subgroup",
+      "proposition_commitment_challenged": "partition_contrast_rs_spread",
+      "evidence_cohort_semantics": "population subgroup contrast with low overlap to prior cohort",
+      "expected_new_uncertainty_coverage": "population_robustness",
+      "expected_independence_profile": {
+        "population_independence": "HIGH",
+        "sample_independence": "HIGH"
+      },
+      "epistemic_consequences": {
+        "if_supporting": "population_robustness remains unresolved \u2014 supporting sub-result does not confirm proposition",
+        "if_disconfirming": "Proposition vulnerable on population_robustness; may transition to CONFLICTED/FALSIFIED",
+        "if_contradictory": "Contradiction emerges on population_robustness",
+        "if_non_informative": "population_robustness remains unresolved \u2014 cohort insufficient or ambiguous",
+        "if_invalid": "No scientific belief change \u2014 invalid execution only"
+      },
+      "falsification_capability": true,
+      "contradiction_resolution_capability": false,
+      "redundancy_classification": "NOVEL",
+      "rescue_risk_classification": "pass",
+      "executability_classification": "SCIENTIFICALLY_VALID_EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to population_subgroup_contrast",
+      "scientific_action_core": {
+        "objective_target_uncertainty": "population_robustness",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "population_subgroup_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_population_robustness",
+        "information_gain_type": "falsify"
+      },
+      "scientific_action_core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "population_subgroup_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "filter",
+          "field": "research_market_state",
+          "operator": "in",
+          "values": [
+            "NORMAL"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "filter",
+            "field": "research_market_state",
+            "operator": "in",
+            "values": [
+              "NORMAL"
+            ],
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "operator_id": "FalsificationOperator",
+      "provenance": {
+        "objective_hash": "18dcf18d1195e6f0bd398f9daa82f6832bab85a0fef3bbe88c0234a4bf7377f2",
+        "operator_id": "FalsificationOperator",
+        "synthesis_hash": "462f0039da4409e6a4f8944eff75f6db58820c4b1cbe98c66ec0b6eedde4e923"
+      },
+      "created_at": "2026-08-22T03:21:54.650315+00:00",
+      "record_hash": "0790193e3d35b5652c636831f939180a17c6277c6334e4916629f7c48029479b"
+    },
+    "selected_core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+    "experiment_spec": {
+      "tool_name": "partition_group_compare",
+      "tool_version": "v1",
+      "inputs": {
+        "partition_column": "rs_spread",
+        "n_groups": 5
+      },
+      "research_scope": {
+        "population_spec": {
+          "kind": "filter",
+          "field": "research_market_state",
+          "operator": "in",
+          "values": [
+            "NORMAL"
+          ],
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0
+      },
+      "data_cutoff_date": "2026-08-17"
+    },
+    "epistemic_consequence_contract": {
+      "if_supporting": "population_robustness remains unresolved \u2014 supporting sub-result does not confirm proposition",
+      "if_disconfirming": "Proposition vulnerable on population_robustness; may transition to CONFLICTED/FALSIFIED",
+      "if_contradictory": "Contradiction emerges on population_robustness",
+      "if_non_informative": "population_robustness remains unresolved \u2014 cohort insufficient or ambiguous",
+      "if_invalid": "No scientific belief change \u2014 invalid execution only"
+    },
+    "cutoff_leakage_policy": "data_cutoff_date=2026-08-17; no rows after cutoff",
+    "anti_rescue_constraints": [
+      "outcome_field",
+      "horizon",
+      "population_refine",
+      "feature_change"
+    ],
+    "created_at": "2026-08-22T03:21:54.650315+00:00",
+    "execution_status": "NOT_EXECUTED",
+    "package_hash": "db7b869ab18dc156a59f91fed3766232411853cf8efd1db43892e0ffc381cd70",
+    "candidate_count": 17,
+    "eligible_count": 10
+  },
+  "execution_status": "NOT_EXECUTED",
+  "future_result_blindness": {
+    "tool_result_accessed": false,
+    "experiment_executed": false,
+    "selection_rerun": false
+  }
+}

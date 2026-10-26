@@ -1,0 +1,31 @@
+{
+  "transitions": [
+    {
+      "transition": "T4",
+      "old_relationship_bb12": "RELATED_BUT_DISTINCT",
+      "new_relationship": "SAME_QUESTION_DIFFERENT_INSTRUMENT",
+      "same_core": true,
+      "valuation_class": "REPRESENTATION_NOVELTY_ONLY",
+      "novelty_delta": -1.5,
+      "tool": "adaptive_partition_compare"
+    },
+    {
+      "transition": "T8",
+      "old_relationship_bb12": "RELATED_BUT_DISTINCT",
+      "new_relationship": "SAME_QUESTION_DIFFERENT_INSTRUMENT",
+      "same_core": true,
+      "valuation_class": "REPRESENTATION_NOVELTY_ONLY",
+      "novelty_delta": -1.5,
+      "tool": "adaptive_partition_compare"
+    },
+    {
+      "transition": "T9",
+      "old_relationship_bb12": "RELATED_BUT_DISTINCT",
+      "new_relationship": "GENUINELY_INDEPENDENT",
+      "same_core": false,
+      "valuation_class": "SCIENTIFIC_NOVELTY",
+      "novelty_delta": 0.0,
+      "tool": "threshold_exploration"
+    }
+  ]
+}

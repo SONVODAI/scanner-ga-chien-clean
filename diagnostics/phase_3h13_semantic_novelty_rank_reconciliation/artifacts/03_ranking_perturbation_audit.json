@@ -1,0 +1,14 @@
+{
+  "benchmarks_replayed": [
+    "BB11",
+    "BB12",
+    "BB13"
+  ],
+  "changes_attributable_to_representation_only": 58,
+  "commit": "48114b4bd",
+  "decision_winner_changes": 0,
+  "pass_criterion": "Changes limited to REPRESENTATION_NOVELTY_ONLY planner novelty removal",
+  "representation_only_reconciliations": 58,
+  "total_planner_novelty_reconciliations": 58,
+  "unexplained_broad_shift": false
+}

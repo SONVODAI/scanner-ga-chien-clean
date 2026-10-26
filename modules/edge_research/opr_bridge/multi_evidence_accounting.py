@@ -1,0 +1,405 @@
+"""
+Phase 3J.8 — Multi-evidence dependence accounting and incremental contribution.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
+from modules.edge_research.opr_bridge.evidence_independence import compute_independence_profile
+from modules.edge_research.opr_bridge.evidence_ledger import build_ledger_entry
+from modules.edge_research.opr_bridge.evidence_relationship_classifier import classify_pair
+from modules.edge_research.opr_bridge.evidence_synthesis_records import EvidenceLedgerEntry, EvidenceRelationship
+from modules.edge_research.opr_bridge.first_experiment_interpretation_records import (
+    EvidenceDirection,
+    EvidenceRelevance,
+    EvidenceStrength,
+    IntentAwareEvidenceAssessment,
+    NullExplanationAccounting,
+    NullExplanationState,
+)
+from modules.edge_research.opr_bridge.lifecycle_records import EvidenceClass
+
+
+@dataclass(frozen=True)
+class EvidenceDependenceAccounting:
+    row_overlap_fraction: float
+    null_target_overlap: float
+    scientific_question_overlap: float
+    sample_dependence_level: str
+    question_novelty: str
+    evidence_relationship: str
+    counted_as_independent_replication: bool
+    independence_rationale: Tuple[str, ...]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "row_overlap_fraction": self.row_overlap_fraction,
+            "null_target_overlap": self.null_target_overlap,
+            "scientific_question_overlap": self.scientific_question_overlap,
+            "sample_dependence_level": self.sample_dependence_level,
+            "question_novelty": self.question_novelty,
+            "evidence_relationship": self.evidence_relationship,
+            "counted_as_independent_replication": self.counted_as_independent_replication,
+            "independence_rationale": list(self.independence_rationale),
+        }
+
+
+@dataclass(frozen=True)
+class IncrementalEvidenceContribution:
+    raw_evidence_strength: str
+    incremental_strength: str
+    incremental_direction: str
+    double_counting_blocked: bool
+    conflict_detected: bool
+    conflict_description: str
+    rationale: Tuple[str, ...]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "raw_evidence_strength": self.raw_evidence_strength,
+            "incremental_strength": self.incremental_strength,
+            "incremental_direction": self.incremental_direction,
+            "double_counting_blocked": self.double_counting_blocked,
+            "conflict_detected": self.conflict_detected,
+            "conflict_description": self.conflict_description,
+            "rationale": list(self.rationale),
+        }
+
+
+@dataclass(frozen=True)
+class CumulativeEvidenceAssessment:
+    experiment_ordinal: int
+    per_experiment_assessments: Tuple[Dict[str, Any], ...]
+    dependence_accounting: EvidenceDependenceAccounting
+    incremental_contribution: IncrementalEvidenceContribution
+    cumulative_null_ledger: Tuple[NullExplanationAccounting, ...]
+    cumulative_evidence_summary: str
+    limitations: Tuple[str, ...]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "experiment_ordinal": self.experiment_ordinal,
+            "per_experiment_assessments": list(self.per_experiment_assessments),
+            "dependence_accounting": self.dependence_accounting.to_dict(),
+            "incremental_contribution": self.incremental_contribution.to_dict(),
+            "cumulative_null_ledger": [n.to_dict() for n in self.cumulative_null_ledger],
+            "cumulative_evidence_summary": self.cumulative_evidence_summary,
+            "limitations": list(self.limitations),
+        }
+
+
+def _sample_dependence_level(row_overlap: float) -> str:
+    if row_overlap >= 0.90:
+        return "HIGH"
+    if row_overlap >= 0.50:
+        return "MEDIUM"
+    if row_overlap > 0.0:
+        return "LOW"
+    return "NONE"
+
+
+def _question_novelty(null_overlap: float, question_overlap: float) -> str:
+    if null_overlap >= 1.0 and question_overlap >= 1.0:
+        return "NONE"
+    if null_overlap == 0.0 and question_overlap == 0.0:
+        return "HIGH"
+    if null_overlap == 0.0:
+        return "MARGINAL"
+    return "LOW"
+
+
+def _cap_strength(raw: str, *, dependence: str, double_count: bool) -> str:
+    order = [
+        EvidenceStrength.INSUFFICIENT.value,
+        EvidenceStrength.WEAK.value,
+        EvidenceStrength.MODERATE.value,
+        EvidenceStrength.STRONG.value,
+    ]
+    if raw not in order:
+        return raw
+    idx = order.index(raw)
+    if double_count or dependence == "HIGH":
+        idx = min(idx, order.index(EvidenceStrength.WEAK.value))
+    elif dependence == "MEDIUM":
+        idx = min(idx, order.index(EvidenceStrength.MODERATE.value))
+    return order[idx]
+
+
+def _ledger_from_assessment(
+    *,
+    evidence_id: str,
+    experiment_id: str,
+    experiment_content_hash: str,
+    epistemic_update_ref: str,
+    assessment: IntentAwareEvidenceAssessment,
+    base_interpretation: Dict[str, Any],
+    tool_result: Dict[str, Any],
+    proposition_id: str,
+    proposition_hash: str,
+    cohort_overlap: float,
+    falsification_intent: bool,
+    null_key: str,
+) -> EvidenceLedgerEntry:
+    pop = (tool_result.get("research_scope") or {}) if isinstance(tool_result.get("research_scope"), dict) else {}
+    return build_ledger_entry(
+        evidence_id=evidence_id,
+        proposition_id=proposition_id,
+        proposition_hash=proposition_hash,
+        experiment_id=experiment_id,
+        experiment_content_hash=experiment_content_hash,
+        epistemic_update_ref=epistemic_update_ref,
+        evidence_class=str(base_interpretation.get("evidence_class", "INVALID")),
+        validity="VALID" if base_interpretation.get("validity_passed") else "INVALID",
+        feature_semantics=assessment.cohort_strategy,
+        population_semantics=str(pop.get("kind", "all")),
+        outcome_semantics=str((tool_result.get("outcome_field") or "t5_return")),
+        horizon=str(tool_result.get("horizon", "0")),
+        cohort_episode_scope=assessment.cohort_strategy,
+        data_cutoff=str(tool_result.get("data_cutoff_date", "")),
+        sample_size=int(tool_result.get("sample_size", 0)),
+        effect_direction=assessment.evidence_direction,
+        effect_magnitude=assessment.evidence_strength,
+        measurement_tool=str(tool_result.get("tool_name", "")),
+        uncertainty_axis_tested=assessment.target_uncertainty,
+        falsification_intent=falsification_intent,
+        cohort_overlap_ratio=cohort_overlap,
+    )
+
+
+def _direction_conflict(dir1: str, dir2: str) -> bool:
+    opposing = {
+        (EvidenceDirection.SUPPORTS.value, EvidenceDirection.CONTRADICTS.value),
+        (EvidenceDirection.SUPPORTS.value, EvidenceDirection.WEAKENS.value),
+        (EvidenceDirection.CONTRADICTS.value, EvidenceDirection.SUPPORTS.value),
+        (EvidenceDirection.WEAKENS.value, EvidenceDirection.SUPPORTS.value),
+    }
+    return (dir1, dir2) in opposing or (dir2, dir1) in opposing
+
+
+def build_cumulative_assessment(
+    *,
+    first_assessment: IntentAwareEvidenceAssessment,
+    first_interpretation: Dict[str, Any],
+    first_execution_meta: Dict[str, Any],
+    second_assessment: IntentAwareEvidenceAssessment,
+    second_interpretation: Dict[str, Any],
+    second_execution_meta: Dict[str, Any],
+    novelty_decomposition: Dict[str, Any],
+    proposition_id: str,
+    proposition_hash: str,
+    first_null_ledger: Tuple[NullExplanationAccounting, ...],
+) -> CumulativeEvidenceAssessment:
+    row_overlap = float(novelty_decomposition.get("ROW_OVERLAP", 0.0))
+    null_overlap = float(novelty_decomposition.get("NULL_TARGET_OVERLAP", 0.0))
+    question_overlap = float(novelty_decomposition.get("SCIENTIFIC_QUESTION_OVERLAP", 0.0))
+    sample_dep = _sample_dependence_level(row_overlap)
+    q_novelty = _question_novelty(null_overlap, question_overlap)
+
+    first_ledger = _ledger_from_assessment(
+        evidence_id="evidence_1",
+        experiment_id=str(first_execution_meta.get("execution_id", "")),
+        experiment_content_hash=str(first_execution_meta.get("experiment_content_hash", "")),
+        epistemic_update_ref=str(first_execution_meta.get("epistemic_update_id", "")),
+        assessment=first_assessment,
+        base_interpretation=first_interpretation,
+        tool_result=first_execution_meta.get("tool_result") or {},
+        proposition_id=proposition_id,
+        proposition_hash=proposition_hash,
+        cohort_overlap=0.0,
+        falsification_intent=False,
+        null_key=first_assessment.null_accounting[0].null_key if first_assessment.null_accounting else "",
+    )
+    second_ledger = _ledger_from_assessment(
+        evidence_id="evidence_2",
+        experiment_id=str(second_execution_meta.get("execution_id", "")),
+        experiment_content_hash=str(second_execution_meta.get("experiment_content_hash", "")),
+        epistemic_update_ref="",
+        assessment=second_assessment,
+        base_interpretation=second_interpretation,
+        tool_result=second_execution_meta.get("tool_result") or {},
+        proposition_id=proposition_id,
+        proposition_hash=proposition_hash,
+        cohort_overlap=row_overlap,
+        falsification_intent=True,
+        null_key=second_assessment.null_accounting[0].null_key if second_assessment.null_accounting else "",
+    )
+
+    relationship = classify_pair(second_ledger, first_ledger)
+    indep_profile = compute_independence_profile(second_ledger, [first_ledger])
+    counted_independent = (
+        relationship
+        in (
+            EvidenceRelationship.INDEPENDENT_REPLICATION,
+            EvidenceRelationship.INDEPENDENT_FALSIFICATION,
+        )
+        and row_overlap < 0.50
+    )
+    double_count = (
+        row_overlap >= 0.85
+        and null_overlap >= 1.0
+        and question_overlap >= 1.0
+    ) or relationship == EvidenceRelationship.EXACT_REPLICATION
+
+    raw_strength = second_assessment.evidence_strength
+    incremental_strength = _cap_strength(
+        raw_strength,
+        dependence=sample_dep,
+        double_count=double_count or row_overlap >= 0.85,
+    )
+    if q_novelty == "HIGH" and null_overlap == 0.0 and row_overlap >= 0.85:
+        incremental_strength = _cap_strength(
+            raw_strength,
+            dependence="HIGH",
+            double_count=False,
+        )
+
+    conflict = _direction_conflict(first_assessment.evidence_direction, second_assessment.evidence_direction)
+    conflict_desc = ""
+    if conflict:
+        if sample_dep == "HIGH":
+            conflict_desc = "directional_conflict_under_high_sample_dependence"
+        else:
+            conflict_desc = "directional_conflict_with_prior_evidence"
+
+    rationale: List[str] = []
+    rationale.extend(indep_profile.rationale)
+    if double_count:
+        rationale.append("double_counting_blocked:high_overlap_same_question")
+    elif row_overlap >= 0.85 and null_overlap == 0.0:
+        rationale.append("new_null_high_sample_reuse:not_independent_replication")
+    if relationship == EvidenceRelationship.PARTIAL_REPLICATION:
+        rationale.append("partial_replication:incremental_contribution_capped")
+
+    incremental = IncrementalEvidenceContribution(
+        raw_evidence_strength=raw_strength,
+        incremental_strength=incremental_strength,
+        incremental_direction=second_assessment.evidence_direction,
+        double_counting_blocked=double_count,
+        conflict_detected=conflict,
+        conflict_description=conflict_desc,
+        rationale=tuple(rationale),
+    )
+
+    dependence = EvidenceDependenceAccounting(
+        row_overlap_fraction=row_overlap,
+        null_target_overlap=null_overlap,
+        scientific_question_overlap=question_overlap,
+        sample_dependence_level=sample_dep,
+        question_novelty=q_novelty,
+        evidence_relationship=relationship.value,
+        counted_as_independent_replication=counted_independent,
+        independence_rationale=tuple(indep_profile.rationale),
+    )
+
+    cumulative_ledger = _merge_null_ledger(
+        first_null_ledger=first_null_ledger,
+        second_null_entry=second_assessment.null_accounting[0] if second_assessment.null_accounting else None,
+        other_nulls=second_assessment.other_nulls_still_alive,
+    )
+
+    limitations = list(second_assessment.limitations)
+    if row_overlap >= 0.85:
+        limitations.append("high_sample_overlap_with_experiment_1")
+    if not counted_independent:
+        limitations.append("not_counted_as_independent_replication")
+
+    summary = (
+        f"ordinal_2;relationship={relationship.value};"
+        f"incremental_strength={incremental_strength};"
+        f"sample_dependence={sample_dep};question_novelty={q_novelty}"
+    )
+
+    return CumulativeEvidenceAssessment(
+        experiment_ordinal=2,
+        per_experiment_assessments=(
+            {"experiment_ordinal": 1, "assessment": first_assessment.to_dict()},
+            {"experiment_ordinal": 2, "assessment": second_assessment.to_dict()},
+        ),
+        dependence_accounting=dependence,
+        incremental_contribution=incremental,
+        cumulative_null_ledger=cumulative_ledger,
+        cumulative_evidence_summary=summary,
+        limitations=tuple(limitations),
+    )
+
+
+def _merge_null_ledger(
+    *,
+    first_null_ledger: Tuple[NullExplanationAccounting, ...],
+    second_null_entry: Optional[NullExplanationAccounting],
+    other_nulls: Tuple[str, ...],
+) -> Tuple[NullExplanationAccounting, ...]:
+    ledger: Dict[str, NullExplanationAccounting] = {}
+    for entry in first_null_ledger:
+        ledger[entry.null_key] = entry
+    if second_null_entry:
+        prior = ledger.get(second_null_entry.null_key)
+        state_before = prior.state_after if prior else second_null_entry.state_before
+        ledger[second_null_entry.null_key] = NullExplanationAccounting(
+            null_explanation_text=second_null_entry.null_explanation_text,
+            null_key=second_null_entry.null_key,
+            state_before=state_before,
+            state_after=second_null_entry.state_after,
+            rationale=second_null_entry.rationale,
+        )
+    for key in other_nulls:
+        if key not in ledger:
+            ledger[key] = NullExplanationAccounting(
+                null_explanation_text=key,
+                null_key=key,
+                state_before=NullExplanationState.STILL_PLAUSIBLE.value,
+                state_after=NullExplanationState.STILL_PLAUSIBLE.value,
+                rationale="Not tested by Experiment #2",
+            )
+    return tuple(ledger[k] for k in sorted(ledger.keys()))
+
+
+def apply_incremental_epistemic_transition(
+    prior_state: str,
+    base_interpretation: Dict[str, Any],
+    incremental: IncrementalEvidenceContribution,
+    *,
+    tested_null_key: str,
+) -> Tuple[str, str]:
+    """Apply epistemic transition reflecting incremental — not doubled — evidence."""
+    ec = str(base_interpretation.get("evidence_class", "INVALID"))
+    if incremental.double_counting_blocked:
+        return prior_state, f"{ec}_DOUBLE_COUNT_BLOCKED"
+
+    if incremental.incremental_strength == EvidenceStrength.INSUFFICIENT.value:
+        return prior_state, f"{ec}_INSUFFICIENT_INCREMENTAL"
+
+    if incremental.conflict_detected:
+        if incremental.incremental_strength in (EvidenceStrength.STRONG.value, EvidenceStrength.MODERATE.value):
+            if prior_state == "SUPPORTED":
+                return "WEAKENED", f"{ec}_CONFLICT"
+            return "WEAKENED", f"{ec}_CONFLICT"
+        if prior_state == "SUPPORTED":
+            return "SUPPORTED", f"{ec}_DEPENDENT_CONFLICT"
+        return prior_state, f"{ec}_DEPENDENT_CONFLICT"
+
+    if ec == EvidenceClass.SUPPORTING.value:
+        if prior_state == "SUPPORTED" and incremental.incremental_strength in (
+            EvidenceStrength.WEAK.value,
+            EvidenceStrength.MODERATE.value,
+        ):
+            return "SUPPORTED", "SUPPORTING_INCREMENTAL_MODEST"
+        if prior_state in ("HYPOTHESIS", "INSUFFICIENT_EVIDENCE"):
+            return "SUPPORTED", "SUPPORTING"
+        return prior_state, "SUPPORTING_NO_ESCALATION"
+
+    if ec == EvidenceClass.DISCONFIRMING.value:
+        strength = base_interpretation.get("metrics_used", {}).get("falsify_strength", "WEAK")
+        if strength == "STRONG" and tested_null_key == "directional_reversal":
+            return "WEAKENED", "DISCONFIRMING_STRONG"
+        return "WEAKENED", "DISCONFIRMING"
+
+    if ec == EvidenceClass.CONTRADICTORY.value:
+        return "WEAKENED", "CONTRADICTORY"
+
+    if ec == EvidenceClass.NON_INFORMATIVE.value:
+        return prior_state, "NON_INFORMATIVE"
+
+    return prior_state, ec

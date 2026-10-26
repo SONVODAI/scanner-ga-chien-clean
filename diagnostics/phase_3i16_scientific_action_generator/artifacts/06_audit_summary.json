@@ -1,0 +1,11 @@
+{
+  "phase": "3I.16",
+  "head": "9c3e6d25a843e341815f8748342938fe075f3476",
+  "verdict": "SCIENTIFIC_ACTION_GENERATION_PASS",
+  "bb_passed": 18,
+  "bb_total": 18,
+  "t2_disposition": "SELECTED",
+  "t2_execution_status": "NOT_EXECUTED",
+  "generator_hash": "77e665c720b3f8c5050ff1113d076c38cd2c678db8df6773711e665e3fcc7eb9",
+  "package_hash": "db7b869ab18dc156a59f91fed3766232411853cf8efd1db43892e0ffc381cd70"
+}
