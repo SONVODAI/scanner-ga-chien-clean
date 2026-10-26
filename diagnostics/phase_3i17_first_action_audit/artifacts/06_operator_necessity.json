@@ -1,0 +1,31 @@
+{
+  "operators": [
+    {
+      "name": "FalsificationOperator",
+      "classification": "CONTEXTUAL_SCIENTIFIC_INSTANTIATION",
+      "population_axis_behavior": "Always emits population_subgroup_contrast only",
+      "template_risk": "HIGH for population axis"
+    },
+    {
+      "name": "RobustnessOperator",
+      "classification": "GENERIC_SCIENTIFIC_TRANSFORMATION",
+      "delegates_to": "FalsificationOperator"
+    },
+    {
+      "name": "ReplicationOperator",
+      "classification": "GENERIC_SCIENTIFIC_TRANSFORMATION",
+      "t2_active": false
+    },
+    {
+      "name": "ContradictionResolutionOperator",
+      "classification": "GENERIC_SCIENTIFIC_TRANSFORMATION",
+      "t2_active": false
+    },
+    {
+      "name": "CounterexampleOperator",
+      "classification": "CONTEXTUAL_SCIENTIFIC_INSTANTIATION",
+      "t2_active": true,
+      "not_selected": true
+    }
+  ]
+}

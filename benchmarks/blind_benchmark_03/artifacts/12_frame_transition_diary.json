@@ -1,0 +1,8 @@
+[
+  {
+    "note": "NO_FRAME_TRANSITIONS_RECORDED",
+    "interpretation": "Session remained in initial research frame or transitions not persisted.",
+    "initial_frame_id": "frame-00001",
+    "frames_in_registry": 1
+  }
+]
