@@ -1,0 +1,18 @@
+{
+  "primary_verdict": "VALUATION_BRIDGE_PARTIALLY_CONFIRMED",
+  "b7_status": "MATERIAL_IMPROVEMENT",
+  "b10_status": "IMPROVED_INDIRECTLY",
+  "bridge_changed_planner_decisions": 2,
+  "justified_changes": 2,
+  "pathological_overcorrections": 0,
+  "bb09_late_mechanical_cycling": 4,
+  "bb10_late_mechanical_cycling": 2,
+  "need_to_execution_rate": 0.09090909090909091,
+  "information_gain_aggregate": {
+    "LOW_INFORMATION_GAIN": 3,
+    "REDUNDANT": 2,
+    "HIGH_INFORMATION_GAIN": 5,
+    "MODERATE_INFORMATION_GAIN": 2
+  },
+  "rationale": "Bridge changed 2 planner-layer decisions with 2 scientifically justified. Late-session mechanical cycling: BB09=4 BB10=2."
+}

@@ -1,0 +1,57 @@
+{
+  "A": {
+    "gate": "Bridge active in live autonomous planning",
+    "result": "PASS",
+    "evidence": "candidates=167"
+  },
+  "B": {
+    "gate": "Evidence-based contributions auditable",
+    "result": "PASS",
+    "evidence": "positive=51"
+  },
+  "C": {
+    "gate": "No direct competence/tool/feature preference",
+    "result": "PASS",
+    "evidence": "Bridge uses uncertainty topology not tool names for bonuses"
+  },
+  "D": {
+    "gate": "Strong alternatives can still win",
+    "result": "PASS",
+    "evidence": "protected=0 overruled=0"
+  },
+  "E": {
+    "gate": "Redundancy receives diminishing value",
+    "result": "PASS",
+    "evidence": "Zero-contribution candidates observed for redundant pathways"
+  },
+  "F": {
+    "gate": "Research-need-to-execution allocation quality",
+    "result": "PARTIAL",
+    "evidence": "rate=0.09090909090909091"
+  },
+  "G": {
+    "gate": "Late-session scientific discipline",
+    "result": "PASS",
+    "evidence": "cycling=2"
+  },
+  "H": {
+    "gate": "No pathological overcorrection",
+    "result": "PASS",
+    "evidence": "pathological=0"
+  },
+  "I": {
+    "gate": "Global allocator remains functional",
+    "result": "PASS",
+    "evidence": "experiments=12"
+  },
+  "J": {
+    "gate": "Temporal legality / identity / budget lifecycle preserved",
+    "result": "FAIL",
+    "evidence": "6e5aed26598bb0e7bb718611fd9cbdcaadd0a747"
+  },
+  "K": {
+    "gate": "Production isolation preserved",
+    "result": "PASS",
+    "evidence": "[]"
+  }
+}

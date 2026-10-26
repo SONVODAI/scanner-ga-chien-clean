@@ -1,0 +1,35 @@
+{
+  "equal_value_ties": [
+    {
+      "transition": 4,
+      "tied_candidates": [
+        [
+          "e8415614d364331f",
+          -0.5999999999999996
+        ],
+        [
+          "288ef208675e4c25",
+          -0.5999999999999996
+        ]
+      ]
+    },
+    {
+      "transition": 6,
+      "tied_candidates": [
+        [
+          "e8415614d364331f",
+          -3.9624999999999986
+        ],
+        [
+          "288ef208675e4c25",
+          -3.9624999999999986
+        ]
+      ]
+    }
+  ],
+  "tie_count": 2,
+  "session_id": "bb10-autonomous-001",
+  "first_divergence_vs_bb09_transition": 6,
+  "divergence_likely_from_bridge": true,
+  "note": "Session-scoped IDs and equal-score tie-breaking may cause path divergence independent of bridge."
+}

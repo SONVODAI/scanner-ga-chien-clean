@@ -1,0 +1,18 @@
+{
+  "experiments_executed": 12,
+  "experiment_budget": 12,
+  "session_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "remaining_budget": 0,
+    "unexplored_frontier_count": 44,
+    "features_touched": 2,
+    "eligible_features": 8,
+    "terminal_status": "BUDGET_EXHAUSTED",
+    "experiment_budget": 12,
+    "experiments_executed": 12,
+    "final_experiment_id": "exp-3f17dab233c5",
+    "unresolved_promising_deferred_count": 0
+  },
+  "evidence_responsive_transition_rate": 1.0
+}

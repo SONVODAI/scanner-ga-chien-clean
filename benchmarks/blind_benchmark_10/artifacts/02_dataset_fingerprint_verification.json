@@ -1,0 +1,7 @@
+{
+  "required_fingerprint": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "verified_fingerprint": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "verified_at": "2026-08-21T15:40:08Z",
+  "source_panel": "/workspace/benchmarks/blind_benchmark_01/artifacts/frozen_panel_snapshot.csv",
+  "match": true
+}

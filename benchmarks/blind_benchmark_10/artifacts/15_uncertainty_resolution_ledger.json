@@ -1,0 +1,26 @@
+{
+  "session_start_material_uncertainties": [
+    "EPISODE_REPLICATION",
+    "HORIZON_STABILITY",
+    "MARKET_DEPENDENCE",
+    "SYMBOL_DISTRIBUTION",
+    "TIME_DISTRIBUTION"
+  ],
+  "session_end_material_uncertainties": [
+    "EPISODE_REPLICATION",
+    "HORIZON_STABILITY",
+    "MARKET_DEPENDENCE",
+    "SYMBOL_DISTRIBUTION",
+    "TIME_DISTRIBUTION"
+  ],
+  "resolved": [],
+  "partially_reduced": [],
+  "still_unresolved": [
+    "EPISODE_REPLICATION",
+    "HORIZON_STABILITY",
+    "MARKET_DEPENDENCE",
+    "SYMBOL_DISTRIBUTION",
+    "TIME_DISTRIBUTION"
+  ],
+  "newly_discovered": []
+}
