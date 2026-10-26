@@ -1,0 +1,8 @@
+{
+  "phase": "3I.17b",
+  "head": "f3eaa0796257a8443e7e83dd80a9428a4e3d447d",
+  "verdict": "EVIDENCE_DERIVED_COHORT_BINDING_PASS",
+  "execution_status": "NOT_EXECUTED",
+  "bb_passed": 18,
+  "bb_total": 18
+}

@@ -1,0 +1,14 @@
+{
+  "attempted_illegal_transformations": [],
+  "rejected_future_leakage_actions": 0,
+  "executed_frame_legality": [
+    {
+      "frame_id": "frame-00001",
+      "observation_horizon": 0,
+      "temporally_legal": true,
+      "outcome_field": "t5_return"
+    }
+  ],
+  "all_executed_frames_temporally_legal": true,
+  "outcome_to_population_legality_decisions": []
+}

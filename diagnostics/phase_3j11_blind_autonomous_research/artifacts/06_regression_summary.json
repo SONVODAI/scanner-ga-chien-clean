@@ -1,0 +1,25 @@
+{
+  "suites": {
+    "tests/test_edge_research_opr_phase_3j11.py": {
+      "exit_code": 0,
+      "passed": true,
+      "tail": "8 passed in 12.34s"
+    },
+    "tests/test_edge_research_opr_phase_3j10.py": {
+      "exit_code": 0,
+      "passed": true,
+      "tail": "8 passed in 8.83s"
+    },
+    "tests/test_edge_research_opr_phase_3j9.py": {
+      "exit_code": 0,
+      "passed": true,
+      "tail": "11 passed in 9.34s"
+    },
+    "tests/test_edge_research_opr_phase_3j8.py": {
+      "exit_code": 0,
+      "passed": true,
+      "tail": "7 passed in 9.20s"
+    }
+  },
+  "all_passed": true
+}

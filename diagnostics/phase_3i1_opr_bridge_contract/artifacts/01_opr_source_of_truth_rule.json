@@ -1,0 +1,66 @@
+{
+  "phase": "3I.1",
+  "version": "opr_source_of_truth_v1",
+  "rule_name": "Minimum Evidence Payload for Legitimate Proposition Synthesis",
+  "mandatory_field": "observation_provenance",
+  "insufficient_alone": [
+    "OBS_* code string",
+    "GAP_* code string",
+    "question_template_id",
+    "action_code",
+    "ResearchNeedType",
+    "assessment.information_gaps membership"
+  ],
+  "minimum_payload_requirements": {
+    "required_elements": [
+      {
+        "name": "evidence_anchor",
+        "description": "Pointer to the experiment/node/tool run that produced the evidence",
+        "fields": ["experiment_node_id", "tool_name", "tool_version", "data_cutoff_date"]
+      },
+      {
+        "name": "empirical_artifacts",
+        "description": "At least one numeric or structural artifact traceable to panel/tool computation",
+        "min_count": 1,
+        "examples": [
+          "median_spread=2.06",
+          "largest_date_share=0.42",
+          "group_count=3",
+          "bin_effects=[...]",
+          "cohort_win_rate=58.9"
+        ]
+      },
+      {
+        "name": "structural_context",
+        "description": "Population/outcome/horizon/feature slice under which evidence was observed",
+        "fields": ["population_spec_hash or spec", "outcome_spec_hash or spec", "observation_horizon", "feature_slice_if_any"]
+      },
+      {
+        "name": "surprise_basis",
+        "description": "Recorded comparison or threshold that makes evidence non-trivial",
+        "examples": [
+          "concentration exceeds session baseline",
+          "cross-horizon spread exceeds prior branch",
+          "shape gradient detected with sufficient sample",
+          "conflict with prior experiment on same core"
+        ]
+      }
+    ],
+    "optional_index": {
+      "obs_codes": "May list OBS_* for audit cross-reference only",
+      "gap_codes": "May list GAP_* for audit cross-reference only — never sole justification"
+    }
+  },
+  "provenance_integrity_checks": [
+    "empirical_artifacts must be reproducible from cited experiment_node_id + tool replay",
+    "structural_context must match experiment scope at time of observation",
+    "surprise_basis must cite empirical comparison not template name",
+    "no hidden_benchmark_phenomenon_id in provenance chain during generator development"
+  ],
+  "reject_if": [
+    "observation_provenance contains only ontology labels",
+    "empirical_artifacts empty or purely categorical without numeric backing",
+    "surprise_basis references template_id or GAP name without empirical delta",
+    "provenance experiment_node_id not in research graph lineage"
+  ]
+}
