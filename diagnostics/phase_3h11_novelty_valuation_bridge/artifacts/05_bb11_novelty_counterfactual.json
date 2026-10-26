@@ -1,0 +1,77 @@
+{
+  "commit": "fd6f7b44b",
+  "transitions": [
+    {
+      "decision_index": 4,
+      "erv_rank_effect": "unchanged",
+      "gated_novelty_component": 1.5,
+      "independent_opportunity_note": "Replay uses selected candidate only; frontier not re-ranked",
+      "novelty_delta": 0.0,
+      "original_candidate": {
+        "action_id": "1cd8543301912be7",
+        "erv_before_gating": 5.49,
+        "tool": "adaptive_partition_compare"
+      },
+      "original_novelty_component": 1.5,
+      "rebuilt_erv_with_gating": 9.745000000000001,
+      "semantic_relationship": "INSUFFICIENT_EVIDENCE",
+      "stop_behavior_change": false,
+      "transition_id": "T4",
+      "valuation_class": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "decision_index": 8,
+      "erv_rank_effect": "unchanged",
+      "gated_novelty_component": 1.5,
+      "independent_opportunity_note": "Replay uses selected candidate only; frontier not re-ranked",
+      "novelty_delta": 0.0,
+      "original_candidate": {
+        "action_id": "5001c4d3def13df5",
+        "erv_before_gating": -1.0996249999999994,
+        "tool": "adaptive_partition_compare"
+      },
+      "original_novelty_component": 1.5,
+      "rebuilt_erv_with_gating": 6.0001875,
+      "semantic_relationship": "INSUFFICIENT_EVIDENCE",
+      "stop_behavior_change": false,
+      "transition_id": "T8",
+      "valuation_class": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "decision_index": 9,
+      "erv_rank_effect": "unchanged",
+      "gated_novelty_component": 1.5,
+      "independent_opportunity_note": "Replay uses selected candidate only; frontier not re-ranked",
+      "novelty_delta": 0.0,
+      "original_candidate": {
+        "action_id": "1b0a96d2a37ac857",
+        "erv_before_gating": 5.7789375,
+        "tool": "threshold_exploration"
+      },
+      "original_novelty_component": 1.5,
+      "rebuilt_erv_with_gating": 9.43946875,
+      "semantic_relationship": "INSUFFICIENT_EVIDENCE",
+      "stop_behavior_change": false,
+      "transition_id": "T9",
+      "valuation_class": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "decision_index": 11,
+      "erv_rank_effect": "unchanged",
+      "gated_novelty_component": 1.5,
+      "independent_opportunity_note": "Replay uses selected candidate only; frontier not re-ranked",
+      "novelty_delta": 0.0,
+      "original_candidate": {
+        "action_id": null,
+        "erv_before_gating": 0.0,
+        "tool": ""
+      },
+      "original_novelty_component": 1.5,
+      "rebuilt_erv_with_gating": 5.0,
+      "semantic_relationship": "INSUFFICIENT_EVIDENCE",
+      "stop_behavior_change": false,
+      "transition_id": "T11",
+      "valuation_class": "INSUFFICIENT_EVIDENCE"
+    }
+  ]
+}
