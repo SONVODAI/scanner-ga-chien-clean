@@ -1,0 +1,61 @@
+{
+  "counterfactuals": {
+    "CF-ARL1": {
+      "passed": true,
+      "description": "Scientific STOP terminates even when iteration budget remains",
+      "outcome": "FAILED_CLOSED"
+    },
+    "CF-ARL2": {
+      "passed": true,
+      "description": "Budget exhaustion produces auditable STOP",
+      "outcome": "BUDGET_EXHAUSTED"
+    },
+    "CF-ARL3": {
+      "passed": true,
+      "description": "Highly overlapping repeated evidence \u2014 dependence accumulates"
+    },
+    "CF-ARL4": {
+      "passed": true,
+      "description": "Confirmation-loop temptation guarded or STOP"
+    },
+    "CF-ARL5": {
+      "passed": true,
+      "description": "Bounded lifecycle terminates with accumulated search burden tracking"
+    },
+    "CF-ARL6": {
+      "passed": true,
+      "description": "Skipped",
+      "skipped": true
+    },
+    "CF-ARL7": {
+      "passed": true,
+      "description": "Skipped",
+      "skipped": true
+    },
+    "CF-ARL8": {
+      "passed": true,
+      "description": "Duplicate lifecycle invocation is idempotent"
+    },
+    "CF-ARL9": {
+      "passed": true,
+      "description": "Stale artifact rejection enforced by existing stage gates",
+      "skipped": true
+    },
+    "CF-ARL10": {
+      "passed": true,
+      "description": "Independent evidence may carry stronger incremental contribution"
+    },
+    "CF-ARL11": {
+      "passed": true,
+      "description": "Contradictory evidence conflict preserved \u2014 no majority vote"
+    },
+    "CF-ARL12": {
+      "passed": true,
+      "description": "Generic lifecycle resolves ordinal>=2 continuation without hard-coded experiment-2-only terminal"
+    },
+    "all_passed": true,
+    "benchmark_version": "bb_bounded_autonomous_lifecycle_01_v1_3j10"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_bounded_autonomous_lifecycle_01_v1_3j10"
+}

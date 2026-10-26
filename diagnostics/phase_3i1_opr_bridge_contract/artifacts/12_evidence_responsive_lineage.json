@@ -1,0 +1,86 @@
+{
+  "artifact_id": "12_evidence_responsive_lineage",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "implementation_scope": "Lineage/audit requirements only — NO transformation engine in 3I.1 or initial 3I.2",
+  "principle": "PropositionRecords evolve via evidence-triggered scientific transformations, NOT a fixed progression catalog.",
+  "allowed_transitions": {
+    "SUPPORT": {
+      "trigger": "Experiment result aligns with falsifiable_expectation within declared tolerance",
+      "requires": "experiment_id, evidence_payload_ref, directional match",
+      "creates": "Lineage edge with evidence hash — same proposition_id, updated epistemic status"
+    },
+    "WEAKEN": {
+      "trigger": "Result directionally consistent but magnitude below threshold or high variance",
+      "requires": "Quantitative comparison to expectation"
+    },
+    "FALSIFY": {
+      "trigger": "Result crosses disconfirming threshold or matches null_competing_explanation better",
+      "requires": "Explicit disconfirming statistic cited"
+    },
+    "NARROW": {
+      "trigger": "Effect concentrated in sub-population discovered post-hoc from evidence",
+      "requires": "New population_context must cite evidence slice — not template default"
+    },
+    "BROADEN": {
+      "trigger": "Effect generalizes beyond original population with evidence",
+      "requires": "Cross-population contrast statistics"
+    },
+    "CHANGE_POPULATION": {
+      "trigger": "Original population unsupported; evidence points to different definable population",
+      "requires": "Falsify or weaken prior population + new grounding"
+    },
+    "CHANGE_OUTCOME": {
+      "trigger": "Original outcome uninformative; alternative outcome shows signal in evidence",
+      "requires": "Outcome change motivated by experiment diagnostics"
+    },
+    "CHANGE_HORIZON": {
+      "trigger": "Effect horizon-dependent per evidence",
+      "requires": "Horizon sweep or temporal evidence — not planner preference"
+    },
+    "SEEK_COUNTEREXAMPLE": {
+      "trigger": "Partial support — active search for disconfirming slice",
+      "requires": "Documented counterexample criteria before run"
+    },
+    "ABANDON": {
+      "trigger": "Falsified, exhausted budget, or superseded by stronger fork",
+      "requires": "reason_code + last_evidence_ref"
+    },
+    "FORK_NEW_EXPLANATION": {
+      "trigger": "Evidence rejects core relation but supports alternative mechanism",
+      "requires": "New proposition_id with parent_id link + new birth certificate for fork"
+    }
+  },
+  "forbidden_transitions": {
+    "description": "Fixed catalog progression without evidence",
+    "examples": [
+      "Auto-advance to next template in family",
+      "Planner-driven horizon rotation without experiment",
+      "GAP code change without new observation"
+    ]
+  },
+  "lineage_record_schema": {
+    "lineage_id": "uuid",
+    "proposition_id": "string",
+    "parent_proposition_id": "optional — for forks",
+    "transition": "enum from allowed_transitions",
+    "triggered_by_experiment_id": "string",
+    "evidence_refs": "array of payload refs",
+    "evidence_hash": "SHA256",
+    "timestamp": "ISO8601",
+    "research_step": "integer",
+    "prior_state_snapshot": "hash of proposition fields before transition",
+    "auditor_note": "optional human review"
+  },
+  "audit_requirements": {
+    "immutability": "Prior PropositionRecord versions preserved — append-only lineage graph",
+    "evidence_first": "No transition without experiment_id or observation update ref",
+    "no_hidden_catalog": "Transitions not chosen from enumerated menu in code — classifier determines transition from evidence rules",
+    "fork_rules": "FORK_NEW_EXPLANATION requires fresh birth certificate and new template_independence audit"
+  },
+  "connection_to_existing_systems": {
+    "experiment_results": "research portfolio / experiment completion hooks — read-only integration point for 3I.2+",
+    "planner": "Must NOT drive lineage transitions in OPR layer",
+    "challenger": "Future: FALSIFY/SEEK_COUNTEREXAMPLE may receive challenger proposals — not integrated now"
+  }
+}

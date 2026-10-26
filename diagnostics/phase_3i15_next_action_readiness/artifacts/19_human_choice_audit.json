@@ -1,0 +1,56 @@
+{
+  "choices": [
+    {
+      "locus": "Uncertainty axis to pursue",
+      "current": "Synthesis engine ranks unresolved; human chose holdout in 3I.9 path",
+      "classification": "autonomy_blocker"
+    },
+    {
+      "locus": "Scientific objective formulation",
+      "current": "Implicit in FalsificationCandidateGenerator vulnerability text",
+      "classification": "partially_automated_single_strategy"
+    },
+    {
+      "locus": "Candidate action generation",
+      "current": "One holdout candidate or GAP-template list",
+      "classification": "autonomy_blocker"
+    },
+    {
+      "locus": "Cohort choice",
+      "current": "Algorithmic holdout dates excluding motivating \u2014 not synthesis-aware",
+      "classification": "scientific_prior_embedded_in_code"
+    },
+    {
+      "locus": "Experiment design",
+      "current": "Fixed quintile partition",
+      "classification": "tool_bound"
+    },
+    {
+      "locus": "Tool selection",
+      "current": "partition_group_compare hard-coded",
+      "classification": "legitimate_execution_constraint_partially"
+    },
+    {
+      "locus": "Selector outcome",
+      "current": "Lexicographic in 3I.9 \u2014 automated given candidates",
+      "classification": "legitimate_execution_constraint"
+    },
+    {
+      "locus": "Multi-evidence priority",
+      "current": "Automated ResearchPriorityDecision (3I.12)",
+      "classification": "autonomous"
+    },
+    {
+      "locus": "Which axis to falsify after T2",
+      "current": "Human/agent chose holdout; synthesis now marks redundant",
+      "classification": "autonomy_blocker"
+    }
+  ],
+  "highest_leverage_autonomy_blocker": "Candidate action generation from ResearchPriorityDecision + unresolved uncertainty structure",
+  "legitimate_execution_constraints": [
+    "Grammar validation",
+    "Sample size gates",
+    "Data cutoff / leakage prevention",
+    "Tool registry existence check"
+  ]
+}

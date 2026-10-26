@@ -1,0 +1,55 @@
+{
+  "CF-BR1": {
+    "passed": true,
+    "description": "Research runner must not contain examiner ground truth",
+    "hits": []
+  },
+  "CF-BR2": {
+    "passed": true,
+    "description": "Policy hash unchanged during exam (no post-result mutation)",
+    "hash_count": 12
+  },
+  "CF-BR3": {
+    "passed": true,
+    "description": "Exam framework rejects manual intervention flag",
+    "manual_intervention_detected": false,
+    "note": "Runner has no override hooks; intervention would require out-of-band session mutation"
+  },
+  "CF-BR4": {
+    "passed": true,
+    "description": "Reveal before freeze hash is invalid",
+    "reveal_order_valid": false
+  },
+  "CF-BR5": {
+    "passed": true,
+    "description": "Correct-looking SUPPORTED on noise must not PASS process score",
+    "process_score": 0.0,
+    "false_positive_risk": "CRITICAL"
+  },
+  "CF-BR6": {
+    "passed": true,
+    "description": "HOLD/STOP with insufficient evidence may PASS process despite imperfect outcome",
+    "process_score": 1.0
+  },
+  "CF-BR7": {
+    "passed": true,
+    "description": "Pure-noise SUPPORTED is major failure",
+    "false_positive_risk": "CRITICAL"
+  },
+  "CF-BR8": {
+    "passed": true,
+    "description": "Episode artifact SUPPORTED penalized",
+    "process_score": 0.5,
+    "false_positive_risk": "ELEVATED"
+  },
+  "CF-BR9": {
+    "passed": true,
+    "description": "WEAKENED on reversal case is acceptable",
+    "process_score": 1.0
+  },
+  "CF-BR10": {
+    "passed": true,
+    "description": "Budget exhaustion yields auditable uncertainty",
+    "calibration": "UNRESOLVED"
+  }
+}

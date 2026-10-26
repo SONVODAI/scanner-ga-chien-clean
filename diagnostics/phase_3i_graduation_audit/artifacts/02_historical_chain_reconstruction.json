@@ -1,0 +1,127 @@
+{
+  "audit_version": "phase_3i_graduation_audit_v1",
+  "canonical_proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "terminal_state": {
+    "epistemic_state": "SUPPORTED",
+    "frontier_decision": "NO_HIGH_INFORMATION_ACTION",
+    "research_activity_state": "DORMANT"
+  },
+  "transitions": [
+    {
+      "step": 1,
+      "phase": "3I.2/3I.3/3I.4",
+      "function": "OBSERVE \u2192 DETECT SURPRISE \u2192 WONDER \u2192 FORM PROPOSITION",
+      "input_state": "Cross-sectional rs_spread dispersion on 2026-08-02; quintile t5_return spread=6.4021",
+      "decision": "Birth proposition prop-efb650d9bd5c451f via CONTRAST_TO_PROPOSITION",
+      "why": "Quintile spread exceeds threshold 1.5; monotonicity break triggers surprise",
+      "authoritative_record": "diagnostics/phase_3i7_minimal_lifecycle/artifacts/02_frozen_proposition.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION within HUMAN_SCIENTIFIC_PRIOR (CONTRAST_TO_PROPOSITION, CROSS_SECTIONAL_DISPERSION family)",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY for dispersion-contrast observations; STOPS_HUMAN_SCIENTIFIC_PRIOR for anomalies outside observation grammar"
+    },
+    {
+      "step": 2,
+      "phase": "3I.5",
+      "function": "ESTABLISH SCIENTIFIC IDENTITY \u2192 PRIORITIZE",
+      "input_state": "22 candidate propositions from multi-date OPR runs; semantic duplicates",
+      "decision": "Select prop-efb650d9bd5c451f as canonical; deduplicate by scientific identity",
+      "why": "Highest surprise magnitude among non-redundant identity groups on prioritized focal date",
+      "authoritative_record": "diagnostics/phase_3i5_observation_prioritization/artifacts/",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 3,
+      "phase": "3I.7",
+      "function": "DESIGN TEST \u2192 INTERPRET EVIDENCE \u2192 UPDATE EPISTEMIC POSITION",
+      "input_state": "HYPOTHESIS proposition; experiment_spec from proposition draft",
+      "decision": "E1 partition_group_compare \u2192 SUPPORTING \u2192 SUPPORTED; chosen_next_action=SEEK_FALSIFICATION",
+      "why": "Quintile spread 2.35 >= 0.5; direction matches expectation; falsification-first policy",
+      "authoritative_record": "diagnostics/phase_3i7_minimal_lifecycle/artifacts/09_append_only_lineage.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 4,
+      "phase": "3I.9",
+      "function": "SEEK FALSIFICATION \u2192 DESIGN FALSIFICATION",
+      "input_state": "SUPPORTED proposition; SEEK_FALSIFICATION decision",
+      "decision": "Select fc-independent_episode_holdout",
+      "why": "Only eligible candidate; episode_instability vulnerability; INDEPENDENT_FALSIFICATION",
+      "authoritative_record": "diagnostics/phase_3i9_falsification_selection/artifacts/08_real_selection.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 5,
+      "phase": "3I.10",
+      "function": "INTERPRET EVIDENCE (falsification execution)",
+      "input_state": "Holdout cohort n=5964; overlap ~97.7% with E1",
+      "decision": "Second SUPPORTING update; epistemic state remains SUPPORTED",
+      "why": "Falsification attempt did not disconfirm; spread 2.09 >= 0.5",
+      "authoritative_record": "diagnostics/phase_3i10_falsification_execution/artifacts/05_epistemic_update.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 6,
+      "phase": "3I.12/3I.13/3I.14",
+      "function": "SYNTHESIZE MULTIPLE EVIDENCE \u2192 IDENTIFY UNRESOLVED UNCERTAINTY",
+      "input_state": "Two evidence events; PARTIAL_REPLICATION relationship",
+      "decision": "Synthesis syn-668415e243a8; priority SEEK_FALSIFICATION; 9 unresolved axes; episode_robustness redundant",
+      "why": "Correlated supports do not upgrade belief; major axes remain uncovered",
+      "authoritative_record": "diagnostics/phase_3i13_lifecycle_synthesis_integration/artifacts/05_real_t2_replay.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 7,
+      "phase": "3I.16",
+      "function": "CHOOSE WHAT IS WORTH LEARNING \u2192 Scientific action generation",
+      "input_state": "Synthesis priority SEEK_FALSIFICATION; unresolved major axes",
+      "decision": "Generate objectives and operator candidates (population/rolling contrast winner in legacy ranking)",
+      "why": "Lexicographic objective generation from unresolved vulnerability axes",
+      "authoritative_record": "diagnostics/phase_3i16_scientific_action_generator/artifacts/04_t2_one_shot_generation.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION within HUMAN_SCIENTIFIC_PRIOR (operator catalog)",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY within operator catalog"
+    },
+    {
+      "step": 8,
+      "phase": "3I.17b",
+      "function": "Evidence-derived cohort binding",
+      "input_state": "Action candidates with population/rolling strategies",
+      "decision": "NO_DEFENSIBLE_COHORT \u2014 all candidates rejected",
+      "why": "Redundant overlap, rescue patterns, insufficient sample independence",
+      "authoritative_record": "diagnostics/phase_3i17b_evidence_cohort_binding/artifacts/05_t2_cohort_diagnostic.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 9,
+      "phase": "3I.18",
+      "function": "ASSESS SCIENTIFIC FRONTIER",
+      "input_state": "NO_DEFENSIBLE_COHORT; major unresolved axes",
+      "decision": "NO_HIGH_INFORMATION_ACTION",
+      "why": "Cohort independence unavailable; marginal information gate on peripheral axes",
+      "authoritative_record": "diagnostics/phase_3i18_non_cohort_frontier/artifacts/03_t2_frontier_diagnostic.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    },
+    {
+      "step": 10,
+      "phase": "3I.19/3I.20",
+      "function": "STOP WHEN MARGINAL INFORMATION IS LOW \u2192 REMEMBER WHY \u2192 REASSESS HOOKS",
+      "input_state": "NO_HIGH_INFORMATION_ACTION; SUPPORTED epistemic state",
+      "decision": "DORMANT with 8 reopening conditions; epistemic SUPPORTED preserved",
+      "why": "Research activity separated from belief; evidence-causal dormancy trigger",
+      "authoritative_record": "diagnostics/phase_3i20_dormancy_lifecycle/artifacts/04_t2_lifecycle_replay.json",
+      "autonomy_class": "BOT_SCIENTIFIC_DECISION",
+      "counterfactual": "CONTINUES_AUTONOMOUSLY"
+    }
+  ],
+  "remove_human_counterfactual_summary": {
+    "earliest_autonomy_break": "Session orchestration \u2014 OPR lifecycle requires human-initiated diagnostic runner; production research_controller does not invoke OPR pipeline",
+    "break_class": "STOPS_DISCONNECTED_CAPABILITY",
+    "within_frozen_chain": "All 10 transitions derive from prior state + frozen rules once chain is initiated"
+  }
+}
