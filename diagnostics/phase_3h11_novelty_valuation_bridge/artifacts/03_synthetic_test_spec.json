@@ -1,0 +1,17 @@
+{
+  "tests": {
+    "A_same_proposition_different_tool": "representation novelty only; gated novelty_component == 0",
+    "B_same_proposition_different_frame": "semantically equivalent; gated novelty_component == 0",
+    "C_same_line_fresh_evidence": "evidence novelty preserved; gated == raw",
+    "D_distinct_independent_line": "scientific novelty preserved; gated == raw",
+    "E_insufficient_evidence": "fail closed; gated == raw",
+    "F_legacy_no_metadata": "empty registry; gated == raw",
+    "G_never_negative_penalty": "gated >= 0 always; never below zero via gating"
+  },
+  "regression": [
+    "tests/test_edge_research_semantic_research_line.py",
+    "tests/test_edge_research_branch_exit_valuation.py",
+    "tests/test_edge_research_novelty_valuation_bridge.py",
+    "full test_edge_research*.py suite"
+  ]
+}

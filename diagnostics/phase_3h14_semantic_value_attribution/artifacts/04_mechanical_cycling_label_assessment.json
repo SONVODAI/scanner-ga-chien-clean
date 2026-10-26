@@ -1,0 +1,11 @@
+{
+  "classification": "MISOWNED as scientific-waste proxy",
+  "code_ref": "benchmarks/blind_benchmark_14/run_benchmark.py:429-454",
+  "does_not_require": [
+    "semantic representation redundancy",
+    "same canonical proposition",
+    "low portfolio ERV"
+  ],
+  "recommendation": "Diagnostic refinement only \u2014 no scoring change",
+  "trigger_rule": "tool in MECHANICAL_TOOLS AND planner total score < 0"
+}
