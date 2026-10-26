@@ -1,0 +1,126 @@
+[
+  {
+    "candidate_id": "exp-c8616c604523",
+    "complexity_score": {
+      "aggregate_score": 7.5,
+      "alternatives_considered": 0,
+      "branch_depth": 1,
+      "categorical_levels": 0,
+      "features_explored": 0,
+      "interaction_depth": 0,
+      "neighborhood_cuts": 0,
+      "outcome_complexity": 1,
+      "partitions_evaluated": 0,
+      "population_complexity": 1,
+      "predicate_count": 1,
+      "refinements": 0,
+      "thresholds_explored": 0
+    },
+    "concentration_evidence": {},
+    "conditions": {},
+    "confirmation_split": {
+      "confirmation_cutoff": null,
+      "confirmation_date_range": null,
+      "confirmation_independence_status": "NOT_AVAILABLE",
+      "confirmation_status": "NOT_AVAILABLE",
+      "discovery_cutoff": "2026-08-17",
+      "discovery_date_range": null,
+      "observations_overlap": null
+    },
+    "confirmation_status": "NOT_AVAILABLE",
+    "current_research_status": "EXPLORATORY",
+    "dates": [],
+    "discovery_evidence_type": "DISCOVERY",
+    "effective_hypotheses_tested": 35,
+    "episodes": [],
+    "evidence_burden": {
+      "concentration_flags": [],
+      "evidence_search_assessment": "INSUFFICIENT",
+      "evidence_to_search_ratio": 0.0,
+      "incremental_effect": null,
+      "raw_effect": null,
+      "sample_size": null,
+      "search_cardinality_preceding": 35,
+      "search_complexity": 7.5,
+      "shape_strength": null,
+      "uncertainty": null
+    },
+    "fragility_flags": [],
+    "incremental_effect": null,
+    "lineage_discovery_vs_falsification": [
+      "DISCOVERY"
+    ],
+    "n": null,
+    "next_required_test": "",
+    "outcome_spec": {
+      "field": "t5_return",
+      "grammar_version": "research_grammar_v1",
+      "kind": "compare",
+      "operator": ">",
+      "value": 0.0
+    },
+    "parent_baseline": null,
+    "parent_comparison": null,
+    "population_spec": {
+      "grammar_version": "research_grammar_v1",
+      "kind": "all"
+    },
+    "raw_outcome_metric": null,
+    "search_accounting": {
+      "branch": {
+        "abandoned_branches": 0,
+        "branch_depth_max": 1,
+        "candidate_actions_considered": 31,
+        "categorical_levels_evaluated": 0,
+        "duplicate_experiments_blocked": 0,
+        "experiments_executed": 1,
+        "explanatory_features_tested": [],
+        "falsification_experiments_executed": 0,
+        "interactions_attempted": 0,
+        "neighborhood_cuts_evaluated": 0,
+        "partitions_evaluated": 0,
+        "questions_generated": 1,
+        "refinements_reframes": 0,
+        "threshold_candidates_evaluated": 0,
+        "unique_outcome_specs": [
+          "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        ],
+        "unique_population_specs": [
+          "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        ],
+        "unique_research_frames": []
+      },
+      "session": {
+        "abandoned_branches": 0,
+        "branch_depth_max": 1,
+        "candidate_actions_considered": 31,
+        "categorical_levels_evaluated": 0,
+        "duplicate_experiments_blocked": 0,
+        "experiments_executed": 1,
+        "explanatory_features_tested": [],
+        "falsification_experiments_executed": 0,
+        "interactions_attempted": 0,
+        "neighborhood_cuts_evaluated": 0,
+        "partitions_evaluated": 0,
+        "questions_generated": 1,
+        "refinements_reframes": 0,
+        "threshold_candidates_evaluated": 0,
+        "unique_outcome_specs": [
+          "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        ],
+        "unique_population_specs": [
+          "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547"
+        ],
+        "unique_research_frames": []
+      }
+    },
+    "shape_evidence": {},
+    "threshold_neighborhood_evidence": {},
+    "why_interesting": "Descriptive group difference with effect=None",
+    "why_not_validated": "Research-only; validated=False always in Phase 3G.",
+    "validated": false,
+    "actionable": false,
+    "originating_frame_id": "",
+    "observation_horizon": 0
+  }
+]
