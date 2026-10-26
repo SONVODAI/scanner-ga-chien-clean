@@ -1,0 +1,44 @@
+{
+  "current_limitation": "3I.7 transition_mapping is evidence-absolute (evidence_class \u2192 resulting_state)",
+  "design": "prior_state_conditioned_transition_table",
+  "examples": {
+    "SUPPORTED + independent SUPPORTING": {
+      "requires": [
+        "independence_profile episode_or_sample high",
+        "same uncertainty dimension or new"
+      ],
+      "possible_outcomes": [
+        "SUPPORTED unchanged",
+        "CONFLICTED if contradicts hidden conflict"
+      ],
+      "not": "auto-upgrade confidence"
+    },
+    "SUPPORTED + independent DISCONFIRMING": {
+      "requires": [
+        "valid disconfirming evidence",
+        "independence from prior support cohort"
+      ],
+      "possible_outcomes": [
+        "WEAKENED",
+        "CONFLICTED",
+        "FALSIFIED if strong"
+      ]
+    },
+    "SUPPORTED + strong CONTRADICTORY": {
+      "outcome": "CONFLICTED"
+    },
+    "WEAKENED + independent SUPPORTING": {
+      "outcome": "SUPPORTED or CONFLICTED \u2014 depends on conflict structure"
+    },
+    "CONFLICTED + additional contradiction": {
+      "outcome": "CONFLICTED persists; seek resolution experiment"
+    },
+    "UNRESOLVED + informative": {
+      "outcome": "state per evidence class"
+    },
+    "FALSIFIED + later SUPPORTING": {
+      "outcome": "FALSIFIED preserved; flag anomaly, no auto-resurrection"
+    }
+  },
+  "preregister_before_synthesis": true
+}

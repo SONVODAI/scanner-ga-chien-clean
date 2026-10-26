@@ -1,0 +1,198 @@
+{
+  "benchmark": "BB-NextAction-01",
+  "case_count": 18,
+  "passed": 18,
+  "all_passed": true,
+  "results": [
+    {
+      "case_id": "BBNA-01",
+      "passed": true,
+      "checks": {
+        "min_distinct_core_hashes": true,
+        "must_include_strategies": true,
+        "must_not_only_strategy": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 10,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-02",
+      "passed": true,
+      "checks": {
+        "must_include_strategies": true,
+        "must_include_axes": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-03",
+      "passed": true,
+      "checks": {
+        "allow_executability": true,
+        "must_not_rescue": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-04",
+      "passed": true,
+      "checks": {
+        "contradiction_resolution": true,
+        "priority_actions": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 1,
+      "priority": "SEEK_CONTRADICTION_RESOLUTION"
+    },
+    {
+      "case_id": "BBNA-05",
+      "passed": true,
+      "checks": {
+        "priority_actions": true,
+        "replication_operator": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 7,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-06",
+      "passed": true,
+      "checks": {
+        "dispositions": true
+      },
+      "disposition": "HOLD",
+      "candidate_count": 0,
+      "priority": "HOLD_PROVISIONALLY"
+    },
+    {
+      "case_id": "BBNA-07",
+      "passed": true,
+      "checks": {
+        "dispositions": true,
+        "no_rescue": true
+      },
+      "disposition": "NO_HIGH_INFORMATION_ACTION",
+      "candidate_count": 0,
+      "priority": "ABANDON"
+    },
+    {
+      "case_id": "BBNA-08",
+      "passed": true,
+      "checks": {
+        "dispositions": true
+      },
+      "disposition": "HOLD",
+      "candidate_count": 0,
+      "priority": "HOLD_PROVISIONALLY"
+    },
+    {
+      "case_id": "BBNA-09",
+      "passed": true,
+      "checks": {
+        "not_executable_preserved": true
+      },
+      "disposition": "NO_HIGH_INFORMATION_ACTION",
+      "candidate_count": 7,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-11",
+      "passed": true,
+      "checks": {
+        "min_distinct_core_hashes": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 10,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-12",
+      "passed": true,
+      "checks": {
+        "winner_not_redundant": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 10,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-13",
+      "passed": true,
+      "checks": {
+        "disguised_redundant": true,
+        "winner_not_disguised": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-10",
+      "passed": true,
+      "checks": {
+        "dedup_works": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-14",
+      "passed": true,
+      "checks": {
+        "no_invalid_selected": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-15",
+      "passed": true,
+      "checks": {
+        "context_changes_actions": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-16",
+      "passed": true,
+      "checks": {
+        "no_rescue": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 7,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-17",
+      "passed": true,
+      "checks": {
+        "must_include_strategies": true,
+        "counterexample": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 11,
+      "priority": "SEEK_FALSIFICATION"
+    },
+    {
+      "case_id": "BBNA-18",
+      "passed": true,
+      "checks": {
+        "contradiction_resolution": true,
+        "no_rescue": true
+      },
+      "disposition": "SELECTED",
+      "candidate_count": 1,
+      "priority": "SEEK_CONTRADICTION_RESOLUTION"
+    }
+  ]
+}

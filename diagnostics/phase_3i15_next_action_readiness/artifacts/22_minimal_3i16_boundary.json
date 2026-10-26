@@ -1,0 +1,34 @@
+{
+  "phase": "3I.16",
+  "mode": "IMPLEMENT minimal generator \u2014 no execution",
+  "pipeline": [
+    "ResearchPriorityDecision",
+    "ScientificObjectiveRecord (1+ per unresolved major axis)",
+    "ScientificActionCandidateRecord (via generic operators)",
+    "ScientificActionCore semantic dedup",
+    "pre-result lexicographic ranking",
+    "SELECT | HOLD | NO_HIGH_INFORMATION_ACTION",
+    "freeze NextActionPackage",
+    "STOP"
+  ],
+  "must_not": [
+    "execute experiment",
+    "mutate proposition",
+    "alter synthesis engine",
+    "alter priority rules",
+    "wire planner/controller",
+    "use hidden benchmark answers"
+  ],
+  "must_include": [
+    "BB-NextAction-01 fixtures with development firewall",
+    "FalsificationOperator reusing 3I.9 patterns as one specialized operator",
+    "redundant_test_axes enforcement before candidate emission",
+    "T2 one-shot diagnostic (NOT_EXECUTED package)"
+  ],
+  "reuse": [
+    "uncertainty_coverage.py axes",
+    "evidence_synthesis_records.py",
+    "FalsificationCandidateGenerator anti-rescue + executability patterns",
+    "research_grammar.py for executability validation only"
+  ]
+}

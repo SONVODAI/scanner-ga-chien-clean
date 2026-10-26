@@ -1,0 +1,10 @@
+{
+  "last_operation": "restore",
+  "last_result": "skipped",
+  "message": "durable backend not configured",
+  "backend": "none",
+  "discovery_run_id": "",
+  "challenger_run_id": "",
+  "cohort_size": 0,
+  "details": {}
+}
