@@ -1,0 +1,98 @@
+{
+  "benchmark_id": "BB-Epistemic-01",
+  "mode": "design_only",
+  "abstract_features_required": true,
+  "cases": [
+    {
+      "id": "BE-01",
+      "name": "one_support_only",
+      "expected_state_hint": "SUPPORTED",
+      "expected_action_hint": "SEEK_FALSIFICATION or replication"
+    },
+    {
+      "id": "BE-02",
+      "name": "two_correlated_supports",
+      "expected_state_hint": "SUPPORTED",
+      "expected_action_hint": "NOT auto-strengthen; saturation partial"
+    },
+    {
+      "id": "BE-03",
+      "name": "two_independent_supports",
+      "expected_state_hint": "SUPPORTED",
+      "expected_action_hint": "may HOLD_PROVISIONALLY if dimensions covered"
+    },
+    {
+      "id": "BE-04",
+      "name": "support_weak_disconfirm",
+      "expected_state_hint": "WEAKENED or CONFLICTED",
+      "expected_action_hint": "SEEK_REPLICATION"
+    },
+    {
+      "id": "BE-05",
+      "name": "support_strong_independent_disconfirm",
+      "expected_state_hint": "WEAKENED/FALSIFIED",
+      "expected_action_hint": "ABANDON or conflict resolution"
+    },
+    {
+      "id": "BE-06",
+      "name": "representation_only_support",
+      "expected_state_hint": "SUPPORTED unchanged info",
+      "expected_action_hint": "reject redundancy"
+    },
+    {
+      "id": "BE-07",
+      "name": "conflicting_independent",
+      "expected_state_hint": "CONFLICTED",
+      "expected_action_hint": "SEEK_CONTRADICTION_RESOLUTION"
+    },
+    {
+      "id": "BE-08",
+      "name": "invalid_disconfirmation",
+      "expected_state_hint": "prior unchanged",
+      "expected_action_hint": "HOLD"
+    },
+    {
+      "id": "BE-09",
+      "name": "non_informative_repetition",
+      "expected_state_hint": "UNRESOLVED/SUPPORTED",
+      "expected_action_hint": "different axis or HOLD"
+    },
+    {
+      "id": "BE-10",
+      "name": "supports_major_dimension_untouched",
+      "expected_state_hint": "SUPPORTED",
+      "expected_action_hint": "SEEK_FALSIFICATION on untouched axis"
+    },
+    {
+      "id": "BE-11",
+      "name": "saturation_no_contradiction",
+      "expected_state_hint": "SUPPORTED",
+      "expected_action_hint": "HOLD_PROVISIONALLY"
+    },
+    {
+      "id": "BE-12",
+      "name": "unresolved_contradiction",
+      "expected_state_hint": "CONFLICTED",
+      "expected_action_hint": "SEEK_CONTRADICTION_RESOLUTION"
+    },
+    {
+      "id": "BE-13",
+      "name": "no_executable_high_info",
+      "expected_state_hint": "prior state",
+      "expected_action_hint": "HOLD_PROVISIONALLY or HOLD_UNRESOLVED"
+    },
+    {
+      "id": "BE-14",
+      "name": "falsified_then_support",
+      "expected_state_hint": "FALSIFIED preserved",
+      "expected_action_hint": "anomaly flag, no resurrection"
+    },
+    {
+      "id": "BE-15",
+      "name": "narrow_after_contradiction_temptation",
+      "expected_state_hint": "FALSIFIED/CONFLICTED",
+      "expected_action_hint": "reject rescue; FORK deferred"
+    }
+  ],
+  "fixture_results": "Deferred to 3I.12 implementation on abstract ledgers"
+}

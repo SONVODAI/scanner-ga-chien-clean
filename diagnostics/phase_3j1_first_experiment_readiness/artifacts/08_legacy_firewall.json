@@ -1,0 +1,7 @@
+{
+  "legacy_can_choose_first_experiment": true,
+  "path": "bootstrap_research_graph \u2192 human seed question \u2192 template experiment",
+  "opr_blocks_legacy_when_active": true,
+  "first_experiment_via_template_map": "Would be TEMPLATE_TRANSLATION if OPR not active",
+  "verdict": "Legacy cannot silently choose when OPR authority active, but no OPR first-experiment selector exists either"
+}

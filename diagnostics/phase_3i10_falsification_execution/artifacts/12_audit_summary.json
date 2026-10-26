@@ -1,0 +1,14 @@
+{
+  "phase": "3I.10",
+  "execution_version": "falsification_one_shot_execution_v1_3i10",
+  "git_head": "52663f1e11ecce4a4f1fa93f6339dfeda446754b",
+  "expected_package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+  "package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+  "verdict": "AUTONOMOUS_FALSIFICATION_PASS",
+  "executed": true,
+  "evidence_class": "SUPPORTING",
+  "prior_state": "SUPPORTED",
+  "resulting_state": "SUPPORTED",
+  "execution_id": "fex-91a2102242c0",
+  "one_shot_execution_count": 1
+}
