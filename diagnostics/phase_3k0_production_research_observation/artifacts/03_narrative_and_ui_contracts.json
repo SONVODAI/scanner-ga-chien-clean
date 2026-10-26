@@ -1,0 +1,129 @@
+{
+  "narrative_contract": {
+    "observation_id": "obs-3af5cdd0c7759e26",
+    "research_topic_vi_key": "bot_dang_nghien_cuu",
+    "research_topic_en": "NO_DISCOVERY",
+    "evidence_summary_keys": [
+      "epistemic_state:UNRESOLVED",
+      "experiments:0"
+    ],
+    "counter_evidence_keys": [],
+    "surviving_null_keys": [],
+    "independence_status_key": "UNKNOWN_INDEPENDENCE",
+    "continue_reason_key": "ACTION_REMAINING",
+    "stop_reason_key": "SILENT",
+    "unknowns_keys": [],
+    "pending_verification_keys": [
+      "T3",
+      "T5",
+      "T10"
+    ],
+    "structured_state_snapshot": {
+      "observation_outcome_kind": "NO_DISCOVERY",
+      "final_epistemic_state": null,
+      "null_ledger_count": 0,
+      "rejected_hypotheses": [],
+      "weakened_findings": [],
+      "artifact_warnings": [],
+      "shadow_authority": {
+        "research_only": true,
+        "trading_authority": false,
+        "buy_signal": false,
+        "sell_signal": false,
+        "edge_active": false
+      }
+    },
+    "narrative_authority": "STRUCTURED_STATE_ONLY",
+    "record_version": "observation_narrative_contract_v1_3k0"
+  },
+  "ui_contract": {
+    "observation_id": "obs-3af5cdd0c7759e26",
+    "sections": [
+      {
+        "id": "A",
+        "vi_label": "H\u00f4m nay Bot \u0111ang nghi\u00ean c\u1ee9u g\u00ec?",
+        "en_key": "current_research_topic",
+        "data": null
+      },
+      {
+        "id": "B",
+        "vi_label": "Research Journey",
+        "en_key": "journey_rows",
+        "data": []
+      },
+      {
+        "id": "C",
+        "vi_label": "Evidence",
+        "en_key": "strongest_evidence",
+        "data": null
+      },
+      {
+        "id": "D",
+        "vi_label": "Nulls / alternative explanations",
+        "en_key": "surviving_nulls",
+        "data": []
+      },
+      {
+        "id": "E",
+        "vi_label": "Current epistemic state",
+        "en_key": "final_epistemic_state",
+        "data": null
+      },
+      {
+        "id": "F",
+        "vi_label": "Why STOP / why continue",
+        "en_key": "stop_reason",
+        "data": "SILENT"
+      },
+      {
+        "id": "G",
+        "vi_label": "Limitations / warnings",
+        "en_key": "limitations",
+        "data": []
+      },
+      {
+        "id": "H",
+        "vi_label": "T3/T5/T10 \u2014 PENDING",
+        "en_key": "forward_horizons",
+        "data": [
+          {
+            "horizon": "T3",
+            "status": "PENDING_FUTURE",
+            "eligible_evaluation_date": "2026-08-05",
+            "realized_outcome": null
+          },
+          {
+            "horizon": "T5",
+            "status": "PENDING_FUTURE",
+            "eligible_evaluation_date": "2026-08-07",
+            "realized_outcome": null
+          },
+          {
+            "horizon": "T10",
+            "status": "PENDING_FUTURE",
+            "eligible_evaluation_date": "2026-08-14",
+            "realized_outcome": null
+          }
+        ]
+      },
+      {
+        "id": "I",
+        "vi_label": "Historical observation summary",
+        "en_key": "observation_outcome_kind",
+        "data": "NO_DISCOVERY"
+      }
+    ],
+    "no_buy_button": true,
+    "no_sell_button": true,
+    "no_trade_recommendation": true,
+    "record_version": "observation_ui_contract_v1_3k0"
+  },
+  "presentation_preview": {
+    "research_topic_en": "NO_DISCOVERY",
+    "epistemic_state": "UNRESOLVED",
+    "outcome_kind": "NO_DISCOVERY",
+    "stop_reason": "SILENT",
+    "pending_horizons": "T3, T5, T10",
+    "presentation_only": "true"
+  }
+}

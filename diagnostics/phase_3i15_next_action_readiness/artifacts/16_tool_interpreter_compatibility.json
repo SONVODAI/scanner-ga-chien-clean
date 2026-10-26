@@ -1,0 +1,18 @@
+{
+  "classifications": {
+    "SCIENTIFICALLY_VALID_EXECUTABLE": "Action core valid; grammar + tool + sample gates pass",
+    "SCIENTIFICALLY_VALID_NOT_EXECUTABLE": "Action core valid; no current interpreter \u2014 preserve for future",
+    "EXECUTABLE_BUT_LOW_INFORMATION": "Runs but REDUNDANT or saturated axis",
+    "REPRESENTATION_ONLY": "Different tool/spec but same scientific core as prior",
+    "RESCUE_RISK": "Fails anti-rescue \u2014 reject",
+    "INVALID": "Grammar/leakage violation"
+  },
+  "current_tools": [
+    "partition_group_compare",
+    "date_decomposition",
+    "threshold_exploration",
+    "..."
+  ],
+  "opr_interpreter": "partition_group_compare via proposition_experiment_interpreter",
+  "rule": "Do not distort scientific action to fit tools silently"
+}

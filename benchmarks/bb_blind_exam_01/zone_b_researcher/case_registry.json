@@ -1,0 +1,20 @@
+{
+  "registry_version": "bb_blind_exam_01_zone_b_v1_3j11",
+  "description": "Researcher-visible blind case registry. Contains NO ground truth or blind class labels.",
+  "data_cutoff_date": "2026-02-15",
+  "max_experiment_iterations": 2,
+  "cases": [
+    {"anonymous_id": "CASE-0101", "seed": 101, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0102", "seed": 102, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0201", "seed": 201, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0202", "seed": 202, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0301", "seed": 301, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0302", "seed": 302, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0401", "seed": 401, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0402", "seed": 402, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0501", "seed": 501, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0502", "seed": 502, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0601", "seed": 601, "cutoff": "2026-02-15"},
+    {"anonymous_id": "CASE-0602", "seed": 602, "cutoff": "2026-02-15"}
+  ]
+}
