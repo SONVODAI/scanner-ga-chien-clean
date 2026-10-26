@@ -1,0 +1,16 @@
+{
+  "generator_version": "opr_generator_v1_3i2",
+  "module_hashes": {
+    "constants.py": "6bbe90b55b5d32e674243d6d6eb5302bd571a6237b1ae3cd4739a025f6468a15",
+    "evidence_ingest.py": "87a6b301f2fd249ebcbe28608f534a42c451d473f6f72811237104fc4a311430",
+    "surprise_detector.py": "dfc37657eacb88c4608ee2ae84a129db9d993bf664014ba0c09f7bcb1035dd2a",
+    "proposition_synthesizer.py": "25f51accd27a8ff6d4b1d2af8e3e9426defe600ad3897235451d81507ce11cf5",
+    "proposition_record.py": "c765f74323efafec7957706ba430db6d5d9fa84e6f8ad2ff4a5fb6c1c743e642",
+    "executability_adapter.py": "a2e24110f8ef103d0e42d589e2441de2a939eb62b4be31354f4a6d71d961215f",
+    "template_independence.py": "83d47f952610663f405b8ee71694f9b537f7ed5be3d1b01c5443d6897cb0dfa6",
+    "laundering_audit.py": "e19db40b158a37b21ea6a6aa3f4ffb4f75590c514ef628c0bfb73bd57b8820e2",
+    "pipeline.py": "0dcb014cd6436769c3c9ceb36cd56c828f9afbcffbdeb265d89d5158e1c9ab45"
+  },
+  "bundle_hash": "f74392132bc1f358a081a50f9cf131a92a31f435f9a5889a4559b24c078526f5",
+  "git_head": "7f6b080220b0903447175f949ee19725699dd2c0"
+}
