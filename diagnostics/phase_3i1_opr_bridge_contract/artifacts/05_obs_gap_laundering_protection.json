@@ -1,0 +1,78 @@
+{
+  "artifact_id": "05_obs_gap_laundering_protection",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "failure_mode": "RAW EVIDENCE → human OBS/GAP code → generator translates code → apparently new question",
+  "must_not_count_as": "autonomous creativity",
+  "detection_tests": [
+    {
+      "test_id": "LAUNDER_01_CODE_ONLY_PROVENANCE",
+      "description": "Proposition cites OBS_* or GAP_* as primary motivation without underlying statistics",
+      "detection": "observation_provenance.primary_evidence_type == ONTOLOGY_LABEL AND no linked raw_payload_ref",
+      "verdict": "FAIL — INSUFFICIENT_EVIDENCE",
+      "remediation": "Reject proposition; require evidence_refs with tool outputs"
+    },
+    {
+      "test_id": "LAUNDER_02_DECODE_WITHOUT_READ",
+      "description": "Generator input is ontology code; output question matches interpreter's implied template for that code",
+      "detection": "Input hash contains only obs_code/gap_code; output template_family matches deterministic GAP→template mapping from research_interpreter",
+      "verdict": "FAIL — TEMPLATE_INSTANCE (laundered)",
+      "remediation": "Classify as template decode, not autonomous"
+    },
+    {
+      "test_id": "LAUNDER_03_PARAPHRASE_LABEL",
+      "description": "motivating_observation text is semantic paraphrase of OBS/GAP developer description",
+      "detection": "embedding_similarity(motivating_observation, interpreter_label_description[code]) >= 0.88 AND raw_statistic_citation_count == 0",
+      "verdict": "FAIL — laundering",
+      "remediation": "Require at least one numeric/statistical citation from raw evidence"
+    },
+    {
+      "test_id": "LAUNDER_04_REVERSE_CAUSALITY",
+      "description": "Proposition written first; observation_provenance retrofitted to matching GAP",
+      "detection": "generation_lineage shows proposition_core before observation_provenance populated; or provenance timestamp after core",
+      "verdict": "FAIL — audit integrity violation",
+      "remediation": "Reject; enforce provenance-first write order in 3I.2"
+    },
+    {
+      "test_id": "LAUNDER_05_STATISTICALLY_EQUIVALENT_PATHS",
+      "description": "Same raw evidence presented via OBS code path vs direct raw path yields identical proposition",
+      "detection": "A/B control: run generator with raw-only input vs code-only input on same underlying panel slice",
+      "expected_autonomous_path": "raw-only may produce grounded proposition; code-only must NOT qualify unless it re-fetches underlying evidence",
+      "verdict_code_only": "FAIL if classified autonomous without evidence re-fetch"
+    },
+    {
+      "test_id": "LAUNDER_06_GAP_FAMILY_LOCKIN",
+      "description": "Proposition uncertainty is fully explained by GAP family semantics without residual surprise",
+      "detection": "BC_Q2 surprise text embeds near GAP definition AND no residual statistic cited beyond what GAP already encodes",
+      "verdict": "FAIL — TEMPLATE_INSTANCE via ontology",
+      "remediation": "Require surprise_or_uncertainty.residual_beyond_ontology == true with evidence"
+    }
+  ],
+  "mandatory_generator_contract_3i2": {
+    "allowed_inputs": [
+      "RAW_DERIVED_MARKET_EVIDENCE payloads",
+      "EXECUTION_METADATA for executability only"
+    ],
+    "disallowed_primary_inputs": [
+      "OBS_* labels without linked raw_payload_ref",
+      "GAP_* labels without linked raw_payload_ref",
+      "assessment flags as surprise source"
+    ],
+    "ontology_as_index_only": "OBS/GAP may appear as secondary tags AFTER proposition synthesized from raw evidence, never as synthesis source"
+  },
+  "provenance_integrity": {
+    "write_order": [
+      "1. ingest raw evidence",
+      "2. record observation_provenance",
+      "3. record surprise_or_uncertainty",
+      "4. synthesize proposition",
+      "5. optional ontology tags for indexing"
+    ],
+    "content_hash": "SHA256 of raw evidence payload must be stored in observation_provenance.evidence_hash",
+    "replay": "Auditor must be able to recompute surprise from stored evidence without reading OBS/GAP labels"
+  },
+  "evaluator_abstraction_for_failures": {
+    "on_laundering_detected": "Report 'OBSERVATIONAL_GROUNDING_FAILURE' — do NOT reveal which GAP/OBS mapping was exploited",
+    "on_success": "Report grounding rate aggregate only in blind eval"
+  }
+}

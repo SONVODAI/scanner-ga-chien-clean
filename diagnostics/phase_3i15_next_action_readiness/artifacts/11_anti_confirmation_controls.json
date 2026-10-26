@@ -1,0 +1,22 @@
+{
+  "threats": [
+    "confirmatory_retest identical ExperimentSpec",
+    "favorable_cohort_selection",
+    "cherry_picked_population",
+    "repeating_strongest_observed_period",
+    "selecting_measurement_that_previously_supported",
+    "avoiding_known_vulnerability",
+    "representation_only_exploration"
+  ],
+  "current_protections": [
+    "FalsificationCandidateGenerator rejects identical content hash (3I.9)",
+    "FalsificationSelector rejects NOT_ACTUALLY_FALSIFICATION",
+    "EvidenceSynthesisEngine redundant_test_axes detection (3I.12)",
+    "Anti-rescue checks in falsification generator"
+  ],
+  "gaps": [
+    "No body-of-evidence-aware action generator applies redundant_test_axes before candidate emission",
+    "No confirmatory-bias audit at multi-evidence priority layer",
+    "Controller stack GAP actions may propose confirmatory decomposition"
+  ]
+}
