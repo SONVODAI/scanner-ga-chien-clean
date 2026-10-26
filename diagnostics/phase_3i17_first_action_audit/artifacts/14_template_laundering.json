@@ -1,0 +1,11 @@
+{
+  "label_only_sufficient": true,
+  "label_only_produces": "population_robustness \u2192 population_subgroup_contrast \u2192 NORMAL filter",
+  "evidence_required_for_full_chain": true,
+  "evidence_required_for": [
+    "population_robustness in unresolved (uncovered by ledger)",
+    "priority SEEK_FALSIFICATION",
+    "not in redundant_test_axes"
+  ],
+  "laundering_verdict": "PARTIAL \u2014 axis\u2192action is label-sufficient; presence in unresolved requires evidence state"
+}

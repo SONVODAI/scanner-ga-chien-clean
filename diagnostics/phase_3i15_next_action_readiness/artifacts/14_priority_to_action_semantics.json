@@ -1,0 +1,32 @@
+{
+  "SEEK_FALSIFICATION": {
+    "allowed": "Generate falsification-capable actions targeting major unresolved non-redundant axes",
+    "forbidden": "Confirmatory retest; redundant holdout; rescue mutations",
+    "may_emit_silence": false
+  },
+  "SEEK_REPLICATION": {
+    "allowed": "Independent replication actions \u2014 new cohort with HIGH sample independence",
+    "forbidden": "Identical ExperimentSpec retest",
+    "may_emit_silence": false
+  },
+  "SEEK_CONTRADICTION_RESOLUTION": {
+    "allowed": "Discriminating actions targeting contradiction_structure entries",
+    "forbidden": "Ignoring contradiction; rescue",
+    "may_emit_silence": "Only if no discriminating executable action exists"
+  },
+  "HOLD_PROVISIONALLY": {
+    "allowed": "NO_HIGH_INFORMATION_ACTION or document low-information available actions without selecting",
+    "forbidden": "Generating experiment merely because generator can",
+    "may_emit_silence": true
+  },
+  "HOLD_UNRESOLVED": {
+    "allowed": "Silence; optional catalog of non-executable valid ideas",
+    "forbidden": "Forced experiment selection",
+    "may_emit_silence": true
+  },
+  "ABANDON": {
+    "allowed": "NO_HIGH_INFORMATION_ACTION only",
+    "forbidden": "Rescue experiments; new falsification attempts",
+    "may_emit_silence": true
+  }
+}

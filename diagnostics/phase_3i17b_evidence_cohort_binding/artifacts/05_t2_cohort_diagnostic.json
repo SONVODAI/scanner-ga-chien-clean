@@ -1,0 +1,3571 @@
+{
+  "binder_content_hash": "cfaf175de409fd2e893497bc8f68d4a6ddc081b3b17158e4dfd9c266ca788b51",
+  "historical_316_core_hash": "efe9abd43ea9a8fbae86a69ea3648adefe83f955df34fafb61cc9221ed1a712f",
+  "historical_316_unchanged": true,
+  "execution_status": "NOT_EXECUTED",
+  "population_robustness": {
+    "axis": "population_robustness",
+    "disposition": "NO_DEFENSIBLE_COHORT",
+    "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+    "candidates": [
+      {
+        "cohort_semantics": "research_market_state cohort value MATURE",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 284,
+        "overlap_profile": {
+          "candidate_row_count": 284,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5680,
+        "overlap_profile": {
+          "candidate_row_count": 5680,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+        "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5112,
+        "overlap_profile": {
+          "candidate_row_count": 5112,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+        "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5964,
+        "overlap_profile": {
+          "candidate_row_count": 5964,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+        "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value STRESS",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 568,
+        "overlap_profile": {
+          "candidate_row_count": 568,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value UNKNOWN",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 1136,
+        "overlap_profile": {
+          "candidate_row_count": 1136,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value nan",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 3124,
+        "overlap_profile": {
+          "candidate_row_count": 3124,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 3124,
+        "overlap_profile": {
+          "candidate_row_count": 3124,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+        "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5822,
+        "overlap_profile": {
+          "candidate_row_count": 5822,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+        "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 426,
+        "overlap_profile": {
+          "candidate_row_count": 426,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value ROLLOVER",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 284,
+        "overlap_profile": {
+          "candidate_row_count": 284,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5964,
+        "overlap_profile": {
+          "candidate_row_count": 5964,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+        "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5822,
+        "overlap_profile": {
+          "candidate_row_count": 5822,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+        "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 426,
+        "overlap_profile": {
+          "candidate_row_count": 426,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+      }
+    ],
+    "selected": null
+  },
+  "temporal_regime_robustness": {
+    "axis": "temporal_regime_robustness",
+    "disposition": "NO_DEFENSIBLE_COHORT",
+    "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+    "candidates": [
+      {
+        "cohort_semantics": "research_market_state cohort value MATURE",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 284,
+        "overlap_profile": {
+          "candidate_row_count": 284,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5680,
+        "overlap_profile": {
+          "candidate_row_count": 5680,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+        "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value UNKNOWN",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 1136,
+        "overlap_profile": {
+          "candidate_row_count": 1136,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value nan",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 3124,
+        "overlap_profile": {
+          "candidate_row_count": 3124,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 426,
+        "overlap_profile": {
+          "candidate_row_count": 426,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value ROLLOVER",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 284,
+        "overlap_profile": {
+          "candidate_row_count": 284,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 426,
+        "overlap_profile": {
+          "candidate_row_count": 426,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+      },
+      {
+        "cohort_semantics": "episode holdout excluding motivating dates",
+        "derivation_source": "motivating_date_exclusion",
+        "sample_size": 6106,
+        "overlap_profile": {
+          "candidate_row_count": 6106,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": false,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "MEDIUM",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Temporal holdout; row_overlap=1.000",
+        "cohort_semantic_hash": "e825f17ced6b2741bcf0e568de01df775ba461bf633e0d295f8c28fa6d3954dd"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5112,
+        "overlap_profile": {
+          "candidate_row_count": 5112,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+        "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5964,
+        "overlap_profile": {
+          "candidate_row_count": 5964,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+        "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+      },
+      {
+        "cohort_semantics": "research_market_state cohort value STRESS",
+        "derivation_source": "legal_categorical_dimension",
+        "sample_size": 568,
+        "overlap_profile": {
+          "candidate_row_count": 568,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "subset",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "MEDIUM",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "MEDIUM",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+        "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 3124,
+        "overlap_profile": {
+          "candidate_row_count": 3124,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+        "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5822,
+        "overlap_profile": {
+          "candidate_row_count": 5822,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+        "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5964,
+        "overlap_profile": {
+          "candidate_row_count": 5964,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+        "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+      },
+      {
+        "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+        "derivation_source": "complementary_partition",
+        "sample_size": 5822,
+        "overlap_profile": {
+          "candidate_row_count": 5822,
+          "row_overlap_fraction": 1.0,
+          "date_overlap_fraction": 1.0,
+          "symbol_overlap_fraction": 1.0,
+          "context_overlap_fraction": 1.0,
+          "relation_to_prior": "partial_overlap",
+          "overlaps_motivating_dates": true,
+          "overlaps_prior_falsification_cohort": true,
+          "max_prior_row_overlap": 1.0
+        },
+        "independence_profile": {
+          "sample_independence": "LOW",
+          "episode_independence": "LOW",
+          "population_independence": "LOW",
+          "context_independence": "LOW",
+          "measurement_independence": "HIGH",
+          "semantic_continuity": "HIGH",
+          "rationale": [
+            "row_overlap_fraction=1.000",
+            "context_overlap=1.000"
+          ]
+        },
+        "redundancy": "REDUNDANT",
+        "semantic_validity": "HIGH",
+        "rescue_risk": "population_narrowing",
+        "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+        "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+        "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+      }
+    ],
+    "selected": null
+  },
+  "all_axis_diagnostics": [
+    {
+      "axis": "temporal_regime_robustness",
+      "disposition": "NO_DEFENSIBLE_COHORT",
+      "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+      "candidates": [
+        {
+          "cohort_semantics": "research_market_state cohort value MATURE",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5680,
+          "overlap_profile": {
+            "candidate_row_count": 5680,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+          "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value UNKNOWN",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 1136,
+          "overlap_profile": {
+            "candidate_row_count": 1136,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value nan",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value ROLLOVER",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+        },
+        {
+          "cohort_semantics": "episode holdout excluding motivating dates",
+          "derivation_source": "motivating_date_exclusion",
+          "sample_size": 6106,
+          "overlap_profile": {
+            "candidate_row_count": 6106,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Temporal holdout; row_overlap=1.000",
+          "cohort_semantic_hash": "e825f17ced6b2741bcf0e568de01df775ba461bf633e0d295f8c28fa6d3954dd"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5112,
+          "overlap_profile": {
+            "candidate_row_count": 5112,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+          "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+          "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value STRESS",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 568,
+          "overlap_profile": {
+            "candidate_row_count": 568,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+          "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+          "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+        }
+      ],
+      "selected": null
+    },
+    {
+      "axis": "population_robustness",
+      "disposition": "NO_DEFENSIBLE_COHORT",
+      "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+      "candidates": [
+        {
+          "cohort_semantics": "research_market_state cohort value MATURE",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5680,
+          "overlap_profile": {
+            "candidate_row_count": 5680,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+          "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5112,
+          "overlap_profile": {
+            "candidate_row_count": 5112,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+          "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+          "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value STRESS",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 568,
+          "overlap_profile": {
+            "candidate_row_count": 568,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value UNKNOWN",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 1136,
+          "overlap_profile": {
+            "candidate_row_count": 1136,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value nan",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+          "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value ROLLOVER",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+          "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+        }
+      ],
+      "selected": null
+    },
+    {
+      "axis": "horizon_robustness",
+      "disposition": "NO_DEFENSIBLE_COHORT",
+      "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+      "candidates": [
+        {
+          "cohort_semantics": "research_market_state cohort value MATURE",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5680,
+          "overlap_profile": {
+            "candidate_row_count": 5680,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+          "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5112,
+          "overlap_profile": {
+            "candidate_row_count": 5112,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+          "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+          "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value STRESS",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 568,
+          "overlap_profile": {
+            "candidate_row_count": 568,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value UNKNOWN",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 1136,
+          "overlap_profile": {
+            "candidate_row_count": 1136,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value nan",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+          "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value ROLLOVER",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+          "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+        },
+        {
+          "cohort_semantics": "episode holdout excluding motivating dates",
+          "derivation_source": "motivating_date_exclusion",
+          "sample_size": 6106,
+          "overlap_profile": {
+            "candidate_row_count": 6106,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Temporal holdout; row_overlap=1.000",
+          "cohort_semantic_hash": "e825f17ced6b2741bcf0e568de01df775ba461bf633e0d295f8c28fa6d3954dd"
+        }
+      ],
+      "selected": null
+    },
+    {
+      "axis": "effect_stability",
+      "disposition": "NO_DEFENSIBLE_COHORT",
+      "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+      "candidates": [
+        {
+          "cohort_semantics": "research_market_state cohort value MATURE",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5680,
+          "overlap_profile": {
+            "candidate_row_count": 5680,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+          "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value UNKNOWN",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 1136,
+          "overlap_profile": {
+            "candidate_row_count": 1136,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value nan",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value ROLLOVER",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+        },
+        {
+          "cohort_semantics": "episode holdout excluding motivating dates",
+          "derivation_source": "motivating_date_exclusion",
+          "sample_size": 6106,
+          "overlap_profile": {
+            "candidate_row_count": 6106,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Temporal holdout; row_overlap=1.000",
+          "cohort_semantic_hash": "e825f17ced6b2741bcf0e568de01df775ba461bf633e0d295f8c28fa6d3954dd"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5112,
+          "overlap_profile": {
+            "candidate_row_count": 5112,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+          "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+          "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value STRESS",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 568,
+          "overlap_profile": {
+            "candidate_row_count": 568,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+          "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+          "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+        }
+      ],
+      "selected": null
+    },
+    {
+      "axis": "regime_context_robustness",
+      "disposition": "NO_DEFENSIBLE_COHORT",
+      "reason": "All candidates rejected: redundant, rescue, fork, or insufficient sample",
+      "candidates": [
+        {
+          "cohort_semantics": "research_market_state cohort value MATURE",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=MATURE; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "081611d7f96145b7346f257064ca13717762fd54e4b2e9152d8efcb15b317989"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=STRESS (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5680,
+          "overlap_profile": {
+            "candidate_row_count": 5680,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding STRESS; overlap=1.000",
+          "cohort_semantic_hash": "1251e222c3ee9eba54060919024fcaca1554108ee614d637e9032772aa74a7db"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=UNKNOWN (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5112,
+          "overlap_profile": {
+            "candidate_row_count": 5112,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding UNKNOWN; overlap=1.000",
+          "cohort_semantic_hash": "202d9edd2beb04baa1874e336f4563c21f63bba711499ef51a4e20d1be25bca5"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=ROLLOVER (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding ROLLOVER; overlap=1.000",
+          "cohort_semantic_hash": "31edfe29f9c6122ade0ecb1098ba5aa21e5f70be81a6c2ab3117326358b223e6"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value STRESS",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 568,
+          "overlap_profile": {
+            "candidate_row_count": 568,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=STRESS; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "35fd567204bd43630fba5f57e30f8d4ed1bfa5ec8bc109652462c7d19fef10f5"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value UNKNOWN",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 1136,
+          "overlap_profile": {
+            "candidate_row_count": 1136,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=UNKNOWN; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "3d5b2ed926ff1d865eb9fbcee9beac6f48fca94ffe2688c8651aac349108cc9f"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value nan",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=nan; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "7c7f47459d50971d0a4583c8a38669ccf0cc68db19ffcec8f5a087f667e4907d"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=nan (BROAD_RECOVERY,EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 3124,
+          "overlap_profile": {
+            "candidate_row_count": 3124,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding nan; overlap=1.000",
+          "cohort_semantic_hash": "813c0c072a9d549a5949caa90b084d502a1f6e760a29f12f6288c417b9ffc18f"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=EARLY_RECOVERY (BROAD_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding EARLY_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "97e664c7ab547dd1ddce679827b623636314c69c01fa14a0bfc806c1a94ec8d1"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value BROAD_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=BROAD_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "a805125b95a06face3e7edbd5443f01ff2e15632f00956e8d3b55cdaaf3048f2"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value ROLLOVER",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 284,
+          "overlap_profile": {
+            "candidate_row_count": 284,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=ROLLOVER; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "c73aab32dff646321c3c7d13fd4c9f610915edfc80bd4652a41a8ce23884e7f3"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=MATURE (BROAD_RECOVERY,EARLY_RECOVERY,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5964,
+          "overlap_profile": {
+            "candidate_row_count": 5964,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding MATURE; overlap=1.000",
+          "cohort_semantic_hash": "d155c744c5a6c1eb6c8c77ad4e1a695e6c9cc1bee25f8e1e97283f6ba682aba0"
+        },
+        {
+          "cohort_semantics": "complement of research_market_state=BROAD_RECOVERY (EARLY_RECOVERY,MATURE,ROLLOVER,STRESS,UNKNOWN,nan)",
+          "derivation_source": "complementary_partition",
+          "sample_size": 5822,
+          "overlap_profile": {
+            "candidate_row_count": 5822,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "partial_overlap",
+            "overlaps_motivating_dates": true,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "LOW",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "HIGH",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "HIGH",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Complementary partition excluding BROAD_RECOVERY; overlap=1.000",
+          "cohort_semantic_hash": "d627d97773e8269aa70a10db35fd71258f14815cf1c2a5b36109a32fb471ace4"
+        },
+        {
+          "cohort_semantics": "research_market_state cohort value EARLY_RECOVERY",
+          "derivation_source": "legal_categorical_dimension",
+          "sample_size": 426,
+          "overlap_profile": {
+            "candidate_row_count": 426,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Categorical slice research_market_state=EARLY_RECOVERY; overlap=1.000; independence sample=LOW",
+          "cohort_semantic_hash": "e505b6bdbe2efb48c89903466ce1036cb2ef8530ddd060551ad4f022751b6908"
+        },
+        {
+          "cohort_semantics": "episode holdout excluding motivating dates",
+          "derivation_source": "motivating_date_exclusion",
+          "sample_size": 6106,
+          "overlap_profile": {
+            "candidate_row_count": 6106,
+            "row_overlap_fraction": 1.0,
+            "date_overlap_fraction": 1.0,
+            "symbol_overlap_fraction": 1.0,
+            "context_overlap_fraction": 1.0,
+            "relation_to_prior": "subset",
+            "overlaps_motivating_dates": false,
+            "overlaps_prior_falsification_cohort": true,
+            "max_prior_row_overlap": 1.0
+          },
+          "independence_profile": {
+            "sample_independence": "LOW",
+            "episode_independence": "MEDIUM",
+            "population_independence": "LOW",
+            "context_independence": "LOW",
+            "measurement_independence": "HIGH",
+            "semantic_continuity": "MEDIUM",
+            "rationale": [
+              "row_overlap_fraction=1.000",
+              "context_overlap=1.000"
+            ]
+          },
+          "redundancy": "REDUNDANT",
+          "semantic_validity": "MEDIUM",
+          "rescue_risk": "population_narrowing",
+          "executability": "SCIENTIFICALLY_VALID_EXECUTABLE",
+          "rank_rationale": "Temporal holdout; row_overlap=1.000",
+          "cohort_semantic_hash": "e825f17ced6b2741bcf0e568de01df775ba461bf633e0d295f8c28fa6d3954dd"
+        }
+      ],
+      "selected": null
+    }
+  ],
+  "t2_cohort_disposition": "NO_DEFENSIBLE_COHORT",
+  "future_result_blindness": {
+    "tool_result_accessed": false,
+    "experiment_executed": false
+  }
+}
