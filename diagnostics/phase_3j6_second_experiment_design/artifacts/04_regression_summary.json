@@ -1,0 +1,10 @@
+{
+  "all_passed": true,
+  "suites": {
+    "tests/test_edge_research_opr_phase_3j6.py": true,
+    "tests/test_edge_research_opr_phase_3j5.py": true,
+    "tests/test_edge_research_opr_phase_3j4.py": true,
+    "tests/test_edge_research_opr_phase_3j3.py": true,
+    "tests/test_edge_research_opr_phase_3j2.py": true
+  }
+}

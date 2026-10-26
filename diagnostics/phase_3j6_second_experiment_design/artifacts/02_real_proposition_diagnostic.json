@@ -1,0 +1,160 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "research_decision_id": "dec-4c5eef9ff644",
+  "research_decision_hash": "ce0701b917fc15a7c311b06306c5785355ddab5123de94c01078bc2cf3b57ebf",
+  "selected_scientific_action": "SEEK_FALSIFICATION",
+  "targeted_null": "directional_reversal",
+  "target_uncertainty": "directional_effect_full_universe",
+  "derived_experiment_objective": "Test whether directional rs_spread quintile commitment holds on the full cross-section",
+  "candidate_designs": [
+    {
+      "candidate_id": "sec-2eb291cd4dd8",
+      "record_version": "second_experiment_candidate_v1_3j6",
+      "proposition_id": "prop-efb650d9bd5c451f",
+      "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+      "objective_id": "seo-83384a335b4f",
+      "scientific_action_core_hash": "58ee7b6d5cf9052c6f80b9e1edd54e7f2cd813198766a1b20d62b8aa231340b5",
+      "scientific_identity": {
+        "objective_target_uncertainty": "directional_effect_full_universe",
+        "proposition_commitment_challenged": "partition_contrast_rs_spread",
+        "cohort_strategy": "full_panel_contrast",
+        "contrast_relation": "partition_quintile_contrast",
+        "expected_epistemic_consequence_type": "falsify_directional_effect_full_universe",
+        "information_gain_type": "falsify"
+      },
+      "target_null_key": "directional_reversal",
+      "target_uncertainty": "directional_effect_full_universe",
+      "scientific_objective": "Does high-rs_spread quintile outperform low on full panel?",
+      "falsification_rationale": "Direction reversal on full cross-section would falsify directional commitment",
+      "informative_observation": "Directional quintile spread or survival on independent cohort",
+      "cannot_establish": "Cannot establish unrelated nulls outside design scope",
+      "primary_classification": "ADMISSIBLE",
+      "falsification_capable": true,
+      "birth_evidence_overlap_fraction": 0.022727272727272728,
+      "first_experiment_overlap_fraction": 0.9772727272727273,
+      "birth_independence_profile": {
+        "sample_independence": "HIGH",
+        "episode_independence": "LOW",
+        "population_independence": "HIGH",
+        "context_independence": "MEDIUM",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.023",
+          "context_overlap=1.000"
+        ]
+      },
+      "first_experiment_independence_profile": {
+        "sample_independence": "LOW",
+        "episode_independence": "LOW",
+        "population_independence": "LOW",
+        "context_independence": "LOW",
+        "measurement_independence": "HIGH",
+        "semantic_continuity": "HIGH",
+        "rationale": [
+          "row_overlap_fraction=0.977",
+          "context_overlap=1.000"
+        ]
+      },
+      "redundancy_assessment": "HIGH_FIRST_EXPERIMENT_OVERLAP",
+      "falsification_capability": "FALSIFICATION_CAPABLE",
+      "executability_status": "EXECUTABLE",
+      "executability_detail": "Tool partition_group_compare binds to full_panel_contrast",
+      "experiment_spec": {
+        "tool_name": "partition_group_compare",
+        "tool_version": "v1",
+        "inputs": {
+          "partition_column": "rs_spread",
+          "n_groups": 5
+        },
+        "research_scope": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        },
+        "data_cutoff_date": "2026-08-17"
+      },
+      "representation_envelope": {
+        "tool": "partition_group_compare",
+        "cohort_strategy": "full_panel_contrast",
+        "feature": "rs_spread",
+        "outcome": "t5_return",
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "syntax": "grammar_v1"
+      },
+      "experiment_content_hash": "65a641bae1a96205a2e01d776216cd1c0ccf4315e0e1c38ad847cd0e421c8a72",
+      "content_hash_differs_from_first": true,
+      "decision_fidelity_ok": true,
+      "rejection_reasons": [],
+      "created_at": "2026-08-22T06:24:10.737419+00:00",
+      "record_hash": "ddc7d93b5f80641c50fff967f1ba8810c781d425034f3b68356284d38017e2cf"
+    }
+  ],
+  "rejected_candidates": [],
+  "selected_design_or_silence": "SELECTED",
+  "selected_candidate_id": "sec-2eb291cd4dd8",
+  "population_spec": {
+    "kind": "all",
+    "grammar_version": "research_grammar_v1"
+  },
+  "outcome_spec": {
+    "kind": "compare",
+    "field": "t5_return",
+    "operator": ">",
+    "value": 0.0,
+    "grammar_version": "research_grammar_v1"
+  },
+  "horizon": 0,
+  "intended_tool": "partition_group_compare",
+  "falsification_capability": "FALSIFICATION_CAPABLE",
+  "birth_evidence_overlap": 0.022727272727272728,
+  "birth_independence": {
+    "sample_independence": "HIGH",
+    "episode_independence": "LOW",
+    "population_independence": "HIGH",
+    "context_independence": "MEDIUM",
+    "measurement_independence": "HIGH",
+    "semantic_continuity": "HIGH",
+    "rationale": [
+      "row_overlap_fraction=0.023",
+      "context_overlap=1.000"
+    ]
+  },
+  "first_experiment_overlap": 0.9772727272727273,
+  "first_experiment_independence": {
+    "sample_independence": "LOW",
+    "episode_independence": "LOW",
+    "population_independence": "LOW",
+    "context_independence": "LOW",
+    "measurement_independence": "HIGH",
+    "semantic_continuity": "HIGH",
+    "rationale": [
+      "row_overlap_fraction=0.977",
+      "context_overlap=1.000"
+    ]
+  },
+  "redundancy_assessment": "HIGH_FIRST_EXPERIMENT_OVERLAP",
+  "executability_status": "EXECUTABLE",
+  "scientific_action_core_hash": "58ee7b6d5cf9052c6f80b9e1edd54e7f2cd813198766a1b20d62b8aa231340b5",
+  "experiment_content_hash": "65a641bae1a96205a2e01d776216cd1c0ccf4315e0e1c38ad847cd0e421c8a72",
+  "package_id": "sefp-ef0593efdb17",
+  "package_hash": "67a17238ed7b370a12b6899f04e6cb1e9cd2f90a7d07724c0d0cd2c680735616",
+  "package_status": "NOT_EXECUTED",
+  "decision_substitution_occurred": false,
+  "confirmation_bias_occurred": false,
+  "execution_occurred": false,
+  "stop_boundary": "STOP_SECOND_EXPERIMENT_DESIGNED",
+  "idempotent_replay": false
+}

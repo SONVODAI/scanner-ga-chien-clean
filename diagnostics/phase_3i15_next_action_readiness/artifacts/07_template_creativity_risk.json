@@ -1,0 +1,16 @@
+{
+  "test_name": "TEMPLATE_TRANSLATION vs autonomous generation",
+  "criterion": "If uncertainty dimension X always maps to one fixed English question or one fixed ExperimentSpec, classify as TEMPLATE_TRANSLATION",
+  "current_system_classification": "TEMPLATE_TRANSLATION",
+  "evidence": [
+    "FalsificationCandidateGenerator: temporal/episode uncertainty \u2192 exactly independent_episode_holdout",
+    "research_actions: each GAP code \u2192 fixed action_code + question_template_id + tool",
+    "No context-dependent branching on saturation_assessment or independence_profiles for action semantics"
+  ],
+  "valid_generator_requirements": [
+    "Same broad uncertainty type yields \u22652 scientifically distinct actions when ledger context differs",
+    "Action semantics change when unresolved set changes \u2014 not only tool availability",
+    "Ranking changes when prior evidence independence changes"
+  ],
+  "3i9_holdout_on_t2": "TEMPLATE_TRANSLATION \u2014 redundant_test_axes includes episode_robustness; holdout would be representation-only"
+}
