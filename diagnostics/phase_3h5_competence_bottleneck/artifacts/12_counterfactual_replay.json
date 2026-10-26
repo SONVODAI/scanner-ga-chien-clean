@@ -1,0 +1,185 @@
+{
+  "replays": [
+    {
+      "transition": 1,
+      "replay_A_actual_candidate_set": {
+        "winner": "1546513c8254481f",
+        "tool": "horizon_comparison"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 2,
+      "replay_A_actual_candidate_set": {
+        "winner": "ea37630b08516f35",
+        "tool": "sensitivity_analysis"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 3,
+      "replay_A_actual_candidate_set": {
+        "winner": "380d6b066fba1184",
+        "tool": "horizon_comparison"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "valuation"
+    },
+    {
+      "transition": 4,
+      "replay_A_actual_candidate_set": {
+        "winner": "1cd8543301912be7",
+        "tool": "adaptive_partition_compare"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 5,
+      "replay_A_actual_candidate_set": {
+        "winner": "a9c8658650c229cd",
+        "tool": "threshold_exploration"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 6,
+      "replay_A_actual_candidate_set": {
+        "winner": "49022f03695315b8",
+        "tool": "horizon_comparison"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "valuation"
+    },
+    {
+      "transition": 7,
+      "replay_A_actual_candidate_set": {
+        "winner": "5001c4d3def13df5",
+        "tool": "adaptive_partition_compare"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 8,
+      "replay_A_actual_candidate_set": {
+        "winner": "9efaca993e326ae5",
+        "tool": "threshold_exploration"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 9,
+      "replay_A_actual_candidate_set": {
+        "winner": "9f863f39276d3025",
+        "tool": "horizon_comparison"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "valuation"
+    },
+    {
+      "transition": 10,
+      "replay_A_actual_candidate_set": {
+        "winner": "7257d42aeca9be34",
+        "tool": "adaptive_partition_compare"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    },
+    {
+      "transition": 11,
+      "replay_A_actual_candidate_set": {
+        "winner": "0422aabb4bee5857",
+        "tool": "threshold_exploration"
+      },
+      "replay_B_without_competence_influence": {
+        "same_as_A": true,
+        "reason": "competence does not alter candidate set"
+      },
+      "replay_C_non_constructible_counterfactual": {
+        "present": false,
+        "note": "All competence-matched tools had generated candidates when legally constructible"
+      },
+      "limiting_layer": "neither"
+    }
+  ],
+  "limiting_layer_dominance": {
+    "neither": 8,
+    "valuation": 3
+  },
+  "conclusion": "Valuation among constructible choices dominates; choice-set construction is not the primary limiter for matched needs."
+}
