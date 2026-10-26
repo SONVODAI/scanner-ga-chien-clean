@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Mr.BOT Edge Research EOD cycle after the trading session close
+
+[Timer]
+OnCalendar=Mon..Fri 16:05:00
+Persistent=true
+Unit=mrbot-edge-research-eod.service
+
+[Install]
+WantedBy=timers.target

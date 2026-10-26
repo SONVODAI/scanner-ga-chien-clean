@@ -31,6 +31,33 @@ from modules.edge_research.metrics import (
 
 def reconstruct_clauses_from_ledger_row(row: pd.Series) -> Tuple[ConditionClause, ...]:
     """Rebuild condition clauses from hypothesis ledger row — no new discovery."""
+    import json
+
+    raw_json = row.get("feature_clauses_json") if hasattr(row, "get") else None
+    if raw_json is not None and not (isinstance(raw_json, float) and pd.isna(raw_json)):
+        text = str(raw_json).strip()
+        if text and text not in ("nan", "None", "<NA>"):
+            try:
+                payload = json.loads(text) if isinstance(raw_json, str) else raw_json
+            except (json.JSONDecodeError, TypeError):
+                payload = None
+            if isinstance(payload, list) and payload:
+                parsed: List[ConditionClause] = []
+                for item in payload:
+                    if not isinstance(item, dict) or not item.get("feature"):
+                        continue
+                    parsed.append(
+                        ConditionClause(
+                            feature=str(item.get("feature", "")),
+                            operator=str(item.get("operator", "")),
+                            threshold_lo=item.get("threshold_lo"),
+                            threshold_hi=item.get("threshold_hi"),
+                            bucket_id=str(item.get("bucket_id") or ""),
+                        )
+                    )
+                if parsed:
+                    return tuple(parsed)
+
     clauses: List[ConditionClause] = []
     for i in (1, 2):
         feat = row.get(f"feature_{i}")
