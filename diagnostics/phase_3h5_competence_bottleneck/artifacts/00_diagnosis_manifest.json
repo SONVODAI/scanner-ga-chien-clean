@@ -1,0 +1,28 @@
+{
+  "phase": "3H.5",
+  "title": "Competence-to-Action Bottleneck Diagnosis",
+  "created_at": "2026-08-21T15:21:40Z",
+  "bb09_session": "bb09-autonomous-001",
+  "frozen_research_commit": "0df4597b2",
+  "bb09_benchmark_commit": "15912659c",
+  "dataset_fingerprint": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "modification_policy": "DIAGNOSIS_ONLY",
+  "artifact_index": [
+    "00_diagnosis_manifest.json",
+    "01_bb09_source_integrity.json",
+    "02_decision_pipeline_reconstruction.json",
+    "03_research_need_first_loss.json",
+    "04_decision_funnel.json",
+    "05_candidate_set_competence_impact.json",
+    "06_planner_valuation_diagnosis.json",
+    "07_global_allocator_diagnosis.json",
+    "08_branch_depth_diagnosis.json",
+    "09_late_session_cycling_diagnosis.json",
+    "10_falsification_gap_diagnosis.json",
+    "11_frontier_debt_diagnosis.json",
+    "12_counterfactual_replay.json",
+    "13_bottleneck_taxonomy_summary.json",
+    "14_root_cause_report.json",
+    "15_diagnosis_freeze_manifest.json"
+  ]
+}

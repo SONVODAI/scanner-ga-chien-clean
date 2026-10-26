@@ -1,0 +1,61 @@
+{
+  "phase": "3H.13",
+  "baseline_commit": "695f040c2",
+  "audit_date": "2026-08-22",
+  "bb13_symptoms": {
+    "novelty_gating_applied_count": 29,
+    "mechanical_cycling_bb11_bb12_bb13": "3 -> 3 -> 3",
+    "autonomous_selections_unchanged": true,
+    "representation_only_gates_active": true,
+    "behavior_change_from_gating": false
+  },
+  "scoring_lifecycle": [
+    "generate_action_candidates",
+    "score_all_candidates (planner: _novelty_bonus tool-based, WEIGHT_NOVELTY=2.0)",
+    "apply_information_value_bridge (optional score adjustment)",
+    "score_opportunities_for_selection -> portfolio_score_adjustments",
+    "build_opportunity_from_candidate (3H.11 gates portfolio novelty_component only)",
+    "plan_next_action ranks by adjusted_scores (= opp.expected_research_value)",
+    "select_global_research_opportunity ranks by expected_research_value",
+    "apply_global_allocation_to_plan_decision"
+  ],
+  "root_cause": {
+    "id": "RC1",
+    "title": "Planner raw novelty embedded in base_score survives portfolio gating",
+    "mechanism": "ERV = base_score + portfolio_adjustments. base_score = sum(planner components) includes components['novelty'] from _novelty_bonus (tool-not-attempted heuristic). 3H.11 apply_novelty_valuation_bridge gates only novelty_component = novelty * (WEIGHT_NOVELTY_PORTFOLIO/2) added in portfolio layer. When valuation_class=REPRESENTATION_NOVELTY_ONLY, portfolio novelty zeros but raw planner novelty (up to 2.0) remains in base_score.",
+    "effect": "Representation-only candidates retain false novelty rank boost of up to WEIGHT_NOVELTY (2.0) even when 29 portfolio gates fire. Rank comparison uses expected_research_value which still embeds ungated planner novelty.",
+    "where_semantic_arrives_too_late": "Semantic classification runs inside build_opportunity_from_candidate but only adjusts portfolio novelty_component, not the planner novelty already summed into base_score. Both plan_next_action and select_global_research_opportunity use ERV for ranking — so gating is structurally incomplete.",
+    "planner_winner_locked": false,
+    "allocator_can_reconsider": true,
+    "allocator_uses_same_incomplete_erv": true
+  },
+  "evidence_from_bb13": {
+    "gated_candidate_example": {
+      "action_id": "6b7a4824e99b007f",
+      "valuation_class": "REPRESENTATION_NOVELTY_ONLY",
+      "relationship": "NEAR_DUPLICATE",
+      "portfolio_raw_novelty": 0.45,
+      "portfolio_gated_novelty": 0.0,
+      "portfolio_delta": -0.45,
+      "planner_novelty_in_base_score": "still present (not reconciled)"
+    },
+    "t4_decision_4": {
+      "selected_action_id": "1cd8543301912be7",
+      "selected_erv": 5.49,
+      "erv_novelty_component_display": 2.0,
+      "note": "ERV includes base_score planner novelty + portfolio novelty; gating on portfolio layer alone insufficient when planner novelty dominates rank margin"
+    }
+  },
+  "chosen_architecture": {
+    "option": "B — post-planner rank reconciliation at ERV computation",
+    "rationale": "Single integration point in build_opportunity_from_candidate reconciles base_score planner novelty using existing 3H.11 valuation_class. Feeds both plan_next_action adjusted_scores and global allocator ERV. Does not move portfolio logic into planner, does not retune weights, does not duplicate classifier.",
+    "formula": "reconciled_base = base_score - raw_planner_novelty + gate(raw_planner_novelty, valuation_class); ERV uses reconciled_base + gated_portfolio_novelty + other components"
+  },
+  "explicitly_not": [
+    "planner weight retuning",
+    "anti-cycling penalties",
+    "tool-specific logic",
+    "second novelty classifier",
+    "benchmark-specific rules"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "verdict": "PARTIALLY_READY",
+  "reason": "Ledger fragments exist (2 EpistemicUpdateRecords, lineage) but no EvidenceSynthesisEngine to reason over accumulated evidence, prior-state-conditioned transitions, saturation, or research priority.",
+  "highest_leverage_missing_capability": "EvidenceSynthesisEngine",
+  "capability_detail": "Synthesize append-only evidence ledger into: relationship taxonomy, independence profiles, contradiction structure, uncertainty coverage, saturation assessment, prior-state-conditioned epistemic state, and ResearchPriorityDecision \u2014 without vote counting or N-confirmation rules.",
+  "minimal_3i12_boundary": "Implement EvidenceSynthesisEngine on abstract BB-Epistemic-01 fixtures only; prior-state-conditioned transition table frozen before real proposition application; then apply once diagnostically to prop-efb650d9bd5c451f ledger.",
+  "proposed_next_phase": "Phase 3I.12 \u2014 Minimal Evidence Synthesis Engine (abstract fixtures first)"
+}
