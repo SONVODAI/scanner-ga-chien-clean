@@ -1,0 +1,17 @@
+{
+  "triggers": 22,
+  "emissions": 3,
+  "budget_cap": 3,
+  "selection_mechanism": "CHRONOLOGICAL_FIRST_COME",
+  "selected_dates": [
+    "2026-06-29",
+    "2026-06-30",
+    "2026-07-23"
+  ],
+  "first_unselected_trigger": "2026-07-24",
+  "interpretation": "DELIBERATELY_MINIMAL_PRIMITIVE_WITH_FIRST_COME_BIAS",
+  "ranking_among_observations": false,
+  "healthy_prioritization": false,
+  "arbitrary_consumption": true,
+  "detail": "Pipeline scans eligible dates in chronological order; emits until max_propositions_per_session=3. No surprise magnitude ranking. First three baseline-ready trigger dates consumed budget before 19 later triggers evaluated for emission."
+}
