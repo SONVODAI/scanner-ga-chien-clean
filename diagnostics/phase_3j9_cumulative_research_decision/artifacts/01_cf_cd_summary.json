@@ -1,0 +1,48 @@
+{
+  "counterfactuals": {
+    "CF-CD1": {
+      "passed": true,
+      "description": "Same cumulative state, different search burden may yield different Decision #2"
+    },
+    "CF-CD2": {
+      "passed": true,
+      "description": "Different remaining null structures may yield different next actions"
+    },
+    "CF-CD3": {
+      "passed": true,
+      "description": "Highly dependent supportive history not treated as strong replication"
+    },
+    "CF-CD4": {
+      "passed": true,
+      "description": "Major nulls addressed \u2014 independent replication may legitimately win"
+    },
+    "CF-CD5": {
+      "passed": true,
+      "description": "Material STILL_PLAUSIBLE null \u2014 continued falsification may win"
+    },
+    "CF-CD6": {
+      "passed": true,
+      "description": "Weak incremental evidence \u2014 STOP competes and may win"
+    },
+    "CF-CD7": {
+      "passed": true,
+      "description": "Budget/evidence burden exhausted \u2014 STOP"
+    },
+    "CF-CD8": {
+      "passed": true,
+      "description": "Negative cumulative evidence \u2014 no confirmation seeking"
+    },
+    "CF-CD9": {
+      "passed": true,
+      "description": "Candidate ordering changes do not alter scientific decision"
+    },
+    "CF-CD10": {
+      "passed": true,
+      "description": "Decision #2 produces no Experiment #3 package or execution"
+    },
+    "all_passed": true,
+    "benchmark_version": "bb_cumulative_research_decision_01_v1_3j9"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_cumulative_research_decision_01_v1_3j9"
+}

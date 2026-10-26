@@ -1,0 +1,96 @@
+{
+  "bb10": {
+    "available": true,
+    "session_id": "bb10-autonomous-001",
+    "experiments_used": 12,
+    "session_status": "BUDGET_EXHAUSTED",
+    "late_mechanical_cycling": 2,
+    "bridge_changed_decisions": 2,
+    "information_value_audit_entries": 11,
+    "global_allocation_decisions": 11,
+    "tool_distribution": {
+      "horizon_comparison": 6,
+      "adaptive_partition_compare": 2,
+      "threshold_exploration": 2,
+      "sensitivity_analysis": 1,
+      "symbol_decomposition": 1
+    },
+    "exit_valuation_active": false,
+    "stop_competed_count": 0,
+    "selection_changed_by_exit_count": 0
+  },
+  "bb11": {
+    "session_id": "bb11-autonomous-001",
+    "experiments_used": 11,
+    "session_status": "NO_EDGE_FOUND",
+    "late_mechanical_cycling": 2,
+    "bridge_changed_decisions": 2,
+    "exit_valuation_active": true,
+    "stop_competed_count": 3,
+    "selection_changed_by_exit_count": 1,
+    "tool_distribution": {
+      "horizon_comparison": 5,
+      "sensitivity_analysis": 1,
+      "adaptive_partition_compare": 2,
+      "threshold_exploration": 2,
+      "symbol_decomposition": 1
+    }
+  },
+  "comparison_table": {
+    "experiments_executed": {
+      "bb10": 12,
+      "bb11": 11
+    },
+    "terminal_status": {
+      "bb10": "BUDGET_EXHAUSTED",
+      "bb11": "NO_EDGE_FOUND"
+    },
+    "late_mechanical_cycling": {
+      "bb10": 2,
+      "bb11": 2
+    },
+    "bridge_changed_decisions": {
+      "bb10": 2,
+      "bb11": 2
+    },
+    "exit_valuation_active": {
+      "bb10": false,
+      "bb11": true
+    },
+    "stop_competed_count": {
+      "bb10": 0,
+      "bb11": 3
+    },
+    "exit_selection_changes": {
+      "bb10": 0,
+      "bb11": 1
+    },
+    "justified_stops_bb11": 1,
+    "premature_stops_bb11": 0,
+    "mechanical_cycling_bb11": 3,
+    "beneficial_interventions_bb11": 1,
+    "harmful_interventions_bb11": 0,
+    "tool_distribution": {
+      "bb10": {
+        "horizon_comparison": 6,
+        "adaptive_partition_compare": 2,
+        "threshold_exploration": 2,
+        "sensitivity_analysis": 1,
+        "symbol_decomposition": 1
+      },
+      "bb11": {
+        "horizon_comparison": 5,
+        "sensitivity_analysis": 1,
+        "adaptive_partition_compare": 2,
+        "threshold_exploration": 2,
+        "symbol_decomposition": 1
+      }
+    }
+  },
+  "not_comparable_fields": [
+    "exit_valuation_bb10",
+    "branch_marginal_state_bb10",
+    "realized_information_gain_bb10"
+  ],
+  "primary_question": "Does Phase 3H.8 exit valuation reduce late-session mechanical persistence without pathological early termination?"
+}

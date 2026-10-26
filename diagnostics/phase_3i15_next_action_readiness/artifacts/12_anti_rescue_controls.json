@@ -1,0 +1,14 @@
+{
+  "forbidden_rescue_actions": [
+    "narrower_population_to_recover_support",
+    "different_horizon_to_recover_support",
+    "changed_outcome_field",
+    "changed_proposition_semantics"
+  ],
+  "current_protections": [
+    "_check_anti_rescue in falsification_candidate_generator.py",
+    "forbidden_rescue_mutations in proposed ScientificObjectiveRecord"
+  ],
+  "fork_rule": "Rescue mutations valid only as future FORK/new proposition \u2014 out of scope",
+  "contradiction_rule": "Contradiction must not trigger rescue \u2014 only resolution or HOLD"
+}
