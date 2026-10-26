@@ -1,0 +1,15 @@
+{
+  "verdict": "PARTIALLY_READY",
+  "rationale": "Body-of-evidence synthesis, uncertainty taxonomy, saturation, and ResearchPriorityDecision exist and are lifecycle-integrated (3I.12\u20133I.14). No component transforms priority + unresolved uncertainty into ranked ScientificAction candidates. Exactly one general capability missing.",
+  "exactly_one_missing_capability": {
+    "name": "ScientificActionGenerator",
+    "description": "ResearchPriorityDecision + EvidenceSynthesisRecord + PropositionRecord \u2192 ScientificObjectiveRecord(s) \u2192 ScientificActionCandidateRecord(s) \u2192 semantic dedup \u2192 pre-result lexicographic ranking \u2192 SELECT | HOLD | NO_HIGH_INFORMATION_ACTION \u2192 freeze action package \u2192 STOP (no execution)"
+  },
+  "answers": {
+    "A_can_turn_worth_learning_into_concrete_action": false,
+    "B_can_distinguish_informative_from_representation_repeat": "PARTIAL \u2014 synthesis detects redundancy; no action generator",
+    "C_can_generate_silence_when_no_high_info_action": "PARTIAL \u2014 priority level yes; action candidate level no",
+    "D_smallest_missing_capability": "ScientificActionGenerator"
+  },
+  "proposed_next_phase": "Phase 3I.16 \u2014 Minimal Scientific Action Generator (BB-NextAction-01 first, then T2 diagnostic, no execution)"
+}

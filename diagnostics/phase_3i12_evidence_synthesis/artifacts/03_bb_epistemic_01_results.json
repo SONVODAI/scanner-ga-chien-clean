@@ -1,0 +1,279 @@
+{
+  "cases": [
+    {
+      "case_id": "BE-01",
+      "name": "one_support_only",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "SEEK_REPLICATION",
+        "SEEK_FALSIFICATION"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-02",
+      "name": "two_correlated_supports",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "PARTIAL",
+      "passed": true
+    },
+    {
+      "case_id": "BE-03",
+      "name": "two_independent_supports",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-04",
+      "name": "support_weak_disconfirm",
+      "synthesized_state": "CONFLICTED",
+      "expected_states": [
+        "CONFLICTED",
+        "WEAKENED"
+      ],
+      "chosen_action": "SEEK_CONTRADICTION_RESOLUTION",
+      "expected_actions": [
+        "SEEK_REPLICATION",
+        "SEEK_CONTRADICTION_RESOLUTION",
+        "SEEK_FALSIFICATION"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-05",
+      "name": "support_strong_independent_disconfirm",
+      "synthesized_state": "CONFLICTED",
+      "expected_states": [
+        "FALSIFIED",
+        "CONFLICTED",
+        "WEAKENED"
+      ],
+      "chosen_action": "SEEK_CONTRADICTION_RESOLUTION",
+      "expected_actions": [
+        "SEEK_REPLICATION",
+        "ABANDON",
+        "SEEK_CONTRADICTION_RESOLUTION"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-06",
+      "name": "representation_only_support",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "PARTIAL",
+      "passed": true
+    },
+    {
+      "case_id": "BE-07",
+      "name": "conflicting_independent",
+      "synthesized_state": "CONFLICTED",
+      "expected_states": [
+        "FALSIFIED",
+        "CONFLICTED"
+      ],
+      "chosen_action": "SEEK_CONTRADICTION_RESOLUTION",
+      "expected_actions": [
+        "SEEK_REPLICATION",
+        "ABANDON",
+        "SEEK_CONTRADICTION_RESOLUTION"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-08",
+      "name": "invalid_disconfirmation",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-09",
+      "name": "non_informative_repetition",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-10",
+      "name": "supports_major_dimension_untouched",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "PARTIAL",
+      "passed": true
+    },
+    {
+      "case_id": "BE-11",
+      "name": "saturation_no_contradiction",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "HOLD_PROVISIONALLY",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "HIGH",
+      "passed": true
+    },
+    {
+      "case_id": "BE-12",
+      "name": "unresolved_contradiction",
+      "synthesized_state": "CONFLICTED",
+      "expected_states": [
+        "FALSIFIED",
+        "CONFLICTED"
+      ],
+      "chosen_action": "SEEK_CONTRADICTION_RESOLUTION",
+      "expected_actions": [
+        "SEEK_CONTRADICTION_RESOLUTION",
+        "ABANDON"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-13",
+      "name": "no_executable_high_info",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "HOLD_PROVISIONALLY",
+        "SEEK_FALSIFICATION",
+        "HOLD_UNRESOLVED"
+      ],
+      "saturation": "PARTIAL",
+      "passed": true
+    },
+    {
+      "case_id": "BE-14",
+      "name": "falsified_then_support",
+      "synthesized_state": "FALSIFIED",
+      "expected_states": [
+        "FALSIFIED"
+      ],
+      "chosen_action": "ABANDON",
+      "expected_actions": [
+        "ABANDON"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "BE-15",
+      "name": "narrow_after_contradiction_temptation",
+      "synthesized_state": "CONFLICTED",
+      "expected_states": [
+        "FALSIFIED",
+        "CONFLICTED",
+        "WEAKENED"
+      ],
+      "chosen_action": "SEEK_CONTRADICTION_RESOLUTION",
+      "expected_actions": [
+        "SEEK_REPLICATION",
+        "ABANDON",
+        "SEEK_CONTRADICTION_RESOLUTION"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "GEN-A",
+      "name": "context_modulation_support",
+      "synthesized_state": "SUPPORTED",
+      "expected_states": [
+        "SUPPORTED"
+      ],
+      "chosen_action": "SEEK_FALSIFICATION",
+      "expected_actions": [
+        "SEEK_REPLICATION",
+        "SEEK_FALSIFICATION"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    },
+    {
+      "case_id": "GEN-B",
+      "name": "context_modulation_conflict",
+      "synthesized_state": "CONFLICTED",
+      "expected_states": [
+        "FALSIFIED",
+        "CONFLICTED"
+      ],
+      "chosen_action": "SEEK_CONTRADICTION_RESOLUTION",
+      "expected_actions": [
+        "SEEK_CONTRADICTION_RESOLUTION",
+        "ABANDON"
+      ],
+      "saturation": "LOW",
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "case_count": 17
+}

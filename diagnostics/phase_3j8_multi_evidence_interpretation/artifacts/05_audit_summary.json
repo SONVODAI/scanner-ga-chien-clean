@@ -1,0 +1,12 @@
+{
+  "phase": "3J.8",
+  "git_head": "5fa5e5bdd56ed1ff726ae8b080b9f471d55e32a0",
+  "cf_mei_all_passed": true,
+  "hidden_answer_passed": true,
+  "real_diagnostic_proposition": "prop-efb650d9bd5c451f",
+  "prior_state": "SUPPORTED",
+  "resulting_state": "SUPPORTED",
+  "counted_independent": false,
+  "stop_boundary": "STOP_SECOND_EVIDENCE_INTERPRETED",
+  "regression_failures": []
+}

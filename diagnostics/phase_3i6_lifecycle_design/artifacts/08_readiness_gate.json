@@ -1,0 +1,10 @@
+{
+  "verdict": "PARTIALLY_READY",
+  "single_prerequisite": "PropositionExperimentInterpreter",
+  "minimal_3i7_boundary": {
+    "scope": "One frozen autonomous proposition \u2192 one partition_group_compare result \u2192 one evidence interpretation \u2192 one ResearchDecisionRecord \u2192 append-only lineage",
+    "frozen_inputs": "3I.3/3I.5 representative proposition (2026-08-02)",
+    "no_general_autonomy": true
+  },
+  "rationale": "Execution and birth infrastructure exist; design contracts pre-registered in 3I.1/3I.6. Exactly one bridge missing: experiment-result interpretation against proposition falsification spec."
+}

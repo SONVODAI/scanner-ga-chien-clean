@@ -1,0 +1,10 @@
+{
+  "phase": "3I.9",
+  "git_head": "d8b6339d8a9d24f35108d9bdd9eae98b6852e33f",
+  "verdict": "FALSIFICATION_SELECTION_PASS",
+  "generator_version": "falsification_candidate_generator_v1_3i9",
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "selected_candidate_id": "fc-independent_episode_holdout",
+  "package_hash": "bdd77912ccdde41d2245ed36a95071335af68b06b1e005f41c153f86314bba46",
+  "second_experiment_executed": false
+}

@@ -1,0 +1,98 @@
+{
+  "CF-OBS1": {
+    "passed": "True",
+    "description": "Future row present in source dataset \u2192 cutoff prevents access",
+    "future_rows_in_source": 1,
+    "max_visible": "2026-01-30"
+  },
+  "CF-OBS2": {
+    "passed": true,
+    "description": "Data timestamp cannot be proven \u2192 fail closed",
+    "diagnostics": {
+      "data_cutoff_date": "2026-02-15",
+      "rows_before_cutoff_filter": 0,
+      "temporal_provenance_established": false,
+      "failure_reason": "empty_source_panel"
+    }
+  },
+  "CF-OBS3": {
+    "passed": true,
+    "description": "Same cutoff rerun \u2192 idempotent; no duplicate birth",
+    "observation_id": "obs-3a3073014c317c8a"
+  },
+  "CF-OBS4": {
+    "passed": true,
+    "description": "Future outcome attempted at birth \u2192 reject",
+    "forward_horizons": [
+      {
+        "horizon": "T3",
+        "status": "PENDING_FUTURE",
+        "eligible_evaluation_date": "2026-02-18",
+        "realized_outcome": null
+      },
+      {
+        "horizon": "T5",
+        "status": "PENDING_FUTURE",
+        "eligible_evaluation_date": "2026-02-20",
+        "realized_outcome": null
+      },
+      {
+        "horizon": "T10",
+        "status": "PENDING_FUTURE",
+        "eligible_evaluation_date": "2026-02-27",
+        "realized_outcome": null
+      }
+    ]
+  },
+  "CF-OBS5": {
+    "passed": true,
+    "description": "Birth record mutation after freeze \u2192 reject / immutable"
+  },
+  "CF-OBS6": {
+    "passed": true,
+    "description": "SILENCE day \u2192 persisted, not discarded",
+    "outcome_kind": "STOP"
+  },
+  "CF-OBS7": {
+    "passed": true,
+    "description": "REJECTED hypothesis fields exist on birth record schema",
+    "has_rejected_field": true
+  },
+  "CF-OBS8": {
+    "passed": true,
+    "description": "Cohort membership frozen at birth"
+  },
+  "CF-OBS9": {
+    "passed": true,
+    "description": "Narrative cannot upgrade WEAK to STRONG"
+  },
+  "CF-OBS10": {
+    "passed": true,
+    "description": "Trading subsystem isolation \u2014 no forbidden imports/writes",
+    "audit": {
+      "passed": true,
+      "import_hits": [],
+      "write_hits": [],
+      "modules_audited": [
+        "production_research_observation.py",
+        "production_observation_records.py",
+        "production_observation_cutoff.py",
+        "production_observation_persistence.py",
+        "production_observation_narrative.py",
+        "production_observation_isolation.py"
+      ]
+    }
+  },
+  "CF-OBS11": {
+    "passed": true,
+    "description": "Historical replay excluded from forward evidence",
+    "test_kind": "HISTORICAL_REPLAY_TEST"
+  },
+  "CF-OBS12": {
+    "passed": true,
+    "description": "Old BirthRecord unchanged after subsequent operations",
+    "birth_record_hash": "1686fb70eb6abe1289a41a4481cd6a488cd083a99d27d9ce54ed922242befa8e"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_production_research_observation_01_v1_3k0"
+}

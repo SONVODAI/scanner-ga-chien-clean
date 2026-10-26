@@ -1,0 +1,30 @@
+{
+  "record_version": "evidence_ledger_entry_v1_3i11",
+  "principle": "Raw append-only EpistemicUpdateRecords remain authoritative; ledger entries index them.",
+  "required_fields_per_event": [
+    "ledger_entry_id",
+    "proposition_id",
+    "epistemic_update_id",
+    "experiment_content_hash",
+    "tool_result_hash",
+    "evidence_class",
+    "relationship_to_proposition",
+    "relationship_to_prior_evidence",
+    "population_spec",
+    "outcome_spec",
+    "observation_horizon",
+    "feature_semantics",
+    "cohort_episode_scope",
+    "data_cutoff",
+    "sample_size",
+    "effect_direction",
+    "effect_magnitude",
+    "validity_status",
+    "independence_profile",
+    "contradiction_status",
+    "information_contribution",
+    "provenance_hashes"
+  ],
+  "no_scalar_confidence": true,
+  "authoritative_source": "EpistemicUpdateRecord + ExperimentSpec + ToolResult refs"
+}

@@ -1,0 +1,57 @@
+{
+  "CF-CG1": {
+    "passed": true,
+    "description": "Exhausted episode grammar \u2192 justified silence, not capability gap",
+    "classification": "REDUNDANCY_STOP"
+  },
+  "CF-CG2": {
+    "passed": true,
+    "description": "Unknown null not in grammar \u2192 CAPABILITY_GAP",
+    "classification": "CAPABILITY_GAP"
+  },
+  "CF-CG3": {
+    "passed": true,
+    "description": "Faithful design exists but not executable \u2192 EXECUTABILITY_GAP",
+    "classification": "EXECUTABILITY_GAP"
+  },
+  "CF-CG4": {
+    "passed": true,
+    "description": "PI loss from examiner penalties after decision completes, not scientific defect",
+    "loss_classification": "EXPECTED_LONGER_JOURNEY_COST"
+  },
+  "CF-CG5": {
+    "passed": true,
+    "description": "FAILED_CLOSED on silence execution attempt classified correctly",
+    "loss_classification": "CONSERVATIVE_FAIL_CLOSED"
+  },
+  "CF-CG6": {
+    "passed": true,
+    "description": "Examiner audit modules not imported by research runtime",
+    "hits": []
+  },
+  "CF-CG7": {
+    "passed": true,
+    "description": "PI delta localized to ordinal 2 decision event",
+    "localization": {
+      "divergence_ordinal": 2,
+      "divergence_stage": "lifecycle_outcome",
+      "baseline_outcome": "BUDGET_EXHAUSTED",
+      "new_outcome": "SCIENTIFIC_STOP",
+      "divergence_field": "decision_leaving"
+    }
+  },
+  "CF-CG8": {
+    "passed": true,
+    "description": "All-bootstrap-silent suite flags FP-zero-from-inability",
+    "flag": true
+  },
+  "CF-CG9": {
+    "passed": true,
+    "description": "Null cycling \u2192 REDUNDANCY_STOP (anti-loop restraint)",
+    "classification": "REDUNDANCY_STOP"
+  },
+  "CF-CG10": {
+    "passed": true,
+    "description": "Candidate ordering does not change silence classification"
+  }
+}

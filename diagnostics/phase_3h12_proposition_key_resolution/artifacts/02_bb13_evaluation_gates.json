@@ -1,0 +1,22 @@
+{
+  "bb13_id": "blind_benchmark_13",
+  "baseline_comparison": ["blind_benchmark_11", "blind_benchmark_12"],
+  "pass_requires_all": [
+    "synthetic_pair_matrix_A-L PASS",
+    "frozen_invariant_audit PASS",
+    "over_collapse_audit acceptable",
+    "no market-specific logic in diff"
+  ],
+  "improvement_signals_any_two": [
+    "representation_gated_count > bb12",
+    "novelty_gating_applied_count > bb12",
+    "mechanical_cycling_total < bb11",
+    "independent_lines_explored >= bb11"
+  ],
+  "fail_if_any": [
+    "premature_stop_count > bb11 + 1",
+    "over_collapse_legitimate_distinct > threshold",
+    "independent_line_selection_count < bb11 - 1"
+  ],
+  "valid_if_no_live_change": "PARTIAL if identity correct but behavior unchanged"
+}
