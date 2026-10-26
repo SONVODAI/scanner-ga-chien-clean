@@ -1,0 +1,15 @@
+[Unit]
+Description=Mr.BOT Production Daily Research timer (LIVE_FORWARD autonomous)
+Documentation=file:/opt/mrbot-camera/diagnostics/phase_3k5_live_forward_production_readiness/LIVE_FORWARD_DEPLOYMENT_RUNBOOK.md
+Requires=mrbot-daily-research.service
+
+[Timer]
+# Conservative post-EOD window — data readiness gate remains authoritative.
+OnCalendar=Mon..Fri *-*-* 18:35:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 20:05:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 22:35:00 Asia/Ho_Chi_Minh
+Persistent=true
+Unit=mrbot-daily-research.service
+
+[Install]
+WantedBy=timers.target

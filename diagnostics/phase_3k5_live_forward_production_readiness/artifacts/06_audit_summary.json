@@ -1,0 +1,32 @@
+{
+  "head": "fec9e08f07b2358dfca2092c45892eb6622a9574",
+  "phase": "3K.5",
+  "stop_boundary": "STOP_LIVE_FORWARD_PRODUCTION_READINESS_AUDITED",
+  "vn_trade_date": "2026-08-22",
+  "cf_ready_pass": true,
+  "dry_run_non_forward": true,
+  "day0_smoke_non_forward": true,
+  "live_forward_activated": false,
+  "genesis_exists": true,
+  "readiness_matrix": {
+    "Scientific integrity": "PASS",
+    "Temporal integrity": "PASS",
+    "Production data readiness": "PASS",
+    "EOD completeness": "PASS_WITH_PREREQUISITE",
+    "Timezone correctness": "PASS_WITH_PREREQUISITE",
+    "Idempotency": "PASS",
+    "Crash recovery": "PASS",
+    "Persistence durability": "PASS_WITH_PREREQUISITE",
+    "Backup readiness": "PASS_WITH_PREREQUISITE",
+    "UI truthfulness": "PASS",
+    "Operational observability": "PASS",
+    "Security/trading isolation": "PASS",
+    "Scheduling readiness": "PASS_WITH_PREREQUISITE",
+    "Day-0 smoke readiness": "PASS_WITH_PREREQUISITE",
+    "LIVE_FORWARD Day-1 readiness": "PASS_WITH_PREREQUISITE"
+  },
+  "any_fail": false,
+  "deployment_recommendation": "READY_FOR_DAY_0_SMOKE_AND_GENESIS_CREATION \u2014 complete manual prerequisites in runbook before LIVE_FORWARD Day 1",
+  "regressions_pass": true,
+  "phase_pass": true
+}

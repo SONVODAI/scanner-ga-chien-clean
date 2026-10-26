@@ -1,0 +1,25 @@
+{
+  "suites": {
+    "tests/test_edge_research_opr_phase_3j13.py::test_cf_fg_counterfactuals": {
+      "passed": true,
+      "tail": "1 passed in 4.99s"
+    },
+    "tests/test_edge_research_opr_phase_3j12.py": {
+      "passed": true,
+      "tail": "5 passed in 28.99s"
+    },
+    "tests/test_edge_research_opr_phase_3j11.py": {
+      "passed": true,
+      "tail": "8 passed in 12.22s"
+    },
+    "tests/test_edge_research_opr_phase_3j10.py": {
+      "passed": true,
+      "tail": "8 passed in 8.76s"
+    },
+    "tests/test_edge_research_opr_phase_3j9.py": {
+      "passed": true,
+      "tail": "11 passed in 9.25s"
+    }
+  },
+  "all_passed": true
+}

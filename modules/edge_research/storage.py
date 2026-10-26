@@ -16,13 +16,17 @@ import pandas as pd
 from modules.edge_research.contracts import (
     CHALLENGER_RUN_COLUMNS,
     DISCOVERY_RUN_COLUMNS,
+    EDGE_ANTI_CONTEXT_COLUMNS,
     EDGE_EPISODE_REGISTRY_COLUMNS,
     EDGE_FORWARD_LEDGER_COLUMNS,
     EDGE_HYPOTHESIS_LEDGER_COLUMNS,
     EDGE_MEMORY_COLUMNS,
     EDGE_ROBUSTNESS_HISTORY_COLUMNS,
+    EDGE_SHADOW_OBSERVATION_COLUMNS,
     EDGE_VALIDATION_HISTORY_COLUMNS,
     ENGINE_VERSION,
+    FROZEN_SPECS_DIRNAME,
+    EDGE_SESSION_ASSESSMENT_COLUMNS,
 )
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "edge_research"
@@ -36,6 +40,9 @@ LEDGER_FILES: Dict[str, Tuple[str, ...]] = {
     "discovery_runs.csv": DISCOVERY_RUN_COLUMNS,
     "edge_robustness_history.csv": EDGE_ROBUSTNESS_HISTORY_COLUMNS,
     "challenger_runs.csv": CHALLENGER_RUN_COLUMNS,
+    "edge_session_assessments.csv": EDGE_SESSION_ASSESSMENT_COLUMNS,
+    "edge_shadow_observations.csv": EDGE_SHADOW_OBSERVATION_COLUMNS,
+    "edge_anti_context.csv": EDGE_ANTI_CONTEXT_COLUMNS,
 }
 
 # Challenger persistence schema — explicit dtypes before categorical assignment.
@@ -45,6 +52,16 @@ HYPOTHESIS_LEDGER_STRING_COLUMNS: Tuple[str, ...] = (
     "fragility_flags",
     "rejection_reasons",
     "main_fragility_flag",
+    "scientific_status",
+    "hypothesis_id",
+    "frozen_spec_path",
+    "frozen_spec_hash",
+    "freeze_eligibility",
+    "oos_mode",
+    "challenger_run_id",
+    "condition_key",
+    "feature_clauses_json",
+    "oos_status",
 )
 
 HYPOTHESIS_LEDGER_NULLABLE_INT_COLUMNS: Tuple[str, ...] = (
@@ -172,6 +189,7 @@ def ensure_storage(data_dir: Optional[Path] = None) -> Path:
     root = resolve_data_dir(data_dir)
     root.mkdir(parents=True, exist_ok=True)
     (root / RESEARCH_SESSIONS_DIR).mkdir(parents=True, exist_ok=True)
+    (root / FROZEN_SPECS_DIRNAME).mkdir(parents=True, exist_ok=True)
     for filename, columns in LEDGER_FILES.items():
         path = root / filename
         if not path.exists():
@@ -359,6 +377,16 @@ def append_candidates(
         bp = cand.profiles.get("baseline", {})
         inc = cand.incremental
         guardrails = getattr(cand, "guardrails", {}) or {}
+        feature_clauses_payload = [
+            {
+                "feature": c.feature,
+                "operator": c.operator,
+                "threshold_lo": c.threshold_lo,
+                "threshold_hi": c.threshold_hi,
+                "bucket_id": c.bucket_id,
+            }
+            for c in clauses
+        ]
         row = {
             "edge_id": edge_id,
             "created_at": created,
@@ -368,6 +396,8 @@ def append_candidates(
             "market_transition": cand.market_transition,
             "baseline_type": cand.baseline_type,
             "condition_text": cand.condition_text,
+            "condition_key": cand.condition_key,
+            "feature_clauses_json": json.dumps(feature_clauses_payload, ensure_ascii=False),
             "feature_1": f1.feature if f1 else "",
             "operator_1": f1.operator if f1 else "",
             "threshold_1": f1.threshold_hi if f1 and f1.threshold_hi is not None else (f1.threshold_lo if f1 else ""),
@@ -604,6 +634,11 @@ def update_ledger_robustness(
         ledger.loc[mask, "fragility_flags"] = "|".join(res.fragility_flags)
         ledger.loc[mask, "rejection_reasons"] = "|".join(res.rejection_reasons)
         ledger.loc[mask, "main_fragility_flag"] = res.main_fragility_flag
+        scientific = getattr(res, "scientific_status", None)
+        if scientific:
+            ledger.loc[mask, "scientific_status"] = scientific
+        if "challenger_run_id" in ledger.columns:
+            ledger.loc[mask, "challenger_run_id"] = run_id
     ledger.to_csv(root / "edge_hypothesis_ledger.csv", index=False)
 
 

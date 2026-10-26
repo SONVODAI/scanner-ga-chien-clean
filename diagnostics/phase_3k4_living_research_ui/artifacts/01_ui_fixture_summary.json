@@ -1,0 +1,85 @@
+{
+  "CF-UI-A": {
+    "passed": true,
+    "description": "No LIVE_FORWARD records yet \u2014 honest empty state"
+  },
+  "CF-UI-B": {
+    "passed": true,
+    "description": "Normal speaking day renders voice narrative",
+    "trade_date": "2026-01-08"
+  },
+  "CF-UI-C": {
+    "passed": true,
+    "description": "Lifecycle states exposed in active observations"
+  },
+  "CF-UI-D": {
+    "passed": true,
+    "description": "Weakening/challenged lifecycle readable from observation records",
+    "lifecycle_values": [
+      "SILENCE"
+    ]
+  },
+  "CF-UI-E": {
+    "passed": true,
+    "description": "Silence/NO_DISCOVERY day has useful page, not dead empty box"
+  },
+  "CF-UI-F": {
+    "passed": true,
+    "description": "T3/T5/T10 status visible in forward panel schema",
+    "forward_panel": {
+      "t3_available": 0,
+      "t5_available": 0,
+      "t10_available": 0,
+      "maturity_label": "NO_FORWARD_EVIDENCE"
+    }
+  },
+  "CF-UI-G": {
+    "passed": true,
+    "description": "T5/T10 pending visible when not yet released"
+  },
+  "CF-UI-H": {
+    "passed": true,
+    "description": "WAITING_FOR_DATA state recognized"
+  },
+  "CF-UI-I": {
+    "passed": true,
+    "description": "FAILED_CLOSED failure state in read model schema"
+  },
+  "CF-UI-J": {
+    "passed": true,
+    "description": "Historical view cannot see future evidence"
+  },
+  "CF-UI-K": {
+    "passed": true,
+    "description": "Voice renderable from assessment when voice file missing",
+    "voice_count": 8
+  },
+  "CF-UI-L": {
+    "passed": true,
+    "description": "Tiny forward sample shows warning"
+  },
+  "CF-UI-TIMELINE": {
+    "passed": true,
+    "description": "Observation timeline starts at BIRTH with historical states",
+    "events": 1
+  },
+  "CF-UI-AUTHORITY": {
+    "passed": true,
+    "description": "No BUY/SELL/EDGE_ACTIVE terms in UI snapshot",
+    "forbidden_hits": []
+  },
+  "CF-UI-MODE": {
+    "passed": true,
+    "description": "BACKFILL not counted as forward evidence in UI"
+  },
+  "CF-UI-ISOLATION": {
+    "passed": true,
+    "description": "UI modules trading-isolated"
+  },
+  "_preview_snapshots": {
+    "normal_day": "============================================================\nMR.BOT \u2014 H\u00d4M NAY T\u00d4I \u0110ANG NGH\u0128 G\u00cc?\nVersion: living_research_ui_v1_3k4\nAuthority: RESEARCH ONLY\nTrade date: 2026-01-08\nRun mode: BACKFILL \u2014 kh\u00f4ng ph\u1ea3i forward evidence th\u1eadt\n\n--- TODAY'S VOICE ---\n**Observation 1**\n\nH\u00f4m nay (2026-01-08) t\u00f4i th\u1ea5y epistemic state l\u00e0 UNRESOLVED. Lifecycle: SILENCE. Research status: ACTIVE.\n\nSo v\u1edbi phi\u00ean tr\u01b0\u1edbc, thay \u0111\u1ed5i: breadth:UNKNOWN, cohort_relative:changed. Kh\u00f4ng \u0111\u1ed5i: epistemic:UNRESOLVED.\n\nMarket delta: breadth:UNKNOWN, cohort_relative:changed. Breadth: UNKNOWN. Transition: UNKNOWN. Compatibility: UNCHANGED.\n\nQuan \u0111i\u1ec3m kh\u00f4ng thay \u0111\u1ed5i (UNRESOLVED \u2192 UNRESOLVED).\n\nEpistemic state remains UNRESOLVED. Market context changed (breadth:UNKNOWN; cohort_relative:changed), but no relevant new evidence arrived to justify changing belief.\n\n\u0110i\u1ec1u ch\u1ed1ng l\u1ea1i hypothesis: kh\u00f4ng c\u00f3.\n\nCh\u01b0a bi\u1ebft: kh\u00f4ng c\u00f3. Limitations: kh\u00f4ng c\u00f3.\n\nWaiting for T3 eligible on 2026-01-07\n\n**Observation 2**\n\nH\u00f4m nay (2026-01-08) t\u00f4i th\u1ea5y epistemic state l\u00e0 UNRESOLVED. Lifecycle: SILENCE. Research status: ACTIVE.\n\nSo v\u1edbi phi\u00ean tr\u01b0\u1edbc, thay \u0111\u1ed5i: breadth:UNKNOWN, cohort_relative:changed, forward_outcome:T5:out-344516de99b63029. Kh\u00f4ng \u0111\u1ed5i: epistemic:UNRESOLVED.\n\nMarket delta: breadth:UNKNOWN, cohort_relative:changed. Breadth: UNKNOWN. Transition: UNKNOWN. Compatibility: UNCHANGED.\n\nQuan \u0111i\u1ec3m kh\u00f4ng thay \u0111\u1ed5i (UNRESOLVED \u2192 UNRESOLVED).\n\nEpistemic state remains UNRESOLVED. Market changed (breadth:UNKNOWN; cohort_relative:changed) and new evidence arrived (forward_outcome:T5:out-344516de99b63029), but it does not materially address the surviving null; therefore the scientific conclusion is unchanged.\n\n\u0110i\u1ec1u ch\u1ed1ng l\u1ea1i hypothesis: kh\u00f4ng c\u00f3.\n\nCh\u01b0a bi\u1ebft: kh\u00f4ng c\u00f3. Limitations: kh\u00f4ng c\u00f3.\n\nWaiting for T3 eligible on 2026-01-06\n\n**Observation 3**\n\nH\u00f4m nay (2026-01-08) t\u00f4i th\u1ea5y epistemic state l\u00e0 UNRESOLVED. Lifecycle: SILENCE. Research status: ACTIVE.\n\n\u0110\u00e2y l\u00e0 assessment \u0111\u1ea7u ti\u00ean sau birth \u2014 ch\u01b0a c\u00f3 phi\u00ean tr\u01b0\u1edbc \u0111\u1ec3 so s\u00e1nh.\n\nMarket del",
+    "no_discovery": "============================================================\nMR.BOT \u2014 H\u00d4M NAY T\u00d4I \u0110ANG NGH\u0128 G\u00cc?\nVersion: living_research_ui_v1_3k4\nAuthority: RESEARCH ONLY\nTrade date: 2026-01-11\nRun mode: BACKFILL \u2014 kh\u00f4ng ph\u1ea3i forward evidence th\u1eadt\n\n--- TODAY'S VOICE ---\nH\u00f4m nay (2026-01-11) t\u00f4i th\u1ea5y epistemic state l\u00e0 UNRESOLVED. Lifecycle: SILENCE. Research status: ACTIVE.\n\n\u0110\u00e2y l\u00e0 assessment \u0111\u1ea7u ti\u00ean sau birth \u2014 ch\u01b0a c\u00f3 phi\u00ean tr\u01b0\u1edbc \u0111\u1ec3 so s\u00e1nh.\n\nMarket delta: breadth:UNKNOWN. Breadth: UNKNOWN. Transition: UNKNOWN. Compatibility: UNCHANGED.\n\nQuan \u0111i\u1ec3m kh\u00f4ng thay \u0111\u1ed5i (UNRESOLVED \u2192 UNRESOLVED).\n\nEpistemic state remains None. Market context changed (breadth:UNKNOWN), but no relevant new evidence arrived to justify changing belief.\n\n\u0110i\u1ec1u ch\u1ed1ng l\u1ea1i hypothesis: kh\u00f4ng c\u00f3.\n\nCh\u01b0a bi\u1ebft: kh\u00f4ng c\u00f3. Limitations: kh\u00f4ng c\u00f3.\n\nWaiting for T3 eligible on 2026-01-14\n\n--- H\u00d4M NAY vs H\u00d4M QUA ---\nPrevious session: None\nSilence/no discovery: False\nNew discovery: False\nBelief changes: 0\n  \u2022 Unchanged despite market: obs-0ef40604624b78d7 \u2014 Epistemic state remains None. Market context changed (breadth:UNKNOWN), but no r\n\n--- OBSERVATIONS \u0110ANG S\u1ed0NG (1) ---\n  \u2022 obs-0ef40604\u2026 | None | SILENCE | age=0 | NON-FORWARD\n\n--- FORWARD EVIDENCE ---\nMaturity: NO_FORWARD_EVIDENCE\nEligible N: 0\n\u26a0 M\u1eabu forward qu\u00e1 nh\u1ecf \u2014 kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 k\u1ebft lu\u1eadn.\n\u2139 Ch\u1ec9 c\u00f3 d\u1eef li\u1ec7u historical/backfill \u2014 KH\u00d4NG ph\u1ea3i forward evidence th\u1eadt.\n  \u2022 I currently have no authoritative LIVE_FORWARD forward evidence in the calibration ledger.\n  \u2022 Only 0 observation(s) h"
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_living_research_ui_01_v1_3k4"
+}

@@ -1,0 +1,272 @@
+{
+  "fc1_version": "forecast_v2_fc1_v1",
+  "generated_at": "2026-08-25T14:19:10Z",
+  "verdict": "HARNESS VALID — CONTINUE DATA ACCUMULATION",
+  "dataset": {
+    "coverage": {
+      "earliest": "2026-07-23",
+      "latest": "2026-08-24",
+      "n_dates": 27,
+      "n_complete": 8,
+      "n_partial": 19
+    },
+    "feature_provenance": {
+      "market_real": "PIT_SAFE",
+      "market_live": "PIT_SAFE",
+      "market_forecast": "PIT_SAFE",
+      "breadth_score": "PIT_SAFE",
+      "vnindex_daily_return_pct": "PIT_SAFE",
+      "market_regime": "PIT_SAFE",
+      "share_THEO_DOI": "PIT_SAFE",
+      "share_TICH_LUY": "PIT_SAFE",
+      "share_MUA_EARLY": "PIT_SAFE",
+      "share_PULL_VUA": "PIT_SAFE",
+      "share_PULL_DEP": "PIT_SAFE",
+      "share_MUA_BREAK": "PIT_SAFE",
+      "share_CP_MANH": "PIT_SAFE",
+      "share_GA_TANG_TOC": "PIT_SAFE",
+      "rsi40_share": "PIT_SAFE",
+      "rsi50_share": "PIT_SAFE",
+      "rsi60_share": "PIT_SAFE",
+      "med_rsi14": "PIT_SAFE",
+      "obv_green_share": "PIT_SAFE",
+      "slope_pos_share": "PIT_SAFE",
+      "mean_rs5": "PIT_SAFE",
+      "mean_rs10": "PIT_SAFE",
+      "pos_rs5_share": "PIT_SAFE",
+      "pos_rs10_share": "PIT_SAFE",
+      "rs5_dispersion": "PIT_SAFE",
+      "near_low20_share": "PIT_SAFE",
+      "near_low60_share": "PIT_SAFE",
+      "near_high20_share": "PIT_SAFE",
+      "lead_conc_top10": "PIT_SAFE",
+      "market_real_lag1": "PIT_SAFE",
+      "market_forecast_lag1": "PIT_SAFE",
+      "rsi50_share_lag1": "PIT_SAFE",
+      "obv_green_share_lag1": "PIT_SAFE"
+    },
+    "labels": {
+      "fc1_version": "forecast_v2_fc1_v1",
+      "label_schema_version": "fc1_labels_v1",
+      "n_rows": 63,
+      "session_dates_n": 17,
+      "by_horizon": {
+        "3": {
+          "n": 24,
+          "date_min": "2026-07-23",
+          "date_max": "2026-08-19"
+        },
+        "5": {
+          "n": 22,
+          "date_min": "2026-07-23",
+          "date_max": "2026-08-17"
+        },
+        "10": {
+          "n": 17,
+          "date_min": "2026-07-23",
+          "date_max": "2026-08-10"
+        }
+      }
+    }
+  },
+  "walkforward": {
+    "protocol": {
+      "type": "expanding_walkforward",
+      "random_split": false,
+      "maturity_rule": "mature_trade_date < prediction_date AND trade_date < prediction_date",
+      "feature_set": [
+        "market_real",
+        "market_live",
+        "market_forecast",
+        "breadth_score",
+        "vnindex_daily_return_pct",
+        "market_regime",
+        "share_THEO_DOI",
+        "share_TICH_LUY",
+        "share_MUA_EARLY",
+        "share_PULL_VUA",
+        "share_PULL_DEP",
+        "share_MUA_BREAK",
+        "share_CP_MANH",
+        "share_GA_TANG_TOC",
+        "rsi40_share",
+        "rsi50_share",
+        "rsi60_share",
+        "med_rsi14",
+        "obv_green_share",
+        "slope_pos_share",
+        "mean_rs5",
+        "mean_rs10",
+        "pos_rs5_share",
+        "pos_rs10_share",
+        "rs5_dispersion",
+        "near_low20_share",
+        "near_low60_share",
+        "near_high20_share",
+        "lead_conc_top10",
+        "market_real_lag1",
+        "market_forecast_lag1",
+        "rsi50_share_lag1",
+        "obv_green_share_lag1"
+      ],
+      "baselines": [
+        "unconditional",
+        "persistence",
+        "real_only",
+        "live_only",
+        "real_live",
+        "breadth_only",
+        "legacy_fc_only",
+        "regime_pit",
+        "composition_early_share"
+      ],
+      "horizons": [
+        3,
+        5,
+        10
+      ]
+    },
+    "n_prediction_rows": 567,
+    "leaderboard_horizons": {
+      "T3": {
+        "n_prediction_dates": 24,
+        "episode_summary": {
+          "date_count": 24,
+          "episode_count": 7,
+          "concentration_by_episode": {
+            "0": 14,
+            "1": 1,
+            "2": 1,
+            "3": 4,
+            "4": 1,
+            "5": 1,
+            "6": 2
+          },
+          "regime_switches": 6,
+          "regimes_present": [
+            "MID",
+            "WEAK"
+          ]
+        }
+      },
+      "T5": {
+        "n_prediction_dates": 22,
+        "episode_summary": {
+          "date_count": 22,
+          "episode_count": 6,
+          "concentration_by_episode": {
+            "0": 14,
+            "1": 1,
+            "2": 1,
+            "3": 4,
+            "4": 1,
+            "5": 1
+          },
+          "regime_switches": 5,
+          "regimes_present": [
+            "MID",
+            "WEAK"
+          ]
+        }
+      },
+      "T10": {
+        "n_prediction_dates": 17,
+        "episode_summary": {
+          "date_count": 17,
+          "episode_count": 4,
+          "concentration_by_episode": {
+            "0": 14,
+            "1": 1,
+            "2": 1,
+            "3": 1
+          },
+          "regime_switches": 3,
+          "regimes_present": [
+            "MID",
+            "WEAK"
+          ]
+        }
+      }
+    }
+  },
+  "leakage_audit": {
+    "lifecycle_forbidden_as_t0_features": "PASS",
+    "future_dates_excluded_from_feature_transforms": "PASS",
+    "rolling_norm_fit_past_only": "PASS",
+    "labels_unavailable_before_maturity": "PASS",
+    "safe_reconstructable_tagged": "PASS",
+    "no_future_outcome_columns_in_feature_matrix": "PASS",
+    "train_precedes_prediction": "PASS",
+    "note": "Enforced by fc1 modules + tests/test_forecast_v2_fc1_harness.py"
+  },
+  "accumulation": {
+    "fc1_version": "forecast_v2_fc1_v1",
+    "latest_t0_date": "2026-08-24",
+    "earliest_t0_date": "2026-07-23",
+    "n_t0_dates": 27,
+    "n_complete": 8,
+    "n_partial": 19,
+    "maturity": {
+      "T3": {
+        "matured_dates": 24,
+        "gate": 40,
+        "remaining_to_gate": 16,
+        "gate_met": false
+      },
+      "T5": {
+        "matured_dates": 22,
+        "gate": 30,
+        "remaining_to_gate": 8,
+        "gate_met": false
+      },
+      "T10": {
+        "matured_dates": 17,
+        "gate": 20,
+        "remaining_to_gate": 3,
+        "gate_met": false
+      }
+    },
+    "direction_switches_T3_favorable_median": 7,
+    "episode_summary_all_t0": {
+      "date_count": 27,
+      "episode_count": 8,
+      "concentration_by_episode": {
+        "0": 14,
+        "1": 1,
+        "2": 1,
+        "3": 4,
+        "4": 1,
+        "5": 1,
+        "6": 3,
+        "7": 2
+      },
+      "regime_switches": 7,
+      "regimes_present": [
+        "MID",
+        "STRONG",
+        "WEAK"
+      ]
+    },
+    "missing_required_on_latest": [],
+    "research_gates": {
+      "T3": 40,
+      "T5": 30,
+      "T10": 20,
+      "min_switches": 8
+    },
+    "gates_met": {
+      "T3": false,
+      "T5": false,
+      "T10": false,
+      "switches": false
+    },
+    "note": "No calendar ETA: trading-day scheduling not projected. Remaining counts are date deficits only."
+  },
+  "artifact_paths": {
+    "pit": "/workspace/data/forecast_research/fc1/fc1_pit_features.csv",
+    "labels": "/workspace/data/forecast_research/fc1/fc1_labels.csv",
+    "predictions": "/workspace/data/forecast_research/fc1/fc1_walkforward_predictions.csv",
+    "leaderboard": "/workspace/data/forecast_research/fc1/fc1_baseline_leaderboard.json",
+    "status": "/workspace/data/forecast_research/fc1/fc1_accumulation_status.json"
+  }
+}

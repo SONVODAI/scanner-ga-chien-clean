@@ -1,0 +1,40 @@
+{
+  "operator_view": "counts_only_until_final_judgment",
+  "candidates": [
+    {
+      "candidate_id": "FFC1_PRIMARY_ABN_ABS_Z20_T10",
+      "feature": "abn_abs_z20",
+      "state": "WAITING_FOR_EVENTS",
+      "triggers": 0,
+      "matured_t10": 0,
+      "unique_symbols": 0,
+      "unique_dates": 0,
+      "data_quality_status": "UNKNOWN",
+      "final_judgment_allowed": false,
+      "note": "Do not trade from interim results."
+    },
+    {
+      "candidate_id": "FFC1_SECONDARY_NET_HI_PCT90_T10",
+      "feature": "net_hi_pct90",
+      "state": "WAITING_FOR_EVENTS",
+      "triggers": 0,
+      "matured_t10": 0,
+      "unique_symbols": 0,
+      "unique_dates": 0,
+      "data_quality_status": "UNKNOWN",
+      "final_judgment_allowed": false
+    },
+    {
+      "candidate_id": "FFC1_OPTIONAL_STREAK_NEG_LE_M5_T10",
+      "feature": "streak_neg_le_m5",
+      "state": "WAITING_FOR_EVENTS",
+      "triggers": 0,
+      "matured_t10": 0,
+      "unique_symbols": 0,
+      "unique_dates": 0,
+      "data_quality_status": "UNKNOWN",
+      "final_judgment_allowed": false,
+      "exploratory": true
+    }
+  ]
+}

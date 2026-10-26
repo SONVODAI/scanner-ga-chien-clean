@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ForeignFlowConfirmationOutcomeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "candidate_id",
+    "trade_date",
+    "symbol",
+    "matured_at",
+    "maturity_trade_date",
+    "ret_t10",
+    "win_t10",
+    "outcome_ok",
+    "outcome_reason"
+  ],
+  "properties": {
+    "event_id": { "type": "string" },
+    "candidate_id": { "type": "string" },
+    "trade_date": { "type": "string" },
+    "symbol": { "type": "string" },
+    "matured_at": { "type": "string", "format": "date-time" },
+    "maturity_trade_date": { "type": "string" },
+    "t10_close": { "type": ["number", "null"] },
+    "ret_t10": {
+      "type": ["number", "null"],
+      "description": "close_T10/close_T0 - 1; NULL if invalid — never 0-fill"
+    },
+    "win_t10": { "type": ["number", "null"] },
+    "mfe_t10": { "type": ["number", "null"] },
+    "mae_t10": { "type": ["number", "null"] },
+    "forward_drawdown_t10": {
+      "type": ["number", "null"],
+      "description": "min_low_path/close_T0 - 1 over sessions 1..10 when path available"
+    },
+    "outcome_ok": { "type": "boolean" },
+    "outcome_reason": { "type": "string" },
+    "layer": { "const": "outcome_append_only" },
+    "note": {
+      "type": "string",
+      "const": "Append to outcome layer only; never mutate the T0 event row."
+    }
+  }
+}

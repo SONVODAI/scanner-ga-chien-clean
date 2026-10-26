@@ -1,0 +1,23 @@
+{
+  "evidence_class": "SUPPORTING",
+  "metrics_used": {
+    "quintile_means": [
+      -0.417532745719201,
+      -0.06763937231746465,
+      0.04048012119072728,
+      0.6013393454050148,
+      1.9343427937275541
+    ],
+    "low_quintile_mean": -0.417532745719201,
+    "high_quintile_mean": 1.9343427937275541,
+    "quintile_mean_spread": 2.351875539446755,
+    "low_high_delta": 2.351875539446755,
+    "outcome_spread": 100.0,
+    "tool_status": "OK",
+    "sample_size": 6106,
+    "contrast_direction": "positive"
+  },
+  "condition_matched": "high_quintile_mean > low_quintile_mean AND quintile_mean_spread >= 0.5",
+  "validity_passed": true,
+  "validity_failures": []
+}
