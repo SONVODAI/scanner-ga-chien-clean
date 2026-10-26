@@ -1,0 +1,35 @@
+{
+  "audit_mode": "AUDIT_REPLAY_SYSTEM_EVALUATION_ONLY",
+  "frozen_hash_integrity": {
+    "passed": true,
+    "checks": {
+      "evidence_synthesis_engine": true,
+      "scientific_action_generator": true,
+      "scientific_frontier_reassessor": true,
+      "research_dormancy_mechanism": true,
+      "lifecycle_dormancy_integration": true,
+      "evidence_derived_cohort_binder": true
+    }
+  },
+  "t2_terminal_state": {
+    "passed": true,
+    "checks": {
+      "epistemic_state": true,
+      "frontier_decision": true,
+      "research_activity_state": true,
+      "dormancy_hash": true
+    },
+    "source": "/workspace/diagnostics/phase_3i20_dormancy_lifecycle/artifacts/04_t2_lifecycle_replay.json"
+  },
+  "opr_production_isolation": {
+    "passed": true,
+    "research_controller_imports_opr_bridge": false,
+    "opr_bridge_isolation_declared": true
+  },
+  "scorecard_verdicts": {
+    "research_primitives": "AUTONOMOUS_RESEARCH_PRIMITIVES_PASS",
+    "research_lifecycle": "AUTONOMOUS_RESEARCH_LIFECYCLE_PARTIAL",
+    "scientific_generality": "AUTONOMOUS_SCIENTIFIC_GENERALITY_PARTIAL",
+    "phase_3i_graduation": "PHASE_3I_NOT_YET_GRADUATED"
+  }
+}

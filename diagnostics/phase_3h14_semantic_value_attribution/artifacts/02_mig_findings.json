@@ -1,0 +1,11 @@
+{
+  "bb14_t4_mig": 3.0,
+  "bb14_t8_mig": 1.8,
+  "bb14_t9_mig": 2.7,
+  "classification": "LEGITIMATE",
+  "code_ref": "modules/edge_research/research_portfolio.py:504-567",
+  "definition": "Diminishing returns for redundant tool/feature on dimension_key",
+  "inherited_untried_appearance": "First branch use of tool gets MIG dampening only via branch_tools_attempted (\u00d70.15)",
+  "new_instrument_independent_evidence": "Legitimate when dimension_key differs (rs10 vs rs_spread)",
+  "ownership_level": "feature\u00d7outcome\u00d7population dimension + global tool counts"
+}

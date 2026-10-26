@@ -1,0 +1,18 @@
+{
+  "problem": "3I.7 decision_mapping always SEEK_FALSIFICATION on SUPPORTING regardless of ledger",
+  "valid_next_actions": [
+    "SEEK_FALSIFICATION",
+    "SEEK_REPLICATION",
+    "SEEK_CONTRADICTION_RESOLUTION",
+    "HOLD_PROVISIONALLY",
+    "HOLD_UNRESOLVED",
+    "ABANDON"
+  ],
+  "hold_provisionally_definition": "Evidence sufficient to preserve proposition as research-usable; marginal experiment value lower than other frontier questions. NOT proven true.",
+  "falsification_no_longer_highest_value_when": [
+    "episode_robustness dimension covered by independent holdout",
+    "remaining falsification axes redundant with ledger",
+    "saturation assessment SATURATED_FOR_CURRENT_UNCERTAINTY",
+    "no executable counterexample axis with marginal information"
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "benchmark_version": "bb_first_experiment_execution_01_v1_3j3",
+  "total": 20,
+  "passed": 20,
+  "all_passed": true,
+  "cases": [
+    {
+      "case_id": "BBFE-01",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-02",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-03",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-04",
+      "skipped": true,
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-05",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-06",
+      "skipped": true,
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-07",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-08",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-09",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-10",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-11",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-12",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-13",
+      "skipped": true,
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-14",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-15",
+      "skipped": true,
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-16",
+      "skipped": true,
+      "disposition": "NO_HIGH_INFORMATION_FIRST_EXPERIMENT",
+      "passed": true
+    },
+    {
+      "case_id": "BBFE-17",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-18",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-19",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    },
+    {
+      "case_id": "BBFE-20",
+      "outcome": "FAILED",
+      "passed": true,
+      "tool": "tier_compare"
+    }
+  ]
+}
