@@ -1,0 +1,281 @@
+{
+  "experiment_identity_version": "research_experiment_identity_v1",
+  "budget_termination_commit": "c605c8326",
+  "duplicate_experiment_already_executed_count": 10,
+  "duplicate_same_cycle_representative_count": 22,
+  "duplicate_experiment_already_executed": [
+    {
+      "decision_index": 5,
+      "opportunity_id": "local:ea37630b08516f35",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 5,
+      "opportunity_id": "local:ea37630b08516f35",
+      "source": "LOCAL",
+      "action_id": "ea37630b08516f35",
+      "frontier_id": "",
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "duplicate_of_experiment_id": "exp-a45e70395b69",
+      "duplicate_representative_id": "",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 6,
+      "opportunity_id": "local:ea37630b08516f35",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 6,
+      "opportunity_id": "local:ea37630b08516f35",
+      "source": "LOCAL",
+      "action_id": "ea37630b08516f35",
+      "frontier_id": "",
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "duplicate_of_experiment_id": "exp-a45e70395b69",
+      "duplicate_representative_id": "",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 8,
+      "opportunity_id": "local:ea37630b08516f35",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 8,
+      "opportunity_id": "local:ea37630b08516f35",
+      "source": "LOCAL",
+      "action_id": "ea37630b08516f35",
+      "frontier_id": "",
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "duplicate_of_experiment_id": "exp-a45e70395b69",
+      "duplicate_representative_id": "",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 9,
+      "opportunity_id": "local:ea37630b08516f35",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 9,
+      "opportunity_id": "local:ea37630b08516f35",
+      "source": "LOCAL",
+      "action_id": "ea37630b08516f35",
+      "frontier_id": "",
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "duplicate_of_experiment_id": "exp-a45e70395b69",
+      "duplicate_representative_id": "",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 11,
+      "opportunity_id": "local:ea37630b08516f35",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    },
+    {
+      "decision_index": 11,
+      "opportunity_id": "local:ea37630b08516f35",
+      "source": "LOCAL",
+      "action_id": "ea37630b08516f35",
+      "frontier_id": "",
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "duplicate_of_experiment_id": "exp-a45e70395b69",
+      "duplicate_representative_id": "",
+      "reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    }
+  ],
+  "duplicate_same_cycle_representative": [
+    {
+      "decision_index": 2,
+      "opportunity_id": "local:e8415614d364331f",
+      "reason": "duplicate_same_cycle_representative:479d97f4cc3b4986be21e902f796d86bf326e09089417ae6d39cfa7812cf9022:kept=frontier:frontier-00001"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "local:288ef208675e4c25",
+      "reason": "duplicate_same_cycle_representative:4599dd14e5db142746bfccc782f8258fd731ce814f7329b148794712f4669e20:kept=frontier:frontier-00002"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "local:0fbabdc2926b2f1b",
+      "reason": "duplicate_same_cycle_representative:13301e6a93b432fdbf829d27bb5a15e9834832cfcb0404244f447a382c8a46b2:kept=frontier:frontier-00003"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00004",
+      "reason": "duplicate_same_cycle_representative:de70e67ddcb70647a9fa44d7a4a61ecdc6f1610d9f32d3b4cb4ff0ff88437e59:kept=local:ee012fa331168e78"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00005",
+      "reason": "duplicate_same_cycle_representative:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44:kept=local:ea37630b08516f35"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00014",
+      "reason": "duplicate_same_cycle_representative:3272df8461f295e5eb205692937f1512dff0f9392ea3137940032a4f2e0e106a:kept=local:a5e6a03dd8497469"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00015",
+      "reason": "duplicate_same_cycle_representative:0ad373a07dec3f62a5701a37d88786d90e304d7621c027bd67b59d7233adc104:kept=local:1cd8543301912be7"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00016",
+      "reason": "duplicate_same_cycle_representative:543f853810700a450ee6a85ebf79679267e2fb5bd1a6639c65768d663489efaa:kept=local:b122f5c882fdf389"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00017",
+      "reason": "duplicate_same_cycle_representative:0292be77c73432ec35fac7ec882975ed10524ed6fb27b8bb6fef5ed82e5ed47b:kept=local:5001c4d3def13df5"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00018",
+      "reason": "duplicate_same_cycle_representative:6a900a328abdd1d28405cd1689977116d5e04bf623cda42f45982e41a6bc0bf5:kept=local:7257d42aeca9be34"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "local:e8415614d364331f",
+      "source": "LOCAL",
+      "action_id": "e8415614d364331f",
+      "frontier_id": "",
+      "experiment_content_hash": "479d97f4cc3b4986be21e902f796d86bf326e09089417ae6d39cfa7812cf9022",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "frontier:frontier-00001",
+      "reason": "duplicate_same_cycle_representative:479d97f4cc3b4986be21e902f796d86bf326e09089417ae6d39cfa7812cf9022:kept=frontier:frontier-00001"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "local:288ef208675e4c25",
+      "source": "LOCAL",
+      "action_id": "288ef208675e4c25",
+      "frontier_id": "",
+      "experiment_content_hash": "4599dd14e5db142746bfccc782f8258fd731ce814f7329b148794712f4669e20",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "frontier:frontier-00002",
+      "reason": "duplicate_same_cycle_representative:4599dd14e5db142746bfccc782f8258fd731ce814f7329b148794712f4669e20:kept=frontier:frontier-00002"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "local:0fbabdc2926b2f1b",
+      "source": "LOCAL",
+      "action_id": "0fbabdc2926b2f1b",
+      "frontier_id": "",
+      "experiment_content_hash": "13301e6a93b432fdbf829d27bb5a15e9834832cfcb0404244f447a382c8a46b2",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "frontier:frontier-00003",
+      "reason": "duplicate_same_cycle_representative:13301e6a93b432fdbf829d27bb5a15e9834832cfcb0404244f447a382c8a46b2:kept=frontier:frontier-00003"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00004",
+      "source": "FRONTIER",
+      "action_id": "ee012fa331168e78",
+      "frontier_id": "frontier-00004",
+      "experiment_content_hash": "de70e67ddcb70647a9fa44d7a4a61ecdc6f1610d9f32d3b4cb4ff0ff88437e59",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:ee012fa331168e78",
+      "reason": "duplicate_same_cycle_representative:de70e67ddcb70647a9fa44d7a4a61ecdc6f1610d9f32d3b4cb4ff0ff88437e59:kept=local:ee012fa331168e78"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00005",
+      "source": "FRONTIER",
+      "action_id": "ea37630b08516f35",
+      "frontier_id": "frontier-00005",
+      "experiment_content_hash": "e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:ea37630b08516f35",
+      "reason": "duplicate_same_cycle_representative:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44:kept=local:ea37630b08516f35"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00014",
+      "source": "FRONTIER",
+      "action_id": "a5e6a03dd8497469",
+      "frontier_id": "frontier-00014",
+      "experiment_content_hash": "3272df8461f295e5eb205692937f1512dff0f9392ea3137940032a4f2e0e106a",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:a5e6a03dd8497469",
+      "reason": "duplicate_same_cycle_representative:3272df8461f295e5eb205692937f1512dff0f9392ea3137940032a4f2e0e106a:kept=local:a5e6a03dd8497469"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00015",
+      "source": "FRONTIER",
+      "action_id": "1cd8543301912be7",
+      "frontier_id": "frontier-00015",
+      "experiment_content_hash": "0ad373a07dec3f62a5701a37d88786d90e304d7621c027bd67b59d7233adc104",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:1cd8543301912be7",
+      "reason": "duplicate_same_cycle_representative:0ad373a07dec3f62a5701a37d88786d90e304d7621c027bd67b59d7233adc104:kept=local:1cd8543301912be7"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00016",
+      "source": "FRONTIER",
+      "action_id": "b122f5c882fdf389",
+      "frontier_id": "frontier-00016",
+      "experiment_content_hash": "543f853810700a450ee6a85ebf79679267e2fb5bd1a6639c65768d663489efaa",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:b122f5c882fdf389",
+      "reason": "duplicate_same_cycle_representative:543f853810700a450ee6a85ebf79679267e2fb5bd1a6639c65768d663489efaa:kept=local:b122f5c882fdf389"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00017",
+      "source": "FRONTIER",
+      "action_id": "5001c4d3def13df5",
+      "frontier_id": "frontier-00017",
+      "experiment_content_hash": "0292be77c73432ec35fac7ec882975ed10524ed6fb27b8bb6fef5ed82e5ed47b",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:5001c4d3def13df5",
+      "reason": "duplicate_same_cycle_representative:0292be77c73432ec35fac7ec882975ed10524ed6fb27b8bb6fef5ed82e5ed47b:kept=local:5001c4d3def13df5"
+    },
+    {
+      "decision_index": 2,
+      "opportunity_id": "frontier:frontier-00018",
+      "source": "FRONTIER",
+      "action_id": "7257d42aeca9be34",
+      "frontier_id": "frontier-00018",
+      "experiment_content_hash": "6a900a328abdd1d28405cd1689977116d5e04bf623cda42f45982e41a6bc0bf5",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "local:7257d42aeca9be34",
+      "reason": "duplicate_same_cycle_representative:6a900a328abdd1d28405cd1689977116d5e04bf623cda42f45982e41a6bc0bf5:kept=local:7257d42aeca9be34"
+    },
+    {
+      "decision_index": 6,
+      "opportunity_id": "local:deec807a33e59266",
+      "reason": "duplicate_same_cycle_representative:458d62ddf762ca232b5d712527a873a64df700a681baaf173a758dfd22ce4d6b:kept=frontier:frontier-00052"
+    },
+    {
+      "decision_index": 6,
+      "opportunity_id": "local:deec807a33e59266",
+      "source": "LOCAL",
+      "action_id": "deec807a33e59266",
+      "frontier_id": "",
+      "experiment_content_hash": "458d62ddf762ca232b5d712527a873a64df700a681baaf173a758dfd22ce4d6b",
+      "duplicate_of_experiment_id": "",
+      "duplicate_representative_id": "frontier:frontier-00052",
+      "reason": "duplicate_same_cycle_representative:458d62ddf762ca232b5d712527a873a64df700a681baaf173a758dfd22ce4d6b:kept=frontier:frontier-00052"
+    }
+  ],
+  "frontier_lifecycle_duplicates_marked": [
+    {
+      "frontier_id": "frontier-00005",
+      "action_id": "ea37630b08516f35",
+      "status": "DUPLICATE",
+      "invalid_reason": "duplicate_experiment_already_executed:e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44"
+    }
+  ],
+  "frontier_lifecycle_duplicate_count": 1,
+  "duplicate_experiment_error_at_spawn": [],
+  "spawn_duplicate_experiment_error_count": 0,
+  "session_experiments_executed": 12,
+  "session_experiments_used": 12,
+  "experiment_index_size": 12,
+  "interpretation": "Identity dedup runs before global ERV selection. Exclusions are auditable; they must not inflate globally_comparable_count or experiments_executed."
+}

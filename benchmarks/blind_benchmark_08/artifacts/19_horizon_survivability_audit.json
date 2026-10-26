@@ -1,0 +1,55 @@
+{
+  "HORIZON_ADVANCED_FRAME_SURVIVED_FOLLOW_ON": true,
+  "horizon_advanced_frames_audited": 1,
+  "frames": [
+    {
+      "frame_id": "frame-00007",
+      "parent_frame_id": "frame-00001",
+      "transformation_type": "OUTCOME_TO_POPULATION",
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 5,
+      "temporal_legal": true,
+      "first_experiment_executed": "exp-a45bc1bf3e69",
+      "follow_on_planning_attempted": true,
+      "grammar_candidates_generated": 1,
+      "adaptive_candidates_generated": 6,
+      "reframe_candidates_generated": 4,
+      "selected_follow_on_action": "FALSIFY_EXTREME",
+      "another_experiment_executed_afterward": false,
+      "frame_status_afterward": "SUPERSEDED",
+      "error": null,
+      "survived_follow_on": true,
+      "lineage_persisted_before_operations": true,
+      "lineage_sequence_order": 0
+    }
+  ],
+  "bb03_failure_path_tested": true,
+  "note": "TRUE requires follow-on planning inside horizon-advanced frame without BB03 GrammarValidationError crash \u2014 not merely spawning the child frame."
+}

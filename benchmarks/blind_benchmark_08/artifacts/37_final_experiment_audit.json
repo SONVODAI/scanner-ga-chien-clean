@@ -1,0 +1,96 @@
+{
+  "final_experiment_step": 12,
+  "final_experiment_node_id": "exp-50dc1b98089b",
+  "final_experiment_content_hash": "e841d7aee88ecc1dad029df9b2a238f84eb12a857724f203185619696eb0ead5",
+  "appears_in_research_graph": true,
+  "experiment_result_finalized": true,
+  "experiment_index_occurrences": 1,
+  "identity_ledger_unique": true,
+  "search_accounting_experiments_executed": 12,
+  "diary_entry_count": 1,
+  "global_diary_reference_count": 1,
+  "portfolio_metrics_present": true,
+  "frame_registry_present": true,
+  "no_post_final_selected_opportunities": true,
+  "post_final_selected_frontier_ids": [],
+  "terminal_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "remaining_budget": 0,
+    "unexplored_frontier_count": 37,
+    "features_touched": 3,
+    "eligible_features": 8,
+    "terminal_status": "BUDGET_EXHAUSTED",
+    "experiment_budget": 12,
+    "experiments_executed": 12,
+    "final_experiment_id": "exp-50dc1b98089b",
+    "unresolved_promising_deferred_count": 1
+  },
+  "remaining_opportunities_at_exhaustion": {
+    "unexplored_frontier_count": 37,
+    "unexplored_frontier_sample": [
+      {
+        "frontier_id": "frontier-00006",
+        "action_code": "REFRAME_OUTCOME",
+        "status": "UNEXPLORED",
+        "planner_score": 8.7
+      },
+      {
+        "frontier_id": "frontier-00007",
+        "action_code": "REFRAME_OUTCOME",
+        "status": "UNEXPLORED",
+        "planner_score": 8.7
+      },
+      {
+        "frontier_id": "frontier-00020",
+        "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00002",
+        "status": "UNEXPLORED",
+        "planner_score": 8.2
+      },
+      {
+        "frontier_id": "frontier-00009",
+        "action_code": "REFRAME_OUTCOME",
+        "status": "UNEXPLORED",
+        "planner_score": 8.175
+      },
+      {
+        "frontier_id": "frontier-00010",
+        "action_code": "REFRAME_OUTCOME",
+        "status": "UNEXPLORED",
+        "planner_score": 8.175
+      },
+      {
+        "frontier_id": "frontier-00026",
+        "action_code": "HORIZON_ADVANCE_frame-00009",
+        "status": "UNEXPLORED",
+        "planner_score": 8.15
+      },
+      {
+        "frontier_id": "frontier-00023",
+        "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00005",
+        "status": "UNEXPLORED",
+        "planner_score": 7.675
+      },
+      {
+        "frontier_id": "frontier-00008",
+        "action_code": "REFRAME_OUTCOME",
+        "status": "UNEXPLORED",
+        "planner_score": 7.125
+      },
+      {
+        "frontier_id": "frontier-00028",
+        "action_code": "REFRAME_OUTCOME",
+        "status": "UNEXPLORED",
+        "planner_score": 4.0875
+      },
+      {
+        "frontier_id": "frontier-00025",
+        "action_code": "REFRAME_HORIZON_ADVANCE_frame-00008",
+        "status": "UNEXPLORED",
+        "planner_score": 3.7
+      }
+    ],
+    "deferred_promising_branch_count": 1,
+    "stop_reason_deferred_count": 1
+  }
+}

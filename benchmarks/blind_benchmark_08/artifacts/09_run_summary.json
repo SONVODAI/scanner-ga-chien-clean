@@ -1,0 +1,203 @@
+{
+  "benchmark_id": "blind_benchmark_08",
+  "completed_at": "2026-08-21T13:44:08Z",
+  "session_id": "bb08-autonomous-001",
+  "session_status": "BUDGET_EXHAUSTED",
+  "session_stop_reason": {
+    "code": "BUDGET_EXHAUSTED",
+    "detail": "Experiment budget exhausted",
+    "remaining_budget": 0,
+    "unexplored_frontier_count": 37,
+    "features_touched": 3,
+    "eligible_features": 8,
+    "terminal_status": "BUDGET_EXHAUSTED",
+    "experiment_budget": 12,
+    "experiments_executed": 12,
+    "final_experiment_id": "exp-50dc1b98089b",
+    "unresolved_promising_deferred_count": 1
+  },
+  "experiments_used": 12,
+  "step_count": 12,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "artifact_dir": "benchmarks/blind_benchmark_08/artifacts",
+  "research_capability_score": 79,
+  "reframing_capability_score": 15,
+  "reframe_survivability_score": 8,
+  "HORIZON_ADVANCED_FRAME_SURVIVED_FOLLOW_ON": true,
+  "capability_gates": {
+    "gate_A_exploration": "PASS",
+    "gate_B_reframing": "PASS",
+    "gate_C_reframe_survivability": "PASS",
+    "gate_D_evidence_driven_transition": "PASS",
+    "gate_E_temporal_legality": "PASS",
+    "gate_F_audit_durability": "PASS",
+    "gate_G_scientific_discipline": "PASS",
+    "gate_H_discovery": "PASS"
+  },
+  "portfolio_session_metrics": {
+    "experiments_executed": 12,
+    "unique_frames_executed": 4,
+    "unique_explanatory_dimensions": 3,
+    "unique_outcomes_executed": 5,
+    "unique_populations_executed": 2,
+    "unique_horizons_executed": 2,
+    "max_same_frame_depth": 4,
+    "independent_branch_count": 1,
+    "revisit_count": 2,
+    "successful_branch_returns": 2,
+    "redundant_experiment_count": 1,
+    "dominated_opportunities_skipped": 0,
+    "high_value_unexplored_at_end": 12,
+    "exploration_debt_at_end": 6.25,
+    "candidate_yield": 0,
+    "anti_edge_yield": 0,
+    "falsification_yield": 1,
+    "mean_marginal_information_gain": 0.7166666666666667,
+    "median_marginal_information_gain": 1.0,
+    "research_value_consumed_per_experiment": 0.7166666666666667,
+    "unresolved_research_value_at_termination": 2.0,
+    "viable_frontier_size": 37,
+    "high_value_opportunities": 12,
+    "stale_opportunities": 31
+  },
+  "portfolio_capability_gates": {
+    "gate_A_budget_exhausted": "PASS",
+    "gate_B_portfolio_decisions_audited": "PASS",
+    "gate_C_opportunity_cost_stored": "PASS",
+    "gate_D_marginal_gain_tracking": "PASS",
+    "gate_E_temporal_legality": "PASS",
+    "gate_F_no_runtime_failure": "PASS",
+    "gate_G_revisit_tracking_active": "PASS",
+    "gate_H_discovery_optional": "PASS",
+    "gate_I_frontier_quality_measured": "PASS",
+    "gate_J_unresolved_value_at_termination": "PASS"
+  },
+  "allocation_comparison_note": {
+    "primary_question": "Did BB05 allocate scarce experiments better than BB04?",
+    "breadth_alone_is_not_success": true,
+    "bb04_limitation_observed": "BB04 executed 12 experiments but touched only 1/8 eligible features; 41 frontier items remained unexplored; allocation was not portfolio-aware.",
+    "bb05_portfolio_awareness": true,
+    "bb05_has_opportunity_cost_audit": true,
+    "comparison_basis": "architectural_allocation_quality_not_human_edge",
+    "no_bb04_relationship_encoding": true
+  },
+  "global_allocation_metrics": {
+    "global_context_switch_count": 3,
+    "frontier_interrupts_viable_local": 1,
+    "strong_local_beats_frontier_count": 8,
+    "negative_local_with_positive_global_alternative": 0,
+    "genuine_revisit_count": 2,
+    "selection_source_counts": {
+      "LOCAL": 8,
+      "FRONTIER": 1,
+      "REVISIT": 2
+    },
+    "unresolved_high_value_count": 12
+  },
+  "experiment_identity_dedup_audit": {
+    "already_executed_exclusions": 10,
+    "same_cycle_exclusions": 22,
+    "spawn_duplicate_experiment_error_count": 0
+  },
+  "lifecycle_repair_verdict": {
+    "bb07_post_budget_error_eliminated": true,
+    "bb08_completed_12_experiments": true,
+    "bb08_budget_exhausted_status": true,
+    "bb08_no_research_graph_error": true,
+    "causal_narrow_conclusion": "REPAIR_CONFIRMED"
+  },
+  "bb08_lifecycle_gates": {
+    "gate_A_twelve_experiments_executed": "PASS",
+    "gate_B_budget_exhausted_terminal_status": "PASS",
+    "gate_C_no_research_graph_error": "PASS",
+    "gate_D_final_experiment_persisted_once": "PASS",
+    "gate_E_no_post_final_selected_opportunities": "PASS",
+    "gate_F_research_semantics_parity_bb07": "FAIL",
+    "gate_G_lifecycle_repair_confirmed": "PASS"
+  },
+  "bb07_bb08_decision_parity": {
+    "research_semantics_unchanged": false,
+    "note": "Decision count may differ by one if BB08 skips post-final-experiment planning; experiment steps 1\u201312 must match if lifecycle refactor did not alter research behavior."
+  },
+  "final_experiment_audit": {
+    "final_experiment_node_id": "exp-50dc1b98089b",
+    "identity_ledger_unique": true,
+    "no_post_final_selected_opportunities": true,
+    "remaining_opportunities": {
+      "unexplored_frontier_count": 37,
+      "unexplored_frontier_sample": [
+        {
+          "frontier_id": "frontier-00006",
+          "action_code": "REFRAME_OUTCOME",
+          "status": "UNEXPLORED",
+          "planner_score": 8.7
+        },
+        {
+          "frontier_id": "frontier-00007",
+          "action_code": "REFRAME_OUTCOME",
+          "status": "UNEXPLORED",
+          "planner_score": 8.7
+        },
+        {
+          "frontier_id": "frontier-00020",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00002",
+          "status": "UNEXPLORED",
+          "planner_score": 8.2
+        },
+        {
+          "frontier_id": "frontier-00009",
+          "action_code": "REFRAME_OUTCOME",
+          "status": "UNEXPLORED",
+          "planner_score": 8.175
+        },
+        {
+          "frontier_id": "frontier-00010",
+          "action_code": "REFRAME_OUTCOME",
+          "status": "UNEXPLORED",
+          "planner_score": 8.175
+        },
+        {
+          "frontier_id": "frontier-00026",
+          "action_code": "HORIZON_ADVANCE_frame-00009",
+          "status": "UNEXPLORED",
+          "planner_score": 8.15
+        },
+        {
+          "frontier_id": "frontier-00023",
+          "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00005",
+          "status": "UNEXPLORED",
+          "planner_score": 7.675
+        },
+        {
+          "frontier_id": "frontier-00008",
+          "action_code": "REFRAME_OUTCOME",
+          "status": "UNEXPLORED",
+          "planner_score": 7.125
+        },
+        {
+          "frontier_id": "frontier-00028",
+          "action_code": "REFRAME_OUTCOME",
+          "status": "UNEXPLORED",
+          "planner_score": 4.0875
+        },
+        {
+          "frontier_id": "frontier-00025",
+          "action_code": "REFRAME_HORIZON_ADVANCE_frame-00008",
+          "status": "UNEXPLORED",
+          "planner_score": 3.7
+        }
+      ],
+      "deferred_promising_branch_count": 1,
+      "stop_reason_deferred_count": 1
+    }
+  },
+  "global_allocator_capability_gates": {
+    "gate_A_global_decisions_audited": true,
+    "gate_B_source_and_erv_recorded": true,
+    "gate_C_no_forced_diversity": true,
+    "gate_D_strong_local_can_win": true,
+    "gate_E_limitation_diagnostics_documented": true,
+    "gate_F_no_spawn_duplicate_experiment_error": true,
+    "gate_G_identity_dedup_audited": true
+  }
+}
