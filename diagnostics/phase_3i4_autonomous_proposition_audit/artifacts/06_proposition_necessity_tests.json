@@ -1,0 +1,29 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "would_generate_without_spread_trigger": false,
+    "would_generate_without_monotonicity_trigger": false,
+    "reason": "Frozen surprise requires spread>=1.5 OR mono_break+spread*0.5; all three records triggered via monotonicity_break+spread path",
+    "evidence_driven": true,
+    "automatic_on_any_trigger": true,
+    "classification": "EVIDENCE_DRIVEN_BUT_MECHANICAL"
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "would_generate_without_spread_trigger": false,
+    "would_generate_without_monotonicity_trigger": false,
+    "reason": "Frozen surprise requires spread>=1.5 OR mono_break+spread*0.5; all three records triggered via monotonicity_break+spread path",
+    "evidence_driven": true,
+    "automatic_on_any_trigger": true,
+    "classification": "EVIDENCE_DRIVEN_BUT_MECHANICAL"
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "would_generate_without_spread_trigger": false,
+    "would_generate_without_monotonicity_trigger": false,
+    "reason": "Frozen surprise requires spread>=1.5 OR mono_break+spread*0.5; all three records triggered via monotonicity_break+spread path",
+    "evidence_driven": true,
+    "automatic_on_any_trigger": true,
+    "classification": "EVIDENCE_DRIVEN_BUT_MECHANICAL"
+  }
+]

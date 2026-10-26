@@ -1,0 +1,14 @@
+{
+  "classification": "GENERIC_CHECKLIST_PLUS_EVIDENCE_UNCOVERED",
+  "components": {
+    "generic_checklist": "PARTITION_UNCERTAINTY_AXES includes population_robustness for partition_contrast type",
+    "evidence_uncovered": "No ledger entry has uncertainty_axis_tested=population_robustness",
+    "evidence_motivation": "E2 independence profile population_independence=LOW (cohort_overlap_ratio=0.977)",
+    "proposition_commitment": "Full-universe partition contrast \u2014 population variation not yet isolated"
+  },
+  "prior_equivalent_population_test": false,
+  "removing_population_gap_would_remove_objective": true,
+  "materially_template_injected": false,
+  "materially_generic_checklist_only": false,
+  "note": "Axis exists in type taxonomy AND remains uncovered by evidence \u2014 mixed derivation"
+}

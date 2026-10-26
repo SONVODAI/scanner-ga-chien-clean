@@ -1,0 +1,52 @@
+{
+  "version": "semantic_novelty_valuation_matrix_v1",
+  "inputs": [
+    "research_line_relationship_classification",
+    "freshness_classification",
+    "representation_novelty_only",
+    "scientific_novelty",
+    "evidence_novelty"
+  ],
+  "classes": {
+    "REPRESENTATION_NOVELTY_ONLY": {
+      "conditions": [
+        "relationship in IDENTICAL | NEAR_DUPLICATE | SAME_QUESTION_DIFFERENT_INSTRUMENT",
+        "NOT evidence_novelty"
+      ],
+      "novelty_component_multiplier": 0.0,
+      "note": "Zero reward, not a penalty"
+    },
+    "EVIDENCE_NOVELTY": {
+      "conditions": [
+        "evidence_novelty true (FRESH_NEW_EVIDENCE | FRESH_NEW_HORIZON | FRESH_NEW_POPULATION | FRESH_NEW_OUTCOME | FRESH_NEW_CONTEXT)"
+      ],
+      "novelty_component_multiplier": 1.0,
+      "note": "Preserve raw planner-derived novelty contribution"
+    },
+    "SCIENTIFIC_NOVELTY": {
+      "conditions": [
+        "relationship in GENUINELY_INDEPENDENT | RELATED_BUT_DISTINCT | SAME_UNCERTAINTY_DIFFERENT_SLICE"
+      ],
+      "novelty_component_multiplier": 1.0,
+      "note": "Preserve existing novelty valuation"
+    },
+    "INSUFFICIENT_EVIDENCE": {
+      "conditions": [
+        "relationship INSUFFICIENT_EVIDENCE OR missing candidate identity OR empty registry with no auditable line"
+      ],
+      "novelty_component_multiplier": 1.0,
+      "note": "Fail closed — no gating"
+    },
+    "LEGACY_NO_SEMANTIC_CONTEXT": {
+      "conditions": [
+        "novelty gating disabled OR identity derivation returned None"
+      ],
+      "novelty_component_multiplier": 1.0,
+      "note": "Backward-compatible deterministic behavior"
+    }
+  },
+  "precedence": [
+    "EVIDENCE_NOVELTY overrides REPRESENTATION_NOVELTY_ONLY",
+    "INSUFFICIENT_EVIDENCE and LEGACY never gate below raw without positive representation proof"
+  ]
+}

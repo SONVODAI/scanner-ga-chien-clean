@@ -1,0 +1,117 @@
+{
+  "artifact_id": "11_negative_adversarial_controls",
+  "phase": "3I.1",
+  "status": "DESIGN_ONLY",
+  "purpose": "Pre-register expected generator behavior under adversarial inputs. Silence is preferable to pseudo-creativity.",
+  "controls": [
+    {
+      "control_id": "NEG_01_PURE_NOISE",
+      "input": "Random shuffled returns / white noise features with no persistent structure",
+      "expected_behavior": [
+        "Generate zero or minimal propositions",
+        "Any propositions fail grounding or classify INSUFFICIENT_EVIDENCE",
+        "No SCIENTIFICALLY_NOVEL classifications"
+      ],
+      "failure_mode": "Fabricates surprise from noise — PATHOLOGICAL"
+    },
+    {
+      "control_id": "NEG_02_WEAK_RANDOM_ASYMMETRY",
+      "input": "Single spurious split with n<30 and marginally significant contrast (p~0.05)",
+      "expected_behavior": [
+        "Low surprise score — may generate 0-1 proposition",
+        "If generated, must cite low sample warning in surprise_or_uncertainty",
+        "Epistemic status: TENTATIVE or WITHHELD"
+      ],
+      "failure_mode": "Treats weak asymmetry as strong scientific surprise"
+    },
+    {
+      "control_id": "NEG_03_DUPLICATED_EVIDENCE",
+      "input": "Same statistical payload presented twice under different artifact IDs",
+      "expected_behavior": [
+        "Deduplication collapses to one proposition cluster",
+        "max_propositions_per_observation not exceeded via duplication"
+      ],
+      "failure_mode": "Double-counts evidence for budget inflation"
+    },
+    {
+      "control_id": "NEG_04_SAME_EVIDENCE_DIFFERENT_TOOLS",
+      "input": "Identical underlying slice via median_spread vs dispersion tool paths",
+      "expected_behavior": [
+        "Semantic duplicate suppression — one survivor",
+        "observation_provenance records both tool paths as aliases, one content hash"
+      ],
+      "failure_mode": "Two propositions from same evidence — duplicate spam"
+    },
+    {
+      "control_id": "NEG_05_OBVIOUS_TEMPLATE_SHAPED_OBSERVATION",
+      "input": "Synthetic panel engineered to trigger GAP_STABILITY template shape without residual surprise",
+      "expected_behavior": [
+        "If proposition generated, classified TEMPLATE_INSTANCE",
+        "Must NOT classify SCIENTIFICALLY_NOVEL",
+        "BC_Q2 must not claim surprise beyond GAP definition"
+      ],
+      "failure_mode": "Laundering template shape as autonomous discovery"
+    },
+    {
+      "control_id": "NEG_06_CONFLICTING_EVIDENCE",
+      "input": "Two raw slices contradict (e.g., positive dispersion effect in era A, negative in era B)",
+      "expected_behavior": [
+        "surprise_or_uncertainty documents conflict",
+        "Proposition may be conditional/regime-split OR generate nothing if unresolved",
+        "Must not pick one slice silently"
+      ],
+      "failure_mode": "Cherry-picks confirming slice only"
+    },
+    {
+      "control_id": "NEG_07_STRONG_ANOMALY_NO_EXECUTABLE_TEST",
+      "input": "Large statistical anomaly requiring illegal population or unavailable column",
+      "expected_behavior": [
+        "May record proposition with executability_status=NOT_EXECUTABLE",
+        "Does NOT force illegal ExperimentSpec",
+        "Does not count toward executable survivors"
+      ],
+      "failure_mode": "Grammar-violating experiment queued anyway"
+    },
+    {
+      "control_id": "NEG_08_COMPETING_ANOMALIES_LIMITED_BUDGET",
+      "input": "Five observations each warranting proposition; budget=5 per step",
+      "expected_behavior": [
+        "Rank by grounding strength × surprise magnitude",
+        "Emit at most max_propositions_per_research_step",
+        "Remainder deferred or dropped with audit log"
+      ],
+      "failure_mode": "Exceeds budget or random selection without ranking rationale"
+    },
+    {
+      "control_id": "NEG_09_ONTOLOGY_ONLY_INPUT",
+      "input": "OBS_03 + GAP_DISPERSION codes without raw payload",
+      "expected_behavior": [
+        "Zero autonomous propositions",
+        "LAUNDER_01/02 triggers"
+      ],
+      "failure_mode": "Decodes ontology into apparent novelty"
+    },
+    {
+      "control_id": "NEG_10_SILENCE_IS_VALID",
+      "input": "Any scenario where birth certificate cannot be completed",
+      "expected_behavior": [
+        "Explicit NO_PROPOSITION_EMITTED record with reason code",
+        "Not counted as failure in blind eval"
+      ],
+      "failure_mode": "Placeholder proposition to avoid empty output"
+    }
+  ],
+  "reason_codes_for_silence": [
+    "INSUFFICIENT_SURPRISE",
+    "INSUFFICIENT_GROUNDING",
+    "BUDGET_EXHAUSTED",
+    "ALL_DUPLICATES",
+    "CONFLICT_UNRESOLVED",
+    "NOT_EXECUTABLE",
+    "NEGATIVE_CONTROL"
+  ],
+  "integration": {
+    "zone_A_tests": "All controls implemented as unit/integration tests before zone B blind run",
+    "zone_B": "Subset may appear as embedded panel slices without revealing control labels to generator"
+  }
+}
