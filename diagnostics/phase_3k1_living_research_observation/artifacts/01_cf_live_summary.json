@@ -1,0 +1,134 @@
+{
+  "CF-LIVE1": {
+    "passed": true,
+    "description": "Same assessment rerun \u2192 idempotent",
+    "keys": [
+      "dc7962049de677c0ff3cf24d91054fbeb9668fbe49432215985e48a62b45b143"
+    ]
+  },
+  "CF-LIVE2": {
+    "passed": true,
+    "description": "Market delta recorded; belief may remain unchanged",
+    "change_flags": [
+      "MARKET_CHANGED"
+    ],
+    "market_delta_keys": [
+      "breadth:UNKNOWN",
+      "cohort_relative:changed"
+    ],
+    "epistemic_changed": false
+  },
+  "CF-LIVE3": {
+    "passed": true,
+    "description": "Assessment schema supports new_evidence_since_prior field",
+    "has_evidence_field": true
+  },
+  "CF-LIVE4": {
+    "passed": true,
+    "description": "T5 supplied before eligible date \u2192 reject",
+    "reason": "early_outcome_rejected:T5:eligible_after_bday_offset"
+  },
+  "CF-LIVE5": {
+    "passed": true,
+    "description": "T3 contradicts birth \u2192 contradiction recorded; no auto REJECTED",
+    "interpretation": {
+      "horizon": "T3",
+      "outcome_record_id": "out-cf5-test",
+      "evaluation_status": "EVALUATED",
+      "cohort_mean_return": -5.0,
+      "supports_birth_expectation": null,
+      "contradicts_birth_expectation": null,
+      "suggested_lifecycle_signal": "FORWARD_EVIDENCE_AMBIGUOUS",
+      "automatic_belief_change": false,
+      "rationale_keys": [
+        "return:ambiguous_relative_to_birth_direction",
+        "birth_epistemic:UNRESOLVED"
+      ]
+    }
+  },
+  "CF-LIVE6": {
+    "passed": true,
+    "description": "T3 supports birth \u2192 evidence recorded; no auto CONFIRMED",
+    "interpretation": {
+      "horizon": "T3",
+      "outcome_record_id": "out-cf6-test",
+      "evaluation_status": "EVALUATED",
+      "cohort_mean_return": 5.0,
+      "supports_birth_expectation": null,
+      "contradicts_birth_expectation": null,
+      "suggested_lifecycle_signal": "FORWARD_EVIDENCE_AMBIGUOUS",
+      "automatic_belief_change": false,
+      "rationale_keys": [
+        "return:ambiguous_relative_to_birth_direction",
+        "birth_epistemic:UNRESOLVED"
+      ]
+    }
+  },
+  "CF-LIVE7": {
+    "passed": true,
+    "description": "BirthRecord rewrite \u2192 reject"
+  },
+  "CF-LIVE8": {
+    "passed": true,
+    "description": "Prior assessment immutable \u2014 stored epistemic state unchanged after mutation attempt"
+  },
+  "CF-LIVE9": {
+    "passed": true,
+    "description": "Stale-presentation audit correctly reflects stale_copy_risk flag",
+    "audit": {
+      "passed": false,
+      "stale_copy_risk": true,
+      "market_changed": true,
+      "belief_unchanged": true,
+      "has_temporal_explanation": true
+    },
+    "stale_copy_risk": true
+  },
+  "CF-LIVE10": {
+    "passed": true,
+    "description": "Artificial belief change rejected",
+    "reason": "artificial_belief_change_rejected:no_relevant_evidence"
+  },
+  "CF-LIVE11": {
+    "passed": true,
+    "description": "Narrator cannot upgrade scientific state"
+  },
+  "CF-LIVE12": {
+    "passed": true,
+    "description": "NO_DISCOVERY day \u2192 DailyResearchSummary exists",
+    "summary_id": "dysum-b28fbcaea7f66bf2"
+  },
+  "CF-LIVE13": {
+    "passed": true,
+    "description": "Multiple observations preserved; no forced Top Stock",
+    "reassessed_count": 3
+  },
+  "CF-LIVE14": {
+    "passed": true,
+    "description": "Trading write blocked",
+    "audit": {
+      "passed": true,
+      "import_hits": [],
+      "write_hits": [],
+      "modules_audited": [
+        "production_research_observation.py",
+        "production_observation_records.py",
+        "production_observation_cutoff.py",
+        "production_observation_persistence.py",
+        "production_observation_narrative.py",
+        "production_observation_isolation.py",
+        "production_living_observation_records.py",
+        "production_living_observation_persistence.py",
+        "production_market_delta.py",
+        "production_forward_outcome_evaluator.py",
+        "production_observation_lifecycle.py",
+        "production_daily_assessment.py",
+        "production_daily_voice.py",
+        "production_living_read_model.py",
+        "production_living_research_observation.py"
+      ]
+    }
+  },
+  "all_passed": true,
+  "benchmark_version": "bb_living_research_observation_01_v1_3k1"
+}

@@ -1,0 +1,45 @@
+{
+  "all_passed": true,
+  "results": [
+    {
+      "test": "tests/test_edge_research_opr_phase_3k5.py",
+      "passed": true,
+      "output": "............                                                             [100%]\n12 passed in 230.83s (0:03:50)\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k4.py::test_ui_read_model_fixtures",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 3.58s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k3.py::test_cf_cal_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 1.39s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k2.py::test_cf_run_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 1.79s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k1.py::test_cf_live_counterfactuals",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 1.51s\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3k0.py",
+      "passed": true,
+      "output": "..........                                                               [100%]\n10 passed in 201.12s (0:03:21)\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j14a.py",
+      "passed": true,
+      "output": ".............                                                            [100%]\n13 passed in 193.41s (0:03:13)\n"
+    },
+    {
+      "test": "tests/test_edge_research_opr_phase_3j10.py::test_cf_arl1_arl12_pass",
+      "passed": true,
+      "output": ".                                                                        [100%]\n1 passed in 3.61s\n"
+    }
+  ]
+}

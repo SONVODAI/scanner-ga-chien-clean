@@ -287,6 +287,7 @@ RESEARCH_OBSERVATION_COLUMNS: Tuple[str, ...] = (
     "rs10",
     "rsi14",
     "rs_spread",
+    "rsi_slope",
     # Forward labels ONLY (trading-session semantics)
     "t3_return",
     "t5_return",

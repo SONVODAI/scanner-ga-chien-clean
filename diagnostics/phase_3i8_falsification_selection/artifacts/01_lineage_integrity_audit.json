@@ -1,0 +1,17 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash_stored": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "proposition_hash_recomputed": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "proposition_hash_match": true,
+  "lineage_proposition_hash_match": true,
+  "epistemic_update_id": "epu-5a7bec6e47ec",
+  "decision_id": "dec-c92fb28fdc13",
+  "decision_cites_update": true,
+  "chosen_next_action": "SEEK_FALSIFICATION",
+  "resulting_epistemic_state": "SUPPORTED",
+  "evidence_class": "SUPPORTING",
+  "lineage_immutable_flag": true,
+  "lineage_hash_present": true,
+  "verdict_3i7": "LIFECYCLE_PASS",
+  "artifacts_preserved": true
+}

@@ -1,0 +1,12 @@
+{
+  "branch": "cursor/phase-3j11-blind-autonomous-research-exam-aad2",
+  "head": "836368bc5f0e337872b5d4ba0a1d127740e94991",
+  "phase": "3J.11",
+  "stop_boundary": "STOP_BLIND_EXAMINATION_COMPLETE",
+  "exam_integrity_pass": true,
+  "scientific_behavior_pass": true,
+  "regressions_pass": true,
+  "phase_pass": true,
+  "case_count": 12,
+  "critical_false_positives": 0
+}

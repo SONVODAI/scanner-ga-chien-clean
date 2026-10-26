@@ -1,0 +1,313 @@
+{
+  "proposition_id": "prop-efb650d9bd5c451f",
+  "proposition_hash": "c3aab7de80fdb9e56b7be68d517ec0e4792b711ec9772638143df3cfe4e39c9b",
+  "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+  "focal_date": "2026-08-02",
+  "falsifiable_expectation": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_group_compare.",
+  "disconfirming_observation_spec": {
+    "description": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+    "operational_test": "partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0",
+    "threshold": "median_spread <= 0 or group rank reversal",
+    "alternative_interpretation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
+  },
+  "experiment_spec_draft": {
+    "tool_name": "partition_group_compare",
+    "tool_version": "v1",
+    "inputs": {
+      "partition_column": "rs_spread",
+      "n_groups": 5
+    },
+    "research_scope": {
+      "population_spec": {
+        "kind": "all",
+        "grammar_version": "research_grammar_v1"
+      },
+      "outcome_spec": {
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0,
+        "grammar_version": "research_grammar_v1"
+      },
+      "observation_horizon": 0,
+      "pending_question_context": {
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0
+      }
+    },
+    "data_cutoff_date": "2026-08-17"
+  },
+  "data_cutoff": "2026-08-17",
+  "full_record": {
+    "proposition_id": "prop-efb650d9bd5c451f",
+    "record_version": "proposition_record_v1",
+    "created_at": "2026-08-22T02:12:55.721115+00:00",
+    "research_step": 0,
+    "generator_version": "opr_generator_v1_3i2",
+    "observation_provenance": {
+      "evidence_anchor": {
+        "experiment_node_id": "opr_evidence_ingest",
+        "tool_name": "opr_dispersion_evidence",
+        "tool_version": "opr_generator_v1_3i2",
+        "data_cutoff_date": "2026-08-17",
+        "focal_date": "2026-08-02"
+      },
+      "empirical_artifacts": [
+        {
+          "name": "cross_sectional_dispersion",
+          "value": 4.518012974708727,
+          "date": "2026-08-02"
+        },
+        {
+          "name": "cross_sectional_n",
+          "value": 142,
+          "date": "2026-08-02"
+        },
+        {
+          "name": "quintile_return_spread",
+          "value": 6.402072074074837,
+          "date": "2026-08-02"
+        },
+        {
+          "name": "monotonicity_score",
+          "value": 0.0,
+          "date": "2026-08-02"
+        },
+        {
+          "name": "quintile_0_mean_t5_return",
+          "value": 1.3449737918885432,
+          "n": 29
+        },
+        {
+          "name": "quintile_1_mean_t5_return",
+          "value": 3.287514626891895,
+          "n": 28
+        },
+        {
+          "name": "quintile_2_mean_t5_return",
+          "value": 3.3590968233515164,
+          "n": 28
+        },
+        {
+          "name": "quintile_3_mean_t5_return",
+          "value": 2.5910055643407017,
+          "n": 28
+        },
+        {
+          "name": "quintile_4_mean_t5_return",
+          "value": 7.74704586596338,
+          "n": 29
+        }
+      ],
+      "structural_context": {
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0,
+        "feature_slice": "rs_spread",
+        "focal_date": "2026-08-02"
+      },
+      "surprise_basis": "Quintile spread of t5_return across rs_spread tiers is 6.4021 (threshold=1.5). Quintile outcome means break monotonicity: [1.345, 3.2875, 3.3591, 2.591, 7.747].",
+      "evidence_hash": "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a",
+      "obs_codes_index": [],
+      "gap_codes_index": []
+    },
+    "motivating_observation": "On 2026-08-02, cross-sectional rs_spread std=4.5180 across 142 symbols; quintile t5_return spread=6.4021.",
+    "surprise_or_uncertainty": "Quintile spread of t5_return across rs_spread tiers is 6.4021 (threshold=1.5). Quintile outcome means break monotonicity: [1.345, 3.2875, 3.3591, 2.591, 7.747].",
+    "scientific_question": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?",
+    "canonical_proposition_core": {
+      "version": "research_proposition_core_v1",
+      "population_spec": {
+        "kind": "all",
+        "grammar_version": "research_grammar_v1"
+      },
+      "outcome_spec": {
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0,
+        "grammar_version": "research_grammar_v1"
+      },
+      "observation_horizon": 0,
+      "uncertainty_family": "CROSS_SECTIONAL_DISPERSION",
+      "conditioning_context": {
+        "dispersion_feature": "rs_spread",
+        "focal_date": "2026-08-02",
+        "contrast_direction": "positive"
+      },
+      "research_needs": [],
+      "completeness": "COMPLETE",
+      "enrichment_sources": [
+        "opr_contrast_to_proposition"
+      ],
+      "scientific_question_key": "q-CROSS_SECTIONAL_DISP-0-4922a6da1cdee946-462ee4176d03f0bd-8faaa86be63b8d6b-_"
+    },
+    "population_context": {
+      "kind": "all",
+      "grammar_version": "research_grammar_v1"
+    },
+    "explanatory_relation": {
+      "feature_or_contrast": "rs_spread",
+      "relation_type": "modulates",
+      "comparison_groups": [
+        {
+          "label": "low_dispersion_quintile",
+          "quintile": 0,
+          "n": 29
+        },
+        {
+          "label": "high_dispersion_quintile",
+          "quintile": 4,
+          "n": 29
+        }
+      ],
+      "contrast_direction": "positive",
+      "empirical_delta": 6.402072074074837
+    },
+    "outcome": {
+      "kind": "compare",
+      "field": "t5_return",
+      "operator": ">",
+      "value": 0.0,
+      "grammar_version": "research_grammar_v1"
+    },
+    "observation_horizon": 0,
+    "falsifiable_expectation": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_group_compare.",
+    "null_competing_explanation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02.",
+    "disconfirming_observation_spec": {
+      "description": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile",
+      "operational_test": "partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0",
+      "threshold": "median_spread <= 0 or group rank reversal",
+      "alternative_interpretation": "The t5_return differential across rs_spread quintiles is a small-sample artifact or confounded by market-wide level effects on 2026-08-02."
+    },
+    "evidence_required": "Partition-group compare experiment partitioning by rs_spread with outcome t5_return at horizon 0d, cohort n>=58.",
+    "execution_requirements": {
+      "required_tool_capabilities": [
+        "partition_group_compare"
+      ],
+      "min_sample": 58,
+      "legal_grammar_refs": [
+        "research_grammar_v1",
+        "research_frame_v1"
+      ],
+      "partition_column": "rs_spread"
+    },
+    "epistemic_status": "HYPOTHESIS",
+    "confidence": "LOW",
+    "semantic_parent_id": null,
+    "generation_lineage": [
+      "opr_evidence_ingest",
+      "d2dd4a149ed1cf78594c035c0ec4b5f997c87f62c912b8512522e595e049003a"
+    ],
+    "birth_certificate": {
+      "answers": [
+        {
+          "question_id": "BC_Q1",
+          "passed": true,
+          "answer": "On 2026-08-02, cross-sectional rs_spread std=4.5180 across 142 symbols; quintile t5_return spread=6.4021."
+        },
+        {
+          "question_id": "BC_Q2",
+          "passed": true,
+          "answer": "Quintile spread of t5_return across rs_spread tiers is 6.4021 (threshold=1.5). Quintile outcome means break monotonicity: [1.345, 3.2875, 3.3591, 2.591, 7.747]."
+        },
+        {
+          "question_id": "BC_Q3",
+          "passed": true,
+          "answer": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section?"
+        },
+        {
+          "question_id": "BC_Q4",
+          "passed": true,
+          "answer": "Does cross-sectional rs_spread dispersion tier predict differential forward t5_return across the market cross-section? Population=all; relation=modulates; outcome=t5_return; horizon=0."
+        },
+        {
+          "question_id": "BC_Q5",
+          "passed": true,
+          "answer": "High-rs_spread quintile mean t5_return (7.7470) exceeds low-rs_spread quintile (1.3450) by at least 3.2010 on partition_group_compare."
+        },
+        {
+          "question_id": "BC_Q6",
+          "passed": true,
+          "answer": "If high-rs_spread names do not outperform low-rs_spread names on forward t5_return when partitioned by rs_spread quintile (partition_group_compare median_spread of t5_return across rs_spread quintiles <= 0)"
+        },
+        {
+          "question_id": "BC_Q7",
+          "passed": true,
+          "answer": "Proposition derived from empirical quintile contrast on focal date, not from template catalog lookup."
+        },
+        {
+          "question_id": "BC_Q8",
+          "passed": true,
+          "answer": "partition_group_compare on rs_spread with outcome t5_return."
+        }
+      ],
+      "all_passed": true
+    },
+    "template_independence_audit": {
+      "classification": "SCIENTIFICALLY_NOVEL",
+      "structural_match_score": 0.7000000000000001,
+      "semantic_similarity": 0.029411764705882353,
+      "best_template_match": "ADAPTIVE_PARTITION",
+      "new_observational_axis_documented": true,
+      "rationale": "Scientific uncertainty not mapped to catalog (sem=0.03)"
+    },
+    "leakage_audit": null,
+    "executability_status": "EXECUTABLE",
+    "experiment_spec_draft": {
+      "tool_name": "partition_group_compare",
+      "tool_version": "v1",
+      "inputs": {
+        "partition_column": "rs_spread",
+        "n_groups": 5
+      },
+      "research_scope": {
+        "population_spec": {
+          "kind": "all",
+          "grammar_version": "research_grammar_v1"
+        },
+        "outcome_spec": {
+          "kind": "compare",
+          "field": "t5_return",
+          "operator": ">",
+          "value": 0.0,
+          "grammar_version": "research_grammar_v1"
+        },
+        "observation_horizon": 0,
+        "pending_question_context": {
+          "population_spec": {
+            "kind": "all",
+            "grammar_version": "research_grammar_v1"
+          },
+          "outcome_spec": {
+            "kind": "compare",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0,
+            "grammar_version": "research_grammar_v1"
+          },
+          "observation_horizon": 0
+        }
+      },
+      "data_cutoff_date": "2026-08-17"
+    }
+  }
+}
