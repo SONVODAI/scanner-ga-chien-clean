@@ -1,0 +1,19 @@
+{
+  "package_exists": true,
+  "package_hash_matches": true,
+  "package_hash_recomputed": true,
+  "execution_status_not_executed": true,
+  "proposition_id_matches": true,
+  "proposition_hash_matches": true,
+  "prior_lineage_hash_matches": true,
+  "interpretation_contract_hash_matches": true,
+  "selected_candidate_id_matches": true,
+  "selected_candidate_hash_matches": true,
+  "experiment_spec_hash_matches": true,
+  "candidate_spec_matches_package": true,
+  "generator_version_matches": true,
+  "selector_version_matches": true,
+  "prior_epistemic_state_supported": true,
+  "passed": true,
+  "failures": []
+}
