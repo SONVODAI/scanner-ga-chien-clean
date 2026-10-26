@@ -1,0 +1,42 @@
+{
+  "artifact_id": "02_evidence_semantics",
+  "phase": "3I.6",
+  "status": "DESIGN_ONLY",
+  "evidence_classes": {
+    "SUPPORTING_EVIDENCE": {
+      "definition": "Experiment or observation outcome aligns with falsifiable_expectation within declared tolerance",
+      "effect_on_belief": "May move PROPOSED/WEAKENED → SUPPORTED; may strengthen ordinal balance",
+      "requires": ["proposition_id", "experiment_node_id", "comparison_to_falsifiable_expectation", "quality_tier"]
+    },
+    "DISCONFIRMING_EVIDENCE": {
+      "definition": "Outcome crosses disconfirming_observation_spec threshold or favors null_competing_explanation",
+      "effect_on_belief": "May move → WEAKENED or FALSIFIED depending on severity",
+      "requires": ["explicit threshold comparison", "operational_test result"]
+    },
+    "CONTRADICTORY_EVIDENCE": {
+      "definition": "Two or more valid evidence events of comparable quality point in opposing directions",
+      "effect_on_belief": "→ CONFLICTED; increases priority for falsification-seeking",
+      "note": "Distinct from single disconfirming event — both sides may be valid"
+    },
+    "NON_INFORMATIVE_EVIDENCE": {
+      "definition": "Experiment executed correctly but does not meaningfully resolve the uncertainty",
+      "examples": ["insufficient variation", "underpowered sample", "flat quintile ordering within noise band"],
+      "effect_on_belief": "→ UNRESOLVED or no change; must NOT count as support"
+    },
+    "INVALID_EVIDENCE": {
+      "definition": "Leakage, execution failure, insufficient sample, grammar violation, or invalid comparison",
+      "effect_on_belief": "Excluded from belief update; logged with exclusion reason",
+      "must_not": "Trigger SUPPORT or WEAKEN transitions"
+    }
+  },
+  "classification_inputs": {
+    "from_proposition": ["falsifiable_expectation", "disconfirming_observation_spec", "null_competing_explanation"],
+    "from_experiment": ["ToolResult.metrics", "ToolResult.status", "experiment_node_id", "content_hash"],
+    "from_pre_emission_lineage": ["EvidenceEvent.role from 3I.5 — SUPPORT/CONTRADICT/NEUTRAL"]
+  },
+  "forbidden_collapses": [
+    "NON_INFORMATIVE → SUPPORT because experiment ran",
+    "INVALID → DISCONFIRMING without quality gate",
+    "p-value alone without proposition-specific threshold"
+  ]
+}
