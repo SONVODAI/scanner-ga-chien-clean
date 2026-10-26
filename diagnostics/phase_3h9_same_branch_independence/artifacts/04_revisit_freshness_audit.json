@@ -1,0 +1,111 @@
+{
+  "revisits": [
+    {
+      "benchmark": "BB11",
+      "decision_index": 7,
+      "action_id": "49022f03695315b8",
+      "erv": 1.1443541666666666,
+      "historical_planner_score": 7.675,
+      "current_revalued": 1.1443541666666666,
+      "revisit_audit": {
+        "branch_originally_left_at_experiment": "exp-114b014042cd",
+        "reason_left": "DEFERRED_PROMISING",
+        "erv_when_reconsidered": 1.1443541666666666,
+        "reason_revisited": "GLOBAL_HIGHEST_ERV",
+        "revisit_count": 0
+      },
+      "experiments_since_defer": 6,
+      "realized_gains_since_defer": [
+        "ZERO",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "freshness_classification": "FRESH_EVIDENCE_REVISIT",
+      "branch_before": "obs-4692b6a8949d",
+      "frame_before": "frame-00006"
+    },
+    {
+      "benchmark": "BB11",
+      "decision_index": 10,
+      "action_id": "9f863f39276d3025",
+      "erv": 0.30918750000000017,
+      "historical_planner_score": 6.625,
+      "current_revalued": 0.30918750000000017,
+      "revisit_audit": {
+        "branch_originally_left_at_experiment": "exp-114b014042cd",
+        "reason_left": "DEFERRED_PROMISING",
+        "erv_when_reconsidered": 0.30918750000000017,
+        "reason_revisited": "GLOBAL_HIGHEST_ERV",
+        "revisit_count": 1
+      },
+      "experiments_since_defer": 9,
+      "realized_gains_since_defer": [
+        "ZERO",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH",
+        "ZERO",
+        "MEDIUM",
+        "MEDIUM"
+      ],
+      "freshness_classification": "FRESH_EVIDENCE_REVISIT",
+      "branch_before": "obs-4692b6a8949d",
+      "frame_before": "frame-00004"
+    },
+    {
+      "benchmark": "BB10",
+      "decision_index": 7,
+      "action_id": "984f7b9a3a54527e",
+      "erv": 1.1443541666666666,
+      "historical_planner_score": 8.2,
+      "current_revalued": 1.1443541666666666,
+      "revisit_audit": {
+        "branch_originally_left_at_experiment": "exp-1b163c2078b0",
+        "reason_left": "DEFERRED_PROMISING",
+        "erv_when_reconsidered": 1.1443541666666666,
+        "reason_revisited": "GLOBAL_HIGHEST_ERV",
+        "revisit_count": 0
+      },
+      "experiments_since_defer": 6,
+      "realized_gains_since_defer": [],
+      "freshness_classification": "STALE_REVISIT",
+      "branch_before": "obs-b08a47b141fd",
+      "frame_before": "frame-00002"
+    },
+    {
+      "benchmark": "BB10",
+      "decision_index": 11,
+      "action_id": "9f863f39276d3025",
+      "erv": -1.6114999999999993,
+      "historical_planner_score": 6.625,
+      "current_revalued": -1.6114999999999993,
+      "revisit_audit": {
+        "branch_originally_left_at_experiment": "exp-1b163c2078b0",
+        "reason_left": "DEFERRED_PROMISING",
+        "erv_when_reconsidered": -1.6114999999999993,
+        "reason_revisited": "GLOBAL_HIGHEST_ERV",
+        "revisit_count": 1
+      },
+      "experiments_since_defer": 10,
+      "realized_gains_since_defer": [],
+      "freshness_classification": "STALE_REVISIT",
+      "branch_before": "obs-b08a47b141fd",
+      "frame_before": "frame-00004"
+    }
+  ],
+  "freshness_labels": [
+    "FRESH_EVIDENCE_REVISIT",
+    "NEW_HORIZON_REVISIT",
+    "NEW_POPULATION_REVISIT",
+    "NEW_OUTCOME_REVISIT",
+    "REVALUED_ONLY",
+    "SAME_EVIDENCE_REVISIT",
+    "STALE_REVISIT",
+    "INCONCLUSIVE"
+  ]
+}

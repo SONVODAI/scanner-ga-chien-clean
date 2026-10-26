@@ -1,0 +1,17 @@
+{
+  "Q1_structural_branch_roots": 1,
+  "Q2_semantic_branches_explored": 6,
+  "Q3_frontier_revisit_independent": "NO \u2014 all FRONTIER/REVISIT share structural branch obs-4692b6a8949d (BB11); semantic overlap predominant",
+  "Q4_genuinely_fresh_revisits": 2,
+  "Q5_stale_revisits": 2,
+  "Q6_tool_changes_false_novelty": "YES \u2014 horizon_comparison repeated across reframes with ZERO gain; novelty_component still positive in ERV",
+  "Q7_reframe_new_science": "PARTIAL \u2014 t3_return and continuation outcome reframes are representational; rs_spread partition is distinct slice",
+  "Q8_decay_transfers_semantic_equivalents": "NO \u2014 decay keyed to branch_root_id; tool/slice changes within same root do not reset marginal state",
+  "Q9_semantic_duplication_caused_cycling": "YES for T8/T9; PARTIAL for T4 (positive ERV masked overlap)",
+  "Q10_independent_alternatives_during_cycling": "Effectively none \u2014 0 genuinely independent high-value alternatives at T8/T9",
+  "Q11_stop_correct_missing_option": "T8/T9: STOP would have been defensible but exit did not compete (DIMINISHING); T11 STOP eventually won",
+  "Q12_primary_bottleneck": "S1 + S3 \u2014 scientific identity not represented; marginal decay does not transfer across semantic equivalents",
+  "Q13_secondary_bottleneck": "S8 \u2014 representation novelty (frame/outcome reframe, tool change) misvalued as information novelty in ERV",
+  "Q14_next_treatment_target": "Semantic research-line identity + decay transfer at scientific-question level (NOT branch_root_id alone)",
+  "Q15_must_not_change": "3H.8 exit valuation, STOP logic, 3H.6 IV, planner weights, ERV formulas, allocator ranking, dedup, budget lifecycle"
+}

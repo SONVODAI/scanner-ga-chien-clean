@@ -1,0 +1,137 @@
+{
+  "entries": [
+    {
+      "experiment": "exp-114b014042cd",
+      "step": 1,
+      "tool": "horizon_comparison",
+      "semantic_branch": "sem-HORIZON-87cd763312c99212",
+      "marginal_state": "INSUFFICIENT_EVIDENCE",
+      "prior_marginal_state": null,
+      "realized_gain": "LOW",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": null,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-7dfd2e32bd8a",
+      "step": 2,
+      "tool": "horizon_comparison",
+      "semantic_branch": "sem-HORIZON-aa905b2dadac9686",
+      "marginal_state": "INSUFFICIENT_EVIDENCE",
+      "prior_marginal_state": "INSUFFICIENT_EVIDENCE",
+      "realized_gain": "ZERO",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-dac5fe0878ee",
+      "step": 3,
+      "tool": "sensitivity_analysis",
+      "semantic_branch": "sem-HORIZON-7001d054a1ad35e8",
+      "marginal_state": "DIMINISHING",
+      "prior_marginal_state": "INSUFFICIENT_EVIDENCE",
+      "realized_gain": "HIGH",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-a4cc06bf2c24",
+      "step": 4,
+      "tool": "horizon_comparison",
+      "semantic_branch": "sem-HORIZON-c662974bb85668fd",
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "prior_marginal_state": "DIMINISHING",
+      "realized_gain": "ZERO",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-89220f993c0b",
+      "step": 5,
+      "tool": "adaptive_partition_compare",
+      "semantic_branch": "sem-HORIZON-7001d054a1ad35e8",
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "prior_marginal_state": "LOW_MARGINAL_VALUE",
+      "realized_gain": "MEDIUM",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-0c6fe91fa88a",
+      "step": 6,
+      "tool": "threshold_exploration",
+      "semantic_branch": "sem-HORIZON-7001d054a1ad35e8",
+      "marginal_state": "DIMINISHING",
+      "prior_marginal_state": "LOW_MARGINAL_VALUE",
+      "realized_gain": "MEDIUM",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": true,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-81c61e51baf7",
+      "step": 7,
+      "tool": "symbol_decomposition",
+      "semantic_branch": "sem-HORIZON-7001d054a1ad35e8",
+      "marginal_state": "PRODUCTIVE",
+      "prior_marginal_state": "DIMINISHING",
+      "realized_gain": "HIGH",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": true,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-ae7f34cac835",
+      "step": 8,
+      "tool": "horizon_comparison",
+      "semantic_branch": "sem-HORIZON-4ec5fd572bfd9cd5",
+      "marginal_state": "DIMINISHING",
+      "prior_marginal_state": "PRODUCTIVE",
+      "realized_gain": "ZERO",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-26a7fee4b696",
+      "step": 9,
+      "tool": "adaptive_partition_compare",
+      "semantic_branch": "sem-HORIZON-7001d054a1ad35e8",
+      "marginal_state": "DIMINISHING",
+      "prior_marginal_state": "DIMINISHING",
+      "realized_gain": "MEDIUM",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-e3011e694cac",
+      "step": 10,
+      "tool": "threshold_exploration",
+      "semantic_branch": "sem-HORIZON-7001d054a1ad35e8",
+      "marginal_state": "DIMINISHING",
+      "prior_marginal_state": "DIMINISHING",
+      "realized_gain": "MEDIUM",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": true,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    },
+    {
+      "experiment": "exp-7b6aee39ee66",
+      "step": 11,
+      "tool": "horizon_comparison",
+      "semantic_branch": "sem-HORIZON-1c94327b79200308",
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "prior_marginal_state": "DIMINISHING",
+      "realized_gain": "ZERO",
+      "decay_follows_structural_branch": true,
+      "decay_follows_semantic_branch": false,
+      "transfer_note": "Marginal state keyed to structural branch_root_id only; semantic branch changes do not reset decay"
+    }
+  ],
+  "finding": "Decay follows structural branch_root_id, not semantic branch identity"
+}

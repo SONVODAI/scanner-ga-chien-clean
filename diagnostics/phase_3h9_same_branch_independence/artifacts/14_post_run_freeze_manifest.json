@@ -1,0 +1,29 @@
+{
+  "phase": "phase_3h9_same_branch_independence",
+  "diagnosis_only": true,
+  "frozen_3h8_commit": "5c62fc334",
+  "frozen_bb11_commit": "84d689b0d",
+  "diagnosis_commit": "84d689b0d",
+  "bb11_not_rerun": true,
+  "bb12_not_run": true,
+  "research_behavior_modified": false,
+  "created_at": "2026-08-21T16:11:48Z",
+  "completed_at": "2026-08-21T16:11:48Z",
+  "artifact_index": [
+    "00_freeze_manifest.json",
+    "01_structural_branch_audit.json",
+    "02_semantic_branch_reconstruction.json",
+    "03_scientific_opportunity_relationships.json",
+    "04_revisit_freshness_audit.json",
+    "05_frontier_independence_audit.json",
+    "06_mechanical_cycling_forensics.json",
+    "07_marginal_decay_transfer_audit.json",
+    "08_independence_first_loss.json",
+    "09_counterfactual_semantic_grouping.json",
+    "10_t4_t8_t9_forensics.json",
+    "11_required_questions.json",
+    "12_bottleneck_taxonomy.json",
+    "13_final_diagnosis.json",
+    "DIAGNOSIS_SUMMARY.md"
+  ]
+}

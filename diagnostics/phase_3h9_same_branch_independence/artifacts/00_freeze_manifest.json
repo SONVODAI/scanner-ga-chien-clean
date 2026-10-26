@@ -1,0 +1,11 @@
+{
+  "phase": "phase_3h9_same_branch_independence",
+  "diagnosis_only": true,
+  "frozen_3h8_commit": "5c62fc334",
+  "frozen_bb11_commit": "84d689b0d",
+  "diagnosis_commit": "84d689b0d",
+  "bb11_not_rerun": true,
+  "bb12_not_run": true,
+  "research_behavior_modified": false,
+  "created_at": "2026-08-21T16:11:48Z"
+}

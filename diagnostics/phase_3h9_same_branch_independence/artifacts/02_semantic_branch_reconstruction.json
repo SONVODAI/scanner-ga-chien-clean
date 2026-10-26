@@ -1,0 +1,208 @@
+{
+  "semantic_branch_count": 6,
+  "clusters": [
+    {
+      "semantic_branch_id": "sem-HORIZON-87cd763312c99212",
+      "structural_branch_root_ids": [
+        "obs-4692b6a8949d"
+      ],
+      "member_experiments": [
+        "exp-114b014042cd"
+      ],
+      "frames": [],
+      "tools_used": [
+        "horizon_comparison"
+      ],
+      "shared_uncertainty_families": [
+        "HORIZON_STABILITY"
+      ],
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 0,
+      "experiment_count": 1
+    },
+    {
+      "semantic_branch_id": "sem-HORIZON-aa905b2dadac9686",
+      "structural_branch_root_ids": [
+        "obs-4692b6a8949d"
+      ],
+      "member_experiments": [
+        "exp-7dfd2e32bd8a"
+      ],
+      "frames": [
+        "frame-00007"
+      ],
+      "tools_used": [
+        "horizon_comparison"
+      ],
+      "shared_uncertainty_families": [
+        "HORIZON_STABILITY"
+      ],
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 5,
+      "experiment_count": 1
+    },
+    {
+      "semantic_branch_id": "sem-HORIZON-7001d054a1ad35e8",
+      "structural_branch_root_ids": [
+        "obs-4692b6a8949d"
+      ],
+      "member_experiments": [
+        "exp-dac5fe0878ee",
+        "exp-89220f993c0b",
+        "exp-0c6fe91fa88a",
+        "exp-81c61e51baf7",
+        "exp-26a7fee4b696",
+        "exp-e3011e694cac"
+      ],
+      "frames": [],
+      "tools_used": [
+        "adaptive_partition_compare",
+        "sensitivity_analysis",
+        "symbol_decomposition",
+        "threshold_exploration"
+      ],
+      "shared_uncertainty_families": [
+        "HORIZON_STABILITY"
+      ],
+      "population_spec": {},
+      "outcome_spec": {},
+      "observation_horizon": 0,
+      "experiment_count": 6
+    },
+    {
+      "semantic_branch_id": "sem-HORIZON-c662974bb85668fd",
+      "structural_branch_root_ids": [
+        "obs-4692b6a8949d"
+      ],
+      "member_experiments": [
+        "exp-a4cc06bf2c24"
+      ],
+      "frames": [
+        "frame-00003"
+      ],
+      "tools_used": [
+        "horizon_comparison"
+      ],
+      "shared_uncertainty_families": [
+        "HORIZON_STABILITY"
+      ],
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t3_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "observation_horizon": 0,
+      "experiment_count": 1
+    },
+    {
+      "semantic_branch_id": "sem-HORIZON-4ec5fd572bfd9cd5",
+      "structural_branch_root_ids": [
+        "obs-4692b6a8949d"
+      ],
+      "member_experiments": [
+        "exp-ae7f34cac835"
+      ],
+      "frames": [
+        "frame-00006"
+      ],
+      "tools_used": [
+        "horizon_comparison"
+      ],
+      "shared_uncertainty_families": [
+        "HORIZON_STABILITY"
+      ],
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "continuation",
+        "operator": ">",
+        "threshold": 0.0,
+        "early_horizon": "T5",
+        "late_horizon": "T10"
+      },
+      "observation_horizon": 0,
+      "experiment_count": 1
+    },
+    {
+      "semantic_branch_id": "sem-HORIZON-1c94327b79200308",
+      "structural_branch_root_ids": [
+        "obs-4692b6a8949d"
+      ],
+      "member_experiments": [
+        "exp-7b6aee39ee66"
+      ],
+      "frames": [
+        "frame-00004"
+      ],
+      "tools_used": [
+        "horizon_comparison"
+      ],
+      "shared_uncertainty_families": [
+        "HORIZON_STABILITY"
+      ],
+      "population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "all"
+      },
+      "outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "persist",
+        "field": "t5_return",
+        "operator": ">",
+        "horizons": [
+          "T5",
+          "T10"
+        ],
+        "threshold": 0.0
+      },
+      "observation_horizon": 0,
+      "experiment_count": 1
+    }
+  ]
+}

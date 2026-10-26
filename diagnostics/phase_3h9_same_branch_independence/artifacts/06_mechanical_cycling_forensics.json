@@ -1,0 +1,362 @@
+{
+  "transitions_audited": [
+    4,
+    8,
+    9
+  ],
+  "forensics": [
+    {
+      "transition": 4,
+      "bb11_original_classification": "MECHANICAL_CYCLING",
+      "triggering_experiment": "exp-a4cc06bf2c24",
+      "resulting_experiment": "exp-89220f993c0b",
+      "structural_branch": "obs-4692b6a8949d",
+      "semantic_branch_current": "sem-HORIZON-c662974bb85668fd",
+      "semantic_branch_selected": "sem--7001d054a1ad35e8",
+      "marginal_state": "LOW_MARGINAL_VALUE",
+      "selected_source": "LOCAL",
+      "selected_tool": "adaptive_partition_compare",
+      "selected_erv": 5.49,
+      "selected_relationship_to_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "alternative_count": 9,
+      "near_duplicate_alternatives": 0,
+      "independent_alternatives": 0,
+      "top_alternatives": [
+        {
+          "action_id": "a5e6a03dd8497469",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 5.49,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "b122f5c882fdf389",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 5.49,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "5001c4d3def13df5",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 5.49,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "7257d42aeca9be34",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 5.49,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "9f863f39276d3025",
+          "source": "FRONTIER",
+          "tool_name": "",
+          "erv": 0.9733333333333335,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        }
+      ],
+      "realized_gain_after": "MEDIUM",
+      "cycling_classification": "SAME_QUESTION_DIFFERENT_TOOL",
+      "causal_hypotheses": [
+        "C9",
+        "C7"
+      ],
+      "scientifically_defensible": false
+    },
+    {
+      "transition": 8,
+      "bb11_original_classification": "MECHANICAL_CYCLING",
+      "triggering_experiment": "exp-ae7f34cac835",
+      "resulting_experiment": "exp-26a7fee4b696",
+      "structural_branch": "obs-4692b6a8949d",
+      "semantic_branch_current": "sem-HORIZON-4ec5fd572bfd9cd5",
+      "semantic_branch_selected": "sem--7001d054a1ad35e8",
+      "marginal_state": "DIMINISHING",
+      "selected_source": "LOCAL",
+      "selected_tool": "adaptive_partition_compare",
+      "selected_erv": -1.0996249999999994,
+      "selected_relationship_to_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "alternative_count": 9,
+      "near_duplicate_alternatives": 0,
+      "independent_alternatives": 0,
+      "top_alternatives": [
+        {
+          "action_id": "a5e6a03dd8497469",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": -1.0996249999999994,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "b122f5c882fdf389",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": -1.0996249999999994,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "7257d42aeca9be34",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": -1.0996249999999994,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "e8415614d364331f",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": -1.5271249999999996,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "ee012fa331168e78",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": -2.9521249999999997,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        }
+      ],
+      "realized_gain_after": "MEDIUM",
+      "cycling_classification": "SAME_QUESTION_DIFFERENT_TOOL",
+      "causal_hypotheses": [
+        "C9",
+        "C7"
+      ],
+      "scientifically_defensible": false
+    },
+    {
+      "transition": 9,
+      "bb11_original_classification": "MECHANICAL_CYCLING",
+      "triggering_experiment": "exp-26a7fee4b696",
+      "resulting_experiment": "exp-e3011e694cac",
+      "structural_branch": "obs-4692b6a8949d",
+      "semantic_branch_current": "sem-HORIZON-7001d054a1ad35e8",
+      "semantic_branch_selected": "sem--7001d054a1ad35e8",
+      "marginal_state": "DIMINISHING",
+      "selected_source": "LOCAL",
+      "selected_tool": "threshold_exploration",
+      "selected_erv": 5.7789375,
+      "selected_relationship_to_line": "INSUFFICIENT_EVIDENCE",
+      "relationship_components": {
+        "same_uncertainty": false,
+        "same_outcome": false,
+        "same_population": false,
+        "same_horizon": true,
+        "same_branch_root": true,
+        "same_tool": false,
+        "same_semantic_key": false
+      },
+      "alternative_count": 9,
+      "near_duplicate_alternatives": 0,
+      "independent_alternatives": 0,
+      "top_alternatives": [
+        {
+          "action_id": "e8415614d364331f",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 3.7814375000000005,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "deec807a33e59266",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 3.3564375,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "ee012fa331168e78",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 2.5064375,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "0fbabdc2926b2f1b",
+          "source": "LOCAL",
+          "tool_name": "",
+          "erv": 1.6564375000000002,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        },
+        {
+          "action_id": "9f863f39276d3025",
+          "source": "FRONTIER",
+          "tool_name": "",
+          "erv": -2.763562499999999,
+          "relationship": "INSUFFICIENT_EVIDENCE",
+          "components": {
+            "same_uncertainty": false,
+            "same_outcome": false,
+            "same_population": false,
+            "same_horizon": true,
+            "same_branch_root": true,
+            "same_tool": false,
+            "same_semantic_key": false
+          }
+        }
+      ],
+      "realized_gain_after": "MEDIUM",
+      "cycling_classification": "SAME_QUESTION_DIFFERENT_TOOL",
+      "causal_hypotheses": [
+        "C9",
+        "C7"
+      ],
+      "scientifically_defensible": false
+    }
+  ],
+  "cycling_labels": [
+    "TRUE_NEW_INFORMATION_ATTEMPT",
+    "SAME_QUESTION_DIFFERENT_TOOL",
+    "SAME_UNCERTAINTY_DIFFERENT_SLICE",
+    "REPRESENTATIONAL_SWITCH_ONLY",
+    "REDUNDANT_RESEARCH",
+    "INCONCLUSIVE"
+  ]
+}

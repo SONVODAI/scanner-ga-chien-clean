@@ -1,0 +1,7 @@
+{
+  "verdict": "PRIMARY: S1+S3 \u2014 scientific identity not represented; marginal decay not transferred across semantic equivalents",
+  "secondary": "S8 \u2014 representation novelty misvalued as information novelty",
+  "phase_3h8_status": "FUNCTIONAL AND FROZEN \u2014 exit STOP at T11 appropriate; does not resolve same-branch cycling",
+  "recommended_next_phase": "Semantic research-line identity representation + decay transfer (diagnosis-informed treatment)",
+  "must_not_change": "3H.8 exit valuation, STOP logic, 3H.6 IV, planner weights, ERV formulas, allocator ranking, dedup, budget lifecycle"
+}

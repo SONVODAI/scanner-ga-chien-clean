@@ -1,0 +1,7 @@
+{
+  "structural_branch_count": 1,
+  "structural_roots": [
+    "obs-4692b6a8949d"
+  ],
+  "bb11_note": "Single observation-root; all experiments share obs-4692b6a8949d"
+}
