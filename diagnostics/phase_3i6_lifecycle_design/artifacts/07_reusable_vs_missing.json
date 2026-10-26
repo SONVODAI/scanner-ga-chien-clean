@@ -1,0 +1,100 @@
+{
+  "reusable": [
+    {
+      "component": "PropositionRecord v1",
+      "location": "opr_bridge/proposition_record.py (3I branch)",
+      "reuse": "Birth record, falsification spec, epistemic enum at birth"
+    },
+    {
+      "component": "EvidenceLineage (3I.5)",
+      "location": "prioritized_pipeline.py",
+      "reuse": "Pre-emission append-only evidence aggregation"
+    },
+    {
+      "component": "ExperimentSpec + execute_research_experiment",
+      "location": "research_state.py, research_tools.py",
+      "reuse": "Run partition_group_compare and other bounded tools"
+    },
+    {
+      "component": "executability_adapter",
+      "location": "opr_bridge/executability_adapter.py",
+      "reuse": "PropositionRecord \u2192 ExperimentSpec syntax bridge"
+    },
+    {
+      "component": "ResearchGraph",
+      "location": "research_graph.py",
+      "reuse": "Append-only experiment nodes, lineage, ABANDON/RESOLVED"
+    },
+    {
+      "component": "ResearchAssessment",
+      "location": "research_assessment.py",
+      "reuse": "Branch-level interpretation \u2014 partial model for experiment reading"
+    },
+    {
+      "component": "scientific_identity / cores_same_question",
+      "location": "scientific_identity.py, research_proposition_core.py",
+      "reuse": "Fork detection, dedup, mutation vs rescue boundary"
+    },
+    {
+      "component": "3I.1 artifact 12",
+      "location": "12_evidence_responsive_lineage.json",
+      "reuse": "Transition vocabulary design precedent"
+    }
+  ],
+  "disconnected_or_template_bound": [
+    {
+      "component": "research_actions.generate_action_candidates",
+      "issue": "24+ frozen question templates + GAP code mapping \u2014 not proposition-scoped"
+    },
+    {
+      "component": "research_planner.plan_next_action",
+      "issue": "Fixed weights on template candidates \u2014 not evidence-class-driven"
+    },
+    {
+      "component": "challenger.run_challenger",
+      "issue": "Phase 2 candidates only; ignores disconfirming_observation_spec"
+    },
+    {
+      "component": "derive_scientific_status",
+      "issue": "Discovery pipeline enum \u2014 not PropositionRecord epistemic lifecycle"
+    },
+    {
+      "component": "ResearchAssessment.validated/actionable",
+      "issue": "Hard-coded False \u2014 never wired to belief update"
+    },
+    {
+      "component": "OPR \u2192 research_controller",
+      "issue": "No integration path; siloed pipelines"
+    }
+  ],
+  "missing": [
+    {
+      "capability": "PropositionExperimentInterpreter",
+      "description": "Compare ToolResult to falsifiable_expectation + disconfirming_observation_spec \u2192 evidence class"
+    },
+    {
+      "capability": "EpistemicUpdateRecord",
+      "description": "Append-only state transition with evidence refs"
+    },
+    {
+      "capability": "ResearchDecisionRecord",
+      "description": "Contract in artifact 04 \u2014 not implemented"
+    },
+    {
+      "capability": "LifecycleDecisionEngine",
+      "description": "Evidence \u2192 next action without template menu"
+    },
+    {
+      "capability": "Proposition-scoped graph join",
+      "description": "proposition_id on QUESTION/EXPERIMENT nodes"
+    },
+    {
+      "capability": "Post-emission evidence lineage",
+      "description": "Bridge 3I.5 pre-emission lineage to experiment results"
+    },
+    {
+      "capability": "FORK_NEW_EXPLANATION generator",
+      "description": "Design only \u2014 evidence-motivated fork with new birth certificate"
+    }
+  ]
+}
