@@ -1,0 +1,159 @@
+{
+  "intervention_labels": [
+    "BENEFICIAL_INTERVENTION",
+    "DEFENSIBLE_BUT_UNPROVEN",
+    "HARMFUL_INTERVENTION",
+    "INCONCLUSIVE"
+  ],
+  "interventions": [
+    {
+      "transition": 1,
+      "planning_sequence": 0,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "1546513c8254481f",
+      "post_3h8_action": "1546513c8254481f",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 16.83,
+      "branch_marginal_state": "INSUFFICIENT_EVIDENCE",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 2,
+      "planning_sequence": 1,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "ea37630b08516f35",
+      "post_3h8_action": "ea37630b08516f35",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 14.635625,
+      "branch_marginal_state": "INSUFFICIENT_EVIDENCE",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 3,
+      "planning_sequence": 2,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "380d6b066fba1184",
+      "post_3h8_action": "380d6b066fba1184",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 4.968750000000002,
+      "branch_marginal_state": "DIMINISHING",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 4,
+      "planning_sequence": 3,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "1cd8543301912be7",
+      "post_3h8_action": "1cd8543301912be7",
+      "exit_value": 3.325,
+      "best_experiment_erv": 5.49,
+      "branch_marginal_state": "LOW_MARGINAL_VALUE",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 5,
+      "planning_sequence": 4,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "d55dd7a6fd7ca2ca",
+      "post_3h8_action": "d55dd7a6fd7ca2ca",
+      "exit_value": 3.090625,
+      "best_experiment_erv": 12.19018675,
+      "branch_marginal_state": "LOW_MARGINAL_VALUE",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 6,
+      "planning_sequence": 5,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "288ef208675e4c25",
+      "post_3h8_action": "288ef208675e4c25",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 4.3616875,
+      "branch_marginal_state": "DIMINISHING",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 7,
+      "planning_sequence": 6,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "49022f03695315b8",
+      "post_3h8_action": "49022f03695315b8",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 1.1443541666666666,
+      "branch_marginal_state": "PRODUCTIVE",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 8,
+      "planning_sequence": 7,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "5001c4d3def13df5",
+      "post_3h8_action": "5001c4d3def13df5",
+      "exit_value": -Infinity,
+      "best_experiment_erv": -1.0996249999999994,
+      "branch_marginal_state": "DIMINISHING",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 9,
+      "planning_sequence": 8,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "1a803315d095e3c5",
+      "post_3h8_action": "1a803315d095e3c5",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 5.7789375,
+      "branch_marginal_state": "DIMINISHING",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 10,
+      "planning_sequence": 9,
+      "selection_changed_by_exit_valuation": false,
+      "would_pre_3h8_have_continued": true,
+      "stop_won": false,
+      "pre_3h8_action": "9f863f39276d3025",
+      "post_3h8_action": "9f863f39276d3025",
+      "exit_value": -Infinity,
+      "best_experiment_erv": 0.30918750000000017,
+      "branch_marginal_state": "DIMINISHING",
+      "intervention_classification": "INCONCLUSIVE"
+    },
+    {
+      "transition": 11,
+      "planning_sequence": 10,
+      "selection_changed_by_exit_valuation": true,
+      "would_pre_3h8_have_continued": false,
+      "stop_won": true,
+      "pre_3h8_action": "e8415614d364331f",
+      "post_3h8_action": "STOP_SESSION",
+      "exit_value": 2.04375,
+      "best_experiment_erv": -3.591499999999999,
+      "branch_marginal_state": "LOW_MARGINAL_VALUE",
+      "intervention_classification": "BENEFICIAL_INTERVENTION"
+    }
+  ],
+  "selection_changed_count": 1,
+  "intervention_class_counts": {
+    "BENEFICIAL_INTERVENTION": 1
+  },
+  "beneficial_count": 1,
+  "harmful_count": 0
+}
