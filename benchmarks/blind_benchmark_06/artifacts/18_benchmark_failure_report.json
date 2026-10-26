@@ -1,0 +1,33 @@
+{
+  "benchmark_id": "blind_benchmark_06",
+  "status": "PARTIAL_RUN_TERMINATED_BY_ERROR",
+  "failed_at": "2026-08-21T13:21:53Z",
+  "frozen_research_commit": "94bde8807",
+  "research_logic_modified": false,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "experiments_completed": 4,
+  "experiments_budget": 12,
+  "error": {
+    "code": "DOWNSTREAM_FAILURE",
+    "operation": "plan_after_experiment",
+    "error_type": "DuplicateExperimentError",
+    "error_message": "Duplicate experiment content_hash=e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44 already recorded at node exp-5f1e13ae9c7c",
+    "triggering_experiment_node_id": "exp-0f6d01eb1bb9",
+    "frame_id": "frame-00003"
+  },
+  "failure_context": {
+    "global_decision_index": 4,
+    "selected_source": "FRONTIER",
+    "selected_action_id": "ea37630b08516f35",
+    "selected_erv": 8.39,
+    "best_local_erv": 5.49,
+    "best_frontier_erv": 8.39,
+    "local_would_have_selected": "1cd8543301912be7",
+    "duplicate_of_node": "exp-5f1e13ae9c7c",
+    "interpretation": "Global allocator selected a frontier opportunity whose experiment spec duplicated an already-executed experiment (same action_id/content_hash as exp-5f1e13ae9c7c from decision 2 LOCAL selection). Apply_plan_decision attempted spawn and raised DuplicateExperimentError."
+  },
+  "partial_allocation_evidence_preserved": true,
+  "bb01_bb05_artifacts_unchanged": true,
+  "post_failure_research_logic_changes": false,
+  "bb06_comparability_note": "BB06 cannot be fairly compared to BB05 on full-session allocation quality because the session terminated at 4/12 experiments. Partial-decision evidence (4 global allocation audits) is preserved in artifact 28."
+}

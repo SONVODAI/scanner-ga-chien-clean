@@ -1,0 +1,85 @@
+{
+  "viable_frontier_size": 32,
+  "high_value_unexplored": 14,
+  "stale_opportunities": 0,
+  "dominated_on_frontier": 0,
+  "high_value_items": [
+    {
+      "frontier_id": "frontier-00006",
+      "action_code": "REFRAME_OUTCOME",
+      "planner_score": 8.7
+    },
+    {
+      "frontier_id": "frontier-00007",
+      "action_code": "REFRAME_OUTCOME",
+      "planner_score": 8.7
+    },
+    {
+      "frontier_id": "frontier-00008",
+      "action_code": "REFRAME_OUTCOME",
+      "planner_score": 7.125
+    },
+    {
+      "frontier_id": "frontier-00009",
+      "action_code": "REFRAME_OUTCOME",
+      "planner_score": 8.175
+    },
+    {
+      "frontier_id": "frontier-00010",
+      "action_code": "REFRAME_OUTCOME",
+      "planner_score": 8.175
+    },
+    {
+      "frontier_id": "frontier-00020",
+      "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00002",
+      "planner_score": 8.2
+    },
+    {
+      "frontier_id": "frontier-00022",
+      "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00004",
+      "planner_score": 6.625
+    },
+    {
+      "frontier_id": "frontier-00023",
+      "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00005",
+      "planner_score": 7.675
+    },
+    {
+      "frontier_id": "frontier-00024",
+      "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00006",
+      "planner_score": 7.675
+    },
+    {
+      "frontier_id": "frontier-00025",
+      "action_code": "REFRAME_HORIZON_ADVANCE_frame-00008",
+      "planner_score": 3.7
+    },
+    {
+      "frontier_id": "frontier-00026",
+      "action_code": "HORIZON_ADVANCE_frame-00009",
+      "planner_score": 8.15
+    },
+    {
+      "frontier_id": "frontier-00027",
+      "action_code": "HORIZON_ADVANCE_frame-00010",
+      "planner_score": 3.2
+    },
+    {
+      "frontier_id": "frontier-00028",
+      "action_code": "REFRAME_OUTCOME",
+      "planner_score": 4.0875
+    },
+    {
+      "frontier_id": "frontier-00030",
+      "action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00011",
+      "planner_score": 3.5875000000000004
+    }
+  ],
+  "status_counts": {
+    "DUPLICATE": 9,
+    "SELECTED": 1,
+    "UNEXPLORED": 32,
+    "INVALID": 8,
+    "EXECUTED": 1
+  }
+}

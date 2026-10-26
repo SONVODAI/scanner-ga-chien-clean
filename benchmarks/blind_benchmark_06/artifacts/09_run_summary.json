@@ -1,0 +1,102 @@
+{
+  "benchmark_id": "blind_benchmark_06",
+  "completed_at": "2026-08-21T13:21:53Z",
+  "session_id": "bb06-autonomous-001",
+  "session_status": "ERROR",
+  "run_status": "PARTIAL_RUN_TERMINATED_BY_ERROR",
+  "experiments_budget": 12,
+  "experiments_completed_of_budget": "4/12",
+  "session_stop_reason": {
+    "code": "DOWNSTREAM_FAILURE",
+    "operation": "plan_after_experiment",
+    "experiment_node_id": "exp-0f6d01eb1bb9",
+    "frame_id": "frame-00003",
+    "error_type": "DuplicateExperimentError",
+    "error_message": "Duplicate experiment content_hash=e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44 already recorded at node exp-5f1e13ae9c7c",
+    "experiment_executed": true
+  },
+  "experiments_used": 4,
+  "step_count": 4,
+  "dataset_fingerprint_sha256": "c4a6affaff536a12bf825dd08549a7fc4c0fee285a321ed5582eb1bfbab24ee5",
+  "artifact_dir": "benchmarks/blind_benchmark_06/artifacts",
+  "research_capability_score": 64,
+  "reframing_capability_score": 15,
+  "reframe_survivability_score": 8,
+  "HORIZON_ADVANCED_FRAME_SURVIVED_FOLLOW_ON": true,
+  "capability_gates": {
+    "gate_A_exploration": "FAIL",
+    "gate_B_reframing": "PASS",
+    "gate_C_reframe_survivability": "PASS",
+    "gate_D_evidence_driven_transition": "PASS",
+    "gate_E_temporal_legality": "PASS",
+    "gate_F_audit_durability": "PASS",
+    "gate_G_scientific_discipline": "PASS",
+    "gate_H_discovery": "PASS"
+  },
+  "portfolio_session_metrics": {
+    "experiments_executed": 4,
+    "unique_frames_executed": 2,
+    "unique_explanatory_dimensions": 0,
+    "unique_outcomes_executed": 3,
+    "unique_populations_executed": 2,
+    "unique_horizons_executed": 2,
+    "max_same_frame_depth": 3,
+    "independent_branch_count": 1,
+    "revisit_count": 0,
+    "successful_branch_returns": 0,
+    "redundant_experiment_count": 1,
+    "dominated_opportunities_skipped": 0,
+    "high_value_unexplored_at_end": 14,
+    "exploration_debt_at_end": 16.0,
+    "candidate_yield": 0,
+    "anti_edge_yield": 0,
+    "falsification_yield": 1,
+    "mean_marginal_information_gain": 0.4,
+    "median_marginal_information_gain": 0.5,
+    "research_value_consumed_per_experiment": 0.4,
+    "unresolved_research_value_at_termination": 1.0,
+    "viable_frontier_size": 32,
+    "high_value_opportunities": 14,
+    "stale_opportunities": 0
+  },
+  "portfolio_capability_gates": {
+    "gate_A_budget_exhausted": "FAIL",
+    "gate_B_portfolio_decisions_audited": "FAIL",
+    "gate_C_opportunity_cost_stored": "PASS",
+    "gate_D_marginal_gain_tracking": "PASS",
+    "gate_E_temporal_legality": "PASS",
+    "gate_F_no_runtime_failure": "FAIL",
+    "gate_G_revisit_tracking_active": "PASS",
+    "gate_H_discovery_optional": "PASS",
+    "gate_I_frontier_quality_measured": "PASS",
+    "gate_J_unresolved_value_at_termination": "PASS"
+  },
+  "allocation_comparison_note": {
+    "primary_question": "Did BB05 allocate scarce experiments better than BB04?",
+    "breadth_alone_is_not_success": true,
+    "bb04_limitation_observed": "BB04 executed 12 experiments but touched only 1/8 eligible features; 41 frontier items remained unexplored; allocation was not portfolio-aware.",
+    "bb05_portfolio_awareness": true,
+    "bb05_has_opportunity_cost_audit": true,
+    "comparison_basis": "architectural_allocation_quality_not_human_edge",
+    "no_bb04_relationship_encoding": true
+  },
+  "global_allocation_metrics": {
+    "global_context_switch_count": 1,
+    "frontier_interrupts_viable_local": 1,
+    "strong_local_beats_frontier_count": 2,
+    "negative_local_with_positive_global_alternative": 0,
+    "genuine_revisit_count": 0,
+    "selection_source_counts": {
+      "LOCAL": 2,
+      "FRONTIER": 2
+    },
+    "unresolved_high_value_count": 14
+  },
+  "global_allocator_capability_gates": {
+    "gate_A_global_decisions_audited": true,
+    "gate_B_source_and_erv_recorded": true,
+    "gate_C_no_forced_diversity": true,
+    "gate_D_strong_local_can_win": true,
+    "gate_E_limitation_diagnostics_documented": true
+  }
+}

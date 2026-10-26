@@ -1,0 +1,56 @@
+{
+  "outcome_to_population_count": 1,
+  "cases": [
+    {
+      "source_outcome": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t5_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "original_observation_horizon": 0,
+      "new_observation_horizon": 5,
+      "new_population_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "refine",
+        "children": [
+          {
+            "grammar_version": "research_grammar_v1",
+            "kind": "filter",
+            "field": "t5_return",
+            "operator": ">",
+            "value": 0.0
+          }
+        ],
+        "parent": {
+          "grammar_version": "research_grammar_v1",
+          "kind": "all"
+        },
+        "reason_code": "OUTCOME_TO_POPULATION",
+        "triggering_evidence": {
+          "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+        }
+      },
+      "later_target_outcome_spec": {
+        "grammar_version": "research_grammar_v1",
+        "kind": "compare",
+        "field": "t10_return",
+        "operator": ">",
+        "value": 0.0
+      },
+      "temporal_legal": true,
+      "sample_n": null,
+      "executed": true,
+      "experiment_results": [
+        {
+          "experiment_id": "exp-e1d941951ed8",
+          "observations": [
+            "HORIZON_HETEROGENEOUS"
+          ]
+        }
+      ]
+    }
+  ],
+  "note": "Zero transformations is a valid benchmark result."
+}

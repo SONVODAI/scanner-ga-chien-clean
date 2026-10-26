@@ -1,0 +1,29 @@
+{
+  "dimension_scores": {
+    "A_autonomy": 10,
+    "B_breadth": 2,
+    "C_depth": 8,
+    "D_shape_discovery": 2,
+    "E_scientific_skepticism": 4,
+    "F_simplicity_preference": 6,
+    "G_research_productivity": 10,
+    "H_novelty": 5,
+    "I_auditability": 9,
+    "J_restraint": 8
+  },
+  "overall_research_capability_score": 64,
+  "reframing_capability_score": 15,
+  "reframe_survivability_score": 8,
+  "reframing_score_notes": {
+    "frames_executed": 3,
+    "transitions_executed": 2,
+    "unexplored_reframe_frontier_items": 21
+  },
+  "evidence_notes": {
+    "diary_steps": 4,
+    "unique_tools": 2,
+    "session_status": "ERROR",
+    "frontier_resume_events": 1,
+    "frame_transitions": 2
+  }
+}

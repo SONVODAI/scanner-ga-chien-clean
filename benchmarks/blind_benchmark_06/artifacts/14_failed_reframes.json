@@ -1,0 +1,28 @@
+[
+  {
+    "frame_id": "frame-00007",
+    "transformation": "OUTCOME_TO_POPULATION",
+    "reason_created": "OUTCOME_TO_POPULATION",
+    "trigger": "OUTCOME_TO_POPULATION",
+    "experiments_run": 1,
+    "observation_codes": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "frame_status_after": "SUPERSEDED",
+    "candidate_yield": 0,
+    "what_bot_did_next": "Returned to frontier or continued same session"
+  },
+  {
+    "frame_id": "frame-00003",
+    "transformation": "STRUCTURAL_TRIGGER",
+    "reason_created": "STRUCTURAL_TRIGGER",
+    "trigger": "STRUCTURAL_TRIGGER",
+    "experiments_run": 1,
+    "observation_codes": [
+      "HORIZON_HETEROGENEOUS"
+    ],
+    "frame_status_after": "UNDEREXPLORED",
+    "candidate_yield": 0,
+    "what_bot_did_next": "Returned to frontier or continued same session"
+  }
+]

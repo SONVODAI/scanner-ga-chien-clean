@@ -1,0 +1,241 @@
+{
+  "gate_A_exploration": {
+    "result": "FAIL",
+    "evidence": {
+      "experiments_executed": 4,
+      "experiment_budget": 12,
+      "pct_budget_used": 33.33,
+      "tools_used": [
+        "horizon_comparison",
+        "sensitivity_analysis"
+      ],
+      "eligible_features": [
+        "breadth_score",
+        "close",
+        "research_market_state",
+        "research_market_transition",
+        "rs10",
+        "rs5",
+        "rs_spread",
+        "rsi14"
+      ],
+      "features_touched": [],
+      "pct_eligible_features_touched": 0.0,
+      "partitions": 0,
+      "thresholds": 0,
+      "categorical_comparisons": 0,
+      "market_context_tests": 0,
+      "interactions": 0,
+      "falsifications": 1,
+      "unique_outcome_specs_executed": [
+        "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+        "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+        "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+      ],
+      "unique_population_specs_executed": [
+        "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+        "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+      ],
+      "unique_research_frames_executed": [
+        "frame-00003",
+        "frame-00007"
+      ],
+      "refinements_reframes": 2
+    }
+  },
+  "gate_B_reframing": {
+    "result": "PASS",
+    "evidence": {
+      "frames_executed": 3,
+      "outcome_specs_executed": 3,
+      "population_specs_executed": 2,
+      "horizons_executed": [
+        0,
+        5
+      ]
+    }
+  },
+  "gate_C_reframe_survivability": {
+    "result": "PASS",
+    "evidence": {
+      "HORIZON_ADVANCED_FRAME_SURVIVED_FOLLOW_ON": true,
+      "horizon_advanced_frames_audited": 1,
+      "frames": [
+        {
+          "frame_id": "frame-00007",
+          "parent_frame_id": "frame-00001",
+          "transformation_type": "OUTCOME_TO_POPULATION",
+          "population_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "refine",
+            "children": [
+              {
+                "grammar_version": "research_grammar_v1",
+                "kind": "filter",
+                "field": "t5_return",
+                "operator": ">",
+                "value": 0.0
+              }
+            ],
+            "parent": {
+              "grammar_version": "research_grammar_v1",
+              "kind": "all"
+            },
+            "reason_code": "OUTCOME_TO_POPULATION",
+            "triggering_evidence": {
+              "source_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+            }
+          },
+          "outcome_spec": {
+            "grammar_version": "research_grammar_v1",
+            "kind": "compare",
+            "field": "t10_return",
+            "operator": ">",
+            "value": 0.0
+          },
+          "observation_horizon": 5,
+          "temporal_legal": true,
+          "first_experiment_executed": "exp-e1d941951ed8",
+          "follow_on_planning_attempted": true,
+          "grammar_candidates_generated": 1,
+          "adaptive_candidates_generated": 6,
+          "reframe_candidates_generated": 4,
+          "selected_follow_on_action": "FALSIFY_EXTREME",
+          "another_experiment_executed_afterward": false,
+          "frame_status_afterward": "SUPERSEDED",
+          "error": null,
+          "survived_follow_on": true,
+          "lineage_persisted_before_operations": true,
+          "lineage_sequence_order": 0
+        }
+      ],
+      "bb03_failure_path_tested": true,
+      "note": "TRUE requires follow-on planning inside horizon-advanced frame without BB03 GrammarValidationError crash \u2014 not merely spawning the child frame."
+    },
+    "note": "Primary BB04 gate \u2014 follow-on planning inside horizon-advanced frame."
+  },
+  "gate_D_evidence_driven_transition": {
+    "result": "PASS",
+    "evidence": "2 executed transitions with audit trail"
+  },
+  "gate_E_temporal_legality": {
+    "result": "PASS",
+    "evidence": {
+      "attempted_illegal_transformations": [],
+      "rejected_future_leakage_actions": 0,
+      "executed_frame_legality": [
+        {
+          "frame_id": "frame-00001",
+          "observation_horizon": 0,
+          "temporally_legal": true,
+          "outcome_field": "t5_return"
+        },
+        {
+          "frame_id": "frame-00007",
+          "observation_horizon": 5,
+          "temporally_legal": true,
+          "outcome_field": "t10_return"
+        },
+        {
+          "frame_id": "frame-00003",
+          "observation_horizon": 0,
+          "temporally_legal": true,
+          "outcome_field": "t3_return"
+        },
+        {
+          "frame_id": "frame-00007",
+          "lineage_temporal_legal": true,
+          "transformation": "OUTCOME_TO_POPULATION"
+        },
+        {
+          "frame_id": "frame-00003",
+          "lineage_temporal_legal": true,
+          "transformation": "STRUCTURAL_TRIGGER"
+        }
+      ],
+      "all_executed_frames_temporally_legal": true,
+      "outcome_to_population_legality_decisions": [
+        {
+          "frame_id": "frame-00007",
+          "legal": true
+        }
+      ]
+    }
+  },
+  "gate_F_audit_durability": {
+    "result": "PASS",
+    "evidence": {
+      "runtime_error_occurred": true,
+      "error_message": "Duplicate experiment content_hash=e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44 already recorded at node exp-5f1e13ae9c7c",
+      "session_terminal_status": "ERROR",
+      "last_completed_experiment": "exp-0f6d01eb1bb9",
+      "active_frame_id": "frame-00003",
+      "lineage_records_persisted": 2,
+      "lineage_survived_failure": true,
+      "lineage_records": [
+        {
+          "old_frame_id": "frame-00001",
+          "new_frame_id": "frame-00007",
+          "transformation": "OUTCOME_TO_POPULATION",
+          "trigger": "OUTCOME_TO_POPULATION",
+          "saturation_evidence": {},
+          "parent_outcome_hash": "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937",
+          "parent_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "new_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+          "new_population_hash": "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0",
+          "observation_horizon": 5,
+          "parent_observation_horizon": 0,
+          "sample_n": null,
+          "temporal_legal": true,
+          "triggering_experiment_id": "exp-952b8ab91072",
+          "planner_action_code": "REFRAME_OUTCOME_TO_POPULATION_frame-00007",
+          "planner_score": 10.15,
+          "sequence_order": 0
+        },
+        {
+          "old_frame_id": "frame-00007",
+          "new_frame_id": "frame-00003",
+          "transformation": "STRUCTURAL_TRIGGER",
+          "trigger": "STRUCTURAL_TRIGGER",
+          "saturation_evidence": {},
+          "parent_outcome_hash": "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+          "parent_population_hash": "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0",
+          "new_outcome_hash": "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+          "new_population_hash": "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+          "observation_horizon": 0,
+          "parent_observation_horizon": 5,
+          "sample_n": null,
+          "temporal_legal": true,
+          "triggering_experiment_id": "exp-952b8ab91072",
+          "planner_action_code": "REFRAME_STRUCTURAL_TRIGGER_frame-00003",
+          "planner_score": null,
+          "sequence_order": 1
+        }
+      ],
+      "frontier_persisted": true,
+      "search_accounting_persisted": true,
+      "false_completion_nodes": [],
+      "session_stop_reason": {
+        "code": "DOWNSTREAM_FAILURE",
+        "operation": "plan_after_experiment",
+        "experiment_node_id": "exp-0f6d01eb1bb9",
+        "frame_id": "frame-00003",
+        "error_type": "DuplicateExperimentError",
+        "error_message": "Duplicate experiment content_hash=e99da83b06c74a9074878f10cb4fd92a15108befab034927c64d8133e1474a44 already recorded at node exp-5f1e13ae9c7c",
+        "experiment_executed": true
+      }
+    }
+  },
+  "gate_G_scientific_discipline": {
+    "result": "PASS",
+    "evidence": {
+      "falsifications": 1,
+      "refinements": 2
+    }
+  },
+  "gate_H_discovery": {
+    "result": "PASS",
+    "evidence": "3 conditional candidates",
+    "note": "Gate H may FAIL while A\u2013G PASS without architectural failure."
+  }
+}
