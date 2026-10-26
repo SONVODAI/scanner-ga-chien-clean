@@ -1,0 +1,104 @@
+{
+  "traditional_coverage": {
+    "experiments_executed": 12,
+    "experiment_budget": 12,
+    "pct_budget_used": 100.0,
+    "tools_used": [
+      "adaptive_partition_compare",
+      "horizon_comparison",
+      "sensitivity_analysis",
+      "symbol_decomposition",
+      "threshold_exploration"
+    ],
+    "eligible_features": [
+      "breadth_score",
+      "close",
+      "research_market_state",
+      "research_market_transition",
+      "rs10",
+      "rs5",
+      "rs_spread",
+      "rsi14"
+    ],
+    "features_touched": [
+      "rs10"
+    ],
+    "pct_eligible_features_touched": 12.5,
+    "partitions": 1,
+    "thresholds": 1,
+    "categorical_comparisons": 4,
+    "market_context_tests": 0,
+    "interactions": 0,
+    "falsifications": 2,
+    "unique_outcome_specs_executed": [
+      "08d474f215df5d8f5e19db964c96976ca68f787513cc66c8f724b9965b3ebfa7",
+      "484c502297598d254549b04a016d7dcb3b65cee0d10f89f2801be8d3150a5244",
+      "4fe3c6d814f7999cd416bf81e0e07a9e7a8cb6a0b748b4f57b7858eb07799095",
+      "90a3e561442d95e6e3e5d265315ad0c9af69541e18c093700f40bae101052cb5",
+      "b1d721830df7521d00a910a66abb981d354154a818e26c9959f341162fc26937"
+    ],
+    "unique_population_specs_executed": [
+      "13dac605fe7b0bee2406e4b8ae8bb694cc5346e5e329900eca2b88151ba42547",
+      "dd53db7f0f2f011814c5859f45f3a3aa169488ba689d0ea3f67cfd3ea0e3dbc0"
+    ],
+    "unique_research_frames_executed": [
+      "frame-00007",
+      "frame-00017"
+    ],
+    "refinements_reframes": 7
+  },
+  "frame_coverage": {
+    "frames_created": 3,
+    "frames_executed": 3,
+    "frames_unexplored": [
+      "frame-00001"
+    ],
+    "frames_by_status": {
+      "SUPERSEDED": 2,
+      "PRODUCTIVE": 1
+    },
+    "unique_outcome_specs_created": 3,
+    "unique_outcome_specs_executed": 5,
+    "unique_population_specs_created": 2,
+    "unique_population_specs_executed": 2,
+    "observation_horizons_created": [
+      0,
+      5
+    ],
+    "observation_horizons_executed": [
+      0,
+      5
+    ],
+    "frame_transitions_recorded": 2,
+    "outcome_reframes_created": 24,
+    "outcome_reframes_executed": 1,
+    "population_reframes_created": 0,
+    "population_reframes_executed": 0,
+    "horizon_advancements_created": 8,
+    "horizon_advancements_executed": 0,
+    "outcome_to_population_created": 9,
+    "outcome_to_population_executed": 1,
+    "same_frame_experiments": 1,
+    "cross_frame_experiments": 11,
+    "frontier_items_with_frame_id": 24,
+    "frontier_reframe_items_unexplored": 24
+  },
+  "created_vs_executed_summary": {
+    "outcome_specs": {
+      "created": 3,
+      "executed": 5
+    },
+    "population_specs": {
+      "created": 2,
+      "executed": 2
+    },
+    "observation_horizons": {
+      "created": 2,
+      "executed": 2
+    },
+    "research_frames": {
+      "created": 3,
+      "executed": 3
+    }
+  }
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "proposition_id": "prop-b0a0e135ec0dc857",
+    "classification": "ADEQUATE",
+    "has_feature_reference": true,
+    "operational_test": "partition_group_compare shows opposite or flat quintile ordering",
+    "note": "Disconfirm spec is structurally identical across all three; only null explanation date differs. Tests quintile ordering reversal \u2014 adequate for partition hypothesis but not STRONG (does not test specific delta magnitude)."
+  },
+  {
+    "proposition_id": "prop-1b00bc69f4ebd1be",
+    "classification": "ADEQUATE",
+    "has_feature_reference": true,
+    "operational_test": "partition_group_compare shows opposite or flat quintile ordering",
+    "note": "Disconfirm spec is structurally identical across all three; only null explanation date differs. Tests quintile ordering reversal \u2014 adequate for partition hypothesis but not STRONG (does not test specific delta magnitude)."
+  },
+  {
+    "proposition_id": "prop-74c9fbabe3d93115",
+    "classification": "ADEQUATE",
+    "has_feature_reference": true,
+    "operational_test": "partition_group_compare shows opposite or flat quintile ordering",
+    "note": "Disconfirm spec is structurally identical across all three; only null explanation date differs. Tests quintile ordering reversal \u2014 adequate for partition hypothesis but not STRONG (does not test specific delta magnitude)."
+  }
+]
