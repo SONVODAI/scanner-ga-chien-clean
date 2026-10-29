@@ -48,12 +48,13 @@ def render_early_recovery_watch(
     directory: Path | None = None,
     storage: TextMirror | None = None,
     streamlit_module: Any = None,
+    display: bool = True,
 ) -> dict[str, Any]:
-    """Draw the research panel. Failure here must not change the Earning board."""
-    st = streamlit_module
-    if st is None:
-        import streamlit as st  # type: ignore[no-redef]
+    """Record the research watch, then draw it when display is on.
 
+    Failure here must not change the Earning board. display=False still
+    appends research events and skips Streamlit output.
+    """
     result = run_watch(
         scan_df=scan_df,
         market_real=market_real,
@@ -69,6 +70,13 @@ def render_early_recovery_watch(
         directory=directory,
         storage=storage,
     )
+    if not display:
+        return result
+
+    st = streamlit_module
+    if st is None:
+        import streamlit as st  # type: ignore[no-redef]
+
     view = result["view"]
     card = view["scorecard"]
     st.markdown(f"## {PANEL_TITLE}")

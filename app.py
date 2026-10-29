@@ -48,6 +48,14 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+# Display flags. Default OFF. Set to 1, true, yes, or on to show the panel again.
+_SHOW_ROTATION_WATCH = os.environ.get("MRBOT_SHOW_ROTATION_WATCH", "0").strip().lower() in {
+    "1", "true", "yes", "on",
+}
+_SHOW_EARLY_RECOVERY_WATCH = os.environ.get("MRBOT_SHOW_EARLY_RECOVERY_WATCH", "0").strip().lower() in {
+    "1", "true", "yes", "on",
+}
+
 try:
     import yfinance as yf
 except Exception:
@@ -119,10 +127,12 @@ st.caption("LCV2-CODE-160-READY")
 _v2_slot = st.empty()
 
 # ROTATION WATCH — isolated human rotation board. Not Candidate / Edge / Learning.
+# Shown only when MRBOT_SHOW_ROTATION_WATCH=1. Default off. Sidecar runner is unchanged.
 try:
     from modules.rotation_watch.render import render_rotation_watch_panel
 
-    render_rotation_watch_panel()
+    if _SHOW_ROTATION_WATCH:
+        render_rotation_watch_panel()
 except Exception:
     pass
 
@@ -6188,6 +6198,7 @@ try:
         breadth=_learning_breadth,
         market_status=market_status,
         market_action=market_action,
+        display=_SHOW_EARLY_RECOVERY_WATCH,
     )
 except Exception as _early_recovery_err:
     st.caption(f"Early Recovery Watch skipped: {_early_recovery_err}")

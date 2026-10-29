@@ -468,6 +468,8 @@ def test_app_hook_isolated_and_production_titles_remain():
     start = app.index("ROTATION WATCH — isolated")
     chunk = app[start : start + 400]
     assert "except Exception" in chunk
+    assert 'os.environ.get("MRBOT_SHOW_ROTATION_WATCH", "0")' in app
+    assert "if _SHOW_ROTATION_WATCH:" in chunk
     for title in (
         "👑 BUY ELITE - DECISION ENGINE",
         "render_live_candidate_v2_panel",

@@ -433,6 +433,59 @@ def test_zero_candidate_panel_stays_visible(tmp_path):
     assert "T3 Winrate=—" in rendered
 
 
+def test_hidden_panel_still_records_and_draws_nothing(tmp_path):
+    evo, watch = _paths(tmp_path)
+    start = datetime(2026, 9, 28, 10, 0, tzinfo=VN)
+    current = start + timedelta(hours=1)
+    _append(evo, [_row("AAA", WEAK, -2.0, 10000)], start)
+    _append(evo, [_row("AAA", RECOVERY, 2.0, 10100)], current)
+    screen = _Streamlit()
+    result = render_early_recovery_watch(
+        scan_df=pd.DataFrame([_row("AAA", RECOVERY, 2.0, 10100)]),
+        market_real=5.0,
+        trade_date=start.date(),
+        evolution_path=evo,
+        directory=watch,
+        streamlit_module=screen,
+        display=False,
+    )
+    assert screen.lines == []
+    assert len(result["events"]) == 1
+    assert result["events"][0]["symbol"] == "AAA"
+    assert (watch / "events.jsonl").exists()
+
+
+def test_run_watch_error_does_not_draw_and_app_continues(monkeypatch):
+    def explode(**_kwargs):
+        raise RuntimeError("watch storage failed")
+
+    monkeypatch.setattr("modules.early_recovery_watch.panel.run_watch", explode)
+    screen = _Streamlit()
+    try:
+        render_early_recovery_watch(
+            scan_df=pd.DataFrame(),
+            market_real=5.0,
+            trade_date="2026-09-28",
+            directory=Path("unused"),
+            streamlit_module=screen,
+            display=False,
+        )
+    except RuntimeError as exc:
+        assert str(exc) == "watch storage failed"
+    else:
+        raise AssertionError("run_watch error must surface to the app handler")
+    assert screen.lines == []
+    source = (REPO / "app.py").read_text(encoding="utf-8")
+    start = source.index("# EARLY RECOVERY WATCH V1")
+    end = source.index("render_earning_money_board(", start)
+    block = source[start:end]
+    handler = block.split("except Exception", 1)[1]
+    assert block.index("try:") < block.index("render_early_recovery_watch(")
+    assert block.index("render_early_recovery_watch(") < block.index("except Exception")
+    assert "st.stop()" not in block
+    assert "raise" not in handler
+
+
 def test_durable_mirror_round_trip_restores_frozen_event(tmp_path):
     evo, watch = _paths(tmp_path)
     mirror = _Mirror(watch)
@@ -471,6 +524,8 @@ def test_panel_is_above_earning_board_and_does_not_read_mutable_earning_files():
     watch_at = source.index("render_early_recovery_watch(")
     board_at = source.index("render_earning_money_board(")
     assert watch_at < board_at
+    assert 'os.environ.get("MRBOT_SHOW_EARLY_RECOVERY_WATCH", "0")' in source
+    assert "display=_SHOW_EARLY_RECOVERY_WATCH" in source
     package = REPO / "modules" / "early_recovery_watch"
     combined = "\n".join(path.read_text(encoding="utf-8") for path in package.glob("*.py"))
     assert "earning_money_snapshots" not in combined
