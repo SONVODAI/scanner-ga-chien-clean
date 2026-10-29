@@ -6068,6 +6068,12 @@ try:
             render_shadow_buy_research_panel()
         except Exception:
             pass
+        try:
+            from modules.v2_research_ledger_panel.ui import render_v2_research_ledger_panel
+
+            render_v2_research_ledger_panel(remote=True)
+        except Exception:
+            pass
         if _v2_gate_a_caption:
             st.caption(_v2_gate_a_caption)
         if _v2_gate_b_caption:
