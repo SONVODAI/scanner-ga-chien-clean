@@ -10,6 +10,7 @@ from research.v2_research_ledger.board_view import apply_filters, project_table
 from research.v2_research_ledger.delivery_view import (
     DELIVERY_UNAVAILABLE,
     SOURCE_STALE,
+    DeliveryDiagnostics,
     DeliveryView,
     load_delivery,
 )
@@ -31,6 +32,46 @@ PANEL_CAPTION = (
 )
 NOT_CONFIGURED = "NOT_CONFIGURED"
 NO_DATA = "NO_DATA"
+
+
+def format_delivery_diagnostics(diagnostics: DeliveryDiagnostics | None) -> str:
+    """One read-only line. Missing fields stay unknown. No price is invented."""
+    if diagnostics is None:
+        return (
+            "generation=unknown as_of=unknown published_at=unknown "
+            "rows=0 source_health=unknown."
+        )
+    health = ", ".join(f"{name}={status}" for name, status in diagnostics.source_health) or "unknown"
+    return (
+        f"generation={diagnostics.generation_id or 'unknown'} "
+        f"as_of={diagnostics.as_of or 'unknown'} "
+        f"published_at={diagnostics.published_at or 'unknown'} "
+        f"rows={diagnostics.rows} "
+        f"source_health={health}."
+    )
+
+
+_NOMINATION_SOURCES = frozenset({"brain_a_scan_setup", "market_aware_sweetspot"})
+
+
+def format_row_composition(rows: list[Any]) -> str:
+    """Separate stored nominations from unattributed action rows. Counts only."""
+    attributed = 0
+    unattributed = 0
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        cohort = str(row.get("cohort") or "")
+        source = str(row.get("source") or "")
+        if cohort == "action_unattributed" or source == "unattributed":
+            unattributed += 1
+        elif cohort == "nomination" or source in _NOMINATION_SOURCES:
+            attributed += 1
+    return (
+        f"research_rows={len(rows)} "
+        f"attributed_nominations={attributed} "
+        f"unattributed_action_only={unattributed}."
+    )
 _REPO = Path(__file__).resolve().parents[2]
 DEFAULT_BOARD = _REPO / "research" / "v2_research_ledger" / "view" / "board.json"
 DEFAULT_SIDECAR = _REPO / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
@@ -110,6 +151,7 @@ def render_v2_research_ledger_panel(
                 f"latest action session={clocks.get('latest_action_session') or 'unknown'}. "
                 f"latest action bar={clocks.get('latest_action_bar') or 'unknown'}."
             )
+            st.caption(format_delivery_diagnostics(delivered.diagnostics))
         if status == NOT_CONFIGURED:
             if cache_reason:
                 return
@@ -162,6 +204,7 @@ def render_v2_research_ledger_panel(
             f"latest action bar={fresh.get('latest_action_bar') or 'unknown'}. "
             f"freshness={freshness_state}."
         )
+        st.caption(format_row_composition(rows))
         if source_counts:
             rendered = ", ".join(f"{name}={count}" for name, count in sorted(source_counts.items()))
             st.caption(f"Source coverage: {rendered}.")

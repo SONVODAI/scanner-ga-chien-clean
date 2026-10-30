@@ -31,11 +31,23 @@ RESEARCH_MANIFEST_PATH = "/current/research_ledger/manifest.json"
 
 
 @dataclass(frozen=True)
+class DeliveryDiagnostics:
+    """Read-only identity of one accepted delivery. It does not select trades."""
+
+    generation_id: str
+    as_of: str
+    published_at: str
+    rows: int
+    source_health: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True)
 class DeliveryView:
     state: str
     reason: str
     board: dict[str, Any] | None = None
     rows: int = 0
+    diagnostics: DeliveryDiagnostics | None = None
 
 
 def load_delivery(directory: Path) -> DeliveryView:
@@ -82,7 +94,33 @@ def load_delivery(directory: Path) -> DeliveryView:
     coverage = board.get("coverage") if isinstance(board.get("coverage"), dict) else {}
     if coverage.get("rows") not in (None, len(rows)):
         return DeliveryView(DELIVERY_UNAVAILABLE, "row_count")
-    return DeliveryView(_state(board), "ok", board, len(rows))
+    return DeliveryView(
+        _state(board),
+        "ok",
+        board,
+        len(rows),
+        _diagnostics(board, manifest, len(rows)),
+    )
+
+
+def _diagnostics(board: dict[str, Any], manifest: dict[str, Any], rows: int) -> DeliveryDiagnostics:
+    health = manifest.get("source_health") if isinstance(manifest.get("source_health"), dict) else {}
+    if not health:
+        fresh = board.get("freshness") if isinstance(board.get("freshness"), dict) else {}
+        nested = fresh.get("source_health") if isinstance(fresh.get("source_health"), dict) else {}
+        health = nested
+    pairs: list[tuple[str, str]] = []
+    for name in sorted(health):
+        item = health[name]
+        status = item.get("status") if isinstance(item, dict) else ""
+        pairs.append((str(name), str(status or "")))
+    return DeliveryDiagnostics(
+        generation_id=str(manifest.get("generation_id") or ""),
+        as_of=str(board.get("as_of") or ""),
+        published_at=str(manifest.get("published_at") or ""),
+        rows=rows,
+        source_health=tuple(pairs),
+    )
 
 
 def _state(board: dict[str, Any]) -> str:
