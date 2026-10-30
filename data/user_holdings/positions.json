@@ -13,7 +13,7 @@
     },
     {
       "symbol": "NLG",
-      "entry_price": 24000.0,
+      "entry_price": 22350.0,
       "entry_date": "2026-09-15"
     },
     {
@@ -103,13 +103,28 @@
     },
     {
       "symbol": "TCH",
-      "entry_price": 11250.0,
+      "entry_price": 11363.0,
       "entry_date": "2026-09-26"
     },
     {
       "symbol": "BVS",
-      "entry_price": 26200.0,
+      "entry_price": 26650.0,
       "entry_date": "2026-10-05"
+    },
+    {
+      "symbol": "EVF",
+      "entry_price": 11700.0,
+      "entry_date": "2026-10-20"
+    },
+    {
+      "symbol": "VRE",
+      "entry_price": 23450.0,
+      "entry_date": "2026-10-20"
+    },
+    {
+      "symbol": "FPT",
+      "entry_price": 58000.0,
+      "entry_date": "2026-10-20"
     }
   ]
 }
