@@ -278,9 +278,38 @@ def commit_editor_positions(
     return saved, changed, status, []
 
 
+def _removed_holding_symbols(durable, incoming):
+    """Stored symbols absent from the edited ledger, in stored order."""
+    kept = {
+        str(item.get("symbol") or "").strip().upper()
+        for item in incoming or []
+        if str(item.get("symbol") or "").strip()
+    }
+    removed = []
+    for item in durable or []:
+        symbol = str(item.get("symbol") or "").strip().upper()
+        if symbol and symbol not in kept and symbol not in removed:
+            removed.append(symbol)
+    return removed
+
+
 def render_holdings_editor():
-    """Editable user ledger. Persist only on explicit Save when canonical JSON differs."""
+    """Editable user ledger. Cell edits stay in the form until Save or Cancel.
+
+    Persistence still goes through parse_editor_frame and commit_editor_positions.
+    Cancel drops the draft by remounting the editor from the stored ledger.
+    Removing a stored symbol is written only after the confirmation box and Save.
+    """
     from modules.user_holdings import load_positions
+
+    form_id = "position_guardian_holdings_form"
+    save_key = "position_guardian_holdings_save"
+    cancel_key = "position_guardian_holdings_cancel"
+    nonce_key = "position_guardian_holdings_editor_nonce"
+    confirm_key = "position_guardian_holdings_confirm_delete"
+
+    def _discard_draft():
+        st.session_state[nonce_key] = int(st.session_state.get(nonce_key, 0) or 0) + 1
 
     st.markdown("---")
     st.subheader("📦 Cổ phiếu đang nắm giữ")
@@ -288,49 +317,83 @@ def render_holdings_editor():
         "Sổ vị thế do bạn nhập thủ công · Mã / Giá vốn / Ngày mua · "
         "Ngày mua: DD/MM/YYYY, ví dụ 10/09/2026 · "
         "giữ nguyên qua ngày mới · chỉ lưu khi bạn bấm Lưu · "
+        "bỏ một mã đã lưu cần chọn xác nhận xóa rồi bấm Lưu · "
+        "Hủy bỏ các sửa chưa lưu · "
         "không bị Rotation / BOT / Learning tự thêm hoặc xóa. "
         "Bảng Guardian ngay dưới dùng cùng sổ này — GIỮ / CẢNH BÁO / BÁN "
         "là hỗ trợ kỹ thuật, không phải lệnh bán bắt buộc."
     )
 
+    nonce = int(st.session_state.get(nonce_key, 0) or 0)
     durable = load_positions()
-    edited = st.data_editor(
-        _positions_to_editor_frame(durable),
-        num_rows="dynamic",
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Mã": st.column_config.TextColumn("Mã", help="Mã chứng khoán"),
-            "Giá vốn": st.column_config.NumberColumn(
-                "Giá vốn",
-                help="Giá vốn / giá trung bình. Để trống nếu chưa nhập.",
-                format="%.2f",
-                min_value=0.0,
-                step=0.05,
-            ),
-            "Ngày mua": st.column_config.TextColumn(
-                "Ngày mua",
-                help="DD/MM/YYYY. Ví dụ: 10/09/2026. Để trống nếu chưa nhập.",
-                max_chars=10,
-            ),
-        },
-        key=HOLDINGS_EDITOR_KEY,
-    )
-    save = st.button("Lưu danh sách nắm giữ", type="primary")
+    with st.form(form_id, clear_on_submit=False):
+        edited = st.data_editor(
+            _positions_to_editor_frame(durable),
+            num_rows="dynamic",
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Mã": st.column_config.TextColumn("Mã", help="Mã chứng khoán"),
+                "Giá vốn": st.column_config.NumberColumn(
+                    "Giá vốn",
+                    help="Giá vốn / giá trung bình. Để trống nếu chưa nhập.",
+                    format="%.2f",
+                    min_value=0.0,
+                    step=0.05,
+                ),
+                "Ngày mua": st.column_config.TextColumn(
+                    "Ngày mua",
+                    help="DD/MM/YYYY. Ví dụ: 10/09/2026. Để trống nếu chưa nhập.",
+                    max_chars=10,
+                ),
+            },
+            key=f"{HOLDINGS_EDITOR_KEY}_{nonce}",
+        )
+        confirm_delete = st.checkbox(
+            "Xác nhận xóa các mã đã bỏ khỏi bảng",
+            key=f"{confirm_key}_{nonce}",
+        )
+        save = st.form_submit_button(
+            "Lưu danh sách nắm giữ",
+            type="primary",
+            key=save_key,
+        )
+        cancel = st.form_submit_button(
+            "Hủy",
+            key=cancel_key,
+            on_click=_discard_draft,
+        )
+    if cancel:
+        st.info("Đã hủy. Sổ vị thế giữ nguyên bản đã lưu.")
+        st.session_state[HOLDINGS_EDITOR_SHOWN_KEY] = True
+        return durable
     if save:
         incoming, parse_errors = parse_editor_frame(edited)
-        durable, changed, status, errors = commit_editor_positions(
-            incoming,
-            durable,
-            parse_errors=parse_errors,
-        )
-        if errors:
-            for message in errors:
+        removed = _removed_holding_symbols(durable, incoming)
+        if removed and not confirm_delete:
+            st.error(
+                "Chưa lưu. Các mã đã bỏ khỏi bảng: "
+                + ", ".join(removed)
+                + ". Chọn xác nhận xóa rồi bấm Lưu."
+            )
+            for message in parse_errors:
                 st.error(message)
-        elif changed:
-            st.success("Đã lưu sổ vị thế." + (f" ({status})" if status else ""))
+            if not parse_errors:
+                for message in future_entry_date_messages(incoming):
+                    st.error(message)
         else:
-            st.info("Không có thay đổi để lưu.")
+            durable, changed, status, errors = commit_editor_positions(
+                incoming,
+                durable,
+                parse_errors=parse_errors,
+            )
+            if errors:
+                for message in errors:
+                    st.error(message)
+            elif changed:
+                st.success("Đã lưu sổ vị thế." + (f" ({status})" if status else ""))
+            else:
+                st.info("Không có thay đổi để lưu.")
     st.session_state[HOLDINGS_EDITOR_SHOWN_KEY] = True
     return durable
 
