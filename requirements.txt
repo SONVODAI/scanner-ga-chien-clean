@@ -1,4 +1,6 @@
-streamlit
+# Position Guardian uses st.fragment, stable since 1.37.
+# Floor only: nothing else in this file pins Streamlit, so deploy still resolves to the current release.
+streamlit>=1.37
 pandas
 numpy
 # PyPI project "vnstock" is quarantined (empty simple index), so

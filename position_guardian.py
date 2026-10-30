@@ -39,6 +39,7 @@ PORTFOLIO_FILE = "portfolio_symbols.txt"
 HOLDINGS_WIDGET_KEY = "position_guardian_watchlist"
 HOLDINGS_EDITOR_SHOWN_KEY = "_user_holdings_editor_shown"
 HOLDINGS_EDITOR_KEY = "user_holdings_ledger_editor_ddmm"
+HOLDINGS_FORM_ID = "user_holdings_ledger_form"
 ENTRY_DATE_COLUMN_FORMAT = "DD/MM/YYYY"
 ENTRY_DATE_TEXT_PATTERN = re.compile(r"^(\d{2})/(\d{2})/(\d{4})$")
 MISSING = "—"
@@ -278,8 +279,45 @@ def commit_editor_positions(
     return saved, changed, status, []
 
 
+# st.fragment is stable in Streamlit 1.37. 1.33–1.36 expose the same
+# behavior as st.experimental_fragment. Older builds have neither.
+def _fragment_decorator():
+    for name in ("fragment", "experimental_fragment"):
+        decorator = getattr(st, name, None)
+        if callable(decorator):
+            return decorator
+    return None
+
+
+def _warn_fragment_unavailable():
+    """Visible only while a script is running and no fragment API exists."""
+    key = "_guardian_fragment_unavailable_warned"
+    if st.session_state.get(key):
+        return
+    st.session_state[key] = True
+    st.warning(
+        "Streamlit không có st.fragment (cần bản 1.37 trở lên). "
+        "Sổ vẫn lưu được, nhưng bấm Lưu sẽ chạy lại toàn bộ ứng dụng."
+    )
+
+
 def render_holdings_editor():
-    """Editable user ledger. Persist only on explicit Save when canonical JSON differs."""
+    """Editable user ledger. Persist only on explicit Save when canonical JSON differs.
+
+    app.py calls this directly when scan_df is empty, outside Guardian's fragment.
+    That call reuses the same fragment so Save does not rerun the whole app.
+    Inside the fragment, or outside a Streamlit script, the editor body runs here.
+    """
+    from streamlit.runtime.scriptrunner_utils.script_run_context import (
+        get_script_run_ctx,
+    )
+
+    ctx = get_script_run_ctx()
+    if ctx is not None and not getattr(ctx, "current_fragment_id", None):
+        if _fragment_decorator() is not None:
+            return render_guardian(pd.DataFrame(), include_editor=True)
+        _warn_fragment_unavailable()
+
     from modules.user_holdings import load_positions
 
     st.markdown("---")
@@ -294,29 +332,30 @@ def render_holdings_editor():
     )
 
     durable = load_positions()
-    edited = st.data_editor(
-        _positions_to_editor_frame(durable),
-        num_rows="dynamic",
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Mã": st.column_config.TextColumn("Mã", help="Mã chứng khoán"),
-            "Giá vốn": st.column_config.NumberColumn(
-                "Giá vốn",
-                help="Giá vốn / giá trung bình. Để trống nếu chưa nhập.",
-                format="%.2f",
-                min_value=0.0,
-                step=0.05,
-            ),
-            "Ngày mua": st.column_config.TextColumn(
-                "Ngày mua",
-                help="DD/MM/YYYY. Ví dụ: 10/09/2026. Để trống nếu chưa nhập.",
-                max_chars=10,
-            ),
-        },
-        key=HOLDINGS_EDITOR_KEY,
-    )
-    save = st.button("Lưu danh sách nắm giữ", type="primary")
+    with st.form(HOLDINGS_FORM_ID, clear_on_submit=False):
+        edited = st.data_editor(
+            _positions_to_editor_frame(durable),
+            num_rows="dynamic",
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Mã": st.column_config.TextColumn("Mã", help="Mã chứng khoán"),
+                "Giá vốn": st.column_config.NumberColumn(
+                    "Giá vốn",
+                    help="Giá vốn / giá trung bình. Để trống nếu chưa nhập.",
+                    format="%.2f",
+                    min_value=0.0,
+                    step=0.05,
+                ),
+                "Ngày mua": st.column_config.TextColumn(
+                    "Ngày mua",
+                    help="DD/MM/YYYY. Ví dụ: 10/09/2026. Để trống nếu chưa nhập.",
+                    max_chars=10,
+                ),
+            },
+            key=HOLDINGS_EDITOR_KEY,
+        )
+        save = st.form_submit_button("Lưu danh sách nắm giữ", type="primary")
     if save:
         incoming, parse_errors = parse_editor_frame(edited)
         durable, changed, status, errors = commit_editor_positions(
@@ -641,7 +680,7 @@ def render_summary(df):
 # RENDER
 # =========================================================
 
-def render_guardian(scan_df, include_editor: bool = True):
+def _render_guardian_body(scan_df, include_editor: bool = True):
     from modules.user_holdings import load_positions
 
     if include_editor:
@@ -678,6 +717,32 @@ def render_guardian(scan_df, include_editor: bool = True):
         )
     except Exception:
         st.caption("Guardian table skipped; sổ vị thế phía trên vẫn giữ nguyên.")
+
+
+def render_guardian(scan_df, include_editor: bool = True):
+    """Run Guardian in a fragment during a Streamlit script.
+
+    Outside a script (unit tests, no ScriptRunContext) the body runs directly.
+    There is no nested fragment and no st.rerun() after save. scan_df is the
+    argument from the latest full app run; the next full run passes a new frame.
+    """
+    from streamlit.runtime.scriptrunner_utils.script_run_context import (
+        get_script_run_ctx,
+    )
+
+    ctx = get_script_run_ctx()
+    if ctx is None or _fragment_decorator() is None:
+        if ctx is not None:
+            _warn_fragment_unavailable()
+        return _render_guardian_body(scan_df, include_editor=include_editor)
+    return _render_guardian_fragment(scan_df, include_editor=include_editor)
+
+
+_decorator = _fragment_decorator()
+if _decorator is not None:
+    _render_guardian_fragment = _decorator(_render_guardian_body)
+else:
+    _render_guardian_fragment = _render_guardian_body
 
 
 
