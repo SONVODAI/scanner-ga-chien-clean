@@ -23,8 +23,8 @@
     "eligible_from"
   ],
   "session": "2026-11-02",
-  "observed_at": "2026-11-02T20:39:39.863508+07:00",
-  "generated_at": "2026-11-02T20:39:39.863508+07:00",
+  "observed_at": "2026-11-02T20:40:32.413228+07:00",
+  "generated_at": "2026-11-02T20:40:32.413228+07:00",
   "market_real": 2.7,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
@@ -6227,7 +6227,7 @@
       "symbol": "VTO",
       "session": "2026-11-02",
       "candidate_first_seen_ts": "2026-10-30T15:13:37Z",
-      "candidate_updated_ts": "2026-11-02T20:39:39.863508+07:00",
+      "candidate_updated_ts": "2026-11-02T20:40:32.413228+07:00",
       "eligible_from": "2026-11-02T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
