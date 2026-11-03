@@ -52,7 +52,7 @@
       "entry_date": "2026-10-20"
     },
     {
-      "symbol": "BVH",
+      "symbol": "CTD",
       "entry_price": 66300.0,
       "entry_date": "2026-11-02"
     },
@@ -100,6 +100,26 @@
       "symbol": "TCB",
       "entry_price": 21400.0,
       "entry_date": "2026-11-02"
+    },
+    {
+      "symbol": "NAB",
+      "entry_price": 12600.0,
+      "entry_date": "2026-11-04"
+    },
+    {
+      "symbol": "BAF",
+      "entry_price": 30800.0,
+      "entry_date": "2026-11-04"
+    },
+    {
+      "symbol": "HVN",
+      "entry_price": 21000.0,
+      "entry_date": "2026-11-04"
+    },
+    {
+      "symbol": "STB",
+      "entry_price": 66600.0,
+      "entry_date": "2026-11-04"
     }
   ]
 }
