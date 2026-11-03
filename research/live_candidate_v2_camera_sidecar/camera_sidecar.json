@@ -23,8 +23,8 @@
     "eligible_from"
   ],
   "session": "2026-11-03",
-  "observed_at": "2026-11-03T15:16:45.440885+07:00",
-  "generated_at": "2026-11-03T15:16:45.440885+07:00",
+  "observed_at": "2026-11-03T15:17:32.512020+07:00",
+  "generated_at": "2026-11-03T15:17:32.512020+07:00",
   "market_real": 3.0,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
@@ -6227,7 +6227,7 @@
       "symbol": "BVH",
       "session": "2026-11-03",
       "candidate_first_seen_ts": "2026-11-02T13:00:17Z",
-      "candidate_updated_ts": "2026-11-03T15:16:45.440885+07:00",
+      "candidate_updated_ts": "2026-11-03T15:17:32.512020+07:00",
       "eligible_from": "2026-11-03T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
