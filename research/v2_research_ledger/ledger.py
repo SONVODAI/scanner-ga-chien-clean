@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from research.v2_research_ledger.contract import (
     ACTION_STATES,
@@ -44,6 +44,7 @@ from research.v2_research_ledger.contract import (
     STATUS_BLOCKED,
     STATUS_MISSING,
     STATUS_PENDING,
+    STATUS_UNAVAILABLE,
     STATUS_VALID,
     STREAM_RANK,
     T0_MISSING,
@@ -168,6 +169,7 @@ class ResearchLedger:
         self._link_ids: set[str] = set()
         self._outcome_ids: set[str] = set()
         self._nominations_by_id: dict[str, dict[str, Any]] = {}
+        self._outcomes_by_id: dict[str, dict[str, Any]] = {}
 
     def hydrate_ids_from_directory(self, directory: Path) -> dict[str, int]:
         """Restore idempotency id sets from a prior ``export_append`` directory.
@@ -186,9 +188,7 @@ class ResearchLedger:
         loaded["links"] = self._hydrate_id_file(
             root / "nomination_link.jsonl", "link_id", self._link_ids
         )
-        loaded["outcomes"] = self._hydrate_id_file(
-            root / "outcome.jsonl", "outcome_id", self._outcome_ids
-        )
+        loaded["outcomes"] = self._hydrate_outcomes_file(root / "outcome.jsonl")
         return loaded
 
     @staticmethod
@@ -210,6 +210,32 @@ class ResearchLedger:
             if not ident or ident in bucket:
                 continue
             bucket.add(ident)
+            added += 1
+        return added
+
+    def _hydrate_outcomes_file(self, path: Path) -> int:
+        """Restore outcome ids; keep PENDING rows mutable for later maturation."""
+        if not path.is_file():
+            return 0
+        added = 0
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(row, dict):
+                continue
+            oid = _text(row.get("outcome_id"))
+            if not oid or oid in self._outcome_ids:
+                continue
+            self._outcome_ids.add(oid)
+            stored = dict(row)
+            self._outcomes_by_id[oid] = stored
+            if stored.get("status") == STATUS_PENDING:
+                self.outcomes.append(stored)
             added += 1
         return added
 
@@ -506,34 +532,94 @@ class ResearchLedger:
         *,
         as_of: date,
         prices: Mapping[str, Mapping[str, Any]] | None = None,
+        horizons: Sequence[int] | None = None,
+        t0_price: float | None = None,
+        allow_unavailable: bool = False,
+        target_sessions: Mapping[int, date | None] | None = None,
     ) -> list[dict[str, Any]]:
         """One row per horizon. Prices stay null unless status is VALID.
 
-        Adjusted returns are not calculated. A snapshot or an unknown
-        adjustment is BLOCKED and stores a null price. Episodes whose
-        origin nomination is ``T0_MISSING`` are skipped entirely.
+        Unadjusted returns are attached only when status is VALID and a
+        genuine ``t0_price`` is provided. A snapshot or unknown adjustment
+        is BLOCKED. ``T0_MISSING`` or uncovered calendar targets yield
+        ``UNAVAILABLE`` when ``allow_unavailable`` is true.
+        ``target_sessions`` must come from a verified exchange calendar —
+        this method never invents holiday-aware dates via weekday math.
+        Terminal rows are never overwritten; ``PENDING`` may mature.
         """
         origin_nom = _text(episode.get("origin_nomination_id"))
-        if origin_nom and not self.nomination_forward_eligible(origin_nom):
-            return []
-        if episode.get("t0_status") == T0_MISSING:
+        missing_t0 = bool(
+            episode.get("t0_status") == T0_MISSING
+            or (origin_nom and not self.nomination_forward_eligible(origin_nom))
+        )
+        if missing_t0 and not allow_unavailable:
             return []
         session_text = _text(episode.get("evaluation_session"))
-        origin = date.fromisoformat(session_text)
+        if not session_text:
+            return []
         written: list[dict[str, Any]] = []
         price_map = prices or {}
-        for horizon in HORIZONS:
-            target = add_weekdays(origin, horizon)
-            target_key = target.isoformat()
-            label = f"T+{horizon}"
-            observation = price_map.get(target_key)
-            record = _outcome_row(episode, label, target_key, as_of, observation)
-            if record["outcome_id"] in self._outcome_ids:
+        selected = tuple(horizons) if horizons is not None else HORIZONS
+        for horizon in selected:
+            label = f"T+{int(horizon)}"
+            if target_sessions is None or int(horizon) not in target_sessions:
+                # Fail closed: no weekday fallback. Calendar gap stays PENDING
+                # so a later verified calendar extension may mature it.
+                record = _pending_uncovered_outcome(episode, label, session_text)
+                kept = self._store_outcome(record)
+                if kept is not None:
+                    written.append(kept)
                 continue
-            self.outcomes.append(record)
-            self._outcome_ids.add(record["outcome_id"])
-            written.append(record)
+            target = target_sessions[int(horizon)]
+            if target is None:
+                record = _pending_uncovered_outcome(episode, label, session_text)
+                kept = self._store_outcome(record)
+                if kept is not None:
+                    written.append(kept)
+                continue
+            target_key = target.isoformat()
+            if missing_t0:
+                if not allow_unavailable:
+                    continue
+                record = _unavailable_outcome(episode, label, target_key)
+            else:
+                observation = price_map.get(target_key)
+                record = _outcome_row(
+                    episode,
+                    label,
+                    target_key,
+                    as_of,
+                    observation,
+                    t0_price=t0_price,
+                )
+            kept = self._store_outcome(record)
+            if kept is not None:
+                written.append(kept)
         return written
+
+    def _store_outcome(self, record: dict[str, Any]) -> dict[str, Any] | None:
+        oid = _text(record.get("outcome_id"))
+        if not oid:
+            return None
+        existing = self._outcomes_by_id.get(oid)
+        if existing is None:
+            self.outcomes.append(record)
+            self._outcome_ids.add(oid)
+            self._outcomes_by_id[oid] = record
+            return record
+        # Mature PENDING only. Never overwrite VALID / MISSING / BLOCKED / UNAVAILABLE.
+        if existing.get("status") != STATUS_PENDING:
+            return None
+        existing_target = _text(existing.get("target_session"))
+        new_target = _text(record.get("target_session"))
+        upgraded_coverage = existing_target.startswith("UNCOVERED|") and not new_target.startswith(
+            "UNCOVERED|"
+        )
+        if record.get("status") != STATUS_PENDING or upgraded_coverage:
+            existing.clear()
+            existing.update(record)
+            return existing
+        return None
 
     def export_append(self, directory: Path) -> None:
         """Append JSONL under `directory` only. Never chooses a default path."""
@@ -612,12 +698,85 @@ def _mark_first_and_repeat(episodes: list[dict[str, Any]]) -> None:
             episode["episode_kind"] = KIND_FIRST if index == 0 else KIND_REPEAT
 
 
+def _outcome_identity(episode: Mapping[str, Any], label: str) -> str:
+    return f"{episode['episode_id']}|{label}"
+
+
+def _unavailable_outcome(
+    episode: Mapping[str, Any],
+    label: str,
+    target_session: str,
+) -> dict[str, Any]:
+    return _stamp(
+        RECORD_OUTCOME,
+        {
+            "outcome_id": _outcome_identity(episode, label),
+            "episode_id": episode["episode_id"],
+            "horizon": label,
+            "target_session": target_session,
+            "status": STATUS_UNAVAILABLE,
+            "price": None,
+            "price_ts": None,
+            "price_source": None,
+            "adjustment_status": None,
+            "is_live_adjusted": None,
+            "return_value": None,
+            "return_pct": None,
+            "mfe": None,
+            "mae": None,
+            "time_to_peak_bars": None,
+            "origin_nomination_id": _opt_str(episode, "origin_nomination_id"),
+            "nomination_disposition": _opt_str(episode, "nomination_disposition"),
+            "action_state": _opt_str(episode, "action_state"),
+            "symbol": _opt_str(episode, "symbol"),
+            "t0_status": T0_MISSING,
+            "calendar_status": "T0_MISSING",
+        },
+    )
+
+
+def _pending_uncovered_outcome(
+    episode: Mapping[str, Any],
+    label: str,
+    session_text: str,
+) -> dict[str, Any]:
+    """Calendar does not yet cover T+n. May mature when a verified index grows."""
+    return _stamp(
+        RECORD_OUTCOME,
+        {
+            "outcome_id": _outcome_identity(episode, label),
+            "episode_id": episode["episode_id"],
+            "horizon": label,
+            "target_session": f"UNCOVERED|{session_text}|{label}",
+            "status": STATUS_PENDING,
+            "price": None,
+            "price_ts": None,
+            "price_source": None,
+            "adjustment_status": None,
+            "is_live_adjusted": None,
+            "return_value": None,
+            "return_pct": None,
+            "mfe": None,
+            "mae": None,
+            "time_to_peak_bars": None,
+            "origin_nomination_id": _opt_str(episode, "origin_nomination_id"),
+            "nomination_disposition": _opt_str(episode, "nomination_disposition"),
+            "action_state": _opt_str(episode, "action_state"),
+            "symbol": _opt_str(episode, "symbol"),
+            "t0_status": _opt_str(episode, "t0_status") or T0_PRESENT,
+            "calendar_status": "COVERAGE_PENDING",
+        },
+    )
+
+
 def _outcome_row(
     episode: Mapping[str, Any],
     label: str,
     target_session: str,
     as_of: date,
     observation: Mapping[str, Any] | None,
+    *,
+    t0_price: float | None = None,
 ) -> dict[str, Any]:
     target = date.fromisoformat(target_session)
     price_source = None
@@ -625,6 +784,8 @@ def _outcome_row(
     is_live_adjusted = None
     price = None
     price_ts = None
+    return_value = None
+    return_pct = None
     if target > as_of:
         status = STATUS_PENDING
     elif observation is None:
@@ -643,13 +804,15 @@ def _outcome_row(
             status = STATUS_VALID
             price = float(observation["price"])
             price_ts = _opt_str(observation, "price_ts")
+            if t0_price is not None and float(t0_price) != 0:
+                return_value = (price / float(t0_price)) - 1.0
+                return_pct = return_value * 100.0
         else:
             status = STATUS_BLOCKED
-    source_key = price_source or "none"
     return _stamp(
         RECORD_OUTCOME,
         {
-            "outcome_id": f"{episode['episode_id']}|{label}|{source_key}",
+            "outcome_id": _outcome_identity(episode, label),
             "episode_id": episode["episode_id"],
             "horizon": label,
             "target_session": target_session,
@@ -659,10 +822,16 @@ def _outcome_row(
             "price_source": price_source,
             "adjustment_status": adjustment_status,
             "is_live_adjusted": is_live_adjusted,
-            "return_value": None,
+            "return_value": return_value,
+            "return_pct": return_pct,
             "mfe": None,
             "mae": None,
             "time_to_peak_bars": None,
+            "origin_nomination_id": _opt_str(episode, "origin_nomination_id"),
+            "nomination_disposition": _opt_str(episode, "nomination_disposition"),
+            "action_state": _opt_str(episode, "action_state"),
+            "symbol": _opt_str(episode, "symbol"),
+            "t0_status": _opt_str(episode, "t0_status") or T0_PRESENT,
         },
     )
 
