@@ -24,6 +24,9 @@ from research.v2_research_ledger.contract import (
     KIND_FIRST,
     KIND_REPEAT,
     LINK_OVERLAP,
+    NOMINATION_ACCEPTED,
+    NOMINATION_DISPOSITIONS,
+    NOMINATION_REJECTED,
     QUALITY_EXECUTION_FLAG,
     QUALITY_PROVENANCE_DATES,
     QUALITY_STATE_CONFLICT,
@@ -43,6 +46,9 @@ from research.v2_research_ledger.contract import (
     STATUS_PENDING,
     STATUS_VALID,
     STREAM_RANK,
+    T0_MISSING,
+    T0_PRESENT,
+    T0_STATUSES,
 )
 
 _VN = timezone(timedelta(hours=7))
@@ -76,6 +82,16 @@ def _opt_bool(raw: Mapping[str, Any], key: str) -> bool | None:
 
 def nomination_id(source: str, provenance_session: str, symbol: str, first_seen: str) -> str:
     return f"{source}|{provenance_session}|{symbol}|{first_seen}"
+
+
+def rejected_nomination_id(
+    source: str,
+    provenance_session: str,
+    symbol: str,
+    rejection_reason: str,
+) -> str:
+    """Stable id for rejected rows. Does not invent a freeze T0 timestamp."""
+    return f"{source}|{provenance_session}|{symbol}|REJECTED|{rejection_reason}"
 
 
 def event_id(symbol: str, bar_ts: str) -> str:
@@ -151,15 +167,99 @@ class ResearchLedger:
         self._raw_ids: set[str] = set()
         self._link_ids: set[str] = set()
         self._outcome_ids: set[str] = set()
+        self._nominations_by_id: dict[str, dict[str, Any]] = {}
+
+    def hydrate_ids_from_directory(self, directory: Path) -> dict[str, int]:
+        """Restore idempotency id sets from a prior ``export_append`` directory.
+
+        Loads ids only — not in-memory row bodies — so a later export writes
+        newly added rows without rewriting prior JSONL lines.
+        """
+        root = Path(directory)
+        loaded = {"nominations": 0, "raw_events": 0, "links": 0, "outcomes": 0}
+        loaded["nominations"] = self._hydrate_id_file(
+            root / "nomination.jsonl", "nomination_id", self._nomination_ids
+        )
+        loaded["raw_events"] = self._hydrate_id_file(
+            root / "action_event_raw.jsonl", "raw_id", self._raw_ids
+        )
+        loaded["links"] = self._hydrate_id_file(
+            root / "nomination_link.jsonl", "link_id", self._link_ids
+        )
+        loaded["outcomes"] = self._hydrate_id_file(
+            root / "outcome.jsonl", "outcome_id", self._outcome_ids
+        )
+        return loaded
+
+    @staticmethod
+    def _hydrate_id_file(path: Path, key: str, bucket: set[str]) -> int:
+        if not path.is_file():
+            return 0
+        added = 0
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(row, dict):
+                continue
+            ident = _text(row.get(key))
+            if not ident or ident in bucket:
+                continue
+            bucket.add(ident)
+            added += 1
+        return added
 
     def add_nomination(self, raw: Mapping[str, Any]) -> dict[str, Any] | None:
         source = _text(raw.get("source"))
         provenance = _text(raw.get("provenance_session"))
         symbol = _symbol(raw.get("symbol"))
         first_seen = _text(raw.get("candidate_first_seen_ts"))
-        if not source or not provenance or not symbol or not first_seen:
-            raise ValueError("nomination requires source, provenance_session, symbol, candidate_first_seen_ts")
-        ident = nomination_id(source, provenance, symbol, first_seen)
+        disposition = _text(raw.get("disposition")) or NOMINATION_ACCEPTED
+        rejection_reason = _opt_str(raw, "rejection_reason")
+        if disposition not in NOMINATION_DISPOSITIONS:
+            raise ValueError(f"unsupported nomination disposition {disposition}")
+        if not source or not provenance or not symbol:
+            raise ValueError("nomination requires source, provenance_session, symbol")
+        price_at_first = _opt_num(raw, "price_at_first_seen")
+        ema9_at_first = _opt_num(raw, "ema9_at_first_seen")
+        breakout_at_first = _opt_num(raw, "breakout_ref_at_first_seen")
+        t0_status = _text(raw.get("t0_status"))
+        if t0_status and t0_status not in T0_STATUSES:
+            raise ValueError(f"unsupported t0_status {t0_status}")
+        if disposition == NOMINATION_REJECTED:
+            if not rejection_reason:
+                raise ValueError("rejected nomination requires rejection_reason")
+            # Genuine T0 only when freeze clock + price are both present. Never invent.
+            if not t0_status:
+                t0_status = (
+                    T0_PRESENT
+                    if first_seen and price_at_first is not None
+                    else T0_MISSING
+                )
+            if t0_status == T0_MISSING:
+                first_seen = ""
+                price_at_first = None
+                ema9_at_first = None
+                breakout_at_first = None
+            ident = rejected_nomination_id(source, provenance, symbol, rejection_reason)
+        else:
+            if not first_seen:
+                raise ValueError("accepted nomination requires candidate_first_seen_ts")
+            if not t0_status:
+                t0_status = (
+                    T0_PRESENT
+                    if price_at_first is not None
+                    else T0_MISSING
+                )
+            if t0_status == T0_MISSING:
+                price_at_first = None
+                ema9_at_first = None
+                breakout_at_first = None
+            ident = nomination_id(source, provenance, symbol, first_seen)
         if ident in self._nomination_ids:
             return None
         market_real = _opt_num(raw, "market_real_at_nomination")
@@ -172,23 +272,28 @@ class ResearchLedger:
                 "symbol": symbol,
                 "setup": _opt_str(raw, "setup"),
                 "group": _opt_str(raw, "group"),
-                "candidate_first_seen_ts": first_seen,
-                "eligible_from": _opt_str(raw, "eligible_from"),
-                "price_at_first_seen": _opt_num(raw, "price_at_first_seen"),
-                "ema9_at_first_seen": _opt_num(raw, "ema9_at_first_seen"),
-                "breakout_ref_at_first_seen": _opt_num(raw, "breakout_ref_at_first_seen"),
+                "disposition": disposition,
+                "rejection_reason": rejection_reason if disposition == NOMINATION_REJECTED else None,
+                "source_status": _opt_str(raw, "source_status"),
+                "t0_status": t0_status,
+                "candidate_first_seen_ts": first_seen or None,
+                "eligible_from": _opt_str(raw, "eligible_from") if t0_status == T0_PRESENT else None,
+                "price_at_first_seen": price_at_first,
+                "ema9_at_first_seen": ema9_at_first,
+                "breakout_ref_at_first_seen": breakout_at_first,
                 "market_permission": _opt_str(raw, "market_permission"),
                 "market_real_at_nomination": market_real,
                 "market_context_source": _opt_str(raw, "market_context_source") if market_real is not None else None,
                 "published_document_session": _opt_str(raw, "published_document_session"),
                 "published_observed_at": _opt_str(raw, "published_observed_at"),
-                "price_source": _opt_str(raw, "price_source"),
+                "price_source": _opt_str(raw, "price_source") if t0_status == T0_PRESENT else None,
                 "adjustment_status": _opt_str(raw, "adjustment_status"),
                 "is_live_adjusted": _opt_bool(raw, "is_live_adjusted"),
             },
         )
         self.nominations.append(record)
         self._nomination_ids.add(ident)
+        self._nominations_by_id[ident] = record
         document_session = record["published_document_session"]
         if document_session and document_session != provenance:
             self._add_quality(
@@ -200,6 +305,24 @@ class ResearchLedger:
                 },
             )
         return record
+
+    def nomination_forward_eligible(self, nomination: Mapping[str, Any] | str) -> bool:
+        """Forward returns require an explicit present T0. T0_MISSING is excluded."""
+        if isinstance(nomination, str):
+            record = self._nominations_by_id.get(nomination)
+        else:
+            record = nomination
+        if not isinstance(record, Mapping):
+            return False
+        if record.get("t0_status") == T0_MISSING:
+            return False
+        if record.get("disposition") == NOMINATION_REJECTED and record.get("t0_status") != T0_PRESENT:
+            return False
+        return (
+            record.get("t0_status") == T0_PRESENT
+            and record.get("price_at_first_seen") is not None
+            and bool(_text(record.get("candidate_first_seen_ts")))
+        )
 
     def link_overlap(self, left_id: str, right_id: str) -> dict[str, Any] | None:
         """Link two stored nominations. Symbol and date do not create a link."""
@@ -387,8 +510,14 @@ class ResearchLedger:
         """One row per horizon. Prices stay null unless status is VALID.
 
         Adjusted returns are not calculated. A snapshot or an unknown
-        adjustment is BLOCKED and stores a null price.
+        adjustment is BLOCKED and stores a null price. Episodes whose
+        origin nomination is ``T0_MISSING`` are skipped entirely.
         """
+        origin_nom = _text(episode.get("origin_nomination_id"))
+        if origin_nom and not self.nomination_forward_eligible(origin_nom):
+            return []
+        if episode.get("t0_status") == T0_MISSING:
+            return []
         session_text = _text(episode.get("evaluation_session"))
         origin = date.fromisoformat(session_text)
         written: list[dict[str, Any]] = []

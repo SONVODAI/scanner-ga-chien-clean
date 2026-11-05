@@ -19,6 +19,16 @@ SOURCE_BRAIN_A = "brain_a_scan_setup"
 SOURCE_SWEETSPOT = "market_aware_sweetspot"
 LINK_OVERLAP = "OVERLAP"
 
+# Nomination disposition — accepted vs rejected stay distinct raw states.
+NOMINATION_ACCEPTED = "ACCEPTED"
+NOMINATION_REJECTED = "REJECTED"
+NOMINATION_DISPOSITIONS = frozenset({NOMINATION_ACCEPTED, NOMINATION_REJECTED})
+
+# Stable market-context reference labels for Stage A ingest (not collectors).
+MARKET_CONTEXT_REF_BRAIN_A_SHADOW = "brain_a_nomination_shadow"
+MARKET_CONTEXT_REF_SWEETSPOT = "market_aware_sweetspot_observer"
+MARKET_CONTEXT_REF_ACTION = "v2_action_evidence"
+
 STREAM_LIVE_WHEN = "live_when"
 STREAM_POST_CLOSE = "post_close"
 STREAM_RANK = {
@@ -53,6 +63,11 @@ STATUS_VALID = "VALID"
 STATUS_PENDING = "PENDING"
 STATUS_MISSING = "MISSING"
 STATUS_BLOCKED = "BLOCKED"
+
+# Nomination T0 evidence. T0_MISSING rows are never forward-return evaluated.
+T0_PRESENT = "T0_PRESENT"
+T0_MISSING = "T0_MISSING"
+T0_STATUSES = frozenset({T0_PRESENT, T0_MISSING})
 
 ADJUSTMENT_EXPLICIT_UNADJUSTED = "EXPLICIT_UNADJUSTED"
 ADJUSTMENT_UNAVAILABLE = "UNAVAILABLE"
