@@ -1,0 +1,55 @@
+name: pytest-followup-watch
+
+on:
+  pull_request:
+    paths:
+      - "modules/live_candidate_v2_followup/**"
+      - "modules/live_candidate_v2_action/observe_store.py"
+      - "modules/live_camera_shadow/feed.py"
+      - "scripts/run_v2_followup_watch.py"
+      - "scripts/run_v2_followup_mature.py"
+      - "tests/test_lcv2_followup_watch.py"
+      - "tests/test_lcv2_followup_e2e.py"
+      - ".github/workflows/pytest-followup-watch.yml"
+  push:
+    branches:
+      - "cursor/v2-followup-watch-v1-*"
+    paths:
+      - "modules/live_candidate_v2_followup/**"
+      - "modules/live_candidate_v2_action/observe_store.py"
+      - "modules/live_camera_shadow/feed.py"
+      - "tests/test_lcv2_followup_watch.py"
+      - "tests/test_lcv2_followup_e2e.py"
+      - ".github/workflows/pytest-followup-watch.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pandas
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt || true
+          fi
+
+      - name: Run Follow-up Watch tests
+        env:
+          MRBOT_V2_FOLLOWUP_WATCH: "0"
+        run: |
+          python -m pytest -q \
+            tests/test_lcv2_followup_watch.py \
+            tests/test_lcv2_followup_e2e.py \
+            tests/test_lcv2_vps_shadow_observe.py \
+            tests/test_lcv2_live_when.py
