@@ -414,7 +414,7 @@ def render_edge_research_panel(
             st.metric("Engine status", engine_label)
             st.metric("Production coupling", status.production_coupling)
             st.metric("Hypotheses", status.hypotheses)
-            st.metric("Validated edges", status.validated_edges)
+            st.metric("ACTIVE reusable edges", status.validated_edges)
         with c2:
             st.metric("Market Research State", status.research_market_state)
             st.metric("Market Transition", status.research_market_transition)
@@ -422,7 +422,10 @@ def render_edge_research_panel(
             st.metric("Action", status.action)
 
         st.caption(f"Engine version: {status.engine_version}")
-        st.caption("Independent validated episodes: 0 (Phase 3 counts observed episodes only)")
+        st.caption(
+            "Reusable/validated knowledge = ACTIVE edge_memory after OOS_PASS only. "
+            "Challenger PASS, READY_FOR_OOS, and OOS_PENDING are not validated."
+        )
 
         st.markdown(
             f"**Historical research coverage:** "
