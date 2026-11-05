@@ -1,0 +1,6691 @@
+{
+  "classification_version": "position_guardian.generate_signal:ee644fc098fc01c6c4a4f54bedcefe892e1beb26b085552f3c7a9929b4c5dd4f",
+  "classifications": {
+    "HOLD": {
+      "horizons": {
+        "T+1": {
+          "average_return_pct": -1.1161,
+          "discontinuity": 0,
+          "downside_p10_pct": -4.7133,
+          "downside_p25_pct": -1.9748,
+          "immature": 0,
+          "loss_rate": 0.6875,
+          "loss_rate_at_or_below_minus_3pct": 0.1875,
+          "loss_rate_at_or_below_minus_5pct": 0.125,
+          "median_return_pct": -0.6972,
+          "missing": 0,
+          "observations": 16,
+          "primary": 16,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": 0.0625,
+          "win_rate_above_5pct": 0.0625
+        },
+        "T+10": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 16,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 16,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+15": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 16,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 16,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+20": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 16,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 16,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+3": {
+          "average_return_pct": 1.5685,
+          "discontinuity": 0,
+          "downside_p10_pct": -2.0961,
+          "downside_p25_pct": -0.1059,
+          "immature": 0,
+          "loss_rate": 0.25,
+          "loss_rate_at_or_below_minus_3pct": 0.0625,
+          "loss_rate_at_or_below_minus_5pct": 0.0,
+          "median_return_pct": 1.0008,
+          "missing": 0,
+          "observations": 16,
+          "primary": 16,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": 0.25,
+          "win_rate_above_5pct": 0.125
+        },
+        "T+5": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 16,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 16,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        }
+      },
+      "observations": 16
+    },
+    "SELL": {
+      "horizons": {
+        "T+1": {
+          "average_return_pct": -2.6882,
+          "discontinuity": 0,
+          "downside_p10_pct": -5.6416,
+          "downside_p25_pct": -4.1916,
+          "immature": 0,
+          "loss_rate": 0.9245,
+          "loss_rate_at_or_below_minus_3pct": 0.3774,
+          "loss_rate_at_or_below_minus_5pct": 0.1509,
+          "median_return_pct": -2.5223,
+          "missing": 1,
+          "observations": 54,
+          "primary": 53,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": 0.0377,
+          "win_rate_above_5pct": 0.0
+        },
+        "T+10": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 53,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 1,
+          "observations": 54,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+15": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 53,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 1,
+          "observations": 54,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+20": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 53,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 1,
+          "observations": 54,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+3": {
+          "average_return_pct": -0.5291,
+          "discontinuity": 0,
+          "downside_p10_pct": -3.5387,
+          "downside_p25_pct": -2.6862,
+          "immature": 0,
+          "loss_rate": 0.5472,
+          "loss_rate_at_or_below_minus_3pct": 0.1887,
+          "loss_rate_at_or_below_minus_5pct": 0.0189,
+          "median_return_pct": -0.6557,
+          "missing": 1,
+          "observations": 54,
+          "primary": 53,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": 0.0943,
+          "win_rate_above_5pct": 0.0377
+        },
+        "T+5": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 53,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 1,
+          "observations": 54,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        }
+      },
+      "observations": 54
+    },
+    "UNAVAILABLE": {
+      "horizons": {
+        "T+1": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 0,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 0,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+10": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 0,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 0,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+15": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 0,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 0,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+20": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 0,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 0,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+3": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 0,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 0,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+5": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 0,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 0,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        }
+      },
+      "observations": 0
+    },
+    "WATCH": {
+      "horizons": {
+        "T+1": {
+          "average_return_pct": -1.7707,
+          "discontinuity": 0,
+          "downside_p10_pct": -4.3542,
+          "downside_p25_pct": -2.6667,
+          "immature": 0,
+          "loss_rate": 0.8493,
+          "loss_rate_at_or_below_minus_3pct": 0.2192,
+          "loss_rate_at_or_below_minus_5pct": 0.0274,
+          "median_return_pct": -1.81,
+          "missing": 0,
+          "observations": 73,
+          "primary": 73,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": 0.0137,
+          "win_rate_above_5pct": 0.0
+        },
+        "T+10": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 73,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 73,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+15": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 73,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 73,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+20": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 73,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 73,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        },
+        "T+3": {
+          "average_return_pct": 2.5844,
+          "discontinuity": 0,
+          "downside_p10_pct": -1.8888,
+          "downside_p25_pct": 0.0,
+          "immature": 0,
+          "loss_rate": 0.2192,
+          "loss_rate_at_or_below_minus_3pct": 0.0411,
+          "loss_rate_at_or_below_minus_5pct": 0.0137,
+          "median_return_pct": 2.3041,
+          "missing": 0,
+          "observations": 73,
+          "primary": 73,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": 0.4384,
+          "win_rate_above_5pct": 0.2192
+        },
+        "T+5": {
+          "average_return_pct": null,
+          "discontinuity": 0,
+          "downside_p10_pct": null,
+          "downside_p25_pct": null,
+          "immature": 73,
+          "loss_rate": null,
+          "loss_rate_at_or_below_minus_3pct": null,
+          "loss_rate_at_or_below_minus_5pct": null,
+          "median_return_pct": null,
+          "missing": 0,
+          "observations": 73,
+          "primary": 0,
+          "review_discontinuity_count": 0,
+          "truncated": 0,
+          "win_rate_above_3pct": null,
+          "win_rate_above_5pct": null
+        }
+      },
+      "observations": 73
+    }
+  },
+  "content_sha256": "e4969d41a8f9fa35b6e0660fb9b0ccaa4c77db2ac26fb33c60d8687529140f30",
+  "counts": {
+    "HOLD": 16,
+    "SELL": 54,
+    "UNAVAILABLE": 0,
+    "WATCH": 73
+  },
+  "input_assessment": {
+    "classification_inputs": [
+      "price",
+      "ema9",
+      "ma20",
+      "obv",
+      "obv_ema9"
+    ],
+    "holdings_invented": false,
+    "live_adjusted_inputs": 117,
+    "position_inputs_required": false,
+    "position_inputs_used": false,
+    "unavailable": 0
+  },
+  "market_real": 3.0,
+  "market_real_status": "supplied",
+  "missed_rally": {
+    "definition": "Share of SELL research labels whose later approximate return is positive by the stated threshold. Not a trade result.",
+    "horizons": {
+      "T+1": {
+        "above_3pct": 0.0377,
+        "above_5pct": 0.0,
+        "sample": 53
+      },
+      "T+10": {
+        "above_3pct": null,
+        "above_5pct": null,
+        "sample": 0
+      },
+      "T+15": {
+        "above_3pct": null,
+        "above_5pct": null,
+        "sample": 0
+      },
+      "T+20": {
+        "above_3pct": null,
+        "above_5pct": null,
+        "sample": 0
+      },
+      "T+3": {
+        "above_3pct": 0.0943,
+        "above_5pct": 0.0377,
+        "sample": 53
+      },
+      "T+5": {
+        "above_3pct": null,
+        "above_5pct": null,
+        "sample": 0
+      }
+    }
+  },
+  "observation_origin": "BACKFILLED",
+  "official_pnl": false,
+  "portfolio_decision": false,
+  "price_basis": "APPROX_LAST_5M_CLOSE",
+  "reconstruction": {
+    "label": "reconstructed from the persisted scan; not a contemporaneous close seal",
+    "saved_at": "2026-10-31T00:27:55+07:00",
+    "source": "data/earning_money_snapshots.csv"
+  },
+  "rows": [
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.333333,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.380952,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "ACB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.518892,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "ACV",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.769912,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.097345,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "AGR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 3.75,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 7.8125,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "ANV",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.653595,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.143791,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "BAF",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.451839,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.525394,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "BFC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.191617,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.844311,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "BID",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.945455,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "BMP",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 4.699248,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 10.526316,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "BSI",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.811594,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.985507,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "BSR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.913043,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -7.536232,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "BVH",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.775194,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 6.20155,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "BVS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.173913,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.173913,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "C4G",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.900901,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 7.207207,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "CEO",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.893939,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.924242,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "CII",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.783784,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.27027,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "CMG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.615385,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "CSV",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.3125,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 6.25,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "CTD",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.815182,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.475248,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "CTG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.522255,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.335312,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "CTR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.298701,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.272727,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "DBC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.303303,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.900901,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "DCM",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.660377,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -4.402516,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "DDV",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.801802,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.45045,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 60,
+      "state_age_sessions": 1,
+      "symbol": "DGC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -6.837607,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.686203,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "DGW",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.628272,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.712042,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "DIG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 2.079723,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 10.918544,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "DPG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.147059,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.941176,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "DPM",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.421053,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.394737,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "DPR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.285714,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.571429,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "DRI",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.376238,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.455446,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "DXG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.461378,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.670146,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "DXS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.310559,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.795031,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "EIB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.423729,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.423729,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "EVF",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "T0_REFERENCE_MISSING"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "T0_REFERENCE_MISSING"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "T0_REFERENCE_MISSING"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "T0_REFERENCE_MISSING"
+        },
+        "T+3": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "T0_REFERENCE_MISSING"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "T0_REFERENCE_MISSING"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "F88",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.943396,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.716981,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "FCN",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.151625,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.541516,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "FOX",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.743833,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.27704,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "FPT",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -6.993948,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.160726,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "FRT",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 1.955307,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 9.217877,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "FTS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.282051,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.076923,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 60,
+      "state_age_sessions": 1,
+      "symbol": "GAS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.675716,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.111614,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "GEE",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.709402,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.282051,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "GEG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.027027,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.252252,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "GEX",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.734104,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 8.208092,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "GIL",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.795066,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.897533,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "GMD",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -6.88,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.36,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "GVR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.413428,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.826855,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "HAG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.819738,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.711984,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "HAH",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.215517,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.525862,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "HCM",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.232143,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.892857,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "HDB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 6.666667,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 12.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "HDC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.666667,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "HDG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.587302,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.058201,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "HHS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.397849,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.333333,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "HHV",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.857143,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.333333,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "HPG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.069124,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.304147,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "HSG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.419355,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "HUT",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.409639,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 6.26506,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "HVN",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.678363,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.216374,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "IDC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.481752,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.379562,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "IJC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.192308,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.038462,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "KBC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.316547,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.719424,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "KDH",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.960784,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.960784,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "KSB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.631579,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "LAS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.432133,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.554017,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "LPB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.849741,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.259067,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "MBB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.666667,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 7.333333,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "MBS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.111111,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.962963,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "MCH",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.834008,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.214575,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "MML",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.316456,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.113924,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "MSB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.287554,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "MSH",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.857143,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.285714,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "MSN",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.555556,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.267974,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "MSR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.162162,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.675676,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "MWG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.790514,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "NAB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 3.116147,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 6.94051,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "NHA",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.680672,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 5.042017,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "NKG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.863636,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "NLG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.222222,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.666667,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "NT2",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.966102,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "NTL",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.740741,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.037037,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "NTP",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.480769,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.480769,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "NVL",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.245283,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.943396,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "OCB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.307692,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.769231,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "OIL",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.060071,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.59364,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "ORS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -12.162162,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "PC1",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.327434,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.769912,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "PDR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.131115,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.782779,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "PET",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -6.935484,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.548387,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PHR",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.5,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "PLC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.941176,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.470588,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PLX",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.645161,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -4.83871,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PNJ",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.229508,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.04918,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "POW",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.333333,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.166667,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "PTB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.5,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.5,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PVB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.678571,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.678571,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PVC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.392758,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.949861,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "PVD",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.295082,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.655738,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PVS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.058824,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.176471,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "PVT",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.991189,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.440529,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "REE",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.650943,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.117925,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "SAB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.449275,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "SBT",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.347418,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.938967,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "SHB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 8.196721,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "SHS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.861427,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.344364,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "SIP",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.332226,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.664452,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "SSB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.331606,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 5.699482,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "SSI",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.809955,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.111614,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "STB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.554404,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 6.476684,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "SZC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.925926,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 1.157407,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TCB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 7.594937,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TCH",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.618421,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.644737,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TCM",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.363636,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.090909,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TCX",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.675978,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.234637,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TNG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.395257,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.790514,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TPB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.081633,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.061224,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "TVN",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.8,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.4,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "TVS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.795737,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.664298,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VCB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 2.027027,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 5.405405,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VCG",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -0.27027,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 9.459459,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VCI",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 7.222222,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VCK",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.837838,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.864865,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VDS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.924171,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -1.895735,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VGC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.781457,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.13245,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VGI",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.181347,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.518135,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "VGS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -3.539823,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.884956,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": false,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VGT",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -5.5666,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.087475,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VHC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.587302,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.31746,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20",
+      "score": 60,
+      "state_age_sessions": 1,
+      "symbol": "VHM",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.449275,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.26087,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VIB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.414938,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -2.904564,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "VIC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.666667,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 5.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VIX",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.531915,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.12766,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "VJC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.238806,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 4.104478,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VND",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.581722,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.878735,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VNM",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.62963,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.777778,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VOS",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -6.100218,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -3.485839,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VPB",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "HOLD",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.554939,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Xu hướng khỏe",
+      "score": 0,
+      "state_age_sessions": 1,
+      "symbol": "VPL",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.826087,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 2.173913,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VPX",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -4.573805,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 0.623701,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VRE",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "WATCH",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.515152,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.030303,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "Giá dưới EMA9",
+      "score": 40,
+      "state_age_sessions": 1,
+      "symbol": "VSC",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -2.884615,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": -0.961538,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VTO",
+      "transition": "INITIAL"
+    },
+    {
+      "classification": "SELL",
+      "horizons": {
+        "T+1": {
+          "included_in_primary": true,
+          "return_pct": -1.637555,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+10": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+15": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+20": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        },
+        "T+3": {
+          "included_in_primary": true,
+          "return_pct": 3.165939,
+          "status": "APPROX_AVAILABLE"
+        },
+        "T+5": {
+          "included_in_primary": false,
+          "return_pct": null,
+          "status": "NOT_YET_OBSERVED"
+        }
+      },
+      "live_adjusted_input": true,
+      "position_inputs_required": false,
+      "position_inputs_used": false,
+      "reason": "EMA9 dưới MA20 + OBV xác nhận",
+      "score": 100,
+      "state_age_sessions": 1,
+      "symbol": "VTP",
+      "transition": "INITIAL"
+    }
+  ],
+  "schema": "guardian_research_performance.v1",
+  "session": "2026-10-30",
+  "snapshot_sha256": "388b856c2d85d885386de51b8ff834b640779e0c3e2e6e3d15902a4a2da72afa",
+  "statement": "Approximate research returns use the last 5-minute close on both ends. They are not execution P&L. HOLD, WATCH, and SELL are research labels, not portfolio orders. A BACKFILLED snapshot was reconstructed from a persisted scan and is not a contemporaneous observation. Missing prices are left blank. No statistical significance is claimed.",
+  "subsequent_drawdown": {
+    "reason": "INTRADAY_PATH_ABSENT",
+    "status": "UNAVAILABLE",
+    "worst_drawdown_pct": null
+  },
+  "tracked_count": 143,
+  "transitions": {
+    "counts": {
+      "INITIAL": 143
+    },
+    "signal_age_sessions": "state_age_sessions on each row"
+  }
+}
