@@ -5,6 +5,7 @@ This module does not download prices, call a market-data API, or read holdings.
 
 from __future__ import annotations
 
+import json
 from datetime import date, datetime, time
 from pathlib import Path
 
@@ -14,8 +15,11 @@ from research.guardian_research.contract import SCAN_COLUMNS
 from research.guardian_research.indicators import finite_number
 from research.guardian_research.snapshot import (
     SnapshotExists,
+    _digest,
     build_snapshot,
+    label_observation_origin,
     load_prior_snapshots,
+    read_snapshot,
     write_snapshot,
 )
 from research.guardian_research.universe import load_tracked_symbols
@@ -53,11 +57,14 @@ def capture_from_close_payload(
     if not isinstance(payload, dict):
         return {"status": "refused", "reason": "SCAN_ABSENT", "path": None, "document": None}
     session = str(payload.get("trade_date") or "")
-    allowed, reason = canonical_close_verified(now, session)
-    if not allowed:
-        return {"status": "refused", "reason": reason, "path": None, "document": None}
     if payload.get("ok") is not True or payload.get("source") != "close_scan":
         return {"status": "refused", "reason": "CLOSE_SCAN_NOT_READY", "path": None, "document": None}
+    witness_reason = _witness_reason(payload)
+    if witness_reason:
+        return {"status": "refused", "reason": witness_reason, "path": None, "document": None}
+    observed_at, timing_reason = _observation_clock(payload, session, now)
+    if timing_reason:
+        return {"status": "refused", "reason": timing_reason, "path": None, "document": None}
     coverage = payload.get("scan_coverage")
     if not isinstance(coverage, dict):
         return {"status": "refused", "reason": "SCAN_COVERAGE_ABSENT", "path": None, "document": None}
@@ -78,6 +85,7 @@ def capture_from_close_payload(
         root=root,
         market_real=payload.get("market_real"),
         symbols=tracked,
+        observed_at=observed_at,
         commit=False,
     )
     if preview.get("status") != "preview":
@@ -95,6 +103,7 @@ def capture_from_close_payload(
         root=root,
         market_real=payload.get("market_real"),
         symbols=tracked,
+        observed_at=observed_at,
     )
     if result.get("status") in {"created", "unchanged"}:
         result["remote"] = publish_snapshot(root, session)
@@ -166,13 +175,23 @@ def capture_post_close(
     root: Path,
     market_real=None,
     symbols: tuple[str, ...] | None = None,
+    observed_at: datetime | None = None,
     commit: bool = True,
 ) -> dict:
     """Write one research snapshot. A same-content retry does not write again."""
     date.fromisoformat(session)
-    allowed, reason = post_close_verified(now, session)
-    if not allowed:
-        return {"status": "refused", "reason": reason, "path": None, "document": None}
+    if observed_at is None:
+        allowed, reason = post_close_verified(now, session)
+        if not allowed:
+            return {"status": "refused", "reason": reason, "path": None, "document": None}
+    else:
+        allowed, reason = canonical_close_verified(observed_at, session)
+        if not allowed:
+            return {"status": "refused", "reason": reason, "path": None, "document": None}
+        from modules.intraday_execution_boundary import as_vn
+
+        if as_vn(now) < as_vn(observed_at):
+            return {"status": "refused", "reason": "SEAL_BEFORE_OBSERVATION", "path": None, "document": None}
     observations, info = observations_from_scan(scan_df, session)
     if not info["verified"]:
         return {
@@ -191,9 +210,37 @@ def capture_post_close(
         symbols=tracked,
         priors=load_prior_snapshots(root, session),
     )
+    if observed_at is not None:
+        from modules.intraday_execution_boundary import as_vn
+
+        observation = as_vn(observed_at)
+        seal = as_vn(now)
+        document = label_observation_origin(
+            document,
+            "CONTEMPORANEOUS" if seal == observation else "DELAYED",
+            reconstruction={
+                "observation_at": observation.isoformat(),
+                "sealed_at": seal.isoformat(),
+                "timestamp_provenance": "close_scan.observed_at",
+            },
+        )
     if not commit:
         return {"status": "preview", "reason": "ok", "path": None, "document": document}
     dest = Path(root) / "sessions" / f"{session}.json"
+    if dest.exists():
+        try:
+            existing = read_snapshot(dest)
+        except (OSError, ValueError, json.JSONDecodeError):
+            existing = None
+        if existing is not None and _same_observation(existing, document):
+            return {
+                "status": "unchanged",
+                "reason": "ok",
+                "path": dest,
+                "document": existing,
+                "tracked_count": existing["tracked_count"],
+                "counts": existing["counts"],
+            }
     existed = dest.exists()
     try:
         path = write_snapshot(root, document)
@@ -207,6 +254,62 @@ def capture_post_close(
         "tracked_count": document["tracked_count"],
         "counts": document["counts"],
     }
+
+
+def _observation_clock(payload: dict, session: str, now: datetime) -> tuple[datetime | None, str | None]:
+    """Separate the scan clock from a later seal. A file-save clock is not a scan clock."""
+    from modules.intraday_execution_boundary import as_vn
+
+    if "observed_at" not in payload:
+        if payload.get("saved_at"):
+            return None, "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+        allowed, reason = canonical_close_verified(now, session)
+        if not allowed:
+            return None, reason
+        return None, None
+    try:
+        parsed = datetime.fromisoformat(str(payload.get("observed_at") or ""))
+    except ValueError:
+        return None, "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    if parsed.tzinfo is None:
+        return None, "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    observation = as_vn(parsed)
+    allowed, reason = canonical_close_verified(observation, session)
+    if not allowed:
+        return None, reason
+    if as_vn(now) < observation:
+        return None, "SEAL_BEFORE_OBSERVATION"
+    return observation, None
+
+
+def _same_observation(existing: dict, candidate: dict) -> bool:
+    """A later seal of the same scan keeps the first file."""
+    return _digest(_without_seal_clock(existing)) == _digest(_without_seal_clock(candidate))
+
+
+def _without_seal_clock(document: dict) -> dict:
+    body = {
+        key: value
+        for key, value in document.items()
+        if key not in {"content_sha256", "observation_origin"}
+    }
+    recorded = body.get("reconstruction")
+    if isinstance(recorded, dict):
+        body["reconstruction"] = {
+            key: value for key, value in recorded.items() if key != "sealed_at"
+        }
+    return body
+
+
+def _witness_reason(payload: dict) -> str | None:
+    """The close scan already asked whether the VNINDEX daily bar is this session."""
+    if "trading_today" not in payload:
+        return "SESSION_EVIDENCE_ABSENT"
+    if payload.get("trading_today") is not True:
+        return "NON_TRADING_SESSION"
+    if not str(payload.get("trading_reason") or "").strip():
+        return "SESSION_EVIDENCE_ABSENT"
+    return None
 
 
 def _session_text(value) -> str | None:

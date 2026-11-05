@@ -197,6 +197,27 @@ def _run_close_writers(payload: dict[str, Any], *, trade_date: str, now: datetim
     return market_t0, sweetspot
 
 
+def _capture_guardian(payload: dict, now: datetime) -> dict[str, Any]:
+    """Seal Guardian from the close scan already in memory. Failure stays local."""
+    try:
+        from research.guardian_research.panel import default_root
+        from research.guardian_research.pipeline import capture_from_close_payload
+
+        result = capture_from_close_payload(payload, now=now, root=default_root())
+        return {
+            "status": result.get("status"),
+            "reason": result.get("reason"),
+            "remote": result.get("remote"),
+            "source": "close_scan",
+        }
+    except Exception as exc:
+        return {
+            "status": "refused",
+            "reason": f"{type(exc).__name__}: {exc}",
+            "source": "close_scan",
+        }
+
+
 def _mature(session_date: str) -> dict[str, Any]:
     notes = {}
     try:
@@ -288,6 +309,7 @@ def run_post_close_finalize(
             )
             report["steps"]["market_t0"] = market_t0
             report["steps"]["sweetspot"] = sweetspot
+            report["steps"]["guardian_research"] = _capture_guardian(payload, local_now)
 
     if mature:
         report["steps"]["maturation"] = _mature(session_date)

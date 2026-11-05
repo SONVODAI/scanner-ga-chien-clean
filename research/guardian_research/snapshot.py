@@ -66,7 +66,7 @@ def build_snapshot(
 
 def label_observation_origin(document: dict, origin: str, *, reconstruction: dict) -> dict:
     """Copy a snapshot and record whether it was sealed at the time or reconstructed."""
-    if origin not in {"BACKFILLED", "CONTEMPORANEOUS"}:
+    if origin not in {"BACKFILLED", "CONTEMPORANEOUS", "DELAYED"}:
         raise ValueError("unknown observation origin")
     if not isinstance(reconstruction, dict):
         raise ValueError("reconstruction record required")

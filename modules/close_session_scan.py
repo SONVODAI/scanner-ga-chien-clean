@@ -241,6 +241,32 @@ def _learning_breadth(report: Any) -> Optional[float]:
     return None
 
 
+def scan_coverage(universe: list[str], scan_df: Any, attached: Any) -> dict[str, Any]:
+    """Use scanner-reported coverage. Otherwise derive it from the returned rows.
+
+    A scanner that does not record exceptions cannot distinguish a raised symbol
+    from an absent one. Those symbols stay in ``absent`` and are not invented.
+    """
+    if isinstance(attached, dict):
+        return attached
+    requested = [str(symbol).strip().upper() for symbol in universe]
+    returned: list[str] = []
+    columns = getattr(scan_df, "columns", [])
+    if isinstance(scan_df, pd.DataFrame) and "symbol" in columns:
+        returned = [
+            str(symbol).strip().upper()
+            for symbol in scan_df["symbol"]
+            if str(symbol).strip()
+        ]
+    found = set(returned)
+    return {
+        "requested": requested,
+        "returned": returned,
+        "absent": [symbol for symbol in requested if symbol not in found],
+        "errors": [],
+    }
+
+
 def build_close_scan_inputs(
     *,
     now: Optional[datetime] = None,
@@ -254,12 +280,14 @@ def build_close_scan_inputs(
         production = api or load_production_scan_api()
         universe = list(symbols) if symbols is not None else list(production["WATCHLIST"])
         scan_df = production["run_scan"](universe)
+        coverage = scan_coverage(universe, scan_df, getattr(production["run_scan"], "coverage", None))
         if not isinstance(scan_df, pd.DataFrame) or scan_df.empty:
             return {
                 "ok": False,
                 "status": "CLOSE_SCAN_EMPTY",
                 "trade_date": trade_date,
                 "scan_df": scan_df if isinstance(scan_df, pd.DataFrame) else pd.DataFrame(),
+                "scan_coverage": coverage if isinstance(coverage, dict) else None,
             }
         scan_df = add_evolution_health(scan_df)
         market_real = production["calc_market_real"](scan_df)
@@ -327,4 +355,6 @@ def build_close_scan_inputs(
         "trading_today": bool(trading_today),
         "trading_reason": str(trading_reason or ""),
         "source": "close_scan",
+        "scan_coverage": coverage if isinstance(coverage, dict) else None,
+        "observed_at": local_now.isoformat(),
     }
