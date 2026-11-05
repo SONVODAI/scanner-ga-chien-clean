@@ -3,16 +3,16 @@
   "name": "Mr.BOT PRO",
   "slogan": "Observe • Learn • Think • Evolve",
   "created_at": "2026-06-25 17:28:56",
-  "updated_at": "2026-11-04 21:17:53",
-  "age_days": 132,
+  "updated_at": "2026-11-05 17:18:00",
+  "age_days": 133,
   "bot_version_number": 4.991,
   "status": "THINKING",
   "personality": "CÂN BẰNG",
   "confidence": 46.0,
   "experience": {
-    "observations": 17331,
-    "signals": 1442,
-    "completed_t5": 1328,
+    "observations": 17504,
+    "signals": 1472,
+    "completed_t5": 1358,
     "hypotheses": 2,
     "beliefs": 0,
     "reflections": 1,
@@ -37,15 +37,6 @@
     "Niềm tin nào cần bị kiểm tra lại?"
   ],
   "evolution_log": [
-    {
-      "time": "2026-10-04 04:40:05",
-      "status": "THINKING",
-      "personality": "PHÒNG THỦ",
-      "confidence": 46.0,
-      "completed_t5": 1098,
-      "market_real": 4.5,
-      "message": "Market REAL 4.5 < 6. Tôi chỉ lập watchlist (REE, GVR, PHR), không đề xuất giải ngân thật. Kỷ luật quan trọng hơn cơ hội."
-    },
     {
       "time": "2026-10-04 04:45:22",
       "status": "THINKING",
@@ -755,6 +746,15 @@
       "confidence": 46.0,
       "completed_t5": 1328,
       "market_real": 7.5,
+      "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
+    },
+    {
+      "time": "2026-11-05 17:18:00",
+      "status": "THINKING",
+      "personality": "CÂN BẰNG",
+      "confidence": 46.0,
+      "completed_t5": 1358,
+      "market_real": 7.0,
       "message": "Tôi đã đủ dữ liệu tối thiểu để học chậm. Hiện tôi ưu tiên kiểm chứng giả thuyết hơn là thay đổi mạnh trọng số."
     }
   ]
