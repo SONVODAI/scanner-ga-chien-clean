@@ -1,0 +1,122 @@
+[
+  {
+    "id": "T30",
+    "name": "below_ema9_slope_still_steep_neg",
+    "screen": {
+      "n": 685,
+      "n_stocks": 125,
+      "n_dates": 22,
+      "n_episodes": 4,
+      "july_share": 0.5489051094890511,
+      "t3_median": 1.831501831501825,
+      "t5_median": 3.0241935483870996,
+      "t5_mean": 3.686689151830362,
+      "t5_winrate": 0.7570789865871833,
+      "t10_median": 4.804625199362045,
+      "t10_mean": 5.585627060299624,
+      "t10_winrate": 0.8180428134556575,
+      "ex_t5_median": 0.26259151865200003,
+      "incC_t5_median": 1.6397084075425838,
+      "incC_t10_median": 3.7428566496093385,
+      "incC_t5_winrate": 0.057078986587183356,
+      "complexity": 2,
+      "verdict": "INTERESTING OBSERVATION"
+    }
+  },
+  {
+    "id": "T31",
+    "name": "new_low_rsi_falling",
+    "screen": {
+      "n": 219,
+      "n_stocks": 110,
+      "n_dates": 17,
+      "n_episodes": 4,
+      "july_share": 0.5707762557077626,
+      "t3_median": 2.444987775061125,
+      "t5_median": 4.434820596366662,
+      "t5_mean": 4.3506021721248915,
+      "t5_winrate": 0.7916666666666666,
+      "t10_median": 6.310679611650483,
+      "t10_mean": 7.133504881279418,
+      "t10_winrate": 0.8839779005524862,
+      "ex_t5_median": 0.057686568686726725,
+      "incC_t5_median": 1.756249167795243,
+      "incC_t10_median": 2.6069759079467847,
+      "incC_t5_winrate": 0.015909090909090873,
+      "complexity": 2,
+      "verdict": "INTERESTING OBSERVATION"
+    }
+  },
+  {
+    "id": "T32",
+    "name": "vol_expand_on_new_low",
+    "screen": {
+      "n": 93,
+      "n_stocks": 55,
+      "n_dates": 17,
+      "n_episodes": 4,
+      "july_share": 0.40860215053763443,
+      "t3_median": 1.1494252873563315,
+      "t5_median": 3.958437419825267,
+      "t5_mean": 4.897301234202199,
+      "t5_winrate": 0.7804878048780488,
+      "t10_median": 7.055519658034692,
+      "t10_mean": 7.8779900426284595,
+      "t10_winrate": 0.825,
+      "ex_t5_median": 0.736218231584862,
+      "incC_t5_median": 1.3550683539753416,
+      "incC_t10_median": 3.0503796324391708,
+      "incC_t5_winrate": 0.03639879236066357,
+      "complexity": 2,
+      "verdict": "INTERESTING OBSERVATION"
+    }
+  },
+  {
+    "id": "T33",
+    "name": "rs10_still_deteriorating",
+    "screen": {
+      "n": 213,
+      "n_stocks": 96,
+      "n_dates": 16,
+      "n_episodes": 4,
+      "july_share": 0.5164319248826291,
+      "t3_median": 1.91256830601092,
+      "t5_median": 3.603603603603611,
+      "t5_mean": 4.173467344640703,
+      "t5_winrate": 0.8066298342541437,
+      "t10_median": 5.554902508191661,
+      "t10_mean": 6.351128040184331,
+      "t10_winrate": 0.8653846153846154,
+      "ex_t5_median": 0.44447250103458735,
+      "incC_t5_median": 0.7532312271648856,
+      "incC_t10_median": 1.2752932285823748,
+      "incC_t5_winrate": 0.035878846111851215,
+      "complexity": 2,
+      "verdict": "NO EDGE"
+    }
+  },
+  {
+    "id": "T42",
+    "name": "too_extended_after_low",
+    "screen": {
+      "n": 0,
+      "n_stocks": 0,
+      "n_dates": 0,
+      "n_episodes": 0,
+      "july_share": null,
+      "t3_median": null,
+      "t5_median": null,
+      "t5_mean": null,
+      "t5_winrate": null,
+      "t10_median": null,
+      "t10_mean": null,
+      "t10_winrate": null,
+      "ex_t5_median": null,
+      "incC_t5_median": null,
+      "incC_t10_median": null,
+      "incC_t5_winrate": null,
+      "complexity": 2,
+      "verdict": "NO EDGE"
+    }
+  }
+]
