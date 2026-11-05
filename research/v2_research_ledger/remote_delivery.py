@@ -51,6 +51,44 @@ def resolve_remote_config() -> tuple[str, str]:
     return _setting("EDGE_RESEARCH_LEDGER_URL"), _setting("EDGE_RESEARCH_LEDGER_TOKEN")
 
 
+APPROXIMATE_PERFORMANCE_PATH = "/current/research_ledger/approximate_performance.json"
+
+
+def fetch_approximate_performance(
+    base_url: str,
+    token: str,
+    *,
+    opener: Opener | None = None,
+    timeout: int = TIMEOUT_SECONDS,
+) -> dict | None:
+    """Fetch the separate performance view. A failure leaves the bundled view in place."""
+    if not str(token or "").strip():
+        return None
+    base = _base_url(base_url)
+    if base is None:
+        return None
+    url = base + APPROXIMATE_PERFORMANCE_PATH
+    if urlsplit(url).path != APPROXIMATE_PERFORMANCE_PATH:
+        return None
+    open_fn = opener or _urllib_open
+    try:
+        response = open_fn(
+            url,
+            {"Authorization": f"Bearer {token}", "User-Agent": "mrbot-research-ledger/1.0"},
+            timeout,
+        )
+    except Exception:
+        return None
+    if response.status != 200 or not response.body.endswith(b"\n"):
+        return None
+    from research.approximate_returns.view import read_view
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "approximate_performance.json"
+        path.write_bytes(response.body)
+        return read_view(path)
+
+
 def fetch_research_trio(
     base_url: str,
     token: str,

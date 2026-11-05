@@ -6082,6 +6082,9 @@ try:
             from modules.v2_research_ledger_panel.ui import render_v2_research_ledger_panel
 
             render_v2_research_ledger_panel(remote=True)
+            from modules.v2_research_ledger_panel.approximate_ui import render_approximate_performance_panel
+
+            render_approximate_performance_panel(remote=False)
         except Exception:
             pass
         if _v2_gate_a_caption:
