@@ -2,12 +2,12 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "THINKING",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-11-06 05:13:11",
+  "updated_at": "2026-11-06 05:18:44",
   "completed_t5": 1388,
   "baseline_winrate": 0.3869,
   "observation": {
     "date": "2026-11-06",
-    "time": "05:13:11",
+    "time": "05:18:44",
     "market_real": 7.0,
     "market_forecast": 1.8,
     "regime": "🟡 TRUNG TÍNH",
@@ -15,7 +15,7 @@
     "signals_today": 30,
     "top_watch": "NAB, TPB, KBC",
     "avg_winprob": 71.4,
-    "avg_elite_score": 70.7,
+    "avg_elite_score": 70.8,
     "high_consensus_count": 11
   },
   "hypotheses": [
