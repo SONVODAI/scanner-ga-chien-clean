@@ -1,8 +1,9 @@
-"""Read-only current-session V2 sidecar for VPS Camera.
+"""Read-only V2 sidecar for VPS Camera observe.
 
 Authoritative source is the Gate B published GitHub sidecar.
 Does not run Brain A. Does not treat Elite rows as V2 nominations.
-Fail closed on absent / invalid / wrong-session documents.
+Fail closed on absent / invalid / unrelated stale documents.
+Accepts T−1 documents only when rows are evaluation-eligible for the cycle day.
 """
 
 from __future__ import annotations
@@ -18,7 +19,10 @@ from modules.live_candidate_v2_action.contract import (
     CANDIDATE_IS_BUY,
     PXV_IMPLIES_BUY,
 )
-from modules.live_candidate_v2_action.universe import current_session_v2_rows
+from modules.live_candidate_v2_action.universe import (
+    current_session_v2_rows,
+    rows_for_evaluation_session,
+)
 from modules.live_candidate_v2_camera.contract import GITHUB_V2_SIDECAR_PATH
 from modules.live_candidate_v2_camera.github_bus import (
     STATUS_NOT_FOUND,
@@ -49,6 +53,7 @@ class SidecarResolveResult:
     session: str = ""
     n_raw: int = 0
     detail: str = ""
+    sidecar_session: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -56,13 +61,22 @@ class SidecarResolveResult:
             "reason": self.reason,
             "source": self.source,
             "session": self.session,
+            "sidecar_session": self.sidecar_session,
             "n_raw": self.n_raw,
             "n_current_session": len(self.rows),
             "detail": self.detail,
         }
 
 
-def _fail(reason: str, *, source: str, session: str, detail: str = "") -> SidecarResolveResult:
+def _fail(
+    reason: str,
+    *,
+    source: str,
+    session: str,
+    detail: str = "",
+    sidecar_session: str = "",
+    n_raw: int = 0,
+) -> SidecarResolveResult:
     return SidecarResolveResult(
         ok=False,
         rows=[],
@@ -70,6 +84,8 @@ def _fail(reason: str, *, source: str, session: str, detail: str = "") -> Sideca
         source=source,
         session=session,
         detail=detail,
+        sidecar_session=sidecar_session,
+        n_raw=n_raw,
     )
 
 
@@ -80,7 +96,12 @@ def _permissions_ok(doc: Mapping[str, Any]) -> bool:
         return False
     if doc.get("pxv_implies_buy") is True:
         return False
-    return pxv_implies_buy(None) is False and CANDIDATE_IS_BUY is False and PXV_IMPLIES_BUY is False and ALERT_ELIGIBLE is False
+    return (
+        pxv_implies_buy(None) is False
+        and CANDIDATE_IS_BUY is False
+        and PXV_IMPLIES_BUY is False
+        and ALERT_ELIGIBLE is False
+    )
 
 
 def accept_sidecar_document(
@@ -89,7 +110,14 @@ def accept_sidecar_document(
     session: date | str,
     source: str,
 ) -> SidecarResolveResult:
-    """Validate + current-session filter. Never invents V2 rows."""
+    """Validate + evaluation-session filter. Never invents V2 rows.
+
+    Same-day sidecar documents keep rows whose evaluation trading session
+    equals the cycle day (including same-day eligible_from). A prior-day
+    sidecar is accepted only when at least one row is evaluation-eligible
+    for the cycle day via ``eligible_from`` / ``evaluation_trading_session``.
+    Unrelated stale, future, or empty-carry documents fail closed.
+    """
     sess = session.isoformat() if isinstance(session, date) else str(session or "").strip()
     if not isinstance(doc, Mapping):
         return _fail(REASON_ABSENT, source=source, session=sess, detail="missing document")
@@ -99,23 +127,56 @@ def accept_sidecar_document(
     if not _permissions_ok(doc):
         return _fail(REASON_PERMISSIONS, source=source, session=sess)
     doc_session = str(doc.get("session") or "").strip()
-    if doc_session != sess:
+    raw = list(doc.get("rows") or [])
+
+    if doc_session == sess:
+        # Same-day document: provenance session filter (unchanged live/feed contract).
+        rows = current_session_v2_rows(raw, sess)
+        return SidecarResolveResult(
+            ok=True,
+            rows=rows,
+            reason=REASON_OK,
+            source=source,
+            session=sess,
+            sidecar_session=doc_session,
+            n_raw=len(raw),
+            detail=GITHUB_V2_SIDECAR_PATH if source == SOURCE_GITHUB else source,
+        )
+
+    if doc_session > sess:
         return _fail(
             REASON_STALE_SESSION,
             source=source,
             session=sess,
-            detail=f"sidecar session={doc_session}",
+            detail=f"future sidecar session={doc_session}",
+            sidecar_session=doc_session,
+            n_raw=len(raw),
         )
-    raw = list(doc.get("rows") or [])
-    rows = current_session_v2_rows(raw, sess)
-    return SidecarResolveResult(
-        ok=True,
-        rows=rows,
-        reason=REASON_OK,
+
+    # Prior-day document: only rows whose evaluation trading session is today.
+    actionable = rows_for_evaluation_session(raw, sess)
+    if actionable:
+        return SidecarResolveResult(
+            ok=True,
+            rows=actionable,
+            reason=REASON_OK,
+            source=source,
+            session=sess,
+            sidecar_session=doc_session,
+            n_raw=len(raw),
+            detail=(
+                f"carry_from_sidecar_session={doc_session};"
+                f"n_eval_eligible={len(actionable)}"
+            ),
+        )
+
+    return _fail(
+        REASON_STALE_SESSION,
         source=source,
         session=sess,
+        detail=f"sidecar session={doc_session};no_eval_eligible_rows",
+        sidecar_session=doc_session,
         n_raw=len(raw),
-        detail=GITHUB_V2_SIDECAR_PATH if source == SOURCE_GITHUB else source,
     )
 
 
@@ -142,13 +203,14 @@ def resolve_published_v2_sidecar(
     sess = session.isoformat() if isinstance(session, date) else str(session or "").strip()
     if rows is not None:
         raw = list(rows)
-        filtered = current_session_v2_rows(raw, sess)
+        filtered = rows_for_evaluation_session(raw, sess)
         return SidecarResolveResult(
             ok=True,
             rows=filtered,
             reason=REASON_OK,
             source=SOURCE_INJECTED,
             session=sess,
+            sidecar_session=sess,
             n_raw=len(raw),
             detail="injected rows (tests)",
         )

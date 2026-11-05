@@ -20,6 +20,7 @@ VPS_SHADOW_STORE = "/var/lib/mrbot/live_pxv_shadow"
 V2_ACTION_SUBDIR = "v2_action"
 V2_ACTION_STATE_NAME = "v2_action_state.json"
 V2_ACTION_EVIDENCE_NAME = "v2_action_evidence.jsonl"
+V2_ACTION_OBSERVE_FAILURE_NAME = "v2_action_observe_failure.json"
 
 # Never these:
 FORBIDDEN_CAMERA_ARCHIVE = "/var/lib/mrbot/intraday_memory"

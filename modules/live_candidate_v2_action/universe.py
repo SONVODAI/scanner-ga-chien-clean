@@ -124,6 +124,51 @@ def current_session_v2_rows(
     return out
 
 
+def rows_for_evaluation_session(
+    rows: Iterable[Mapping[str, Any]] | None,
+    evaluation_session: str,
+) -> list[dict[str, Any]]:
+    """Keep nominations whose evaluation trading session equals ``evaluation_session``.
+
+    Uses ``evaluation_trading_session`` / ``eligible_from`` (next-open carry).
+    Preserves original row ``session`` provenance. Does not keep a row merely
+    because the sidecar document is from yesterday. Drops expired (eval day
+    before cycle), future (eval day after cycle), and invalid chronology.
+    """
+    from modules.live_candidate_v2_action.state import (
+        evaluation_trading_session,
+        nomination_from_mapping,
+        parse_legal_ts,
+    )
+
+    want = str(evaluation_session or "").strip()[:10]
+    out: list[dict[str, Any]] = []
+    if not want:
+        return out
+    for raw in rows or []:
+        if not isinstance(raw, Mapping):
+            continue
+        nom = nomination_from_mapping(raw)
+        if not nom.symbol:
+            continue
+        if parse_legal_ts(nom.candidate_first_seen_ts) is None:
+            continue
+        if parse_legal_ts(nom.eligible_from) is None:
+            continue
+        eval_day = evaluation_trading_session(nom)
+        if eval_day != want:
+            continue
+        rec = dict(raw)
+        rec["symbol"] = nom.symbol
+        # Provenance session stays as published (may be T-1).
+        rec["session"] = str(rec.get("session") or nom.session or "").strip()
+        rec["v2_camera"] = True
+        rec["candidate_is_buy"] = False
+        rec["alert_eligible"] = False
+        out.append(rec)
+    return out
+
+
 def merge_elite_v2(
     elite_rows: Iterable[Mapping[str, Any]] | None,
     v2_rows: Iterable[Mapping[str, Any]] | None,
