@@ -21,7 +21,6 @@
 # V3.0 Brain Learning
 # =========================================================
 
-import streamlit as st
 import pandas as pd
 import numpy as np
 import re
@@ -300,6 +299,7 @@ def render_holdings_editor():
     Cancel drops the draft by remounting the editor from the stored ledger.
     Removing a stored symbol is written only after the confirmation box and Save.
     """
+    import streamlit as st
     from modules.user_holdings import load_positions
 
     form_id = "position_guardian_holdings_form"
@@ -680,6 +680,7 @@ def row_color(row):
 # =========================================================
 
 def render_summary(df):
+    import streamlit as st
 
     total = len(df)
     status = df["Trạng thái"].astype(str)
@@ -705,6 +706,7 @@ def render_summary(df):
 # =========================================================
 
 def render_guardian(scan_df, include_editor: bool = True):
+    import streamlit as st
     from modules.user_holdings import load_positions
 
     if include_editor:

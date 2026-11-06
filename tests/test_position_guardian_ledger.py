@@ -67,6 +67,72 @@ def test_generate_signal_rules_are_identical():
         "EMA9 dưới MA20 + OBV xác nhận",
         80,
     )
+    equal_price = pd.Series(
+        {"price": 25.0, "ema9": 25.0, "ma20": 24.0, "obv": 1000, "obv_ema9": 900}
+    )
+    equal_ma = pd.Series(
+        {"price": 24.0, "ema9": 25.0, "ma20": 25.0, "obv": 1000, "obv_ema9": 900}
+    )
+    equal_obv = pd.Series(
+        {"price": 24.0, "ema9": 23.0, "ma20": 24.0, "obv": 900, "obv_ema9": 900}
+    )
+    assert pg.generate_signal(equal_price) == (pg.SIGNAL_HOLD, "Xu hướng khỏe", 0)
+    assert pg.generate_signal(equal_ma) == (pg.SIGNAL_WARNING, "Giá dưới EMA9", 40)
+    assert pg.generate_signal(equal_obv) == (pg.SIGNAL_SELL, "EMA9 dưới MA20", 60)
+
+
+def test_generate_signal_imports_without_streamlit():
+    """Research runtime must execute the same function with Streamlit absent."""
+    import json
+    import subprocess
+
+    script = r"""
+import json, sys
+import pandas as pd
+
+class _Block:
+    def find_spec(self, name, path, target=None):
+        if name == "streamlit" or name.startswith("streamlit."):
+            raise ModuleNotFoundError("No module named 'streamlit'")
+        return None
+
+sys.meta_path.insert(0, _Block())
+from position_guardian import generate_signal, SIGNAL_HOLD, SIGNAL_WARNING, SIGNAL_SELL
+rows = {
+    "hold": {"price": 26.0, "ema9": 25.0, "ma20": 24.0, "obv": 1000, "obv_ema9": 900},
+    "warn": {"price": 24.0, "ema9": 25.0, "ma20": 24.0, "obv": 1000, "obv_ema9": 900},
+    "sell": {"price": 24.0, "ema9": 23.0, "ma20": 24.0, "obv": 1100, "obv_ema9": 900},
+    "sell_obv": {"price": 24.0, "ema9": 23.0, "ma20": 24.0, "obv": 800, "obv_ema9": 900},
+    "equal_price": {"price": 25.0, "ema9": 25.0, "ma20": 24.0, "obv": 1000, "obv_ema9": 900},
+    "equal_ma": {"price": 24.0, "ema9": 25.0, "ma20": 25.0, "obv": 1000, "obv_ema9": 900},
+    "equal_obv": {"price": 24.0, "ema9": 23.0, "ma20": 24.0, "obv": 900, "obv_ema9": 900},
+}
+payload = {key: list(generate_signal(pd.Series(value))) for key, value in rows.items()}
+payload["labels"] = [SIGNAL_HOLD, SIGNAL_WARNING, SIGNAL_SELL]
+print(json.dumps(payload, ensure_ascii=True))
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    raw = [line for line in completed.stdout.splitlines() if line.startswith("{")][-1]
+    got = json.loads(raw)
+    pg = _import_position_guardian()
+    assert got["labels"] == [pg.SIGNAL_HOLD, pg.SIGNAL_WARNING, pg.SIGNAL_SELL]
+    assert got["hold"] == [pg.SIGNAL_HOLD, "Xu hướng khỏe", 0]
+    assert got["warn"] == [pg.SIGNAL_WARNING, "Giá dưới EMA9", 40]
+    assert got["sell"] == [pg.SIGNAL_SELL, "EMA9 dưới MA20", 60]
+    assert got["sell_obv"] == [pg.SIGNAL_SELL, "EMA9 dưới MA20 + OBV xác nhận", 80]
+    assert got["equal_price"] == [pg.SIGNAL_HOLD, "Xu hướng khỏe", 0]
+    assert got["equal_ma"] == [pg.SIGNAL_WARNING, "Giá dưới EMA9", 40]
+    assert got["equal_obv"] == [pg.SIGNAL_SELL, "EMA9 dưới MA20", 60]
+    source = (REPO / "position_guardian.py").read_text(encoding="utf-8")
+    assert "\nimport streamlit" not in source
+    assert source.count("import streamlit as st") == 3
 
 
 def _stub_streamlit():
