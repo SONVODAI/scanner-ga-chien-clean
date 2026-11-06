@@ -1,0 +1,36 @@
+name: guardian-close
+
+on:
+  schedule:
+    # 19:30 Asia/Ho_Chi_Minh (UTC+7, no daylight saving), weekdays.
+    # 19:30 ICT = 12:30 UTC.
+    - cron: "30 12 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  guardian:
+    # Independent of post-close-research.yml. Leave this variable unset
+    # to keep the job off. Clearing it is the rollback.
+    if: vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Seal Guardian T0 from the close scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GUARDIAN_RESEARCH_SNAPSHOT_ENABLED: ${{ vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED }}
+          GITHUB_REPO_OWNER: SONVODAI
+          GITHUB_REPO_NAME: scanner-ga-chien-clean
+          GITHUB_BRANCH: main
+        run: python -m research.guardian_research.close_job

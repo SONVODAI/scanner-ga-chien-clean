@@ -272,8 +272,13 @@ def build_close_scan_inputs(
     now: Optional[datetime] = None,
     symbols: Optional[list[str]] = None,
     api: Optional[dict[str, Any]] = None,
+    retain_research: bool = True,
 ) -> dict[str, Any]:
-    """Build the close-scan payload. Does not read a session handoff."""
+    """Build the close-scan payload. Does not read a session handoff.
+
+    ``retain_research`` keeps the existing Market Context and evolution-ledger
+    appends. The Guardian-only job passes False so it does not write them.
+    """
     local_now = as_vn(now or datetime.now(VN_TZ))
     trade_date = local_now.strftime("%Y-%m-%d")
     try:
@@ -308,34 +313,35 @@ def build_close_scan_inputs(
             "error": f"{type(exc).__name__}: {exc}",
             "scan_df": pd.DataFrame(),
         }
-    try:
-        from modules.research_market_context.contract import SOURCE_CLOSE_SCAN
-        from modules.research_market_context.market_context import try_append_market_context
+    if retain_research:
+        try:
+            from modules.research_market_context.contract import SOURCE_CLOSE_SCAN
+            from modules.research_market_context.market_context import try_append_market_context
 
-        try_append_market_context(
-            trade_date=trade_date,
-            market_real=market_real,
-            market_live=market_live,
-            market_forecast=forecast.score,
-            market_regime=regime_name,
-            source=SOURCE_CLOSE_SCAN,
-            scan_df=scan_df,
-            captured_at=local_now,
-        )
-    except Exception:
-        pass
-    try:
-        from modules.research_evolution_ledger.ledger import try_append_evolution_ledger
-        from modules.research_market_context.contract import SOURCE_CLOSE_SCAN
+            try_append_market_context(
+                trade_date=trade_date,
+                market_real=market_real,
+                market_live=market_live,
+                market_forecast=forecast.score,
+                market_regime=regime_name,
+                source=SOURCE_CLOSE_SCAN,
+                scan_df=scan_df,
+                captured_at=local_now,
+            )
+        except Exception:
+            pass
+        try:
+            from modules.research_evolution_ledger.ledger import try_append_evolution_ledger
+            from modules.research_market_context.contract import SOURCE_CLOSE_SCAN
 
-        try_append_evolution_ledger(
-            trade_date=trade_date,
-            source=SOURCE_CLOSE_SCAN,
-            scan_df=scan_df,
-            captured_at=local_now,
-        )
-    except Exception:
-        pass
+            try_append_evolution_ledger(
+                trade_date=trade_date,
+                source=SOURCE_CLOSE_SCAN,
+                scan_df=scan_df,
+                captured_at=local_now,
+            )
+        except Exception:
+            pass
     return {
         "ok": True,
         "status": "READY",
