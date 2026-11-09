@@ -92,7 +92,7 @@ def test_archive_save_clock_is_not_an_after_close_observation(tmp_path: Path):
     payload["saved_at"] = "2026-11-04T21:11:16+07:00"
     refused = capture_from_close_payload(
         payload,
-        now=datetime(2026, 11, 6, 6, 0, tzinfo=VN),
+        now=datetime(2026, 11, 4, 21, 30, tzinfo=VN),
         root=tmp_path,
         symbols=tracked,
     )
@@ -108,8 +108,33 @@ def test_archive_save_clock_is_not_an_after_close_observation(tmp_path: Path):
         root=tmp_path,
         symbols=tracked,
     )
-    assert early_morning["reason"] == "CLOCK_SESSION_MISMATCH"
+    assert early_morning["reason"] == "SCHEDULE_TOO_LATE"
     assert not (tmp_path / "sessions").exists()
+
+    # Observation stayed on the session evening; seal after ICT midnight is DELAYED.
+    delayed_payload = _payload([_row("HPG")], tracked)
+    delayed_payload["observed_at"] = EVENING.isoformat()
+    delayed = capture_from_close_payload(
+        delayed_payload,
+        now=datetime(2026, 11, 6, 5, 30, tzinfo=VN),
+        root=tmp_path / "delayed",
+        symbols=tracked,
+    )
+    assert delayed["status"] == "created"
+    assert delayed["document"]["observation_origin"] == "DELAYED"
+    assert delayed["document"]["reconstruction"]["observation_at"] == EVENING.isoformat()
+    assert delayed["document"]["reconstruction"]["sealed_at"] == datetime(
+        2026, 11, 6, 5, 30, tzinfo=VN
+    ).isoformat()
+
+    after_open = capture_from_close_payload(
+        delayed_payload,
+        now=datetime(2026, 11, 6, 9, 0, tzinfo=VN),
+        root=tmp_path / "after_open",
+        symbols=tracked,
+    )
+    assert after_open["reason"] == "SCHEDULE_TOO_LATE"
+    assert not (tmp_path / "after_open" / "sessions").exists()
 
 
 def test_a_verified_scan_clock_can_be_sealed_later_without_rewriting(tmp_path: Path):

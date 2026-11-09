@@ -1,0 +1,19 @@
+{
+  "schema": "guardian_research_gap.v1",
+  "session": "2026-11-09",
+  "status": "HARD_GAP",
+  "reason": "NO_CONTEMPORANEOUS_SNAPSHOT",
+  "detail": "Scheduled guardian-close run 42713254137 started ~10h late (05:35 ICT 2026-11-10) and refused with NON_TRADING_SESSION. No data/guardian_research/sessions/2026-11-09.json exists locally or on GitHub. The ephemeral runner scan was not persisted. This gap is not filled from live or current prices.",
+  "failed_run_url": "https://github.com/SONVODAI/scanner-ga-chien-clean/actions/runs/42713254137",
+  "failed_at_ict": "2026-11-10T05:39:11+07:00",
+  "verified_absent_local": true,
+  "verified_absent_github": true,
+  "reconstructed_from_live_prices": false,
+  "preserved_sessions": [
+    "2026-11-06"
+  ],
+  "related_non_guardian_t0": {
+    "market_daily_t0": "2026-11-09 AFTER_CLOSE captured_at 2026-11-09T14:19:36Z",
+    "t0_observation_freeze": "2026-11-09 +143 symbols frozen_at 2026-11-09T14:20:22Z"
+  }
+}

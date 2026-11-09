@@ -187,14 +187,30 @@ def test_observed_at_and_vnindex_witness_are_required(monkeypatch, tmp_path: Pat
     closed = _payload(("HPG",))
     closed["trading_today"] = False
     closed["trading_reason"] = "VNINDEX mới nhất là 2026-11-05, không phải 2026-11-06"
-    witness = _run(
+    # Accepted VNINDEX bar for the session overrides a false clock-day flag.
+    aligned = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: closed,
         symbols=("HPG",),
     )
-    assert witness["reason"] == "NON_TRADING_SESSION"
-    assert not (tmp_path / "sessions").exists()
+    assert aligned["status"] == "created"
+    assert aligned["session"] == SESSION
+    assert read_snapshot(Path(aligned["path"]))["session_witness"]["bar_session"] == SESSION
+
+    from research.guardian_research.pipeline import capture_from_close_payload
+
+    no_bar = _payload(("HPG",))
+    no_bar["trading_today"] = False
+    no_bar["trading_reason"] = "VNINDEX mới nhất là 2026-11-05, không phải 2026-11-06"
+    refused = capture_from_close_payload(
+        no_bar,
+        now=EVENING,
+        root=tmp_path / "no_bar",
+        symbols=("HPG",),
+    )
+    assert refused["reason"] == "NON_TRADING_SESSION"
+    assert not (tmp_path / "no_bar" / "sessions").exists()
 
 
 def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_path: Path):
@@ -332,7 +348,8 @@ def test_vnindex_bar_names_the_session_and_a_mixed_scan_is_refused(monkeypatch, 
         symbols=("HPG",),
         witness=_witness("2026-11-05"),
     )
-    assert stale_bar["reason"] == "STALE_MARKET_DATA"
+    # Prior-day bar is outside the seal window for that session.
+    assert stale_bar["reason"] == "SCHEDULE_TOO_LATE"
     assert not (tmp_path / "other" / "sessions").exists()
 
     mixed = _payload(("HPG", "SSI"))
@@ -371,6 +388,103 @@ def test_vnindex_bar_names_the_session_and_a_mixed_scan_is_refused(monkeypatch, 
     assert not (tmp_path / "mismatch" / "sessions").exists()
 
 
+def test_delayed_cross_midnight_seal_preserves_observed_at(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    morning = datetime(2026, 11, 7, 5, 35, tzinfo=VN)
+    payload = _payload(("HPG",), observed_at=OBSERVED)
+    payload["trading_today"] = False
+    payload["trading_reason"] = "VNINDEX mới nhất là 2026-11-06, không phải 2026-11-07"
+    sealed = _run(
+        now=morning,
+        root=tmp_path,
+        close_scan=lambda: payload,
+        symbols=("HPG",),
+    )
+    assert sealed["status"] == "created"
+    stored = read_snapshot(Path(sealed["path"]))
+    assert stored["session"] == SESSION
+    assert stored["observation_origin"] == "DELAYED"
+    assert stored["reconstruction"]["observation_at"] == OBSERVED
+    assert stored["reconstruction"]["sealed_at"] == morning.isoformat()
+    assert stored["reconstruction"]["timestamp_provenance"] == "close_scan.observed_at"
+    assert stored["session_witness"]["bar_session"] == SESSION
+
+    again = _run(
+        now=datetime(2026, 11, 7, 6, 0, tzinfo=VN),
+        root=tmp_path,
+        close_scan=lambda: payload,
+        symbols=("HPG",),
+    )
+    assert again["status"] == "unchanged"
+    assert again["content_sha256"] == sealed["content_sha256"]
+
+
+def test_schedule_too_late_and_mismatched_observation_are_refused(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    too_late = _run(
+        now=datetime(2026, 11, 7, 9, 0, tzinfo=VN),
+        root=tmp_path / "late",
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert too_late["status"] == "refused"
+    assert too_late["reason"] == "SCHEDULE_TOO_LATE"
+    assert too_late["session"] == SESSION
+    assert not (tmp_path / "late" / "sessions").exists()
+
+    next_morning_obs = _payload(("HPG",), observed_at="2026-11-07T05:35:00+07:00")
+    next_morning_obs["trading_today"] = False
+    refused = _run(
+        now=datetime(2026, 11, 7, 5, 40, tzinfo=VN),
+        root=tmp_path / "obs",
+        close_scan=lambda: next_morning_obs,
+        symbols=("HPG",),
+    )
+    assert refused["reason"] == "SCHEDULE_TOO_LATE"
+    assert not (tmp_path / "obs" / "sessions").exists()
+
+    stale_rows = _payload(("HPG",), day="2026-11-05")
+    stale = _run(
+        now=EVENING,
+        root=tmp_path / "stale",
+        close_scan=lambda: stale_rows,
+        symbols=("HPG",),
+        witness=_witness(SESSION),
+    )
+    assert stale["reason"] == "STALE_MARKET_DATA"
+    assert not (tmp_path / "stale" / "sessions").exists()
+
+    missing = run_guardian_close(
+        now=EVENING,
+        root=tmp_path / "missing",
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+        witness={"source": "vnindex_daily_bar", "bar_session": "", "probe_error": "NO_BAR"},
+    )
+    assert missing["reason"] == "SESSION_EVIDENCE_ABSENT"
+    assert not (tmp_path / "missing" / "sessions").exists()
+
+
+def test_hard_gap_marker_for_2026_11_09_does_not_touch_existing_t0():
+    root = Path(__file__).resolve().parents[1]
+    sessions = root / "data" / "guardian_research" / "sessions"
+    gap = root / "data" / "guardian_research" / "gaps" / "2026-11-09.json"
+    preserved = sessions / "2026-11-06.json"
+    assert preserved.is_file()
+    assert not (sessions / "2026-11-09.json").exists()
+    assert gap.is_file()
+    marker = json.loads(gap.read_text(encoding="utf-8"))
+    assert marker["schema"] == "guardian_research_gap.v1"
+    assert marker["session"] == "2026-11-09"
+    assert marker["status"] == "HARD_GAP"
+    assert marker["reconstructed_from_live_prices"] is False
+    before = preserved.read_bytes()
+    assert json.loads(before)["session"] == "2026-11-06"
+    assert preserved.read_bytes() == before
+
+
 def test_schedule_is_isolated_and_the_ledger_workflow_is_unchanged():
     root = Path(__file__).resolve().parents[1]
     guardian = root.joinpath(".github", "workflows", "guardian-close.yml").read_text(encoding="utf-8")
@@ -392,3 +506,5 @@ def test_schedule_is_isolated_and_the_ledger_workflow_is_unchanged():
     assert "authority_ready" in source
     position = root.joinpath("position_guardian.py").read_text(encoding="utf-8")
     assert "def generate_signal" in position
+    live = root.joinpath("research", "guardian_research", "live.py").read_text(encoding="utf-8")
+    assert "The returned document is not a T0 snapshot" in live
