@@ -2,6 +2,10 @@
 Controlled conditional edge discovery for Edge Research (Phase 2).
 
 Stops at CANDIDATE — no OOS, anti-edge, or production coupling.
+
+Phase A: new discovery searches the chronological discovery split only so the
+OOS holdout remains unseen. Historical candidates already searched on the full
+panel must still use prospective-after-freeze OOS, never a fake retrospective split.
 """
 
 from __future__ import annotations
@@ -48,6 +52,7 @@ from modules.edge_research.statistical_guardrails import (
     welch_one_sided_pvalue,
 )
 from modules.edge_research.episodes import segment_market_episodes
+from modules.edge_research.oos import chronological_research_split
 
 FEATURE_LABELS = {
     "rs5": "RS5",
@@ -140,6 +145,11 @@ class DiscoveryRunResult:
     search_cardinality: Dict[str, Any] = field(default_factory=dict)
     no_edge_outcome: Optional[str] = None
     hypothesis_tests: List[Dict[str, Any]] = field(default_factory=list)
+    holdout_applied: bool = False
+    oos_start_date: str = ""
+    embargo_trading_days: int = 10
+    search_observation_count: int = 0
+    full_panel_observation_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -148,6 +158,11 @@ class DiscoveryRunResult:
             "research_version": self.research_version,
             "discovery_start_date": self.discovery_start_date,
             "discovery_end_date": self.discovery_end_date,
+            "holdout_applied": self.holdout_applied,
+            "oos_start_date": self.oos_start_date,
+            "embargo_trading_days": self.embargo_trading_days,
+            "search_observation_count": self.search_observation_count,
+            "full_panel_observation_count": self.full_panel_observation_count,
             "data_quality": self.data_quality,
             "conditions_tested": self.conditions_tested,
             "rejected_insufficient_sample": self.rejected_insufficient_sample,
@@ -174,6 +189,16 @@ class DiscoveryRunResult:
                     "discovery_start_date": c.discovery_start_date,
                     "discovery_end_date": c.discovery_end_date,
                     "guardrails": c.guardrails,
+                    "clauses": [
+                        {
+                            "feature": cl.feature,
+                            "operator": cl.operator,
+                            "threshold_lo": cl.threshold_lo,
+                            "threshold_hi": cl.threshold_hi,
+                            "bucket_id": cl.bucket_id,
+                        }
+                        for cl in c.clauses
+                    ],
                 }
                 for c in self.candidates
             ],
@@ -495,13 +520,33 @@ def run_discovery(
     *,
     enable_three_feature: bool = False,
     max_candidates: int = 20,
+    apply_chronological_holdout: bool = True,
 ) -> DiscoveryRunResult:
-    """Run controlled discovery search; returns ranked candidates."""
+    """Run controlled discovery search; returns ranked candidates.
+
+    When apply_chronological_holdout is True (production default), search uses
+    only the discovery split so the OOS holdout remains unseen.
+    """
+    from modules.edge_research.oos import DEFAULT_EMBARGO_TRADING_DAYS
+
     run_id = hashlib.sha256(
         f"{datetime.now(timezone.utc).isoformat()}:{len(panel)}".encode()
     ).hexdigest()[:12]
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    dq = compute_data_quality(panel)
+    full_n = 0 if panel is None else int(len(panel))
+    search_panel = panel
+    holdout_applied = False
+    oos_start_date = ""
+    embargo_days = DEFAULT_EMBARGO_TRADING_DAYS
+    if apply_chronological_holdout and panel is not None and not panel.empty:
+        split = chronological_research_split(panel, embargo_trading_days=embargo_days)
+        if split.holdout_applied and not split.discovery_panel.empty:
+            search_panel = split.discovery_panel
+            holdout_applied = True
+            oos_start_date = split.oos_start_date
+            embargo_days = split.embargo_trading_days
+
+    dq = compute_data_quality(search_panel)
     start = dq.get("date_range_start") or ""
     end = dq.get("date_range_end") or ""
 
@@ -512,12 +557,17 @@ def run_discovery(
         discovery_start_date=start or "",
         discovery_end_date=end or "",
         data_quality=dq,
+        holdout_applied=holdout_applied,
+        oos_start_date=oos_start_date,
+        embargo_trading_days=embargo_days,
+        search_observation_count=int(len(search_panel)) if search_panel is not None else 0,
+        full_panel_observation_count=full_n,
     )
 
-    if panel.empty or dq.get("eligible_observations", 0) == 0:
+    if search_panel is None or search_panel.empty or dq.get("eligible_observations", 0) == 0:
         return result
 
-    eligible = panel[panel["research_market_state"] != "UNKNOWN"].copy()
+    eligible = search_panel[search_panel["research_market_state"] != "UNKNOWN"].copy()
     contexts = (
         eligible[["research_market_transition", "research_market_state"]]
         .drop_duplicates()
@@ -533,7 +583,7 @@ def run_discovery(
     seen_keys: set[str] = set()
     hypothesis_records: List[HypothesisTestRecord] = []
     raw_candidates: List[DiscoveryCandidate] = []
-    episodes = segment_market_episodes(panel)
+    episodes = segment_market_episodes(search_panel)
 
     for transition, state in contexts:
         for clauses in condition_sets:
@@ -544,7 +594,7 @@ def run_discovery(
             seen_keys.add(key)
 
             record, cand = _evaluate_hypothesis_record(
-                panel,
+                search_panel,
                 clauses,
                 str(transition),
                 str(state),
