@@ -2,21 +2,21 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "THINKING",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-11-09 21:23:42",
+  "updated_at": "2026-11-09 22:08:40",
   "completed_t5": 1396,
   "baseline_winrate": 0.3875,
   "observation": {
     "date": "2026-11-09",
-    "time": "21:23:42",
+    "time": "22:08:40",
     "market_real": 5.5,
     "market_forecast": 0.2,
     "regime": "🔴 MÙA ĐÔNG",
     "regime_note": "Market yếu: chỉ lập watchlist, chưa giải ngân thật.",
-    "signals_today": 21,
-    "top_watch": "VDS, CTG, OCB",
-    "avg_winprob": 46.6,
-    "avg_elite_score": 46.1,
-    "high_consensus_count": 7
+    "signals_today": 22,
+    "top_watch": "VDS, CTG, FCN",
+    "avg_winprob": 45.2,
+    "avg_elite_score": 43.2,
+    "high_consensus_count": 5
   },
   "hypotheses": [
     "🟡 Market REAL >= 8: n=296, WinRate=25.0%, AvgT+5=-1.97, lệch baseline -13.8% → GIẢ THUYẾT MẠNH",
