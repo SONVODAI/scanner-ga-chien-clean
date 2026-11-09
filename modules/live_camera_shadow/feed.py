@@ -376,6 +376,43 @@ class LiveShadowFeed:
                     exit_code=0,
                 )
             universe = select_actionable_v2(rows, now=now, cap=self.hard_cap)
+            followup_meta: dict[str, Any] = {"enabled": False, "n_followup_added": 0}
+            try:
+                from modules.live_candidate_v2_followup.contract import followup_enabled
+                from modules.live_candidate_v2_followup.runtime import (
+                    enrich_rows_with_followup_camera,
+                )
+
+                if followup_enabled():
+                    merged = enrich_rows_with_followup_camera(
+                        rows,
+                        now=now,
+                        session=session.isoformat(),
+                    )
+                    followup_meta = {
+                        "enabled": True,
+                        "reason": merged.get("reason"),
+                        "n_followup_added": len(merged.get("followup_added") or []),
+                        "n_followup_skipped_cap": len(
+                            merged.get("followup_skipped_cap") or []
+                        ),
+                    }
+                    uni = merged.get("universe")
+                    if uni is not None:
+                        universe = uni
+            except Exception as exc:  # noqa: BLE001 — SHADOW isolate
+                logger.exception(
+                    "followup camera enrich failed session=%s err=%s",
+                    session,
+                    exc,
+                )
+                followup_meta = {
+                    "enabled": True,
+                    "ok": False,
+                    "reason": "CAMERA_ENRICH_ERROR",
+                    "error": str(exc),
+                    "n_followup_added": 0,
+                }
             self._v2_union = {
                 "policy": "v2_actionable_only",
                 "n_actionable": universe.n_actionable,
@@ -384,6 +421,7 @@ class LiveShadowFeed:
                 "n_cap_dropped": len(universe.cap_dropped),
                 "hard_cap": universe.hard_cap,
                 "symbols": [rec["symbol"] for rec in universe.fetch],
+                "v2_followup": followup_meta,
             }
             if universe.empty:
                 self._publish_empty_actionable(now=now, session=session)

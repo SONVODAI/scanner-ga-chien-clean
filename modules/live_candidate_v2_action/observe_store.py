@@ -6,6 +6,7 @@ Consumes Gate B sidecar + ``load_session`` bars only.
 
 from __future__ import annotations
 
+import logging
 import os
 from datetime import date, datetime
 from pathlib import Path
@@ -41,6 +42,7 @@ from modules.live_shadow_transport.shadow_store import publish_v2_action_state, 
 
 DEFAULT_CAMERA_ROOT = Path("/var/lib/mrbot/intraday_memory")
 ENV_CAMERA_ROOT = "MRBOT_INTRADAY_DATA_ROOT"
+logger = logging.getLogger(__name__)
 
 
 def resolve_camera_root(explicit: Path | None = None) -> Path:
@@ -137,6 +139,41 @@ def observe_from_collected_session(
         except Exception:
             pass
         items.append((nom, history, result))
+    # Follow-up Watch V1 — SHADOW/RESEARCH only. Default OFF.
+    # When ON: ingest + per-session re-eval (Candidate Guardian / TTL) + camera
+    # queue + as-of outcome maturity. Never mutates ordinary Action result rows.
+    followup_meta: dict[str, Any] = {"enabled": False}
+    try:
+        from modules.live_candidate_v2_followup.contract import followup_enabled
+        from modules.live_candidate_v2_followup.runtime import run_followup_runtime_cycle
+
+        if followup_enabled():
+            baseline_rows = [result.as_dict() for _nom, _hist, result in items]
+            followup_meta = run_followup_runtime_cycle(
+                session=sess_s,
+                observed_at=now_l,
+                sidecar_rows=list(sidecar.rows),
+                action_baseline_rows=baseline_rows,
+            )
+            if not followup_meta.get("ok", True):
+                logger.error(
+                    "followup runtime reported failure session=%s reason=%s error=%s",
+                    sess_s,
+                    followup_meta.get("reason"),
+                    followup_meta.get("error"),
+                )
+    except Exception as exc:  # noqa: BLE001 — isolate SHADOW from observe path
+        logger.exception(
+            "followup observe hook failed session=%s err=%s",
+            sess_s,
+            exc,
+        )
+        followup_meta = {
+            "enabled": True,
+            "ok": False,
+            "reason": "OBSERVE_HOOK_ERROR",
+            "error": str(exc),
+        }
     if items:
         persist_cycle(
             session=sess,
@@ -149,6 +186,14 @@ def observe_from_collected_session(
         stored["v2_sidecar"] = sidecar.as_dict()
         stored["kbs_polled"] = False
         stored["collector"] = "mrbot-intraday-collect"
+        stored["v2_followup"] = {
+            "enabled": bool(followup_meta.get("enabled")),
+            "ok": followup_meta.get("ok"),
+            "reason": followup_meta.get("reason"),
+            "n_ingested": len(followup_meta.get("ingested") or []),
+            "n_camera_rows": len(followup_meta.get("camera_rows") or []),
+            "n_results": len(followup_meta.get("results") or []),
+        }
         if n_legal == 0:
             stored["waiting"] = WAITING_FOR_NEXT_LIVE_ELIGIBLE_5M
         V2ActionStore(action_dir).write_state(stored)
@@ -156,6 +201,11 @@ def observe_from_collected_session(
     else:
         payload["waiting"] = WAITING_FOR_NEXT_LIVE_ELIGIBLE_5M
         payload["observe_reason"] = "NO_CURRENT_SESSION_V2_ROWS"
+        payload["v2_followup"] = {
+            "enabled": bool(followup_meta.get("enabled")),
+            "ok": followup_meta.get("ok"),
+            "reason": followup_meta.get("reason"),
+        }
         V2ActionStore(action_dir).write_state(payload)
     _publish(action_dir, shadow_store_dir)
     return payload
