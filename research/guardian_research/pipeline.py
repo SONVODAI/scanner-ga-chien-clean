@@ -271,13 +271,18 @@ def capture_post_close(
 def _observation_clock(payload: dict, session: str, now: datetime) -> tuple[datetime | None, str | None]:
     """Separate the scan clock from a later seal. A file-save clock is not a scan clock."""
     from modules.intraday_execution_boundary import as_vn
+    from research.guardian_research.session_authority import assess_seal_window
+
+    window_ok, window_reason = assess_seal_window(now, session)
+    if not window_ok:
+        return None, window_reason
 
     if "observed_at" not in payload:
         if payload.get("saved_at"):
             return None, "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
         allowed, reason = canonical_close_verified(now, session)
         if not allowed:
-            return None, reason
+            return None, _late_clock_reason(reason, as_vn(now), session)
         return None, None
     try:
         parsed = datetime.fromisoformat(str(payload.get("observed_at") or ""))
@@ -288,10 +293,20 @@ def _observation_clock(payload: dict, session: str, now: datetime) -> tuple[date
     observation = as_vn(parsed)
     allowed, reason = canonical_close_verified(observation, session)
     if not allowed:
-        return None, reason
+        return None, _late_clock_reason(reason, observation, session)
     if as_vn(now) < observation:
         return None, "SEAL_BEFORE_OBSERVATION"
     return observation, None
+
+
+def _late_clock_reason(reason: str, clock: datetime, session: str) -> str:
+    """A next-day clock is a late schedule, not a silent rename of the session."""
+    if clock.strftime("%Y-%m-%d") > session and reason in {
+        "CLOCK_SESSION_MISMATCH",
+        "NOT_A_WEEKDAY_SESSION",
+    }:
+        return "SCHEDULE_TOO_LATE"
+    return reason
 
 
 def _same_observation(existing: dict, candidate: dict) -> bool:
@@ -331,7 +346,15 @@ def _stored_witness(session: str, witness) -> tuple[dict | None, str | None]:
 
 
 def _witness_reason(payload: dict) -> str | None:
-    """The close scan already asked whether the VNINDEX daily bar is this session."""
+    """Prefer an aligned VNINDEX bar witness over a clock-day trading_today flag."""
+    session = str(payload.get("trade_date") or "")
+    witness = payload.get("session_witness")
+    if isinstance(witness, dict) and witness.get("source") == "vnindex_daily_bar":
+        if witness.get("probe_error"):
+            return "SESSION_EVIDENCE_ABSENT"
+        if session and str(witness.get("bar_session") or "") == session:
+            return None
+        return "BAR_SESSION_MISMATCH"
     if "trading_today" not in payload:
         return "SESSION_EVIDENCE_ABSENT"
     if payload.get("trading_today") is not True:

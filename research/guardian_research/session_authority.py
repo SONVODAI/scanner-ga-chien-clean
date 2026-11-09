@@ -11,6 +11,8 @@ from datetime import date, datetime, time, timedelta
 
 WITNESS_SOURCE = "vnindex_daily_bar"
 CANONICAL_CLOSE = time(18, 0)
+# Seal may finish after ICT midnight, but not after the next calendar open.
+NEXT_OPEN = time(9, 0)
 
 
 def assess_session(now: datetime, session: str, witness: dict | None) -> tuple[bool, str]:
@@ -39,6 +41,28 @@ def assess_session(now: datetime, session: str, witness: dict | None) -> tuple[b
         return False, "SESSION_EVIDENCE_ABSENT"
     if bar_session != session:
         return False, "NON_TRADING_SESSION"
+    return True, "ok"
+
+
+def assess_seal_window(now: datetime, session: str) -> tuple[bool, str]:
+    """Allow a seal from session 18:00 ICT until the next calendar day 09:00.
+
+    Same-evening seals stay contemporaneous. A seal after ICT midnight is
+    DELAYED. Past the next open is SCHEDULE_TOO_LATE — never the next session.
+    """
+    from modules.intraday_execution_boundary import as_vn
+
+    local = as_vn(now)
+    try:
+        day = date.fromisoformat(session)
+    except ValueError:
+        return False, "SESSION_DATE_INVALID"
+    earliest = datetime.combine(day, CANONICAL_CLOSE, tzinfo=local.tzinfo)
+    deadline = datetime.combine(day + timedelta(days=1), NEXT_OPEN, tzinfo=local.tzinfo)
+    if local < earliest:
+        return False, "BEFORE_CANONICAL_WINDOW"
+    if local >= deadline:
+        return False, "SCHEDULE_TOO_LATE"
     return True, "ok"
 
 

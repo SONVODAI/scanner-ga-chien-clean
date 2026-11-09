@@ -16,7 +16,11 @@ import pandas as pd
 
 from research.guardian_research.collector import ENABLE_ENV
 from research.guardian_research.indicators import finite_number
-from research.guardian_research.session_authority import WITNESS_SOURCE, probe_vnindex
+from research.guardian_research.session_authority import (
+    WITNESS_SOURCE,
+    assess_seal_window,
+    probe_vnindex,
+)
 
 INPUTS = ("price", "ema9", "ma20", "obv", "obv_ema9")
 
@@ -50,7 +54,12 @@ def run_guardian_close(
     accepted, witness_error = _accept_bar(witness if witness is not None else probe_vnindex(search_end))
     if witness_error:
         return _public("refused", witness_error)
+    window_ok, window_reason = assess_seal_window(local_now, accepted["bar_session"])
+    if not window_ok:
+        return _public("refused", window_reason, session=accepted["bar_session"])
     payload = dict(payload)
+    # Bar session names the seal. Clock-day trading_today may already be false
+    # after ICT midnight; the accepted VNINDEX bar is the trading-day witness.
     payload["trade_date"] = accepted["bar_session"]
     payload["session_witness"] = accepted
     from research.guardian_research.universe import load_tracked_symbols
@@ -58,7 +67,7 @@ def run_guardian_close(
     tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
     blocker = _input_blocker(payload, tracked)
     if blocker:
-        return _public("refused", blocker)
+        return _public("refused", blocker, session=accepted["bar_session"])
     from research.guardian_research.panel import default_root
     from research.guardian_research.pipeline import capture_from_close_payload
 
