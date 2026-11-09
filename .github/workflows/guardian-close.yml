@@ -2,14 +2,32 @@ name: guardian-close
 
 on:
   schedule:
-    # 19:30 Asia/Ho_Chi_Minh (UTC+7, no daylight saving), weekdays.
-    # 19:30 ICT = 12:30 UTC. The runner clock does not name the sealed session.
-    # close_job seals the VNINDEX daily bar_session after its own validation.
+    # Same-evening weekday slots, Asia/Ho_Chi_Minh (UTC+7, no daylight saving).
+    # The runner clock does not name the sealed session; close_job seals the
+    # accepted VNINDEX daily bar_session after its own validation.
+    #
+    # Primary:  19:30 ICT = 12:30 UTC
+    # Backup 1: 21:30 ICT = 14:30 UTC
+    # Backup 2: 22:30 ICT = 15:30 UTC
+    #
+    # Retries are best-effort only. GitHub Actions schedules can still slip past
+    # ICT midnight or beyond the seal window (next calendar day 09:00 ICT).
+    # Duplicate starts are serialized and rely on immutable/idempotent seals
+    # (created → later unchanged; conflicting content is refused).
+    # Retries do NOT invent observed_at; a separate persisted evening observation
+    # mechanism may still be required if the first runnable start is already late.
     - cron: "30 12 * * 1-5"
+    - cron: "30 14 * * 1-5"
+    - cron: "30 15 * * 1-5"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+# One seal at a time. Do not cancel an in-flight seal when a backup slot fires.
+concurrency:
+  group: guardian-research-close
+  cancel-in-progress: false
 
 jobs:
   guardian:
@@ -28,10 +46,33 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Seal Guardian T0 from the close scan
+        id: seal
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GUARDIAN_RESEARCH_SNAPSHOT_ENABLED: ${{ vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED }}
           GITHUB_REPO_OWNER: SONVODAI
           GITHUB_REPO_NAME: scanner-ga-chien-clean
           GITHUB_BRANCH: main
-        run: python -m research.guardian_research.close_job
+        run: |
+          set -euo pipefail
+          python -m research.guardian_research.close_job | tee seal_result.json
+
+      - name: Publish seal outcome
+        if: always() && steps.seal.outcome != 'skipped'
+        run: |
+          {
+            echo "## Guardian close seal outcome"
+            echo
+            echo "- Event: \`${{ github.event_name }}\`"
+            echo "- Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "- Seal step: \`${{ steps.seal.outcome }}\`"
+            echo "- Note: same-evening retries are best-effort; schedule delay can still miss the seal window."
+            echo
+            if [ -f seal_result.json ]; then
+              echo '```json'
+              cat seal_result.json
+              echo '```'
+            else
+              echo "No seal_result.json was produced."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

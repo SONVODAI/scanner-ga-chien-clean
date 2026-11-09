@@ -490,7 +490,15 @@ def test_schedule_is_isolated_and_the_ledger_workflow_is_unchanged():
     guardian = root.joinpath(".github", "workflows", "guardian-close.yml").read_text(encoding="utf-8")
     ledger = root.joinpath(".github", "workflows", "post-close-research.yml").read_text(encoding="utf-8")
     assert 'cron: "30 12 * * 1-5"' in guardian
+    assert 'cron: "30 14 * * 1-5"' in guardian
+    assert 'cron: "30 15 * * 1-5"' in guardian
     assert "19:30 ICT = 12:30 UTC" in guardian
+    assert "21:30 ICT = 14:30 UTC" in guardian
+    assert "22:30 ICT = 15:30 UTC" in guardian
+    assert "group: guardian-research-close" in guardian
+    assert "cancel-in-progress: false" in guardian
+    assert "Publish seal outcome" in guardian
+    assert "GITHUB_STEP_SUMMARY" in guardian
     assert "contents: write" in guardian
     assert "secrets.GITHUB_TOKEN" in guardian
     assert "vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED == 'true'" in guardian
@@ -508,3 +516,57 @@ def test_schedule_is_isolated_and_the_ledger_workflow_is_unchanged():
     assert "def generate_signal" in position
     live = root.joinpath("research", "guardian_research", "live.py").read_text(encoding="utf-8")
     assert "The returned document is not a T0 snapshot" in live
+
+
+def test_same_evening_retry_crons_map_ict_to_utc_without_dst():
+    """ICT is fixed UTC+7. Backup slots stay before ICT midnight."""
+    from datetime import datetime, timedelta, timezone
+
+    ict = timezone(timedelta(hours=7))
+    expected = {
+        "30 12 * * 1-5": datetime(2026, 11, 10, 19, 30, tzinfo=ict),
+        "30 14 * * 1-5": datetime(2026, 11, 10, 21, 30, tzinfo=ict),
+        "30 15 * * 1-5": datetime(2026, 11, 10, 22, 30, tzinfo=ict),
+    }
+    root = Path(__file__).resolve().parents[1]
+    guardian = root.joinpath(".github", "workflows", "guardian-close.yml").read_text(encoding="utf-8")
+    for cron, local in expected.items():
+        assert f'cron: "{cron}"' in guardian
+        minute, hour, *_ = cron.split()
+        utc = local.astimezone(timezone.utc)
+        assert utc.minute == int(minute)
+        assert utc.hour == int(hour)
+        assert utc.tzname() == "UTC"
+        assert local.hour < 24
+        assert local.date() == datetime(2026, 11, 10, tzinfo=ict).date()
+
+
+def test_backup_slot_is_idempotent_and_does_not_mutate_an_existing_seal(monkeypatch, tmp_path: Path):
+    """A later same-evening retry must keep the first immutable snapshot bytes."""
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    first = _run(
+        now=EVENING,
+        root=tmp_path,
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert first["status"] == "created"
+    before = Path(first["path"]).read_bytes()
+    backup = _run(
+        now=datetime(2026, 11, 6, 21, 30, tzinfo=VN),
+        root=tmp_path,
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert backup["status"] == "unchanged"
+    assert backup["content_sha256"] == first["content_sha256"]
+    assert Path(first["path"]).read_bytes() == before
+    late_backup = _run(
+        now=datetime(2026, 11, 6, 22, 30, tzinfo=VN),
+        root=tmp_path,
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert late_backup["status"] == "unchanged"
+    assert Path(first["path"]).read_bytes() == before
