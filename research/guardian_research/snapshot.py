@@ -64,6 +64,23 @@ def build_snapshot(
     return document
 
 
+def attach_session_witness(document: dict, witness: dict) -> dict:
+    """Copy a snapshot and record the VNINDEX bar that named its session."""
+    bar = str((witness or {}).get("bar_session") or "")
+    if (witness or {}).get("source") != "vnindex_daily_bar" or bar != document.get("session"):
+        raise ValueError("bar session does not match snapshot session")
+    body = {key: value for key, value in document.items() if key != "content_sha256"}
+    body["session_witness"] = {
+        "source": "vnindex_daily_bar",
+        "bar_session": bar,
+        "provenance": "research.guardian_research.session_authority.probe_vnindex",
+        "observation_provenance": "close_scan.observed_at",
+    }
+    body["content_sha256"] = _digest(body)
+    _require_document(body)
+    return body
+
+
 def label_observation_origin(document: dict, origin: str, *, reconstruction: dict) -> dict:
     """Copy a snapshot and record whether it was sealed at the time or reconstructed."""
     if origin not in {"BACKFILLED", "CONTEMPORANEOUS", "DELAYED"}:

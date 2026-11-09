@@ -16,6 +16,7 @@ import pandas as pd
 
 from research.guardian_research.collector import ENABLE_ENV
 from research.guardian_research.indicators import finite_number
+from research.guardian_research.session_authority import WITNESS_SOURCE, probe_vnindex
 
 INPUTS = ("price", "ema9", "ma20", "obv", "obv_ema9")
 
@@ -26,8 +27,9 @@ def run_guardian_close(
     root: Path | None = None,
     close_scan=None,
     symbols: tuple[str, ...] | None = None,
+    witness: dict | None = None,
 ) -> dict:
-    """Seal today's close scan. A disabled flag does not scan or write."""
+    """Seal the VNINDEX bar session. The job clock does not name that session."""
     if os.environ.get(ENABLE_ENV) != "true":
         return _public("disabled", "ENABLE_FLAG_OFF")
     from modules.intraday_execution_boundary import VN_TZ, as_vn
@@ -44,6 +46,13 @@ def run_guardian_close(
         if isinstance(payload, dict) and payload.get("status"):
             reason = str(payload.get("status"))
         return _public("refused", reason, error=_error_text(payload))
+    search_end = local_now.strftime("%Y-%m-%d")
+    accepted, witness_error = _accept_bar(witness if witness is not None else probe_vnindex(search_end))
+    if witness_error:
+        return _public("refused", witness_error)
+    payload = dict(payload)
+    payload["trade_date"] = accepted["bar_session"]
+    payload["session_witness"] = accepted
     from research.guardian_research.universe import load_tracked_symbols
 
     tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
@@ -99,15 +108,40 @@ def _input_blocker(payload: dict, tracked: tuple[str, ...]) -> str | None:
             seen[symbol] = item
     if any(symbol not in seen for symbol in tracked):
         return "PARTIAL_SCAN"
+    sessions = []
     for symbol in tracked:
         item = seen[symbol]
-        if _session_text(item.get("date")) != session:
-            return "STALE_MARKET_DATA"
         if any(finite_number(item.get(column)) is None for column in INPUTS):
             return "INCOMPLETE_INPUT"
+        sessions.append(_session_text(item.get("date")))
+    if len(set(sessions)) != 1:
+        return "MIXED_SESSION"
+    if sessions[0] != session:
+        return "STALE_MARKET_DATA"
     if finite_number(payload.get("market_real")) is None:
         return "MARKET_CONTEXT_ABSENT"
     return None
+
+
+def _accept_bar(witness) -> tuple[dict | None, str | None]:
+    """Accept the downloaded VNINDEX bar date. A clock label is not a session."""
+    if not isinstance(witness, dict) or witness.get("source") != WITNESS_SOURCE:
+        return None, "SESSION_EVIDENCE_ABSENT"
+    if witness.get("probe_error") == "ADAPTER_UNAVAILABLE":
+        return None, "WITNESS_ADAPTER_UNAVAILABLE"
+    if witness.get("probe_error"):
+        return None, "SESSION_EVIDENCE_ABSENT"
+    bar = str(witness.get("bar_session") or "")
+    try:
+        datetime.strptime(bar, "%Y-%m-%d")
+    except ValueError:
+        return None, "SESSION_EVIDENCE_ABSENT"
+    return {
+        "source": WITNESS_SOURCE,
+        "bar_session": bar,
+        "probe_error": None,
+        "provenance": "research.guardian_research.session_authority.probe_vnindex",
+    }, None
 
 
 def _session_text(value) -> str | None:

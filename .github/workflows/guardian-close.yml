@@ -3,7 +3,8 @@ name: guardian-close
 on:
   schedule:
     # 19:30 Asia/Ho_Chi_Minh (UTC+7, no daylight saving), weekdays.
-    # 19:30 ICT = 12:30 UTC.
+    # 19:30 ICT = 12:30 UTC. The runner clock does not name the sealed session.
+    # close_job seals the VNINDEX daily bar_session after its own validation.
     - cron: "30 12 * * 1-5"
   workflow_dispatch:
 

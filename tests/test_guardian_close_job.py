@@ -59,6 +59,15 @@ def _enable(monkeypatch):
     monkeypatch.setenv("GUARDIAN_RESEARCH_SNAPSHOT_ENABLED", "true")
 
 
+def _witness(day=SESSION):
+    return {"source": "vnindex_daily_bar", "bar_session": day, "probe_error": None}
+
+
+def _run(*args, **kwargs):
+    kwargs.setdefault("witness", _witness())
+    return run_guardian_close(*args, **kwargs)
+
+
 def _local_only(monkeypatch):
     monkeypatch.setattr(
         "research.guardian_research.pipeline.read_remote_snapshot",
@@ -109,7 +118,7 @@ def test_guardian_job_does_not_finalize_other_systems(monkeypatch, tmp_path: Pat
         monkeypatch.setattr(target, boom)
     _enable(monkeypatch)
     _local_only(monkeypatch)
-    result = run_guardian_close(
+    result = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
@@ -136,7 +145,7 @@ def test_default_scan_does_not_retain_research_ledgers(monkeypatch, tmp_path: Pa
     monkeypatch.setattr("modules.close_session_scan.build_close_scan_inputs", build)
     _enable(monkeypatch)
     _local_only(monkeypatch)
-    result = run_guardian_close(now=EVENING, root=tmp_path, symbols=("HPG",))
+    result = _run(now=EVENING, root=tmp_path, symbols=("HPG",))
     assert result["status"] == "created"
     assert seen["retain_research"] is False
     assert seen["now"] == EVENING
@@ -145,7 +154,7 @@ def test_default_scan_does_not_retain_research_ledgers(monkeypatch, tmp_path: Pa
 def test_flag_off_does_not_scan(monkeypatch):
     monkeypatch.delenv("GUARDIAN_RESEARCH_SNAPSHOT_ENABLED", raising=False)
     called = []
-    result = run_guardian_close(close_scan=lambda: called.append("scan") or _payload(("HPG",)))
+    result = _run(close_scan=lambda: called.append("scan") or _payload(("HPG",)))
     assert result["status"] == "disabled"
     assert result["reason"] == "ENABLE_FLAG_OFF"
     assert called == []
@@ -157,7 +166,7 @@ def test_observed_at_and_vnindex_witness_are_required(monkeypatch, tmp_path: Pat
     missing_clock = _payload(("HPG",))
     del missing_clock["observed_at"]
     missing_clock["saved_at"] = "2026-11-06T21:10:01+07:00"
-    saved = run_guardian_close(
+    saved = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: missing_clock,
@@ -167,7 +176,7 @@ def test_observed_at_and_vnindex_witness_are_required(monkeypatch, tmp_path: Pat
     assert not (tmp_path / "sessions").exists()
 
     early = _payload(("HPG",), observed_at="2026-11-06T17:59:00+07:00")
-    too_soon = run_guardian_close(
+    too_soon = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: early,
@@ -178,7 +187,7 @@ def test_observed_at_and_vnindex_witness_are_required(monkeypatch, tmp_path: Pat
     closed = _payload(("HPG",))
     closed["trading_today"] = False
     closed["trading_reason"] = "VNINDEX mới nhất là 2026-11-05, không phải 2026-11-06"
-    witness = run_guardian_close(
+    witness = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: closed,
@@ -192,7 +201,7 @@ def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_
     _enable(monkeypatch)
     tracked = load_tracked_symbols()
     assert len(tracked) == 143
-    partial = run_guardian_close(
+    partial = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: _payload(tracked, absent=("HPG",)),
@@ -203,7 +212,7 @@ def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_
     stale = _payload(("HPG",), day="2026-11-05")
     stale["trade_date"] = SESSION
     stale["scan_df"] = pd.DataFrame([_row("HPG", day="2026-11-05")])
-    refused = run_guardian_close(
+    refused = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: stale,
@@ -213,7 +222,7 @@ def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_
 
     blank = _payload(("HPG",))
     blank["scan_df"] = pd.DataFrame([_row("HPG", obv=None)])
-    incomplete = run_guardian_close(
+    incomplete = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: blank,
@@ -226,7 +235,7 @@ def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_
 def test_same_seal_is_idempotent_and_a_conflict_is_rejected(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
     _local_only(monkeypatch)
-    first = run_guardian_close(
+    first = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
@@ -238,7 +247,7 @@ def test_same_seal_is_idempotent_and_a_conflict_is_rejected(monkeypatch, tmp_pat
     assert stored["content_sha256"] == first["content_sha256"]
     before = Path(first["path"]).read_bytes()
 
-    again = run_guardian_close(
+    again = _run(
         now=datetime(2026, 11, 6, 20, 0, tzinfo=VN),
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
@@ -248,7 +257,7 @@ def test_same_seal_is_idempotent_and_a_conflict_is_rejected(monkeypatch, tmp_pat
     assert again["content_sha256"] == first["content_sha256"]
     assert Path(first["path"]).read_bytes() == before
 
-    conflict = run_guardian_close(
+    conflict = _run(
         now=datetime(2026, 11, 6, 20, 5, tzinfo=VN),
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",), price=99),
@@ -270,7 +279,7 @@ def test_publication_reports_the_remote_result_and_the_backfill_stays(monkeypatc
         "research.guardian_research.pipeline.publish_snapshot",
         lambda root, session: published.append((Path(root), session)) or "GITHUB_OK",
     )
-    result = run_guardian_close(
+    result = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
@@ -285,11 +294,91 @@ def test_publication_reports_the_remote_result_and_the_backfill_stays(monkeypatc
     assert view["counts"] == {"HOLD": 16, "SELL": 54, "UNAVAILABLE": 0, "WATCH": 73}
 
 
+def test_vnindex_bar_names_the_session_and_a_mixed_scan_is_refused(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    seen = {}
+
+    def probe(session):
+        seen["search_end"] = session
+        return _witness(SESSION)
+
+    monkeypatch.setattr("research.guardian_research.close_job.probe_vnindex", probe)
+    mislabeled = _payload(("HPG",))
+    mislabeled["trade_date"] = "2026-11-10"
+    sealed = run_guardian_close(
+        now=EVENING,
+        root=tmp_path,
+        close_scan=lambda: mislabeled,
+        symbols=("HPG",),
+    )
+    assert seen["search_end"] == SESSION
+    assert sealed["status"] == "created"
+    assert sealed["session"] == SESSION
+    stored = read_snapshot(Path(sealed["path"]))
+    assert stored["session_witness"]["bar_session"] == SESSION
+    assert stored["session_witness"]["source"] == "vnindex_daily_bar"
+    assert stored["session_witness"]["provenance"].endswith("probe_vnindex")
+    assert stored["classification_version"].startswith("position_guardian.generate_signal:")
+    assert stored["reconstruction"]["timestamp_provenance"] == "close_scan.observed_at"
+    assert stored["tracked_count"] == 1
+    reread = read_snapshot(Path(sealed["path"]))
+    assert reread["content_sha256"] == stored["content_sha256"]
+
+    stale_bar = run_guardian_close(
+        now=EVENING,
+        root=tmp_path / "other",
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+        witness=_witness("2026-11-05"),
+    )
+    assert stale_bar["reason"] == "STALE_MARKET_DATA"
+    assert not (tmp_path / "other" / "sessions").exists()
+
+    mixed = _payload(("HPG", "SSI"))
+    mixed["scan_df"] = pd.DataFrame([_row("HPG"), _row("SSI", day="2026-11-05")])
+    mixed["scan_coverage"]["returned"] = ["HPG", "SSI"]
+    refused = _run(
+        now=EVENING,
+        root=tmp_path / "mixed",
+        close_scan=lambda: mixed,
+        symbols=("HPG", "SSI"),
+    )
+    assert refused["reason"] == "MIXED_SESSION"
+    assert not (tmp_path / "mixed" / "sessions").exists()
+
+    unavailable = run_guardian_close(
+        now=EVENING,
+        root=tmp_path / "adapter",
+        close_scan=lambda: _payload(("HPG",)),
+        symbols=("HPG",),
+        witness={"source": "vnindex_daily_bar", "bar_session": "", "probe_error": "ADAPTER_UNAVAILABLE"},
+    )
+    assert unavailable["reason"] == "WITNESS_ADAPTER_UNAVAILABLE"
+    assert not (tmp_path / "adapter" / "sessions").exists()
+
+    from research.guardian_research.pipeline import capture_from_close_payload
+
+    mismatched = _payload(("HPG",))
+    mismatched["session_witness"] = _witness("2026-11-05")
+    blocked = capture_from_close_payload(
+        mismatched,
+        now=EVENING,
+        root=tmp_path / "mismatch",
+        symbols=("HPG",),
+    )
+    assert blocked["reason"] == "BAR_SESSION_MISMATCH"
+    assert not (tmp_path / "mismatch" / "sessions").exists()
+
+
 def test_schedule_is_isolated_and_the_ledger_workflow_is_unchanged():
     root = Path(__file__).resolve().parents[1]
     guardian = root.joinpath(".github", "workflows", "guardian-close.yml").read_text(encoding="utf-8")
     ledger = root.joinpath(".github", "workflows", "post-close-research.yml").read_text(encoding="utf-8")
     assert 'cron: "30 12 * * 1-5"' in guardian
+    assert "19:30 ICT = 12:30 UTC" in guardian
+    assert "contents: write" in guardian
+    assert "secrets.GITHUB_TOKEN" in guardian
     assert "vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED == 'true'" in guardian
     assert "python -m research.guardian_research.close_job" in guardian
     assert "post_close_finalize" not in guardian

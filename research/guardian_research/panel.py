@@ -138,12 +138,13 @@ def render_guardian_research_panel(
     *,
     root: Path | None = None,
 ) -> dict | None:
-    """Display the latest sealed snapshot. This page view does not archive one."""
+    """Show the intraday board and the latest sealed snapshot. Neither write is done here."""
     import streamlit as st
 
-    del market_real, now
+    del market_real
     store = Path(root) if root is not None else default_root()
     st.markdown("---")
+    _render_live(st, scan_df, now)
     st.markdown("## 🛡️ GUARDIAN RESEARCH")
     document = latest_snapshot(store)
     view = _load_forward_view(root)
@@ -186,6 +187,41 @@ def render_guardian_research_panel(
     if view is not None:
         _render_forward(st, view)
     return document
+
+
+def _render_live(st, scan_df, now) -> None:
+    """Current scan only. Refreshing this board does not replace a sealed snapshot."""
+    from research.guardian_research.live import evaluate_live, live_board
+
+    st.markdown("## 🟢 GUARDIAN LIVE")
+    st.caption(
+        "Intraday HOLD / WATCH / SELL from the current scan via position_guardian.generate_signal. "
+        "This board is not a sealed T0 snapshot and not a portfolio order."
+    )
+    live = evaluate_live(scan_df, evaluated_at=now)
+    if live.get("scan_session"):
+        session = live["scan_session"]
+    elif live.get("mixed_session"):
+        session = "MIXED"
+    else:
+        session = "UNAVAILABLE"
+    st.caption(
+        f"Scan session {session} · display clock {live.get('evaluated_at') or 'UNAVAILABLE'} · "
+        f"fresh {live['fresh_count']} · stale {live['stale_count']} · "
+        f"undated {live['undated_count']} · incomplete {live['incomplete_count']} · "
+        f"missing {live['missing_count']} · "
+        f"{live['tracked_count']} tracked symbols"
+    )
+    board = live_board(live)
+    if board.empty:
+        st.info("No tracked symbols in the live scan.")
+        return
+    st.dataframe(
+        board.style.map(_paint, subset=["Classification"]),
+        use_container_width=True,
+        hide_index=True,
+        height=420,
+    )
 
 
 def _load_forward_view(root: Path | None) -> dict | None:

@@ -16,6 +16,7 @@ from research.guardian_research.indicators import finite_number
 from research.guardian_research.snapshot import (
     SnapshotExists,
     _digest,
+    attach_session_witness,
     build_snapshot,
     label_observation_origin,
     load_prior_snapshots,
@@ -75,6 +76,12 @@ def capture_from_close_payload(
     errors = [str(symbol).strip().upper() for symbol in coverage.get("errors") or [] if str(symbol).strip()]
     if errors:
         return {"status": "refused", "reason": "PARTIAL_SCAN", "path": None, "document": None}
+    if "session_witness" in payload:
+        session_witness, witness_problem = _stored_witness(session, payload.get("session_witness"))
+        if witness_problem:
+            return {"status": "refused", "reason": witness_problem, "path": None, "document": None}
+    else:
+        session_witness = None
     remote, remote_state = read_remote_snapshot(root, session)
     if remote_state == "unverified":
         return {"status": "refused", "reason": "REMOTE_UNVERIFIED", "path": None, "document": None}
@@ -86,6 +93,7 @@ def capture_from_close_payload(
         market_real=payload.get("market_real"),
         symbols=tracked,
         observed_at=observed_at,
+        session_witness=session_witness,
         commit=False,
     )
     if preview.get("status") != "preview":
@@ -104,6 +112,7 @@ def capture_from_close_payload(
         market_real=payload.get("market_real"),
         symbols=tracked,
         observed_at=observed_at,
+        session_witness=session_witness,
     )
     if result.get("status") in {"created", "unchanged"}:
         result["remote"] = publish_snapshot(root, session)
@@ -176,6 +185,7 @@ def capture_post_close(
     market_real=None,
     symbols: tuple[str, ...] | None = None,
     observed_at: datetime | None = None,
+    session_witness: dict | None = None,
     commit: bool = True,
 ) -> dict:
     """Write one research snapshot. A same-content retry does not write again."""
@@ -210,6 +220,8 @@ def capture_post_close(
         symbols=tracked,
         priors=load_prior_snapshots(root, session),
     )
+    if session_witness is not None:
+        document = attach_session_witness(document, session_witness)
     if observed_at is not None:
         from modules.intraday_execution_boundary import as_vn
 
@@ -299,6 +311,23 @@ def _without_seal_clock(document: dict) -> dict:
             key: value for key, value in recorded.items() if key != "sealed_at"
         }
     return body
+
+
+def _stored_witness(session: str, witness) -> tuple[dict | None, str | None]:
+    """Keep a VNINDEX bar only when it is the snapshot session."""
+    if not isinstance(witness, dict) or witness.get("source") != "vnindex_daily_bar":
+        return None, "SESSION_EVIDENCE_ABSENT"
+    if witness.get("probe_error"):
+        return None, "SESSION_EVIDENCE_ABSENT"
+    bar = str(witness.get("bar_session") or "")
+    if bar != session:
+        return None, "BAR_SESSION_MISMATCH"
+    return {
+        "source": "vnindex_daily_bar",
+        "bar_session": bar,
+        "provenance": "research.guardian_research.session_authority.probe_vnindex",
+        "observation_provenance": "close_scan.observed_at",
+    }, None
 
 
 def _witness_reason(payload: dict) -> str | None:

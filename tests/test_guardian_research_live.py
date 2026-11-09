@@ -1,0 +1,174 @@
+"""LIVE uses production generate_signal and cannot become a sealed snapshot."""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import pandas as pd
+
+from position_guardian import generate_signal
+from research.guardian_research.contract import GENERATE_SIGNAL_SHA256, PRODUCTION_TO_RESEARCH
+from research.guardian_research.live import evaluate_live, live_board
+from research.guardian_research.panel import render_guardian_research_panel
+from research.guardian_research.snapshot import SnapshotExists, build_snapshot, read_snapshot, write_snapshot
+
+VN = ZoneInfo("Asia/Ho_Chi_Minh")
+SESSION = "2026-11-10"
+WHEN = datetime(2026, 11, 10, 10, 15, tzinfo=VN)
+
+
+def _frame(rows):
+    return pd.DataFrame(rows)
+
+
+def _row(symbol, price, ema9, ma20, obv, obv_ema9, day=SESSION):
+    return {
+        "symbol": symbol,
+        "date": day,
+        "price": price,
+        "ema9": ema9,
+        "ma20": ma20,
+        "obv": obv,
+        "obv_ema9": obv_ema9,
+    }
+
+
+def test_live_matches_generate_signal_for_each_group():
+    cases = (
+        ("HPG", 30, 25, 20, 100, 50),
+        ("SSI", 20, 25, 20, 100, 50),
+        ("VCB", 30, 22, 24, 100, 50),
+        ("FPT", 30, 22, 24, 10, 50),
+    )
+    frame = _frame([_row(*case) for case in cases])
+    live = evaluate_live(frame, symbols=tuple(case[0] for case in cases), evaluated_at=WHEN)
+    assert live["schema"] == "guardian_research_live.v1"
+    assert live["scan_session"] == SESSION
+    assert live["evaluated_at"] == WHEN.isoformat()
+    assert live["fresh_count"] == 4
+    assert live["portfolio_decision"] is False
+    assert live["classification_version"].endswith(GENERATE_SIGNAL_SHA256)
+    by_symbol = {row["symbol"]: row for row in live["rows"]}
+    for symbol, price, ema9, ma20, obv, obv_ema9 in cases:
+        signal, reason, score = generate_signal(
+            pd.Series({"price": price, "ema9": ema9, "ma20": ma20, "obv": obv, "obv_ema9": obv_ema9})
+        )
+        row = by_symbol[symbol]
+        assert row["classification"] == PRODUCTION_TO_RESEARCH[signal]
+        assert row["score"] == score
+        assert row["reason"] == reason
+        assert row["freshness"] == "FRESH"
+    labels = {row["classification"] for row in live["rows"]}
+    assert labels == {"HOLD", "WATCH", "SELL"}
+    assert by_symbol["HPG"]["score"] == 0
+    assert by_symbol["SSI"]["score"] == 40
+    assert by_symbol["VCB"]["score"] == 60
+    assert by_symbol["FPT"]["score"] == 80
+    board = live_board(live)
+    assert list(board["Classification"]) == ["HOLD", "WATCH", "SELL", "SELL"]
+
+
+def test_live_marks_missing_and_stale_rows_and_writes_nothing(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    frame = _frame(
+        [
+            _row("HPG", 30, 25, 20, 100, 50, day="2026-11-10"),
+            _row("SSI", 20, 25, 20, 100, 50, day="2026-11-06"),
+            {"symbol": "VCB", "date": SESSION, "price": None, "ema9": 1, "ma20": 1, "obv": 1, "obv_ema9": 1},
+        ]
+    )
+    live = evaluate_live(frame, symbols=("HPG", "SSI", "VCB", "FPT"), evaluated_at=WHEN)
+    by_symbol = {row["symbol"]: row for row in live["rows"]}
+    assert live["mixed_session"] is True
+    assert live["scan_session"] is None
+    assert by_symbol["HPG"]["freshness"] == "STALE"
+    assert by_symbol["HPG"]["classification"] == "HOLD"
+    assert by_symbol["SSI"]["freshness"] == "STALE"
+    assert by_symbol["VCB"]["classification"] == "UNAVAILABLE"
+    assert by_symbol["VCB"]["freshness"] == "INCOMPLETE"
+    assert by_symbol["VCB"]["reason"] == "INPUT_INCOMPLETE"
+    assert by_symbol["VCB"]["score"] is None
+    assert by_symbol["FPT"]["freshness"] == "MISSING"
+    assert by_symbol["FPT"]["reason"] == "SYMBOL_ABSENT"
+    assert list(tmp_path.rglob("*.json")) == []
+    source = Path(__file__).resolve().parents[1].joinpath("research", "guardian_research", "live.py").read_text(encoding="utf-8")
+    assert "write_snapshot" not in source
+    assert "sessions" not in source
+
+
+def test_shipped_snapshot_cannot_be_overwritten(tmp_path: Path):
+    source = Path("data/guardian_research/sessions/2026-11-06.json")
+    before = source.read_bytes()
+    original = read_snapshot(source)
+    assert original["session"] == "2026-11-06"
+    assert original["observation_origin"] == "CONTEMPORANEOUS"
+    assert original["tracked_count"] == 143
+    assert len(original["rows"]) == 143
+    (tmp_path / "sessions").mkdir()
+    stored = tmp_path / "sessions" / "2026-11-06.json"
+    stored.write_bytes(before)
+    replacement = build_snapshot("2026-11-06", observations={}, symbols=("HPG",))
+    try:
+        write_snapshot(tmp_path, replacement)
+    except SnapshotExists:
+        refused = True
+    else:
+        refused = False
+    assert refused
+    assert stored.read_bytes() == before
+    assert source.read_bytes() == before
+    reread = json.loads(source.read_text(encoding="utf-8"))
+    assert reread["content_sha256"] == original["content_sha256"]
+
+
+def test_panel_keeps_live_apart_from_the_sealed_session(tmp_path: Path, monkeypatch):
+    from research.guardian_research.pipeline import capture_from_close_payload
+
+    payload = {
+        "ok": True,
+        "status": "READY",
+        "source": "close_scan",
+        "trade_date": "2026-11-06",
+        "market_real": 6.5,
+        "trading_today": True,
+        "trading_reason": "VNINDEX có giao dịch hôm nay: 2026-11-06",
+        "observed_at": "2026-11-06T19:05:00+07:00",
+        "scan_df": _frame([_row("HPG", 30, 25, 20, 100, 50, day="2026-11-06")]),
+        "scan_coverage": {"requested": ["HPG"], "returned": ["HPG"], "absent": [], "errors": []},
+    }
+    sealed = capture_from_close_payload(
+        payload,
+        now=datetime(2026, 11, 6, 19, 30, tzinfo=VN),
+        root=tmp_path,
+        symbols=("HPG",),
+    )
+    assert sealed["status"] == "created"
+    before = Path(sealed["path"]).read_bytes()
+    import streamlit as st
+
+    headings = []
+    monkeypatch.setattr(st, "markdown", lambda text, **_kwargs: headings.append(str(text)))
+    monkeypatch.setattr(st, "caption", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(st, "info", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(st, "dataframe", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(st, "columns", lambda count: [_Metric() for _ in range(count)])
+    shown = render_guardian_research_panel(
+        _frame([_row("HPG", 20, 25, 20, 100, 50)]),
+        99,
+        WHEN,
+        root=tmp_path,
+    )
+    assert shown["session"] == "2026-11-06"
+    assert shown["rows"][0]["classification"] == "HOLD"
+    assert any("GUARDIAN LIVE" in heading for heading in headings)
+    assert any("GUARDIAN RESEARCH" in heading for heading in headings)
+    assert Path(sealed["path"]).read_bytes() == before
+    assert list(tmp_path.joinpath("sessions").glob("*.json")) == [Path(sealed["path"])]
+
+
+class _Metric:
+    def metric(self, *_args, **_kwargs):
+        return None
