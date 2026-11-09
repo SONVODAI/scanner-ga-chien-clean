@@ -1,112 +1,92 @@
 [
   {
-    "session": "2026-11-05",
+    "session": "2026-11-06",
+    "symbol": "AGR",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
+    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+    "source": "buy_elite_learning_history",
+    "status": "ACTIVE",
+    "eligible_from": "2026-11-09T09:15:00+07:00"
+  },
+  {
+    "session": "2026-11-06",
     "symbol": "BAF",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
     "candidate_reason": "MUA NHỎ / ƯU TIÊN",
     "source": "buy_elite_learning_history",
     "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
+    "eligible_from": "2026-11-09T09:15:00+07:00"
   },
   {
-    "session": "2026-11-05",
-    "symbol": "HPG",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
+    "session": "2026-11-06",
+    "symbol": "BFC",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
     "candidate_reason": "MUA NHỎ / ƯU TIÊN",
     "source": "buy_elite_learning_history",
     "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
+    "eligible_from": "2026-11-09T09:15:00+07:00"
   },
   {
-    "session": "2026-11-05",
+    "session": "2026-11-06",
+    "symbol": "FCN",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
+    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+    "source": "buy_elite_learning_history",
+    "status": "ACTIVE",
+    "eligible_from": "2026-11-09T09:15:00+07:00"
+  },
+  {
+    "session": "2026-11-06",
+    "symbol": "GIL",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
+    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+    "source": "buy_elite_learning_history",
+    "status": "ACTIVE",
+    "eligible_from": "2026-11-09T09:15:00+07:00"
+  },
+  {
+    "session": "2026-11-06",
+    "symbol": "HDB",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
+    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
+    "source": "buy_elite_learning_history",
+    "status": "ACTIVE",
+    "eligible_from": "2026-11-09T09:15:00+07:00"
+  },
+  {
+    "session": "2026-11-06",
     "symbol": "KBC",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
     "candidate_reason": "MUA NHỎ / ƯU TIÊN",
     "source": "buy_elite_learning_history",
     "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
+    "eligible_from": "2026-11-09T09:15:00+07:00"
   },
   {
-    "session": "2026-11-05",
-    "symbol": "NAB",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
+    "session": "2026-11-06",
+    "symbol": "MSH",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
     "candidate_reason": "MUA NHỎ / ƯU TIÊN",
     "source": "buy_elite_learning_history",
     "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
+    "eligible_from": "2026-11-09T09:15:00+07:00"
   },
   {
-    "session": "2026-11-05",
-    "symbol": "NHA",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
+    "session": "2026-11-06",
+    "symbol": "VJC",
+    "candidate_first_seen_ts": "2026-11-06T21:25:00.038737+07:00",
+    "candidate_updated_ts": "2026-11-06T22:04:46.777497+07:00",
     "candidate_reason": "MUA NHỎ / ƯU TIÊN",
     "source": "buy_elite_learning_history",
     "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
-  },
-  {
-    "session": "2026-11-05",
-    "symbol": "NTP",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
-    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
-    "source": "buy_elite_learning_history",
-    "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
-  },
-  {
-    "session": "2026-11-05",
-    "symbol": "REE",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
-    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
-    "source": "buy_elite_learning_history",
-    "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
-  },
-  {
-    "session": "2026-11-05",
-    "symbol": "TPB",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
-    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
-    "source": "buy_elite_learning_history",
-    "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
-  },
-  {
-    "session": "2026-11-05",
-    "symbol": "VCG",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
-    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
-    "source": "buy_elite_learning_history",
-    "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
-  },
-  {
-    "session": "2026-11-05",
-    "symbol": "VGS",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
-    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
-    "source": "buy_elite_learning_history",
-    "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
-  },
-  {
-    "session": "2026-11-05",
-    "symbol": "VIC",
-    "candidate_first_seen_ts": "2026-11-05T17:17:50.216035+07:00",
-    "candidate_updated_ts": "2026-11-05T18:21:23.129712+07:00",
-    "candidate_reason": "MUA NHỎ / ƯU TIÊN",
-    "source": "buy_elite_learning_history",
-    "status": "ACTIVE",
-    "eligible_from": "2026-11-06T09:15:00+07:00"
+    "eligible_from": "2026-11-09T09:15:00+07:00"
   }
 ]
