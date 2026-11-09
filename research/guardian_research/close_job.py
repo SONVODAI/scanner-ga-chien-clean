@@ -37,8 +37,23 @@ def run_guardian_close(
     if os.environ.get(ENABLE_ENV) != "true":
         return _public("disabled", "ENABLE_FLAG_OFF")
     from modules.intraday_execution_boundary import VN_TZ, as_vn
+    from research.guardian_research.panel import default_root
 
     local_now = as_vn(now or datetime.now(VN_TZ))
+    root_path = Path(root) if root is not None else default_root()
+    # Probe + window + existing-seal check happen before any watchlist scan so
+    # same-evening backup slots do not rescan or rewrite an immutable T0.
+    search_end = local_now.strftime("%Y-%m-%d")
+    accepted, witness_error = _accept_bar(witness if witness is not None else probe_vnindex(search_end))
+    if witness_error:
+        return _public("refused", witness_error)
+    session = accepted["bar_session"]
+    window_ok, window_reason = assess_seal_window(local_now, session)
+    if not window_ok:
+        return _public("refused", window_reason, session=session)
+    existing = _existing_seal_without_scan(root_path, session)
+    if existing is not None:
+        return existing
     if close_scan is None:
         from modules.close_session_scan import build_close_scan_inputs
 
@@ -49,32 +64,24 @@ def run_guardian_close(
         reason = "CLOSE_SCAN_NOT_READY"
         if isinstance(payload, dict) and payload.get("status"):
             reason = str(payload.get("status"))
-        return _public("refused", reason, error=_error_text(payload))
-    search_end = local_now.strftime("%Y-%m-%d")
-    accepted, witness_error = _accept_bar(witness if witness is not None else probe_vnindex(search_end))
-    if witness_error:
-        return _public("refused", witness_error)
-    window_ok, window_reason = assess_seal_window(local_now, accepted["bar_session"])
-    if not window_ok:
-        return _public("refused", window_reason, session=accepted["bar_session"])
+        return _public("refused", reason, error=_error_text(payload), session=session)
     payload = dict(payload)
     # Bar session names the seal. Clock-day trading_today may already be false
     # after ICT midnight; the accepted VNINDEX bar is the trading-day witness.
-    payload["trade_date"] = accepted["bar_session"]
+    payload["trade_date"] = session
     payload["session_witness"] = accepted
     from research.guardian_research.universe import load_tracked_symbols
 
     tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
     blocker = _input_blocker(payload, tracked)
     if blocker:
-        return _public("refused", blocker, session=accepted["bar_session"])
-    from research.guardian_research.panel import default_root
+        return _public("refused", blocker, session=session)
     from research.guardian_research.pipeline import capture_from_close_payload
 
     result = capture_from_close_payload(
         payload,
         now=local_now,
-        root=Path(root) if root is not None else default_root(),
+        root=root_path,
         symbols=tracked,
     )
     document = result.get("document") if isinstance(result.get("document"), dict) else {}
@@ -83,7 +90,51 @@ def run_guardian_close(
         str(result.get("reason") or ""),
         path=result.get("path"),
         remote=result.get("remote"),
-        session=document.get("session") or payload.get("trade_date"),
+        session=document.get("session") or session,
+        tracked_count=document.get("tracked_count"),
+        content_sha256=document.get("content_sha256"),
+        counts=document.get("counts"),
+    )
+
+
+def _existing_seal_without_scan(root: Path, session: str) -> dict | None:
+    """Return an unchanged public result when a sealed T0 already exists.
+
+    Backup schedules must not rescan or rewrite. Remote is preferred; a local
+    sealed file is also treated as immutable and may only be re-published.
+    """
+    from research.guardian_research.pipeline import publish_snapshot, read_remote_snapshot
+    from research.guardian_research.snapshot import read_snapshot
+
+    remote, remote_state = read_remote_snapshot(root, session)
+    if remote_state == "unverified":
+        return _public("refused", "REMOTE_UNVERIFIED", session=session)
+    local_path = Path(root) / "sessions" / f"{session}.json"
+    local_document = None
+    if local_path.exists():
+        try:
+            local_document = read_snapshot(local_path)
+        except (OSError, ValueError, json.JSONDecodeError):
+            local_document = None
+    document = None
+    if remote_state == "present" and isinstance(remote, dict) and remote.get("session") == session:
+        document = remote
+        remote_result = "unchanged"
+    elif isinstance(local_document, dict) and local_document.get("session") == session:
+        document = local_document
+        if remote_state == "absent":
+            remote_result = publish_snapshot(root, session)
+        else:
+            remote_result = "disabled"
+    else:
+        return None
+    path = local_path if local_path.exists() else None
+    return _public(
+        "unchanged",
+        "ok",
+        path=path,
+        remote=remote_result,
+        session=session,
         tracked_count=document.get("tracked_count"),
         content_sha256=document.get("content_sha256"),
         counts=document.get("counts"),

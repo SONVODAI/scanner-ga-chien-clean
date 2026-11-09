@@ -12,10 +12,11 @@ on:
     #
     # Retries are best-effort only. GitHub Actions schedules can still slip past
     # ICT midnight or beyond the seal window (next calendar day 09:00 ICT).
-    # Duplicate starts are serialized and rely on immutable/idempotent seals
-    # (created → later unchanged; conflicting content is refused).
-    # Retries do NOT invent observed_at; a separate persisted evening observation
-    # mechanism may still be required if the first runnable start is already late.
+    # Duplicate starts are serialized. close_job probes VNINDEX, checks the seal
+    # window, then returns unchanged if a sealed T0 already exists — before any
+    # watchlist rescan or rewrite. Retries do NOT invent observed_at; a separate
+    # persisted evening observation may still be required if the first runnable
+    # start is already late.
     - cron: "30 12 * * 1-5"
     - cron: "30 14 * * 1-5"
     - cron: "30 15 * * 1-5"

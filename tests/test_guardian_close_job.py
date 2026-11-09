@@ -273,10 +273,13 @@ def test_same_seal_is_idempotent_and_a_conflict_is_rejected(monkeypatch, tmp_pat
     assert again["content_sha256"] == first["content_sha256"]
     assert Path(first["path"]).read_bytes() == before
 
-    conflict = _run(
+    # Conflicting rewrite is refused by the capture path without mutating bytes.
+    from research.guardian_research.pipeline import capture_from_close_payload
+
+    conflict = capture_from_close_payload(
+        _payload(("HPG",), price=99),
         now=datetime(2026, 11, 6, 20, 5, tzinfo=VN),
         root=tmp_path,
-        close_scan=lambda: _payload(("HPG",), price=99),
         symbols=("HPG",),
     )
     assert conflict["status"] == "conflict"
@@ -545,10 +548,11 @@ def test_backup_slot_is_idempotent_and_does_not_mutate_an_existing_seal(monkeypa
     """A later same-evening retry must keep the first immutable snapshot bytes."""
     _enable(monkeypatch)
     _local_only(monkeypatch)
+    scans = []
     first = _run(
         now=EVENING,
         root=tmp_path,
-        close_scan=lambda: _payload(("HPG",)),
+        close_scan=lambda: scans.append("primary") or _payload(("HPG",)),
         symbols=("HPG",),
     )
     assert first["status"] == "created"
@@ -556,7 +560,7 @@ def test_backup_slot_is_idempotent_and_does_not_mutate_an_existing_seal(monkeypa
     backup = _run(
         now=datetime(2026, 11, 6, 21, 30, tzinfo=VN),
         root=tmp_path,
-        close_scan=lambda: _payload(("HPG",)),
+        close_scan=lambda: scans.append("21:30") or _payload(("HPG",), price=99),
         symbols=("HPG",),
     )
     assert backup["status"] == "unchanged"
@@ -565,8 +569,105 @@ def test_backup_slot_is_idempotent_and_does_not_mutate_an_existing_seal(monkeypa
     late_backup = _run(
         now=datetime(2026, 11, 6, 22, 30, tzinfo=VN),
         root=tmp_path,
-        close_scan=lambda: _payload(("HPG",)),
+        close_scan=lambda: scans.append("22:30") or _payload(("HPG",), price=12),
         symbols=("HPG",),
     )
     assert late_backup["status"] == "unchanged"
     assert Path(first["path"]).read_bytes() == before
+    # Existing seal must be detected before any backup rescan/write.
+    assert scans == ["primary"]
+
+
+def test_backup_skips_scan_when_remote_seal_exists(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    sealed = {
+        "schema": "guardian_research_snapshot.v1",
+        "session": SESSION,
+        "content_sha256": "abc123",
+        "tracked_count": 1,
+        "counts": {"HOLD": 1, "SELL": 0, "WATCH": 0, "UNAVAILABLE": 0},
+    }
+    monkeypatch.setattr(
+        "research.guardian_research.pipeline.read_remote_snapshot",
+        lambda _root, session: (sealed, "present") if session == SESSION else (None, "absent"),
+    )
+    monkeypatch.setattr(
+        "research.guardian_research.pipeline.publish_snapshot",
+        lambda _root, _session: (_ for _ in ()).throw(AssertionError("must not publish")),
+    )
+    scans = []
+    result = _run(
+        now=datetime(2026, 11, 6, 21, 30, tzinfo=VN),
+        root=tmp_path,
+        close_scan=lambda: scans.append("scan") or _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert result["status"] == "unchanged"
+    assert result["content_sha256"] == "abc123"
+    assert result["remote"] == "unchanged"
+    assert scans == []
+    assert not (tmp_path / "sessions").exists()
+
+
+def test_primary_failure_then_backup_success_and_late_start_refuses(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    scans = []
+    failed = _run(
+        now=EVENING,
+        root=tmp_path / "primary",
+        close_scan=lambda: scans.append("fail") or _payload(("HPG",), absent=("HPG",)),
+        symbols=("HPG",),
+    )
+    assert failed["reason"] == "PARTIAL_SCAN"
+    assert not (tmp_path / "primary" / "sessions").exists()
+
+    success = _run(
+        now=datetime(2026, 11, 6, 21, 30, tzinfo=VN),
+        root=tmp_path / "backup",
+        close_scan=lambda: scans.append("backup") or _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert success["status"] == "created"
+    stored = read_snapshot(Path(success["path"]))
+    assert stored["session"] == SESSION
+    assert stored["session_witness"]["bar_session"] == SESSION
+    assert stored["reconstruction"]["observation_at"] == OBSERVED
+    assert stored["tracked_count"] == 1
+
+    late = _run(
+        now=datetime(2026, 11, 7, 9, 0, tzinfo=VN),
+        root=tmp_path / "late",
+        close_scan=lambda: scans.append("late") or _payload(("HPG",)),
+        symbols=("HPG",),
+    )
+    assert late["reason"] == "SCHEDULE_TOO_LATE"
+    assert "late" not in scans
+    assert scans == ["fail", "backup"]
+
+
+def test_full_universe_backup_requires_143_and_rejects_partial(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    tracked = load_tracked_symbols()
+    assert len(tracked) == 143
+    ok = _run(
+        now=datetime(2026, 11, 6, 21, 30, tzinfo=VN),
+        root=tmp_path / "full",
+        close_scan=lambda: _payload(tracked),
+        symbols=tracked,
+    )
+    assert ok["status"] == "created"
+    assert ok["tracked_count"] == 143
+    document = read_snapshot(Path(ok["path"]))
+    assert document["session_witness"]["bar_session"] == SESSION
+    assert len(document["rows"]) == 143
+
+    partial = _run(
+        now=datetime(2026, 11, 6, 22, 30, tzinfo=VN),
+        root=tmp_path / "partial",
+        close_scan=lambda: _payload(tracked, absent=("HPG",)),
+        symbols=tracked,
+    )
+    assert partial["reason"] == "PARTIAL_SCAN"
+    assert not (tmp_path / "partial" / "sessions").exists()
