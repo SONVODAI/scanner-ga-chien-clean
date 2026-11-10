@@ -65,7 +65,10 @@ jobs:
 
       - name: Refresh T+ evidence without resealing
         id: outcomes
-        if: always() && steps.seal.outcome == 'success'
+        # A skipped seal means setup failed or the job never sealed. Success and
+        # failure both leave any already sealed T0 readable. The seal step has no
+        # error override, so a refusal still fails the job.
+        if: always() && steps.seal.outcome != 'skipped'
         run: python -m research.guardian_research.outcomes
 
       - name: Publish changed T+ evidence
