@@ -145,7 +145,9 @@ def render_guardian_research_panel(
     store = Path(root) if root is not None else default_root()
     st.markdown("---")
     _render_live(st, scan_df, now)
-    return _render_sealed(st, store, scan_df, root)
+    document = _render_sealed(st, store, scan_df, root)
+    _render_outcomes(st, store)
+    return document
 
 
 def _render_live(st, scan_df, now) -> None:
@@ -186,7 +188,7 @@ def _render_live(st, scan_df, now) -> None:
         st.info("No tracked symbols in the live scan.")
         return
     st.dataframe(
-        board.style.map(_paint, subset=["Classification"]),
+        _style_live_board(board),
         use_container_width=True,
         hide_index=True,
         height=720,
@@ -257,6 +259,128 @@ def _metric_row(st, counts: dict) -> None:
     columns = st.columns(4)
     for column, name in zip(columns, CLASS_ORDER):
         column.metric(name, int(counts.get(name, 0)))
+
+
+def _render_outcomes(st, root: Path) -> None:
+    """Read the precomputed T+ file. This does not scan or score."""
+    if Path(root).resolve() != default_root().resolve():
+        return
+    from research.guardian_research.outcomes import read_outcomes
+
+    view = read_outcomes()
+    with st.expander("Guardian Research — T+ Performance", expanded=False):
+        if view is None:
+            st.info("T+ evidence file is absent or failed its digest check. No return was calculated.")
+            return
+        st.caption(view.get("statement") or "")
+        st.caption(
+            f"Evidence {view.get('evidence_status')} · calendar {view.get('calendar_status')} · "
+            f"price basis {view.get('price_basis') or 'absent'}."
+        )
+        st.dataframe(_outcome_comparison(view), use_container_width=True, hide_index=True)
+        st.markdown("**Per-symbol history**")
+        st.dataframe(_outcome_symbols(view), use_container_width=True, hide_index=True, height=360)
+        st.markdown("**Sample, missing data, and maturity**")
+        st.dataframe(_outcome_quality(view), use_container_width=True, hide_index=True)
+        st.markdown("**False SELL / later rise**")
+        st.dataframe(_outcome_false_sell(view), use_container_width=True, hide_index=True)
+        tenure = view.get("tenure") if isinstance(view.get("tenure"), dict) else {}
+        st.caption(
+            f"New or changed states {tenure.get('NEW_OR_CHANGED', 0)} · "
+            f"persistent states {tenure.get('PERSISTENT', 0)} · "
+            f"unclassified tenure {tenure.get('UNCLASSIFIED_TENURE', 0)}. "
+            "A horizon marked INSUFFICIENT_EVIDENCE has no measured sample."
+        )
+
+
+def _outcome_comparison(view: dict):
+    records = []
+    classes = view.get("classifications") if isinstance(view.get("classifications"), dict) else {}
+    for name in CLASS_ORDER:
+        horizons = (classes.get(name) or {}).get("horizons") or {}
+        for label, item in _ordered_horizons(horizons):
+            records.append({
+                "Classification": name,
+                "Horizon": label,
+                "Evidence": item.get("evidence"),
+                "Sample": item.get("primary"),
+                "Positive": _rate(item.get("positive_return_rate")),
+                "Average": _pct(item.get("average_return_pct")),
+                "Median": _pct(item.get("median_return_pct")),
+                "Rise >3%": _rate(item.get("win_rate_above_3pct")),
+                "Rise >5%": _rate(item.get("win_rate_above_5pct")),
+                "Loss <0": _rate(item.get("loss_rate")),
+                "Loss <-3%": _rate(item.get("loss_rate_below_minus_3pct")),
+                "Loss <-5%": _rate(item.get("loss_rate_below_minus_5pct")),
+                "Close-path avg": _pct(item.get("adverse_close_path_average_pct")),
+                "Worst close-path": _pct(item.get("adverse_close_path_worst_pct")),
+            })
+    return pd.DataFrame(records)
+
+
+def _outcome_symbols(view: dict):
+    from research.guardian_research.outcomes import HORIZON_LABELS
+
+    records = []
+    for row in view.get("rows") or []:
+        horizons = row.get("horizons") or {}
+        record = {
+            "Session": row.get("session"),
+            "Symbol": row.get("symbol"),
+            "Classification": row.get("classification"),
+            "Tenure": row.get("tenure"),
+            "Live-adjusted T0 input": "YES" if row.get("live_adjusted_input") else "",
+        }
+        for label in HORIZON_LABELS:
+            cell = horizons.get(label) or {}
+            record[f"{label} status"] = cell.get("status")
+            record[label] = cell.get("return_pct")
+        records.append(record)
+    return pd.DataFrame(records)
+
+
+def _outcome_quality(view: dict):
+    records = []
+    classes = view.get("classifications") if isinstance(view.get("classifications"), dict) else {}
+    for name in CLASS_ORDER:
+        horizons = (classes.get(name) or {}).get("horizons") or {}
+        for label, item in _ordered_horizons(horizons):
+            records.append({
+                "Classification": name,
+                "Horizon": label,
+                "Evidence": item.get("evidence"),
+                "Observations": item.get("observations"),
+                "Mature sample": item.get("primary"),
+                "Not yet": item.get("immature"),
+                "Missing": item.get("missing"),
+                "Not measured": item.get("unmeasured"),
+                "Truncated": item.get("truncated"),
+                "Discontinuity": item.get("discontinuity"),
+                "Adverse sample": item.get("adverse_sample"),
+            })
+    return pd.DataFrame(records)
+
+
+def _outcome_false_sell(view: dict):
+    false_sell = view.get("false_sell") if isinstance(view.get("false_sell"), dict) else {}
+    records = []
+    for label, item in _ordered_horizons(false_sell.get("horizons") or {}):
+        records.append({
+            "Horizon": label,
+            "Evidence": item.get("evidence"),
+            "Sample": item.get("sample"),
+            "Later rise": _rate(item.get("rose")),
+            "Rise >3%": _rate(item.get("rose_above_3pct")),
+            "Rise >5%": _rate(item.get("rose_above_5pct")),
+            "Later fall": _rate(item.get("fell")),
+        })
+    return pd.DataFrame(records)
+
+
+def _ordered_horizons(horizons: dict):
+    from research.guardian_research.outcomes import HORIZON_LABELS
+
+    return [(label, horizons[label]) for label in HORIZON_LABELS if isinstance(horizons, dict) and label in horizons]
 
 
 def _load_forward_view(root: Path | None) -> dict | None:
@@ -345,6 +469,15 @@ def _rate(value) -> str:
 
 def _pct_rate(value) -> str:
     return _rate(value)
+
+
+def _style_live_board(board: pd.DataFrame):
+    """Paint every cell from the row classification. The frame order is unchanged."""
+    def paint(row: pd.Series) -> list[str]:
+        style = CLASS_STYLE.get(str(row.get("Classification")), "")
+        return [style] * len(row)
+
+    return board.style.apply(paint, axis=1)
 
 
 def _paint(value: object) -> str:

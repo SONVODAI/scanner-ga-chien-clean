@@ -12,7 +12,7 @@ import pandas as pd
 from position_guardian import generate_signal
 from research.guardian_research.contract import GENERATE_SIGNAL_SHA256, PRODUCTION_TO_RESEARCH
 from research.guardian_research.live import evaluate_live, live_board
-from research.guardian_research.panel import render_guardian_research_panel
+from research.guardian_research.panel import CLASS_STYLE, _style_live_board, render_guardian_research_panel
 from research.guardian_research.snapshot import SnapshotExists, build_snapshot, read_snapshot, write_snapshot
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -135,6 +135,40 @@ def test_live_uses_the_same_scan_row_as_position_guardian(tmp_path: Path):
     assert board.loc[board["Symbol"] == "FPT", "Quote"].iloc[0] == ""
     assert Path("data/guardian_research/sessions/2026-11-06.json").read_bytes() == before
     assert list(tmp_path.rglob("*.json")) == []
+
+
+def test_live_row_color_covers_the_whole_row_and_keeps_grouping():
+    hold = _row("HPG", 30, 25, 20, 100, 50)
+    watch = _row("SSI", 20, 25, 20, 100, 50)
+    sell = _row("FPT", 30, 22, 24, 10, 50)
+    daily = _row("VCB", 30, 25, 20, 100, 50)
+    daily["is_live_adjusted"] = False
+    frame = _frame([sell, hold, watch, daily])
+    live = evaluate_live(frame, symbols=("FPT", "HPG", "SSI", "VCB", "ACV"), evaluated_at=WHEN)
+    board = live_board(live)
+    assert list(board["Classification"]) == ["HOLD", "HOLD", "WATCH", "SELL", "UNAVAILABLE"]
+    assert list(board["Symbol"]) == ["HPG", "VCB", "SSI", "FPT", "ACV"]
+    assert board.loc[board["Symbol"] == "VCB", "Live"].iloc[0] == ""
+    assert board.loc[board["Symbol"] == "VCB", "Quote"].iloc[0] == ""
+    assert board.loc[board["Symbol"] == "ACV", "Quote"].iloc[0] == ""
+    import re
+
+    html = _style_live_board(board).to_html()
+    css = html.split("</style>", 1)[0]
+    for label, color in (
+        ("HOLD", "#d9ead3"),
+        ("WATCH", "#fff2cc"),
+        ("SELL", "#f4cccc"),
+        ("UNAVAILABLE", "#d9d9d9"),
+    ):
+        assert color in CLASS_STYLE[label]
+        row = int(board.index[board["Classification"] == label][0])
+        for col in range(len(board.columns)):
+            rule = re.search(rf"[^{{]*row{row}_col{col}[^{{]*\{{[^}}]+}}", css)
+            assert rule is not None
+            compact = rule.group(0).replace(" ", "")
+            assert f"background-color:{color}" in compact
+            assert "color:#" in compact
 
 
 def test_shipped_snapshot_cannot_be_overwritten(tmp_path: Path):
