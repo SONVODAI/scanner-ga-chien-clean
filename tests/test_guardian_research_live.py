@@ -247,6 +247,22 @@ def test_panel_keeps_live_apart_from_the_sealed_session(tmp_path: Path, monkeypa
     assert list(tmp_path.joinpath("sessions").glob("*.json")) == [Path(sealed["path"])]
 
 
+def test_guardian_research_section_follows_position_guardian():
+    app = Path("app.py").read_text(encoding="utf-8")
+    panel = Path("research/guardian_research/panel.py").read_text(encoding="utf-8")
+    guardian = app.index("render_guardian(")
+    research = app.index("render_guardian_research_panel(")
+    market = app.index("# MARKET FIRST", guardian)
+    assert app.count("render_guardian(") == 1
+    assert app.count("render_guardian_research_panel(") == 1
+    assert guardian < research < market
+    assert "render_earning_money_board(" not in app[guardian:research]
+    body = panel[panel.index("def render_guardian_research_panel"):panel.index("def _render_live")]
+    assert body.index("_render_live(") < body.index("_render_sealed(") < body.index("_render_outcomes(")
+    sealed = panel[panel.index("def _render_sealed"):panel.index("def _count_classes")]
+    assert "_render_forward(" in sealed
+
+
 class _Expander:
     def __enter__(self):
         return self
