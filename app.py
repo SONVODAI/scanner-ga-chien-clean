@@ -41,6 +41,12 @@ from modules.earning_learning import (
 )
 from modules.accumulation_opportunity import render_accumulation_board
 from modules.experience_engine import run_experience_engine
+from modules.scan_fetch import (
+    LiveQuoteDeferred,
+    TransportTimeout,
+    bounded_yf_download,
+    call_with_request_timeout,
+)
 from forecast_engine import ForecastEngine
 
 _FORECAST_ENGINE = ForecastEngine()
@@ -955,13 +961,15 @@ def download_symbol_data(symbol: str) -> pd.DataFrame:
     try:
         from vnstock import stock_historical_data
 
-        df = stock_historical_data(
-            symbol=symbol,
-            start_date="2025-01-01",
-            end_date=today_str(),
-            resolution="1D",
-            type="stock",
-            beautify=True,
+        df = call_with_request_timeout(
+            lambda: stock_historical_data(
+                symbol=symbol,
+                start_date="2025-01-01",
+                end_date=today_str(),
+                resolution="1D",
+                type="stock",
+                beautify=True,
+            )
         )
 
         if df is None or len(df) == 0:
@@ -997,6 +1005,8 @@ def download_symbol_data(symbol: str) -> pd.DataFrame:
         df = df.dropna(subset=["date", "close"]).sort_values("date")
         return df.reset_index(drop=True)
 
+    except TransportTimeout:
+        raise
     except Exception:
         return pd.DataFrame()
 
@@ -1014,25 +1024,23 @@ def fetch_live_price(symbol: str) -> dict:
     ticker = f"{symbol}{YAHOO_SUFFIX}"
 
     try:
-        data = yf.download(
-            ticker,
-            period="1d",
-            interval="15m",
-            progress=False,
-            auto_adjust=False,
-            threads=False,
-        )
-
+        try:
+            data = bounded_yf_download(
+                yf.download,
+                ticker=ticker,
+                period="1d",
+                interval="15m",
+            )
+        except LiveQuoteDeferred:
+            raise
         source = "YF_15M"
 
         if data is None or data.empty:
-            data = yf.download(
-                ticker,
+            data = bounded_yf_download(
+                yf.download,
+                ticker=ticker,
                 period="5d",
                 interval="1d",
-                progress=False,
-                auto_adjust=False,
-                threads=False,
             )
             source = "YF_1D_FALLBACK"
 
@@ -1072,6 +1080,8 @@ def fetch_live_price(symbol: str) -> dict:
             "ts": ts,
         }
 
+    except LiveQuoteDeferred:
+        raise
     except Exception:
         return {"price": np.nan, "volume": np.nan, "source": "ERROR", "ts": ""}
 
@@ -1178,32 +1188,39 @@ def inject_live_into_daily(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame
 
         return df.reset_index(drop=True), live
 
+    except LiveQuoteDeferred:
+        return _daily_without_live_quote(raw, symbol)
     except Exception as e:
         log_runtime_error(symbol, "inject_live_into_daily", e)
-        try:
-            df = raw.copy().sort_values("date").reset_index(drop=True)
-            if not df.empty:
-                df["is_live_adjusted"] = False
-                last = df.iloc[-1]
-                live = {
-                    "price": to_float(last.get("close", np.nan)),
-                    "volume": to_float(last.get("volume", np.nan)),
-                    "source": "SAFE_MODE_D1",
-                    "ts": "",
-                    "daily_last_close_before_live": to_float(last.get("close", np.nan)),
-                }
-                return df, live
-        except Exception as e2:
-            log_runtime_error(symbol, "inject_fallback", e2)
+        return _daily_without_live_quote(raw, symbol)
 
-        live = {
-            "price": np.nan,
-            "volume": np.nan,
-            "source": "SAFE_MODE_EMPTY",
-            "ts": "",
-            "daily_last_close_before_live": np.nan,
-        }
-        return pd.DataFrame(), live
+
+def _daily_without_live_quote(raw: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame, dict]:
+    """Keep the daily bar. It is not marked live."""
+    try:
+        df = raw.copy().sort_values("date").reset_index(drop=True)
+        if not df.empty:
+            df["is_live_adjusted"] = False
+            last = df.iloc[-1]
+            live = {
+                "price": to_float(last.get("close", np.nan)),
+                "volume": to_float(last.get("volume", np.nan)),
+                "source": "SAFE_MODE_D1",
+                "ts": "",
+                "daily_last_close_before_live": to_float(last.get("close", np.nan)),
+            }
+            return df, live
+    except Exception as e2:
+        log_runtime_error(symbol, "inject_fallback", e2)
+
+    live = {
+        "price": np.nan,
+        "volume": np.nan,
+        "source": "SAFE_MODE_EMPTY",
+        "ts": "",
+        "daily_last_close_before_live": np.nan,
+    }
+    return pd.DataFrame(), live
 
 # =========================================================
 # INDICATORS
