@@ -28,7 +28,8 @@ def refresh_outcomes(root: Path | None = None, store_path: Path | None = None, d
     """Rewrite the evidence file. Sealed snapshots are read and then re-read."""
     base = Path(root) if root is not None else _default_root()
     before = _snapshot_bytes(base)
-    store = _read_store(Path(store_path) if store_path is not None else base / STORE_NAME)
+    chosen = Path(store_path) if store_path is not None else _store_path(base)
+    store = _read_store(chosen) if chosen is not None else None
     view = build_outcomes(base, store)
     target = Path(destination) if destination is not None else _package_view()
     _write(view, target)
@@ -285,6 +286,12 @@ def _load_sealed(root: Path) -> list[dict]:
         if isinstance(document, dict):
             documents.append(document)
     return documents
+
+
+def _store_path(root: Path) -> Path | None:
+    from research.guardian_research.reference_export import resolve_store_path
+
+    return resolve_store_path(root)
 
 
 def _read_store(path: Path) -> dict | None:

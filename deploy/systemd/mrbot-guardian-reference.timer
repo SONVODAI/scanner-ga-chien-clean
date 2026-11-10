@@ -1,0 +1,15 @@
+[Unit]
+Description=Mr.BOT Guardian approximate-close export timer
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+
+[Timer]
+# After the intraday collector's evening and morning slots. Not installed by deploy/systemd/install.sh.
+OnCalendar=Mon..Fri *-*-* 18:50:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 20:20:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 22:50:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 06:20:00 Asia/Ho_Chi_Minh
+Persistent=true
+Unit=mrbot-guardian-reference.service
+
+[Install]
+WantedBy=timers.target

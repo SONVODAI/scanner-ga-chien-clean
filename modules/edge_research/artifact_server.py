@@ -8,6 +8,7 @@ Serves only:
   GET      /current/live_shadow/live_shadow_status.json
   GET      /current/rotation_watch/board.json               (GET-only, isolated store)
   GET      /current/rotation_watch/status.json
+  GET      /current/guardian_research/reference_store.json (GET-only, isolated store)
 
 Storage:
   Edge bundle:     /var/lib/mrbot/edge_research_durable
@@ -55,6 +56,7 @@ from modules.edge_research.bundle import (
 DEFAULT_STORAGE_ROOT = Path("/var/lib/mrbot/edge_research_durable")
 DEFAULT_LIVE_SHADOW_ROOT = Path("/var/lib/mrbot/live_pxv_shadow")
 DEFAULT_ROTATION_WATCH_ROOT = Path("/var/lib/mrbot/rotation_watch")
+DEFAULT_GUARDIAN_REFERENCE_ROOT = Path("/var/lib/mrbot/guardian_reference")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 DEFAULT_MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -73,6 +75,9 @@ ROTATION_WATCH_GET_PATHS = {
     "/current/rotation_watch/board.json": "board.json",
     "/current/rotation_watch/status.json": "status.json",
 }
+GUARDIAN_REFERENCE_GET_PATHS = {
+    "/current/guardian_research/reference_store.json": "reference_store.json",
+}
 
 
 @dataclass(frozen=True)
@@ -84,6 +89,7 @@ class ArtifactServerConfig:
     max_upload_bytes: int = DEFAULT_MAX_UPLOAD_BYTES
     live_shadow_root: Path = DEFAULT_LIVE_SHADOW_ROOT
     rotation_watch_root: Path = DEFAULT_ROTATION_WATCH_ROOT
+    guardian_reference_root: Path = DEFAULT_GUARDIAN_REFERENCE_ROOT
 
     @classmethod
     def from_env(cls) -> "ArtifactServerConfig":
@@ -98,6 +104,7 @@ class ArtifactServerConfig:
         )
         shadow = os.environ.get("MRBOT_LIVE_PXV_SHADOW_STORE", str(DEFAULT_LIVE_SHADOW_ROOT))
         rotation = os.environ.get("MRBOT_ROTATION_WATCH_STORE", str(DEFAULT_ROTATION_WATCH_ROOT))
+        guardian = os.environ.get("GUARDIAN_REFERENCE_ROOT", str(DEFAULT_GUARDIAN_REFERENCE_ROOT))
         return cls(
             storage_root=Path(storage),
             token=token,
@@ -106,6 +113,7 @@ class ArtifactServerConfig:
             max_upload_bytes=max_upload,
             live_shadow_root=Path(shadow),
             rotation_watch_root=Path(rotation),
+            guardian_reference_root=Path(guardian),
         )
 
 
@@ -320,6 +328,18 @@ def create_wsgi_app(config: ArtifactServerConfig):
                 src=Path(config.rotation_watch_root) / filename,
                 root=Path(config.rotation_watch_root),
                 missing_error="rotation_watch_not_found",
+            )
+
+        if path in GUARDIAN_REFERENCE_GET_PATHS:
+            filename = GUARDIAN_REFERENCE_GET_PATHS[path]
+            return _serve_allowlisted_file_get(
+                environ,
+                start_response,
+                token=config.token,
+                method=method,
+                src=Path(config.guardian_reference_root) / filename,
+                root=Path(config.guardian_reference_root),
+                missing_error="guardian_reference_not_found",
             )
 
         if path == ALLOWED_PRODUCTION_OBS_PATH and method in ALLOWED_METHODS:

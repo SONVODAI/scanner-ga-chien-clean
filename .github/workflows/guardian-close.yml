@@ -36,6 +36,9 @@ jobs:
     # to keep the job off. Clearing it is the rollback.
     if: vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED == 'true'
     runs-on: ubuntu-latest
+    env:
+      EDGE_RESEARCH_LEDGER_URL: ${{ secrets.EDGE_RESEARCH_LEDGER_URL }}
+      EDGE_RESEARCH_LEDGER_TOKEN: ${{ secrets.EDGE_RESEARCH_LEDGER_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
