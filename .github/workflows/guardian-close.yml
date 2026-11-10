@@ -37,9 +37,10 @@ jobs:
     if: vars.GUARDIAN_RESEARCH_SNAPSHOT_ENABLED == 'true'
     runs-on: ubuntu-latest
     env:
-      EDGE_RESEARCH_LEDGER_URL: ${{ secrets.EDGE_RESEARCH_LEDGER_URL }}
-      EDGE_RESEARCH_LEDGER_TOKEN: ${{ secrets.EDGE_RESEARCH_LEDGER_TOKEN }}
-      GUARDIAN_REFERENCE_PREFIX: ${{ secrets.GUARDIAN_REFERENCE_PREFIX }}
+      # Independent of the Research Ledger secrets. Leave either value unset
+      # and the T+ download stays unavailable; the seal step still finishes.
+      GUARDIAN_REFERENCE_URL: ${{ secrets.GUARDIAN_REFERENCE_URL }}
+      GUARDIAN_REFERENCE_TOKEN: ${{ secrets.GUARDIAN_REFERENCE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 

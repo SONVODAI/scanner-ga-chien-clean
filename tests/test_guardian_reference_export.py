@@ -11,9 +11,11 @@ from research.guardian_research.outcomes import build_outcomes
 from research.guardian_research.reference_export import (
     PUBLISHED_PATH,
     ReferenceExportError,
+    _NoRedirect,
     export_reference_store,
     fetch_published_store,
-    published_url,
+    guardian_reference_url,
+    resolve_store_path,
     write_reference_store,
 )
 from research.guardian_research.snapshot import build_snapshot, label_observation_origin, write_snapshot
@@ -192,6 +194,7 @@ def test_published_fetch_keeps_a_verified_body_and_drops_a_bad_one(tmp_path):
     store = export_reference_store(tmp_path / "camera", symbols=("HPG",))
     body = (json.dumps(store, sort_keys=True) + "\n").encode("utf-8")
     seen = {}
+    endpoint = "https://artifacts.example/edge-research" + PUBLISHED_PATH
 
     def opener(url, token):
         seen["url"] = url
@@ -199,21 +202,55 @@ def test_published_fetch_keeps_a_verified_body_and_drops_a_bad_one(tmp_path):
         return body
 
     destination = tmp_path / "reference_store.json"
-    fetched = fetch_published_store("https://artifacts.example", "secret", destination, opener=opener)
+    fetched = fetch_published_store(endpoint, "secret", destination, opener=opener)
     assert fetched == destination
-    assert seen["url"] == "https://artifacts.example" + PUBLISHED_PATH
+    assert seen["url"] == endpoint
     assert seen["token"] == "secret"
     broken = body.replace(b"APPROX_LAST_5M_CLOSE", b"OFFICIAL_DAILY_CLOSE")
 
     def bad_opener(url, token):
         return broken
 
-    assert fetch_published_store("https://artifacts.example", "secret", destination, opener=bad_opener) is None
+    assert fetch_published_store(endpoint, "secret", destination, opener=bad_opener) is None
     assert not destination.exists()
-    assert fetch_published_store("http://artifacts.example", "secret", destination, opener=opener) is None
-    assert published_url("https://artifacts.example", "/edge-research") == (
-        "https://artifacts.example/edge-research" + PUBLISHED_PATH
-    )
-    assert published_url("https://artifacts.example/edge-research") is None
-    assert published_url("https://artifacts.example", "/edge-research/../etc") is None
-    assert published_url("https://user:secret@artifacts.example", "/edge-research") is None
+    assert fetch_published_store("http://artifacts.example" + endpoint[len("https://artifacts.example"):], "secret", destination, opener=opener) is None
+    assert guardian_reference_url(endpoint) == endpoint
+    assert guardian_reference_url("https://artifacts.example/edge-research") is None
+    assert guardian_reference_url("https://artifacts.example/edge-research/../etc" + PUBLISHED_PATH) is None
+    assert guardian_reference_url("https://user:secret@artifacts.example" + PUBLISHED_PATH) is None
+    assert guardian_reference_url(endpoint + "?download=1") is None
+    assert _NoRedirect().redirect_request(None, None, 302, "Moved", {}, "https://other.example/x") is None
+
+
+def test_guardian_download_ignores_ledger_secrets(tmp_path, monkeypatch):
+    endpoint = "https://artifacts.example/edge-research" + PUBLISHED_PATH
+    _write_bars(tmp_path / "camera", "2026-11-06", [_bar("2026-11-06", "HPG", "14:45", 100)])
+    store = export_reference_store(tmp_path / "camera", symbols=("HPG",))
+    body = (json.dumps(store, sort_keys=True) + "\n").encode("utf-8")
+    seen = []
+
+    def opener(url, token):
+        seen.append((url, token))
+        return body
+
+    monkeypatch.setattr("research.guardian_research.reference_export._open_https", opener)
+    monkeypatch.setenv("EDGE_RESEARCH_LEDGER_URL", "https://ledger.example")
+    monkeypatch.setenv("EDGE_RESEARCH_LEDGER_TOKEN", "ledger-secret")
+    monkeypatch.setenv("GUARDIAN_REFERENCE_PREFIX", "/edge-research")
+    monkeypatch.setenv("GUARDIAN_REFERENCE_DOWNLOAD", str(tmp_path / "downloaded.json"))
+    monkeypatch.delenv("GUARDIAN_REFERENCE_URL", raising=False)
+    monkeypatch.delenv("GUARDIAN_REFERENCE_TOKEN", raising=False)
+    assert resolve_store_path(tmp_path / "absent") is None
+    assert seen == []
+
+    monkeypatch.setenv("GUARDIAN_REFERENCE_URL", endpoint)
+    assert resolve_store_path(tmp_path / "absent") is None
+    assert seen == []
+
+    monkeypatch.setenv("GUARDIAN_REFERENCE_TOKEN", "guardian-secret")
+    fetched = resolve_store_path(tmp_path / "absent")
+    assert fetched == tmp_path / "downloaded.json"
+    assert seen == [(endpoint, "guardian-secret")]
+    monkeypatch.setenv("GUARDIAN_REFERENCE_URL", "https://artifacts.example/edge-research")
+    assert resolve_store_path(tmp_path / "still-absent") is None
+    assert seen == [(endpoint, "guardian-secret")]

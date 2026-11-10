@@ -98,30 +98,32 @@ def read_reference_store(path: Path) -> dict | None:
     return document
 
 
-def published_url(base_url: str, prefix: str = "") -> str | None:
-    """HTTPS origin plus an optional path prefix. The final path is exact."""
-    base = _base_url(base_url)
-    if base is None:
+def guardian_reference_url(value: str) -> str | None:
+    """Accept only an HTTPS reference endpoint, including the public Caddy path."""
+    parsed = urlsplit(str(value or "").strip())
+    if parsed.scheme != "https" or not parsed.hostname:
         return None
-    path = _published_path(prefix)
-    if path is None:
+    if parsed.username or parsed.password or parsed.query or parsed.fragment:
         return None
-    url = base + path
-    if urlsplit(url).path != path or urlsplit(url).query or urlsplit(url).fragment:
+    path = parsed.path or ""
+    if not path.endswith(PUBLISHED_PATH):
         return None
-    return url
+    prefix = path[: -len(PUBLISHED_PATH)]
+    if _published_path(prefix) != path:
+        return None
+    return f"https://{parsed.netloc}{path}"
 
 
-def fetch_published_store(base_url: str, token: str, destination: Path, *, prefix: str = "", opener=None) -> Path | None:
+def fetch_published_store(url: str, token: str, destination: Path, *, opener=None) -> Path | None:
     """Download the allowlisted artifact. Redirects are not followed."""
     if not str(token or "").strip():
         return None
-    url = published_url(base_url, prefix)
-    if url is None:
+    endpoint = guardian_reference_url(url)
+    if endpoint is None:
         return None
     open_fn = opener or _open_https
     try:
-        body = open_fn(url, token)
+        body = open_fn(endpoint, token)
     except Exception:
         return None
     if not body:
@@ -145,13 +147,12 @@ def resolve_store_path(local_root: Path) -> Path | None:
     configured = os.environ.get("GUARDIAN_REFERENCE_STORE", "").strip()
     if configured and Path(configured).is_file():
         return Path(configured)
-    url = os.environ.get("EDGE_RESEARCH_LEDGER_URL", "").strip()
-    token = os.environ.get("EDGE_RESEARCH_LEDGER_TOKEN", "").strip()
+    url = os.environ.get("GUARDIAN_REFERENCE_URL", "").strip()
+    token = os.environ.get("GUARDIAN_REFERENCE_TOKEN", "").strip()
     if not url or not token:
         return None
-    prefix = os.environ.get("GUARDIAN_REFERENCE_PREFIX", "")
     destination = Path(os.environ.get("GUARDIAN_REFERENCE_DOWNLOAD", "/tmp/guardian_reference_store.json"))
-    return fetch_published_store(url, token, destination, prefix=prefix)
+    return fetch_published_store(url, token, destination)
 
 
 def _select_session(frame: pd.DataFrame, session: date, tracked: tuple[str, ...]) -> tuple[list[dict], list[dict], set[str]]:
@@ -311,17 +312,6 @@ def _published_path(prefix: str) -> str | None:
     if not parts or any(not part.replace("-", "").replace("_", "").isalnum() for part in parts):
         return None
     return text + PUBLISHED_PATH
-
-
-def _base_url(value: str) -> str | None:
-    parsed = urlsplit(str(value or "").strip())
-    if parsed.scheme != "https" or not parsed.hostname:
-        return None
-    if parsed.username or parsed.password or parsed.query or parsed.fragment:
-        return None
-    if parsed.path not in {"", "/"}:
-        return None
-    return f"https://{parsed.netloc}"
 
 
 def _open_https(url: str, token: str) -> bytes:
