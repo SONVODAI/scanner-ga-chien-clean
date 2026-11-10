@@ -132,6 +132,7 @@ def test_live_uses_the_same_scan_row_as_position_guardian(tmp_path: Path):
     assert list(board["Classification"]) == ["WATCH", "UNAVAILABLE"]
     assert list(board["Symbol"]) == ["HPG", "FPT"]
     assert board.loc[board["Symbol"] == "HPG", "Quote"].iloc[0] == "2026-11-10 10:00:00+07:00"
+    assert board.loc[board["Symbol"] == "FPT", "Quote"].iloc[0] == ""
     assert Path("data/guardian_research/sessions/2026-11-06.json").read_bytes() == before
     assert list(tmp_path.rglob("*.json")) == []
 
@@ -187,11 +188,14 @@ def test_panel_keeps_live_apart_from_the_sealed_session(tmp_path: Path, monkeypa
     import streamlit as st
 
     headings = []
+    expanders = []
+    metrics = []
     monkeypatch.setattr(st, "markdown", lambda text, **_kwargs: headings.append(str(text)))
     monkeypatch.setattr(st, "caption", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(st, "info", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(st, "dataframe", lambda *_args, **_kwargs: None)
-    monkeypatch.setattr(st, "columns", lambda count: [_Metric() for _ in range(count)])
+    monkeypatch.setattr(st, "expander", lambda label, **kwargs: expanders.append((str(label), kwargs.get("expanded"))) or _Expander())
+    monkeypatch.setattr(st, "columns", lambda count: [_Metric(metrics) for _ in range(count)])
     shown = render_guardian_research_panel(
         _frame([_row("HPG", 20, 25, 20, 100, 50)]),
         99,
@@ -200,12 +204,28 @@ def test_panel_keeps_live_apart_from_the_sealed_session(tmp_path: Path, monkeypa
     )
     assert shown["session"] == "2026-11-06"
     assert shown["rows"][0]["classification"] == "HOLD"
-    assert any("GUARDIAN LIVE" in heading for heading in headings)
-    assert any("GUARDIAN RESEARCH" in heading for heading in headings)
+    assert headings[1] == "## 🟢 GUARDIAN RESEARCH LIVE"
+    assert not any(heading.startswith("## 🛡️") for heading in headings)
+    assert expanders == [("Sealed T0 snapshot 2026-11-06 — not the live board", False)]
+    assert metrics[:4] == [("HOLD", 0), ("WATCH", 1), ("SELL", 0), ("UNAVAILABLE", 142)]
+    assert ("HOLD", 1) in metrics[4:]
     assert Path(sealed["path"]).read_bytes() == before
     assert list(tmp_path.joinpath("sessions").glob("*.json")) == [Path(sealed["path"])]
 
 
+class _Expander:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+
 class _Metric:
-    def metric(self, *_args, **_kwargs):
+    def __init__(self, sink=None):
+        self._sink = sink
+
+    def metric(self, label, value, *_args, **_kwargs):
+        if self._sink is not None:
+            self._sink.append((str(label), int(value)))
         return None

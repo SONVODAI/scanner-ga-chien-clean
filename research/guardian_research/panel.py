@@ -138,67 +138,32 @@ def render_guardian_research_panel(
     *,
     root: Path | None = None,
 ) -> dict | None:
-    """Show the intraday board and the latest sealed snapshot. Neither write is done here."""
+    """Show the intraday board, then the sealed snapshot in a separate section."""
     import streamlit as st
 
     del market_real
     store = Path(root) if root is not None else default_root()
     st.markdown("---")
     _render_live(st, scan_df, now)
-    st.markdown("## 🛡️ GUARDIAN RESEARCH")
-    document = latest_snapshot(store)
-    view = _load_forward_view(root)
-    if document is None and view is None:
-        st.caption(
-            "HOLD / WATCH / SELL here are research labels, not portfolio orders. "
-            "Market Real is context only."
-        )
-        st.info("No Guardian Research snapshot yet.")
-        return None
-    if document is None and view is not None:
-        st.caption(
-            "Reconstructed research board. This is not a contemporaneous close observation "
-            "and not a portfolio order. Market Real is context only."
-        )
-        _classification_summary(st, view.get("counts") or {}, view.get("tracked_count"), view.get("session"))
-        if view.get("observation_origin") == "BACKFILLED":
-            st.caption("Observation origin BACKFILLED. It was reconstructed from a persisted scan.")
-        board = research_board(_view_as_document(view), scan_df)
-        st.dataframe(board.style.map(_paint, subset=["Classification"]), use_container_width=True, hide_index=True, height=720)
-    else:
-        st.caption(
-            "Latest sealed close-scan snapshot. "
-            "HOLD / WATCH / SELL here are research labels, not portfolio orders. "
-            "Market Real is context only. The sealed snapshot does not contain measured returns."
-        )
-        counts = document.get("counts") or {}
-        _classification_summary(
-            st,
-            counts,
-            document.get("tracked_count"),
-            document.get("session"),
-            document.get("market", {}).get("market_real_status"),
-        )
-        if document.get("observation_origin") == "BACKFILLED":
-            st.caption("Observation origin BACKFILLED. It was reconstructed from a persisted scan.")
-        board = research_board(document, scan_df)
-        styled = board.style.map(_paint, subset=["Classification"])
-        st.dataframe(styled, use_container_width=True, hide_index=True, height=720)
-    if view is not None:
-        _render_forward(st, view)
-    return document
+    return _render_sealed(st, store, scan_df, root)
 
 
 def _render_live(st, scan_df, now) -> None:
     """Current scan only. Refreshing this board does not replace a sealed snapshot."""
     from research.guardian_research.live import evaluate_live, live_board
 
-    st.markdown("## 🟢 GUARDIAN LIVE")
+    st.markdown("## 🟢 GUARDIAN RESEARCH LIVE")
     st.caption(
-        "Same position_guardian.generate_signal call and scan row as Position Guardian, "
-        "for every tracked symbol. This board is not a sealed T0 snapshot and not a portfolio order."
+        "Primary board for all tracked symbols. "
+        "Same position_guardian.generate_signal call and scan row as Position Guardian. "
+        "These counts are the current scan. They are not the sealed T0 snapshot and not a portfolio order."
     )
-    live = evaluate_live(scan_df, evaluated_at=now)
+    try:
+        live = evaluate_live(scan_df, evaluated_at=now)
+    except Exception as exc:
+        st.error(f"Guardian Research LIVE failed: {type(exc).__name__}: {exc}")
+        return
+    _metric_row(st, _count_classes(live.get("rows") or []))
     if live.get("scan_session"):
         session = live["scan_session"]
     elif live.get("mixed_session"):
@@ -206,14 +171,15 @@ def _render_live(st, scan_df, now) -> None:
     else:
         session = "UNAVAILABLE"
     st.caption(
-        f"Daily bar {session} · live-adjusted {live.get('live_adjusted_count', 0)} · "
-        f"quotes {live.get('quoted_count', 0)} · "
-        f"display clock {live.get('evaluated_at') or 'UNAVAILABLE'} · "
-        f"fresh {live['fresh_count']} · stale {live['stale_count']} · "
+        f"Scan bar date {session}. The scan bar date is not a quote time. "
+        f"Display clock {live.get('evaluated_at') or 'UNAVAILABLE'}. "
+        f"Live-adjusted rows {live.get('live_adjusted_count', 0)}. "
+        f"Rows with a quote timestamp {live.get('quoted_count', 0)}. "
+        f"Bar freshness fresh {live['fresh_count']} · stale {live['stale_count']} · "
         f"undated {live['undated_count']} · incomplete {live['incomplete_count']} · "
-        f"missing {live['missing_count']} · "
+        f"missing {live['missing_count']}. "
         f"{live['tracked_count']} tracked symbols. "
-        "The daily bar date is not a quote time. A missing quote is left blank."
+        "A missing quote is left blank."
     )
     board = live_board(live)
     if board.empty:
@@ -223,8 +189,74 @@ def _render_live(st, scan_df, now) -> None:
         board.style.map(_paint, subset=["Classification"]),
         use_container_width=True,
         hide_index=True,
-        height=420,
+        height=720,
     )
+
+
+def _render_sealed(st, store: Path, scan_df, root: Path | None):
+    """Sealed T0 only. Closed by default so its counts are not the live board."""
+    document = latest_snapshot(store)
+    view = _load_forward_view(root)
+    session = (document or view or {}).get("session") or "UNAVAILABLE"
+    with st.expander(f"Sealed T0 snapshot {session} — not the live board", expanded=False):
+        if document is None and view is None:
+            st.caption(
+                "HOLD / WATCH / SELL here are research labels, not portfolio orders. "
+                "Market Real is context only."
+            )
+            st.info("No Guardian Research snapshot yet.")
+        elif document is None and view is not None:
+            st.caption(
+                "Reconstructed research board. This is not a contemporaneous close observation "
+                "and not a portfolio order. Market Real is context only."
+            )
+            _classification_summary(st, view.get("counts") or {}, view.get("tracked_count"), view.get("session"))
+            if view.get("observation_origin") == "BACKFILLED":
+                st.caption("Observation origin BACKFILLED. It was reconstructed from a persisted scan.")
+            board = research_board(_view_as_document(view), scan_df)
+            st.dataframe(
+                board.style.map(_paint, subset=["Classification"]),
+                use_container_width=True,
+                hide_index=True,
+                height=720,
+            )
+        else:
+            st.caption(
+                "Latest sealed close-scan snapshot. "
+                "HOLD / WATCH / SELL here are research labels, not portfolio orders. "
+                "Market Real is context only. The sealed snapshot does not contain measured returns."
+            )
+            counts = document.get("counts") or {}
+            _classification_summary(
+                st,
+                counts,
+                document.get("tracked_count"),
+                document.get("session"),
+                document.get("market", {}).get("market_real_status"),
+            )
+            if document.get("observation_origin") == "BACKFILLED":
+                st.caption("Observation origin BACKFILLED. It was reconstructed from a persisted scan.")
+            board = research_board(document, scan_df)
+            styled = board.style.map(_paint, subset=["Classification"])
+            st.dataframe(styled, use_container_width=True, hide_index=True, height=720)
+    if view is not None:
+        _render_forward(st, view)
+    return document
+
+
+def _count_classes(rows) -> dict:
+    counts = {name: 0 for name in CLASS_ORDER}
+    for row in rows:
+        name = str((row or {}).get("classification") or "")
+        if name in counts:
+            counts[name] += 1
+    return counts
+
+
+def _metric_row(st, counts: dict) -> None:
+    columns = st.columns(4)
+    for column, name in zip(columns, CLASS_ORDER):
+        column.metric(name, int(counts.get(name, 0)))
 
 
 def _load_forward_view(root: Path | None) -> dict | None:
@@ -234,9 +266,7 @@ def _load_forward_view(root: Path | None) -> dict | None:
 
 
 def _classification_summary(st, counts: dict, tracked, session, market_status=None) -> None:
-    columns = st.columns(4)
-    for column, name in zip(columns, CLASS_ORDER):
-        column.metric(name, int(counts.get(name, 0)))
+    _metric_row(st, counts)
     market = f" · Market Real {market_status}" if market_status else ""
     st.caption(f"Snapshot session {session} · {tracked} tracked symbols{market}")
 
