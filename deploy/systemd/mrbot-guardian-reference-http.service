@@ -1,0 +1,16 @@
+[Unit]
+Description=Mr.BOT Guardian reference file HTTP service
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mrbot-guardian-release/source
+EnvironmentFile=/etc/mrbot/guardian-reference-http.env
+ExecStart=/opt/mrbot-camera-venv/bin/python -m research.guardian_research.reference_server
+Restart=on-failure
+RestartSec=5
+Nice=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

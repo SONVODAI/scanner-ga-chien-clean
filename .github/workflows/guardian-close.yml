@@ -39,6 +39,7 @@ jobs:
     env:
       EDGE_RESEARCH_LEDGER_URL: ${{ secrets.EDGE_RESEARCH_LEDGER_URL }}
       EDGE_RESEARCH_LEDGER_TOKEN: ${{ secrets.EDGE_RESEARCH_LEDGER_TOKEN }}
+      GUARDIAN_REFERENCE_PREFIX: ${{ secrets.GUARDIAN_REFERENCE_PREFIX }}
     steps:
       - uses: actions/checkout@v4
 
