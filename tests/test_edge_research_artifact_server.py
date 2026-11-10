@@ -289,6 +289,46 @@ def test_case10_service_restart_persistence(artifact_server, reference_copy):
         server2.stop()
 
 
+def test_guardian_reference_get_is_authenticated_and_exact(tmp_path):
+    mod = _load_artifact_server()
+    root = tmp_path / "guardian_reference"
+    root.mkdir()
+    (root / "reference_store.json").write_text('{"schema":"approximate_reference_store.v1"}\n', encoding="utf-8")
+    (root / "other.json").write_text("nope\n", encoding="utf-8")
+    config = mod.ArtifactServerConfig(
+        storage_root=tmp_path / "durable",
+        token=TEST_TOKEN,
+        host="127.0.0.1",
+        port=_free_port(),
+        guardian_reference_root=root,
+    )
+    app = mod.create_wsgi_app(config)
+    status, body = _wsgi(app, "GET", "/current/guardian_research/reference_store.json", TEST_TOKEN)
+    assert status == 200
+    assert b"approximate_reference_store.v1" in body
+    status, _ = _wsgi(app, "GET", "/current/guardian_research/reference_store.json", "wrong")
+    assert status == 401
+    status, _ = _wsgi(app, "PUT", "/current/guardian_research/reference_store.json", TEST_TOKEN)
+    assert status == 405
+    status, _ = _wsgi(app, "GET", "/current/guardian_research/other.json", TEST_TOKEN)
+    assert status == 404
+    assert (root / "reference_store.json").read_text(encoding="utf-8").startswith("{")
+
+
+def _wsgi(app, method, path, token):
+    captured = {}
+
+    def start_response(status, headers):
+        captured["status"] = int(status.split()[0])
+
+    body = b"".join(app({
+        "REQUEST_METHOD": method,
+        "PATH_INFO": path,
+        "HTTP_AUTHORIZATION": f"Bearer {token}",
+    }, start_response))
+    return captured["status"], body
+
+
 def test_health_unauthenticated(artifact_server):
     base_url, _, _ = artifact_server
     status, body = _request("GET", f"{base_url}/health", None)

@@ -1,0 +1,17 @@
+[Unit]
+Description=Mr.BOT Guardian approximate-close export
+Documentation=file:/opt/mrbot-camera/docs/intraday_memory_deployment.md
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+EnvironmentFile=-/etc/mrbot/intraday.env
+ExecStart=/opt/mrbot-camera-venv/bin/python -m research.guardian_research.reference_export --root /var/lib/mrbot/intraday_memory --output /var/lib/mrbot/guardian_reference/reference_store.json
+ReadOnlyPaths=/var/lib/mrbot/intraday_memory
+ReadWritePaths=/var/lib/mrbot/guardian_reference
+Nice=10
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
