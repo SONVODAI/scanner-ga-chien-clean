@@ -188,7 +188,7 @@ def _render_live(st, scan_df, now) -> None:
         st.info("No tracked symbols in the live scan.")
         return
     st.dataframe(
-        board.style.map(_paint, subset=["Classification"]),
+        _style_live_board(board),
         use_container_width=True,
         hide_index=True,
         height=720,
@@ -469,6 +469,15 @@ def _rate(value) -> str:
 
 def _pct_rate(value) -> str:
     return _rate(value)
+
+
+def _style_live_board(board: pd.DataFrame):
+    """Paint every cell from the row classification. The frame order is unchanged."""
+    def paint(row: pd.Series) -> list[str]:
+        style = CLASS_STYLE.get(str(row.get("Classification")), "")
+        return [style] * len(row)
+
+    return board.style.apply(paint, axis=1)
 
 
 def _paint(value: object) -> str:
