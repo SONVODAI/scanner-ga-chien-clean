@@ -98,13 +98,26 @@ def read_reference_store(path: Path) -> dict | None:
     return document
 
 
-def fetch_published_store(base_url: str, token: str, destination: Path, *, opener=None) -> Path | None:
-    """Download the allowlisted artifact. Redirects are not followed."""
+def published_url(base_url: str, prefix: str = "") -> str | None:
+    """HTTPS origin plus an optional path prefix. The final path is exact."""
     base = _base_url(base_url)
-    if base is None or not str(token or "").strip():
+    if base is None:
         return None
-    url = base + PUBLISHED_PATH
-    if urlsplit(url).path != PUBLISHED_PATH:
+    path = _published_path(prefix)
+    if path is None:
+        return None
+    url = base + path
+    if urlsplit(url).path != path or urlsplit(url).query or urlsplit(url).fragment:
+        return None
+    return url
+
+
+def fetch_published_store(base_url: str, token: str, destination: Path, *, prefix: str = "", opener=None) -> Path | None:
+    """Download the allowlisted artifact. Redirects are not followed."""
+    if not str(token or "").strip():
+        return None
+    url = published_url(base_url, prefix)
+    if url is None:
         return None
     open_fn = opener or _open_https
     try:
@@ -136,8 +149,9 @@ def resolve_store_path(local_root: Path) -> Path | None:
     token = os.environ.get("EDGE_RESEARCH_LEDGER_TOKEN", "").strip()
     if not url or not token:
         return None
+    prefix = os.environ.get("GUARDIAN_REFERENCE_PREFIX", "")
     destination = Path(os.environ.get("GUARDIAN_REFERENCE_DOWNLOAD", "/tmp/guardian_reference_store.json"))
-    return fetch_published_store(url, token, destination)
+    return fetch_published_store(url, token, destination, prefix=prefix)
 
 
 def _select_session(frame: pd.DataFrame, session: date, tracked: tuple[str, ...]) -> tuple[list[dict], list[dict], set[str]]:
@@ -285,6 +299,18 @@ def _digest(document: dict) -> str:
     body = {key: value for key, value in document.items() if key != "content_sha256"}
     encoded = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _published_path(prefix: str) -> str | None:
+    text = str(prefix or "").strip()
+    if text in {"", "/"}:
+        return PUBLISHED_PATH
+    if not text.startswith("/") or text.endswith("/") or "//" in text or ".." in text.split("/"):
+        return None
+    parts = [part for part in text.split("/") if part]
+    if not parts or any(not part.replace("-", "").replace("_", "").isalnum() for part in parts):
+        return None
+    return text + PUBLISHED_PATH
 
 
 def _base_url(value: str) -> str | None:

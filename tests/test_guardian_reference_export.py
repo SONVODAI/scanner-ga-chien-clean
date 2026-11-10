@@ -13,6 +13,7 @@ from research.guardian_research.reference_export import (
     ReferenceExportError,
     export_reference_store,
     fetch_published_store,
+    published_url,
     write_reference_store,
 )
 from research.guardian_research.snapshot import build_snapshot, label_observation_origin, write_snapshot
@@ -210,3 +211,9 @@ def test_published_fetch_keeps_a_verified_body_and_drops_a_bad_one(tmp_path):
     assert fetch_published_store("https://artifacts.example", "secret", destination, opener=bad_opener) is None
     assert not destination.exists()
     assert fetch_published_store("http://artifacts.example", "secret", destination, opener=opener) is None
+    assert published_url("https://artifacts.example", "/edge-research") == (
+        "https://artifacts.example/edge-research" + PUBLISHED_PATH
+    )
+    assert published_url("https://artifacts.example/edge-research") is None
+    assert published_url("https://artifacts.example", "/edge-research/../etc") is None
+    assert published_url("https://user:secret@artifacts.example", "/edge-research") is None
