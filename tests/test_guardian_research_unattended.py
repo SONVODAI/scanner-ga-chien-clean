@@ -344,6 +344,7 @@ def test_panel_reads_the_snapshot_and_does_not_write(tmp_path: Path, monkeypatch
     monkeypatch.setattr(st, "caption", lambda *_a, **_k: None)
     monkeypatch.setattr(st, "info", lambda *_a, **_k: None)
     monkeypatch.setattr(st, "dataframe", lambda *_a, **_k: None)
+    monkeypatch.setattr(st, "expander", lambda *_a, **_k: _Expander())
     monkeypatch.setattr(st, "columns", lambda count: [_Metric() for _ in range(count)])
     shown = render_guardian_research_panel(
         pd.DataFrame([_row("ZZZ", price=1, ema9=1, ma20=1)]),
@@ -394,6 +395,14 @@ def test_finalize_seals_from_the_close_scan_without_replacing_other_steps(tmp_pa
     assert report["steps"]["sweetspot"]["status"] == "FROZEN"
     assert report["steps"]["guardian_research"]["status"] == "created"
     assert report["steps"]["guardian_research"]["source"] == "close_scan"
+
+
+class _Expander:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
 
 
 class _Metric:

@@ -66,7 +66,7 @@ def live_board(document: dict) -> pd.DataFrame:
                 "Score": row.get("score"),
                 "Freshness": row.get("freshness"),
                 "Live": "YES" if row.get("live_adjusted") is True else "",
-                "Quote": row.get("quote_observed_at"),
+                "Quote": row.get("quote_observed_at") or "",
                 "Reason": row.get("reason"),
                 "Input session": row.get("input_session"),
             }
