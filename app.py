@@ -6124,6 +6124,14 @@ try:
 except Exception:
     pass
 
+# Guardian Research follows Position Guardian. Same panel, same inputs.
+try:
+    from research.guardian_research.panel import render_guardian_research_panel
+
+    render_guardian_research_panel(scan_df, market_real, vn_now())
+except Exception as _guardian_research_err:
+    st.caption(f"Guardian Research skipped: {_guardian_research_err}")
+
 # =========================================================
 # MARKET FIRST
 # =========================================================
@@ -6231,13 +6239,6 @@ render_earning_money_board(
     title="🏆 EARNING MONEY BOARD",
     height=720,
 )
-
-try:
-    from research.guardian_research.panel import render_guardian_research_panel
-
-    render_guardian_research_panel(scan_df, market_real, vn_now())
-except Exception as _guardian_research_err:
-    st.caption(f"Guardian Research skipped: {_guardian_research_err}")
 
 # Độ rộng RSI + lời kết luận tự động của Mr.BOT.
 rsi_breadth_report = render_rsi_breadth_report(scan_df)
