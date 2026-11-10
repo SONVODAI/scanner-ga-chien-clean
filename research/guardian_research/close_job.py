@@ -242,6 +242,12 @@ def main(argv: list[str] | None = None) -> int:
     """Explicit command. The ledger finalizer is not registered here."""
     del argv
     result = run_guardian_close()
+    try:
+        from research.guardian_research.outcomes import refresh_outcomes
+
+        result["outcomes"] = refresh_outcomes()
+    except Exception as exc:
+        result["outcomes"] = {"status": "skipped", "reason": type(exc).__name__}
     print(json.dumps(result, ensure_ascii=False, default=str))
     if result.get("status") in {"disabled", "created", "unchanged"}:
         return 0

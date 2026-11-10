@@ -58,6 +58,27 @@ jobs:
           set -euo pipefail
           python -m research.guardian_research.close_job | tee seal_result.json
 
+      - name: Refresh T+ evidence without resealing
+        id: outcomes
+        if: always() && steps.seal.outcome == 'success'
+        run: python -m research.guardian_research.outcomes
+
+      - name: Publish changed T+ evidence
+        if: always() && steps.outcomes.outcome == 'success'
+        run: |
+          set -euo pipefail
+          cp research/guardian_research/outcomes.json /tmp/guardian-outcomes.json
+          git checkout -- .
+          git clean -fd -- data/guardian_research/sessions
+          git fetch origin main
+          git rebase origin/main
+          cp /tmp/guardian-outcomes.json research/guardian_research/outcomes.json
+          git add research/guardian_research/outcomes.json
+          git diff --cached --quiet && exit 0
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Update Guardian Research T+ evidence"
+          git push origin HEAD:main
+
       - name: Publish seal outcome
         if: always() && steps.seal.outcome != 'skipped'
         run: |
