@@ -195,8 +195,8 @@ def _render_live(st, scan_df, now) -> None:
 
     st.markdown("## 🟢 GUARDIAN LIVE")
     st.caption(
-        "Intraday HOLD / WATCH / SELL from the current scan via position_guardian.generate_signal. "
-        "This board is not a sealed T0 snapshot and not a portfolio order."
+        "Same position_guardian.generate_signal call and scan row as Position Guardian, "
+        "for every tracked symbol. This board is not a sealed T0 snapshot and not a portfolio order."
     )
     live = evaluate_live(scan_df, evaluated_at=now)
     if live.get("scan_session"):
@@ -206,11 +206,14 @@ def _render_live(st, scan_df, now) -> None:
     else:
         session = "UNAVAILABLE"
     st.caption(
-        f"Scan session {session} · display clock {live.get('evaluated_at') or 'UNAVAILABLE'} · "
+        f"Daily bar {session} · live-adjusted {live.get('live_adjusted_count', 0)} · "
+        f"quotes {live.get('quoted_count', 0)} · "
+        f"display clock {live.get('evaluated_at') or 'UNAVAILABLE'} · "
         f"fresh {live['fresh_count']} · stale {live['stale_count']} · "
         f"undated {live['undated_count']} · incomplete {live['incomplete_count']} · "
         f"missing {live['missing_count']} · "
-        f"{live['tracked_count']} tracked symbols"
+        f"{live['tracked_count']} tracked symbols. "
+        "The daily bar date is not a quote time. A missing quote is left blank."
     )
     board = live_board(live)
     if board.empty:

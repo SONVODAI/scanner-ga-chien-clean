@@ -87,16 +87,53 @@ def test_live_marks_missing_and_stale_rows_and_writes_nothing(tmp_path: Path, mo
     assert by_symbol["HPG"]["freshness"] == "STALE"
     assert by_symbol["HPG"]["classification"] == "HOLD"
     assert by_symbol["SSI"]["freshness"] == "STALE"
-    assert by_symbol["VCB"]["classification"] == "UNAVAILABLE"
-    assert by_symbol["VCB"]["freshness"] == "INCOMPLETE"
-    assert by_symbol["VCB"]["reason"] == "INPUT_INCOMPLETE"
-    assert by_symbol["VCB"]["score"] is None
+    vcb_signal, vcb_reason, vcb_score = generate_signal(
+        pd.Series({"price": None, "ema9": 1, "ma20": 1, "obv": 1, "obv_ema9": 1})
+    )
+    assert by_symbol["VCB"]["classification"] == PRODUCTION_TO_RESEARCH[vcb_signal]
+    assert by_symbol["VCB"]["reason"] == vcb_reason
+    assert by_symbol["VCB"]["score"] == vcb_score
+    assert by_symbol["VCB"]["freshness"] == "STALE"
+    assert by_symbol["VCB"]["live_adjusted"] is False
+    assert by_symbol["VCB"]["quote_observed_at"] is None
     assert by_symbol["FPT"]["freshness"] == "MISSING"
     assert by_symbol["FPT"]["reason"] == "SYMBOL_ABSENT"
     assert list(tmp_path.rglob("*.json")) == []
     source = Path(__file__).resolve().parents[1].joinpath("research", "guardian_research", "live.py").read_text(encoding="utf-8")
     assert "write_snapshot" not in source
     assert "sessions" not in source
+
+
+def test_live_uses_the_same_scan_row_as_position_guardian(tmp_path: Path):
+    """A previous daily bar with a real quote still follows generate_signal."""
+    row = _row("hpg", 20, 25, 20, 100, 50, day="2026-11-09")
+    row["is_live_adjusted"] = True
+    row["live_ts"] = "2026-11-10 10:00:00+07:00"
+    row["live_source"] = "YF_15M"
+    before = Path("data/guardian_research/sessions/2026-11-06.json").read_bytes()
+    live = evaluate_live(_frame([row]), symbols=("HPG", "FPT"), evaluated_at=WHEN)
+    signal, reason, score = generate_signal(pd.Series(row))
+    got = next(item for item in live["rows"] if item["symbol"] == "HPG")
+    assert got["classification"] == PRODUCTION_TO_RESEARCH[signal] == "WATCH"
+    assert got["reason"] == reason
+    assert got["score"] == score
+    assert got["production_signal"] == signal
+    assert got["input_session"] == "2026-11-09"
+    assert got["live_adjusted"] is True
+    assert got["quote_observed_at"] == "2026-11-10 10:00:00+07:00"
+    assert live["scan_session"] == "2026-11-09"
+    assert live["live_adjusted_count"] == 1
+    assert live["quoted_count"] == 1
+    assert live["evaluated_at"] == WHEN.isoformat()
+    absent = next(item for item in live["rows"] if item["symbol"] == "FPT")
+    assert absent["classification"] == "UNAVAILABLE"
+    assert absent["quote_observed_at"] is None
+    board = live_board(live)
+    assert list(board["Classification"]) == ["WATCH", "UNAVAILABLE"]
+    assert list(board["Symbol"]) == ["HPG", "FPT"]
+    assert board.loc[board["Symbol"] == "HPG", "Quote"].iloc[0] == "2026-11-10 10:00:00+07:00"
+    assert Path("data/guardian_research/sessions/2026-11-06.json").read_bytes() == before
+    assert list(tmp_path.rglob("*.json")) == []
 
 
 def test_shipped_snapshot_cannot_be_overwritten(tmp_path: Path):
