@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -308,15 +309,15 @@ def _outcome_comparison(view: dict):
                 "Evidence": item.get("evidence"),
                 "Sample": item.get("primary"),
                 "Positive": _rate(item.get("positive_return_rate")),
-                "Average": _pct(item.get("average_return_pct")),
-                "Median": _pct(item.get("median_return_pct")),
+                "Average": format_forward_return(item.get("average_return_pct")),
+                "Median": format_forward_return(item.get("median_return_pct")),
                 "Rise >3%": _rate(item.get("win_rate_above_3pct")),
                 "Rise >5%": _rate(item.get("win_rate_above_5pct")),
                 "Loss <0": _rate(item.get("loss_rate")),
                 "Loss <-3%": _rate(item.get("loss_rate_below_minus_3pct")),
                 "Loss <-5%": _rate(item.get("loss_rate_below_minus_5pct")),
-                "Close-path avg": _pct(item.get("adverse_close_path_average_pct")),
-                "Worst close-path": _pct(item.get("adverse_close_path_worst_pct")),
+                "Close-path avg": format_forward_return(item.get("adverse_close_path_average_pct")),
+                "Worst close-path": format_forward_return(item.get("adverse_close_path_worst_pct")),
             })
     return pd.DataFrame(records)
 
@@ -337,7 +338,7 @@ def _outcome_symbols(view: dict):
         for label in HORIZON_LABELS:
             cell = horizons.get(label) or {}
             record[f"{label} status"] = cell.get("status")
-            record[label] = cell.get("return_pct")
+            record[label] = format_forward_return(cell.get("return_pct"))
         records.append(record)
     return pd.DataFrame(records)
 
@@ -435,12 +436,12 @@ def _forward_table(view: dict):
                 "Classification": name,
                 "Horizon": label,
                 "Sample": item.get("primary"),
-                "Average": _pct(item.get("average_return_pct")),
-                "Median": _pct(item.get("median_return_pct")),
+                "Average": format_forward_return(item.get("average_return_pct")),
+                "Median": format_forward_return(item.get("median_return_pct")),
                 "Rise >3%": _rate(item.get("win_rate_above_3pct")),
                 "Rise >5%": _pct_rate(item.get("win_rate_above_5pct")),
                 "Loss rate": _rate(item.get("loss_rate")),
-                "Downside p10": _pct(item.get("downside_p10_pct")),
+                "Downside p10": format_forward_return(item.get("downside_p10_pct")),
             })
     missed = ((view.get("missed_rally") or {}).get("horizons") or {})
     for label, item in missed.items():
@@ -458,10 +459,17 @@ def _forward_table(view: dict):
     return pd.DataFrame(records)
 
 
-def _pct(value) -> str:
-    if not isinstance(value, (int, float)):
+def format_forward_return(value) -> str:
+    """Display a stored percentage-point return. Does not rescale the number."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         return "—"
-    return f"{value:.2f}%"
+    number = float(value)
+    if not math.isfinite(number):
+        return "—"
+    text = f"{number:+.2f}"
+    if text in {"+0.00", "-0.00"}:
+        return "0.00%"
+    return f"{text}%"
 
 
 def _rate(value) -> str:
