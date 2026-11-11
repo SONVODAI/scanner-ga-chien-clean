@@ -470,6 +470,52 @@ def test_schedule_too_late_and_mismatched_observation_are_refused(monkeypatch, t
     assert not (tmp_path / "missing" / "sessions").exists()
 
 
+def test_empty_close_scan_refuses_exits_nonzero_and_writes_no_t0(monkeypatch, tmp_path: Path, capsys):
+    """An empty scan stays a refusal. It must not become a seal."""
+    root = Path(__file__).resolve().parents[1]
+    sealed = root / "data" / "guardian_research" / "sessions" / "2026-11-06.json"
+    outcomes = root / "research" / "guardian_research" / "outcomes.json"
+    gap = root / "data" / "guardian_research" / "gaps" / "2026-11-09.json"
+    before_seal = sealed.read_bytes()
+    before_outcomes = outcomes.read_bytes()
+    before_gap = gap.read_bytes()
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    refused = _run(
+        now=EVENING,
+        root=tmp_path,
+        close_scan=lambda: {
+            "ok": False,
+            "status": "CLOSE_SCAN_EMPTY",
+            "trade_date": SESSION,
+            "scan_df": pd.DataFrame(),
+        },
+        symbols=("HPG",),
+    )
+    assert refused["status"] == "refused"
+    assert refused["reason"] == "CLOSE_SCAN_EMPTY"
+    assert refused["path"] is None
+    assert list(tmp_path.rglob("*.json")) == []
+
+    monkeypatch.setattr(
+        "research.guardian_research.close_job.run_guardian_close",
+        lambda: refused,
+    )
+    monkeypatch.setattr(
+        "research.guardian_research.outcomes.refresh_outcomes",
+        lambda: {"status": "skipped", "reason": "test"},
+    )
+    from research.guardian_research.close_job import main
+
+    assert main() == 1
+    printed = capsys.readouterr().out
+    assert '"status": "refused"' in printed
+    assert "CLOSE_SCAN_EMPTY" in printed
+    assert sealed.read_bytes() == before_seal
+    assert outcomes.read_bytes() == before_outcomes
+    assert gap.read_bytes() == before_gap
+
+
 def test_hard_gap_marker_for_2026_11_09_does_not_touch_existing_t0():
     root = Path(__file__).resolve().parents[1]
     sessions = root / "data" / "guardian_research" / "sessions"
