@@ -3,17 +3,24 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from position_guardian import generate_signal
+from position_guardian import SIGNAL_HOLD, SIGNAL_SELL, SIGNAL_WARNING, generate_signal, row_color
 from research.guardian_research.contract import GENERATE_SIGNAL_SHA256, PRODUCTION_TO_RESEARCH
 from research.guardian_research.live import evaluate_live, live_board
-from research.guardian_research.panel import CLASS_STYLE, _style_live_board, render_guardian_research_panel
+from research.guardian_research.panel import (
+    CLASS_STYLE,
+    LIVE_ROW_STYLE,
+    _style_live_board,
+    render_guardian_research_panel,
+)
 from research.guardian_research.snapshot import SnapshotExists, build_snapshot, read_snapshot, write_snapshot
+from research.guardian_research.universe import load_tracked_symbols
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
 SESSION = "2026-11-10"
@@ -34,6 +41,56 @@ def _row(symbol, price, ema9, ma20, obv, obv_ema9, day=SESSION):
         "obv": obv,
         "obv_ema9": obv_ema9,
     }
+
+
+def _contrast_ratio(background: str, foreground: str) -> float:
+    def channel(value: str) -> float:
+        number = int(value, 16) / 255
+        if number <= 0.04045:
+            return number / 12.92
+        return ((number + 0.055) / 1.055) ** 2.4
+
+    def luminance(color: str) -> float:
+        hex_color = color.lstrip("#")
+        red, green, blue = (channel(hex_color[index:index + 2]) for index in (0, 2, 4))
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+    light = max(luminance(background), luminance(foreground))
+    dark = min(luminance(background), luminance(foreground))
+    return (light + 0.05) / (dark + 0.05)
+
+
+def _styled_rule(css: str, row: int, col: int) -> str:
+    compact = re.sub(r"\s+", "", css).lower()
+    rule = re.search(rf"(?:^|[^0-9])row{row}_col{col}(?![0-9])[^{{]*\{{([^}}]+)\}}", compact)
+    assert rule is not None
+    return rule.group(1)
+
+
+def _declaration(rule: str, prop: str) -> str:
+    match = re.search(rf"(?:^|{{|;){prop}:([^;}}]+)", rule)
+    assert match is not None
+    return match.group(1)
+
+
+def _assert_live_contrast(board: pd.DataFrame, css: str) -> None:
+    expected = {
+        "HOLD": ("#ddffdd", "#1b4332"),
+        "WATCH": ("#fff2cc", "#7f6000"),
+        "SELL": ("#c8102e", "#ffffff"),
+        "UNAVAILABLE": ("#d9d9d9", "#333333"),
+    }
+    for label, (background, foreground) in expected.items():
+        assert _contrast_ratio(background, foreground) >= 4.5
+        assert f"background-color:{background}" in LIVE_ROW_STYLE[label].replace(" ", "").lower()
+        assert f"color:{foreground}" in LIVE_ROW_STYLE[label].replace(" ", "").lower()
+    for index, label in enumerate(board["Classification"]):
+        background, foreground = expected[label]
+        for col in range(len(board.columns)):
+            rule = _styled_rule(css, index, col)
+            assert _declaration(rule, "background-color") == background
+            assert _declaration(rule, "color") == foreground
+            assert _contrast_ratio(background, foreground) >= 4.5
 
 
 def test_live_matches_generate_signal_for_each_group():
@@ -148,27 +205,101 @@ def test_live_row_color_covers_the_whole_row_and_keeps_grouping():
     board = live_board(live)
     assert list(board["Classification"]) == ["HOLD", "HOLD", "WATCH", "SELL", "UNAVAILABLE"]
     assert list(board["Symbol"]) == ["HPG", "VCB", "SSI", "FPT", "ACV"]
+    assert list(board.columns) == [
+        "Classification",
+        "Symbol",
+        "Price",
+        "Score",
+        "Freshness",
+        "Live",
+        "Quote",
+        "Reason",
+        "Input session",
+    ]
     assert board.loc[board["Symbol"] == "VCB", "Live"].iloc[0] == ""
     assert board.loc[board["Symbol"] == "VCB", "Quote"].iloc[0] == ""
     assert board.loc[board["Symbol"] == "ACV", "Quote"].iloc[0] == ""
-    import re
+    hold_bg = row_color(pd.Series({"Trạng thái": SIGNAL_HOLD}))[0].replace(" ", "")
+    watch_bg = row_color(pd.Series({"Trạng thái": SIGNAL_WARNING}))[0].replace(" ", "")
+    sell_bg = row_color(pd.Series({"Trạng thái": SIGNAL_SELL}))[0].replace(" ", "")
+    assert hold_bg == "background-color:#ddffdd"
+    assert watch_bg == "background-color:#fff6cc"
+    assert sell_bg == "background-color:#ffd9d9"
+    assert LIVE_ROW_STYLE["HOLD"].replace(" ", "").startswith(hold_bg)
+    assert LIVE_ROW_STYLE["WATCH"] == CLASS_STYLE["WATCH"]
+    assert "background-color:#fff2cc" in LIVE_ROW_STYLE["WATCH"].replace(" ", "")
+    assert sell_bg not in LIVE_ROW_STYLE["SELL"].replace(" ", "")
+    assert "#f4cccc" not in LIVE_ROW_STYLE["SELL"]
+    assert CLASS_STYLE == {
+        "HOLD": "background-color:#d9ead3;color:#1b4332;font-weight:700",
+        "WATCH": "background-color:#fff2cc;color:#7f6000;font-weight:700",
+        "SELL": "background-color:#f4cccc;color:#990000;font-weight:700",
+        "UNAVAILABLE": "background-color:#d9d9d9;color:#333333;font-weight:700",
+    }
+    styled = _style_live_board(board)
+    pd.testing.assert_frame_equal(styled.data, board)
+    _assert_live_contrast(board, styled.to_html().split("</style>", 1)[0])
+    from streamlit.elements.lib.pandas_styler_utils import marshall_styler
+    from streamlit.proto.ArrowData_pb2 import ArrowData
 
-    html = _style_live_board(board).to_html()
-    css = html.split("</style>", 1)[0]
-    for label, color in (
-        ("HOLD", "#d9ead3"),
-        ("WATCH", "#fff2cc"),
-        ("SELL", "#f4cccc"),
-        ("UNAVAILABLE", "#d9d9d9"),
-    ):
-        assert color in CLASS_STYLE[label]
-        row = int(board.index[board["Classification"] == label][0])
-        for col in range(len(board.columns)):
-            rule = re.search(rf"[^{{]*row{row}_col{col}[^{{]*\{{[^}}]+}}", css)
-            assert rule is not None
-            compact = rule.group(0).replace(" ", "")
-            assert f"background-color:{color}" in compact
-            assert "color:#" in compact
+    proto = ArrowData()
+    marshall_styler(proto, styled, "live")
+    _assert_live_contrast(board, proto.styler.styles)
+
+
+def test_live_colors_keep_the_143_symbol_fixture(tmp_path: Path):
+    """Styling reads the sealed scan inputs and does not rewrite them."""
+    source = Path("data/guardian_research/sessions/2026-11-06.json")
+    before = source.read_bytes()
+    document = json.loads(before)
+    tracked = load_tracked_symbols()
+    by_symbol = {row["symbol"]: row for row in document["rows"]}
+    assert document["tracked_count"] == 143
+    assert len(by_symbol) == 143
+    assert set(by_symbol) == set(tracked)
+    frame = _frame(
+        [
+            {
+                "symbol": symbol,
+                "date": by_symbol[symbol]["freshness"]["input_session"],
+                "price": by_symbol[symbol]["inputs"]["price"],
+                "ema9": by_symbol[symbol]["inputs"]["ema9"],
+                "ma20": by_symbol[symbol]["inputs"]["ma20"],
+                "obv": by_symbol[symbol]["inputs"]["obv"],
+                "obv_ema9": by_symbol[symbol]["inputs"]["obv_ema9"],
+            }
+            for symbol in tracked
+        ]
+    )
+    live = evaluate_live(frame, symbols=tracked, evaluated_at=WHEN)
+    board = live_board(live)
+    expected_symbols = [
+        symbol
+        for label in ("HOLD", "WATCH", "SELL", "UNAVAILABLE")
+        for symbol in tracked
+        if by_symbol[symbol]["classification"] == label
+    ]
+    assert list(board["Symbol"]) == expected_symbols
+    assert list(board["Classification"]) == [by_symbol[symbol]["classification"] for symbol in expected_symbols]
+    assert [int(score) for score in board["Score"]] == [int(by_symbol[symbol]["score"]) for symbol in expected_symbols]
+    assert list(board["Reason"]) == [by_symbol[symbol]["reason"] for symbol in expected_symbols]
+    assert list(board["Price"]) == [by_symbol[symbol]["inputs"]["price"] for symbol in expected_symbols]
+    ranks = {"HOLD": 0, "WATCH": 1, "SELL": 2, "UNAVAILABLE": 3}
+    order = [ranks[label] for label in board["Classification"]]
+    assert order == sorted(order)
+    assert list(dict.fromkeys(board["Classification"])) == ["HOLD", "WATCH", "SELL"]
+    assert [int((board["Classification"] == label).sum()) for label in ("HOLD", "WATCH", "SELL", "UNAVAILABLE")] == [57, 8, 78, 0]
+    styled = _style_live_board(board)
+    pd.testing.assert_frame_equal(styled.data, board)
+    _assert_live_contrast(board, styled.to_html().split("</style>", 1)[0])
+    from streamlit.elements.lib.pandas_styler_utils import marshall_styler
+    from streamlit.proto.ArrowData_pb2 import ArrowData
+
+    proto = ArrowData()
+    marshall_styler(proto, styled, "fixture")
+    _assert_live_contrast(board, proto.styler.styles)
+    assert source.read_bytes() == before
+    assert list(tmp_path.rglob("*.json")) == []
 
 
 def test_shipped_snapshot_cannot_be_overwritten(tmp_path: Path):

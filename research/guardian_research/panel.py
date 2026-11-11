@@ -11,12 +11,15 @@ from research.guardian_research.snapshot import read_snapshot
 
 CLASS_ORDER = ("HOLD", "WATCH", "SELL", "UNAVAILABLE")
 # Same weight and palette as the Earning Money board health styles.
+# The sealed board paints the classification cell from this map.
 CLASS_STYLE = {
     "HOLD": "background-color:#d9ead3;color:#1b4332;font-weight:700",
     "WATCH": "background-color:#fff2cc;color:#7f6000;font-weight:700",
     "SELL": "background-color:#f4cccc;color:#990000;font-weight:700",
     "UNAVAILABLE": "background-color:#d9d9d9;color:#333333;font-weight:700",
 }
+# Pantone 186 C. Production row_color uses pale pink #ffd9d9 for BÁN; this board does not.
+_SELL_FLAG_RED = "background-color:#c8102e;color:#ffffff;font-weight:700"
 BOARD_COLUMNS = (
     "Classification",
     "Symbol",
@@ -471,10 +474,36 @@ def _pct_rate(value) -> str:
     return _rate(value)
 
 
+def _position_guardian_background(signal: str) -> str:
+    """Background declaration from production ``position_guardian.row_color``."""
+    from position_guardian import row_color
+
+    style = str(row_color(pd.Series({"Trạng thái": signal}))[0]).replace(" ", "")
+    if not style.startswith("background-color:#") or style.count(":") != 1:
+        raise RuntimeError(f"unexpected position guardian row style: {style}")
+    return style
+
+
+def _live_row_styles() -> dict[str, str]:
+    """HOLD uses production GIỮ green. WATCH keeps the current pale yellow."""
+    from position_guardian import SIGNAL_HOLD
+
+    hold_text = CLASS_STYLE["HOLD"].split(";", 1)[1]
+    return {
+        "HOLD": f"{_position_guardian_background(SIGNAL_HOLD)};{hold_text}",
+        "WATCH": CLASS_STYLE["WATCH"],
+        "SELL": _SELL_FLAG_RED,
+        "UNAVAILABLE": CLASS_STYLE["UNAVAILABLE"],
+    }
+
+
+LIVE_ROW_STYLE = _live_row_styles()
+
+
 def _style_live_board(board: pd.DataFrame):
     """Paint every cell from the row classification. The frame order is unchanged."""
     def paint(row: pd.Series) -> list[str]:
-        style = CLASS_STYLE.get(str(row.get("Classification")), "")
+        style = LIVE_ROW_STYLE.get(str(row.get("Classification")), "")
         return [style] * len(row)
 
     return board.style.apply(paint, axis=1)
