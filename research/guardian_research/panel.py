@@ -316,8 +316,8 @@ def _outcome_comparison(view: dict):
                 "Loss <0": _rate(item.get("loss_rate")),
                 "Loss <-3%": _rate(item.get("loss_rate_below_minus_3pct")),
                 "Loss <-5%": _rate(item.get("loss_rate_below_minus_5pct")),
-                "Close-path avg": _pct(item.get("adverse_close_path_average_pct")),
-                "Worst close-path": _pct(item.get("adverse_close_path_worst_pct")),
+                "Close-path avg": format_forward_return(item.get("adverse_close_path_average_pct")),
+                "Worst close-path": format_forward_return(item.get("adverse_close_path_worst_pct")),
             })
     return pd.DataFrame(records)
 
@@ -470,12 +470,6 @@ def format_forward_return(value) -> str:
     if text in {"+0.00", "-0.00"}:
         return "0.00%"
     return f"{text}%"
-
-
-def _pct(value) -> str:
-    if not isinstance(value, (int, float)):
-        return "—"
-    return f"{value:.2f}%"
 
 
 def _rate(value) -> str:

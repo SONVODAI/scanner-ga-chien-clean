@@ -85,12 +85,15 @@ def test_tables_format_every_horizon_and_leave_counts_and_numbers_alone():
     assert hold["Average"] == "+0.74%"
     assert hold["Median"] == "-1.70%"
     assert hold["Evidence"] == "MEASURED"
+    assert hold["Close-path avg"] == "+0.74%"
+    assert hold["Worst close-path"] == "-1.70%"
     assert hold["Sample"] == 2
     assert hold["Positive"] == "50.0%"
-    assert hold["Close-path avg"] == "-0.50%"
     missing = comparison[(comparison["Classification"] == "HOLD") & (comparison["Horizon"] == "T+10")].iloc[0]
     assert missing["Average"] == MISSING
     assert missing["Median"] == MISSING
+    assert missing["Close-path avg"] == MISSING
+    assert missing["Worst close-path"] == MISSING
     assert missing["Sample"] == 0
     assert missing["Evidence"] == "INSUFFICIENT_EVIDENCE"
 
@@ -156,9 +159,12 @@ def test_shipped_forward_files_keep_their_numbers_when_displayed():
     hold_t10 = comparison[(comparison["Classification"] == "HOLD") & (comparison["Horizon"] == "T+10")].iloc[0]
     assert hold_t1["Average"] == "-0.76%"
     assert hold_t1["Median"] == "-0.80%"
+    assert hold_t1["Close-path avg"] == "-0.76%"
+    assert hold_t1["Worst close-path"] == "-3.34%"
     assert hold_t1["Sample"] == 57
     assert hold_t1["Evidence"] == "MEASURED"
     assert hold_t10["Average"] == MISSING
+    assert hold_t10["Close-path avg"] == MISSING
     assert hold_t10["Sample"] == 0
     assert hold_t10["Evidence"] == "INSUFFICIENT_EVIDENCE"
 
@@ -213,8 +219,8 @@ def _view(values: dict) -> dict:
             "loss_rate": 0.0 if value is not None else None,
             "loss_rate_below_minus_3pct": None,
             "loss_rate_below_minus_5pct": None,
-            "adverse_close_path_average_pct": -0.5 if value is not None else None,
-            "adverse_close_path_worst_pct": None,
+            "adverse_close_path_average_pct": 0.7371 if label == "T+1" else None,
+            "adverse_close_path_worst_pct": -1.7021 if label == "T+1" else None,
         }
     blank = {
         label: {"status": "NOT_MEASURED", "return_pct": None, "included_in_primary": False}
