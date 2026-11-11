@@ -210,7 +210,15 @@ def load_production_scan_api() -> dict[str, Any]:
     except Exception:
         yf = None
     from forecast_engine import ForecastEngine
+    from modules.scan_fetch import (
+        LiveQuoteDeferred,
+        TransportTimeout,
+        bounded_yf_download,
+        call_with_request_timeout,
+    )
 
+    # The extractor keeps function and assignment bodies only. Import lines in
+    # app.py are not copied, so the production scan-fetch helpers are bound here.
     namespace: dict[str, Any] = {
         "np": np,
         "pd": pd,
@@ -222,6 +230,10 @@ def load_production_scan_api() -> dict[str, Any]:
         "st": _StreamlitStub(),
         "yf": yf,
         "ForecastEngine": ForecastEngine,
+        "call_with_request_timeout": call_with_request_timeout,
+        "TransportTimeout": TransportTimeout,
+        "bounded_yf_download": bounded_yf_download,
+        "LiveQuoteDeferred": LiveQuoteDeferred,
         "__name__": "close_session_scan_api",
     }
     exec(compile(module, str(APP_PATH), "exec"), namespace)  # noqa: S102 — production defs, not a second copy
