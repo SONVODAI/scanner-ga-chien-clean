@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from research.guardian_research.session_authority import CANONICAL_CLOSE
+
 INPUTS = ("price", "ema9", "ma20", "obv", "obv_ema9")
 SNAPSHOT_FILE = Path("data") / "earning_money_snapshots.csv"
 OBSERVATION_FILE = Path("data") / "earning_learning" / "observations.csv"
@@ -73,6 +75,149 @@ def load_persisted_scan(project_root: Path, session: str, tracked: tuple[str, ..
             "market_real_source": market_source,
         },
     }
+
+
+def load_agreed_freeze(project_root: Path, session: str, tracked: tuple[str, ...]) -> dict:
+    """Return one close payload from the append-only freeze, or a refusal.
+
+    The observation clock is ``frozen_at``. This does not read
+    ``earning_money_snapshots.csv``, does not scan, and does not fill gaps.
+    """
+    try:
+        day = date.fromisoformat(session)
+    except ValueError:
+        return _freeze_refusal("SESSION_DATE_INVALID")
+    freeze_path = Path(project_root) / FREEZE_FILE
+    if not freeze_path.is_file():
+        return _freeze_refusal("FREEZE_ABSENT")
+    freeze = _read_freeze_table(
+        freeze_path,
+        ("trade_date", "symbol", "frozen_at", "market_real", *INPUTS),
+    )
+    if freeze is None:
+        return _freeze_refusal("FREEZE_UNVERIFIED")
+    try:
+        selected = _session_rows(freeze, "trade_date", day.isoformat())
+    except ArchiveRejected:
+        return _freeze_refusal("FREEZE_UNVERIFIED")
+    if selected.empty:
+        return _freeze_refusal("FREEZE_ABSENT")
+    observed_at, clock_reason = _freeze_observed_at(selected["frozen_at"], day)
+    if clock_reason:
+        return _freeze_refusal(clock_reason)
+    symbols = _symbols(selected["symbol"])
+    symbol_reason = _freeze_symbol_reason(symbols, tracked)
+    if symbol_reason:
+        return _freeze_refusal(symbol_reason)
+    if not _inputs_complete(selected):
+        return _freeze_refusal("INCOMPLETE_INPUT")
+    market = _single_market(selected["market_real"])
+    if not isinstance(market, float):
+        return _freeze_refusal("FREEZE_MISMATCH")
+    agreed = _observations_agree(Path(project_root), day.isoformat(), selected, tracked, market)
+    if agreed:
+        return _freeze_refusal(agreed)
+    frame = pd.DataFrame(
+        {
+            "symbol": symbols,
+            "date": day.isoformat(),
+            "price": pd.to_numeric(selected["price"], errors="coerce").to_numpy(),
+            "ema9": pd.to_numeric(selected["ema9"], errors="coerce").to_numpy(),
+            "ma20": pd.to_numeric(selected["ma20"], errors="coerce").to_numpy(),
+            "obv": pd.to_numeric(selected["obv"], errors="coerce").to_numpy(),
+            "obv_ema9": pd.to_numeric(selected["obv_ema9"], errors="coerce").to_numpy(),
+        }
+    )
+    return {
+        "ok": True,
+        "status": "READY",
+        "source": "close_scan",
+        "observed_at": observed_at,
+        "market_real": market,
+        "scan_df": frame,
+        "scan_coverage": {
+            "requested": list(tracked),
+            "returned": list(symbols),
+            "absent": [],
+            "errors": [],
+        },
+        "freeze_source": FREEZE_FILE.as_posix(),
+    }
+
+
+def _freeze_refusal(reason: str) -> dict:
+    return {"ok": False, "reason": reason, "source": FREEZE_FILE.as_posix()}
+
+
+def _read_freeze_table(path: Path, columns: tuple[str, ...]) -> pd.DataFrame | None:
+    try:
+        return pd.read_csv(path, usecols=list(columns))
+    except (OSError, ValueError):
+        return None
+
+
+def _freeze_symbol_reason(symbols: list[str], tracked: tuple[str, ...]) -> str | None:
+    if len(set(symbols)) != len(symbols):
+        return "DUPLICATE_SYMBOLS"
+    found = set(symbols)
+    expected = set(tracked)
+    if found == expected:
+        return None
+    if any(symbol not in found for symbol in expected):
+        return "INCOMPLETE_INPUT"
+    return "FREEZE_MISMATCH"
+
+
+def _freeze_observed_at(values, session: date) -> tuple[str | None, str | None]:
+    """Accept one same-session clock at or after 18:00 ICT. Naive clocks are refused."""
+    text = []
+    for value in values:
+        item = str(value).strip()
+        if not item or item.lower() == "nan":
+            return None, "STALE_FREEZE"
+        text.append(item)
+    if len(set(text)) != 1:
+        return None, "STALE_FREEZE"
+    parsed = pd.to_datetime(text[0], errors="coerce")
+    if pd.isna(parsed) or getattr(parsed, "tzinfo", None) is None:
+        return None, "STALE_FREEZE"
+    local = parsed.tz_convert("Asia/Ho_Chi_Minh")
+    if local.date() != session or local.weekday() >= 5 or local.time() < CANONICAL_CLOSE:
+        return None, "STALE_FREEZE"
+    stamp = local.to_pydatetime()
+    if stamp.tzinfo is None:
+        return None, "STALE_FREEZE"
+    return stamp.isoformat(), None
+
+
+def _observations_agree(
+    project_root: Path,
+    session: str,
+    freeze: pd.DataFrame,
+    tracked: tuple[str, ...],
+    market: float,
+) -> str | None:
+    path = project_root / OBSERVATION_FILE
+    if not path.is_file():
+        return "FREEZE_UNVERIFIED"
+    table = _read_freeze_table(path, ("trade_date", "symbol", "market_real", *INPUTS))
+    if table is None:
+        return "FREEZE_UNVERIFIED"
+    try:
+        selected = _session_rows(table, "trade_date", session)
+    except ArchiveRejected:
+        return "FREEZE_UNVERIFIED"
+    if selected.empty:
+        return "FREEZE_UNVERIFIED"
+    symbols = _symbols(selected["symbol"])
+    if _freeze_symbol_reason(symbols, tracked):
+        return "FREEZE_MISMATCH"
+    if not _inputs_complete(selected) or not _same_inputs(freeze, selected):
+        return "FREEZE_MISMATCH"
+    other = _single_market(selected["market_real"])
+    if not isinstance(other, float) or not _market_agrees(market, other):
+        return "FREEZE_MISMATCH"
+    return None
 
 
 def _market_real(project_root: Path, session: str, snapshot: pd.DataFrame, tracked: tuple[str, ...]):
