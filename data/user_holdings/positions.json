@@ -22,11 +22,6 @@
       "entry_date": "2026-10-02"
     },
     {
-      "symbol": "ORS",
-      "entry_price": 13250.0,
-      "entry_date": "2026-10-02"
-    },
-    {
       "symbol": "TCH",
       "entry_price": 11363.0,
       "entry_date": "2026-09-26"
@@ -50,71 +45,6 @@
       "symbol": "FPT",
       "entry_price": 58000.0,
       "entry_date": "2026-10-20"
-    },
-    {
-      "symbol": "CTD",
-      "entry_price": 66300.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "MSH",
-      "entry_price": 34950.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "TNG",
-      "entry_price": 17600.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "ANV",
-      "entry_price": 16600.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "VCG",
-      "entry_price": 15100.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "GEX",
-      "entry_price": 21750.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "VIC",
-      "entry_price": 242000.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "BSI",
-      "entry_price": 27850.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "MSB",
-      "entry_price": 15750.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "TCB",
-      "entry_price": 21400.0,
-      "entry_date": "2026-11-02"
-    },
-    {
-      "symbol": "NAB",
-      "entry_price": 12600.0,
-      "entry_date": "2026-11-04"
-    },
-    {
-      "symbol": "BAF",
-      "entry_price": 30800.0,
-      "entry_date": "2026-11-04"
-    },
-    {
-      "symbol": "HVN",
-      "entry_price": 21000.0,
-      "entry_date": "2026-11-04"
     },
     {
       "symbol": "STB",
