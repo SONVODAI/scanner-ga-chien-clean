@@ -12,7 +12,13 @@ import pandas as pd
 from position_guardian import generate_signal
 from research.guardian_research.contract import GENERATE_SIGNAL_SHA256, PRODUCTION_TO_RESEARCH
 from research.guardian_research.live import evaluate_live, live_board
-from research.guardian_research.panel import CLASS_STYLE, _style_live_board, render_guardian_research_panel
+from research.guardian_research.panel import (
+    CLASS_STYLE,
+    LIVE_ROW_STYLE,
+    _paint,
+    _style_live_board,
+    render_guardian_research_panel,
+)
 from research.guardian_research.snapshot import SnapshotExists, build_snapshot, read_snapshot, write_snapshot
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -155,13 +161,21 @@ def test_live_row_color_covers_the_whole_row_and_keeps_grouping():
 
     html = _style_live_board(board).to_html()
     css = html.split("</style>", 1)[0]
+    guardian = Path("position_guardian.py").read_text(encoding="utf-8")
+    assert '"background-color:#ddffdd"' in guardian
+    assert "#ddffdd" in LIVE_ROW_STYLE["HOLD"]
+    assert "#fff2cc" in LIVE_ROW_STYLE["WATCH"]
+    assert "#DA251D" in LIVE_ROW_STYLE["SELL"]
+    assert "#ffffff" in LIVE_ROW_STYLE["SELL"]
+    assert "#d9ead3" in _paint("HOLD")
+    assert "#d9ead3" in CLASS_STYLE["HOLD"]
     for label, color in (
-        ("HOLD", "#d9ead3"),
+        ("HOLD", "#ddffdd"),
         ("WATCH", "#fff2cc"),
-        ("SELL", "#f4cccc"),
+        ("SELL", "#DA251D"),
         ("UNAVAILABLE", "#d9d9d9"),
     ):
-        assert color in CLASS_STYLE[label]
+        assert color in LIVE_ROW_STYLE[label]
         row = int(board.index[board["Classification"] == label][0])
         for col in range(len(board.columns)):
             rule = re.search(rf"[^{{]*row{row}_col{col}[^{{]*\{{[^}}]+}}", css)

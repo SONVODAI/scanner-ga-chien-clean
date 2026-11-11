@@ -10,11 +10,18 @@ from research.guardian_research.performance import read_performance_view
 from research.guardian_research.snapshot import read_snapshot
 
 CLASS_ORDER = ("HOLD", "WATCH", "SELL", "UNAVAILABLE")
-# Same weight and palette as the Earning Money board health styles.
+# Sealed T0 keeps this palette. LIVE uses LIVE_ROW_STYLE.
 CLASS_STYLE = {
     "HOLD": "background-color:#d9ead3;color:#1b4332;font-weight:700",
     "WATCH": "background-color:#fff2cc;color:#7f6000;font-weight:700",
     "SELL": "background-color:#f4cccc;color:#990000;font-weight:700",
+    "UNAVAILABLE": "background-color:#d9d9d9;color:#333333;font-weight:700",
+}
+# HOLD background is position_guardian.row_color's fresh green, #ddffdd.
+LIVE_ROW_STYLE = {
+    "HOLD": "background-color:#ddffdd;color:#14532d;font-weight:700",
+    "WATCH": "background-color:#fff2cc;color:#7f6000;font-weight:700",
+    "SELL": "background-color:#DA251D;color:#ffffff;font-weight:700",
     "UNAVAILABLE": "background-color:#d9d9d9;color:#333333;font-weight:700",
 }
 BOARD_COLUMNS = (
@@ -474,7 +481,7 @@ def _pct_rate(value) -> str:
 def _style_live_board(board: pd.DataFrame):
     """Paint every cell from the row classification. The frame order is unchanged."""
     def paint(row: pd.Series) -> list[str]:
-        style = CLASS_STYLE.get(str(row.get("Classification")), "")
+        style = LIVE_ROW_STYLE.get(str(row.get("Classification")), "")
         return [style] * len(row)
 
     return board.style.apply(paint, axis=1)
