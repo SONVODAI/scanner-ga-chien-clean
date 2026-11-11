@@ -222,6 +222,7 @@ def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_
         root=tmp_path,
         close_scan=lambda: _payload(tracked, absent=("HPG",)),
         symbols=tracked,
+        project_root=tmp_path / "no-freeze",
     )
     assert partial["reason"] == "PARTIAL_SCAN"
 
@@ -392,19 +393,27 @@ def test_vnindex_bar_names_the_session_and_a_mixed_scan_is_refused(monkeypatch, 
 
 
 def test_delayed_cross_midnight_seal_preserves_observed_at(monkeypatch, tmp_path: Path):
+    """After midnight the freeze clock stays the observation time. There is no rescan."""
     _enable(monkeypatch)
     _local_only(monkeypatch)
     morning = datetime(2026, 11, 7, 5, 35, tzinfo=VN)
-    payload = _payload(("HPG",), observed_at=OBSERVED)
-    payload["trading_today"] = False
-    payload["trading_reason"] = "VNINDEX mới nhất là 2026-11-06, không phải 2026-11-07"
+    project = tmp_path / "repo"
+    _write_agreed_freeze(project, ("HPG",), frozen_at=OBSERVED)
+    scans = []
+
+    def refuse_scan():
+        scans.append("scan")
+        raise AssertionError("delayed sealing must not rescan")
+
     sealed = _run(
         now=morning,
-        root=tmp_path,
-        close_scan=lambda: payload,
+        root=tmp_path / "seal",
+        close_scan=refuse_scan,
         symbols=("HPG",),
+        project_root=project,
     )
     assert sealed["status"] == "created"
+    assert scans == []
     stored = read_snapshot(Path(sealed["path"]))
     assert stored["session"] == SESSION
     assert stored["observation_origin"] == "DELAYED"
@@ -412,15 +421,19 @@ def test_delayed_cross_midnight_seal_preserves_observed_at(monkeypatch, tmp_path
     assert stored["reconstruction"]["sealed_at"] == morning.isoformat()
     assert stored["reconstruction"]["timestamp_provenance"] == "close_scan.observed_at"
     assert stored["session_witness"]["bar_session"] == SESSION
+    before = Path(sealed["path"]).read_bytes()
 
     again = _run(
         now=datetime(2026, 11, 7, 6, 0, tzinfo=VN),
-        root=tmp_path,
-        close_scan=lambda: payload,
+        root=tmp_path / "seal",
+        close_scan=refuse_scan,
         symbols=("HPG",),
+        project_root=project,
     )
     assert again["status"] == "unchanged"
     assert again["content_sha256"] == sealed["content_sha256"]
+    assert Path(sealed["path"]).read_bytes() == before
+    assert scans == []
 
 
 def test_schedule_too_late_and_mismatched_observation_are_refused(monkeypatch, tmp_path: Path):
@@ -437,16 +450,31 @@ def test_schedule_too_late_and_mismatched_observation_are_refused(monkeypatch, t
     assert too_late["session"] == SESSION
     assert not (tmp_path / "late" / "sessions").exists()
 
-    next_morning_obs = _payload(("HPG",), observed_at="2026-11-07T05:35:00+07:00")
-    next_morning_obs["trading_today"] = False
+    scans = []
     refused = _run(
         now=datetime(2026, 11, 7, 5, 40, tzinfo=VN),
         root=tmp_path / "obs",
-        close_scan=lambda: next_morning_obs,
+        close_scan=lambda: scans.append("scan") or _payload(("HPG",), observed_at="2026-11-07T05:35:00+07:00"),
+        symbols=("HPG",),
+        project_root=tmp_path / "no-freeze",
+    )
+    assert scans == []
+    assert refused["reason"] == "FREEZE_ABSENT"
+    assert not (tmp_path / "obs" / "sessions").exists()
+
+    from research.guardian_research.pipeline import capture_from_close_payload
+
+    morning_clock = _payload(("HPG",), observed_at="2026-11-07T05:35:00+07:00")
+    morning_clock["trading_today"] = False
+    morning_clock["session_witness"] = _witness(SESSION)
+    blocked = capture_from_close_payload(
+        morning_clock,
+        now=datetime(2026, 11, 7, 5, 40, tzinfo=VN),
+        root=tmp_path / "morning-clock",
         symbols=("HPG",),
     )
-    assert refused["reason"] == "SCHEDULE_TOO_LATE"
-    assert not (tmp_path / "obs" / "sessions").exists()
+    assert blocked["reason"] == "SCHEDULE_TOO_LATE"
+    assert not (tmp_path / "morning-clock" / "sessions").exists()
 
     stale_rows = _payload(("HPG",), day="2026-11-05")
     stale = _run(
@@ -714,6 +742,245 @@ def test_full_universe_backup_requires_143_and_rejects_partial(monkeypatch, tmp_
         root=tmp_path / "partial",
         close_scan=lambda: _payload(tracked, absent=("HPG",)),
         symbols=tracked,
+        project_root=tmp_path / "no-freeze",
     )
     assert partial["reason"] == "PARTIAL_SCAN"
     assert not (tmp_path / "partial" / "sessions").exists()
+
+
+def _write_agreed_freeze(
+    project: Path,
+    symbols: tuple[str, ...],
+    *,
+    session: str = SESSION,
+    frozen_at: str = OBSERVED,
+    market_real: float = 6.5,
+    blank: tuple[str, str] | None = None,
+) -> None:
+    """Write a freeze and a matching observations file. No money snapshot is written."""
+    rows = []
+    for symbol in symbols:
+        row = {
+            "trade_date": session,
+            "symbol": symbol,
+            "frozen_at": frozen_at,
+            "market_real": market_real,
+            "price": 26.0,
+            "ema9": 25.0,
+            "ma20": 24.0,
+            "obv": 1000.0,
+            "obv_ema9": 900.0,
+        }
+        if blank is not None and symbol == blank[0]:
+            row[blank[1]] = ""
+        rows.append(row)
+    folder = Path(project) / "data" / "earning_learning"
+    folder.mkdir(parents=True, exist_ok=True)
+    frame = pd.DataFrame(rows)
+    frame.to_csv(folder / "t0_observation_freeze.csv", index=False)
+    frame.drop(columns=["frozen_at"]).to_csv(folder / "observations.csv", index=False)
+
+
+def _repo_session_bytes() -> dict[str, bytes]:
+    root = Path(__file__).resolve().parents[1] / "data" / "guardian_research" / "sessions"
+    return {path.name: path.read_bytes() for path in sorted(root.glob("*.json"))}
+
+
+def test_same_evening_complete_scan_is_contemporaneous(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+
+    def refuse_freeze(*_args, **_kwargs):
+        raise AssertionError("a complete same-evening scan must not read the freeze")
+
+    monkeypatch.setattr("research.guardian_research.scan_archive.load_agreed_freeze", refuse_freeze)
+    payload = _payload(("HPG",), observed_at=EVENING.isoformat())
+    sealed = _run(
+        now=EVENING,
+        root=tmp_path,
+        close_scan=lambda: payload,
+        symbols=("HPG",),
+    )
+    assert sealed["status"] == "created"
+    stored = read_snapshot(Path(sealed["path"]))
+    assert stored["observation_origin"] == "CONTEMPORANEOUS"
+    assert stored["reconstruction"]["observation_at"] == EVENING.isoformat()
+    assert stored["reconstruction"]["sealed_at"] == EVENING.isoformat()
+    assert stored["session_witness"]["bar_session"] == SESSION
+    assert stored["tracked_count"] == 1
+
+
+def test_delayed_freeze_seals_before_0900_and_keeps_the_original_clock(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    before = _repo_session_bytes()
+    assert "2026-11-06.json" in before
+    assert "2026-11-11.json" in before
+    morning = datetime(2026, 11, 7, 8, 30, tzinfo=VN)
+    project = tmp_path / "repo"
+    _write_agreed_freeze(project, ("HPG", "FPT"), frozen_at=OBSERVED)
+    # A mutable money snapshot must not be consulted, even when it disagrees.
+    snap = project / "data"
+    snap.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        [{"snapshot_date": SESSION, "symbol": "HPG", "price": 1, "market_real": 0}]
+    ).to_csv(snap / "earning_money_snapshots.csv", index=False)
+    monkeypatch.setattr(
+        "modules.close_session_scan.build_close_scan_inputs",
+        lambda **_kwargs: (_ for _ in ()).throw(AssertionError("delayed sealing must not rescan")),
+    )
+    sealed = run_guardian_close(
+        now=morning,
+        root=tmp_path / "seal",
+        symbols=("HPG", "FPT"),
+        witness=_witness(SESSION),
+        project_root=project,
+    )
+    assert sealed["status"] == "created"
+    assert sealed["tracked_count"] == 2
+    stored = read_snapshot(Path(sealed["path"]))
+    assert stored["observation_origin"] == "DELAYED"
+    assert stored["reconstruction"]["observation_at"] == OBSERVED
+    assert stored["reconstruction"]["sealed_at"] == morning.isoformat()
+    assert stored["reconstruction"]["observation_at"] != stored["reconstruction"]["sealed_at"]
+    assert stored["session_witness"]["bar_session"] == SESSION
+    assert stored["session_witness"]["source"] == "vnindex_daily_bar"
+    assert {row["symbol"] for row in stored["rows"]} == {"HPG", "FPT"}
+    assert _repo_session_bytes() == before
+
+
+def test_delayed_seal_is_refused_at_0900_even_with_a_valid_freeze(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    project = tmp_path / "repo"
+    _write_agreed_freeze(project, ("HPG",))
+    calls = []
+    monkeypatch.setattr(
+        "research.guardian_research.scan_archive.load_agreed_freeze",
+        lambda *_args, **_kwargs: calls.append("freeze") or {"ok": True},
+    )
+    refused = _run(
+        now=datetime(2026, 11, 7, 9, 0, tzinfo=VN),
+        root=tmp_path / "late",
+        close_scan=lambda: calls.append("scan") or _payload(("HPG",)),
+        symbols=("HPG",),
+        project_root=project,
+    )
+    assert refused["status"] == "refused"
+    assert refused["reason"] == "SCHEDULE_TOO_LATE"
+    assert calls == []
+    assert not (tmp_path / "late" / "sessions").exists()
+
+
+def test_missing_or_incomplete_freeze_is_refused_without_a_rescan(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    morning = datetime(2026, 11, 7, 8, 0, tzinfo=VN)
+    scans = []
+    missing = _run(
+        now=morning,
+        root=tmp_path / "missing",
+        close_scan=lambda: scans.append("scan") or _payload(("HPG",)),
+        symbols=("HPG",),
+        project_root=tmp_path / "empty",
+    )
+    assert missing["reason"] == "FREEZE_ABSENT"
+    assert scans == []
+    assert not (tmp_path / "missing" / "sessions").exists()
+
+    tracked = load_tracked_symbols()
+    assert len(tracked) == 143
+    incomplete_root = tmp_path / "incomplete"
+    _write_agreed_freeze(incomplete_root, tracked[:-1])
+    incomplete = _run(
+        now=morning,
+        root=tmp_path / "incomplete-seal",
+        close_scan=lambda: scans.append("scan") or _payload(tracked),
+        symbols=tracked,
+        project_root=incomplete_root,
+    )
+    assert incomplete["reason"] == "INCOMPLETE_INPUT"
+    assert scans == []
+    assert not (tmp_path / "incomplete-seal" / "sessions").exists()
+
+    blank_root = tmp_path / "blank"
+    _write_agreed_freeze(blank_root, ("HPG",), blank=("HPG", "ema9"))
+    blank = _run(
+        now=morning,
+        root=tmp_path / "blank-seal",
+        close_scan=lambda: scans.append("scan"),
+        symbols=("HPG",),
+        project_root=blank_root,
+    )
+    assert blank["reason"] == "INCOMPLETE_INPUT"
+    assert scans == []
+
+
+def test_wrong_session_date_and_invalid_witness_are_refused(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    morning = datetime(2026, 11, 7, 8, 0, tzinfo=VN)
+    project = tmp_path / "repo"
+    _write_agreed_freeze(project, ("HPG",), frozen_at="2026-11-05T19:40:00+07:00")
+    calls = []
+    stale = _run(
+        now=morning,
+        root=tmp_path / "stale",
+        close_scan=lambda: calls.append("scan"),
+        symbols=("HPG",),
+        project_root=project,
+    )
+    assert stale["reason"] == "STALE_FREEZE"
+    assert calls == []
+    assert not (tmp_path / "stale" / "sessions").exists()
+
+    other_day = tmp_path / "other-day"
+    _write_agreed_freeze(other_day, ("HPG",), session="2026-11-05", frozen_at="2026-11-05T19:40:00+07:00")
+    mismatched = _run(
+        now=morning,
+        root=tmp_path / "mismatch",
+        close_scan=lambda: calls.append("scan"),
+        symbols=("HPG",),
+        project_root=other_day,
+    )
+    assert mismatched["reason"] == "FREEZE_ABSENT"
+    assert not (tmp_path / "mismatch" / "sessions").exists()
+
+    monkeypatch.setattr(
+        "research.guardian_research.scan_archive.load_agreed_freeze",
+        lambda *_args, **_kwargs: calls.append("freeze"),
+    )
+    invalid = run_guardian_close(
+        now=morning,
+        root=tmp_path / "witness",
+        close_scan=lambda: calls.append("scan"),
+        symbols=("HPG",),
+        witness={"source": "vnindex_daily_bar", "bar_session": "", "probe_error": "NO_BAR"},
+        project_root=project,
+    )
+    assert invalid["reason"] == "SESSION_EVIDENCE_ABSENT"
+    assert calls == []
+    assert not (tmp_path / "witness" / "sessions").exists()
+
+
+def test_same_evening_empty_scan_can_seal_a_qualified_freeze(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    project = tmp_path / "repo"
+    _write_agreed_freeze(project, ("HPG",), frozen_at=OBSERVED)
+    scans = []
+    sealed = _run(
+        now=EVENING,
+        root=tmp_path / "seal",
+        close_scan=lambda: scans.append("scan")
+        or {"ok": False, "status": "CLOSE_SCAN_EMPTY", "source": "close_scan"},
+        symbols=("HPG",),
+        project_root=project,
+    )
+    assert scans == ["scan"]
+    assert sealed["status"] == "created"
+    stored = read_snapshot(Path(sealed["path"]))
+    assert stored["observation_origin"] == "DELAYED"
+    assert stored["reconstruction"]["observation_at"] == OBSERVED
+    assert stored["reconstruction"]["sealed_at"] == EVENING.isoformat()
+    assert stored["reconstruction"]["observation_at"] != stored["reconstruction"]["sealed_at"]

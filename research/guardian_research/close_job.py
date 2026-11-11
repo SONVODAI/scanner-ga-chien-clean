@@ -32,6 +32,7 @@ def run_guardian_close(
     close_scan=None,
     symbols: tuple[str, ...] | None = None,
     witness: dict | None = None,
+    project_root: Path | None = None,
 ) -> dict:
     """Seal the VNINDEX bar session. The job clock does not name that session."""
     if os.environ.get(ENABLE_ENV) != "true":
@@ -54,28 +55,68 @@ def run_guardian_close(
     existing = _existing_seal_without_scan(root_path, session)
     if existing is not None:
         return existing
+    from research.guardian_research.universe import load_tracked_symbols
+
+    tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
+    repo = Path(project_root) if project_root is not None else Path(__file__).resolve().parents[2]
+    # After ICT midnight the job must not rescan. The freeze clock is the
+    # observation time; the job clock is only the seal time.
+    if local_now.strftime("%Y-%m-%d") > session:
+        return _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted)
+    payload = _load_close_scan(local_now, close_scan)
+    sealed = _seal_scan_payload(payload, local_now, root_path, session, tracked, accepted)
+    if sealed.get("status") in {"created", "unchanged"}:
+        return sealed
+    frozen = _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted)
+    if frozen.get("status") in {"created", "unchanged"}:
+        return frozen
+    return sealed
+
+
+def _load_close_scan(local_now: datetime, close_scan):
     if close_scan is None:
         from modules.close_session_scan import build_close_scan_inputs
 
-        payload = build_close_scan_inputs(now=local_now, retain_research=False)
-    else:
-        payload = close_scan()
+        return build_close_scan_inputs(now=local_now, retain_research=False)
+    return close_scan()
+
+
+def _seal_scan_payload(payload, local_now, root_path, session, tracked, accepted) -> dict:
     if not isinstance(payload, dict) or payload.get("ok") is not True:
         reason = "CLOSE_SCAN_NOT_READY"
         if isinstance(payload, dict) and payload.get("status"):
             reason = str(payload.get("status"))
         return _public("refused", reason, error=_error_text(payload), session=session)
     payload = dict(payload)
-    # Bar session names the seal. Clock-day trading_today may already be false
-    # after ICT midnight; the accepted VNINDEX bar is the trading-day witness.
+    # Bar session names the seal. A same-evening scan keeps its own observed_at.
     payload["trade_date"] = session
     payload["session_witness"] = accepted
-    from research.guardian_research.universe import load_tracked_symbols
-
-    tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
     blocker = _input_blocker(payload, tracked)
     if blocker:
         return _public("refused", blocker, session=session)
+    return _capture(payload, local_now, root_path, session, tracked)
+
+
+def _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted) -> dict:
+    """Seal an already frozen session. This does not scan or reconstruct."""
+    from research.guardian_research.scan_archive import load_agreed_freeze
+
+    loaded = load_agreed_freeze(repo, session, tracked)
+    if not isinstance(loaded, dict) or loaded.get("ok") is not True:
+        reason = "FREEZE_ABSENT"
+        if isinstance(loaded, dict) and loaded.get("reason"):
+            reason = str(loaded["reason"])
+        return _public("refused", reason, session=session)
+    payload = dict(loaded)
+    payload["trade_date"] = session
+    payload["session_witness"] = accepted
+    blocker = _input_blocker(payload, tracked)
+    if blocker:
+        return _public("refused", blocker, session=session)
+    return _capture(payload, local_now, root_path, session, tracked)
+
+
+def _capture(payload, local_now, root_path, session, tracked) -> dict:
     from research.guardian_research.pipeline import capture_from_close_payload
 
     result = capture_from_close_payload(
