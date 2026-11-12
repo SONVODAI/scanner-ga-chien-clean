@@ -174,6 +174,10 @@ class DurableRowStore:
             return None
         return loaded
 
+    def record_conflict(self, subject_id: str, reason: str, kept: object, offered: object) -> None:
+        """Append a conflict and leave the sealed record unchanged."""
+        self._record_conflict(subject_id, reason, kept, offered)
+
     def _record_conflict(self, subject_id: str, reason: str, kept: object, offered: object) -> None:
         conflict_id = hashlib.sha256(_stable({"offered": offered, "reason": reason, "subject": subject_id}).encode("utf-8")).hexdigest()
         if conflict_id in self._conflict_ids:

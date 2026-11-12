@@ -18,6 +18,9 @@ research/shadow_buy_events/*.jsonl
 research/shadow_buy_events/*.json
 research/early_recovery_watch/*.jsonl
 
+# Research row-store writer lock. The JSONL files are the store. The lock is not.
+research/v2_research_ledger/durable/.ingest.lock
+
 # Rotation Watch runtime (watchlist.csv is source; artifacts are ephemeral)
 data/rotation_watch/state.json
 data/rotation_watch/board.json
