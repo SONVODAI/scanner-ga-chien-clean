@@ -40,6 +40,11 @@
       "symbol": "FPT",
       "entry_price": 58000.0,
       "entry_date": "2026-10-20"
+    },
+    {
+      "symbol": "BVH",
+      "entry_price": 62650.0,
+      "entry_date": "2026-11-06"
     }
   ]
 }
