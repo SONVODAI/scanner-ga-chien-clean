@@ -1,0 +1,36 @@
+{
+  "action_evidence": {
+    "path": "research/v2_research_ledger/evidence",
+    "status": "MISSING"
+  },
+  "approximate_view_modified": false,
+  "conflict_count": 0,
+  "counts": {
+    "conflict": 0,
+    "inserted": 1375,
+    "unchanged": 0
+  },
+  "final_buy_enabled": false,
+  "historical_row_panel": {
+    "detail": "The 1055-row research panel file is not in the repository.",
+    "status": "UNAVAILABLE"
+  },
+  "identity_count": 1339,
+  "link_count": 36,
+  "schema": "v2_research_row_store_manifest.v1",
+  "schema_records": "v2_research_row_store.v1",
+  "sidecar": {
+    "freeze_rows": 1108,
+    "linked_current_rows": 36,
+    "path": "research/live_candidate_v2_camera_sidecar/camera_sidecar.json",
+    "sha256": "9c31193a323cd02fca3669042c422bd8438a8e7e388cf882c03a6e0f1959e1f7",
+    "status": "PRESENT"
+  },
+  "sweetspot": {
+    "path": "data/earning_learning/market_aware_sweetspot_observer_ledger.csv",
+    "rows": 231,
+    "sha256": "620390c4431153d68dc2398d8b5d580e3829dc5a68e49f4451482249c29e7b81",
+    "status": "PRESENT"
+  },
+  "t_plus_recomputed": false
+}

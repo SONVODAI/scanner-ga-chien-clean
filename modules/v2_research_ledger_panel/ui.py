@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 from research.v2_research_ledger.board_view import apply_filters, project_table
+from research.v2_research_ledger.durable_store import DurableRowStore
+from research.v2_research_ledger.panel_board import HORIZON_STATUS, load_row_panel
 from research.v2_research_ledger.delivery_view import (
     DELIVERY_UNAVAILABLE,
     SOURCE_STALE,
@@ -74,6 +76,7 @@ def format_row_composition(rows: list[Any]) -> str:
     )
 _REPO = Path(__file__).resolve().parents[2]
 DEFAULT_BOARD = _REPO / "research" / "v2_research_ledger" / "view" / "board.json"
+DEFAULT_ROW_STORE = _REPO / "research" / "v2_research_ledger" / "durable"
 DEFAULT_SIDECAR = _REPO / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
 DEFAULT_EVIDENCE = _REPO / "research" / "v2_research_ledger" / "evidence"
 DEFAULT_SWEET = _REPO / "data" / "earning_learning" / "market_aware_sweetspot_observer_ledger.csv"
@@ -107,6 +110,7 @@ def render_v2_research_ledger_panel(
     remote: bool = False,
     cache_path: Path | None = None,
     remote_view: DeliveryView | None = None,
+    row_store: Path | None = None,
 ) -> None:
     """Expandable table inside RESEARCH / SHADOW. Reads research artifacts only."""
     st = st_module
@@ -114,14 +118,23 @@ def render_v2_research_ledger_panel(
         import streamlit as st  # type: ignore
     delivered = None
     cache_reason = None
+    from_row_store = False
     if remote and delivery_dir is None and board_path is None:
         if remote_view is None:
             url, token = resolve_remote_config()
             remote_view = fetch_research_trio(url, token)
         if remote_view.state == DELIVERY_UNAVAILABLE or remote_view.board is None:
             cache_reason = remote_view.reason
-            path = Path(cache_path) if cache_path is not None else DEFAULT_BOARD
-            status, board = load_board(path)
+            store_path = Path(row_store) if row_store is not None else DEFAULT_ROW_STORE
+            board = load_row_panel(DurableRowStore(store_path))
+            if board is None:
+                with st.expander(PANEL_TITLE, expanded=False):
+                    st.caption(PANEL_CAPTION)
+                    st.warning(f"{DELIVERY_UNAVAILABLE}: {cache_reason}.")
+                    st.warning("ROW_STORE_UNAVAILABLE: the durable research row store is not present.")
+                return
+            from_row_store = True
+            status, path = "OK", store_path
         else:
             delivered = remote_view
             status, board = "OK", remote_view.board
@@ -163,7 +176,19 @@ def render_v2_research_ledger_panel(
         rows = list(board.get("rows") or [])
         dates = sorted({str(row.get("t0_date") or "") for row in rows if row.get("t0_date")}, reverse=True)
         sources = sorted({str(row.get("source") or "") for row in rows if row.get("source")})
-        if cache_reason:
+        fresh = board.get("freshness") if isinstance(board.get("freshness"), dict) else {}
+        coverage = board.get("coverage") if isinstance(board.get("coverage"), dict) else {}
+        if from_row_store:
+            st.caption(
+                "durable_row_store "
+                f"identities={coverage.get('rows')} "
+                f"sidecar_identities={coverage.get('sidecar_identities')} "
+                f"deduped_research_observations={coverage.get('deduped_research_observations')} "
+                f"historical_row_panel={board.get('historical_row_panel')} "
+                f"row_horizons={HORIZON_STATUS}."
+            )
+            st.caption("Sealed T0 is shown from the store. A newer source file is not substituted.")
+        elif cache_reason:
             st.caption(
                 "cached local board "
                 f"source_updated_at={board.get('source_updated_at') or 'unknown'}. "
@@ -174,8 +199,6 @@ def render_v2_research_ledger_panel(
             f"Cutoff as_of={board.get('as_of') or 'unknown'}. "
             f"Price book: {board.get('price_book') or 'absent'}."
         )
-        fresh = board.get("freshness") if isinstance(board.get("freshness"), dict) else {}
-        coverage = board.get("coverage") if isinstance(board.get("coverage"), dict) else {}
         source_counts = fresh.get("source_coverage") or coverage.get("by_source") or {}
         observe = False if delivered is not None or cache_reason else (bool(fresh) if check_sources is None else check_sources)
         reasons = list(fresh.get("reasons") or [])
@@ -190,6 +213,8 @@ def render_v2_research_ledger_panel(
             )
         if delivered is not None:
             freshness_state = delivered.state
+        elif from_row_store:
+            freshness_state = "UNVERIFIED"
         elif cache_reason:
             freshness_state = "STALE"
         else:
@@ -217,6 +242,8 @@ def render_v2_research_ledger_panel(
         if delivered is not None and delivered.state == SOURCE_STALE:
             detail = ", ".join(reasons) if reasons else delivered.state
             st.warning(f"{SOURCE_STALE}: source evidence is ahead of this delivery ({detail}).")
+        elif from_row_store:
+            pass
         elif delivered is None and freshness_state == STALE_DATA:
             detail = ", ".join(reasons) if reasons else "stored freshness status"
             st.warning(f"{STALE_DATA}: the research board is behind available source evidence ({detail}).")
