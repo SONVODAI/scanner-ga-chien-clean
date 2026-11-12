@@ -4,26 +4,21 @@
     "status": "MISSING"
   },
   "approximate_view_modified": false,
-  "conflict_count": 0,
-  "counts": {
-    "conflict": 0,
-    "inserted": 1375,
-    "unchanged": 0
-  },
+  "conflict_count": 4,
   "final_buy_enabled": false,
   "historical_row_panel": {
     "detail": "The 1055-row research panel file is not in the repository.",
     "status": "UNAVAILABLE"
   },
   "identity_count": 1339,
-  "link_count": 36,
+  "link_count": 39,
   "schema": "v2_research_row_store_manifest.v1",
   "schema_records": "v2_research_row_store.v1",
   "sidecar": {
     "freeze_rows": 1108,
     "linked_current_rows": 36,
     "path": "research/live_candidate_v2_camera_sidecar/camera_sidecar.json",
-    "sha256": "9c31193a323cd02fca3669042c422bd8438a8e7e388cf882c03a6e0f1959e1f7",
+    "sha256": "5d740adfaca1cbc3ad6b339a44c36130efbdac89ec151fe035d7f8442074d577",
     "status": "PRESENT"
   },
   "sweetspot": {

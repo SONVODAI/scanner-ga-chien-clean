@@ -96,11 +96,22 @@ def _ingest_sidecar(store: DurableRowStore, path: Path | None, counts: dict[str,
             str(raw.get("symbol") or "").strip().upper(),
             str(raw.get("candidate_first_seen_ts") or ""),
         )
-        existing = freeze_keys.get(key)
+        existing = freeze_keys.get(key) or _stored_sidecar_identity(store, key)
         if existing:
-            result = store.put_link(_nomination_link(existing, raw, document))
-            counts[result] = counts.get(result, 0) + 1
-            linked += 1
+            if _link_matches_sealed_price(store, existing, raw):
+                result = store.put_link(_nomination_link(existing, raw, document))
+                counts[result] = counts.get(result, 0) + 1
+                if result in {INSERTED, UNCHANGED}:
+                    linked += 1
+            else:
+                sealed = store.identities[existing].get("sealed")
+                store.record_conflict(
+                    f"nomination|{existing}",
+                    "LINK_PRICE_DIFFERS_FROM_SEALED_T0",
+                    sealed,
+                    {"t0_price": canonical_number(raw.get("price_at_first_seen"))},
+                )
+                counts[CONFLICT] = counts.get(CONFLICT, 0) + 1
             continue
         record = _row_identity(raw, document, source)
         if record is None:
@@ -114,6 +125,24 @@ def _ingest_sidecar(store: DurableRowStore, path: Path | None, counts: dict[str,
         "sha256": _sha256(source),
         "status": "PRESENT",
     }
+
+
+def _stored_sidecar_identity(store: DurableRowStore, key: tuple[str, str, str]) -> str | None:
+    """Use an identity already sealed in the store. Do not invent one from the ticker."""
+    session, symbol, seen = key
+    if not session or not symbol or not seen:
+        return None
+    candidate = f"sidecar|{session}|{symbol}|{seen}"
+    if candidate in store.identities:
+        return candidate
+    return None
+
+
+def _link_matches_sealed_price(store: DurableRowStore, identity_id: str, raw: Mapping[str, Any]) -> bool:
+    sealed = store.identities[identity_id].get("sealed")
+    if not isinstance(sealed, dict):
+        return False
+    return canonical_number(raw.get("price_at_first_seen")) == sealed.get("t0_price")
 
 
 def _ingest_sweetspot(store: DurableRowStore, path: Path | None, counts: dict[str, int]) -> dict[str, Any]:
