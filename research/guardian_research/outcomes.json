@@ -6,30 +6,30 @@
     "HOLD": {
       "horizons": {
         "T+1": {
-          "adverse_close_path_average_pct": -0.7603,
+          "adverse_close_path_average_pct": -0.5648,
           "adverse_close_path_worst_pct": -3.3445,
-          "adverse_sample": 57,
-          "average_return_pct": -0.7603,
+          "adverse_sample": 120,
+          "average_return_pct": -0.5648,
           "discontinuity": 0,
-          "downside_p10_pct": -2.4607,
-          "downside_p25_pct": -1.7429,
+          "downside_p10_pct": -2.2178,
+          "downside_p25_pct": -1.5316,
           "evidence": "MEASURED",
-          "immature": 63,
-          "loss_rate": 0.6842,
-          "loss_rate_at_or_below_minus_3pct": 0.0175,
+          "immature": 0,
+          "loss_rate": 0.65,
+          "loss_rate_at_or_below_minus_3pct": 0.0083,
           "loss_rate_at_or_below_minus_5pct": 0.0,
-          "loss_rate_below_minus_3pct": 0.0175,
+          "loss_rate_below_minus_3pct": 0.0083,
           "loss_rate_below_minus_5pct": 0.0,
-          "median_return_pct": -0.7984,
+          "median_return_pct": -0.8031,
           "missing": 0,
           "observations": 120,
-          "positive_return_rate": 0.193,
-          "primary": 57,
+          "positive_return_rate": 0.2167,
+          "primary": 120,
           "review_discontinuity_count": 0,
           "truncated": 0,
           "unmeasured": 0,
-          "win_rate_above_3pct": 0.0351,
-          "win_rate_above_5pct": 0.0
+          "win_rate_above_3pct": 0.0417,
+          "win_rate_above_5pct": 0.0083
         },
         "T+10": {
           "adverse_close_path_average_pct": null,
@@ -169,29 +169,29 @@
     "SELL": {
       "horizons": {
         "T+1": {
-          "adverse_close_path_average_pct": -0.3117,
+          "adverse_close_path_average_pct": -0.4936,
           "adverse_close_path_worst_pct": -5.6478,
-          "adverse_sample": 73,
-          "average_return_pct": -0.3117,
+          "adverse_sample": 147,
+          "average_return_pct": -0.4936,
           "discontinuity": 0,
-          "downside_p10_pct": -2.1261,
-          "downside_p25_pct": -1.1429,
+          "downside_p10_pct": -2.0275,
+          "downside_p25_pct": -1.3532,
           "evidence": "MEASURED",
-          "immature": 74,
-          "loss_rate": 0.4658,
-          "loss_rate_at_or_below_minus_3pct": 0.0548,
-          "loss_rate_at_or_below_minus_5pct": 0.0137,
-          "loss_rate_below_minus_3pct": 0.0548,
-          "loss_rate_below_minus_5pct": 0.0137,
-          "median_return_pct": 0.0,
+          "immature": 0,
+          "loss_rate": 0.6054,
+          "loss_rate_at_or_below_minus_3pct": 0.034,
+          "loss_rate_at_or_below_minus_5pct": 0.0068,
+          "loss_rate_below_minus_3pct": 0.034,
+          "loss_rate_below_minus_5pct": 0.0068,
+          "median_return_pct": -0.3745,
           "missing": 8,
           "observations": 155,
-          "positive_return_rate": 0.4247,
-          "primary": 73,
+          "positive_return_rate": 0.2925,
+          "primary": 147,
           "review_discontinuity_count": 0,
           "truncated": 0,
           "unmeasured": 0,
-          "win_rate_above_3pct": 0.0137,
+          "win_rate_above_3pct": 0.0068,
           "win_rate_above_5pct": 0.0
         },
         "T+10": {
@@ -495,25 +495,25 @@
     "WATCH": {
       "horizons": {
         "T+1": {
-          "adverse_close_path_average_pct": -0.2322,
+          "adverse_close_path_average_pct": -0.4111,
           "adverse_close_path_worst_pct": -2.7375,
-          "adverse_sample": 8,
-          "average_return_pct": -0.2322,
+          "adverse_sample": 11,
+          "average_return_pct": -0.4111,
           "discontinuity": 0,
-          "downside_p10_pct": -1.8003,
-          "downside_p25_pct": -1.3051,
+          "downside_p10_pct": -2.0173,
+          "downside_p25_pct": -1.3362,
           "evidence": "MEASURED",
-          "immature": 3,
-          "loss_rate": 0.625,
+          "immature": 0,
+          "loss_rate": 0.6364,
           "loss_rate_at_or_below_minus_3pct": 0.0,
           "loss_rate_at_or_below_minus_5pct": 0.0,
           "loss_rate_below_minus_3pct": 0.0,
           "loss_rate_below_minus_5pct": 0.0,
-          "median_return_pct": -0.3244,
+          "median_return_pct": -0.6061,
           "missing": 0,
           "observations": 11,
-          "positive_return_rate": 0.375,
-          "primary": 8,
+          "positive_return_rate": 0.2727,
+          "primary": 11,
           "review_discontinuity_count": 0,
           "truncated": 0,
           "unmeasured": 0,
@@ -660,7 +660,7 @@
     "2026-11-06",
     "2026-11-11"
   ],
-  "content_sha256": "02e257da893b4a00c78c8920bb436e028df52e32ad9fdb3bb079cda06ffe4982",
+  "content_sha256": "6fce93f87aea00550760a3e9ebc873e4f1f6927b2e3f28e42bc1752ce36496bf",
   "evidence_status": "MEASURED",
   "false_sell": {
     "definition": "SELL research labels whose later same-basis return is positive. Not a portfolio order.",
@@ -668,11 +668,11 @@
     "horizons": {
       "T+1": {
         "evidence": "MEASURED",
-        "fell": 0.4658,
-        "rose": 0.4247,
-        "rose_above_3pct": 0.0137,
+        "fell": 0.6054,
+        "rose": 0.2925,
+        "rose_above_3pct": 0.0068,
         "rose_above_5pct": 0.0,
-        "sample": 73
+        "sample": 147
       },
       "T+10": {
         "evidence": "INSUFFICIENT_EVIDENCE",
@@ -8018,11 +8018,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.9709,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.970874,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8069,11 +8069,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7614,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.761421,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8120,11 +8120,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2712,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.271186,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8171,11 +8171,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.1161,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.116147,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8222,11 +8222,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8078,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.807754,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8273,11 +8273,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2132,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.213172,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8324,11 +8324,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0786,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.078582,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8375,11 +8375,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.2299,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.229885,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8426,11 +8426,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2027,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.202749,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8477,11 +8477,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.7905,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.790514,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8528,11 +8528,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0093,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.009274,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8579,11 +8579,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4388,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.438849,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8630,11 +8630,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0833,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.083333,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8681,11 +8681,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8732,11 +8732,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.3534,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.353357,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8783,11 +8783,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8834,11 +8834,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.655,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.655022,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8885,11 +8885,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 3.5211,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 3.521127,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8936,11 +8936,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7862,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.786164,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -8987,11 +8987,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.8987,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.898734,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9038,11 +9038,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2346,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.234568,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9089,11 +9089,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 2.1667,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.166667,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9140,11 +9140,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2903,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.290323,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9191,11 +9191,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.4587,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.458716,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9242,11 +9242,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.6378,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.637755,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9293,11 +9293,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.4762,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.47619,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9344,11 +9344,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 6.4615,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 6.461538,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9395,11 +9395,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.7732,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.773196,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9446,11 +9446,11 @@
       "classification": "WATCH",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9497,11 +9497,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.2556,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.255639,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9548,11 +9548,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7699,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.769912,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9599,11 +9599,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.6,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.6,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9650,11 +9650,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2195,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.219512,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9701,11 +9701,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8403,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.840336,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9803,11 +9803,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8772,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.877193,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9905,11 +9905,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.6523,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.652259,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -9956,11 +9956,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.1351,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.135135,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10007,11 +10007,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0202,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.020202,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10058,11 +10058,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.6129,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.612903,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10109,11 +10109,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.9687,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.96875,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10160,11 +10160,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2766,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.276596,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10211,11 +10211,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7897,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.789709,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10262,11 +10262,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 3.5219,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 3.521878,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10313,11 +10313,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.1866,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.186567,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10364,11 +10364,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6803,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.680272,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10415,11 +10415,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.365,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.364964,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10466,11 +10466,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.3112,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.311203,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10517,11 +10517,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10568,11 +10568,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10619,11 +10619,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.5267,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.526718,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10670,11 +10670,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2121,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.212121,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10721,11 +10721,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 1.3105,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.310484,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10772,11 +10772,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3158,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.315789,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10823,11 +10823,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4052,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.405152,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10874,11 +10874,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10925,11 +10925,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.3256,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.325581,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -10976,11 +10976,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.2173,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.217295,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11027,11 +11027,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.2793,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.27933,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11078,11 +11078,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3831,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.383126,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11129,11 +11129,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.1029,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.102941,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11180,11 +11180,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.3226,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.322581,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11231,11 +11231,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7937,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.793651,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11282,11 +11282,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8772,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.877193,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11333,11 +11333,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.5525,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.552486,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11384,11 +11384,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0309,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.030928,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11435,11 +11435,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2121,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.212121,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11486,11 +11486,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.4019,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.401929,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11588,11 +11588,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2232,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.223242,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11639,11 +11639,11 @@
       "classification": "WATCH",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0173,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.017291,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11690,11 +11690,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8357,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.835655,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11741,11 +11741,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.5111,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.511073,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11792,11 +11792,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.9498,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.949796,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11843,11 +11843,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 1.5625,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.5625,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11894,11 +11894,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.8278,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.827763,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11945,11 +11945,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 2.439,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.439024,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -11996,11 +11996,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 1.6736,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.67364,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12047,11 +12047,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12098,11 +12098,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.1321,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.132075,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12149,11 +12149,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.1832,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.18315,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12200,11 +12200,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4218,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.421801,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12251,11 +12251,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.9259,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.925926,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12302,11 +12302,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.5873,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.587302,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12353,11 +12353,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3793,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.37931,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12404,11 +12404,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.9036,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.903614,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12455,11 +12455,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12506,11 +12506,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.1972,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.197239,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12557,11 +12557,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8446,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.844595,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12608,11 +12608,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4851,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.485149,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12659,11 +12659,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 2.2831,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.283105,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12710,11 +12710,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 2.7491,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.749141,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12761,11 +12761,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7874,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.787402,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12812,11 +12812,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6768,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.676819,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12863,11 +12863,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12914,11 +12914,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.9259,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.925926,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -12965,11 +12965,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.9174,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.917431,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13016,11 +13016,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6993,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.699301,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13067,11 +13067,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.2387,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.238663,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13118,11 +13118,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 2.4948,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.494802,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13169,11 +13169,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0381,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.038062,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13220,11 +13220,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.4739,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.473934,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13271,11 +13271,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3453,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.345291,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13322,11 +13322,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4706,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.470588,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13373,11 +13373,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.6,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.6,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13424,11 +13424,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.3311,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.331126,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13475,11 +13475,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4599,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.459854,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13526,11 +13526,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.5839,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.583942,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13577,11 +13577,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.4854,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.485437,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13628,11 +13628,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.373,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.372998,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13679,11 +13679,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7353,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.735294,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13730,11 +13730,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13781,11 +13781,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0417,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.041667,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13832,11 +13832,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.2857,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.285714,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13883,11 +13883,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13934,11 +13934,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0753,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.075269,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -13985,11 +13985,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.6736,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.67364,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14036,11 +14036,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.5535,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.553506,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14087,11 +14087,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14138,11 +14138,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7327,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.732673,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14189,11 +14189,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.2847,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.28471,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14240,11 +14240,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.1066,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.10664,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14291,11 +14291,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.246,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.246002,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14342,11 +14342,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8152,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.815217,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14393,11 +14393,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14444,11 +14444,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14495,11 +14495,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.9082,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.908174,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14546,11 +14546,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.48,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.48,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14597,11 +14597,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14648,11 +14648,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8972,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.897227,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14699,11 +14699,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.8797,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.879699,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14750,11 +14750,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14801,11 +14801,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.6846,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.684564,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14852,11 +14852,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.5505,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.550459,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14903,11 +14903,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3889,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.388889,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -14954,11 +14954,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7937,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.793722,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -15005,11 +15005,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -15056,11 +15056,11 @@
       "classification": "WATCH",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6479,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.647948,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -15107,11 +15107,11 @@
       "classification": "HOLD",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.8299,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.829876,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -15158,11 +15158,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.8116,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.811594,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -15209,11 +15209,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.9756,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.97561,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
@@ -15260,11 +15260,11 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7576,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.757576,
+          "status": "APPROX_AVAILABLE"
         },
         "T+10": {
           "adverse_close_path_pct": null,
