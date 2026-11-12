@@ -98,6 +98,61 @@ def load_board(path: Path) -> tuple[str, dict[str, Any] | None]:
     return "OK", loaded
 
 
+def _exact_count(value: object, actual: int) -> bool:
+    return type(value) is int and value == actual
+
+
+def _validated_durable_board(store_path: Path) -> tuple[str, dict[str, Any] | None, str]:
+    """Return OK, MISSING, or INVALID. Do not replace a failed store with another board."""
+    root = Path(store_path)
+    manifest_path = root / "manifest.json"
+    if not manifest_path.exists():
+        return "MISSING", None, "manifest is not present"
+    if not manifest_path.is_file():
+        return "INVALID", None, "manifest is not a file"
+    try:
+        store = DurableRowStore(root)
+        manifest = store.read_manifest()
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
+        return "INVALID", None, "store is unreadable"
+    if manifest is None:
+        return "INVALID", None, "manifest schema is not v2_research_row_store_manifest.v1"
+    if not _exact_count(manifest.get("identity_count"), len(store.identities)):
+        return "INVALID", None, "identity_count does not match identities.jsonl"
+    if not _exact_count(manifest.get("link_count"), len(store.links)):
+        return "INVALID", None, "link_count does not match links.jsonl"
+    if len(store.identities) > 0 and not (root / "identities.jsonl").is_file():
+        return "INVALID", None, "identities.jsonl is not present"
+    board = load_row_panel(store)
+    if not isinstance(board, dict) or not isinstance(board.get("rows"), list):
+        return "INVALID", None, "panel projection is missing"
+    if len(board["rows"]) != len(store.identities):
+        return "INVALID", None, "panel row count does not match identity_count"
+    return "OK", board, ""
+
+
+def _show_historical_remote(st: Any, view: DeliveryView | None, *, unavailable_reason: str | None) -> None:
+    """Show a remote trio separately. Its rows are not the durable store population."""
+    if view is None or not isinstance(view.board, dict):
+        if unavailable_reason:
+            st.caption(f"historical_remote_delivery=UNAVAILABLE reason={unavailable_reason}.")
+        return
+    rows = [row for row in (view.board.get("rows") or []) if isinstance(row, dict)]
+    fresh = view.board.get("freshness") if isinstance(view.board.get("freshness"), dict) else {}
+    latest = fresh.get("latest_t0") or "unknown"
+    st.caption(
+        "historical_remote_delivery "
+        f"state={view.state} "
+        f"historical_rows={len(rows)} "
+        f"latest T0 (provenance)={latest}. "
+        "This is not the durable store population."
+    )
+    if view.state == SOURCE_STALE:
+        st.warning(f"{SOURCE_STALE}: historical remote delivery is stale.")
+    if rows:
+        st.dataframe(project_table(rows), use_container_width=True, hide_index=True)
+
+
 def render_v2_research_ledger_panel(
     st_module: Any = None,
     *,
@@ -119,26 +174,32 @@ def render_v2_research_ledger_panel(
     delivered = None
     cache_reason = None
     from_row_store = False
+    historical_view = None
+    historical_unavailable = None
     if remote and delivery_dir is None and board_path is None:
         if remote_view is None:
             url, token = resolve_remote_config()
             remote_view = fetch_research_trio(url, token)
         if remote_view.state == DELIVERY_UNAVAILABLE or remote_view.board is None:
-            cache_reason = remote_view.reason
-            store_path = Path(row_store) if row_store is not None else DEFAULT_ROW_STORE
-            board = load_row_panel(DurableRowStore(store_path))
-            if board is None:
-                with st.expander(PANEL_TITLE, expanded=False):
-                    st.caption(PANEL_CAPTION)
-                    st.warning(f"{DELIVERY_UNAVAILABLE}: {cache_reason}.")
-                    st.warning("ROW_STORE_UNAVAILABLE: the durable research row store is not present.")
-                return
-            from_row_store = True
-            status, path = "OK", store_path
+            historical_unavailable = remote_view.reason or "unavailable"
         else:
-            delivered = remote_view
-            status, board = "OK", remote_view.board
-            path = Path("remote-research-ledger")
+            historical_view = remote_view
+        store_path = Path(row_store) if row_store is not None else DEFAULT_ROW_STORE
+        store_state, board, store_reason = _validated_durable_board(store_path)
+        if store_state != "OK":
+            label = "DURABLE_STORE_MISSING" if store_state == "MISSING" else "DURABLE_STORE_INVALID"
+            with st.expander(PANEL_TITLE, expanded=False):
+                st.caption(PANEL_CAPTION)
+                st.warning(f"{label}: {store_reason}.")
+                if store_state == "MISSING":
+                    st.warning("ROW_STORE_UNAVAILABLE: the durable research row store is not present.")
+                st.warning("Historical remote data is not the current durable store.")
+                if historical_unavailable:
+                    st.warning(f"{DELIVERY_UNAVAILABLE}: {historical_unavailable}.")
+                _show_historical_remote(st, historical_view, unavailable_reason=historical_unavailable)
+            return
+        from_row_store = True
+        status, path = "OK", store_path
     elif delivery_dir is not None:
         delivered = load_delivery(Path(delivery_dir))
         if delivered.state == DELIVERY_UNAVAILABLE:
@@ -266,6 +327,8 @@ def render_v2_research_ledger_panel(
         )
         if not selected:
             st.warning(f"{NO_DATA}: no stored candidates match these filters.")
+            if from_row_store:
+                _show_historical_remote(st, historical_view, unavailable_reason=historical_unavailable)
             return
         st.dataframe(project_table(selected), use_container_width=True, hide_index=True)
         history = []
@@ -283,3 +346,5 @@ def render_v2_research_ledger_panel(
         if history:
             st.caption("Action history for the rows above. WAIT and later states stay listed.")
             st.dataframe(history, use_container_width=True, hide_index=True)
+        if from_row_store:
+            _show_historical_remote(st, historical_view, unavailable_reason=historical_unavailable)
