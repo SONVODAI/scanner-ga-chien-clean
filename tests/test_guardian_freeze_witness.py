@@ -85,7 +85,8 @@ def _git_blob(path: Path) -> str:
     return hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
 
 
-def test_first_write_stamps_only_new_rows_and_a_rerun_does_not_probe(tmp_path: Path):
+def test_first_write_stamps_only_new_rows_and_a_rerun_does_not_probe(monkeypatch, tmp_path: Path):
+    _freeze_clock(monkeypatch)
     calls = []
 
     def probe(session: str) -> dict:
@@ -138,7 +139,7 @@ def test_first_write_stamps_only_new_rows_and_a_rerun_does_not_probe(tmp_path: P
     assert float(_again.loc[_again["symbol"] == "HPG", "price"].iloc[0]) == 26.0
 
 
-def test_probe_failure_and_mismatched_bar_append_blank_and_delay_refuses(monkeypatch, tmp_path: Path):
+def test_probe_failure_and_mismatched_bar_store_nothing(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
     _freeze_clock(monkeypatch)
     monkeypatch.setattr(
@@ -155,11 +156,44 @@ def test_probe_failure_and_mismatched_bar_append_blank_and_delay_refuses(monkeyp
         brain_dir=tmp_path / "fail-brain",
         witness_probe=explode,
     )
-    assert added == 1
-    assert failed["guardian_witness_source"].eq("").all()
-    assert failed["guardian_witness_sha256"].eq("").all()
-    project = tmp_path / "fail-repo"
-    _write_freeze(project, failed)
+    assert added == 0
+    assert failed.empty
+
+    def wrong_day(session: str) -> dict:
+        return {"source": "vnindex_daily_bar", "bar_session": "2026-11-11", "probe_error": None}
+
+    mismatched, added = append_t0_observation_freeze(
+        pd.DataFrame(),
+        _board(("FPT",)),
+        brain_dir=tmp_path / "mismatch-brain",
+        witness_probe=wrong_day,
+    )
+    assert added == 0
+    assert mismatched.empty
+
+    rows = []
+    for symbol in ("HPG",):
+        rows.append(
+            {
+                "trade_date": SESSION,
+                "symbol": symbol,
+                "observation_id": f"{SESSION}:{symbol}",
+                "frozen_at": "2026-11-12T19:05:00+07:00",
+                "market_real": 6.4,
+                "price": 26.0,
+                "ema9": 25.0,
+                "ma20": 24.0,
+                "obv": 1000.0,
+                "obv_ema9": 900.0,
+                "guardian_witness_source": "",
+                "guardian_witness_bar_session": "",
+                "guardian_witness_provenance": "",
+                "guardian_witness_sha256": "",
+            }
+        )
+    project = tmp_path / "invalid"
+    _write_freeze(project, pd.DataFrame(rows))
+    before = (project / "data" / "earning_learning" / "t0_observation_freeze.csv").read_bytes()
     refused = run_guardian_close(
         now=MORNING,
         root=tmp_path / "fail-seal",
@@ -171,28 +205,7 @@ def test_probe_failure_and_mismatched_bar_append_blank_and_delay_refuses(monkeyp
     assert refused["status"] == "refused"
     assert refused["reason"] == "WITNESS_ABSENT"
     assert not (tmp_path / "fail-seal" / "sessions").exists()
-
-    def wrong_day(session: str) -> dict:
-        return {"source": "vnindex_daily_bar", "bar_session": "2026-11-11", "probe_error": None}
-
-    mismatched, added = append_t0_observation_freeze(
-        pd.DataFrame(),
-        _board(("FPT",)),
-        brain_dir=tmp_path / "mismatch-brain",
-        witness_probe=wrong_day,
-    )
-    assert added == 1
-    assert mismatched["guardian_witness_bar_session"].eq("").all()
-    _write_freeze(tmp_path / "mismatch-repo", mismatched)
-    mismatch = run_guardian_close(
-        now=MORNING,
-        root=tmp_path / "mismatch-seal",
-        close_scan=lambda: (_ for _ in ()).throw(AssertionError("must not scan")),
-        symbols=("FPT",),
-        project_root=tmp_path / "mismatch-repo",
-    )
-    assert mismatch["reason"] == "WITNESS_ABSENT"
-    assert not (tmp_path / "mismatch-seal" / "sessions").exists()
+    assert (project / "data" / "earning_learning" / "t0_observation_freeze.csv").read_bytes() == before
 
 
 def test_hash_survives_csv_and_tamper_is_rejected(monkeypatch, tmp_path: Path):
@@ -406,11 +419,6 @@ def test_same_evening_fallback_does_not_substitute_a_live_probe(monkeypatch, tmp
 
 def test_same_evening_complete_scan_stays_contemporaneous(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
-
-    def refuse_freeze(*_args, **_kwargs):
-        raise AssertionError("a complete same-evening scan must not read the freeze")
-
-    monkeypatch.setattr("research.guardian_research.scan_archive.load_agreed_freeze", refuse_freeze)
     payload = {
         "ok": True,
         "status": "READY",
@@ -447,6 +455,7 @@ def test_same_evening_complete_scan_stays_contemporaneous(monkeypatch, tmp_path:
         close_scan=lambda: payload,
         symbols=("HPG",),
         witness={"source": "vnindex_daily_bar", "bar_session": SESSION, "probe_error": None},
+        project_root=tmp_path / "freeze",
     )
     assert sealed["status"] == "created"
     stored = read_snapshot(Path(sealed["path"]))

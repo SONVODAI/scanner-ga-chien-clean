@@ -1,0 +1,15 @@
+[Unit]
+Description=Mr.BOT Guardian close dispatch timer
+Documentation=file:/opt/mrbot-camera/deploy/systemd/mrbot-guardian-dispatch.timer
+
+[Timer]
+# Same-evening dispatch only. A catch-up after the next 09:00 ICT must refuse
+# both a new freeze and a seal. This unit is not installed by install.sh.
+OnCalendar=Mon..Fri *-*-* 18:20:00 Asia/Ho_Chi_Minh
+OnCalendar=Mon..Fri *-*-* 20:00:00 Asia/Ho_Chi_Minh
+Persistent=true
+AccuracySec=1min
+Unit=mrbot-guardian-dispatch.service
+
+[Install]
+WantedBy=timers.target

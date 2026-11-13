@@ -1,0 +1,18 @@
+[Unit]
+Description=Mr.BOT Guardian close workflow dispatch
+Documentation=file:/opt/mrbot-camera/deploy/systemd/mrbot-guardian-dispatch.service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mrbot-camera
+EnvironmentFile=-/etc/mrbot/guardian-dispatch.env
+ExecStart=/opt/mrbot-camera-venv/bin/python /opt/mrbot-camera/scripts/guardian_close_dispatch.py
+TimeoutStartSec=30
+Restart=no
+Nice=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

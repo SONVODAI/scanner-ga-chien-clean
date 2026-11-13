@@ -774,6 +774,47 @@ class GitHubLocalStorage:
 
         raise RuntimeError("Unknown GitHub write error")
 
+    def read_content_cas(self, filename: str) -> Tuple[Optional[str], Optional[str]]:
+        """Return ``(text, sha)`` for one freeze compare-and-swap read."""
+        sha = self._github_sha(filename)
+        if sha is None:
+            return None, None
+        payload = self._github_read(filename)
+        if payload is None:
+            return None, sha
+        return payload.text, sha
+
+    def write_content_cas_once(
+        self,
+        filename: str,
+        text: str,
+        sha: Optional[str],
+        commit_message: str,
+    ) -> None:
+        """PUT once. A 409 or 422 raises and does not retry the stale body."""
+        from modules.learning_t0_capture import FreezeConflict
+
+        payload: Dict[str, Any] = {
+            "message": commit_message,
+            "content": base64.b64encode(text.encode("utf-8")).decode("ascii"),
+            "branch": self.github.branch,
+        }
+        if sha:
+            payload["sha"] = sha
+        response = self._request(
+            "PUT",
+            self._api_url(filename),
+            headers=self._headers(),
+            json=payload,
+        )
+        if response.status_code in {409, 422}:
+            raise FreezeConflict(f"GitHub freeze conflict: HTTP {response.status_code}")
+        if response.status_code not in {200, 201}:
+            raise RuntimeError(
+                f"GitHub write failed: HTTP {response.status_code} "
+                f"{response.text[:300]}"
+            )
+
     def read_text(self, filename: str) -> StorageReadResult:
         github_error: Optional[str] = None
 
@@ -2959,25 +3000,19 @@ def update_learning(
 
             t0_freeze_added = 0
             try:
-                from modules.learning_t0_capture import append_t0_observation_freeze
+                from modules.learning_t0_capture import commit_qualified_freeze
+                from research.guardian_research.universe import load_tracked_symbols
 
-                existing_freeze, _ = _read_csv_from_storage(
+                committed = commit_qualified_freeze(
                     storage,
-                    T0_FREEZE_FILE,
-                )
-                frozen, t0_freeze_added = append_t0_observation_freeze(
-                    existing_freeze,
                     canonical,
+                    expected_symbols=load_tracked_symbols(),
                 )
-                if t0_freeze_added > 0:
-                    _write_csv_to_storage(
-                        storage,
-                        T0_FREEZE_FILE,
-                        frozen,
-                        commit_message=(
-                            "Mr.BOT append T0 observation freeze "
-                            f"{trade_date_value} +{t0_freeze_added}"
-                        ),
+                t0_freeze_added = int(committed.get("added") or 0)
+                if not committed.get("ok"):
+                    _LOGGER.warning(
+                        "T0 observation freeze skipped: %s",
+                        committed.get("reason"),
                     )
             except Exception as freeze_exc:
                 _LOGGER.warning(

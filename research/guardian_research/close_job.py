@@ -69,17 +69,34 @@ def run_guardian_close(
     from research.guardian_research.universe import load_tracked_symbols
 
     tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
-    # A session date before the job date is already past midnight. Do not scan.
+    # A session date before the job date is already past midnight. Do not scan
+    # and do not append a next-morning freeze for the previous session.
     if local_now.strftime("%Y-%m-%d") > session:
         return _seal_from_freeze(local_now, root_path, repo, session, tracked)
     payload = _load_close_scan(local_now, close_scan)
-    sealed = _seal_scan_payload(payload, local_now, root_path, session, tracked, accepted)
-    if sealed.get("status") in {"created", "unchanged"}:
-        return sealed
-    frozen = _seal_from_freeze(local_now, root_path, repo, session, tracked)
-    if frozen.get("status") in {"created", "unchanged"}:
-        return frozen
-    return sealed
+    if not isinstance(payload, dict) or payload.get("ok") is not True:
+        frozen = _seal_from_freeze(local_now, root_path, repo, session, tracked)
+        if frozen.get("status") in {"created", "unchanged"}:
+            return frozen
+        return _scan_refusal(payload, session)
+    payload = dict(payload)
+    payload["trade_date"] = session
+    payload["session_witness"] = accepted
+    blocker = _input_blocker(payload, tracked)
+    if blocker:
+        return _public("refused", blocker, session=session)
+    clock_reason = _observed_clock_reason(payload, session)
+    if clock_reason:
+        return _public("refused", clock_reason, session=session)
+    try:
+        committed = _persist_qualified_freeze(repo, payload, session, tracked, accepted)
+    except Exception as exc:
+        return _public("refused", "FREEZE_UNVERIFIED", error=type(exc).__name__, session=session)
+    if not committed.get("ok"):
+        return _public("refused", str(committed.get("reason") or "FREEZE_UNVERIFIED"), session=session)
+    if committed.get("reason") == "APPENDED" and not _scan_matches_freeze(payload, committed.get("frame")):
+        return _public("refused", "FREEZE_MISMATCH", session=session)
+    return _seal_from_freeze(local_now, root_path, repo, session, tracked)
 
 
 def _load_close_scan(local_now: datetime, close_scan):
@@ -90,20 +107,96 @@ def _load_close_scan(local_now: datetime, close_scan):
     return close_scan()
 
 
-def _seal_scan_payload(payload, local_now, root_path, session, tracked, accepted) -> dict:
-    if not isinstance(payload, dict) or payload.get("ok") is not True:
-        reason = "CLOSE_SCAN_NOT_READY"
-        if isinstance(payload, dict) and payload.get("status"):
-            reason = str(payload.get("status"))
-        return _public("refused", reason, error=_error_text(payload), session=session)
-    payload = dict(payload)
-    # Bar session names the seal. A same-evening scan keeps its own observed_at.
-    payload["trade_date"] = session
-    payload["session_witness"] = accepted
-    blocker = _input_blocker(payload, tracked)
-    if blocker:
-        return _public("refused", blocker, session=session)
-    return _capture(payload, local_now, root_path, session, tracked)
+def _persist_qualified_freeze(repo, payload, session, tracked, accepted) -> dict:
+    """Write the scan frame through the freeze-only commit."""
+    from modules.earning_learning import _hash_payload, _make_storage
+    from modules.learning_t0_capture import commit_qualified_freeze
+
+    observations = _freeze_observations(payload, session, _hash_payload)
+    storage = _make_storage(Path(repo) / "data" / "earning_learning")
+
+    def probe(_session: str) -> dict:
+        return accepted
+
+    return commit_qualified_freeze(
+        storage,
+        observations,
+        expected_symbols=tuple(tracked),
+        witness_probe=probe,
+        frozen_at=str(payload.get("observed_at") or ""),
+    )
+
+
+def _freeze_observations(payload: dict, session: str, hash_payload) -> pd.DataFrame:
+    frame = payload.get("scan_df")
+    rows = []
+    if isinstance(frame, pd.DataFrame):
+        for _, item in frame.iterrows():
+            symbol = str(item.get("symbol") or "").strip().upper()
+            rows.append(
+                {
+                    "symbol": symbol,
+                    "trade_date": session,
+                    "price": item.get("price"),
+                    "ema9": item.get("ema9"),
+                    "ma20": item.get("ma20"),
+                    "obv": item.get("obv"),
+                    "obv_ema9": item.get("obv_ema9"),
+                    "market_real": payload.get("market_real"),
+                    "observation_id": hash_payload((session, symbol)),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _observed_clock_reason(payload: dict, session: str) -> str | None:
+    from modules.intraday_execution_boundary import as_vn
+    from research.guardian_research.pipeline import canonical_close_verified
+
+    try:
+        parsed = datetime.fromisoformat(str(payload.get("observed_at") or ""))
+    except ValueError:
+        return "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    if parsed.tzinfo is None:
+        return "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    allowed, reason = canonical_close_verified(as_vn(parsed), session)
+    if not allowed:
+        return reason
+    return None
+
+
+def _scan_matches_freeze(payload: dict, frame) -> bool:
+    from research.guardian_research.freeze_witness import canonical_number
+
+    if not isinstance(frame, pd.DataFrame) or frame.empty:
+        return False
+    session = str(payload.get("trade_date") or "")
+    selected = frame[frame["trade_date"].astype(str).str.slice(0, 10) == session]
+    scan = payload.get("scan_df")
+    if not isinstance(scan, pd.DataFrame):
+        return False
+    stored = {}
+    for _, row in selected.iterrows():
+        symbol = str(row.get("symbol") or "").strip().upper()
+        if symbol:
+            stored[symbol] = row
+    for _, row in scan.iterrows():
+        symbol = str(row.get("symbol") or "").strip().upper()
+        item = stored.get(symbol)
+        if item is None:
+            return False
+        for column in ("price", "ema9", "ma20", "obv", "obv_ema9"):
+            if canonical_number(item.get(column)) != canonical_number(row.get(column)):
+                return False
+    markets = {canonical_number(value) for value in selected["market_real"]} if "market_real" in selected.columns else set()
+    return markets == {canonical_number(payload.get("market_real"))}
+
+
+def _scan_refusal(payload, session: str) -> dict:
+    reason = "CLOSE_SCAN_NOT_READY"
+    if isinstance(payload, dict) and payload.get("status"):
+        reason = str(payload.get("status"))
+    return _public("refused", reason, error=_error_text(payload), session=session)
 
 
 def _seal_delayed_session(local_now, root_path, repo, session, symbols) -> dict:
