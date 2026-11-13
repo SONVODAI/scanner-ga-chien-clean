@@ -29,6 +29,10 @@ T0_FREEZE_EXTRA_COLUMNS = (
     "pattern_key_v2_frozen",
     "pattern_algorithm_version",
     "frozen_at",
+    "guardian_witness_source",
+    "guardian_witness_bar_session",
+    "guardian_witness_provenance",
+    "guardian_witness_sha256",
 )
 
 
@@ -126,9 +130,14 @@ def append_t0_observation_freeze(
     observations: pd.DataFrame,
     *,
     brain_dir: Optional[Path] = None,
+    witness_probe=None,
 ) -> Tuple[pd.DataFrame, int]:
     """
     Append-only first-write-wins immutable T0 store keyed by observation_id.
+
+    A VNINDEX witness is probed only when new observation ids are appended.
+    The stamp lands on those new rows before the caller writes the freeze.
+    Stored rows are not restamped, and a failed probe still appends them.
     """
     brain_path = brain_dir or DEFAULT_BRAIN_DIR
     brain_path.mkdir(parents=True, exist_ok=True)
@@ -155,6 +164,9 @@ def append_t0_observation_freeze(
     if to_append.empty:
         return old.reset_index(drop=True), 0
 
+    from research.guardian_research.freeze_witness import stamp_new_freeze_rows
+
+    to_append = stamp_new_freeze_rows(to_append, probe=witness_probe)
     combined = pd.concat([old, to_append], ignore_index=True, sort=False)
     combined = combined.drop_duplicates(
         subset=["observation_id"],
