@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,6 +13,7 @@ import pandas as pd
 
 from modules.earning_learning import (
     OBSERVATIONS_FILE,
+    STATUS_FILE,
     T0_FREEZE_FILE,
     _adapt_board,
     _build_outcomes,
@@ -228,6 +230,8 @@ class T0FreezeTests(unittest.TestCase):
         freeze_path = self.data_dir / T0_FREEZE_FILE
         self.assertTrue(freeze_path.exists())
         self.assertGreater(result.get("t0_freeze_added", 0), 0)
+        self.assertEqual(result.get("t0_freeze_reason"), "APPENDED")
+        self.assertEqual(self._status().get("t0_freeze_reason"), "APPENDED")
         freeze = _read_t0_freeze(self.data_dir)
         self.assertEqual(len(freeze), 2)
 
@@ -252,10 +256,13 @@ class T0FreezeTests(unittest.TestCase):
 
         first_result = self._run_learning(scan_v1)
         self.assertGreater(first_result.get("t0_freeze_added", 0), 0)
+        self.assertEqual(first_result.get("t0_freeze_reason"), "APPENDED")
         freeze_after_first = _read_t0_freeze(self.data_dir).copy()
 
         second_result = self._run_learning(scan_v2)
         self.assertEqual(second_result.get("t0_freeze_added", 0), 0)
+        self.assertEqual(second_result.get("t0_freeze_reason"), "UNCHANGED")
+        self.assertEqual(self._status().get("t0_freeze_reason"), "UNCHANGED")
 
         obs_path = self.data_dir / OBSERVATIONS_FILE
         observations = pd.read_csv(obs_path)
@@ -313,6 +320,70 @@ class T0FreezeTests(unittest.TestCase):
             preserved.sort_values("observation_id").reset_index(drop=True),
             check_dtype=False,
         )
+
+    def _status(self) -> dict:
+        return json.loads((self.data_dir / STATUS_FILE).read_text(encoding="utf-8"))
+
+    def test_pre_1800_writes_zero_rows_then_qualified_append(self):
+        early_scan = _sample_scan()
+        early_scan.loc[early_scan["symbol"] == "AAA", "price"] = 1.0
+        self._clock = "2026-08-12T09:08:00Z"
+        early = self._run_learning(early_scan)
+        self.assertEqual(early.get("t0_freeze_added"), 0)
+        self.assertEqual(early.get("t0_freeze_reason"), "CLOCK_REJECTED")
+        self.assertEqual(self._status().get("t0_freeze_reason"), "CLOCK_REJECTED")
+        self.assertFalse((self.data_dir / T0_FREEZE_FILE).exists())
+
+        self._clock = "2026-08-12T12:05:00Z"
+        later = self._run_learning(_sample_scan())
+        self.assertEqual(later.get("t0_freeze_reason"), "APPENDED")
+        self.assertEqual(later.get("t0_freeze_added"), 2)
+        freeze = _read_t0_freeze(self.data_dir)
+        aaa = freeze[freeze["symbol"] == "AAA"].iloc[0]
+        self.assertAlmostEqual(float(aaa["price"]), 10.0)
+        self.assertEqual(str(aaa["frozen_at"]), "2026-08-12T12:05:00Z")
+        self.assertTrue(str(aaa["guardian_witness_sha256"]).strip())
+        self.assertEqual(str(aaa["guardian_witness_bar_session"]), "2026-08-12")
+
+    def test_missing_witness_writes_zero_rows_and_does_not_occupy(self):
+        from research.guardian_research import session_authority
+
+        session_authority.probe_vnindex = lambda session: {
+            "source": "vnindex_daily_bar",
+            "bar_session": "1999-01-01",
+            "probe_error": None,
+        }
+        early_scan = _sample_scan()
+        early_scan.loc[early_scan["symbol"] == "AAA", "price"] = 1.0
+        refused = self._run_learning(early_scan)
+        self.assertEqual(refused.get("t0_freeze_added"), 0)
+        self.assertEqual(refused.get("t0_freeze_reason"), "WITNESS_ABSENT")
+        self.assertEqual(self._status().get("t0_freeze_reason"), "WITNESS_ABSENT")
+        self.assertFalse((self.data_dir / T0_FREEZE_FILE).exists())
+
+        session_authority.probe_vnindex = lambda session: {
+            "source": "vnindex_daily_bar",
+            "bar_session": session,
+            "probe_error": None,
+        }
+        later = self._run_learning(_sample_scan())
+        self.assertEqual(later.get("t0_freeze_reason"), "APPENDED")
+        freeze = _read_t0_freeze(self.data_dir)
+        aaa = freeze[freeze["symbol"] == "AAA"].iloc[0]
+        self.assertAlmostEqual(float(aaa["price"]), 10.0)
+        self.assertEqual(len(freeze), 2)
+
+    def test_freeze_exception_records_freeze_error_and_writes_no_rows(self):
+        with mock.patch(
+            "modules.learning_t0_capture.commit_qualified_freeze",
+            side_effect=RuntimeError("disk"),
+        ):
+            result = self._run_learning(_sample_scan())
+        self.assertTrue(result.get("ok"))
+        self.assertEqual(result.get("t0_freeze_added"), 0)
+        self.assertEqual(result.get("t0_freeze_reason"), "FREEZE_ERROR")
+        self.assertEqual(self._status().get("t0_freeze_reason"), "FREEZE_ERROR")
+        self.assertFalse((self.data_dir / T0_FREEZE_FILE).exists())
 
     def test_g_non_trading_day_creates_no_new_rows(self):
         before_obs = self.data_dir / OBSERVATIONS_FILE

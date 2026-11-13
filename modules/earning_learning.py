@@ -230,6 +230,7 @@ class LearningResult:
     decision_archive_rows: int = 0
     verified_decisions_rows: int = 0
     t0_freeze_added: int = 0
+    t0_freeze_reason: Optional[str] = None
     storage_mode: str = "LOCAL_ONLY"
     github_sync: str = "NOT_ATTEMPTED"
     skipped_reason: Optional[str] = None
@@ -2999,6 +3000,7 @@ def update_learning(
             )
 
             t0_freeze_added = 0
+            t0_freeze_reason: Optional[str] = None
             try:
                 from modules.learning_t0_capture import commit_qualified_freeze
                 from research.guardian_research.universe import load_tracked_symbols
@@ -3009,12 +3011,15 @@ def update_learning(
                     expected_symbols=load_tracked_symbols(),
                 )
                 t0_freeze_added = int(committed.get("added") or 0)
+                reason = committed.get("reason")
+                t0_freeze_reason = str(reason) if reason else None
                 if not committed.get("ok"):
                     _LOGGER.warning(
                         "T0 observation freeze skipped: %s",
                         committed.get("reason"),
                     )
             except Exception as freeze_exc:
+                t0_freeze_reason = "FREEZE_ERROR"
                 _LOGGER.warning(
                     "T0 observation freeze skipped: %s",
                     freeze_exc,
@@ -3247,6 +3252,7 @@ def update_learning(
                 decision_archive_rows=len(decision_archive),
                 verified_decisions_rows=len(verified_decisions),
                 t0_freeze_added=t0_freeze_added,
+                t0_freeze_reason=t0_freeze_reason,
                 storage_mode=storage_mode,
                 github_sync=github_sync,
             )

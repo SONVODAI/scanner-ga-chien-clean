@@ -1018,6 +1018,32 @@ def test_wrong_session_date_and_invalid_witness_are_refused(monkeypatch, tmp_pat
     assert not (tmp_path / "witness" / "sessions").exists()
 
 
+def test_pre_1800_freeze_does_not_seal_and_leaves_sealed_sessions(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    _local_only(monkeypatch)
+    before_sessions = _repo_session_bytes()
+    morning = datetime(2026, 11, 7, 8, 0, tzinfo=VN)
+    project = tmp_path / "early"
+    _write_agreed_freeze(project, ("HPG",), frozen_at="2026-11-06T17:08:00+07:00")
+    freeze_path = project / "data" / "earning_learning" / "t0_observation_freeze.csv"
+    freeze_before = freeze_path.read_bytes()
+    calls = []
+    refused = _run(
+        now=morning,
+        root=tmp_path / "seal",
+        close_scan=lambda: calls.append("scan"),
+        symbols=("HPG",),
+        project_root=project,
+    )
+    assert refused["status"] == "refused"
+    assert refused["reason"] == "STALE_FREEZE"
+    assert calls == []
+    assert not (tmp_path / "seal" / "sessions").exists()
+    assert freeze_path.read_bytes() == freeze_before
+    assert _repo_session_bytes() == before_sessions
+    assert "2026-11-13.json" not in before_sessions
+
+
 def test_same_evening_empty_scan_can_seal_a_qualified_freeze(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
     _local_only(monkeypatch)
