@@ -5,6 +5,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import pandas as pd
@@ -31,6 +32,10 @@ def _sample_scan(*, trade_date: str = "2026-08-12") -> pd.DataFrame:
                 "symbol": "AAA",
                 "trade_date": trade_date,
                 "price": 10.0,
+                "ema9": 9.5,
+                "ma20": 9.0,
+                "obv": 1000.0,
+                "obv_ema9": 900.0,
                 "rsi14": 55.0,
                 "group": "PULL ĐẸP",
                 "total_score": 80.0,
@@ -43,6 +48,10 @@ def _sample_scan(*, trade_date: str = "2026-08-12") -> pd.DataFrame:
                 "symbol": "BBB",
                 "trade_date": trade_date,
                 "price": 20.0,
+                "ema9": 19.0,
+                "ma20": 18.0,
+                "obv": 1100.0,
+                "obv_ema9": 1000.0,
                 "rsi14": 60.0,
                 "group": "PULL VỪA",
                 "total_score": 70.0,
@@ -175,15 +184,28 @@ class T0FreezeTests(unittest.TestCase):
         from research.guardian_research import session_authority
 
         self._probe = session_authority.probe_vnindex
-        session_authority.probe_vnindex = lambda _session: {
+        session_authority.probe_vnindex = lambda session: {
             "source": "vnindex_daily_bar",
-            "bar_session": "",
-            "probe_error": "TEST_DISABLED",
+            "bar_session": session,
+            "probe_error": None,
         }
+        self._clock = "2026-08-12T12:05:00Z"
+        self._clock_patch = mock.patch(
+            "modules.learning_t0_capture._utc_now_iso",
+            lambda: self._clock,
+        )
+        self._universe_patch = mock.patch(
+            "research.guardian_research.universe.load_tracked_symbols",
+            lambda *args, **kwargs: ("AAA", "BBB"),
+        )
+        self._clock_patch.start()
+        self._universe_patch.start()
 
     def tearDown(self):
         from research.guardian_research import session_authority
 
+        self._universe_patch.stop()
+        self._clock_patch.stop()
         session_authority.probe_vnindex = self._probe
         self.temp_dir.cleanup()
 
@@ -212,7 +234,9 @@ class T0FreezeTests(unittest.TestCase):
     def test_a_different_dates_create_distinct_freeze_rows(self):
         scan_a = _sample_scan(trade_date="2026-08-10")
         scan_b = _sample_scan(trade_date="2026-08-12")
+        self._clock = "2026-08-10T12:05:00Z"
         self._run_learning(scan_a)
+        self._clock = "2026-08-12T12:05:00Z"
         self._run_learning(scan_b)
 
         freeze = _read_t0_freeze(self.data_dir)
@@ -272,8 +296,10 @@ class T0FreezeTests(unittest.TestCase):
     def test_e_storage_read_append_write_preserves_existing_rows(self):
         scan_a = _sample_scan(trade_date="2026-08-10")
         scan_b = _sample_scan(trade_date="2026-08-12")
+        self._clock = "2026-08-10T12:05:00Z"
         self._run_learning(scan_a)
         after_first = _read_t0_freeze(self.data_dir)
+        self._clock = "2026-08-12T12:05:00Z"
         self._run_learning(scan_b)
         after_second = _read_t0_freeze(self.data_dir)
 
@@ -362,15 +388,21 @@ class T0CaptureDemo(unittest.TestCase):
         from research.guardian_research import session_authority
 
         self._probe = session_authority.probe_vnindex
-        session_authority.probe_vnindex = lambda _session: {
+        session_authority.probe_vnindex = lambda session: {
             "source": "vnindex_daily_bar",
-            "bar_session": "",
-            "probe_error": "TEST_DISABLED",
+            "bar_session": session,
+            "probe_error": None,
         }
+        self._clock_patch = mock.patch(
+            "modules.learning_t0_capture._utc_now_iso",
+            lambda: "2026-08-12T12:05:00Z",
+        )
+        self._clock_patch.start()
 
     def tearDown(self):
         from research.guardian_research import session_authority
 
+        self._clock_patch.stop()
         session_authority.probe_vnindex = self._probe
 
     def test_demo_new_observation_row(self):

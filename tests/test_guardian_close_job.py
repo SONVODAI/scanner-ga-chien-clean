@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pandas as pd
+import pytest
 
 from research.guardian_research.close_job import run_guardian_close
 from research.guardian_research.performance import read_performance_view
@@ -68,6 +70,32 @@ def _run(*args, **kwargs):
     return run_guardian_close(*args, **kwargs)
 
 
+def _digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    if path.is_file():
+        digest.update(path.read_bytes())
+        return digest.hexdigest()
+    if not path.exists():
+        return ""
+    for file in sorted(item for item in path.rglob("*") if item.is_file()):
+        digest.update(file.relative_to(path).as_posix().encode())
+        digest.update(file.read_bytes())
+    return digest.hexdigest()
+
+
+@pytest.fixture(autouse=True)
+def production_research_data_stays_put():
+    root = Path(__file__).resolve().parents[1]
+    watched = (
+        root / "data" / "earning_learning" / "t0_observation_freeze.csv",
+        root / "data" / "guardian_research" / "sessions",
+    )
+    before = {path: _digest(path) for path in watched}
+    yield
+    after = {path: _digest(path) for path in watched}
+    assert after == before
+
+
 def _local_only(monkeypatch):
     monkeypatch.setattr(
         "research.guardian_research.pipeline.read_remote_snapshot",
@@ -123,6 +151,7 @@ def test_guardian_job_does_not_finalize_other_systems(monkeypatch, tmp_path: Pat
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert result["status"] == "created"
     assert calls == []
@@ -133,6 +162,7 @@ def test_guardian_job_does_not_finalize_other_systems(monkeypatch, tmp_path: Pat
     assert "authority_ready" not in source
     assert "live_candidate" not in source
     assert "position_guardian" not in source
+    assert "update_learning" not in source
 
 
 def test_default_scan_does_not_retain_research_ledgers(monkeypatch, tmp_path: Path):
@@ -145,7 +175,7 @@ def test_default_scan_does_not_retain_research_ledgers(monkeypatch, tmp_path: Pa
     monkeypatch.setattr("modules.close_session_scan.build_close_scan_inputs", build)
     _enable(monkeypatch)
     _local_only(monkeypatch)
-    result = _run(now=EVENING, root=tmp_path, symbols=("HPG",))
+    result = _run(now=EVENING, root=tmp_path, symbols=("HPG",), project_root=tmp_path / "freeze")
     assert result["status"] == "created"
     assert seen["retain_research"] is False
     assert seen["now"] == EVENING
@@ -193,6 +223,7 @@ def test_observed_at_and_vnindex_witness_are_required(monkeypatch, tmp_path: Pat
         root=tmp_path,
         close_scan=lambda: closed,
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert aligned["status"] == "created"
     assert aligned["session"] == SESSION
@@ -257,6 +288,7 @@ def test_same_seal_is_idempotent_and_a_conflict_is_rejected(monkeypatch, tmp_pat
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert first["status"] == "created"
     assert first["tracked_count"] == 1
@@ -304,6 +336,7 @@ def test_publication_reports_the_remote_result_and_the_backfill_stays(monkeypatc
         root=tmp_path,
         close_scan=lambda: _payload(("HPG",)),
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert result["remote"] == "GITHUB_OK"
     assert published == [(tmp_path, SESSION)]
@@ -331,6 +364,7 @@ def test_vnindex_bar_names_the_session_and_a_mixed_scan_is_refused(monkeypatch, 
         root=tmp_path,
         close_scan=lambda: mislabeled,
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert seen["search_end"] == SESSION
     assert sealed["status"] == "created"
@@ -628,6 +662,7 @@ def test_backup_slot_is_idempotent_and_does_not_mutate_an_existing_seal(monkeypa
         root=tmp_path,
         close_scan=lambda: scans.append("primary") or _payload(("HPG",)),
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert first["status"] == "created"
     before = Path(first["path"]).read_bytes()
@@ -701,6 +736,7 @@ def test_primary_failure_then_backup_success_and_late_start_refuses(monkeypatch,
         root=tmp_path / "backup",
         close_scan=lambda: scans.append("backup") or _payload(("HPG",)),
         symbols=("HPG",),
+        project_root=tmp_path / "backup-freeze",
     )
     assert success["status"] == "created"
     stored = read_snapshot(Path(success["path"]))
@@ -730,6 +766,7 @@ def test_full_universe_backup_requires_143_and_rejects_partial(monkeypatch, tmp_
         root=tmp_path / "full",
         close_scan=lambda: _payload(tracked),
         symbols=tracked,
+        project_root=tmp_path / "full-freeze",
     )
     assert ok["status"] == "created"
     assert ok["tracked_count"] == 143
@@ -808,17 +845,13 @@ def _repo_session_bytes() -> dict[str, bytes]:
 def test_same_evening_complete_scan_is_contemporaneous(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
     _local_only(monkeypatch)
-
-    def refuse_freeze(*_args, **_kwargs):
-        raise AssertionError("a complete same-evening scan must not read the freeze")
-
-    monkeypatch.setattr("research.guardian_research.scan_archive.load_agreed_freeze", refuse_freeze)
     payload = _payload(("HPG",), observed_at=EVENING.isoformat())
     sealed = _run(
         now=EVENING,
         root=tmp_path,
         close_scan=lambda: payload,
         symbols=("HPG",),
+        project_root=tmp_path / "freeze",
     )
     assert sealed["status"] == "created"
     stored = read_snapshot(Path(sealed["path"]))

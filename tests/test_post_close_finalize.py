@@ -230,20 +230,28 @@ def test_replaying_handoff_does_not_add_forward_or_t0_rows(tmp_path):
     board = _sample_scan(trade_date="2026-09-22")
     from modules.earning_learning import update_learning
 
-    first_learn = update_learning(
-        earning_board_df=board,
-        market_context={"market_real": 7, "market_live": 6, "market_forecast": 5, "market_regime": "mid"},
-        trading_today=True,
-        data_dir=data_dir,
-        strict=True,
-    )
-    second_learn = update_learning(
-        earning_board_df=board,
-        market_context={"market_real": 7, "market_live": 6, "market_forecast": 5, "market_regime": "mid"},
-        trading_today=True,
-        data_dir=data_dir,
-        strict=True,
-    )
+    symbols = tuple(board["symbol"].astype(str))
+    with mock.patch("modules.learning_t0_capture._utc_now_iso", lambda: "2026-09-22T12:05:00Z"), mock.patch(
+        "research.guardian_research.universe.load_tracked_symbols",
+        lambda *args, **kwargs: symbols,
+    ), mock.patch(
+        "research.guardian_research.session_authority.probe_vnindex",
+        lambda session: {"source": "vnindex_daily_bar", "bar_session": session, "probe_error": None},
+    ):
+        first_learn = update_learning(
+            earning_board_df=board,
+            market_context={"market_real": 7, "market_live": 6, "market_forecast": 5, "market_regime": "mid"},
+            trading_today=True,
+            data_dir=data_dir,
+            strict=True,
+        )
+        second_learn = update_learning(
+            earning_board_df=board,
+            market_context={"market_real": 7, "market_live": 6, "market_forecast": 5, "market_regime": "mid"},
+            trading_today=True,
+            data_dir=data_dir,
+            strict=True,
+        )
     freeze = pd.read_csv(data_dir / T0_FREEZE_FILE)
     assert first_learn.get("t0_freeze_added", 0) > 0
     assert second_learn.get("t0_freeze_added", 0) == 0
