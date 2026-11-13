@@ -757,12 +757,15 @@ def _write_agreed_freeze(
     market_real: float = 6.5,
     blank: tuple[str, str] | None = None,
 ) -> None:
-    """Write a freeze and a matching observations file. No money snapshot is written."""
+    """Write a stamped freeze. Observations are not the delayed-seal authority."""
+    from research.guardian_research.freeze_witness import PROVENANCE, WITNESS_SOURCE, witness_digest
+
     rows = []
     for symbol in symbols:
         row = {
             "trade_date": session,
             "symbol": symbol,
+            "observation_id": f"{session}:{symbol}",
             "frozen_at": frozen_at,
             "market_real": market_real,
             "price": 26.0,
@@ -777,8 +780,24 @@ def _write_agreed_freeze(
     folder = Path(project) / "data" / "earning_learning"
     folder.mkdir(parents=True, exist_ok=True)
     frame = pd.DataFrame(rows)
+    digest = witness_digest(
+        session=session,
+        frozen_at=frozen_at,
+        source=WITNESS_SOURCE,
+        bar_session=session,
+        rows=frame,
+    )
+    if digest:
+        frame["guardian_witness_source"] = WITNESS_SOURCE
+        frame["guardian_witness_bar_session"] = session
+        frame["guardian_witness_provenance"] = PROVENANCE
+        frame["guardian_witness_sha256"] = digest
     frame.to_csv(folder / "t0_observation_freeze.csv", index=False)
-    frame.drop(columns=["frozen_at"]).to_csv(folder / "observations.csv", index=False)
+    observations = frame.drop(
+        columns=["frozen_at", "guardian_witness_source", "guardian_witness_bar_session", "guardian_witness_provenance", "guardian_witness_sha256"],
+        errors="ignore",
+    )
+    observations.to_csv(folder / "observations.csv", index=False)
 
 
 def _repo_session_bytes() -> dict[str, bytes]:
@@ -946,9 +965,10 @@ def test_wrong_session_date_and_invalid_witness_are_refused(monkeypatch, tmp_pat
     assert mismatched["reason"] == "FREEZE_ABSENT"
     assert not (tmp_path / "mismatch" / "sessions").exists()
 
+    probes = []
     monkeypatch.setattr(
-        "research.guardian_research.scan_archive.load_agreed_freeze",
-        lambda *_args, **_kwargs: calls.append("freeze"),
+        "research.guardian_research.close_job.probe_vnindex",
+        lambda _session: probes.append("probe"),
     )
     invalid = run_guardian_close(
         now=morning,
@@ -958,7 +978,9 @@ def test_wrong_session_date_and_invalid_witness_are_refused(monkeypatch, tmp_pat
         witness={"source": "vnindex_daily_bar", "bar_session": "", "probe_error": "NO_BAR"},
         project_root=project,
     )
-    assert invalid["reason"] == "SESSION_EVIDENCE_ABSENT"
+    # Before 09:00 the live witness is not consulted. The freeze clock is.
+    assert invalid["reason"] == "STALE_FREEZE"
+    assert probes == []
     assert calls == []
     assert not (tmp_path / "witness" / "sessions").exists()
 

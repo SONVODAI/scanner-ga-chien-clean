@@ -80,7 +80,8 @@ def load_persisted_scan(project_root: Path, session: str, tracked: tuple[str, ..
 def load_agreed_freeze(project_root: Path, session: str, tracked: tuple[str, ...]) -> dict:
     """Return one close payload from the append-only freeze, or a refusal.
 
-    The observation clock is ``frozen_at``. This does not read
+    The observation clock is ``frozen_at``. The session witness is the stamp
+    written with those rows. This does not read ``observations.csv`` or
     ``earning_money_snapshots.csv``, does not scan, and does not fill gaps.
     """
     try:
@@ -90,10 +91,7 @@ def load_agreed_freeze(project_root: Path, session: str, tracked: tuple[str, ...
     freeze_path = Path(project_root) / FREEZE_FILE
     if not freeze_path.is_file():
         return _freeze_refusal("FREEZE_ABSENT")
-    freeze = _read_freeze_table(
-        freeze_path,
-        ("trade_date", "symbol", "frozen_at", "market_real", *INPUTS),
-    )
+    freeze = _read_freeze_frame(freeze_path)
     if freeze is None:
         return _freeze_refusal("FREEZE_UNVERIFIED")
     try:
@@ -114,9 +112,11 @@ def load_agreed_freeze(project_root: Path, session: str, tracked: tuple[str, ...
     market = _single_market(selected["market_real"])
     if not isinstance(market, float):
         return _freeze_refusal("FREEZE_MISMATCH")
-    agreed = _observations_agree(Path(project_root), day.isoformat(), selected, tracked, market)
-    if agreed:
-        return _freeze_refusal(agreed)
+    from research.guardian_research.freeze_witness import verify_persisted_witness
+
+    witness, witness_reason = verify_persisted_witness(selected, day.isoformat())
+    if witness_reason:
+        return _freeze_refusal(witness_reason)
     frame = pd.DataFrame(
         {
             "symbol": symbols,
@@ -141,6 +141,7 @@ def load_agreed_freeze(project_root: Path, session: str, tracked: tuple[str, ...
             "absent": [],
             "errors": [],
         },
+        "session_witness": witness,
         "freeze_source": FREEZE_FILE.as_posix(),
     }
 
@@ -154,6 +155,18 @@ def _read_freeze_table(path: Path, columns: tuple[str, ...]) -> pd.DataFrame | N
         return pd.read_csv(path, usecols=list(columns))
     except (OSError, ValueError):
         return None
+
+
+def _read_freeze_frame(path: Path) -> pd.DataFrame | None:
+    """Read a freeze file without requiring witness columns it may not have."""
+    required = ("trade_date", "symbol", "frozen_at", "market_real", *INPUTS)
+    try:
+        frame = pd.read_csv(path)
+    except (OSError, ValueError, pd.errors.EmptyDataError, pd.errors.ParserError):
+        return None
+    if any(column not in frame.columns for column in required):
+        return None
+    return frame
 
 
 def _freeze_symbol_reason(symbols: list[str], tracked: tuple[str, ...]) -> str | None:
@@ -188,36 +201,6 @@ def _freeze_observed_at(values, session: date) -> tuple[str | None, str | None]:
     if stamp.tzinfo is None:
         return None, "STALE_FREEZE"
     return stamp.isoformat(), None
-
-
-def _observations_agree(
-    project_root: Path,
-    session: str,
-    freeze: pd.DataFrame,
-    tracked: tuple[str, ...],
-    market: float,
-) -> str | None:
-    path = project_root / OBSERVATION_FILE
-    if not path.is_file():
-        return "FREEZE_UNVERIFIED"
-    table = _read_freeze_table(path, ("trade_date", "symbol", "market_real", *INPUTS))
-    if table is None:
-        return "FREEZE_UNVERIFIED"
-    try:
-        selected = _session_rows(table, "trade_date", session)
-    except ArchiveRejected:
-        return "FREEZE_UNVERIFIED"
-    if selected.empty:
-        return "FREEZE_UNVERIFIED"
-    symbols = _symbols(selected["symbol"])
-    if _freeze_symbol_reason(symbols, tracked):
-        return "FREEZE_MISMATCH"
-    if not _inputs_complete(selected) or not _same_inputs(freeze, selected):
-        return "FREEZE_MISMATCH"
-    other = _single_market(selected["market_real"])
-    if not isinstance(other, float) or not _market_agrees(market, other):
-        return "FREEZE_MISMATCH"
-    return None
 
 
 def _market_real(project_root: Path, session: str, snapshot: pd.DataFrame, tracked: tuple[str, ...]):

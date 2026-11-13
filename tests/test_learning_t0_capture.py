@@ -172,8 +172,19 @@ class T0FreezeTests(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.data_dir = Path(self.temp_dir.name) / "earning_learning"
         self.data_dir.mkdir(parents=True)
+        from research.guardian_research import session_authority
+
+        self._probe = session_authority.probe_vnindex
+        session_authority.probe_vnindex = lambda _session: {
+            "source": "vnindex_daily_bar",
+            "bar_session": "",
+            "probe_error": "TEST_DISABLED",
+        }
 
     def tearDown(self):
+        from research.guardian_research import session_authority
+
+        session_authority.probe_vnindex = self._probe
         self.temp_dir.cleanup()
 
     def _run_learning(
@@ -346,6 +357,21 @@ class StormRankingUnchangedTests(unittest.TestCase):
 
 class T0CaptureDemo(unittest.TestCase):
     """Section 8 dry-run: print one fully populated observation row."""
+
+    def setUp(self):
+        from research.guardian_research import session_authority
+
+        self._probe = session_authority.probe_vnindex
+        session_authority.probe_vnindex = lambda _session: {
+            "source": "vnindex_daily_bar",
+            "bar_session": "",
+            "probe_error": "TEST_DISABLED",
+        }
+
+    def tearDown(self):
+        from research.guardian_research import session_authority
+
+        session_authority.probe_vnindex = self._probe
 
     def test_demo_new_observation_row(self):
         canonical = _adapt_board(_learning_input(), market_context=_market_context())

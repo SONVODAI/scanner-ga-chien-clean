@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -17,6 +17,7 @@ import pandas as pd
 from research.guardian_research.collector import ENABLE_ENV
 from research.guardian_research.indicators import finite_number
 from research.guardian_research.session_authority import (
+    NEXT_OPEN,
     WITNESS_SOURCE,
     assess_seal_window,
     probe_vnindex,
@@ -34,7 +35,11 @@ def run_guardian_close(
     witness: dict | None = None,
     project_root: Path | None = None,
 ) -> dict:
-    """Seal the VNINDEX bar session. The job clock does not name that session."""
+    """Seal one Guardian session.
+
+    Before 09:00 ICT the session is the previous calendar date and the witness
+    is the freeze stamp. From 09:00 onward the VNINDEX probe names the session.
+    """
     if os.environ.get(ENABLE_ENV) != "true":
         return _public("disabled", "ENABLE_FLAG_OFF")
     from modules.intraday_execution_boundary import VN_TZ, as_vn
@@ -42,6 +47,12 @@ def run_guardian_close(
 
     local_now = as_vn(now or datetime.now(VN_TZ))
     root_path = Path(root) if root is not None else default_root()
+    repo = Path(project_root) if project_root is not None else Path(__file__).resolve().parents[2]
+    # Before 09:00 ICT the only open window is the previous calendar date.
+    # That seal reads the freeze stamp. It does not probe or scan.
+    if local_now.timetz().replace(tzinfo=None) < NEXT_OPEN:
+        session = (local_now.date() - timedelta(days=1)).isoformat()
+        return _seal_delayed_session(local_now, root_path, repo, session, symbols)
     # Probe + window + existing-seal check happen before any watchlist scan so
     # same-evening backup slots do not rescan or rewrite an immutable T0.
     search_end = local_now.strftime("%Y-%m-%d")
@@ -58,16 +69,14 @@ def run_guardian_close(
     from research.guardian_research.universe import load_tracked_symbols
 
     tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
-    repo = Path(project_root) if project_root is not None else Path(__file__).resolve().parents[2]
-    # After ICT midnight the job must not rescan. The freeze clock is the
-    # observation time; the job clock is only the seal time.
+    # A session date before the job date is already past midnight. Do not scan.
     if local_now.strftime("%Y-%m-%d") > session:
-        return _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted)
+        return _seal_from_freeze(local_now, root_path, repo, session, tracked)
     payload = _load_close_scan(local_now, close_scan)
     sealed = _seal_scan_payload(payload, local_now, root_path, session, tracked, accepted)
     if sealed.get("status") in {"created", "unchanged"}:
         return sealed
-    frozen = _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted)
+    frozen = _seal_from_freeze(local_now, root_path, repo, session, tracked)
     if frozen.get("status") in {"created", "unchanged"}:
         return frozen
     return sealed
@@ -97,8 +106,22 @@ def _seal_scan_payload(payload, local_now, root_path, session, tracked, accepted
     return _capture(payload, local_now, root_path, session, tracked)
 
 
-def _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted) -> dict:
-    """Seal an already frozen session. This does not scan or reconstruct."""
+def _seal_delayed_session(local_now, root_path, repo, session, symbols) -> dict:
+    """Seal yesterday from its freeze stamp. No probe and no watchlist scan."""
+    window_ok, window_reason = assess_seal_window(local_now, session)
+    if not window_ok:
+        return _public("refused", window_reason, session=session)
+    existing = _existing_seal_without_scan(root_path, session)
+    if existing is not None:
+        return existing
+    from research.guardian_research.universe import load_tracked_symbols
+
+    tracked = tuple(symbols) if symbols is not None else load_tracked_symbols()
+    return _seal_from_freeze(local_now, root_path, repo, session, tracked)
+
+
+def _seal_from_freeze(local_now, root_path, repo, session, tracked) -> dict:
+    """Seal an already frozen session from its own witness. This does not scan."""
     from research.guardian_research.scan_archive import load_agreed_freeze
 
     loaded = load_agreed_freeze(repo, session, tracked)
@@ -109,7 +132,7 @@ def _seal_from_freeze(local_now, root_path, repo, session, tracked, accepted) ->
         return _public("refused", reason, session=session)
     payload = dict(loaded)
     payload["trade_date"] = session
-    payload["session_witness"] = accepted
+    payload["session_witness"] = loaded.get("session_witness")
     blocker = _input_blocker(payload, tracked)
     if blocker:
         return _public("refused", blocker, session=session)
