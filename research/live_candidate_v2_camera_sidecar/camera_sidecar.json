@@ -23,8 +23,8 @@
     "eligible_from"
   ],
   "session": "2026-11-16",
-  "observed_at": "2026-11-16T20:55:08.945414+07:00",
-  "generated_at": "2026-11-16T20:55:08.945414+07:00",
+  "observed_at": "2026-11-16T21:42:29.240770+07:00",
+  "generated_at": "2026-11-16T21:42:29.240770+07:00",
   "market_real": 3.6,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
@@ -9579,7 +9579,7 @@
       "symbol": "NT2",
       "session": "2026-11-16",
       "candidate_first_seen_ts": "2026-11-13T14:44:22Z",
-      "candidate_updated_ts": "2026-11-16T20:55:08.945414+07:00",
+      "candidate_updated_ts": "2026-11-16T21:42:29.240770+07:00",
       "eligible_from": "2026-11-16T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -9656,7 +9656,7 @@
       "symbol": "VGS",
       "session": "2026-11-16",
       "candidate_first_seen_ts": "2026-11-13T14:44:22Z",
-      "candidate_updated_ts": "2026-11-16T20:55:08.945414+07:00",
+      "candidate_updated_ts": "2026-11-16T21:42:29.240770+07:00",
       "eligible_from": "2026-11-16T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
