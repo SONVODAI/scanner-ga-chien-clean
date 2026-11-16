@@ -2,19 +2,35 @@
 
 Reads snapshots and, when present, the approximate reference store.
 It does not write a snapshot, invent a session, or mix price bases.
+
+A DELAYED seal stays labeled DELAYED. It is measured only when its own
+observation clock, witness, freeze, and snapshot still agree. BACKFILLED
+seals stay out of the table.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime, time, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import pandas as pd
 
 from research.approximate_returns.contract import PRICE_BASIS, SCHEMA_REFERENCE
 from research.approximate_returns.reference import index_store
 from research.approximate_returns.report import _performance
-from research.guardian_research.contract import FORWARD_CALENDAR, FORWARD_HORIZONS
+from research.guardian_research.contract import FORWARD_CALENDAR, FORWARD_HORIZONS, FORWARD_OUTCOMES
 from research.guardian_research.forward import measure_snapshot
+from research.guardian_research.freeze_witness import (
+    HASH_FIELDS,
+    PROVENANCE,
+    WITNESS_SOURCE,
+    canonical_number,
+    verify_persisted_witness,
+)
+from research.guardian_research.indicators import finite_number
 from research.guardian_research.snapshot import read_snapshot
 
 SCHEMA = "guardian_research_outcomes.v1"
@@ -22,6 +38,9 @@ STORE_NAME = "reference_store.json"
 VIEW_NAME = "outcomes.json"
 CLASS_ORDER = ("HOLD", "WATCH", "SELL", "UNAVAILABLE")
 HORIZON_LABELS = tuple(f"T+{step}" for step in FORWARD_HORIZONS)
+ICT = ZoneInfo("Asia/Ho_Chi_Minh")
+CANONICAL_CLOSE = time(18, 0)
+OBSERVATION_PROVENANCE = "close_scan.observed_at"
 
 
 def refresh_outcomes(root: Path | None = None, store_path: Path | None = None, destination: Path | None = None) -> dict:
@@ -43,16 +62,34 @@ def refresh_outcomes(root: Path | None = None, store_path: Path | None = None, d
     }
 
 
-def build_outcomes(root: Path, store: dict | None) -> dict:
+def build_outcomes(root: Path, store: dict | None, freeze_path: Path | None = None) -> dict:
     documents = _load_sealed(root)
     contemporaneous = [doc for doc in documents if doc.get("observation_origin") == "CONTEMPORANEOUS"]
     backfilled = [doc for doc in documents if doc.get("observation_origin") == "BACKFILLED"]
+    freeze = _read_freeze(root, freeze_path)
+    admitted = []
+    delayed_included = []
+    delayed_excluded = []
+    for document in documents:
+        origin = document.get("observation_origin")
+        session = document.get("session")
+        if origin == "CONTEMPORANEOUS":
+            admitted.append(document)
+            continue
+        if origin != "DELAYED":
+            continue
+        reason = delayed_admission_reason(document, freeze)
+        if reason is None:
+            delayed_included.append(session)
+            admitted.append(document)
+        else:
+            delayed_excluded.append({"session": session, "reason": reason})
     accepted, store_status = _accept_store(store)
-    measured = bool(contemporaneous) and accepted is not None
+    measured = bool(admitted) and accepted is not None
     rows = []
     if measured:
         lookup = index_store(accepted)
-        for document in contemporaneous:
+        for document in admitted:
             view = measure_snapshot(document, accepted)
             by_symbol = {row.get("symbol"): row for row in document.get("rows") or []}
             for item in view["rows"]:
@@ -74,7 +111,7 @@ def build_outcomes(root: Path, store: dict | None) -> dict:
                     "horizons": horizons,
                 })
     else:
-        for document in contemporaneous:
+        for document in admitted:
             for source in document.get("rows") or []:
                 rows.append({
                     "session": document.get("session"),
@@ -96,6 +133,8 @@ def build_outcomes(root: Path, store: dict | None) -> dict:
         "calendar_status": "REFERENCE_STORE" if measured else "UNAVAILABLE",
         "sealed_sessions": [_session_fact(doc) for doc in documents],
         "contemporaneous_sessions": [doc.get("session") for doc in contemporaneous],
+        "delayed_sessions_included": delayed_included,
+        "delayed_sessions_excluded": delayed_excluded,
         "backfilled_sessions_excluded": [doc.get("session") for doc in backfilled],
         "classifications": _by_class(rows),
         "tenure": _tenure_summary(rows),
@@ -105,6 +144,174 @@ def build_outcomes(root: Path, store: dict | None) -> dict:
     }
     view["content_sha256"] = _digest(view)
     return view
+
+
+def delayed_admission_reason(document: dict, freeze: pd.DataFrame | None) -> str | None:
+    """Return why a DELAYED snapshot stays out of T+, or None when it may enter.
+
+    The snapshot file is not rewritten and its origin label is not changed.
+    """
+    session = str(document.get("session") or "")
+    clock = _observation_clock_reason(document.get("reconstruction"), session)
+    if clock:
+        return clock
+    witness = _snapshot_witness_reason(document.get("session_witness"), session)
+    if witness:
+        return witness
+    rows = document.get("rows")
+    coverage = _coverage_reason(document, rows, session)
+    if coverage:
+        return coverage
+    if freeze is None:
+        return "FREEZE_ABSENT"
+    return _freeze_agreement_reason(document, rows, freeze, session)
+
+
+def _observation_clock_reason(reconstruction, session: str) -> str | None:
+    if not isinstance(reconstruction, dict):
+        return "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    if reconstruction.get("timestamp_provenance") != OBSERVATION_PROVENANCE:
+        return "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    observed = _aware(reconstruction.get("observation_at"))
+    if observed is None:
+        return "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    local = observed.astimezone(ICT)
+    if local.strftime("%Y-%m-%d") != session or local.weekday() >= 5 or local.time() < CANONICAL_CLOSE:
+        return "CLOCK_REJECTED"
+    sealed = _aware(reconstruction.get("sealed_at"))
+    if sealed is None or sealed < observed:
+        return "SEAL_UNVERIFIED"
+    return None
+
+
+def _snapshot_witness_reason(witness, session: str) -> str | None:
+    if not isinstance(witness, dict) or not all(witness.get(key) for key in ("source", "bar_session", "provenance")):
+        return "WITNESS_ABSENT"
+    if witness.get("source") != WITNESS_SOURCE or witness.get("provenance") != PROVENANCE:
+        return "WITNESS_INVALID"
+    if witness.get("bar_session") != session:
+        return "WITNESS_INCONSISTENT"
+    if witness.get("observation_provenance") != OBSERVATION_PROVENANCE:
+        return "OBSERVATION_TIMESTAMP_NOT_INDEPENDENT"
+    return None
+
+
+def _coverage_reason(document: dict, rows, session: str) -> str | None:
+    if document.get("portfolio_decision") is not False or not isinstance(rows, list) or not rows:
+        return "INCOMPLETE_INPUT"
+    tracked = document.get("tracked_count")
+    symbols = []
+    for row in rows:
+        if not isinstance(row, dict) or row.get("portfolio_decision") is not False:
+            return "INCOMPLETE_INPUT"
+        if row.get("session") != session:
+            return "SESSION_MISMATCH"
+        symbol = str(row.get("symbol") or "").strip().upper()
+        if not symbol:
+            return "INCOMPLETE_INPUT"
+        symbols.append(symbol)
+        if not _inputs_match_reference(row):
+            return "INCOMPLETE_INPUT"
+        if not _forward_is_unverified(row.get("forward")):
+            return "LOOKAHEAD"
+    if len(symbols) != len(set(symbols)) or tracked != len(symbols):
+        return "INCOMPLETE_INPUT"
+    return None
+
+
+def _inputs_match_reference(row: dict) -> bool:
+    inputs = row.get("inputs")
+    if not isinstance(inputs, dict):
+        return False
+    for field in HASH_FIELDS:
+        if field == "market_real":
+            continue
+        if finite_number(inputs.get(field)) is None:
+            return False
+    if finite_number(row.get("market_real")) is None:
+        return False
+    return canonical_number(row.get("reference_price")) == canonical_number(inputs.get("price"))
+
+
+def _forward_is_unverified(forward) -> bool:
+    if not isinstance(forward, dict) or forward.get("status") != "UNVERIFIED":
+        return False
+    horizons = forward.get("horizons")
+    if not isinstance(horizons, dict):
+        return False
+    for label in HORIZON_LABELS:
+        cell = horizons.get(label)
+        if not isinstance(cell, dict):
+            return False
+        if any(cell.get(name) is not None for name in FORWARD_OUTCOMES):
+            return False
+    return True
+
+
+def _freeze_agreement_reason(document: dict, rows: list, freeze: pd.DataFrame, session: str) -> str | None:
+    if "trade_date" not in freeze.columns or "symbol" not in freeze.columns:
+        return "FREEZE_ABSENT"
+    selected = freeze.loc[freeze["trade_date"].astype(str).str.slice(0, 10) == session].copy()
+    if selected.empty:
+        return "FREEZE_ABSENT"
+    symbols = [str(value).strip().upper() for value in selected["symbol"]]
+    wanted = {str(row.get("symbol") or "").strip().upper() for row in rows}
+    if len(symbols) != len(set(symbols)) or set(symbols) != wanted:
+        return "FREEZE_MISMATCH"
+    observed = str((document.get("reconstruction") or {}).get("observation_at") or "")
+    frozen_values = {str(value) for value in selected["frozen_at"]} if "frozen_at" in selected.columns else set()
+    if len(frozen_values) != 1 or not _same_instant(next(iter(frozen_values)), observed):
+        return "FREEZE_MISMATCH"
+    by_symbol = {}
+    for _, item in selected.iterrows():
+        by_symbol[str(item.get("symbol") or "").strip().upper()] = item
+    market = canonical_number((document.get("market") or {}).get("market_real"))
+    for row in rows:
+        symbol = str(row.get("symbol") or "").strip().upper()
+        stored = by_symbol[symbol]
+        if canonical_number(stored.get("market_real")) != canonical_number(row.get("market_real")):
+            return "FREEZE_MISMATCH"
+        if market is not None and canonical_number(stored.get("market_real")) != market:
+            return "FREEZE_MISMATCH"
+        inputs = row.get("inputs") or {}
+        for field in HASH_FIELDS:
+            if field == "market_real":
+                continue
+            if canonical_number(stored.get(field)) != canonical_number(inputs.get(field)):
+                return "FREEZE_MISMATCH"
+    _witness, reason = verify_persisted_witness(selected, session)
+    return reason
+
+
+def _aware(value) -> datetime | None:
+    try:
+        parsed = datetime.fromisoformat(str(value or ""))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed
+
+
+def _same_instant(left: str, right: str) -> bool:
+    first = _aware(left)
+    second = _aware(right)
+    if first is None or second is None:
+        return False
+    return first.astimezone(timezone.utc) == second.astimezone(timezone.utc)
+
+
+def _read_freeze(root: Path, freeze_path: Path | None) -> pd.DataFrame | None:
+    path = Path(freeze_path) if freeze_path is not None else Path(root).parent / "earning_learning" / "t0_observation_freeze.csv"
+    if not path.is_file():
+        return None
+    try:
+        frame = pd.read_csv(path)
+    except (OSError, UnicodeError, ValueError, pd.errors.ParserError, pd.errors.EmptyDataError):
+        return None
+    if not isinstance(frame, pd.DataFrame) or frame.empty:
+        return None
+    return frame
 
 
 def read_outcomes(path: Path | None = None) -> dict | None:

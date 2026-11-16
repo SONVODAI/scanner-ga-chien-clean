@@ -469,6 +469,26 @@ def _read_local_text(path: Path) -> Optional[str]:
         return path.read_text(encoding="utf-8")
 
 
+def _freeze_put_receipt(response: Any) -> Dict[str, Any]:
+    """Keep the blob id and size GitHub returns for the uploaded bytes."""
+    body: Dict[str, Any] = {}
+    try:
+        parsed = response.json()
+    except Exception:
+        parsed = None
+    if isinstance(parsed, dict):
+        body = parsed
+    content = body.get("content") if isinstance(body.get("content"), dict) else {}
+    commit = body.get("commit") if isinstance(body.get("commit"), dict) else {}
+    size = content.get("size")
+    return {
+        "http_status": int(response.status_code),
+        "content_sha": content.get("sha") if isinstance(content.get("sha"), str) else None,
+        "size": size if isinstance(size, int) and not isinstance(size, bool) else None,
+        "commit_sha": commit.get("sha") if isinstance(commit.get("sha"), str) else None,
+    }
+
+
 def _csv_to_text(df: pd.DataFrame) -> str:
     return df.to_csv(index=False, encoding="utf-8-sig")
 
@@ -791,8 +811,13 @@ class GitHubLocalStorage:
         text: str,
         sha: Optional[str],
         commit_message: str,
-    ) -> None:
-        """PUT once. A 409 or 422 raises and does not retry the stale body."""
+    ) -> Dict[str, Any]:
+        """PUT once and return the Contents API receipt.
+
+        A 409 or 422 raises and does not retry the stale body. The receipt is
+        not proof by itself: the caller still checks the blob id, the byte
+        size, and the parsed rows.
+        """
         from modules.learning_t0_capture import FreezeConflict
 
         payload: Dict[str, Any] = {
@@ -815,6 +840,7 @@ class GitHubLocalStorage:
                 f"GitHub write failed: HTTP {response.status_code} "
                 f"{response.text[:300]}"
             )
+        return _freeze_put_receipt(response)
 
     def read_text(self, filename: str) -> StorageReadResult:
         github_error: Optional[str] = None
