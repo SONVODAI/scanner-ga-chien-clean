@@ -273,10 +273,10 @@
           "win_rate_above_5pct": null
         },
         "T+3": {
-          "adverse_close_path_average_pct": -1.2981,
+          "adverse_close_path_average_pct": -1.2921,
           "adverse_close_path_worst_pct": -6.5421,
           "adverse_sample": 147,
-          "average_return_pct": -0.4682,
+          "average_return_pct": -0.4623,
           "discontinuity": 0,
           "downside_p10_pct": -3.6578,
           "downside_p25_pct": -2.0408,
@@ -660,7 +660,7 @@
     "2026-11-06",
     "2026-11-11"
   ],
-  "content_sha256": "1fae392b91451504c91837e1bc2ca53fb47eb3aa37cb55ddd013e7a893cbab0f",
+  "content_sha256": "67f09a28305d2bdaf686c9afa3eab149e4763c839ba8a293f9b547bed01059d1",
   "delayed_sessions_excluded": [],
   "delayed_sessions_included": [
     "2026-11-16"
@@ -14476,10 +14476,10 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": -1.7544,
+          "adverse_close_path_pct": -0.8772,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": -1.754386,
+          "return_pct": -0.877193,
           "status": "APPROX_AVAILABLE"
         },
         "T+5": {
