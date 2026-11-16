@@ -15,7 +15,12 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 from modules.earning_learning import _csv_to_text, _hash_payload
-from modules.learning_t0_capture import FreezeConflict, commit_qualified_freeze, qualify_t0_freeze_batch
+from modules.learning_t0_capture import (
+    FreezeConflict,
+    commit_qualified_freeze,
+    git_blob_sha1,
+    qualify_t0_freeze_batch,
+)
 from position_guardian import generate_signal
 from research.guardian_research.classify import classification_version
 from research.guardian_research.close_job import run_guardian_close
@@ -496,3 +501,231 @@ def test_production_freeze_and_sealed_sessions_are_byte_stable():
     assert before == hashlib.sha256(freeze.read_bytes()).hexdigest()
     assert session_bytes == {path.name: path.read_bytes() for path in sessions.glob("*.json")}
     assert not (sessions / "2026-11-13.json").exists()
+
+
+class _ReceiptRemote(_Remote):
+    """Contents PUT double. The read can stay on the pre-write body."""
+
+    def __init__(self, folder: Path, *, bind: bool = True, publish_read: bool = True):
+        super().__init__(folder)
+        self.bind = bind
+        self.publish_read = publish_read
+        self.reads = 0
+
+    def read_content_cas(self, filename):
+        self.reads += 1
+        return super().read_content_cas(filename)
+
+    def write_content_cas_once(self, _filename, text, sha, _message):
+        self.attempts.append(text)
+        if self.conflicts:
+            self.conflicts -= 1
+            raise FreezeConflict("HTTP 409")
+        if sha != self.sha:
+            raise FreezeConflict("stale sha")
+        self.stored.append(text)
+        if self.publish_read:
+            self.text = text
+            self.sha = "sha-stored"
+        raw = text.encode("utf-8")
+        if not self.bind:
+            return {"http_status": 201, "content_sha": "0" * 40, "size": len(raw), "commit_sha": "unbound"}
+        return {
+            "http_status": 201,
+            "content_sha": git_blob_sha1(text),
+            "size": len(raw),
+            "commit_sha": "bound",
+        }
+
+
+def _commit(remote, observations):
+    return commit_qualified_freeze(
+        remote,
+        observations,
+        expected_symbols=tuple(observations["symbol"].astype(str)),
+        witness_probe=_probe,
+        frozen_at=FROZEN_AT,
+    )
+
+
+def test_put_succeeds_when_the_following_get_is_stale(tmp_path: Path):
+    remote = _ReceiptRemote(tmp_path, publish_read=False)
+    result = _commit(remote, _board(("HPG",)))
+    assert result["ok"] is True
+    assert result["reason"] == "APPENDED"
+    assert result["added"] == 1
+    assert len(remote.stored) == 1
+    assert remote.text is None
+    assert remote.reads == 1
+    assert str(result["frame"]["symbol"].iloc[0]) == "HPG"
+    assert (tmp_path / "t0_observation_freeze.csv").read_text(encoding="utf-8") == remote.stored[0]
+
+
+def test_http_success_without_a_binding_receipt_is_not_accepted(tmp_path: Path):
+    remote = _ReceiptRemote(tmp_path, bind=False, publish_read=False)
+    result = _commit(remote, _board(("HPG",)))
+    assert result["ok"] is False
+    assert result["reason"] == "FREEZE_UNVERIFIED"
+    assert len(remote.stored) == 1
+    assert remote.reads == 1
+    assert not (tmp_path / "t0_observation_freeze.csv").exists()
+
+
+def test_http_success_does_not_skip_the_integrity_check(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr("modules.learning_t0_capture._rows_preserved", lambda *_args, **_kwargs: False)
+    remote = _ReceiptRemote(tmp_path, publish_read=False)
+    result = _commit(remote, _board(("HPG",)))
+    assert result["reason"] == "FREEZE_UNVERIFIED"
+    assert len(remote.attempts) == 1
+
+
+def test_identical_existing_freeze_is_not_uploaded(tmp_path: Path):
+    observations = _board(("HPG",))
+    frame, added, reason = qualify_t0_freeze_batch(
+        pd.DataFrame(),
+        observations,
+        witness_probe=_probe,
+        frozen_at=FROZEN_AT,
+        expected_symbols=("HPG",),
+    )
+    assert reason == "APPENDED" and added == 1
+    remote = _ReceiptRemote(tmp_path)
+    remote.text = _csv_to_text(frame)
+    remote.sha = "stored"
+    result = _commit(remote, observations)
+    assert result["ok"] is True
+    assert result["reason"] == "UNCHANGED"
+    assert result["added"] == 0
+    assert remote.attempts == []
+
+
+def test_same_observation_id_with_different_content_keeps_the_original(tmp_path: Path):
+    observations = _board(("HPG",))
+    frame, _added, reason = qualify_t0_freeze_batch(
+        pd.DataFrame(),
+        observations,
+        witness_probe=_probe,
+        frozen_at=FROZEN_AT,
+        expected_symbols=("HPG",),
+    )
+    assert reason == "APPENDED"
+    changed = observations.copy()
+    changed.loc[changed["symbol"] == "HPG", "price"] = 99
+    remote = _ReceiptRemote(tmp_path)
+    remote.text = _csv_to_text(frame)
+    remote.sha = "stored"
+    result = _commit(remote, changed)
+    assert result["ok"] is True
+    assert result["reason"] == "UNCHANGED"
+    assert result["added"] == 0
+    assert remote.attempts == []
+    assert float(result["frame"].loc[result["frame"]["symbol"] == "HPG", "price"].iloc[0]) == 26.0
+
+
+def test_confirmation_checks_the_new_session_when_older_rows_have_no_witness(tmp_path: Path):
+    identity = _hash_payload(("2026-11-11", "HPG"))
+    remote = _ReceiptRemote(tmp_path, publish_read=False)
+    remote.text = _historical("HPG", "2026-11-11", 10.0, identity)
+    remote.sha = "older"
+    result = _commit(remote, _board(("HPG",)))
+    assert result["ok"] is True
+    assert result["reason"] == "APPENDED"
+    assert result["added"] == 1
+    assert len(remote.stored) == 1
+    assert float(result["frame"].loc[result["frame"]["trade_date"].astype(str).str.slice(0, 10) == "2026-11-11", "price"].iloc[0]) == 10.0
+
+
+def test_witness_missing_or_wrong_date_stores_nothing():
+    missing, added, reason = qualify_t0_freeze_batch(
+        pd.DataFrame(),
+        _board(("HPG",)),
+        witness_probe=lambda _session: None,
+        frozen_at=FROZEN_AT,
+        expected_symbols=("HPG",),
+    )
+    assert reason == "WITNESS_ABSENT" and added == 0 and missing.empty
+    wrong_day, added, reason = qualify_t0_freeze_batch(
+        pd.DataFrame(),
+        _board(("HPG",)),
+        witness_probe=lambda _session: {"source": "vnindex_daily_bar", "bar_session": "2026-11-11", "probe_error": None},
+        frozen_at=FROZEN_AT,
+        expected_symbols=("HPG",),
+    )
+    assert reason == "WITNESS_ABSENT" and added == 0 and wrong_day.empty
+
+
+def test_verified_put_seals_in_the_same_run_when_reread_is_stale(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    project = tmp_path / "repo"
+    remote = _ReceiptRemote(project / "data" / "earning_learning", publish_read=False)
+    monkeypatch.setattr("modules.earning_learning._make_storage", lambda _folder: remote)
+    observed = datetime(2026, 11, 12, 18, 20, tzinfo=VN)
+    result = run_guardian_close(
+        now=observed,
+        root=tmp_path / "seal",
+        close_scan=lambda: _payload(("HPG",), observed_at=observed.isoformat(), day=SESSION),
+        symbols=("HPG",),
+        witness=_probe(SESSION),
+        project_root=project,
+    )
+    assert result["status"] == "created"
+    assert result["reason"] == "ok"
+    assert len(remote.stored) == 1
+    assert remote.text is None
+    snapshot = read_snapshot(Path(result["path"]))
+    assert snapshot["observation_origin"] == "CONTEMPORANEOUS"
+    assert snapshot["tracked_count"] == 1
+    assert snapshot["rows"][0]["inputs"]["price"] == 26.0
+
+
+def test_failed_1820_run_is_sealed_by_2000_and_a_rerun_does_not_rewrite(monkeypatch, tmp_path: Path):
+    _enable(monkeypatch)
+    project = tmp_path / "repo"
+    remote = _ReceiptRemote(project / "data" / "earning_learning", bind=False, publish_read=False)
+    monkeypatch.setattr("modules.earning_learning._make_storage", lambda _folder: remote)
+    first_clock = datetime(2026, 11, 12, 18, 20, tzinfo=VN)
+    payload = _payload(("HPG",), observed_at=first_clock.isoformat(), day=SESSION)
+    first = run_guardian_close(
+        now=first_clock,
+        root=tmp_path / "seal",
+        close_scan=lambda: payload,
+        symbols=("HPG",),
+        witness=_probe(SESSION),
+        project_root=project,
+    )
+    assert first["status"] == "refused"
+    assert first["reason"] == "FREEZE_UNVERIFIED"
+    assert len(remote.stored) == 1
+    freeze_path = project / "data" / "earning_learning" / "t0_observation_freeze.csv"
+    assert not freeze_path.exists()
+    freeze_path.parent.mkdir(parents=True, exist_ok=True)
+    freeze_path.write_text(remote.stored[0], encoding="utf-8")
+    remote.text = remote.stored[0]
+    remote.sha = "sha-stored"
+    second = run_guardian_close(
+        now=datetime(2026, 11, 12, 20, 0, tzinfo=VN),
+        root=tmp_path / "seal",
+        close_scan=lambda: _payload(("HPG",), price=99, observed_at=first_clock.isoformat(), day=SESSION),
+        symbols=("HPG",),
+        witness=_probe(SESSION),
+        project_root=project,
+    )
+    assert second["status"] == "created"
+    snapshot = read_snapshot(Path(second["path"]))
+    sealed = Path(second["path"]).read_bytes()
+    assert snapshot["observation_origin"] == "DELAYED"
+    assert snapshot["rows"][0]["inputs"]["price"] == 26.0
+    assert snapshot["reconstruction"]["observation_at"] == first_clock.isoformat()
+    third = run_guardian_close(
+        now=datetime(2026, 11, 12, 20, 30, tzinfo=VN),
+        root=tmp_path / "seal",
+        close_scan=lambda: _payload(("HPG",), price=99, observed_at=first_clock.isoformat(), day=SESSION),
+        symbols=("HPG",),
+        witness=_probe(SESSION),
+        project_root=project,
+    )
+    assert third["status"] == "unchanged"
+    assert third["content_sha256"] == second["content_sha256"]
+    assert Path(second["path"]).read_bytes() == sealed
+    assert len(remote.stored) == 1
+    assert freeze_path.read_text(encoding="utf-8") == remote.stored[0]

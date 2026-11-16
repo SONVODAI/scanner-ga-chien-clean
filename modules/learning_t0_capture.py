@@ -6,6 +6,7 @@ Preserves first-seen T0 DNA + market context without changing ranking engines.
 
 from __future__ import annotations
 
+import hashlib
 import math
 from datetime import time
 from pathlib import Path
@@ -215,7 +216,10 @@ def commit_qualified_freeze(
     """Write one qualified batch. A 409/422 rereads and reconciles.
 
     The shared learning CSV writer is not used. A conflict never uploads the
-    stale full file. Existing observation ids are preserved.
+    stale full file. Existing observation ids are preserved. A GitHub 200 or
+    201 is accepted only when the response blob id and size match the bytes
+    that were sent and those bytes still pass the row, id, and witness checks.
+    A successful response that fails those checks is not uploaded again.
     """
     from modules.earning_learning import T0_FREEZE_FILE, _csv_to_text, _text_to_csv
 
@@ -243,12 +247,19 @@ def commit_qualified_freeze(
         payload = _csv_to_text(merged)
         message = _freeze_commit_message(merged, existing, added)
         try:
-            _write_cas(storage, filename, payload, sha, message, github)
+            receipt = _write_cas(storage, filename, payload, sha, message, github)
         except FreezeConflict:
             continue
-        confirmed_text, _confirmed_sha = _read_cas(storage, filename, github)
-        confirmed = _text_to_csv(confirmed_text) if confirmed_text else pd.DataFrame()
-        if _rows_preserved(existing, confirmed) and _new_ids_present(merged, existing, confirmed):
+        bound = github and receipt is not None
+        if bound and not _receipt_binds(receipt, payload):
+            return _unverified(last_existing)
+        if bound:
+            confirmed_text = payload
+            confirmed = _text_to_csv(payload)
+        else:
+            confirmed_text, _confirmed_sha = _read_cas(storage, filename, github)
+            confirmed = _text_to_csv(confirmed_text) if confirmed_text else pd.DataFrame()
+        if _append_confirmed(existing, merged, confirmed):
             if github:
                 _refresh_local(storage, filename, confirmed_text or "")
             return {
@@ -257,12 +268,54 @@ def commit_qualified_freeze(
                 "reason": "APPENDED",
                 "frame": confirmed,
             }
+        if bound:
+            return _unverified(last_existing)
     return {
         "ok": False,
         "added": 0,
         "reason": "FREEZE_CONFLICT",
         "frame": last_existing,
     }
+
+
+def git_blob_sha1(text: str) -> str:
+    """Git blob id of the exact UTF-8 payload a Contents API PUT uploads."""
+    raw = text.encode("utf-8")
+    return hashlib.sha1(b"blob " + str(len(raw)).encode("ascii") + b"\0" + raw).hexdigest()
+
+
+def _unverified(frame: pd.DataFrame) -> dict:
+    return {
+        "ok": False,
+        "added": 0,
+        "reason": "FREEZE_UNVERIFIED",
+        "frame": frame,
+    }
+
+
+def _receipt_binds(receipt: Any, payload: str) -> bool:
+    """Bind a Contents response to the bytes that were uploaded.
+
+    The HTTP status is required and is not sufficient on its own.
+    """
+    if not isinstance(receipt, dict) or receipt.get("http_status") not in {200, 201}:
+        return False
+    sha = receipt.get("content_sha")
+    if not isinstance(sha, str) or len(sha) != 40:
+        return False
+    size = receipt.get("size")
+    raw = payload.encode("utf-8")
+    if isinstance(size, bool) or not isinstance(size, int) or size != len(raw):
+        return False
+    return sha == git_blob_sha1(payload)
+
+
+def _append_confirmed(existing: pd.DataFrame, merged: pd.DataFrame, confirmed: pd.DataFrame) -> bool:
+    return (
+        _rows_preserved(existing, confirmed)
+        and _new_ids_present(merged, existing, confirmed)
+        and _appended_witness_ok(confirmed, existing)
+    )
 
 
 def _batch_reason(
@@ -335,10 +388,9 @@ def _write_cas(
     sha: Optional[str],
     message: str,
     github: bool,
-) -> None:
+):
     if github:
-        storage.write_content_cas_once(filename, text, sha, message)
-        return
+        return storage.write_content_cas_once(filename, text, sha, message)
     from modules.earning_learning import _atomic_write_text, _read_local_text
 
     path = storage._local_path(filename)
@@ -392,6 +444,31 @@ def _rows_preserved(before: pd.DataFrame, after: pd.DataFrame) -> bool:
             if not _same_cell(row.get(column), stored.get(column), canonical_number):
                 return False
     return True
+
+
+def _appended_witness_ok(confirmed: pd.DataFrame, existing: pd.DataFrame) -> bool:
+    """Recompute the witness on the rows this write added.
+
+    Older rows in the same file may predate the witness columns. They are
+    not restamped and are not part of this check.
+    """
+    from research.guardian_research.freeze_witness import verify_persisted_witness
+
+    if confirmed is None or confirmed.empty or "observation_id" not in confirmed.columns:
+        return False
+    existing_ids = (
+        set(existing["observation_id"].astype(str))
+        if not existing.empty and "observation_id" in existing.columns
+        else set()
+    )
+    new_rows = confirmed.loc[~confirmed["observation_id"].astype(str).isin(existing_ids)].copy()
+    if new_rows.empty or "trade_date" not in new_rows.columns:
+        return False
+    sessions = {_session(value) for value in new_rows["trade_date"]}
+    if len(sessions) != 1 or "" in sessions:
+        return False
+    _witness, reason = verify_persisted_witness(new_rows, next(iter(sessions)))
+    return reason is None
 
 
 def _new_ids_present(merged: pd.DataFrame, existing: pd.DataFrame, confirmed: pd.DataFrame) -> bool:
