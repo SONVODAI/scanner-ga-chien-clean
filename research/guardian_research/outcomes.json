@@ -110,29 +110,29 @@
           "win_rate_above_5pct": null
         },
         "T+3": {
-          "adverse_close_path_average_pct": -0.8756,
-          "adverse_close_path_worst_pct": -3.3445,
-          "adverse_sample": 57,
-          "average_return_pct": 0.9999,
+          "adverse_close_path_average_pct": -1.7766,
+          "adverse_close_path_worst_pct": -6.1856,
+          "adverse_sample": 120,
+          "average_return_pct": -0.7532,
           "discontinuity": 0,
-          "downside_p10_pct": -0.8478,
-          "downside_p25_pct": 0.0,
+          "downside_p10_pct": -4.2029,
+          "downside_p25_pct": -3.3543,
           "evidence": "MEASURED",
-          "immature": 63,
-          "loss_rate": 0.2281,
-          "loss_rate_at_or_below_minus_3pct": 0.0,
-          "loss_rate_at_or_below_minus_5pct": 0.0,
-          "loss_rate_below_minus_3pct": 0.0,
-          "loss_rate_below_minus_5pct": 0.0,
-          "median_return_pct": 0.9346,
+          "immature": 0,
+          "loss_rate": 0.5083,
+          "loss_rate_at_or_below_minus_3pct": 0.2917,
+          "loss_rate_at_or_below_minus_5pct": 0.0333,
+          "loss_rate_below_minus_3pct": 0.2917,
+          "loss_rate_below_minus_5pct": 0.0333,
+          "median_return_pct": -0.1783,
           "missing": 0,
           "observations": 120,
-          "positive_return_rate": 0.7018,
-          "primary": 57,
+          "positive_return_rate": 0.4333,
+          "primary": 120,
           "review_discontinuity_count": 0,
           "truncated": 0,
           "unmeasured": 0,
-          "win_rate_above_3pct": 0.1228,
+          "win_rate_above_3pct": 0.0667,
           "win_rate_above_5pct": 0.0
         },
         "T+5": {
@@ -273,30 +273,30 @@
           "win_rate_above_5pct": null
         },
         "T+3": {
-          "adverse_close_path_average_pct": -0.8515,
+          "adverse_close_path_average_pct": -1.2981,
           "adverse_close_path_worst_pct": -6.5421,
-          "adverse_sample": 73,
-          "average_return_pct": 0.3547,
+          "adverse_sample": 147,
+          "average_return_pct": -0.4682,
           "discontinuity": 0,
-          "downside_p10_pct": -3.5003,
-          "downside_p25_pct": -0.4654,
+          "downside_p10_pct": -3.6578,
+          "downside_p25_pct": -2.0408,
           "evidence": "MEASURED",
-          "immature": 74,
-          "loss_rate": 0.2933,
-          "loss_rate_at_or_below_minus_3pct": 0.1333,
-          "loss_rate_at_or_below_minus_5pct": 0.0267,
-          "loss_rate_below_minus_3pct": 0.1333,
-          "loss_rate_below_minus_5pct": 0.0267,
-          "median_return_pct": 0.7792,
+          "immature": 0,
+          "loss_rate": 0.5235,
+          "loss_rate_at_or_below_minus_3pct": 0.1544,
+          "loss_rate_at_or_below_minus_5pct": 0.0403,
+          "loss_rate_below_minus_3pct": 0.1544,
+          "loss_rate_below_minus_5pct": 0.0336,
+          "median_return_pct": -0.3367,
           "missing": 6,
           "observations": 155,
-          "positive_return_rate": 0.6133,
-          "primary": 75,
+          "positive_return_rate": 0.4228,
+          "primary": 149,
           "review_discontinuity_count": 0,
           "truncated": 0,
           "unmeasured": 0,
-          "win_rate_above_3pct": 0.0933,
-          "win_rate_above_5pct": 0.0267
+          "win_rate_above_3pct": 0.0671,
+          "win_rate_above_5pct": 0.0134
         },
         "T+5": {
           "adverse_close_path_average_pct": -1.5103,
@@ -599,30 +599,30 @@
           "win_rate_above_5pct": null
         },
         "T+3": {
-          "adverse_close_path_average_pct": -0.3892,
-          "adverse_close_path_worst_pct": -2.7375,
-          "adverse_sample": 8,
-          "average_return_pct": 1.9189,
+          "adverse_close_path_average_pct": -0.9853,
+          "adverse_close_path_worst_pct": -5.0599,
+          "adverse_sample": 11,
+          "average_return_pct": 0.9617,
           "discontinuity": 0,
-          "downside_p10_pct": -1.0822,
-          "downside_p25_pct": 0.2558,
+          "downside_p10_pct": -1.4862,
+          "downside_p25_pct": -0.7427,
           "evidence": "MEASURED",
-          "immature": 3,
-          "loss_rate": 0.25,
-          "loss_rate_at_or_below_minus_3pct": 0.0,
-          "loss_rate_at_or_below_minus_5pct": 0.0,
-          "loss_rate_below_minus_3pct": 0.0,
-          "loss_rate_below_minus_5pct": 0.0,
-          "median_return_pct": 1.2549,
+          "immature": 0,
+          "loss_rate": 0.3636,
+          "loss_rate_at_or_below_minus_3pct": 0.0909,
+          "loss_rate_at_or_below_minus_5pct": 0.0909,
+          "loss_rate_below_minus_3pct": 0.0909,
+          "loss_rate_below_minus_5pct": 0.0909,
+          "median_return_pct": 0.8639,
           "missing": 0,
           "observations": 11,
-          "positive_return_rate": 0.75,
-          "primary": 8,
+          "positive_return_rate": 0.6364,
+          "primary": 11,
           "review_discontinuity_count": 0,
           "truncated": 0,
           "unmeasured": 0,
-          "win_rate_above_3pct": 0.25,
-          "win_rate_above_5pct": 0.125
+          "win_rate_above_3pct": 0.1818,
+          "win_rate_above_5pct": 0.0909
         },
         "T+5": {
           "adverse_close_path_average_pct": -0.5219,
@@ -660,7 +660,7 @@
     "2026-11-06",
     "2026-11-11"
   ],
-  "content_sha256": "2ce211515341e5938ebb8bff700dfcf3b7e54d1cb55cf3938df72ab2bffd93a5",
+  "content_sha256": "3e0afee4a290dcaa3c67f5ff80568d7b5689308ae803bcf7dfa68257b525b097",
   "evidence_status": "MEASURED",
   "false_sell": {
     "definition": "SELL research labels whose later same-basis return is positive. Not a portfolio order.",
@@ -700,11 +700,11 @@
       },
       "T+3": {
         "evidence": "MEASURED",
-        "fell": 0.2933,
-        "rose": 0.6133,
-        "rose_above_3pct": 0.0933,
-        "rose_above_5pct": 0.0267,
-        "sample": 75
+        "fell": 0.5235,
+        "rose": 0.4228,
+        "rose_above_3pct": 0.0671,
+        "rose_above_5pct": 0.0134,
+        "sample": 149
       },
       "T+5": {
         "evidence": "MEASURED",
@@ -8046,11 +8046,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2136,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.728155,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8097,11 +8097,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.269,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.269036,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8148,11 +8148,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.3898,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.389831,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8199,11 +8199,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.3824,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.382436,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8250,11 +8250,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8078,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.292407,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8301,11 +8301,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.8128,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.812825,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8352,11 +8352,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.4653,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.465331,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8403,11 +8403,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.5326,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.91954,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8454,11 +8454,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -6.1856,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -6.185567,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8505,11 +8505,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.1976,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.592885,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8556,11 +8556,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0093,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.854714,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8607,11 +8607,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.3957,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.395683,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8658,11 +8658,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.1667,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.166667,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8709,11 +8709,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.878,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.878049,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8760,11 +8760,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.947,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.946996,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8811,11 +8811,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8862,11 +8862,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.4585,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.458515,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8913,11 +8913,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 1.1268,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.126761,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -8964,11 +8964,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.8868,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.886792,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9015,11 +9015,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.1139,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.113924,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9066,11 +9066,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2346,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.234568,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9117,11 +9117,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.6667,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.166667,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9168,11 +9168,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.9355,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.935484,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9219,11 +9219,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.152905,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9270,11 +9270,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.6378,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 4.081633,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9321,11 +9321,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.8095,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.809524,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9372,11 +9372,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.2308,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.230769,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9423,11 +9423,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.2577,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.257732,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9474,11 +9474,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.0599,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.05992,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9525,11 +9525,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.0075,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.503759,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9576,11 +9576,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.0973,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.097345,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9627,11 +9627,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9678,11 +9678,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.5244,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.52439,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9729,11 +9729,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.3613,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.361345,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9831,11 +9831,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.5088,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.508772,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9933,11 +9933,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.947,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.946955,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -9984,11 +9984,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6757,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.675676,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10035,11 +10035,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.0505,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.050505,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10086,11 +10086,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.2849,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.284946,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10137,11 +10137,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.9062,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.4375,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10188,11 +10188,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7021,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.702128,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10239,11 +10239,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.1454,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.145414,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10290,11 +10290,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.842,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.842049,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10341,11 +10341,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.5597,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.559701,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10392,11 +10392,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0408,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.040816,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10443,11 +10443,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.365,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.364964,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10494,11 +10494,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.4896,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.489627,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10545,11 +10545,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0776,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.862069,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10596,11 +10596,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8889,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.888889,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10647,11 +10647,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.1985,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.198473,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10698,11 +10698,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2121,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.606061,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10749,11 +10749,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.3185,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.318548,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10800,11 +10800,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.7449,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.744939,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10851,11 +10851,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4052,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.405152,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10902,11 +10902,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.6199,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.61991,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -10953,11 +10953,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.3256,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.325581,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11004,11 +11004,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.1042,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.104213,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11055,11 +11055,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.352,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.351955,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11106,11 +11106,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.5961,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.596127,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11157,11 +11157,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4706,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.470588,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11208,11 +11208,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.5806,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.580645,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11259,11 +11259,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.5714,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.571429,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11310,11 +11310,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.6316,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.631579,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11361,11 +11361,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.1381,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.624309,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11412,11 +11412,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0619,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.061856,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11463,11 +11463,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.2424,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.242424,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11514,11 +11514,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7235,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 4.501608,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11616,11 +11616,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2232,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.611621,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11667,11 +11667,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.0173,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.576369,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11718,11 +11718,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8357,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.417827,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11769,11 +11769,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3629,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.362862,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11820,11 +11820,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.2212,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.221167,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11871,11 +11871,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 1.1719,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.171875,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11922,11 +11922,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -5.2699,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -5.269923,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -11973,11 +11973,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.4065,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.406504,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12024,11 +12024,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 1.4644,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.464435,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12075,11 +12075,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.851064,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12126,11 +12126,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.7736,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.773585,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12177,11 +12177,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12228,11 +12228,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.8957,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.895735,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12279,11 +12279,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.3148,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.314815,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12330,11 +12330,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.381,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.380952,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12381,11 +12381,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.4483,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.448276,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12432,11 +12432,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.1084,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.108434,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12483,11 +12483,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.8136,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.813559,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12534,11 +12534,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.4793,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.47929,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12585,11 +12585,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.8581,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.858108,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12636,11 +12636,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.4752,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.475248,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12687,11 +12687,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.3044,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.304414,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12738,11 +12738,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6873,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.687285,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12789,11 +12789,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.7874,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.181102,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12840,11 +12840,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.5533,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.553299,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12891,11 +12891,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 3.208556,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12942,11 +12942,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.7778,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.777778,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -12993,11 +12993,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.223242,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13044,11 +13044,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6993,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.34965,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13095,11 +13095,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.2387,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.238663,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13146,11 +13146,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.9356,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.935551,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13197,11 +13197,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7301,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.730104,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13248,11 +13248,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.4739,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.473934,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13299,11 +13299,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.139,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.139013,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13350,11 +13350,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.4118,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.411765,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13401,11 +13401,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.2,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.6,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13452,11 +13452,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.3311,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.986755,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13503,11 +13503,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.4063,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.406326,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13554,11 +13554,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.5839,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 3.941606,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13605,11 +13605,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.699,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.699029,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13656,11 +13656,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.5172,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.517162,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13707,11 +13707,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.0441,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.044118,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13758,11 +13758,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.3344,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.334448,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13809,11 +13809,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.9931,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.993056,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13860,11 +13860,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.5714,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.571429,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13911,11 +13911,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.4351,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.435115,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -13962,11 +13962,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.0753,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.075269,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14013,11 +14013,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.5105,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.51046,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14064,11 +14064,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.845,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.845018,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14115,11 +14115,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.5016,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.501608,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14166,11 +14166,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.703,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.70297,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14217,11 +14217,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.5694,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.56942,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14268,11 +14268,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.7223,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.722334,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14319,11 +14319,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.599,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.599016,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14370,11 +14370,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8152,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -0.815217,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14421,11 +14421,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.9261,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.926108,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14472,11 +14472,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7544,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.754386,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14523,11 +14523,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.9082,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 2.320888,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14574,11 +14574,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.48,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14625,11 +14625,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7794,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.779359,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14676,11 +14676,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.8972,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.141925,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14727,11 +14727,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.7594,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.759398,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14778,11 +14778,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 1.465201,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14829,11 +14829,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -4.0268,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -4.026846,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14880,11 +14880,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.6514,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.651376,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14931,11 +14931,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.3889,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.388889,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -14982,11 +14982,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -2.6906,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -2.690583,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15033,11 +15033,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.0,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15084,11 +15084,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -0.6479,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.863931,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15135,11 +15135,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.6224,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.622407,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15186,11 +15186,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -3.2609,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -3.26087,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15237,11 +15237,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": 0.0,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": 0.487805,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15288,11 +15288,11 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": null,
-          "adverse_status": "NOT_YET_OBSERVED",
-          "included_in_primary": false,
-          "return_pct": null,
-          "status": "NOT_YET_OBSERVED"
+          "adverse_close_path_pct": -1.7316,
+          "adverse_status": "DAILY_CLOSE_PATH",
+          "included_in_primary": true,
+          "return_pct": -1.731602,
+          "status": "APPROX_AVAILABLE"
         },
         "T+5": {
           "adverse_close_path_pct": null,
@@ -15334,6 +15334,19 @@
       "live_adjusted_inputs": 117,
       "observation_origin": "CONTEMPORANEOUS",
       "session": "2026-11-11",
+      "tracked_count": 143
+    },
+    {
+      "content_sha256": "d0421389ff1f7c07041eda3d6f23a35d2a42f2df725758c351d64c330fca5a0d",
+      "counts": {
+        "HOLD": 20,
+        "SELL": 86,
+        "UNAVAILABLE": 0,
+        "WATCH": 37
+      },
+      "live_adjusted_inputs": 0,
+      "observation_origin": "DELAYED",
+      "session": "2026-11-16",
       "tracked_count": 143
     }
   ],
