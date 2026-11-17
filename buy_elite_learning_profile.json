@@ -2,7 +2,7 @@
   "version": "BUY_ELITE_LEARNING_V3",
   "mode": "ACTIVE_LEARNING",
   "created_at": "2026-06-25 16:55:06",
-  "updated_at": "2026-11-17 20:28:53",
+  "updated_at": "2026-11-17 20:42:48",
   "completed_t5": 1512,
   "baseline_winrate": 0.3955,
   "min_completed_to_learn": 80,
@@ -16,7 +16,7 @@
     "zone": 0.999,
     "obv": 1.0,
     "rsi_penalty": 1.0,
-    "dist_penalty": 0.947
+    "dist_penalty": 0.948
   },
   "regime_multipliers": {
     "WINTER": {
@@ -41,7 +41,7 @@
     "evo: good: n=1084, winrate=38.7%, baseline=39.6%, mult=0.996, blended=0.996",
     "zone: good: n=1367, winrate=39.5%, baseline=39.6%, mult=1.0, blended=0.999",
     "obv: good: n=1512, winrate=39.6%, baseline=39.6%, mult=1.0, blended=1.0",
-    "dist_penalty: risk: n=30, winrate=46.7%, baseline=39.6%, mult=0.954, blended=0.947",
+    "dist_penalty: risk: n=30, winrate=46.7%, baseline=39.6%, mult=0.954, blended=0.948",
     "Regime WINTER: n=540, winrate=43.3%, seasonal=1.009",
     "Regime NEUTRAL: n=942, winrate=38.4%, seasonal=0.997"
   ],
