@@ -12,11 +12,6 @@
       "entry_date": "2026-09-15"
     },
     {
-      "symbol": "VGI",
-      "entry_price": 83700.0,
-      "entry_date": "2026-09-24"
-    },
-    {
       "symbol": "TCH",
       "entry_price": 11363.0,
       "entry_date": "2026-09-26"
@@ -30,21 +25,6 @@
       "symbol": "EVF",
       "entry_price": 11700.0,
       "entry_date": "2026-10-20"
-    },
-    {
-      "symbol": "VRE",
-      "entry_price": 23450.0,
-      "entry_date": "2026-10-20"
-    },
-    {
-      "symbol": "FPT",
-      "entry_price": 58000.0,
-      "entry_date": "2026-10-20"
-    },
-    {
-      "symbol": "BVH",
-      "entry_price": 62650.0,
-      "entry_date": "2026-11-06"
     }
   ]
 }
