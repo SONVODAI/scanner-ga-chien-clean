@@ -178,8 +178,8 @@ def test_committed_store_is_the_current_population():
         row_store=STORE,
     )
     text = "\n".join(fake.captions)
-    assert "durable_row_store identities=1339" in text
-    assert "research_rows=1339" in text
+    assert "durable_row_store identities=1434" in text
+    assert "research_rows=1434" in text
     assert f"row_horizons={HORIZON_STATUS}" in text
     assert "historical_rows=1" in text
     assert "HISTORICAL" not in _symbols(fake.frames[0])
