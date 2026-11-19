@@ -11,6 +11,7 @@ DISPLAY_COLUMNS = (
     "Symbol",
     "T0 date",
     "source",
+    "population",
     "setup",
     "T0 price",
     "current V2 Action state",
@@ -35,8 +36,11 @@ def horizon_text(cell: Mapping[str, Any] | None) -> str:
     if not cell:
         return "NOT_YET_OBSERVED"
     status = str(cell.get("status") or "NOT_YET_OBSERVED")
-    if status == "VALID" and cell.get("return_pct") is not None:
-        return f"{cell['return_pct']:.2f}%"
+    value = cell.get("return_pct")
+    if status in {"VALID", "APPROX_AVAILABLE"} and isinstance(value, (int, float)) and not isinstance(value, bool):
+        return f"{float(value):.2f}%"
+    if status == "APPROX_AVAILABLE":
+        return "UNAVAILABLE_NOT_RECOMPUTED"
     return status
 
 
@@ -46,6 +50,7 @@ def project_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "Symbol": row.get("symbol") or "",
         "T0 date": row.get("t0_date") or "",
         "source": row.get("source") or "",
+        "population": row.get("population") or "",
         "setup": row.get("setup"),
         "T0 price": row.get("t0_price"),
         "current V2 Action state": row.get("action_state") or "",
@@ -73,6 +78,7 @@ def apply_filters(
     state: str | None = None,
     visibility: str = "all",
     symbol: str = "",
+    population: str | None = None,
 ) -> list[dict[str, Any]]:
     """Return matching rows. `None` or `all` leaves that dimension open."""
     wanted_symbol = symbol.strip().upper()
@@ -81,6 +87,8 @@ def apply_filters(
         if t0_date and t0_date != "all" and row.get("t0_date") != t0_date:
             continue
         if source and source != "all" and row.get("source") != source:
+            continue
+        if population and population != "all" and row.get("population") != population:
             continue
         if state and state != "all" and row.get("action_state") != state:
             continue

@@ -1,7 +1,8 @@
 """Read-only board projected from the durable row store.
 
-Horizon cells are not calculated. The historical 1,055-row panel is not
-filled in from later files.
+A verified derived generation can fill horizon cells. A missing or invalid
+generation leaves them UNAVAILABLE_NOT_RECOMPUTED. The historical 1,055-row
+panel is not filled in from later files.
 """
 
 from __future__ import annotations
@@ -10,18 +11,27 @@ from typing import Any
 
 from research.v2_research_ledger.contract import HORIZONS, SOURCE_BRAIN_A, SOURCE_SWEETSPOT
 from research.v2_research_ledger.durable_store import DurableRowStore
+from research.v2_research_ledger.forward_outcomes import (
+    FALLBACK_STATUS,
+    ForwardBuildError,
+    attachable_outcomes,
+    display_horizon,
+    population_for,
+)
 
 HORIZON_STATUS = "UNAVAILABLE_NOT_RECOMPUTED"
 PANEL_SCHEMA = "v2_research_row_panel.v1"
 RESEARCH_DECISIONS = frozenset({"ACCEPTED", "REJECTED", "NOMINATED"})
 
 
-def load_row_panel(store: DurableRowStore) -> dict[str, Any] | None:
+def load_row_panel(store: DurableRowStore, *, outcomes_root: Any = None) -> dict[str, Any] | None:
     """Return the panel document, or None when the store has not been created."""
     manifest = store.read_manifest()
     if manifest is None:
         return None
-    rows = [_panel_row(row, store) for row in store.identities.values()]
+    attached = attachable_outcomes(store.directory, outcomes_root)
+    by_outcome = {str(row.get("identity_id") or ""): row for row in (attached or {}).get("rows") or []}
+    rows = [_panel_row(row, store, by_outcome.get(str(row.get("identity_id") or ""))) for row in store.identities.values()]
     rows.sort(key=lambda item: (str(item.get("t0_date") or ""), str(item.get("symbol") or ""), str(item.get("row_id") or "")))
     deduped = deduped_research_observations(store)
     sidecar_identities = sum(1 for row in store.identities.values() if row.get("record_role") == "sidecar_identity")
@@ -40,7 +50,10 @@ def load_row_panel(store: DurableRowStore) -> dict[str, Any] | None:
             reasons.append(f"UNAVAILABLE:{name}")
         elif status == "PRESENT_NOT_INTERPRETED":
             reasons.append(f"PRESENT_NOT_INTERPRETED:{name}")
-    reasons.append("UNAVAILABLE:row_horizons")
+    if attached is None:
+        reasons.append("UNAVAILABLE:row_horizons")
+    else:
+        reasons.append("ATTACHED:forward_outcomes")
     by_source: dict[str, int] = {}
     for row in rows:
         label = str(row.get("source") or "")
@@ -58,9 +71,15 @@ def load_row_panel(store: DurableRowStore) -> dict[str, Any] | None:
             "source_health": health,
             "status": "UNVERIFIED",
         },
+        "forward_outcomes": {
+            "as_of": None if attached is None else attached.get("as_of"),
+            "calculation_version": None if attached is None else attached.get("calculation_version"),
+            "reference_sha256": None if attached is None else attached.get("reference_sha256"),
+            "status": FALLBACK_STATUS if attached is None else "attached",
+        },
         "historical_approximate_view": "preserved_not_recomputed",
         "historical_row_panel": "UNAVAILABLE",
-        "price_book": "absent",
+        "price_book": "absent" if attached is None else "APPROX_LAST_5M_CLOSE",
         "rows": rows,
         "schema": PANEL_SCHEMA,
         "source_updated_at": None,
@@ -111,7 +130,7 @@ def _qualified(record: dict[str, Any], store: DurableRowStore) -> tuple[str, str
     return None
 
 
-def _panel_row(record: dict[str, Any], store: DurableRowStore) -> dict[str, Any]:
+def _panel_row(record: dict[str, Any], store: DurableRowStore, outcome: dict[str, Any] | None) -> dict[str, Any]:
     source_field = record.get("source_field")
     flags = [f"decision={record.get('decision') or 'DECISION_UNAVAILABLE'}"]
     if record.get("decision_detail") and record.get("decision_detail") != record.get("decision"):
@@ -133,7 +152,15 @@ def _panel_row(record: dict[str, Any], store: DurableRowStore) -> dict[str, Any]
     link = store.links.get(f"nomination|{record.get('identity_id')}")
     if link:
         flags.append(f"nomination_status={link.get('status') or ''}")
-    horizons = {f"T+{step}": {"return_pct": None, "status": HORIZON_STATUS} for step in HORIZONS}
+    try:
+        population = population_for(record, store.links)
+    except ForwardBuildError:
+        population = "unknown"
+    outcome_horizons = outcome.get("horizons") if isinstance(outcome, dict) else None
+    if isinstance(outcome_horizons, dict):
+        horizons = {f"T+{step}": display_horizon(outcome_horizons.get(f"T+{step}") or {}) for step in HORIZONS}
+    else:
+        horizons = {f"T+{step}": {"return_pct": None, "status": HORIZON_STATUS} for step in HORIZONS}
     return {
         "action_state": "NO_OBSERVATION",
         "age_sessions": None,
@@ -142,6 +169,7 @@ def _panel_row(record: dict[str, Any], store: DurableRowStore) -> dict[str, Any]
         "horizons": horizons,
         "lifecycle": "STORED",
         "market_real": record.get("market_real"),
+        "population": population,
         "quality_status": ";".join(flags),
         "record_role": record.get("record_role"),
         "row_id": record.get("identity_id"),
