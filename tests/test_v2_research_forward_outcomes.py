@@ -519,3 +519,384 @@ def _generation_name(document: dict) -> str:
     from research.v2_research_ledger.forward_outcomes import _generation_id
 
     return f"{_generation_id(document)}.json"
+
+
+def _publish_namespace() -> dict:
+    import textwrap
+
+    workflow = (ROOT / ".github" / "workflows" / "ledger-forward-publish.yml").read_text(encoding="utf-8")
+    begin = "# BEGIN LEDGER_FORWARD_PUBLISH\n"
+    start = workflow.index(begin) + len(begin)
+    stop = workflow.index("# END LEDGER_FORWARD_PUBLISH", start)
+    namespace = {"__name__": "ledger_forward_publish"}
+    exec(compile(textwrap.dedent(workflow[start:stop]), "ledger-forward-publish.yml", "exec"), namespace)
+    return namespace
+
+
+def _git(repo: Path, *args: str) -> str:
+    import subprocess
+
+    completed = subprocess.run(
+        ["git", "-C", str(repo), "-c", "user.name=test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", *args],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise AssertionError(completed.stderr or completed.stdout)
+    return completed.stdout
+
+
+def _origin_bytes(origin: Path, relative: str) -> bytes:
+    import subprocess
+
+    return subprocess.check_output(["git", "--git-dir", str(origin), "show", f"main:{relative}"])
+
+
+def _seed_repository(tmp_path: Path, namespace: dict) -> tuple[Path, Path, dict[str, object]]:
+    import subprocess
+
+    origin = tmp_path / "origin.git"
+    subprocess.run(["git", "init", "--bare", "-b", "main", str(origin)], check=True, capture_output=True, text=True)
+    repo = tmp_path / "publisher"
+    subprocess.run(["git", "init", "-b", "main", str(repo)], check=True, capture_output=True, text=True)
+    durable = repo / "research" / "v2_research_ledger" / "durable"
+    durable.mkdir(parents=True)
+    for name in namespace["DURABLE_FILES"]:
+        (durable / name).write_text(name + "\n", encoding="utf-8")
+    historical = repo / namespace["HISTORICAL_GENERATION"]
+    historical.parent.mkdir(parents=True, exist_ok=True)
+    historical.write_text("historical\n", encoding="utf-8")
+    (repo / "research" / "v2_research_ledger" / "outcomes" / "index.json").write_text('{"generations":[]}\n', encoding="utf-8")
+    guardian = repo / "research" / "guardian_research" / "outcomes.json"
+    guardian.parent.mkdir(parents=True)
+    guardian.write_text('{"guardian":true}\n', encoding="utf-8")
+    (repo / "pattern_history.csv").write_text("symbol\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "seed")
+    _git(repo, "remote", "add", "origin", str(origin))
+    _git(repo, "push", "origin", "HEAD:main")
+    baseline = {
+        "durable": namespace["durable_hashes"](repo),
+        "history": namespace["historical_digest"](repo),
+        "guardian": guardian.read_bytes(),
+    }
+    return origin, repo, baseline
+
+
+def _stage_candidate(repo: Path, namespace: dict, baseline: dict) -> str:
+    generation_id = "2026-11-19_abc123abc123_def456def456"
+    path = repo / namespace["allowed_paths"](generation_id)[0]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {"as_of": "2026-11-19", "ledger_hashes": baseline["durable"], "official_pnl": False},
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    index = repo / "research" / "v2_research_ledger" / "outcomes" / "index.json"
+    index.write_text(json.dumps({"generations": [generation_id]}, sort_keys=True) + "\n", encoding="utf-8")
+    return generation_id
+
+
+def _other_clone(tmp_path: Path, origin: Path) -> Path:
+    import subprocess
+
+    other = tmp_path / "other"
+    subprocess.run(["git", "clone", str(origin), str(other)], check=True, capture_output=True, text=True)
+    _git(other, "config", "user.name", "test")
+    _git(other, "config", "user.email", "test@example.com")
+    return other
+
+
+def test_publish_workflow_is_manual_and_the_dry_run_workflow_is_unchanged():
+    import subprocess
+
+    dry = ROOT / ".github" / "workflows" / "ledger-forward-outcomes.yml"
+    committed = subprocess.check_output(["git", "-C", str(ROOT), "show", "HEAD:.github/workflows/ledger-forward-outcomes.yml"])
+    assert dry.read_bytes() == committed
+    workflow = (ROOT / ".github" / "workflows" / "ledger-forward-publish.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch:" in workflow
+    assert "schedule:" not in workflow
+    assert "cron:" not in workflow
+    assert "pull_request:" not in workflow
+    assert "\n  push:" not in workflow
+    assert "contents: write" in workflow
+    assert "contents: read" not in workflow
+    assert "LEDGER_FORWARD_PUBLISH_ENABLED == 'true'" in workflow
+    assert "github.ref == 'refs/heads/main'" in workflow
+    assert "publish-2026-11-19" in workflow
+    assert "fetch-depth: 0" in workflow
+    assert "ref: main" in workflow
+    assert "cancel-in-progress: false" in workflow
+    assert '"push", "origin", "HEAD:main"' in workflow
+    assert 'push", "--force"' not in workflow
+    assert "git push --force" not in workflow
+    assert "+HEAD" not in workflow
+    assert '"--force", "--force-with-lease", "--force-if-includes"' in workflow
+    assert "git clean" not in workflow
+    assert "checkout --" not in workflow
+    assert "--approve-repository-write" in workflow
+    body = workflow[workflow.index("def publish_main"):workflow.index("if __name__")]
+    assert body.index("publication_action") < body.index("commit_publication") < body.index("push_fast_forward")
+    assert "already_published" in body
+    builder = workflow[workflow.index("def _run_builder"):workflow.index("def publish_main")]
+    assert '"--publish"' in builder
+    assert '"--approve-repository-write"' in builder
+    namespace = _publish_namespace()
+    assert hashlib.sha256(OUTCOMES_GENERATION.read_bytes()).hexdigest() == namespace["HISTORICAL_SHA256"]
+
+
+def test_dispatch_and_price_book_fail_closed(tmp_path: Path):
+    namespace = _publish_namespace()
+    namespace["require_dispatch_context"]("true", "publish-2026-11-19", "refs/heads/main")
+    refused = (
+        (None, "publish-2026-11-19", "refs/heads/main", "PUBLICATION_DISABLED"),
+        ("true", "validate-only", "refs/heads/main", "CONFIRMATION_REFUSED"),
+        ("true", "publish-2026-11-19", "refs/heads/other", "BRANCH_REFUSED"),
+    )
+    for enabled, confirm, ref, reason in refused:
+        with pytest.raises(namespace["PublicationRefusal"]) as error:
+            namespace["require_dispatch_context"](enabled, confirm, ref)
+        assert error.value.reason == reason
+    good = tmp_path / "good.json"
+    _write_reference(good, SESSIONS + ["2026-11-19"])
+    store = namespace["validated_store"](good)
+    receipt = namespace["safe_receipt"](store)
+    assert receipt == {
+        "as_of": "2026-11-19",
+        "content_sha256": store["content_sha256"],
+        "first_session": "2026-11-11",
+        "last_session": "2026-11-19",
+        "price_basis": "APPROX_LAST_5M_CLOSE",
+        "session_count": 7,
+        "source": "vnstock4_kbs",
+    }
+    assert "rows" not in receipt
+    current = tmp_path / "current.json"
+    _write_reference(current)
+    with pytest.raises(namespace["PublicationRefusal"]) as as_of_error:
+        namespace["validated_store"](current)
+    assert as_of_error.value.reason == "AS_OF_REFUSED"
+    broken = tmp_path / "broken.json"
+    payload = json.loads(good.read_text(encoding="utf-8"))
+    payload["rows"][0]["close"] = 1
+    broken.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as checksum_error:
+        namespace["validated_store"](broken)
+    assert checksum_error.value.reason == "REFERENCE_NOT_VALIDATED"
+    calendar = json.loads(good.read_text(encoding="utf-8"))
+    calendar["trading_sessions"] = list(reversed(calendar["trading_sessions"]))
+    calendar["content_sha256"] = _digest(calendar)
+    reversed_path = tmp_path / "reversed.json"
+    reversed_path.write_text(json.dumps(calendar, sort_keys=True) + "\n", encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as calendar_error:
+        namespace["validated_store"](reversed_path)
+    assert calendar_error.value.reason == "CALENDAR_INVALID"
+
+
+def test_publication_action_requires_a_new_generation_and_repeat_is_idle():
+    namespace = _publish_namespace()
+    generation_id = "2026-11-19_aaaaaaaaaaaa_bbbbbbbbbbbb"
+    report = {
+        "as_of": "2026-11-19",
+        "file_status": "would_write",
+        "generation_id": generation_id,
+        "index_status": "would_write",
+        "mode": "dry_run",
+        "ok": True,
+    }
+    assert namespace["publication_action"](report, 0) == "publish"
+    namespace["require_publish_result"]({**report, "file_status": "written", "index_status": "written", "mode": "publish"}, generation_id)
+    repeat = {**report, "file_status": "unchanged", "index_status": "unchanged"}
+    assert namespace["publication_action"](repeat, 0) == "already_published"
+    with pytest.raises(namespace["PublicationRefusal"]) as violations:
+        namespace["publication_action"](report, 2)
+    assert violations.value.reason == "MISSING_RETURN_NOT_NULL"
+    with pytest.raises(namespace["PublicationRefusal"]) as mismatch:
+        namespace["publication_action"]({**report, "index_status": "unchanged"}, 0)
+    assert mismatch.value.reason == "DRY_RUN_STATUS_REFUSED"
+    with pytest.raises(namespace["PublicationRefusal"]) as old_book:
+        namespace["publication_action"]({**report, "as_of": "2026-11-18", "generation_id": "2026-11-18_41f36ca0cad9_a90e163943d8"}, 0)
+    assert old_book.value.reason == "AS_OF_REFUSED"
+    with pytest.raises(namespace["PublicationRefusal"]) as republish:
+        namespace["require_publish_result"]({**repeat, "mode": "publish"}, generation_id)
+    assert republish.value.reason == "PUBLISH_FAILED"
+    assert namespace["paths_block_publication"](["pattern_history.csv", "research/guardian_research/outcomes.json"]) is False
+    assert namespace["paths_block_publication"](["research/v2_research_ledger/durable/identities.jsonl"]) is True
+    assert namespace["paths_block_publication"](["research/v2_research_ledger/outcomes/index.json"]) is True
+
+
+def test_commit_allowlist_refuses_guardian_and_force_push(tmp_path: Path):
+    namespace = _publish_namespace()
+    _origin, repo, baseline = _seed_repository(tmp_path, namespace)
+    generation_id = _stage_candidate(repo, namespace, baseline)
+    (repo / "research" / "guardian_research" / "outcomes.json").write_text('{"guardian":false}\n', encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as refused:
+        namespace["commit_publication"](repo, generation_id, baseline["durable"], baseline["history"])
+    assert refused.value.reason == "ALLOWLIST_REFUSED"
+    assert _git(repo, "rev-list", "--count", "HEAD").strip() == "1"
+    assert _origin_bytes(_origin, "research/guardian_research/outcomes.json") == b'{"guardian":true}\n'
+    with pytest.raises(namespace["PublicationRefusal"]) as force:
+        namespace["_git"](repo, "push", "--force", "origin", "HEAD:main")
+    assert force.value.reason == "FORCE_PUSH_REFUSED"
+    with pytest.raises(namespace["PublicationRefusal"]) as lease:
+        namespace["_git"](repo, "push", "--force-with-lease", "origin", "HEAD:main")
+    assert lease.value.reason == "FORCE_PUSH_REFUSED"
+
+
+def test_fast_forward_publishes_two_paths_and_rebases_an_unrelated_snapshot(tmp_path: Path):
+    namespace = _publish_namespace()
+    origin, repo, baseline = _seed_repository(tmp_path, namespace)
+    generation_id = _stage_candidate(repo, namespace, baseline)
+    namespace["commit_publication"](repo, generation_id, baseline["durable"], baseline["history"])
+    other = _other_clone(tmp_path, origin)
+    pattern = other / "pattern_history.csv"
+    pattern.write_text("symbol\nAAA\n", encoding="utf-8")
+    _git(other, "add", "pattern_history.csv")
+    _git(other, "commit", "-m", "Update pattern history")
+    _git(other, "push", "origin", "HEAD:main")
+    pushed = namespace["push_fast_forward"](repo, generation_id, baseline["durable"], baseline["history"])
+    assert pushed["rebases"] == 1
+    names = _git(repo, "diff", "--name-only", "HEAD^", "HEAD").splitlines()
+    assert sorted(names) == sorted(namespace["allowed_paths"](generation_id))
+    assert _origin_bytes(origin, "pattern_history.csv") == b"symbol\nAAA\n"
+    assert _origin_bytes(origin, "research/guardian_research/outcomes.json") == baseline["guardian"]
+    assert _origin_bytes(origin, namespace["HISTORICAL_GENERATION"]) == b"historical\n"
+    assert _origin_bytes(origin, "research/v2_research_ledger/durable/identities.jsonl") == b"identities.jsonl\n"
+    published = json.loads(_origin_bytes(origin, namespace["allowed_paths"](generation_id)[0]))
+    assert published["as_of"] == "2026-11-19"
+    assert published["official_pnl"] is False
+    repeat = namespace["push_fast_forward"](repo, generation_id, baseline["durable"], baseline["history"])
+    assert repeat["commit"] == pushed["commit"]
+    assert _git(origin, "rev-list", "--count", "main").strip() == "3"
+
+
+def test_upstream_durable_or_outcomes_change_is_not_pushed(tmp_path: Path):
+    namespace = _publish_namespace()
+    origin, repo, baseline = _seed_repository(tmp_path, namespace)
+    generation_id = _stage_candidate(repo, namespace, baseline)
+    namespace["commit_publication"](repo, generation_id, baseline["durable"], baseline["history"])
+    other = _other_clone(tmp_path, origin)
+    durable = other / "research" / "v2_research_ledger" / "durable" / "identities.jsonl"
+    durable.write_text("changed\n", encoding="utf-8")
+    _git(other, "add", "research/v2_research_ledger/durable/identities.jsonl")
+    _git(other, "commit", "-m", "Append ledger identity")
+    _git(other, "push", "origin", "HEAD:main")
+    with pytest.raises(namespace["PublicationRefusal"]) as durable_error:
+        namespace["push_fast_forward"](repo, generation_id, baseline["durable"], baseline["history"])
+    assert durable_error.value.reason == "UPSTREAM_LEDGER_CHANGED"
+    origin_files = _git(origin, "ls-tree", "-r", "--name-only", "main")
+    assert f"research/v2_research_ledger/outcomes/generations/{generation_id}.json" not in origin_files
+    assert _origin_bytes(origin, "research/v2_research_ledger/durable/identities.jsonl") == b"changed\n"
+
+    outcomes_origin, outcomes_repo, outcomes_baseline = _seed_repository(tmp_path / "outcomes", namespace)
+    outcomes_id = _stage_candidate(outcomes_repo, namespace, outcomes_baseline)
+    namespace["commit_publication"](outcomes_repo, outcomes_id, outcomes_baseline["durable"], outcomes_baseline["history"])
+    outcomes_other = _other_clone(tmp_path / "outcomes", outcomes_origin)
+    (outcomes_other / "research" / "v2_research_ledger" / "outcomes" / "index.json").write_text('{"generations":["upstream"]}\n', encoding="utf-8")
+    _git(outcomes_other, "add", "research/v2_research_ledger/outcomes/index.json")
+    _git(outcomes_other, "commit", "-m", "Replace outcomes index")
+    _git(outcomes_other, "push", "origin", "HEAD:main")
+    with pytest.raises(namespace["PublicationRefusal"]) as outcomes_error:
+        namespace["push_fast_forward"](outcomes_repo, outcomes_id, outcomes_baseline["durable"], outcomes_baseline["history"])
+    assert outcomes_error.value.reason == "UPSTREAM_LEDGER_CHANGED"
+    assert _origin_bytes(outcomes_origin, "research/v2_research_ledger/outcomes/index.json") == b'{"generations":["upstream"]}\n'
+    assert not (outcomes_origin / "rebase-merge").exists()
+
+
+def test_extra_local_history_and_immutable_files_fail_closed(tmp_path: Path):
+    namespace = _publish_namespace()
+    origin, repo, baseline = _seed_repository(tmp_path, namespace)
+    generation_id = _stage_candidate(repo, namespace, baseline)
+    namespace["commit_publication"](repo, generation_id, baseline["durable"], baseline["history"])
+    (repo / "pattern_history.csv").write_text("symbol\nextra\n", encoding="utf-8")
+    _git(repo, "add", "pattern_history.csv")
+    _git(repo, "commit", "-m", "local snapshot")
+    with pytest.raises(namespace["PublicationRefusal"]) as history:
+        namespace["push_fast_forward"](repo, generation_id, baseline["durable"], baseline["history"])
+    assert history.value.reason == "HISTORY_REFUSED"
+    assert _git(origin, "rev-list", "--count", "main").strip() == "1"
+
+    fresh_origin, fresh, fresh_baseline = _seed_repository(tmp_path / "immutable", namespace)
+    (fresh / namespace["HISTORICAL_GENERATION"]).write_text("rewritten\n", encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as historical:
+        namespace["assert_immutable"](fresh, fresh_baseline["durable"], fresh_baseline["history"])
+    assert historical.value.reason == "HISTORICAL_GENERATION_CHANGED"
+    (fresh / "research" / "v2_research_ledger" / "durable" / "manifest.json").write_text("rewritten\n", encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as durable:
+        namespace["assert_immutable"](fresh, fresh_baseline["durable"], fresh_baseline["history"])
+    assert durable.value.reason == "DURABLE_CHANGED"
+    assert _git(fresh_origin, "rev-list", "--count", "main").strip() == "1"
+
+
+def test_real_publication_commits_one_generation_and_a_repeat_does_not(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    import subprocess
+
+    namespace = _publish_namespace()
+    origin = tmp_path / "origin.git"
+    repo = tmp_path / "publisher"
+    subprocess.run(["git", "init", "--bare", "-b", "main", str(origin)], check=True, capture_output=True, text=True)
+    subprocess.run(["git", "init", "-b", "main", str(repo)], check=True, capture_output=True, text=True)
+    ledger = repo / "research" / "v2_research_ledger" / "durable"
+    output = repo / "research" / "v2_research_ledger" / "outcomes"
+    _write_ledger(ledger)
+    first_reference = tmp_path / "reference_store.json"
+    _write_reference(first_reference)
+    document = build_forward_document(ledger, first_reference)
+    first = publish_forward_document(document, output, ledger)
+    historical = repo / namespace["HISTORICAL_GENERATION"]
+    historical.parent.mkdir(parents=True, exist_ok=True)
+    historical.write_text("sealed-history\n", encoding="utf-8")
+    assert Path(first["path"]).name != historical.name
+    guardian = repo / "research" / "guardian_research" / "outcomes.json"
+    guardian.parent.mkdir(parents=True)
+    guardian.write_text('{"guardian":true}\n', encoding="utf-8")
+    before_first = Path(first["path"]).read_bytes()
+    before_durable = {name: (ledger / name).read_bytes() for name in namespace["DURABLE_FILES"]}
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "seed")
+    _git(repo, "remote", "add", "origin", str(origin))
+    _git(repo, "push", "origin", "HEAD:main")
+    baseline_durable = namespace["durable_hashes"](repo)
+    baseline_history = namespace["historical_digest"](repo)
+    later = tmp_path / "later.json"
+    _write_reference(later, SESSIONS + ["2026-11-19"])
+    code = main(
+        [
+            "--ledger",
+            str(ledger),
+            "--reference",
+            str(later),
+            "--output-root",
+            str(output),
+            "--publish",
+            "--approve-repository-write",
+        ]
+    )
+    published = json.loads(capsys.readouterr().out)
+    assert code == 0
+    assert published["mode"] == "publish"
+    assert published["as_of"] == "2026-11-19"
+    assert published["file_status"] == "written"
+    assert published["index_status"] == "written"
+    generation_id = published["generation_id"]
+    assert generation_id.startswith("2026-11-19_")
+    namespace["commit_publication"](repo, generation_id, baseline_durable, baseline_history)
+    pushed = namespace["push_fast_forward"](repo, generation_id, baseline_durable, baseline_history)
+    assert pushed["rebases"] == 0
+    assert sorted(_git(repo, "diff", "--name-only", "HEAD^", "HEAD").splitlines()) == sorted(namespace["allowed_paths"](generation_id))
+    assert {name: _origin_bytes(origin, f"research/v2_research_ledger/durable/{name}") for name in before_durable} == before_durable
+    assert _origin_bytes(origin, namespace["HISTORICAL_GENERATION"]) == b"sealed-history\n"
+    assert _origin_bytes(origin, str(Path(first["path"]).relative_to(repo))) == before_first
+    assert _origin_bytes(origin, "research/guardian_research/outcomes.json") == b'{"guardian":true}\n'
+    origin_index = json.loads(_origin_bytes(origin, "research/v2_research_ledger/outcomes/index.json"))
+    assert [item["generation_id"] for item in origin_index["generations"]] == [first["generation_id"], generation_id]
+    dry = main(["--ledger", str(ledger), "--reference", str(later), "--output-root", str(output)])
+    repeat = json.loads(capsys.readouterr().out)
+    assert dry == 0
+    assert namespace["publication_action"](repeat, namespace["missing_return_violations"](build_forward_document(ledger, later))) == "already_published"
+    assert len(list((output / "generations").glob("*.json"))) == 3
+    assert _git(origin, "rev-parse", "main").strip() == pushed["commit"]

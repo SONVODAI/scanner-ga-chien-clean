@@ -1,0 +1,404 @@
+name: ledger-forward-publish
+
+# One supervised publication of the 2026-11-19 Research Ledger generation.
+# There is no schedule. Leave LEDGER_FORWARD_PUBLISH_ENABLED unset until the
+# operator dispatches this workflow from main. The dry-run workflow is a
+# separate file and is not changed here. A failed job does not push.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type publish-2026-11-19. Any other value is refused."
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ledger-forward-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: vars.LEDGER_FORWARD_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Publish the 2026-11-19 generation or stop
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+          GITHUB_REF: ${{ github.ref }}
+          GUARDIAN_REFERENCE_TOKEN: ${{ secrets.GUARDIAN_REFERENCE_TOKEN }}
+          GUARDIAN_REFERENCE_URL: ${{ secrets.GUARDIAN_REFERENCE_URL }}
+          LEDGER_FORWARD_PUBLISH_ENABLED: ${{ vars.LEDGER_FORWARD_PUBLISH_ENABLED }}
+        run: |
+          set -euo pipefail
+          python - << 'PY'
+          # BEGIN LEDGER_FORWARD_PUBLISH
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          from research.approximate_returns.contract import PRICE_BASIS, SOURCE
+          from research.guardian_research.reference_export import fetch_published_store, read_reference_store
+          from research.v2_research_ledger.forward_outcomes import ForwardBuildError, build_forward_document
+
+          EXPECTED_AS_OF = "2026-11-19"
+          EXPECTED_CONFIRMATION = "publish-2026-11-19"
+          HISTORICAL_GENERATION = "research/v2_research_ledger/outcomes/generations/2026-11-18_41f36ca0cad9_a90e163943d8.json"
+          HISTORICAL_SHA256 = "14aeba749aee6d3d4811ab68257ea2819a75c85aa1f3b253a1fa34287cc80dc6"
+          DURABLE_ROOT = "research/v2_research_ledger/durable"
+          OUTCOMES_ROOT = "research/v2_research_ledger/outcomes"
+          DURABLE_FILES = ("identities.jsonl", "links.jsonl", "conflicts.jsonl", "manifest.json")
+          MISSING_STATUSES = {"NOT_YET_OBSERVED", "T0_REFERENCE_MISSING", "TARGET_MISSING"}
+          MAX_PUSH_ATTEMPTS = 3
+          COMMIT_MESSAGE = "Publish Research Ledger T+ generation 2026-11-19"
+
+          class PublicationRefusal(RuntimeError):
+              def __init__(self, reason: str):
+                  super().__init__(reason)
+                  self.reason = reason
+
+          def require_dispatch_context(enabled: str | None, confirm: str | None, ref: str | None) -> None:
+              if enabled != "true":
+                  raise PublicationRefusal("PUBLICATION_DISABLED")
+              if confirm != EXPECTED_CONFIRMATION:
+                  raise PublicationRefusal("CONFIRMATION_REFUSED")
+              if ref != "refs/heads/main":
+                  raise PublicationRefusal("BRANCH_REFUSED")
+
+          def require_price_book(store: dict) -> None:
+              if store.get("price_basis") != PRICE_BASIS or store.get("source") != SOURCE or not store.get("content_sha256"):
+                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
+              if store.get("as_of") != EXPECTED_AS_OF:
+                  raise PublicationRefusal("AS_OF_REFUSED")
+              sessions = [str(item) for item in store.get("trading_sessions") or []]
+              if not sessions or sessions != sorted(set(sessions)) or store.get("as_of") != sessions[-1]:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+
+          def validated_store(path: Path) -> dict:
+              store = read_reference_store(path)
+              if store is None:
+                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
+              require_price_book(store)
+              return store
+
+          def safe_receipt(store: dict) -> dict:
+              sessions = [str(item) for item in store.get("trading_sessions") or []]
+              return {
+                  "as_of": store.get("as_of"),
+                  "content_sha256": store.get("content_sha256"),
+                  "first_session": sessions[0],
+                  "last_session": sessions[-1],
+                  "price_basis": store.get("price_basis"),
+                  "session_count": len(sessions),
+                  "source": store.get("source"),
+              }
+
+          def missing_return_violations(document: dict) -> int:
+              violations = 0
+              for row in document.get("rows") or []:
+                  for cell in (row.get("horizons") or {}).values():
+                      if cell.get("status") in MISSING_STATUSES and cell.get("return_pct") is not None:
+                          violations += 1
+              return violations
+
+          def publication_action(report: dict, violations: int) -> str:
+              if violations != 0:
+                  raise PublicationRefusal("MISSING_RETURN_NOT_NULL")
+              if report.get("ok") is not True or report.get("mode") != "dry_run":
+                  raise PublicationRefusal("DRY_RUN_FAILED")
+              if report.get("as_of") != EXPECTED_AS_OF:
+                  raise PublicationRefusal("AS_OF_REFUSED")
+              generation_id = str(report.get("generation_id") or "")
+              if not generation_id.startswith(EXPECTED_AS_OF + "_"):
+                  raise PublicationRefusal("GENERATION_REFUSED")
+              if generation_id == "2026-11-18_41f36ca0cad9_a90e163943d8":
+                  raise PublicationRefusal("GENERATION_REFUSED")
+              file_status = report.get("file_status")
+              index_status = report.get("index_status")
+              if file_status == "unchanged" and index_status == "unchanged":
+                  return "already_published"
+              if file_status == "would_write" and index_status == "would_write":
+                  return "publish"
+              raise PublicationRefusal("DRY_RUN_STATUS_REFUSED")
+
+          def require_publish_result(report: dict, generation_id: str) -> None:
+              if report.get("ok") is not True or report.get("mode") != "publish":
+                  raise PublicationRefusal("PUBLISH_FAILED")
+              if report.get("as_of") != EXPECTED_AS_OF or report.get("generation_id") != generation_id:
+                  raise PublicationRefusal("PUBLISH_FAILED")
+              if report.get("file_status") != "written" or report.get("index_status") != "written":
+                  raise PublicationRefusal("PUBLISH_FAILED")
+
+          def allowed_paths(generation_id: str) -> tuple[str, str]:
+              return (
+                  f"{OUTCOMES_ROOT}/generations/{generation_id}.json",
+                  f"{OUTCOMES_ROOT}/index.json",
+              )
+
+          def assert_exact_paths(actual: list[str], generation_id: str) -> None:
+              expected = list(allowed_paths(generation_id))
+              if sorted(actual) != sorted(expected):
+                  raise PublicationRefusal("ALLOWLIST_REFUSED")
+
+          def paths_block_publication(paths: list[str]) -> bool:
+              protected = (DURABLE_ROOT, OUTCOMES_ROOT)
+              for raw in paths:
+                  path = raw.replace("\\", "/").strip().strip('"')
+                  if any(path == root or path.startswith(root + "/") for root in protected):
+                      return True
+              return False
+
+          def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+              if any(arg in {"--force", "--force-with-lease", "--force-if-includes"} or arg.startswith("+") for arg in args):
+                  raise PublicationRefusal("FORCE_PUSH_REFUSED")
+              completed = subprocess.run(
+                  ["git", "-C", str(repo), "-c", "color.ui=false", "-c", "commit.gpgsign=false", *args],
+                  check=False,
+                  capture_output=True,
+                  text=True,
+                  env={**os.environ, "GIT_TERMINAL_PROMPT": "0", "GIT_EDITOR": "true"},
+              )
+              if check and completed.returncode != 0:
+                  refusal = PublicationRefusal("GIT_FAILED")
+                  refusal.detail = (completed.stderr or completed.stdout)[-500:]
+                  raise refusal
+              return completed
+
+          def _rev(repo: Path, revision: str) -> str:
+              return _git(repo, "rev-parse", revision).stdout.strip()
+
+          def _names(repo: Path, *args: str) -> list[str]:
+              completed = _git(repo, "diff", "--name-only", *args)
+              return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+
+          def _is_ancestor(repo: Path, earlier: str, later: str) -> bool:
+              return _git(repo, "merge-base", "--is-ancestor", earlier, later, check=False).returncode == 0
+
+          def porcelain_paths(repo: Path) -> list[str]:
+              completed = _git(repo, "status", "--porcelain", "--untracked-files=all")
+              paths = []
+              for line in completed.stdout.splitlines():
+                  if len(line) < 4:
+                      continue
+                  path = line[3:]
+                  if " -> " in path:
+                      path = path.split(" -> ", 1)[1]
+                  paths.append(path.strip().strip('"'))
+              return paths
+
+          def _sha256(path: Path) -> str:
+              if not path.is_file():
+                  raise PublicationRefusal("DURABLE_CHANGED")
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def durable_hashes(repo: Path) -> dict[str, str]:
+              root = repo / DURABLE_ROOT
+              hashes = {}
+              for name in DURABLE_FILES:
+                  path = root / name
+                  if not path.is_file():
+                      raise PublicationRefusal("DURABLE_CHANGED")
+                  hashes[name] = _sha256(path)
+              return hashes
+
+          def historical_digest(repo: Path) -> str:
+              path = repo / HISTORICAL_GENERATION
+              if not path.is_file():
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def assert_generation_document(repo: Path, generation_id: str, baseline_durable: dict[str, str]) -> None:
+              path = repo / allowed_paths(generation_id)[0]
+              try:
+                  document = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, UnicodeError, json.JSONDecodeError):
+                  raise PublicationRefusal("LEDGER_HASH_DIVERGED") from None
+              if not isinstance(document, dict) or document.get("as_of") != EXPECTED_AS_OF or document.get("official_pnl") is not False:
+                  raise PublicationRefusal("PUBLISH_FAILED")
+              if document.get("ledger_hashes") != baseline_durable:
+                  raise PublicationRefusal("LEDGER_HASH_DIVERGED")
+
+          def assert_immutable(repo: Path, baseline_durable: dict[str, str], baseline_history: str) -> None:
+              if durable_hashes(repo) != baseline_durable:
+                  raise PublicationRefusal("DURABLE_CHANGED")
+              if historical_digest(repo) != baseline_history:
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+
+          def assert_ready_to_push(repo: Path, generation_id: str, baseline_durable: dict[str, str], baseline_history: str) -> None:
+              if porcelain_paths(repo) or _names(repo, "--cached"):
+                  raise PublicationRefusal("WORKSPACE_DIRTY")
+              assert_exact_paths(_names(repo, "HEAD^", "HEAD"), generation_id)
+              assert_immutable(repo, baseline_durable, baseline_history)
+              assert_generation_document(repo, generation_id, baseline_durable)
+
+          def commit_publication(repo: Path, generation_id: str, baseline_durable: dict[str, str], baseline_history: str) -> None:
+              generation, index = allowed_paths(generation_id)
+              assert_exact_paths(porcelain_paths(repo), generation_id)
+              assert_immutable(repo, baseline_durable, baseline_history)
+              assert_generation_document(repo, generation_id, baseline_durable)
+              _git(repo, "add", "--", generation, index)
+              assert_exact_paths(_names(repo, "--cached"), generation_id)
+              _git(
+                  repo,
+                  "-c",
+                  "user.name=github-actions[bot]",
+                  "-c",
+                  "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+                  "commit",
+                  "-m",
+                  COMMIT_MESSAGE,
+              )
+              assert_ready_to_push(repo, generation_id, baseline_durable, baseline_history)
+
+          def push_fast_forward(repo: Path, generation_id: str, baseline_durable: dict[str, str], baseline_history: str, attempts: int = MAX_PUSH_ATTEMPTS) -> dict:
+              rebases = 0
+              for _attempt in range(attempts):
+                  _git(repo, "fetch", "origin", "main")
+                  head = _rev(repo, "HEAD")
+                  origin = _rev(repo, "origin/main")
+                  if origin == head:
+                      assert_ready_to_push(repo, generation_id, baseline_durable, baseline_history)
+                      return {"commit": head, "rebases": rebases}
+                  if _git(repo, "merge-base", head, origin, check=False).returncode != 0:
+                      raise PublicationRefusal("UPSTREAM_REWRITTEN")
+                  ahead = _git(repo, "rev-list", "--count", f"{origin}..HEAD").stdout.strip()
+                  if ahead != "1":
+                      raise PublicationRefusal("HISTORY_REFUSED")
+                  assert_ready_to_push(repo, generation_id, baseline_durable, baseline_history)
+                  parent = _rev(repo, "HEAD^")
+                  upstream = _git(repo, "rev-list", "--count", f"HEAD..{origin}").stdout.strip()
+                  if upstream != "0":
+                      if paths_block_publication(_names(repo, parent, origin)):
+                          raise PublicationRefusal("UPSTREAM_LEDGER_CHANGED")
+                      rebase = _git(repo, "rebase", "origin/main", check=False)
+                      if rebase.returncode != 0:
+                          _git(repo, "rebase", "--abort", check=False)
+                          raise PublicationRefusal("REBASE_REFUSED")
+                      rebases += 1
+                      continue
+                  assert_ready_to_push(repo, generation_id, baseline_durable, baseline_history)
+                  push = _git(repo, "push", "origin", "HEAD:main", check=False)
+                  if push.returncode != 0:
+                      continue
+                  _git(repo, "fetch", "origin", "main")
+                  head = _rev(repo, "HEAD")
+                  origin = _rev(repo, "origin/main")
+                  if origin == head:
+                      return {"commit": head, "rebases": rebases}
+                  if _is_ancestor(repo, head, origin):
+                      if paths_block_publication(_names(repo, head, origin)):
+                          raise PublicationRefusal("UPSTREAM_LEDGER_CHANGED_AFTER_PUSH")
+                      assert_ready_to_push(repo, generation_id, baseline_durable, baseline_history)
+                      return {"commit": head, "rebases": rebases}
+              raise PublicationRefusal("PUSH_REJECTED")
+
+          def _run_builder(repo: Path, reference: Path, publish: bool) -> dict:
+              command = [
+                  sys.executable,
+                  "-m",
+                  "research.v2_research_ledger.forward_outcomes",
+                  "--ledger",
+                  str(repo / DURABLE_ROOT),
+                  "--reference",
+                  str(reference),
+                  "--output-root",
+                  str(repo / OUTCOMES_ROOT),
+              ]
+              if publish:
+                  command.extend(["--publish", "--approve-repository-write"])
+              completed = subprocess.run(command, check=False, capture_output=True, text=True)
+              if completed.stdout:
+                  sys.stdout.write(completed.stdout)
+              if completed.stderr:
+                  sys.stderr.write(completed.stderr)
+              if completed.returncode != 0:
+                  raise PublicationRefusal("PUBLISH_FAILED" if publish else "DRY_RUN_FAILED")
+              try:
+                  report = json.loads(completed.stdout)
+              except json.JSONDecodeError:
+                  raise PublicationRefusal("DRY_RUN_FAILED") from None
+              return report
+
+          def publish_main() -> int:
+              require_dispatch_context(
+                  os.environ.get("LEDGER_FORWARD_PUBLISH_ENABLED"),
+                  os.environ.get("CONFIRM"),
+                  os.environ.get("GITHUB_REF"),
+              )
+              repo = Path(".").resolve()
+              reference = Path("/tmp/reference_store.json")
+              fetched = fetch_published_store(
+                  os.environ.get("GUARDIAN_REFERENCE_URL", ""),
+                  os.environ.get("GUARDIAN_REFERENCE_TOKEN", ""),
+                  reference,
+              )
+              if fetched is None:
+                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
+              store = validated_store(reference)
+              print(json.dumps(safe_receipt(store), sort_keys=True))
+              try:
+                  document = build_forward_document(repo / DURABLE_ROOT, reference)
+              except ForwardBuildError as exc:
+                  raise PublicationRefusal(exc.reason) from None
+              violations = missing_return_violations(document)
+              if violations:
+                  raise PublicationRefusal("MISSING_RETURN_NOT_NULL")
+              baseline_durable = durable_hashes(repo)
+              baseline_history = historical_digest(repo)
+              if baseline_history != HISTORICAL_SHA256:
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              report = _run_builder(repo, reference, publish=False)
+              action = publication_action(report, violations)
+              generation_id = str(report["generation_id"])
+              if action == "already_published":
+                  if porcelain_paths(repo):
+                      raise PublicationRefusal("WORKSPACE_DIRTY")
+                  print(json.dumps({"as_of": EXPECTED_AS_OF, "generation_id": generation_id, "mode": "already_published", "ok": True}, sort_keys=True))
+                  return 0
+              published = _run_builder(repo, reference, publish=True)
+              require_publish_result(published, generation_id)
+              assert_immutable(repo, baseline_durable, baseline_history)
+              commit_publication(repo, generation_id, baseline_durable, baseline_history)
+              pushed = push_fast_forward(repo, generation_id, baseline_durable, baseline_history)
+              print(json.dumps({
+                  "as_of": EXPECTED_AS_OF,
+                  "commit": pushed["commit"],
+                  "file_status": "written",
+                  "generation_id": generation_id,
+                  "index_status": "written",
+                  "missing_return_violations": 0,
+                  "mode": "publish",
+                  "ok": True,
+                  "rebases": pushed["rebases"],
+              }, sort_keys=True))
+              return 0
+
+          if __name__ == "__main__":
+              try:
+                  raise SystemExit(publish_main())
+              except PublicationRefusal as refusal:
+                  print(json.dumps({"ok": False, "reason": refusal.reason}, sort_keys=True))
+                  raise SystemExit(1)
+              except Exception:
+                  print(json.dumps({"ok": False, "reason": "UNEXPECTED"}, sort_keys=True))
+                  raise SystemExit(1)
+          # END LEDGER_FORWARD_PUBLISH
+          PY
