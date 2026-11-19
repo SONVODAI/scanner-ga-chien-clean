@@ -29,8 +29,11 @@ from research.v2_research_ledger.freshness import (
 PANEL_TITLE = "V2 RESEARCH LEDGER — T+1 TO T+20"
 PANEL_CAPTION = (
     "Research record only. execution_enabled is not used. "
-    "NOT_YET_OBSERVED is a pending horizon. MISSING_PRICE means no unadjusted "
-    "daily bar was supplied. No order is created."
+    "NOT_YET_OBSERVED is a pending horizon. "
+    "T0_REFERENCE_MISSING and TARGET_MISSING are absent reference closes, not zero returns. "
+    "APPROX_AVAILABLE is the only displayed percentage. "
+    "brain_unlinked rows have no verified nomination link. "
+    "No blended win rate is shown. No order is created."
 )
 NOT_CONFIGURED = "NOT_CONFIGURED"
 NO_DATA = "NO_DATA"
@@ -240,13 +243,17 @@ def render_v2_research_ledger_panel(
         fresh = board.get("freshness") if isinstance(board.get("freshness"), dict) else {}
         coverage = board.get("coverage") if isinstance(board.get("coverage"), dict) else {}
         if from_row_store:
+            forward = board.get("forward_outcomes") if isinstance(board.get("forward_outcomes"), dict) else {}
+            horizon_note = HORIZON_STATUS
+            if forward.get("status") == "attached":
+                horizon_note = f"attached as_of={forward.get('as_of') or 'unknown'}"
             st.caption(
                 "durable_row_store "
                 f"identities={coverage.get('rows')} "
                 f"sidecar_identities={coverage.get('sidecar_identities')} "
                 f"deduped_research_observations={coverage.get('deduped_research_observations')} "
                 f"historical_row_panel={board.get('historical_row_panel')} "
-                f"row_horizons={HORIZON_STATUS}."
+                f"row_horizons={horizon_note}."
             )
             st.caption("Sealed T0 is shown from the store. A newer source file is not substituted.")
         elif cache_reason:
@@ -310,6 +317,11 @@ def render_v2_research_ledger_panel(
             st.warning(f"{STALE_DATA}: the research board is behind available source evidence ({detail}).")
         chosen_date = st.selectbox("T0 date", options=[*dates, "all"], index=0 if dates else 0)
         chosen_source = st.selectbox("source", options=["all", *sources], index=0)
+        chosen_population = st.selectbox(
+            "population",
+            options=["all", "brain_linked", "brain_unlinked", "sweetspot", "sweetspot_blank"],
+            index=0,
+        )
         chosen_state = st.selectbox(
             "state",
             options=["all", "BUY_READY", "WAIT", "WEAKENED", "NO_OBSERVATION", "REJECTED"],
@@ -324,6 +336,7 @@ def render_v2_research_ledger_panel(
             state=str(chosen_state),
             visibility=str(chosen_visibility),
             symbol=str(symbol or ""),
+            population=str(chosen_population),
         )
         if not selected:
             st.warning(f"{NO_DATA}: no stored candidates match these filters.")
