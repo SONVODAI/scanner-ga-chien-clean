@@ -13,6 +13,20 @@
       },
       "path": "generations/2026-11-18_41f36ca0cad9_a90e163943d8.json",
       "reference_sha256": "a90e163943d8b2b953f5eab718c05334da49d5caf60be6d9d6ef1d855bd54bdd"
+    },
+    {
+      "as_of": "2026-11-19",
+      "calculation_version": "ledger_forward.v1",
+      "generation_id": "2026-11-19_41f36ca0cad9_63b98229a9f9",
+      "identity_count": 1434,
+      "ledger_hashes": {
+        "conflicts.jsonl": "ed13a4a6b9b66017993f85471137b04b9fa536dd950b6dfd93c4e1f07d4db82d",
+        "identities.jsonl": "a2e868e74e62fef8d74c0215f817194e9489cba7af523e788c42251f9c28b848",
+        "links.jsonl": "377ff151d96c290c062efdfe32118b02d49efaaa30c98d5871fe6ac5b1fd2ec4",
+        "manifest.json": "48e44d058ec1bc4c11321afb21265f2e9ae95c932c2cac156586ccdcdefbe25b"
+      },
+      "path": "generations/2026-11-19_41f36ca0cad9_63b98229a9f9.json",
+      "reference_sha256": "63b98229a9f937f255eb2a89f9b028bb0b1fc05dcb4db0f4984f23a7dcdb1f60"
     }
   ],
   "schema": "v2_research_forward_index.v1"
