@@ -450,6 +450,40 @@ def test_repository_publication_requires_a_separate_approval(tmp_path: Path, cap
     assert hashlib.sha256((DURABLE / "identities.jsonl").read_bytes()).hexdigest() == STAGE2_LEDGER_HASHES["identities.jsonl"]
 
 
+def test_cli_dry_run_does_not_overwrite_existing_outcomes(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    ledger, output, _document, first = _build(tmp_path)
+    before = {path: path.read_bytes() for path in output.rglob("*") if path.is_file()}
+    same = main(["--ledger", str(ledger), "--reference", str(tmp_path / "reference_store.json"), "--output-root", str(output)])
+    same_report = json.loads(capsys.readouterr().out)
+    assert same == 0
+    assert same_report["mode"] == "dry_run"
+    assert same_report["file_status"] == "unchanged"
+    assert same_report["index_status"] == "unchanged"
+    assert same_report["generation_id"] == first["generation_id"]
+    assert {path: path.read_bytes() for path in output.rglob("*") if path.is_file()} == before
+    _write_reference(tmp_path / "later.json", SESSIONS + ["2026-11-19"])
+    newer = main(["--ledger", str(ledger), "--reference", str(tmp_path / "later.json"), "--output-root", str(output)])
+    newer_report = json.loads(capsys.readouterr().out)
+    assert newer == 0
+    assert newer_report["mode"] == "dry_run"
+    assert newer_report["as_of"] == "2026-11-19"
+    assert newer_report["file_status"] == "would_write"
+    assert newer_report["index_status"] == "would_write"
+    assert newer_report["generation_id"] != first["generation_id"]
+    assert {path: path.read_bytes() for path in output.rglob("*") if path.is_file()} == before
+    assert not (output / "generations" / f"{newer_report['generation_id']}.json").exists()
+    broken = tmp_path / "broken.json"
+    store = json.loads((tmp_path / "reference_store.json").read_text(encoding="utf-8"))
+    store["rows"][0]["close"] = 1
+    broken.write_text(json.dumps(store, sort_keys=True) + "\n", encoding="utf-8")
+    refused = main(["--ledger", str(ledger), "--reference", str(broken), "--output-root", str(output)])
+    refusal = json.loads(capsys.readouterr().out)
+    assert refused == 1
+    assert refusal["ok"] is False
+    assert refusal["reason"] == "REFERENCE_CHECKSUM_MISMATCH"
+    assert {path: path.read_bytes() for path in output.rglob("*") if path.is_file()} == before
+
+
 def test_publication_change_leaves_scan_guardian_camera_and_ledger_ui(tmp_path: Path):
     import subprocess
 
@@ -457,14 +491,28 @@ def test_publication_change_leaves_scan_guardian_camera_and_ledger_ui(tmp_path: 
         committed = subprocess.check_output(["git", "-C", str(ROOT), "show", f"HEAD:{relative}"])
         assert (ROOT / relative).read_bytes() == committed
     workflow = (ROOT / ".github" / "workflows" / "ledger-forward-outcomes.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch:" in workflow
+    assert "validate-only" in workflow
     assert "schedule:" not in workflow
     assert "cron:" not in workflow
+    assert "pull_request:" not in workflow
     assert "contents: read" in workflow
     assert "contents: write" not in workflow
     assert "LEDGER_FORWARD_OUTCOMES_ENABLED" in workflow
     assert "--publish" not in workflow
+    assert "--approve-repository-write" not in workflow
     assert "git push" not in workflow
     assert "git commit" not in workflow
+    assert "research/v2_research_ledger/outcomes" in workflow
+    assert "research/v2_research_ledger/durable" in workflow
+    assert "REFERENCE_NOT_VALIDATED" in workflow
+    assert "CALENDAR_INVALID" in workflow
+    assert "missing_return_violations" in workflow
+    assert "git diff --exit-code" in workflow
+    assert "git status --porcelain --untracked-files=all" in workflow
+    assert "json.dumps(store" not in workflow
+    assert 'store["rows"]' not in workflow
+    assert "os.environ[" not in workflow.replace('os.environ.get("GUARDIAN_REFERENCE_URL", "")', "").replace('os.environ.get("GUARDIAN_REFERENCE_TOKEN", "")', "")
 
 
 def _generation_name(document: dict) -> str:

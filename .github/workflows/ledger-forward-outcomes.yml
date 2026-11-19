@@ -3,7 +3,7 @@ name: ledger-forward-outcomes
 # Supervised validation only. This workflow has no schedule and no write
 # permission. Leave LEDGER_FORWARD_OUTCOMES_ENABLED unset. Setting that
 # variable still cannot publish a generation or merge a pull request.
-# A reviewed commit of research/v2_research_ledger/outcomes is the publication.
+# The dry run reads the committed outcomes directory and must not write it.
 
 on:
   workflow_dispatch:
@@ -40,19 +40,114 @@ jobs:
             exit 1
           fi
 
-      - name: Download the published Price Book
+      - name: Download and validate the published Price Book
         env:
           GUARDIAN_REFERENCE_URL: ${{ secrets.GUARDIAN_REFERENCE_URL }}
           GUARDIAN_REFERENCE_TOKEN: ${{ secrets.GUARDIAN_REFERENCE_TOKEN }}
         run: |
           set -euo pipefail
-          python -c "import os, sys; from pathlib import Path; from research.guardian_research.reference_export import fetch_published_store; path = fetch_published_store(os.environ.get('GUARDIAN_REFERENCE_URL', ''), os.environ.get('GUARDIAN_REFERENCE_TOKEN', ''), Path('/tmp/reference_store.json')); sys.exit(0 if path else 1)"
+          python - << 'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
 
-      - name: Dry-run the Ledger T+ generation
+          from research.approximate_returns.contract import PRICE_BASIS, SOURCE
+          from research.guardian_research.reference_export import fetch_published_store, read_reference_store
+
+          destination = Path("/tmp/reference_store.json")
+          fetched = fetch_published_store(
+              os.environ.get("GUARDIAN_REFERENCE_URL", ""),
+              os.environ.get("GUARDIAN_REFERENCE_TOKEN", ""),
+              destination,
+          )
+          store = read_reference_store(fetched) if fetched is not None else None
+          if store is None:
+              print("REFERENCE_NOT_VALIDATED")
+              sys.exit(1)
+          if store.get("price_basis") != PRICE_BASIS or store.get("source") != SOURCE:
+              print("REFERENCE_NOT_VALIDATED")
+              sys.exit(1)
+          sessions = [str(item) for item in store.get("trading_sessions") or []]
+          if not sessions or sessions != sorted(set(sessions)) or store.get("as_of") != sessions[-1]:
+              print("CALENDAR_INVALID")
+              sys.exit(1)
+          print(json.dumps({
+              "as_of": store.get("as_of"),
+              "content_sha256": store.get("content_sha256"),
+              "first_session": sessions[0],
+              "last_session": sessions[-1],
+              "price_basis": store.get("price_basis"),
+              "session_count": len(sessions),
+              "source": store.get("source"),
+          }, sort_keys=True))
+          PY
+
+      - name: Dry-run Ledger T+ against the committed outcomes
         run: |
           set -euo pipefail
-          python -m research.v2_research_ledger.forward_outcomes \
-            --ledger research/v2_research_ledger/durable \
-            --reference /tmp/reference_store.json \
-            --output-root /tmp/ledger-forward-dry-run
-          test ! -e /tmp/ledger-forward-dry-run
+          python - << 'PY'
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          from research.v2_research_ledger.forward_outcomes import ForwardBuildError, build_forward_document
+
+          ledger = Path("research/v2_research_ledger/durable")
+          reference = Path("/tmp/reference_store.json")
+          outcomes = Path("research/v2_research_ledger/outcomes")
+          missing = {"NOT_YET_OBSERVED", "T0_REFERENCE_MISSING", "TARGET_MISSING"}
+          try:
+              document = build_forward_document(ledger, reference)
+          except ForwardBuildError as exc:
+              print(json.dumps({"ok": False, "reason": exc.reason}, sort_keys=True))
+              sys.exit(1)
+          violations = 0
+          for row in document["rows"]:
+              for cell in row["horizons"].values():
+                  if cell.get("status") in missing and cell.get("return_pct") is not None:
+                      violations += 1
+          if violations:
+              print(json.dumps({"missing_return_violations": violations, "ok": False}, sort_keys=True))
+              sys.exit(1)
+          completed = subprocess.run(
+              [
+                  sys.executable,
+                  "-m",
+                  "research.v2_research_ledger.forward_outcomes",
+                  "--ledger",
+                  str(ledger),
+                  "--reference",
+                  str(reference),
+                  "--output-root",
+                  str(outcomes),
+              ],
+              check=False,
+              capture_output=True,
+              text=True,
+          )
+          sys.stdout.write(completed.stdout)
+          sys.stderr.write(completed.stderr)
+          if completed.returncode != 0:
+              sys.exit(completed.returncode)
+          report = json.loads(completed.stdout)
+          if report.get("mode") != "dry_run" or report.get("ok") is not True:
+              sys.exit(1)
+          print(json.dumps({
+              "as_of": report.get("as_of"),
+              "file_status": report.get("file_status"),
+              "generation_id": report.get("generation_id"),
+              "index_status": report.get("index_status"),
+              "missing_return_violations": violations,
+              "mode": report.get("mode"),
+              "ok": True,
+              "reference_sha256": report.get("reference_sha256"),
+          }, sort_keys=True))
+          PY
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "WORKSPACE_CHANGED"
+            git status --porcelain --untracked-files=all
+            exit 1
+          fi
+          git diff --exit-code
