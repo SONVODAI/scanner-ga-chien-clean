@@ -309,14 +309,31 @@ def test_shipped_store_preserves_repository_sources_and_survives_reload():
         assert "T+1" not in stored
     linked = 0
     for raw in sidecar["rows"]:
-        ident = f"sidecar|{str(raw['session'])[:10]}|{raw['symbol']}|{raw['candidate_first_seen_ts']}"
+        symbol = str(raw["symbol"]).strip().upper()
+        seen = raw["candidate_first_seen_ts"]
+        ident = f"sidecar|{str(raw['session'])[:10]}|{symbol}|{seen}"
+        if raw.get("source") == "market_aware_sweetspot":
+            matches = [
+                identity_id
+                for identity_id, row in second.identities.items()
+                if row.get("record_role") == "sweetspot_identity"
+                and str((row.get("sealed") or {}).get("symbol") or "").strip().upper() == symbol
+                and str((row.get("sealed") or {}).get("created_at") or "") == seen
+                and (row.get("sealed") or {}).get("t0_price") == canonical_number(raw.get("price_at_first_seen"))
+            ]
+            assert matches
+            assert len(matches) == 1
+            assert ident not in second.identities
+            assert f"nomination|{ident}" not in second.links
+            assert second.identities[matches[0]]["sealed"]["t0_date"]
+            continue
         assert ident in second.identities
         link = second.links[f"nomination|{ident}"]
         assert link["status"] == raw["status"]
         assert link["source_field"] == raw["source"]
         assert second.identities[ident]["t0_price"] == int(raw["price_at_first_seen"])
         linked += 1
-    assert linked == len(sidecar["rows"])
+    assert linked == sum(1 for raw in sidecar["rows"] if raw.get("source") != "market_aware_sweetspot")
     with SWEET.open(encoding="utf-8", newline="") as handle:
         sweet_rows = list(csv.DictReader(handle))
     assert sweet_rows
