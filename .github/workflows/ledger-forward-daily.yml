@@ -1,0 +1,724 @@
+name: ledger-forward-daily
+
+# Daily Research Ledger publication after the VPS Price Book export.
+# LEDGER_FORWARD_DAILY_ENABLED is not created or set by this workflow.
+# Leave it unset. The job is skipped until an operator sets it to true.
+# The manual dry run and the supervised 2026-11-19 workflow are separate
+# files. A failed job does not push. The schedule cannot send the holiday
+# confirmation. A missing weekday is an alert or a refusal, never a session
+# this job invents.
+
+on:
+  schedule:
+    # GitHub cron is UTC. Asia/Ho_Chi_Minh is UTC+7 and does not observe daylight saving.
+    # Primary:  19:10 ICT = 12:10 UTC, Monday-Friday. After the 18:50 ICT export.
+    # Retry:    20:40 ICT = 13:40 UTC, Monday-Friday. After the 20:20 ICT export.
+    # Retry:    23:10 ICT = 16:10 UTC, Monday-Friday. After the 22:50 ICT export.
+    # Morning:  06:40 ICT = 23:40 UTC, Tuesday-Saturday. After the 06:20 ICT export.
+    - cron: "10 12 * * 1-5"
+    - cron: "40 13 * * 1-5"
+    - cron: "10 16 * * 1-5"
+    - cron: "40 23 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type publish-next-session. Type publish-holiday-gap only when a weekday was skipped. The schedule cannot send the holiday confirmation."
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ledger-forward-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: vars.LEDGER_FORWARD_DAILY_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Publish the next validated generation or stop
+        env:
+          CONFIRM: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm || '' }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+          GUARDIAN_REFERENCE_TOKEN: ${{ secrets.GUARDIAN_REFERENCE_TOKEN }}
+          GUARDIAN_REFERENCE_URL: ${{ secrets.GUARDIAN_REFERENCE_URL }}
+          LEDGER_FORWARD_DAILY_ENABLED: ${{ vars.LEDGER_FORWARD_DAILY_ENABLED }}
+        run: |
+          set -euo pipefail
+          python - << 'PY'
+          # BEGIN LEDGER_FORWARD_DAILY
+          import datetime
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          from research.approximate_returns.contract import PRICE_BASIS, SOURCE
+          from research.guardian_research.reference_export import fetch_published_store, read_reference_store
+          from research.guardian_research.universe import load_tracked_symbols
+          from research.v2_research_ledger.forward_outcomes import ForwardBuildError, build_forward_document
+
+          ICT = ZoneInfo("Asia/Ho_Chi_Minh")
+          NEXT_CONFIRMATION = "publish-next-session"
+          HOLIDAY_CONFIRMATION = "publish-holiday-gap"
+          HISTORICAL_GENERATION = "research/v2_research_ledger/outcomes/generations/2026-11-18_41f36ca0cad9_a90e163943d8.json"
+          HISTORICAL_SHA256 = "14aeba749aee6d3d4811ab68257ea2819a75c85aa1f3b253a1fa34287cc80dc6"
+          PUBLISHED_GENERATION = "research/v2_research_ledger/outcomes/generations/2026-11-19_41f36ca0cad9_63b98229a9f9.json"
+          PUBLISHED_SHA256 = "5329e539635ce7393400b83ef7d5cc507184fc152f4aad657db4d257df59f1a5"
+          PINNED_GENERATIONS = {
+              HISTORICAL_GENERATION: HISTORICAL_SHA256,
+              PUBLISHED_GENERATION: PUBLISHED_SHA256,
+          }
+          PINNED_GENERATION_IDS = (
+              "2026-11-18_41f36ca0cad9_a90e163943d8",
+              "2026-11-19_41f36ca0cad9_63b98229a9f9",
+          )
+          DURABLE_ROOT = "research/v2_research_ledger/durable"
+          OUTCOMES_ROOT = "research/v2_research_ledger/outcomes"
+          DURABLE_FILES = ("identities.jsonl", "links.jsonl", "conflicts.jsonl", "manifest.json")
+          INDEX_SCHEMA = "v2_research_forward_index.v1"
+          MISSING_STATUSES = {"NOT_YET_OBSERVED", "T0_REFERENCE_MISSING", "TARGET_MISSING"}
+          TRACKED_COUNT = 143
+          MAX_PUSH_ATTEMPTS = 3
+          # UTC weekday 1-5 is Monday-Friday. The 23:40 UTC slot is 06:40 ICT the next day, Tuesday-Saturday.
+          SCHEDULED_SLOTS = (
+              {"cron": "10 12 * * 1-5", "utc_hour": 12, "utc_minute": 10, "ict_hour": 19, "ict_minute": 10, "kind": "evening"},
+              {"cron": "40 13 * * 1-5", "utc_hour": 13, "utc_minute": 40, "ict_hour": 20, "ict_minute": 40, "kind": "evening"},
+              {"cron": "10 16 * * 1-5", "utc_hour": 16, "utc_minute": 10, "ict_hour": 23, "ict_minute": 10, "kind": "evening"},
+              {"cron": "40 23 * * 1-5", "utc_hour": 23, "utc_minute": 40, "ict_hour": 6, "ict_minute": 40, "kind": "morning"},
+          )
+
+          class PublicationRefusal(RuntimeError):
+              def __init__(self, reason: str):
+                  super().__init__(reason)
+                  self.reason = reason
+
+          def require_dispatch_context(enabled: str | None, confirm: str | None, ref: str | None, event: str | None) -> str:
+              if enabled != "true":
+                  raise PublicationRefusal("PUBLICATION_DISABLED")
+              if ref != "refs/heads/main":
+                  raise PublicationRefusal("BRANCH_REFUSED")
+              if event == "schedule":
+                  return "schedule"
+              if event == "workflow_dispatch":
+                  if confirm == NEXT_CONFIRMATION:
+                      return "next"
+                  if confirm == HOLIDAY_CONFIRMATION:
+                      return "holiday"
+                  raise PublicationRefusal("CONFIRMATION_REFUSED")
+              raise PublicationRefusal("EVENT_REFUSED")
+
+          def _iso_day(value: object) -> str:
+              text = str(value or "")
+              try:
+                  parsed = datetime.date.fromisoformat(text)
+              except ValueError as exc:
+                  raise PublicationRefusal("CALENDAR_INVALID") from exc
+              if parsed.isoformat() != text:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              return text
+
+          def require_price_book(store: dict) -> None:
+              if store.get("price_basis") != PRICE_BASIS or store.get("source") != SOURCE or not store.get("content_sha256"):
+                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
+              sessions = [str(item) for item in store.get("trading_sessions") or []]
+              if not sessions or sessions != sorted(set(sessions)) or store.get("as_of") != sessions[-1]:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              _iso_day(store.get("as_of"))
+              for session in sessions:
+                  _iso_day(session)
+
+          def validated_store(path: Path) -> dict:
+              store = read_reference_store(path)
+              if store is None:
+                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
+              require_price_book(store)
+              return store
+
+          def _session_counts(store: dict, session: str) -> dict[str, int]:
+              ok = 0
+              other = 0
+              for row in store.get("rows") or []:
+                  if not isinstance(row, dict) or str(row.get("session") or "") != session:
+                      continue
+                  if str(row.get("quality") or "") == "OK":
+                      ok += 1
+                  else:
+                      other += 1
+              rejections = 0
+              for item in store.get("rejections") or []:
+                  if isinstance(item, dict) and str(item.get("session") or "") == session:
+                      rejections += 1
+              return {"ok": ok, "other": other, "rejections": rejections}
+
+          def safe_receipt(store: dict) -> dict:
+              sessions = [str(item) for item in store.get("trading_sessions") or []]
+              counts = _session_counts(store, sessions[-1])
+              coverage = store.get("coverage") if isinstance(store.get("coverage"), dict) else {}
+              return {
+                  "as_of": store.get("as_of"),
+                  "content_sha256": store.get("content_sha256"),
+                  "first_session": sessions[0],
+                  "last_session": sessions[-1],
+                  "new_session_ok": counts["ok"],
+                  "new_session_other": counts["other"],
+                  "new_session_rejections": counts["rejections"],
+                  "price_basis": store.get("price_basis"),
+                  "session_count": len(sessions),
+                  "source": store.get("source"),
+                  "tracked_count": coverage.get("tracked_count"),
+              }
+
+          def require_universe(symbols: tuple[str, ...]) -> set[str]:
+              tracked = {str(item).strip().upper() for item in symbols}
+              if len(symbols) != TRACKED_COUNT or len(tracked) != TRACKED_COUNT:
+                  raise PublicationRefusal("UNIVERSE_MISMATCH")
+              return tracked
+
+          def _ict(moment: datetime.datetime) -> datetime.datetime:
+              if moment.tzinfo is None:
+                  raise PublicationRefusal("CLOCK_INVALID")
+              return moment.astimezone(ICT)
+
+          def _previous_weekday(day: datetime.date) -> datetime.date:
+              cursor = day - datetime.timedelta(days=1)
+              while cursor.weekday() >= 5:
+                  cursor -= datetime.timedelta(days=1)
+              return cursor
+
+          def unchanged_disposition(as_of: str, moment: datetime.datetime) -> str:
+              """Say whether an unchanged book should wait, count as current, or alert.
+
+              The previous weekday is only the morning alert threshold. It is not
+              appended to the Price Book calendar.
+              """
+              ict = _ict(moment)
+              day = _iso_day(as_of)
+              if 6 <= ict.hour < 18:
+                  if day < _previous_weekday(ict.date()).isoformat():
+                      return "PRICE_BOOK_NOT_ADVANCED"
+                  return "already_published"
+              if day < ict.date().isoformat():
+                  return "waiting_for_price_book"
+              return "already_published"
+
+          def weekday_gaps(previous: str, current: str) -> list[str]:
+              """Weekdays strictly between two sessions. The result is not a calendar."""
+              start = datetime.date.fromisoformat(_iso_day(previous))
+              end = datetime.date.fromisoformat(_iso_day(current))
+              if end <= start:
+                  return []
+              missing = []
+              cursor = start + datetime.timedelta(days=1)
+              while cursor < end:
+                  if cursor.weekday() < 5:
+                      missing.append(cursor.isoformat())
+                  cursor += datetime.timedelta(days=1)
+              return missing
+
+          def _ok_symbols(store: dict, session: str, tracked: set[str], *, strict: bool) -> set[str]:
+              seen: list[str] = []
+              for row in store.get("rows") or []:
+                  if not isinstance(row, dict) or str(row.get("session") or "") != session:
+                      continue
+                  symbol = str(row.get("symbol") or "").strip().upper()
+                  if not symbol or symbol not in tracked:
+                      if strict:
+                          raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+                      continue
+                  if str(row.get("quality") or "") != "OK":
+                      if strict:
+                          raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+                      continue
+                  seen.append(symbol)
+              if len(seen) != len(set(seen)):
+                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+              return set(seen)
+
+          def require_complete_session(store: dict, tracked: set[str]) -> None:
+              sessions = [str(item) for item in store.get("trading_sessions") or []]
+              if len(sessions) < 2:
+                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+              new_session = sessions[-1]
+              previous = sessions[-2]
+              rejections = store.get("rejections")
+              if not isinstance(rejections, list):
+                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+              for item in rejections:
+                  if isinstance(item, dict) and str(item.get("session") or "") == new_session:
+                      raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+              coverage = store.get("coverage")
+              if not isinstance(coverage, dict) or coverage.get("tracked_count") != len(tracked):
+                  raise PublicationRefusal("UNIVERSE_MISMATCH")
+              current = _ok_symbols(store, new_session, tracked, strict=True)
+              prior = _ok_symbols(store, previous, tracked, strict=False)
+              if not prior or not current.issuperset(prior):
+                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+
+          def assess_publication(
+              store: dict,
+              prior: dict,
+              *,
+              today_ict: str,
+              mode: str,
+              tracked: set[str],
+              moment: datetime.datetime,
+          ) -> dict:
+              if mode not in {"schedule", "next", "holiday"}:
+                  raise PublicationRefusal("EVENT_REFUSED")
+              sessions = [str(item) for item in store.get("trading_sessions") or []]
+              as_of = _iso_day(store.get("as_of"))
+              today = _iso_day(today_ict)
+              if datetime.date.fromisoformat(as_of).weekday() >= 5:
+                  raise PublicationRefusal("WEEKEND_SESSION")
+              if as_of > today:
+                  raise PublicationRefusal("FUTURE_SESSION")
+              prior_as_of = _iso_day(prior.get("as_of"))
+              prior_sessions = [str(item) for item in prior.get("trading_sessions") or []]
+              if not prior_sessions or prior_sessions[-1] != prior_as_of or prior_sessions != sorted(set(prior_sessions)):
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              if as_of < prior_as_of:
+                  raise PublicationRefusal("STALE_PRICE_BOOK")
+              if as_of == prior_as_of:
+                  if store.get("content_sha256") != prior.get("reference_sha256") or sessions != prior_sessions:
+                      raise PublicationRefusal("PRICE_BOOK_REVISED")
+                  disposition = unchanged_disposition(as_of, moment)
+                  if disposition == "PRICE_BOOK_NOT_ADVANCED":
+                      raise PublicationRefusal("PRICE_BOOK_NOT_ADVANCED")
+                  return {"action": disposition, "as_of": as_of}
+              if sessions[:-1] != prior_sessions or sessions[-1] != as_of:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              gaps = weekday_gaps(prior_as_of, as_of)
+              if gaps:
+                  if mode != "holiday":
+                      raise PublicationRefusal("CALENDAR_GAP")
+              elif mode == "holiday":
+                  raise PublicationRefusal("GAP_ABSENT")
+              require_complete_session(store, tracked)
+              return {"action": "publish", "as_of": as_of}
+
+          def load_prior(repo: Path) -> dict:
+              index_path = repo / OUTCOMES_ROOT / "index.json"
+              try:
+                  loaded = json.loads(index_path.read_text(encoding="utf-8"))
+              except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                  raise PublicationRefusal("INDEX_INVALID") from exc
+              if not isinstance(loaded, dict) or loaded.get("schema") != INDEX_SCHEMA:
+                  raise PublicationRefusal("INDEX_INVALID")
+              generations = loaded.get("generations")
+              if not isinstance(generations, list) or not generations:
+                  raise PublicationRefusal("PRIOR_GENERATION_ABSENT")
+              chosen = [item for item in generations if isinstance(item, dict)]
+              if len(chosen) != len(generations):
+                  raise PublicationRefusal("INDEX_INVALID")
+              latest = max(_iso_day(item.get("as_of")) for item in chosen)
+              current = [item for item in chosen if str(item.get("as_of") or "") == latest]
+              if len(current) != 1:
+                  raise PublicationRefusal("DUPLICATE_AS_OF")
+              entry = current[0]
+              relative = str(entry.get("path") or "")
+              if not relative.startswith("generations/") or ".." in relative.split("/"):
+                  raise PublicationRefusal("INDEX_INVALID")
+              path = repo / OUTCOMES_ROOT / relative
+              try:
+                  document = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                  raise PublicationRefusal("PRIOR_GENERATION_ABSENT") from exc
+              if not isinstance(document, dict):
+                  raise PublicationRefusal("PRIOR_GENERATION_ABSENT")
+              sessions = [str(item) for item in document.get("trading_sessions") or []]
+              generation_id = str(entry.get("generation_id") or "")
+              if path.name != f"{generation_id}.json" or document.get("as_of") != latest or document.get("reference_sha256") != entry.get("reference_sha256"):
+                  raise PublicationRefusal("PRIOR_GENERATION_ABSENT")
+              if not sessions or sessions != sorted(set(sessions)) or sessions[-1] != latest:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              return {
+                  "as_of": latest,
+                  "generation_id": generation_id,
+                  "reference_sha256": str(entry.get("reference_sha256") or ""),
+                  "trading_sessions": sessions,
+              }
+
+          def missing_return_violations(document: dict) -> int:
+              violations = 0
+              for row in document.get("rows") or []:
+                  for cell in (row.get("horizons") or {}).values():
+                      if cell.get("status") in MISSING_STATUSES and cell.get("return_pct") is not None:
+                          violations += 1
+              return violations
+
+          def confirm_unchanged(report: dict, prior: dict) -> None:
+              if report.get("ok") is not True or report.get("mode") != "dry_run":
+                  raise PublicationRefusal("DRY_RUN_FAILED")
+              if report.get("generation_id") != prior.get("generation_id"):
+                  raise PublicationRefusal("LEDGER_CHANGED")
+              if report.get("file_status") != "unchanged" or report.get("index_status") != "unchanged":
+                  raise PublicationRefusal("LEDGER_CHANGED")
+
+          def publication_action(report: dict, violations: int, as_of: str) -> str:
+              if violations != 0:
+                  raise PublicationRefusal("MISSING_RETURN_NOT_NULL")
+              if report.get("ok") is not True or report.get("mode") != "dry_run":
+                  raise PublicationRefusal("DRY_RUN_FAILED")
+              if report.get("as_of") != as_of:
+                  raise PublicationRefusal("AS_OF_REFUSED")
+              sessions = [str(item) for item in report.get("trading_sessions") or []]
+              if not sessions or sessions[-1] != as_of:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              generation_id = str(report.get("generation_id") or "")
+              if not generation_id.startswith(as_of + "_") or generation_id in PINNED_GENERATION_IDS:
+                  raise PublicationRefusal("GENERATION_REFUSED")
+              file_status = report.get("file_status")
+              index_status = report.get("index_status")
+              if file_status == "unchanged" and index_status == "unchanged":
+                  return "already_published"
+              if file_status == "would_write" and index_status == "would_write":
+                  return "publish"
+              raise PublicationRefusal("DRY_RUN_STATUS_REFUSED")
+
+          def require_publish_result(report: dict, generation_id: str, as_of: str) -> None:
+              if report.get("ok") is not True or report.get("mode") != "publish":
+                  raise PublicationRefusal("PUBLISH_FAILED")
+              if report.get("as_of") != as_of or report.get("generation_id") != generation_id:
+                  raise PublicationRefusal("PUBLISH_FAILED")
+              if report.get("file_status") != "written" or report.get("index_status") != "written":
+                  raise PublicationRefusal("PUBLISH_FAILED")
+
+          def allowed_paths(generation_id: str) -> tuple[str, str]:
+              return (
+                  f"{OUTCOMES_ROOT}/generations/{generation_id}.json",
+                  f"{OUTCOMES_ROOT}/index.json",
+              )
+
+          def commit_message(as_of: str) -> str:
+              return f"Publish Research Ledger T+ generation {_iso_day(as_of)}"
+
+          def assert_exact_paths(actual: list[str], generation_id: str) -> None:
+              expected = list(allowed_paths(generation_id))
+              if sorted(actual) != sorted(expected):
+                  raise PublicationRefusal("ALLOWLIST_REFUSED")
+
+          def paths_block_publication(paths: list[str]) -> bool:
+              protected = (DURABLE_ROOT, OUTCOMES_ROOT)
+              for raw in paths:
+                  path = raw.replace("\\", "/").strip().strip('"')
+                  if any(path == root or path.startswith(root + "/") for root in protected):
+                      return True
+              return False
+
+          def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+              if any(arg in {"--force", "--force-with-lease", "--force-if-includes"} or arg.startswith("+") for arg in args):
+                  raise PublicationRefusal("FORCE_PUSH_REFUSED")
+              completed = subprocess.run(
+                  ["git", "-C", str(repo), "-c", "color.ui=false", "-c", "commit.gpgsign=false", *args],
+                  check=False,
+                  capture_output=True,
+                  text=True,
+                  env={**os.environ, "GIT_TERMINAL_PROMPT": "0", "GIT_EDITOR": "true"},
+              )
+              if check and completed.returncode != 0:
+                  refusal = PublicationRefusal("GIT_FAILED")
+                  refusal.detail = (completed.stderr or completed.stdout)[-500:]
+                  raise refusal
+              return completed
+
+          def _rev(repo: Path, revision: str) -> str:
+              return _git(repo, "rev-parse", revision).stdout.strip()
+
+          def _names(repo: Path, *args: str) -> list[str]:
+              completed = _git(repo, "diff", "--name-only", *args)
+              return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+
+          def _is_ancestor(repo: Path, earlier: str, later: str) -> bool:
+              return _git(repo, "merge-base", "--is-ancestor", earlier, later, check=False).returncode == 0
+
+          def porcelain_paths(repo: Path) -> list[str]:
+              completed = _git(repo, "status", "--porcelain", "--untracked-files=all")
+              paths = []
+              for line in completed.stdout.splitlines():
+                  if len(line) < 4:
+                      continue
+                  path = line[3:]
+                  if " -> " in path:
+                      path = path.split(" -> ", 1)[1]
+                  paths.append(path.strip().strip('"'))
+              return paths
+
+          def _sha256(path: Path) -> str:
+              if not path.is_file():
+                  raise PublicationRefusal("DURABLE_CHANGED")
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def durable_hashes(repo: Path) -> dict[str, str]:
+              root = repo / DURABLE_ROOT
+              hashes = {}
+              for name in DURABLE_FILES:
+                  path = root / name
+                  if not path.is_file():
+                      raise PublicationRefusal("DURABLE_CHANGED")
+                  hashes[name] = _sha256(path)
+              return hashes
+
+          def historical_digest(repo: Path) -> str:
+              path = repo / HISTORICAL_GENERATION
+              if not path.is_file():
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def generation_snapshot(repo: Path) -> dict[str, str]:
+              root = repo / OUTCOMES_ROOT / "generations"
+              if not root.is_dir():
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              hashes = {}
+              for path in sorted(root.glob("*.json")):
+                  if not path.is_file():
+                      raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+                  hashes[f"{OUTCOMES_ROOT}/generations/{path.name}"] = hashlib.sha256(path.read_bytes()).hexdigest()
+              if not hashes:
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              return hashes
+
+          def assert_pinned_history(repo: Path) -> None:
+              for relative, digest in PINNED_GENERATIONS.items():
+                  path = repo / relative
+                  if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+                      raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+
+          def assert_generation_document(repo: Path, generation_id: str, baseline_durable: dict[str, str], as_of: str) -> None:
+              path = repo / allowed_paths(generation_id)[0]
+              try:
+                  document = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, UnicodeError, json.JSONDecodeError):
+                  raise PublicationRefusal("LEDGER_HASH_DIVERGED") from None
+              if not isinstance(document, dict) or document.get("as_of") != as_of or document.get("official_pnl") is not False:
+                  raise PublicationRefusal("PUBLISH_FAILED")
+              if document.get("ledger_hashes") != baseline_durable:
+                  raise PublicationRefusal("LEDGER_HASH_DIVERGED")
+
+          def assert_immutable(repo: Path, baseline_durable: dict[str, str], baseline_generations: dict[str, str], generation_id: str | None = None) -> None:
+              if durable_hashes(repo) != baseline_durable:
+                  raise PublicationRefusal("DURABLE_CHANGED")
+              current = generation_snapshot(repo)
+              allowed_new = f"{OUTCOMES_ROOT}/generations/{generation_id}.json" if generation_id else None
+              extra = set(current) - set(baseline_generations)
+              if allowed_new is None and extra:
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              if allowed_new is not None and extra - {allowed_new}:
+                  raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+              for relative, digest in baseline_generations.items():
+                  if current.get(relative) != digest:
+                      raise PublicationRefusal("HISTORICAL_GENERATION_CHANGED")
+
+          def assert_ready_to_push(repo: Path, generation_id: str, as_of: str, baseline_durable: dict[str, str], baseline_generations: dict[str, str]) -> None:
+              if porcelain_paths(repo) or _names(repo, "--cached"):
+                  raise PublicationRefusal("WORKSPACE_DIRTY")
+              assert_exact_paths(_names(repo, "HEAD^", "HEAD"), generation_id)
+              assert_immutable(repo, baseline_durable, baseline_generations, generation_id)
+              assert_generation_document(repo, generation_id, baseline_durable, as_of)
+
+          def commit_publication(repo: Path, generation_id: str, as_of: str, baseline_durable: dict[str, str], baseline_generations: dict[str, str]) -> None:
+              generation, index = allowed_paths(generation_id)
+              assert_exact_paths(porcelain_paths(repo), generation_id)
+              assert_immutable(repo, baseline_durable, baseline_generations, generation_id)
+              assert_generation_document(repo, generation_id, baseline_durable, as_of)
+              _git(repo, "add", "--", generation, index)
+              assert_exact_paths(_names(repo, "--cached"), generation_id)
+              _git(
+                  repo,
+                  "-c",
+                  "user.name=github-actions[bot]",
+                  "-c",
+                  "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+                  "commit",
+                  "-m",
+                  commit_message(as_of),
+              )
+              assert_ready_to_push(repo, generation_id, as_of, baseline_durable, baseline_generations)
+
+          def push_fast_forward(repo: Path, generation_id: str, as_of: str, baseline_durable: dict[str, str], baseline_generations: dict[str, str], attempts: int = MAX_PUSH_ATTEMPTS) -> dict:
+              rebases = 0
+              for _attempt in range(attempts):
+                  _git(repo, "fetch", "origin", "main")
+                  head = _rev(repo, "HEAD")
+                  origin = _rev(repo, "origin/main")
+                  if origin == head:
+                      assert_ready_to_push(repo, generation_id, as_of, baseline_durable, baseline_generations)
+                      return {"commit": head, "rebases": rebases}
+                  if _git(repo, "merge-base", head, origin, check=False).returncode != 0:
+                      raise PublicationRefusal("UPSTREAM_REWRITTEN")
+                  ahead = _git(repo, "rev-list", "--count", f"{origin}..HEAD").stdout.strip()
+                  if ahead != "1":
+                      raise PublicationRefusal("HISTORY_REFUSED")
+                  assert_ready_to_push(repo, generation_id, as_of, baseline_durable, baseline_generations)
+                  parent = _rev(repo, "HEAD^")
+                  upstream = _git(repo, "rev-list", "--count", f"HEAD..{origin}").stdout.strip()
+                  if upstream != "0":
+                      if paths_block_publication(_names(repo, parent, origin)):
+                          raise PublicationRefusal("UPSTREAM_LEDGER_CHANGED")
+                      rebase = _git(repo, "rebase", "origin/main", check=False)
+                      if rebase.returncode != 0:
+                          _git(repo, "rebase", "--abort", check=False)
+                          raise PublicationRefusal("REBASE_REFUSED")
+                      rebases += 1
+                      continue
+                  assert_ready_to_push(repo, generation_id, as_of, baseline_durable, baseline_generations)
+                  push = _git(repo, "push", "origin", "HEAD:main", check=False)
+                  if push.returncode != 0:
+                      continue
+                  _git(repo, "fetch", "origin", "main")
+                  head = _rev(repo, "HEAD")
+                  origin = _rev(repo, "origin/main")
+                  if origin == head:
+                      return {"commit": head, "rebases": rebases}
+                  if _is_ancestor(repo, head, origin):
+                      if paths_block_publication(_names(repo, head, origin)):
+                          raise PublicationRefusal("UPSTREAM_LEDGER_CHANGED_AFTER_PUSH")
+                      assert_ready_to_push(repo, generation_id, as_of, baseline_durable, baseline_generations)
+                      return {"commit": head, "rebases": rebases}
+              raise PublicationRefusal("PUSH_REJECTED")
+
+          def _run_builder(repo: Path, reference: Path, publish: bool) -> dict:
+              command = [
+                  sys.executable,
+                  "-m",
+                  "research.v2_research_ledger.forward_outcomes",
+                  "--ledger",
+                  str(repo / DURABLE_ROOT),
+                  "--reference",
+                  str(reference),
+                  "--output-root",
+                  str(repo / OUTCOMES_ROOT),
+              ]
+              if publish:
+                  command.extend(["--publish", "--approve-repository-write"])
+              completed = subprocess.run(command, check=False, capture_output=True, text=True)
+              if completed.stdout:
+                  sys.stdout.write(completed.stdout)
+              if completed.stderr:
+                  sys.stderr.write(completed.stderr)
+              if completed.returncode != 0:
+                  raise PublicationRefusal("PUBLISH_FAILED" if publish else "DRY_RUN_FAILED")
+              try:
+                  report = json.loads(completed.stdout)
+              except json.JSONDecodeError:
+                  raise PublicationRefusal("DRY_RUN_FAILED") from None
+              return report
+
+          def _hold(repo: Path, reference: Path, prior: dict, decision: dict) -> None:
+              try:
+                  document = build_forward_document(repo / DURABLE_ROOT, reference)
+              except ForwardBuildError as exc:
+                  raise PublicationRefusal(exc.reason) from None
+              if missing_return_violations(document):
+                  raise PublicationRefusal("MISSING_RETURN_NOT_NULL")
+              report = _run_builder(repo, reference, publish=False)
+              confirm_unchanged(report, prior)
+              if porcelain_paths(repo):
+                  raise PublicationRefusal("WORKSPACE_DIRTY")
+              print(json.dumps({
+                  "as_of": decision["as_of"],
+                  "generation_id": prior["generation_id"],
+                  "mode": decision["action"],
+                  "ok": True,
+              }, sort_keys=True))
+
+          def publish_main() -> int:
+              mode = require_dispatch_context(
+                  os.environ.get("LEDGER_FORWARD_DAILY_ENABLED"),
+                  os.environ.get("CONFIRM"),
+                  os.environ.get("GITHUB_REF"),
+                  os.environ.get("GITHUB_EVENT_NAME"),
+              )
+              repo = Path(".").resolve()
+              assert_pinned_history(repo)
+              reference = Path("/tmp/reference_store.json")
+              fetched = fetch_published_store(
+                  os.environ.get("GUARDIAN_REFERENCE_URL", ""),
+                  os.environ.get("GUARDIAN_REFERENCE_TOKEN", ""),
+                  reference,
+              )
+              if fetched is None:
+                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
+              store = validated_store(reference)
+              print(json.dumps(safe_receipt(store), sort_keys=True))
+              tracked = require_universe(load_tracked_symbols())
+              prior = load_prior(repo)
+              moment = datetime.datetime.now(ICT)
+              decision = assess_publication(
+                  store,
+                  prior,
+                  today_ict=moment.date().isoformat(),
+                  mode=mode,
+                  tracked=tracked,
+                  moment=moment,
+              )
+              if decision["action"] != "publish":
+                  _hold(repo, reference, prior, decision)
+                  return 0
+              try:
+                  document = build_forward_document(repo / DURABLE_ROOT, reference)
+              except ForwardBuildError as exc:
+                  raise PublicationRefusal(exc.reason) from None
+              violations = missing_return_violations(document)
+              if violations:
+                  raise PublicationRefusal("MISSING_RETURN_NOT_NULL")
+              as_of = decision["as_of"]
+              if [str(item) for item in document.get("trading_sessions") or []] != [str(item) for item in store.get("trading_sessions") or []]:
+                  raise PublicationRefusal("CALENDAR_INVALID")
+              baseline_durable = durable_hashes(repo)
+              baseline_generations = generation_snapshot(repo)
+              report = _run_builder(repo, reference, publish=False)
+              action = publication_action(report, violations, as_of)
+              generation_id = str(report["generation_id"])
+              if action == "already_published":
+                  if porcelain_paths(repo):
+                      raise PublicationRefusal("WORKSPACE_DIRTY")
+                  print(json.dumps({"as_of": as_of, "generation_id": generation_id, "mode": "already_published", "ok": True}, sort_keys=True))
+                  return 0
+              published = _run_builder(repo, reference, publish=True)
+              require_publish_result(published, generation_id, as_of)
+              assert_immutable(repo, baseline_durable, baseline_generations, generation_id)
+              commit_publication(repo, generation_id, as_of, baseline_durable, baseline_generations)
+              pushed = push_fast_forward(repo, generation_id, as_of, baseline_durable, baseline_generations)
+              print(json.dumps({
+                  "as_of": as_of,
+                  "commit": pushed["commit"],
+                  "file_status": "written",
+                  "generation_id": generation_id,
+                  "index_status": "written",
+                  "missing_return_violations": 0,
+                  "mode": "publish",
+                  "ok": True,
+                  "rebases": pushed["rebases"],
+              }, sort_keys=True))
+              return 0
+
+          if __name__ == "__main__":
+              try:
+                  raise SystemExit(publish_main())
+              except PublicationRefusal as refusal:
+                  print(json.dumps({"ok": False, "reason": refusal.reason}, sort_keys=True))
+                  raise SystemExit(1)
+              except Exception:
+                  print(json.dumps({"ok": False, "reason": "UNEXPECTED"}, sort_keys=True))
+                  raise SystemExit(1)
+          # END LEDGER_FORWARD_DAILY
+          PY

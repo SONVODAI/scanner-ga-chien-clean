@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 from pathlib import Path
@@ -227,7 +228,6 @@ def test_loader_falls_closed(tmp_path: Path):
     assert all(row["horizons"]["T+1"]["status"] == HORIZON_STATUS for row in panel["rows"])
 
 
-OUTCOMES_INDEX_SHA256 = "50a3ab5948f86e287f69535d6249a1026e1bc191e93c3d172be31267b3515d09"
 OUTCOMES_GENERATION_SHA256 = "14aeba749aee6d3d4811ab68257ea2819a75c85aa1f3b253a1fa34287cc80dc6"
 OUTCOMES_GENERATION = (
     ROOT
@@ -236,6 +236,15 @@ OUTCOMES_GENERATION = (
     / "outcomes"
     / "generations"
     / "2026-11-18_41f36ca0cad9_a90e163943d8.json"
+)
+PUBLISHED_GENERATION_SHA256 = "5329e539635ce7393400b83ef7d5cc507184fc152f4aad657db4d257df59f1a5"
+PUBLISHED_GENERATION = (
+    ROOT
+    / "research"
+    / "v2_research_ledger"
+    / "outcomes"
+    / "generations"
+    / "2026-11-19_41f36ca0cad9_63b98229a9f9.json"
 )
 UNTOUCHED = (
     "app.py",
@@ -255,9 +264,14 @@ def test_stage2_ledger_and_guardian_forward_stay_byte_stable():
         assert hashlib.sha256((DURABLE / name).read_bytes()).hexdigest() == digest
     committed = subprocess.check_output(["git", "-C", str(ROOT), "show", "HEAD:research/guardian_research/forward.py"])
     assert hashlib.sha256(GUARDIAN.read_bytes()).digest() == hashlib.sha256(committed).digest()
-    index = ROOT / "research" / "v2_research_ledger" / "outcomes" / "index.json"
-    assert hashlib.sha256(index.read_bytes()).hexdigest() == OUTCOMES_INDEX_SHA256
+    index = json.loads((ROOT / "research" / "v2_research_ledger" / "outcomes" / "index.json").read_text(encoding="utf-8"))
+    assert index["schema"] == "v2_research_forward_index.v1"
+    assert [item["generation_id"] for item in index["generations"]] == [
+        "2026-11-18_41f36ca0cad9_a90e163943d8",
+        "2026-11-19_41f36ca0cad9_63b98229a9f9",
+    ]
     assert hashlib.sha256(OUTCOMES_GENERATION.read_bytes()).hexdigest() == OUTCOMES_GENERATION_SHA256
+    assert hashlib.sha256(PUBLISHED_GENERATION.read_bytes()).hexdigest() == PUBLISHED_GENERATION_SHA256
 
 
 def test_newer_price_book_derives_as_of_without_stage2_pins(tmp_path: Path):
@@ -900,3 +914,372 @@ def test_real_publication_commits_one_generation_and_a_repeat_does_not(tmp_path:
     assert namespace["publication_action"](repeat, namespace["missing_return_violations"](build_forward_document(ledger, later))) == "already_published"
     assert len(list((output / "generations").glob("*.json"))) == 3
     assert _git(origin, "rev-parse", "main").strip() == pushed["commit"]
+
+
+DAILY_TRACKED = {"HPG", "VCB", "SSI"}
+
+
+def _daily_namespace() -> dict:
+    import textwrap
+
+    workflow = (ROOT / ".github" / "workflows" / "ledger-forward-daily.yml").read_text(encoding="utf-8")
+    begin = "# BEGIN LEDGER_FORWARD_DAILY\n"
+    start = workflow.index(begin) + len(begin)
+    stop = workflow.index("# END LEDGER_FORWARD_DAILY", start)
+    namespace = {"__name__": "ledger_forward_daily"}
+    exec(compile(textwrap.dedent(workflow[start:stop]), "ledger-forward-daily.yml", "exec"), namespace)
+    return namespace
+
+
+def _utc(day: str, hour: int, minute: int) -> datetime.datetime:
+    year, month, day_number = (int(part) for part in day.split("-"))
+    return datetime.datetime(year, month, day_number, hour, minute, tzinfo=datetime.timezone.utc)
+
+
+def _daily_store(sessions: list[str], rows: list[dict], rejections: list[dict] | None = None, tracked_count: int = 3) -> dict:
+    store = build_reference_store(pd.DataFrame(rows), sessions, as_of=sessions[-1])
+    store["rejections"] = [] if rejections is None else rejections
+    store["coverage"] = {"tracked_count": tracked_count}
+    store["content_sha256"] = _digest(store)
+    return store
+
+
+def _closes(sessions: list[str], *, omit: set[tuple[str, str]] | None = None, truncated: set[tuple[str, str]] | None = None, extra: list[dict] | None = None) -> list[dict]:
+    skipped = omit or set()
+    early = truncated or set()
+    rows = []
+    for day in sessions:
+        for index, symbol in enumerate(("HPG", "VCB", "SSI")):
+            if (symbol, day) in skipped:
+                continue
+            rows.append({
+                "symbol": symbol,
+                "session": day,
+                "close": 1000 + index * 10,
+                "clock": "14:30" if (symbol, day) in early else "14:50",
+            })
+    rows.extend(extra or [])
+    return rows
+
+
+def _prior(sessions: list[str], sha: str) -> dict:
+    return {
+        "as_of": sessions[-1],
+        "generation_id": f"{sessions[-1]}_aaaaaaaaaaaa_bbbbbbbbbbbb",
+        "reference_sha256": sha,
+        "trading_sessions": list(sessions),
+    }
+
+
+def _assess(namespace: dict, store: dict, prior: dict, moment: datetime.datetime, mode: str = "schedule", tracked: set[str] | None = None) -> dict:
+    ict_day = moment.astimezone(namespace["ICT"]).date().isoformat()
+    return namespace["assess_publication"](
+        store,
+        prior,
+        today_ict=ict_day,
+        mode=mode,
+        tracked=DAILY_TRACKED if tracked is None else tracked,
+        moment=moment,
+    )
+
+
+def test_daily_workflow_keeps_the_manual_workflows_and_maps_four_slots():
+    import subprocess
+
+    namespace = _daily_namespace()
+    workflow = (ROOT / ".github" / "workflows" / "ledger-forward-daily.yml").read_text(encoding="utf-8")
+    assert workflow.count("cron:") == 4
+    for slot in namespace["SCHEDULED_SLOTS"]:
+        assert workflow.count(f'cron: "{slot["cron"]}"') == 1
+    assert "workflow_dispatch:" in workflow
+    assert "publish-next-session" in workflow
+    assert "publish-holiday-gap" in workflow
+    assert "pull_request:" not in workflow
+    assert "\n  push:" not in workflow
+    assert "contents: write" in workflow
+    assert "LEDGER_FORWARD_DAILY_ENABLED == 'true'" in workflow
+    assert "github.ref == 'refs/heads/main'" in workflow
+    assert "group: ledger-forward-publish" in workflow
+    assert "cancel-in-progress: false" in workflow
+    assert "fetch-depth: 0" in workflow
+    assert "ref: main" in workflow
+    assert '"push", "origin", "HEAD:main"' in workflow
+    assert '"--force", "--force-with-lease", "--force-if-includes"' in workflow
+    assert "git push --force" not in workflow
+    assert 'push", "--force"' not in workflow
+    assert "git clean" not in workflow
+    assert "checkout --" not in workflow
+    assert "--approve-repository-write" in workflow
+    assert "json.dumps(store" not in workflow
+    assert "gh variable" not in workflow
+    assert "LEDGER_FORWARD_PUBLISH_ENABLED" not in workflow
+    for relative in (".github/workflows/ledger-forward-publish.yml", ".github/workflows/ledger-forward-outcomes.yml"):
+        committed = subprocess.check_output(["git", "-C", str(ROOT), "show", f"HEAD:{relative}"])
+        assert (ROOT / relative).read_bytes() == committed
+        text = committed.decode("utf-8")
+        assert "LEDGER_FORWARD_DAILY_ENABLED" not in text
+        assert "publish-next-session" not in text
+        assert "cron:" not in text
+    monday = datetime.date(2026, 11, 16)
+    for slot in namespace["SCHEDULED_SLOTS"]:
+        for offset in range(5):
+            day = monday + datetime.timedelta(days=offset)
+            assert day.isoweekday() == offset + 1
+            moment = datetime.datetime(day.year, day.month, day.day, slot["utc_hour"], slot["utc_minute"], tzinfo=datetime.timezone.utc)
+            ict = moment.astimezone(namespace["ICT"])
+            assert (ict.hour, ict.minute) == (slot["ict_hour"], slot["ict_minute"])
+            if slot["kind"] == "morning":
+                assert ict.date() == day + datetime.timedelta(days=1)
+                assert ict.isoweekday() == offset + 2
+            else:
+                assert ict.date() == day
+                assert ict.isoweekday() == offset + 1
+    thursday_morning = _utc("2026-11-18", 23, 40)
+    assert thursday_morning.astimezone(namespace["ICT"]) == datetime.datetime(2026, 11, 19, 6, 40, tzinfo=namespace["ICT"])
+    assert namespace["unchanged_disposition"]("2026-11-17", thursday_morning) == "PRICE_BOOK_NOT_ADVANCED"
+    assert namespace["unchanged_disposition"]("2026-11-18", thursday_morning) == "already_published"
+    saturday_morning = _utc("2026-11-20", 23, 40)
+    assert saturday_morning.astimezone(namespace["ICT"]) == datetime.datetime(2026, 11, 21, 6, 40, tzinfo=namespace["ICT"])
+    assert namespace["unchanged_disposition"]("2026-11-20", saturday_morning) == "already_published"
+    assert namespace["unchanged_disposition"]("2026-11-19", saturday_morning) == "PRICE_BOOK_NOT_ADVANCED"
+    current_evening = _utc("2026-11-18", 12, 10)
+    assert namespace["unchanged_disposition"]("2026-11-18", current_evening) == "already_published"
+
+
+def test_daily_slots_wait_or_alert_without_inventing_a_session():
+    namespace = _daily_namespace()
+    sessions = ["2026-11-17"]
+    store = _daily_store(sessions, _closes(sessions))
+    prior = _prior(sessions, store["content_sha256"])
+    before = list(store["trading_sessions"])
+    for hour, minute, expected in ((12, 10, "waiting_for_price_book"), (13, 40, "waiting_for_price_book"), (16, 10, "waiting_for_price_book")):
+        decision = _assess(namespace, store, prior, _utc("2026-11-18", hour, minute))
+        assert decision == {"action": expected, "as_of": "2026-11-17"}
+    with pytest.raises(namespace["PublicationRefusal"]) as morning:
+        _assess(namespace, store, prior, _utc("2026-11-18", 23, 40))
+    assert morning.value.reason == "PRICE_BOOK_NOT_ADVANCED"
+    current = _daily_store(["2026-11-18"], _closes(["2026-11-18"]))
+    current_prior = _prior(["2026-11-18"], current["content_sha256"])
+    assert _assess(namespace, current, current_prior, _utc("2026-11-18", 23, 40))["action"] == "already_published"
+    assert store["trading_sessions"] == before
+    assert namespace["weekday_gaps"]("2026-11-20", "2026-11-23") == []
+    assert "2026-11-21" not in namespace["weekday_gaps"]("2026-11-19", "2026-11-23")
+    assert "2026-11-22" not in namespace["weekday_gaps"]("2026-11-19", "2026-11-23")
+
+
+def test_daily_dispatch_holiday_gap_and_missing_symbols_fail_closed():
+    namespace = _daily_namespace()
+    namespace["require_dispatch_context"]("true", "publish-next-session", "refs/heads/main", "workflow_dispatch")
+    assert namespace["require_dispatch_context"]("true", "publish-holiday-gap", "refs/heads/main", "schedule") == "schedule"
+    assert namespace["require_dispatch_context"]("true", "publish-holiday-gap", "refs/heads/main", "workflow_dispatch") == "holiday"
+    refused = (
+        (None, "publish-next-session", "refs/heads/main", "schedule", "PUBLICATION_DISABLED"),
+        ("true", "validate-only", "refs/heads/main", "workflow_dispatch", "CONFIRMATION_REFUSED"),
+        ("true", "publish-next-session", "refs/heads/other", "workflow_dispatch", "BRANCH_REFUSED"),
+        ("true", "publish-next-session", "refs/heads/main", "push", "EVENT_REFUSED"),
+    )
+    for enabled, confirm, ref, event, reason in refused:
+        with pytest.raises(namespace["PublicationRefusal"]) as error:
+            namespace["require_dispatch_context"](enabled, confirm, ref, event)
+        assert error.value.reason == reason
+
+    def book(previous: str, current: str, **kwargs) -> tuple[dict, dict]:
+        sessions = [previous, current]
+        store = _daily_store(sessions, _closes(sessions, **kwargs))
+        return store, _prior([previous], "previous-book")
+
+    weekend, weekend_prior = book("2026-11-20", "2026-11-21")
+    with pytest.raises(namespace["PublicationRefusal"]) as weekend_error:
+        _assess(namespace, weekend, weekend_prior, _utc("2026-11-23", 12, 10))
+    assert weekend_error.value.reason == "WEEKEND_SESSION"
+
+    future, future_prior = book("2026-11-19", "2026-11-20")
+    with pytest.raises(namespace["PublicationRefusal"]) as future_error:
+        namespace["assess_publication"](future, future_prior, today_ict="2026-11-19", mode="schedule", tracked=DAILY_TRACKED, moment=_utc("2026-11-19", 12, 10))
+    assert future_error.value.reason == "FUTURE_SESSION"
+
+    stale = _daily_store(["2026-11-18", "2026-11-19"], _closes(["2026-11-18", "2026-11-19"]))
+    with pytest.raises(namespace["PublicationRefusal"]) as stale_error:
+        _assess(namespace, stale, _prior(["2026-11-19", "2026-11-20"], "later"), _utc("2026-11-20", 12, 10))
+    assert stale_error.value.reason == "STALE_PRICE_BOOK"
+
+    revised = _daily_store(["2026-11-19", "2026-11-20"], _closes(["2026-11-19", "2026-11-20"]))
+    revised_prior = _prior(["2026-11-19", "2026-11-20"], revised["content_sha256"])
+    revised["rows"][0]["close"] = 1
+    revised["content_sha256"] = _digest(revised)
+    with pytest.raises(namespace["PublicationRefusal"]) as revised_error:
+        _assess(namespace, revised, revised_prior, _utc("2026-11-20", 12, 10))
+    assert revised_error.value.reason == "PRICE_BOOK_REVISED"
+
+    holiday_store, holiday_prior = book("2026-11-19", "2026-11-23")
+    holiday_before = list(holiday_store["trading_sessions"])
+    assert namespace["weekday_gaps"]("2026-11-19", "2026-11-23") == ["2026-11-20"]
+    with pytest.raises(namespace["PublicationRefusal"]) as gap_error:
+        _assess(namespace, holiday_store, holiday_prior, _utc("2026-11-23", 12, 10), mode="schedule")
+    assert gap_error.value.reason == "CALENDAR_GAP"
+    assert holiday_store["trading_sessions"] == holiday_before
+    assert "2026-11-20" not in holiday_store["trading_sessions"]
+    assert _assess(namespace, holiday_store, holiday_prior, _utc("2026-11-23", 12, 10), mode="holiday")["action"] == "publish"
+    national, national_prior = book("2026-08-28", "2026-09-03")
+    assert namespace["weekday_gaps"]("2026-08-28", "2026-09-03") == ["2026-08-31", "2026-09-01", "2026-09-02"]
+    with pytest.raises(namespace["PublicationRefusal"]) as national_error:
+        _assess(namespace, national, national_prior, _utc("2026-09-03", 12, 10))
+    assert national_error.value.reason == "CALENDAR_GAP"
+    assert _assess(namespace, national, national_prior, _utc("2026-09-03", 12, 10), mode="holiday")["action"] == "publish"
+
+    monday_store, monday_prior = book("2026-11-20", "2026-11-23")
+    with pytest.raises(namespace["PublicationRefusal"]) as absent_gap:
+        _assess(namespace, monday_store, monday_prior, _utc("2026-11-23", 12, 10), mode="holiday")
+    assert absent_gap.value.reason == "GAP_ABSENT"
+    published = _assess(namespace, monday_store, monday_prior, _utc("2026-11-23", 12, 10))
+    assert published == {"action": "publish", "as_of": "2026-11-23"}
+    assert monday_store["trading_sessions"] == ["2026-11-20", "2026-11-23"]
+
+    halted, halted_prior = book("2026-11-20", "2026-11-23", omit={("SSI", "2026-11-23")})
+    with pytest.raises(namespace["PublicationRefusal"]) as halted_error:
+        _assess(namespace, halted, halted_prior, _utc("2026-11-23", 12, 10))
+    assert halted_error.value.reason == "PRICE_BOOK_INCOMPLETE"
+    holiday_halted, holiday_halted_prior = book("2026-11-19", "2026-11-23", omit={("SSI", "2026-11-23")})
+    with pytest.raises(namespace["PublicationRefusal"]) as holiday_halted_error:
+        _assess(namespace, holiday_halted, holiday_halted_prior, _utc("2026-11-23", 12, 10), mode="holiday")
+    assert holiday_halted_error.value.reason == "PRICE_BOOK_INCOMPLETE"
+    rejected, rejected_prior = book("2026-11-20", "2026-11-23")
+    rejected["rejections"] = [{"session": "2026-11-23", "symbol": "SSI", "reason": "SYMBOL_ABSENT", "clock": ""}]
+    rejected["content_sha256"] = _digest(rejected)
+    with pytest.raises(namespace["PublicationRefusal"]) as rejected_error:
+        _assess(namespace, rejected, rejected_prior, _utc("2026-11-23", 12, 10))
+    assert rejected_error.value.reason == "PRICE_BOOK_INCOMPLETE"
+    truncated, truncated_prior = book("2026-11-20", "2026-11-23", truncated={("VCB", "2026-11-23")})
+    with pytest.raises(namespace["PublicationRefusal"]) as truncated_error:
+        _assess(namespace, truncated, truncated_prior, _utc("2026-11-23", 12, 10))
+    assert truncated_error.value.reason == "PRICE_BOOK_INCOMPLETE"
+    earlier_truncation, earlier_prior = book("2026-11-20", "2026-11-23", truncated={("SSI", "2026-11-20")})
+    assert _assess(namespace, earlier_truncation, earlier_prior, _utc("2026-11-23", 12, 10))["action"] == "publish"
+    outside, outside_prior = book("2026-11-20", "2026-11-23", extra=[{"symbol": "FPT", "session": "2026-11-23", "close": 50, "clock": "14:50"}])
+    with pytest.raises(namespace["PublicationRefusal"]) as outside_error:
+        _assess(namespace, outside, outside_prior, _utc("2026-11-23", 12, 10))
+    assert outside_error.value.reason == "PRICE_BOOK_INCOMPLETE"
+    jumped = _daily_store(["2026-11-19", "2026-11-20", "2026-11-23"], _closes(["2026-11-19", "2026-11-20", "2026-11-23"]))
+    with pytest.raises(namespace["PublicationRefusal"]) as jumped_error:
+        _assess(namespace, jumped, _prior(["2026-11-19"], "old"), _utc("2026-11-23", 12, 10))
+    assert jumped_error.value.reason == "CALENDAR_INVALID"
+    mismatched = _daily_store(["2026-11-20", "2026-11-23"], _closes(["2026-11-20", "2026-11-23"]), tracked_count=2)
+    with pytest.raises(namespace["PublicationRefusal"]) as universe_error:
+        _assess(namespace, mismatched, _prior(["2026-11-20"], "old"), _utc("2026-11-23", 12, 10))
+    assert universe_error.value.reason == "UNIVERSE_MISMATCH"
+
+
+def test_daily_pins_published_generations_and_the_live_watchlist():
+    from research.guardian_research.universe import load_tracked_symbols
+
+    namespace = _daily_namespace()
+    namespace["assert_pinned_history"](ROOT)
+    assert namespace["PINNED_GENERATIONS"][namespace["HISTORICAL_GENERATION"]] == OUTCOMES_GENERATION_SHA256
+    assert namespace["PINNED_GENERATIONS"][namespace["PUBLISHED_GENERATION"]] == PUBLISHED_GENERATION_SHA256
+    prior = namespace["load_prior"](ROOT)
+    assert prior["as_of"] == "2026-11-19"
+    assert prior["generation_id"] == "2026-11-19_41f36ca0cad9_63b98229a9f9"
+    assert prior["trading_sessions"][-2:] == ["2026-11-18", "2026-11-19"]
+    assert len(namespace["require_universe"](load_tracked_symbols())) == 143
+    with pytest.raises(namespace["PublicationRefusal"]) as short:
+        namespace["require_universe"](tuple(f"S{index:03d}" for index in range(142)))
+    assert short.value.reason == "UNIVERSE_MISMATCH"
+    receipt = namespace["safe_receipt"](_daily_store(["2026-11-20", "2026-11-23"], _closes(["2026-11-20", "2026-11-23"])))
+    assert receipt["new_session_ok"] == 3
+    assert receipt["new_session_rejections"] == 0
+    assert "rows" not in receipt
+
+
+def test_daily_publication_action_and_commit_allowlist(tmp_path: Path):
+    namespace = _daily_namespace()
+    generation_id = "2026-11-23_aaaaaaaaaaaa_bbbbbbbbbbbb"
+    report = {
+        "as_of": "2026-11-23",
+        "file_status": "would_write",
+        "generation_id": generation_id,
+        "index_status": "would_write",
+        "mode": "dry_run",
+        "ok": True,
+        "trading_sessions": ["2026-11-20", "2026-11-23"],
+    }
+    assert namespace["publication_action"](report, 0, "2026-11-23") == "publish"
+    repeat = {**report, "file_status": "unchanged", "index_status": "unchanged"}
+    assert namespace["publication_action"](repeat, 0, "2026-11-23") == "already_published"
+    with pytest.raises(namespace["PublicationRefusal"]) as violations:
+        namespace["publication_action"](report, 2, "2026-11-23")
+    assert violations.value.reason == "MISSING_RETURN_NOT_NULL"
+    with pytest.raises(namespace["PublicationRefusal"]) as pinned:
+        namespace["publication_action"]({**report, "generation_id": "2026-11-19_41f36ca0cad9_63b98229a9f9", "as_of": "2026-11-19", "trading_sessions": ["2026-11-19"]}, 0, "2026-11-19")
+    assert pinned.value.reason == "GENERATION_REFUSED"
+    with pytest.raises(namespace["PublicationRefusal"]) as changed:
+        namespace["confirm_unchanged"]({**report, "generation_id": "other"}, {"generation_id": "2026-11-19_41f36ca0cad9_63b98229a9f9"})
+    assert changed.value.reason == "LEDGER_CHANGED"
+    assert namespace["paths_block_publication"](["pattern_history.csv", "research/guardian_research/outcomes.json"]) is False
+    assert namespace["paths_block_publication"](["research/v2_research_ledger/outcomes/index.json"]) is True
+
+    origin, repo, seeded = _seed_repository(tmp_path, namespace)
+    generations = namespace["generation_snapshot"](repo)
+    generation_id = _stage_candidate(repo, namespace, seeded)
+    (repo / "research" / "guardian_research" / "outcomes.json").write_text('{"guardian":false}\n', encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as allowlist:
+        namespace["commit_publication"](repo, generation_id, "2026-11-19", seeded["durable"], generations)
+    assert allowlist.value.reason == "ALLOWLIST_REFUSED"
+    assert _origin_bytes(origin, "research/guardian_research/outcomes.json") == b'{"guardian":true}\n'
+    with pytest.raises(namespace["PublicationRefusal"]) as force:
+        namespace["_git"](repo, "push", "--force", "origin", "HEAD:main")
+    assert force.value.reason == "FORCE_PUSH_REFUSED"
+    with pytest.raises(namespace["PublicationRefusal"]) as lease:
+        namespace["_git"](repo, "push", "--force-with-lease", "origin", "HEAD:main")
+    assert lease.value.reason == "FORCE_PUSH_REFUSED"
+    with pytest.raises(namespace["PublicationRefusal"]) as pinned_history:
+        namespace["assert_pinned_history"](repo)
+    assert pinned_history.value.reason == "HISTORICAL_GENERATION_CHANGED"
+
+
+def test_daily_fast_forward_keeps_history_and_refuses_ledger_races(tmp_path: Path):
+    namespace = _daily_namespace()
+    origin, repo, seeded = _seed_repository(tmp_path, namespace)
+    generations = namespace["generation_snapshot"](repo)
+    generation_id = _stage_candidate(repo, namespace, seeded)
+    namespace["commit_publication"](repo, generation_id, "2026-11-19", seeded["durable"], generations)
+    assert _git(repo, "log", "-1", "--format=%s").strip() == "Publish Research Ledger T+ generation 2026-11-19"
+    other = _other_clone(tmp_path, origin)
+    pattern = other / "pattern_history.csv"
+    pattern.write_text("symbol\nAAA\n", encoding="utf-8")
+    _git(other, "add", "pattern_history.csv")
+    _git(other, "commit", "-m", "Update pattern history")
+    _git(other, "push", "origin", "HEAD:main")
+    pushed = namespace["push_fast_forward"](repo, generation_id, "2026-11-19", seeded["durable"], generations)
+    assert pushed["rebases"] == 1
+    names = _git(repo, "diff", "--name-only", "HEAD^", "HEAD").splitlines()
+    assert sorted(names) == sorted(namespace["allowed_paths"](generation_id))
+    assert _origin_bytes(origin, "pattern_history.csv") == b"symbol\nAAA\n"
+    assert _origin_bytes(origin, namespace["HISTORICAL_GENERATION"]) == b"historical\n"
+    assert _origin_bytes(origin, "research/v2_research_ledger/durable/identities.jsonl") == b"identities.jsonl\n"
+    repeat = namespace["push_fast_forward"](repo, generation_id, "2026-11-19", seeded["durable"], generations)
+    assert repeat["commit"] == pushed["commit"]
+    assert _git(origin, "rev-list", "--count", "main").strip() == "3"
+
+    durable_origin, durable_repo, durable_seed = _seed_repository(tmp_path / "durable", namespace)
+    durable_generations = namespace["generation_snapshot"](durable_repo)
+    durable_id = _stage_candidate(durable_repo, namespace, durable_seed)
+    namespace["commit_publication"](durable_repo, durable_id, "2026-11-19", durable_seed["durable"], durable_generations)
+    durable_other = _other_clone(tmp_path / "durable", durable_origin)
+    identity = durable_other / "research" / "v2_research_ledger" / "durable" / "identities.jsonl"
+    identity.write_text("changed\n", encoding="utf-8")
+    _git(durable_other, "add", "research/v2_research_ledger/durable/identities.jsonl")
+    _git(durable_other, "commit", "-m", "Append ledger identity")
+    _git(durable_other, "push", "origin", "HEAD:main")
+    with pytest.raises(namespace["PublicationRefusal"]) as durable_error:
+        namespace["push_fast_forward"](durable_repo, durable_id, "2026-11-19", durable_seed["durable"], durable_generations)
+    assert durable_error.value.reason == "UPSTREAM_LEDGER_CHANGED"
+    assert _origin_bytes(durable_origin, "research/v2_research_ledger/durable/identities.jsonl") == b"changed\n"
+    assert f"research/v2_research_ledger/outcomes/generations/{durable_id}.json" not in _git(durable_origin, "ls-tree", "-r", "--name-only", "main")
+
+    fresh_origin, fresh, fresh_seed = _seed_repository(tmp_path / "immutable", namespace)
+    fresh_generations = namespace["generation_snapshot"](fresh)
+    (fresh / namespace["HISTORICAL_GENERATION"]).write_text("rewritten\n", encoding="utf-8")
+    with pytest.raises(namespace["PublicationRefusal"]) as historical:
+        namespace["assert_immutable"](fresh, fresh_seed["durable"], fresh_generations)
+    assert historical.value.reason == "HISTORICAL_GENERATION_CHANGED"
+    assert _git(fresh_origin, "rev-list", "--count", "main").strip() == "1"
