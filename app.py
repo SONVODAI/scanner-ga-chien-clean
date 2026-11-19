@@ -6096,9 +6096,6 @@ try:
         except Exception:
             pass
         try:
-            from modules.v2_research_ledger_panel.ui import render_v2_research_ledger_panel
-
-            render_v2_research_ledger_panel(remote=True)
             from modules.v2_research_ledger_panel.approximate_ui import render_approximate_performance_panel
 
             render_approximate_performance_panel(remote=False)
@@ -6114,6 +6111,15 @@ except Exception:
             st.caption("Live Candidate V2 unavailable this cycle.")
     except Exception:
         st.caption("Live Candidate V2 unavailable this cycle.")
+
+# Research Ledger is outside the V2 placeholder, so a scan does not clear it
+# before this run reaches the panel. It is still before Position Guardian.
+try:
+    from modules.v2_research_ledger_panel.ui import render_v2_research_ledger_panel
+
+    render_v2_research_ledger_panel(remote=True)
+except Exception:
+    pass
 
 # =========================================================
 # PORTFOLIO / POSITION GUARDIAN — one high-priority area, same ledger
