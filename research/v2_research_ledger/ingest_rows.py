@@ -29,6 +29,10 @@ ACCEPTED = "ACCEPTED"
 REJECTED = "REJECTED"
 NOMINATED = "NOMINATED"
 DECISION_UNAVAILABLE = "DECISION_UNAVAILABLE"
+EXISTING_OBSERVATION = "EXISTING_OBSERVATION"
+DEFERRED = "DEFERRED"
+CLASS_CONFLICT = "CONFLICT"
+SIDECAR_NOMINATION = "SIDECAR_NOMINATION"
 ACTION_EVIDENCE_FILES = (
     "live_when_v2_action_evidence.jsonl",
     "post_close_v2_action_evidence.jsonl",
@@ -44,8 +48,8 @@ def ingest_sources(
 ) -> dict[str, Any]:
     """Insert identities once. A second call with the same sealed fields does not append."""
     counts = {INSERTED: 0, UNCHANGED: 0, CONFLICT: 0}
-    sidecar_status = _ingest_sidecar(store, sidecar_path, counts)
     sweet_status = _ingest_sweetspot(store, sweet_csv, counts)
+    sidecar_status = _ingest_sidecar(store, sidecar_path, counts)
     evidence_status = _evidence_status(evidence_dir)
     manifest = {
         "action_evidence": evidence_status,
@@ -77,7 +81,6 @@ def _ingest_sidecar(store: DurableRowStore, path: Path | None, counts: dict[str,
         return {"path": _display_path(source), "sha256": _sha256(source), "status": "UNREADABLE"}
     freeze = document.get("freeze_ledger") if isinstance(document.get("freeze_ledger"), list) else []
     rows = document.get("rows") if isinstance(document.get("rows"), list) else []
-    freeze_keys: dict[tuple[str, str, str], str] = {}
     for raw in freeze:
         if not isinstance(raw, dict):
             continue
@@ -86,39 +89,33 @@ def _ingest_sidecar(store: DurableRowStore, path: Path | None, counts: dict[str,
             continue
         result = store.put_identity(record)
         counts[result] = counts.get(result, 0) + 1
-        freeze_keys[(record["t0_date"], record["symbol"], record["candidate_first_seen_ts"])] = record["identity_id"]
     linked = 0
+    admissions: list[dict[str, Any]] = []
     for raw in rows:
         if not isinstance(raw, dict):
             continue
-        key = (
-            str(raw.get("session") or "")[:10],
-            str(raw.get("symbol") or "").strip().upper(),
-            str(raw.get("candidate_first_seen_ts") or ""),
-        )
-        existing = freeze_keys.get(key) or _stored_sidecar_identity(store, key)
-        if existing:
-            if _link_matches_sealed_price(store, existing, raw):
-                result = store.put_link(_nomination_link(existing, raw, document))
-                counts[result] = counts.get(result, 0) + 1
-                if result in {INSERTED, UNCHANGED}:
-                    linked += 1
-            else:
-                sealed = store.identities[existing].get("sealed")
-                store.record_conflict(
-                    f"nomination|{existing}",
-                    "LINK_PRICE_DIFFERS_FROM_SEALED_T0",
-                    sealed,
-                    {"t0_price": canonical_number(raw.get("price_at_first_seen"))},
-                )
-                counts[CONFLICT] = counts.get(CONFLICT, 0) + 1
+        decision = classify_camera_nomination(store, raw)
+        kind = decision["classification"]
+        if kind == SIDECAR_NOMINATION:
+            identity_id = str(decision["identity_id"])
+            result = store.put_link(_nomination_link(identity_id, raw, document))
+            counts[result] = counts.get(result, 0) + 1
+            if result in {INSERTED, UNCHANGED}:
+                linked += 1
             continue
-        record = _row_identity(raw, document, source)
-        if record is None:
+        if kind == CLASS_CONFLICT and decision.get("reason") == "LINK_PRICE_DIFFERS_FROM_SEALED_T0":
+            identity_id = str(decision["identity_id"])
+            _record_price_conflict(store, counts, f"nomination|{identity_id}", raw)
+            admissions.append(decision)
             continue
-        result = store.put_identity(record)
-        counts[result] = counts.get(result, 0) + 1
+        if kind == CLASS_CONFLICT:
+            _record_price_conflict(store, counts, str(decision["identity_id"]), raw)
+            admissions.append(decision)
+            continue
+        admissions.append(decision)
+    admissions.sort(key=_admission_sort)
     return {
+        "admission": admissions,
         "freeze_rows": len(freeze),
         "linked_current_rows": linked,
         "path": _display_path(source),
@@ -127,22 +124,93 @@ def _ingest_sidecar(store: DurableRowStore, path: Path | None, counts: dict[str,
     }
 
 
-def _stored_sidecar_identity(store: DurableRowStore, key: tuple[str, str, str]) -> str | None:
-    """Use an identity already sealed in the store. Do not invent one from the ticker."""
-    session, symbol, seen = key
-    if not session or not symbol or not seen:
-        return None
-    candidate = f"sidecar|{session}|{symbol}|{seen}"
-    if candidate in store.identities:
-        return candidate
-    return None
+def classify_camera_nomination(store: DurableRowStore, raw: Mapping[str, Any]) -> dict[str, Any]:
+    """Decide one Camera row before any identity or link is written.
+
+    A Sweetspot nomination that matches one sealed observation is not a new T0.
+    A current row never becomes an identity by borrowing the Camera session date.
+    """
+    symbol = str(raw.get("symbol") or "").strip().upper()
+    seen = str(raw.get("candidate_first_seen_ts") or "")
+    source = str(raw.get("source") or "").strip()
+    session = str(raw.get("session") or "")[:10]
+    decision = {
+        "candidate_first_seen_ts": seen,
+        "classification": DEFERRED,
+        "identity_id": None,
+        "reason": "INCOMPLETE_CAMERA_NOMINATION",
+        "symbol": symbol,
+    }
+    if source == SOURCE_SWEETSPOT:
+        if not symbol or not seen:
+            return decision
+        matches = _matching_sweetspot(store, symbol, seen)
+        if len(matches) != 1:
+            decision["reason"] = "AMBIGUOUS_SWEETSPOT_MATCH" if len(matches) > 1 else "UNMATCHED_SWEETSPOT_NOMINATION"
+            return decision
+        identity_id = matches[0]
+        decision["identity_id"] = identity_id
+        sealed = store.identities[identity_id].get("sealed")
+        if not isinstance(sealed, dict) or sealed.get("t0_price") != canonical_number(raw.get("price_at_first_seen")):
+            decision["classification"] = CLASS_CONFLICT
+            decision["reason"] = "T0_IMMUTABLE"
+            return decision
+        decision["classification"] = EXISTING_OBSERVATION
+        decision["reason"] = None
+        return decision
+    if not session or not symbol or not seen or not source:
+        return decision
+    identity_id = f"sidecar|{session}|{symbol}|{seen}"
+    current = store.identities.get(identity_id)
+    if current is None or current.get("record_role") != "sidecar_identity":
+        decision["reason"] = "UNMATCHED_CAMERA_NOMINATION"
+        return decision
+    sealed = current.get("sealed")
+    decision["identity_id"] = identity_id
+    if not isinstance(sealed, dict) or sealed.get("t0_price") != canonical_number(raw.get("price_at_first_seen")):
+        decision["classification"] = CLASS_CONFLICT
+        decision["reason"] = "LINK_PRICE_DIFFERS_FROM_SEALED_T0"
+        return decision
+    decision["classification"] = SIDECAR_NOMINATION
+    decision["reason"] = None
+    return decision
 
 
-def _link_matches_sealed_price(store: DurableRowStore, identity_id: str, raw: Mapping[str, Any]) -> bool:
-    sealed = store.identities[identity_id].get("sealed")
-    if not isinstance(sealed, dict):
-        return False
-    return canonical_number(raw.get("price_at_first_seen")) == sealed.get("t0_price")
+def _matching_sweetspot(store: DurableRowStore, symbol: str, seen: str) -> list[str]:
+    matches: list[str] = []
+    for identity_id, row in store.identities.items():
+        if row.get("record_role") != "sweetspot_identity":
+            continue
+        sealed = row.get("sealed") if isinstance(row.get("sealed"), dict) else {}
+        sealed_symbol = str(sealed.get("symbol") or row.get("symbol") or "").strip().upper()
+        sealed_seen = str(sealed.get("created_at") or row.get("candidate_first_seen_ts") or "")
+        if sealed_symbol == symbol and sealed_seen == seen:
+            matches.append(identity_id)
+    return sorted(matches)
+
+
+def _record_price_conflict(store: DurableRowStore, counts: dict[str, int], subject_id: str, raw: Mapping[str, Any]) -> None:
+    identity_id = subject_id.removeprefix("nomination|")
+    current = store.identities.get(identity_id) or {}
+    before = len(store.conflicts)
+    store.record_conflict(
+        subject_id,
+        "LINK_PRICE_DIFFERS_FROM_SEALED_T0" if subject_id.startswith("nomination|") else "T0_IMMUTABLE",
+        current.get("sealed"),
+        {"t0_price": canonical_number(raw.get("price_at_first_seen"))},
+    )
+    outcome = CONFLICT if len(store.conflicts) > before else UNCHANGED
+    counts[outcome] = counts.get(outcome, 0) + 1
+
+
+def _admission_sort(decision: Mapping[str, Any]) -> tuple[str, str, str, str, str]:
+    return (
+        str(decision.get("classification") or ""),
+        str(decision.get("symbol") or ""),
+        str(decision.get("candidate_first_seen_ts") or ""),
+        str(decision.get("reason") or ""),
+        str(decision.get("identity_id") or ""),
+    )
 
 
 def _ingest_sweetspot(store: DurableRowStore, path: Path | None, counts: dict[str, int]) -> dict[str, Any]:
@@ -200,40 +268,6 @@ def _freeze_identity(raw: Mapping[str, Any], source: Path) -> dict[str, Any] | N
         "setup": None,
         "source_attribution": SOURCE_BRAIN_A,
         "source_field": None,
-        "symbol": symbol,
-        "t0_date": session,
-        "t0_price": canonical_number(raw.get("price_at_first_seen")),
-    }
-
-
-def _row_identity(raw: Mapping[str, Any], document: Mapping[str, Any], source: Path) -> dict[str, Any] | None:
-    session = str(raw.get("session") or "")[:10]
-    symbol = str(raw.get("symbol") or "").strip().upper()
-    seen = str(raw.get("candidate_first_seen_ts") or "")
-    source_field = str(raw.get("source") or "").strip()
-    if not session or not symbol or not seen or not source_field:
-        return None
-    status = str(raw.get("status") or "").strip()
-    return {
-        "attribution_basis": "sidecar_row_source_field",
-        "breakout_ref_at_first_seen": canonical_number(raw.get("breakout_ref_at_first_seen")),
-        "candidate_first_seen_ts": seen,
-        "created_at": None,
-        "decision": status or DECISION_UNAVAILABLE,
-        "decision_detail": status or None,
-        "document_observed_at": str(document.get("observed_at") or "") or None,
-        "document_session": str(document.get("session") or "")[:10] or None,
-        "ema9_at_first_seen": canonical_number(raw.get("ema9_at_first_seen")),
-        "identity_id": f"sidecar|{session}|{symbol}|{seen}",
-        "market_real": canonical_number(raw.get("market_real")),
-        "observer_status": None,
-        "origin_file": _display_path(source),
-        "origin_sha256": _sha256(source),
-        "record_role": "sidecar_identity",
-        "schema": SCHEMA,
-        "setup": str(raw.get("setup") or "") or None,
-        "source_attribution": source_field,
-        "source_field": source_field,
         "symbol": symbol,
         "t0_date": session,
         "t0_price": canonical_number(raw.get("price_at_first_seen")),

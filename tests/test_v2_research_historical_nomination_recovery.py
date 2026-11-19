@@ -99,14 +99,18 @@ def test_historical_replay_appends_92_links_and_replays_clean(tmp_path: Path):
     assert (directory / "links.jsonl").read_bytes() == links_once
     assert (directory / "conflicts.jsonl").read_bytes() == conflicts_once
     assert (directory / "identities.jsonl").read_bytes() == identities
-    assert _sha((directory / "manifest.json").read_bytes()) == MANIFEST_SHA
+    assert (STORE / "manifest.json").read_bytes() == committed_manifest
+    first_manifest = (directory / "manifest.json").read_bytes()
 
     again = incremental_ingest(directory, sidecar_path=SIDECAR, sweet_csv=SWEET, evidence_dir=EVIDENCE)
     assert again["inserted_identities"] == []
     assert again["inserted_links"] == []
-    assert (directory / "manifest.json").read_bytes() == committed_manifest
+    assert again["manifest"]["identity_count"] == 1434
     assert (directory / "links.jsonl").read_bytes() == committed_links
     assert (directory / "conflicts.jsonl").read_bytes() == committed_conflicts
+    assert (directory / "identities.jsonl").read_bytes() == identities
+    assert (directory / "manifest.json").read_bytes() == first_manifest
+    assert (STORE / "manifest.json").read_bytes() == committed_manifest
     reloaded = DurableRowStore(directory)
     for ident, sealed in seals.items():
         assert reloaded.identities[ident].get("sealed") == sealed

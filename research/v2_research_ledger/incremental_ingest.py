@@ -26,7 +26,13 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from research.v2_research_ledger.durable_store import MANIFEST_NAME, DurableRowStore
-from research.v2_research_ledger.ingest_rows import ingest_sources
+from research.v2_research_ledger.ingest_rows import (
+    CLASS_CONFLICT,
+    DEFERRED,
+    EXISTING_OBSERVATION,
+    classify_camera_nomination,
+    ingest_sources,
+)
 
 LOCK_NAME = ".ingest.lock"
 COMMIT_PATHS = (
@@ -89,13 +95,14 @@ def incremental_ingest(
         coverage = _coverage(store, sidecar_path)
         sidecar = manifest.get("sidecar")
         if isinstance(sidecar, dict) and coverage.get("status") == "PRESENT":
-            sidecar["linked_current_rows"] = coverage["current_rows"] - len(coverage["missing_link"]) - len(coverage["missing_identity"])
+            sidecar["linked_current_rows"] = coverage["linked_current_rows"]
         _publish_manifest(store, manifest)
         return {
             "conflict_ids": [row.get("subject_id") for row in store.conflicts],
             "conflicts": len(store.conflicts),
             "coverage": coverage,
             "identity_count": len(store.identities),
+            "admission": list((ingested.get("sidecar") or {}).get("admission") or []),
             "inserted_identities": sorted(set(store.identities) - before_ids),
             "inserted_links": sorted(set(store.links) - before_links),
             "link_count": len(store.links),
@@ -143,6 +150,7 @@ def _coverage(store: DurableRowStore, sidecar_path: Path | None) -> dict[str, An
     current = []
     missing_link = []
     missing_identity = []
+    linked = 0
     for raw in rows:
         if not isinstance(raw, dict):
             continue
@@ -152,14 +160,21 @@ def _coverage(store: DurableRowStore, sidecar_path: Path | None) -> dict[str, An
             f"{raw.get('candidate_first_seen_ts') or ''}"
         )
         current.append(ident)
+        decision = classify_camera_nomination(store, raw)
+        kind = decision["classification"]
+        if kind in {EXISTING_OBSERVATION, DEFERRED, CLASS_CONFLICT}:
+            continue
         if ident not in store.identities:
             missing_identity.append(ident)
         elif f"nomination|{ident}" not in store.links:
             missing_link.append(ident)
+        else:
+            linked += 1
     nomination_links = [link_id for link_id in store.links if str(link_id).startswith("nomination|")]
     rotating = sorted(set(nomination_links) - {f"nomination|{ident}" for ident in current})
     return {
         "current_rows": len(current),
+        "linked_current_rows": linked,
         "missing_identity": missing_identity,
         "missing_link": missing_link,
         "rotating_links_not_in_current_rows": rotating,
