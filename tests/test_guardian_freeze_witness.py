@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROTECTED = {
     "data/guardian_research/sessions/2026-11-06.json": "e512eaf590c188758fff5c6f3f925167b636d6e8",
     "data/guardian_research/sessions/2026-11-11.json": "13ec93f01fcb60bf554b77e868cdc98791a63c73",
-    "research/v2_research_ledger/durable/identities.jsonl": "70479dacf795d4860d87e6ba718cf5c172180dba",
+    "research/v2_research_ledger/durable/identities.jsonl": "53b3102617bc93f9eb59f959ed410adc662b3c87",
 }
 
 

@@ -10,21 +10,21 @@
     "detail": "The 1055-row research panel file is not in the repository.",
     "status": "UNAVAILABLE"
   },
-  "identity_count": 1339,
+  "identity_count": 1434,
   "link_count": 39,
   "schema": "v2_research_row_store_manifest.v1",
   "schema_records": "v2_research_row_store.v1",
   "sidecar": {
-    "freeze_rows": 1108,
-    "linked_current_rows": 36,
+    "freeze_rows": 1192,
+    "linked_current_rows": 0,
     "path": "research/live_candidate_v2_camera_sidecar/camera_sidecar.json",
-    "sha256": "5d740adfaca1cbc3ad6b339a44c36130efbdac89ec151fe035d7f8442074d577",
+    "sha256": "753f11d837896256733cabd4fb86b8b9aa9cd5841c3f196f6d310d5903aff08f",
     "status": "PRESENT"
   },
   "sweetspot": {
     "path": "data/earning_learning/market_aware_sweetspot_observer_ledger.csv",
-    "rows": 231,
-    "sha256": "620390c4431153d68dc2398d8b5d580e3829dc5a68e49f4451482249c29e7b81",
+    "rows": 242,
+    "sha256": "c6270d9b89be8448ad380fe6560c0d2975f6ee0551381cd6b9ba3791dfa153fd",
     "status": "PRESENT"
   },
   "t_plus_recomputed": false
