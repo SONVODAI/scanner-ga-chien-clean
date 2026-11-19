@@ -1,0 +1,58 @@
+name: ledger-forward-outcomes
+
+# Supervised validation only. This workflow has no schedule and no write
+# permission. Leave LEDGER_FORWARD_OUTCOMES_ENABLED unset. Setting that
+# variable still cannot publish a generation or merge a pull request.
+# A reviewed commit of research/v2_research_ledger/outcomes is the publication.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type validate-only. Any other value is refused."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: vars.LEDGER_FORWARD_OUTCOMES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Refuse anything except a dry run
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          if [ "$CONFIRM" != "validate-only" ]; then
+            echo "REFUSED: confirmation must be validate-only. This workflow does not publish."
+            exit 1
+          fi
+
+      - name: Download the published Price Book
+        env:
+          GUARDIAN_REFERENCE_URL: ${{ secrets.GUARDIAN_REFERENCE_URL }}
+          GUARDIAN_REFERENCE_TOKEN: ${{ secrets.GUARDIAN_REFERENCE_TOKEN }}
+        run: |
+          set -euo pipefail
+          python -c "import os, sys; from pathlib import Path; from research.guardian_research.reference_export import fetch_published_store; path = fetch_published_store(os.environ.get('GUARDIAN_REFERENCE_URL', ''), os.environ.get('GUARDIAN_REFERENCE_TOKEN', ''), Path('/tmp/reference_store.json')); sys.exit(0 if path else 1)"
+
+      - name: Dry-run the Ledger T+ generation
+        run: |
+          set -euo pipefail
+          python -m research.v2_research_ledger.forward_outcomes \
+            --ledger research/v2_research_ledger/durable \
+            --reference /tmp/reference_store.json \
+            --output-root /tmp/ledger-forward-dry-run
+          test ! -e /tmp/ledger-forward-dry-run

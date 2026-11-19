@@ -1,8 +1,11 @@
 """Derived T+ outcomes for the Research Ledger.
 
 The builder reads a sealed ledger and a validated approximate reference store.
-It writes a new generation file. An existing generation with different bytes
-is refused, so a later ``as_of`` does not replace an earlier one.
+``as_of`` is the validated Price Book's last trading session. The system clock
+is not a session. A dry run reports the generation and writes nothing.
+``--publish`` writes one new generation. An existing generation with different
+bytes is refused, and a failed index update removes a generation created by
+that same attempt.
 
 The sealed JSONL files, Guardian Research, and the reference store are not
 written. The panel falls back to ``UNAVAILABLE_NOT_RECOMPUTED`` when no
@@ -11,6 +14,7 @@ generation matches the ledger that is open.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 from pathlib import Path
@@ -28,7 +32,8 @@ from research.approximate_returns.contract import (
     STATUS_TRUNCATED,
 )
 from research.approximate_returns.returns import evaluate_rows
-from research.guardian_research.reference_export import read_reference_store
+from research.guardian_research.reference_export import _digest, read_reference_store
+from research.v2_research_ledger.durable_store import MANIFEST_SCHEMA
 
 DOCUMENT_SCHEMA = "v2_research_forward_outcomes.v1"
 INDEX_SCHEMA = "v2_research_forward_index.v1"
@@ -42,6 +47,9 @@ SWEETSPOT_BLANK = "sweetspot_blank"
 POPULATIONS = (BRAIN_LINKED, BRAIN_UNLINKED, SWEETSPOT, SWEETSPOT_BLANK)
 
 LEDGER_FILES = ("identities.jsonl", "links.jsonl", "conflicts.jsonl", "manifest.json")
+PACKAGED_OUTCOMES = Path(__file__).resolve().parent / "outcomes"
+# Byte pins for the committed Stage 2 store. Publication does not read them.
+# A newer ledger or Price Book is validated from the files that were opened.
 STAGE2_LEDGER_HASHES = {
     "identities.jsonl": "a2e868e74e62fef8d74c0215f817194e9489cba7af523e788c42251f9c28b848",
     "links.jsonl": "377ff151d96c290c062efdfe32118b02d49efaaa30c98d5871fe6ac5b1fd2ec4",
@@ -91,20 +99,27 @@ def build_forward_document(
     ledger_dir: Path,
     reference_path: Path,
     *,
-    expected_ledger_hashes: Mapping[str, str],
-    expected_reference_sha256: str,
+    expected_ledger_hashes: Mapping[str, str] | None = None,
+    expected_reference_sha256: str | None = None,
 ) -> dict[str, Any]:
-    """Return a derived document. The ledger and the reference file are only read."""
+    """Return a derived document. The ledger and the reference file are only read.
+
+    The sealed-file hashes, manifest counts, Price Book checksum, price basis,
+    source, and trading calendar are always checked. Optional expected hashes
+    are an additional pin. They do not replace those checks, and publication
+    does not require the Stage 2 pins.
+    """
     ledger_root = Path(ledger_dir)
     hashes = file_hashes(ledger_root)
-    if dict(expected_ledger_hashes) != hashes:
+    if expected_ledger_hashes is not None and dict(expected_ledger_hashes) != hashes:
         raise ForwardBuildError("LEDGER_HASH_MISMATCH")
-    store = read_reference_store(Path(reference_path))
-    if store is None or store.get("content_sha256") != expected_reference_sha256:
+    identities, links, conflict_count = _load_ledger(ledger_root)
+    _validate_manifest(ledger_root, len(identities), len(links), conflict_count)
+    _require_unique_coverage(identities)
+    store = _validated_reference(Path(reference_path))
+    if expected_reference_sha256 is not None and store.get("content_sha256") != expected_reference_sha256:
         raise ForwardBuildError("REFERENCE_NOT_VALIDATED")
     sessions = _calendar(store)
-    identities, links = _load_ledger(ledger_root)
-    _require_unique_coverage(identities)
     prepared = [
         {
             "row_id": row.get("identity_id"),
@@ -161,33 +176,43 @@ def build_forward_document(
     return document
 
 
+def plan_forward_publication(document: Mapping[str, Any], output_root: Path, ledger_dir: Path) -> dict[str, Any]:
+    """Report the write. This creates no directory and replaces no file."""
+    plan = _publication_plan(document, output_root, ledger_dir)
+    return {key: value for key, value in plan.items() if key not in {"entry", "payload"}}
+
+
 def publish_forward_document(document: Mapping[str, Any], output_root: Path, ledger_dir: Path) -> dict[str, Any]:
     """Write one generation. A different body for the same generation is refused."""
-    root = Path(output_root)
-    _refuse_protected_output(root, Path(ledger_dir))
-    generation_id = _generation_id(document)
-    payload = _canonical(document)
-    directory = root / "generations"
-    directory.mkdir(parents=True, exist_ok=True)
-    target = directory / f"{generation_id}.json"
-    if target.is_file():
-        if target.read_bytes() != payload:
-            raise ForwardBuildError("REFUSE_OVERWRITE")
-        file_status = "unchanged"
-    else:
-        _atomic_write(target, payload)
-        file_status = "written"
-    entry = {
-        "as_of": document["as_of"],
-        "calculation_version": document["calculation_version"],
-        "generation_id": generation_id,
-        "identity_count": document["identity_count"],
-        "ledger_hashes": document["ledger_hashes"],
-        "path": f"generations/{generation_id}.json",
-        "reference_sha256": document["reference_sha256"],
+    plan = _publication_plan(document, output_root, ledger_dir)
+    target = Path(plan["path"])
+    if plan["file_status"] == "unchanged" and plan["index_status"] == "unchanged":
+        return {
+            "file_status": "unchanged",
+            "generation_id": plan["generation_id"],
+            "index_status": "unchanged",
+            "path": str(target),
+        }
+    created = False
+    if plan["file_status"] == "would_write":
+        target.parent.mkdir(parents=True, exist_ok=True)
+        _atomic_write(target, plan["payload"])
+        created = True
+    try:
+        if plan["index_status"] == "would_write":
+            index_status = _record_generation(Path(output_root) / "index.json", plan["entry"])
+        else:
+            index_status = "unchanged"
+    except Exception:
+        if created:
+            target.unlink(missing_ok=True)
+        raise
+    return {
+        "file_status": "written" if created else "unchanged",
+        "generation_id": plan["generation_id"],
+        "index_status": index_status,
+        "path": str(target),
     }
-    index_status = _record_generation(root / "index.json", entry)
-    return {"file_status": file_status, "generation_id": generation_id, "index_status": index_status, "path": str(target)}
 
 
 def attachable_outcomes(ledger_dir: Path, outcomes_root: Path | None = None) -> dict[str, Any] | None:
@@ -195,7 +220,7 @@ def attachable_outcomes(ledger_dir: Path, outcomes_root: Path | None = None) -> 
     root = Path(outcomes_root) if outcomes_root is not None else Path(ledger_dir).parent / "outcomes"
     try:
         hashes = file_hashes(ledger_dir)
-        identities, links = _load_ledger(Path(ledger_dir))
+        identities, links, _conflict_count = _load_ledger(Path(ledger_dir))
     except (ForwardBuildError, OSError, UnicodeError, json.JSONDecodeError, ValueError):
         return None
     index = _read_index(root / "index.json")
@@ -240,9 +265,11 @@ def display_horizon(cell: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _calendar(store: Mapping[str, Any]) -> list[str]:
-    sessions = [str(item) for item in store.get("trading_sessions") or []]
+    sessions = [_session_day(item) for item in store.get("trading_sessions") or []]
     as_of = str(store.get("as_of") or "")
     if not sessions or sessions != sorted(set(sessions)) or sessions[-1] != as_of:
+        raise ForwardBuildError("CALENDAR_INVALID")
+    if _session_day(as_of) != as_of:
         raise ForwardBuildError("CALENDAR_INVALID")
     for row in store.get("rows") or []:
         if str(row.get("session") or "") > as_of:
@@ -250,10 +277,68 @@ def _calendar(store: Mapping[str, Any]) -> list[str]:
     return sessions
 
 
-def _load_ledger(directory: Path) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
+def _session_day(value: object) -> str:
+    text = str(value or "")
+    try:
+        parsed = datetime.date.fromisoformat(text)
+    except ValueError as exc:
+        raise ForwardBuildError("CALENDAR_INVALID") from exc
+    if parsed.isoformat() != text:
+        raise ForwardBuildError("CALENDAR_INVALID")
+    return text
+
+
+def _validated_reference(path: Path) -> dict[str, Any]:
+    """Accept a store only when its checksum, basis, and source agree."""
+    store = read_reference_store(path)
+    if store is not None:
+        return store
+    try:
+        document = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ForwardBuildError("REFERENCE_NOT_VALIDATED") from exc
+    if not isinstance(document, dict):
+        raise ForwardBuildError("REFERENCE_NOT_VALIDATED")
+    if document.get("price_basis") != PRICE_BASIS:
+        raise ForwardBuildError("REFERENCE_BASIS_MISMATCH")
+    if document.get("source") != SOURCE:
+        raise ForwardBuildError("REFERENCE_SOURCE_MISMATCH")
+    if document.get("content_sha256") != _digest(document):
+        raise ForwardBuildError("REFERENCE_CHECKSUM_MISMATCH")
+    raise ForwardBuildError("REFERENCE_NOT_VALIDATED")
+
+
+def _validate_manifest(directory: Path, identity_count: int, link_count: int, conflict_count: int) -> None:
+    path = directory / "manifest.json"
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ForwardBuildError("MANIFEST_INVALID") from exc
+    if not isinstance(manifest, dict) or manifest.get("schema") != MANIFEST_SCHEMA:
+        raise ForwardBuildError("MANIFEST_INVALID")
+    counts = (
+        manifest.get("identity_count") == identity_count
+        and manifest.get("link_count") == link_count
+        and manifest.get("conflict_count") == conflict_count
+    )
+    if not counts:
+        raise ForwardBuildError("MANIFEST_COUNT_MISMATCH")
+    if manifest.get("final_buy_enabled") not in {None, False}:
+        raise ForwardBuildError("MANIFEST_INVALID")
+    if manifest.get("t_plus_recomputed") not in {None, False}:
+        raise ForwardBuildError("MANIFEST_INVALID")
+
+
+def _load_ledger(directory: Path) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]], int]:
     identities = _jsonl(directory / "identities.jsonl")
-    links = {str(row.get("link_id") or ""): row for row in _jsonl(directory / "links.jsonl") if row.get("link_id")}
-    return identities, links
+    links: dict[str, dict[str, Any]] = {}
+    for row in _jsonl(directory / "links.jsonl"):
+        link_id = str(row.get("link_id") or "")
+        if not link_id or link_id in links:
+            raise ForwardBuildError("LEDGER_ROW_INVALID")
+        links[link_id] = row
+    conflicts = _jsonl(directory / "conflicts.jsonl")
+    return identities, links, len(conflicts)
 
 
 def _jsonl(path: Path) -> list[dict[str, Any]]:
@@ -404,6 +489,72 @@ def _document_matches(
     return True
 
 
+def _publication_plan(document: Mapping[str, Any], output_root: Path, ledger_dir: Path) -> dict[str, Any]:
+    root = Path(output_root)
+    _refuse_protected_output(root, Path(ledger_dir))
+    _require_publishable(document)
+    generation_id = _generation_id(document)
+    payload = _canonical(document)
+    target = root / "generations" / f"{generation_id}.json"
+    if target.is_file():
+        if target.read_bytes() != payload:
+            raise ForwardBuildError("REFUSE_OVERWRITE")
+        file_status = "unchanged"
+    else:
+        file_status = "would_write"
+    entry = {
+        "as_of": document["as_of"],
+        "calculation_version": document["calculation_version"],
+        "generation_id": generation_id,
+        "identity_count": document["identity_count"],
+        "ledger_hashes": document["ledger_hashes"],
+        "path": f"generations/{generation_id}.json",
+        "reference_sha256": document["reference_sha256"],
+    }
+    return {
+        "entry": entry,
+        "file_status": file_status,
+        "generation_id": generation_id,
+        "index_status": _index_disposition(root / "index.json", entry),
+        "path": str(target),
+        "payload": payload,
+    }
+
+
+def _require_publishable(document: Mapping[str, Any]) -> None:
+    if document.get("schema") != DOCUMENT_SCHEMA or document.get("calculation_version") != CALCULATION_VERSION:
+        raise ForwardBuildError("DOCUMENT_INVALID")
+    if document.get("official_pnl") is not False or document.get("price_basis") != PRICE_BASIS:
+        raise ForwardBuildError("DOCUMENT_INVALID")
+    if document.get("reference_source") != SOURCE:
+        raise ForwardBuildError("DOCUMENT_INVALID")
+    sessions = document.get("trading_sessions")
+    if not isinstance(sessions, list) or not sessions or document.get("as_of") != sessions[-1]:
+        raise ForwardBuildError("CALENDAR_INVALID")
+    if not isinstance(document.get("ledger_hashes"), dict) or not document.get("reference_sha256"):
+        raise ForwardBuildError("DOCUMENT_INVALID")
+    rows = document.get("rows")
+    if not isinstance(rows, list) or document.get("identity_count") != len(rows):
+        raise ForwardBuildError("DOCUMENT_INVALID")
+
+
+def _index_disposition(path: Path, entry: Mapping[str, Any]) -> str:
+    if path.exists() and not path.is_file():
+        raise ForwardBuildError("INDEX_INVALID")
+    if not path.is_file():
+        return "would_write"
+    current = _read_index(path)
+    if current is None:
+        raise ForwardBuildError("INDEX_INVALID")
+    for existing in current.get("generations") or []:
+        if not isinstance(existing, dict) or existing.get("generation_id") != entry["generation_id"]:
+            continue
+        if existing != dict(entry):
+            raise ForwardBuildError("REFUSE_OVERWRITE")
+        return "unchanged"
+    return "would_write"
+
+
 def _generation_id(document: Mapping[str, Any]) -> str:
     ledger = hashlib.sha256(_canonical({"ledger_hashes": document["ledger_hashes"]})).hexdigest()[:12]
     reference = str(document.get("reference_sha256") or "")[:12]
@@ -411,14 +562,10 @@ def _generation_id(document: Mapping[str, Any]) -> str:
 
 
 def _record_generation(path: Path, entry: Mapping[str, Any]) -> str:
-    current = _read_index(path)
-    generations = list(current.get("generations") or []) if current else []
-    for existing in generations:
-        if existing.get("generation_id") != entry["generation_id"]:
-            continue
-        if existing != dict(entry):
-            raise ForwardBuildError("REFUSE_OVERWRITE")
+    if _index_disposition(path, entry) == "unchanged":
         return "unchanged"
+    current = _read_index(path) if path.is_file() else None
+    generations = list(current.get("generations") or []) if current else []
     generations.append(dict(entry))
     generations.sort(key=lambda item: (str(item.get("as_of") or ""), str(item.get("generation_id") or "")))
     payload = _canonical({"generations": generations, "schema": INDEX_SCHEMA})
@@ -464,8 +611,12 @@ def _refuse_protected_output(output_root: Path, ledger_dir: Path) -> None:
 
 def _atomic_write(path: Path, payload: bytes) -> None:
     partial = path.with_name(f".{path.name}.partial")
-    partial.write_bytes(payload)
-    partial.replace(path)
+    try:
+        partial.write_bytes(payload)
+        partial.replace(path)
+    except Exception:
+        partial.unlink(missing_ok=True)
+        raise
 
 
 def _canonical(document: Mapping[str, Any]) -> bytes:
@@ -476,26 +627,62 @@ def _is_number(value: object) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
+def _is_packaged_outcomes(output_root: Path) -> bool:
+    return Path(output_root).resolve() == PACKAGED_OUTCOMES.resolve()
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Publish one derived Ledger T+ generation")
+    parser = argparse.ArgumentParser(description="Validate or publish one derived Ledger T+ generation")
     parser.add_argument("--ledger", required=True)
     parser.add_argument("--reference", required=True)
     parser.add_argument("--output-root", required=True)
+    parser.add_argument("--publish", action="store_true", help="Write the generation. Omit for a dry run.")
+    parser.add_argument(
+        "--approve-repository-write",
+        action="store_true",
+        help="Required only when --publish targets the committed outcomes directory.",
+    )
+    parser.add_argument("--expect-reference-sha256", default=None)
     args = parser.parse_args(argv)
     try:
         document = build_forward_document(
             Path(args.ledger),
             Path(args.reference),
-            expected_ledger_hashes=STAGE2_LEDGER_HASHES,
-            expected_reference_sha256=STAGE2_REFERENCE_SHA256,
+            expected_reference_sha256=args.expect_reference_sha256,
         )
-        result = publish_forward_document(document, Path(args.output_root), Path(args.ledger))
+        output = Path(args.output_root)
+        if args.publish and _is_packaged_outcomes(output) and not args.approve_repository_write:
+            raise ForwardBuildError("REPOSITORY_PUBLICATION_NOT_APPROVED")
+        if args.publish:
+            result = publish_forward_document(document, output, Path(args.ledger))
+            mode = "publish"
+        else:
+            result = plan_forward_publication(document, output, Path(args.ledger))
+            mode = "dry_run"
     except ForwardBuildError as exc:
         print(json.dumps({"ok": False, "reason": exc.reason}, sort_keys=True))
         return 1
-    print(json.dumps({"ok": True, **result}, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "as_of": document["as_of"],
+                "calculation_version": document["calculation_version"],
+                "coverage": document["coverage"],
+                "identity_count": document["identity_count"],
+                "ledger_hashes": document["ledger_hashes"],
+                "mode": mode,
+                "ok": True,
+                "price_basis": document["price_basis"],
+                "reference_sha256": document["reference_sha256"],
+                "reference_source": document["reference_source"],
+                "trading_sessions": document["trading_sessions"],
+                **result,
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 
