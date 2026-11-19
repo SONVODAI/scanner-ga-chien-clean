@@ -1,9 +1,11 @@
-"""Incremental research ingest. Fixtures plus the committed store. No git push."""
+"""Incremental research ingest. Fixtures and a temporary copy of the committed store. No git push."""
 
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -235,16 +237,45 @@ def test_concurrent_ingest_waits_and_keeps_both_identities(tmp_path: Path):
     assert store.read_manifest()["identity_count"] == 2
 
 
-def test_repository_ingest_fixes_current_row_gaps_without_resealing_frt():
+DURABLE_FILES = (
+    "identities.jsonl",
+    "links.jsonl",
+    "conflicts.jsonl",
+    "manifest.json",
+)
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _durable_hashes(directory: Path) -> dict[str, str]:
+    return {name: _sha256(directory / name) for name in DURABLE_FILES}
+
+
+def test_repository_ingest_fixes_current_row_gaps_without_resealing_frt(tmp_path: Path):
+    """Copy the committed store, ingest the copy, and leave the repository bytes unchanged."""
+    before_hashes = _durable_hashes(STORE)
+    before_bytes = {name: (STORE / name).read_bytes() for name in DURABLE_FILES}
+    directory = tmp_path / "durable"
+    directory.mkdir()
+    for name in DURABLE_FILES:
+        shutil.copyfile(STORE / name, directory / name)
+    assert directory.resolve() != STORE.resolve()
     guardian = GUARDIAN_OUTCOMES.read_bytes()
     approximate = BUNDLED_VIEW.read_bytes()
     sidecar_bytes = SIDECAR.read_bytes()
     contract = ACTION_CONTRACT.read_bytes()
-    before = DurableRowStore(STORE)
+    before = DurableRowStore(directory)
     frt_seal = dict(before.identities[FRT]["sealed"])
     had_frt_link = f"nomination|{FRT}" in before.links
-    report = incremental_ingest(STORE, sidecar_path=SIDECAR, sweet_csv=ROOT / "data/earning_learning/market_aware_sweetspot_observer_ledger.csv", evidence_dir=ROOT / "research/v2_research_ledger/evidence")
-    after = DurableRowStore(STORE)
+    report = incremental_ingest(
+        directory,
+        sidecar_path=SIDECAR,
+        sweet_csv=ROOT / "data/earning_learning/market_aware_sweetspot_observer_ledger.csv",
+        evidence_dir=ROOT / "research/v2_research_ledger/evidence",
+    )
+    after = DurableRowStore(directory)
     assert after.identities[FRT]["sealed"] == frt_seal
     assert after.identities[FRT]["t0_price"] == 148000
     document = json.loads(sidecar_bytes)
@@ -263,11 +294,15 @@ def test_repository_ingest_fixes_current_row_gaps_without_resealing_frt():
     assert GUARDIAN_OUTCOMES.read_bytes() == guardian
     assert BUNDLED_VIEW.read_bytes() == approximate
     assert ACTION_CONTRACT.read_bytes() == contract
-    published = json.loads((STORE / "manifest.json").read_text(encoding="utf-8"))
+    published = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
     assert published["identity_count"] == len(after.identities)
     assert published["link_count"] == len(after.links)
     assert published["t_plus_recomputed"] is False
     assert published["action_evidence"]["status"] == "MISSING"
+    after_hashes = _durable_hashes(STORE)
+    assert after_hashes == before_hashes
+    for name in DURABLE_FILES:
+        assert (STORE / name).read_bytes() == before_bytes[name]
 
 
 class pytest_raises_keyerror:
