@@ -4,14 +4,14 @@
     "status": "MISSING"
   },
   "approximate_view_modified": false,
-  "conflict_count": 4,
+  "conflict_count": 33,
   "final_buy_enabled": false,
   "historical_row_panel": {
     "detail": "The 1055-row research panel file is not in the repository.",
     "status": "UNAVAILABLE"
   },
   "identity_count": 1434,
-  "link_count": 39,
+  "link_count": 131,
   "schema": "v2_research_row_store_manifest.v1",
   "schema_records": "v2_research_row_store.v1",
   "sidecar": {
