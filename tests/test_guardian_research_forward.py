@@ -84,23 +84,27 @@ def test_backfill_is_labeled_and_a_different_seal_is_refused(tmp_path: Path):
     archive = ROOT / "data" / "earning_money_snapshots.csv"
     if not archive.is_file():
         pytest.skip("persisted scan is not in this worktree")
-    try:
-        first = seal_reconstructed_session(ROOT, "2026-10-30", tmp_path)
-    except ArchiveRejected as exc:
-        if exc.reason == "STALE_ARCHIVE":
-            pytest.skip("the stored scan was saved after the next calendar day")
-        raise
-    document = first["document"]
-    assert document["observation_origin"] == "BACKFILLED"
-    assert document["reconstruction"]["saved_at"] == "2026-10-31T00:27:55+07:00"
-    assert document["counts"]["HOLD"] == 16
-    assert document["counts"]["WATCH"] == 73
-    assert document["counts"]["SELL"] == 54
-    assert document["counts"]["UNAVAILABLE"] == 0
-    assert document["tracked_count"] == 143
-    assert all(row["position_inputs_used"] is False for row in document["rows"])
-    again = seal_reconstructed_session(ROOT, "2026-10-30", tmp_path)
-    assert again["document"]["content_sha256"] == document["content_sha256"]
+    before = archive.read_bytes()
+    with pytest.raises(ArchiveRejected) as stale:
+        seal_reconstructed_session(ROOT, "2026-10-30", tmp_path)
+    assert stale.value.reason == "STALE_ARCHIVE"
+    assert archive.read_bytes() == before
+    assert list(tmp_path.rglob("*.json")) == []
+    fresh = tmp_path / "fresh"
+    copied = fresh / "data" / "earning_money_snapshots.csv"
+    copied.parent.mkdir(parents=True)
+    copied.write_text(before.decode("utf-8").replace("2026-11-02T11:15:29+07:00", "2026-10-31T00:27:55+07:00"), encoding="utf-8")
+    with pytest.raises(ArchiveRejected) as retired:
+        seal_reconstructed_session(fresh, "2026-10-30", tmp_path / "seal")
+    assert retired.value.reason == "EXTRA_SYMBOLS"
+    assert archive.read_bytes() == before
+    assert list((tmp_path / "seal").rglob("*.json")) == []
+    document = build_snapshot(
+        "2026-10-30",
+        observations={},
+        symbols=("HPG",),
+    )
+    write_snapshot(tmp_path, document)
     changed = json.loads(json.dumps(document))
     changed["reconstruction"] = {"source": "other", "saved_at": "other", "label": "other"}
     from research.guardian_research.snapshot import _digest
@@ -116,15 +120,13 @@ def test_bundled_view_matches_a_backfilled_measurement(tmp_path: Path):
     archive = ROOT / "data" / "earning_money_snapshots.csv"
     if bundled is None or not store_path.is_file() or not archive.is_file():
         pytest.skip("bundled guardian view is not built")
-    try:
-        sealed = seal_reconstructed_session(ROOT, "2026-10-30", tmp_path)
-    except ArchiveRejected as exc:
-        if exc.reason == "STALE_ARCHIVE":
-            pytest.skip("the stored scan was saved after the next calendar day")
-        raise
-    store = json.loads(store_path.read_text(encoding="utf-8"))
-    measured = measure_snapshot(sealed["document"], store)
-    assert bundled["content_sha256"] == measured["content_sha256"]
-    assert bundled["observation_origin"] == "BACKFILLED"
-    assert bundled["classifications"]["SELL"]["horizons"]["T+5"]["average_return_pct"] is None
+    bundled_path = ROOT / "research" / "guardian_research" / "performance_view.json"
+    before_bundled = bundled_path.read_bytes() if bundled_path.is_file() else None
+    before_archive = archive.read_bytes()
+    with pytest.raises(ArchiveRejected) as retired:
+        seal_reconstructed_session(ROOT, "2026-10-30", tmp_path)
+    assert retired.value.reason == "STALE_ARCHIVE"
+    assert archive.read_bytes() == before_archive
+    if before_bundled is not None:
+        assert bundled_path.read_bytes() == before_bundled
     assert bundled["portfolio_decision"] is False

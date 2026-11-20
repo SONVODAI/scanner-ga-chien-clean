@@ -256,7 +256,8 @@ def test_live_colors_keep_the_143_symbol_fixture(tmp_path: Path):
     by_symbol = {row["symbol"]: row for row in document["rows"]}
     assert document["tracked_count"] == 143
     assert len(by_symbol) == 143
-    assert set(by_symbol) == set(tracked)
+    assert set(by_symbol) - set(tracked) == {"F88"}
+    sealed_symbols = tuple(sorted(by_symbol))
     frame = _frame(
         [
             {
@@ -268,15 +269,15 @@ def test_live_colors_keep_the_143_symbol_fixture(tmp_path: Path):
                 "obv": by_symbol[symbol]["inputs"]["obv"],
                 "obv_ema9": by_symbol[symbol]["inputs"]["obv_ema9"],
             }
-            for symbol in tracked
+            for symbol in sealed_symbols
         ]
     )
-    live = evaluate_live(frame, symbols=tracked, evaluated_at=WHEN)
+    live = evaluate_live(frame, symbols=sealed_symbols, evaluated_at=WHEN)
     board = live_board(live)
     expected_symbols = [
         symbol
         for label in ("HOLD", "WATCH", "SELL", "UNAVAILABLE")
-        for symbol in tracked
+        for symbol in sealed_symbols
         if by_symbol[symbol]["classification"] == label
     ]
     assert list(board["Symbol"]) == expected_symbols
@@ -372,7 +373,7 @@ def test_panel_keeps_live_apart_from_the_sealed_session(tmp_path: Path, monkeypa
     assert headings[1] == "## 🟢 GUARDIAN RESEARCH LIVE"
     assert not any(heading.startswith("## 🛡️") for heading in headings)
     assert expanders == [("Sealed T0 snapshot 2026-11-06 — not the live board", False)]
-    assert metrics[:4] == [("HOLD", 0), ("WATCH", 1), ("SELL", 0), ("UNAVAILABLE", 142)]
+    assert metrics[:4] == [("HOLD", 0), ("WATCH", 1), ("SELL", 0), ("UNAVAILABLE", 141)]
     assert ("HOLD", 1) in metrics[4:]
     assert Path(sealed["path"]).read_bytes() == before
     assert list(tmp_path.joinpath("sessions").glob("*.json")) == [Path(sealed["path"])]

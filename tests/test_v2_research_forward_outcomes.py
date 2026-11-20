@@ -1132,7 +1132,7 @@ def test_daily_dispatch_holiday_gap_and_missing_symbols_fail_closed():
         _assess(namespace, monday_store, monday_prior, _utc("2026-11-23", 12, 10), mode="holiday")
     assert absent_gap.value.reason == "GAP_ABSENT"
     published = _assess(namespace, monday_store, monday_prior, _utc("2026-11-23", 12, 10))
-    assert published == {"action": "publish", "as_of": "2026-11-23"}
+    assert published == {"action": "publish", "as_of": "2026-11-23", "skipped_rejections": []}
     assert monday_store["trading_sessions"] == ["2026-11-20", "2026-11-23"]
 
     halted, halted_prior = book("2026-11-20", "2026-11-23", omit={("SSI", "2026-11-23")})
@@ -1169,6 +1169,87 @@ def test_daily_dispatch_holiday_gap_and_missing_symbols_fail_closed():
     assert universe_error.value.reason == "UNIVERSE_MISMATCH"
 
 
+def test_daily_retired_symbol_does_not_block_the_tracked_book():
+    namespace = _daily_namespace()
+    sessions = ["2026-11-19", "2026-11-20"]
+    moment = _utc("2026-11-20", 12, 10)
+    prior = _prior(["2026-11-19"], "previous-book")
+
+    def gate(store):
+        return _assess(namespace, store, prior, moment)
+
+    retired = _daily_store(
+        sessions,
+        _closes(sessions),
+        rejections=[
+            {"session": "2026-11-19", "symbol": "F88", "reason": "SYMBOL_ABSENT", "clock": ""},
+            {"session": "2026-11-20", "symbol": "F88", "reason": "SYMBOL_ABSENT", "clock": ""},
+        ],
+        tracked_count=4,
+    )
+    decision = gate(retired)
+    assert decision["action"] == "publish"
+    assert decision["skipped_rejections"] == [
+        {"clock": "", "reason": "SYMBOL_ABSENT", "session": "2026-11-20", "symbol": "F88"},
+    ]
+
+    blocked = _daily_store(
+        sessions,
+        _closes(sessions, omit={("HPG", "2026-11-20")}),
+        rejections=[
+            {"session": "2026-11-20", "symbol": "F88", "reason": "SYMBOL_ABSENT", "clock": ""},
+            {"session": "2026-11-20", "symbol": "HPG", "reason": "SYMBOL_ABSENT", "clock": ""},
+        ],
+        tracked_count=4,
+    )
+    with pytest.raises(namespace["PublicationRefusal"]) as missing:
+        gate(blocked)
+    assert missing.value.reason == "PRICE_BOOK_INCOMPLETE"
+    assert missing.value.skipped_rejections[0]["symbol"] == "F88"
+
+    duplicated = _daily_store(sessions, _closes(sessions), tracked_count=3)
+    duplicated["rows"].append(dict(duplicated["rows"][0]))
+    duplicated["content_sha256"] = _digest(duplicated)
+    with pytest.raises(namespace["PublicationRefusal"]) as duplicate:
+        gate(duplicated)
+    assert duplicate.value.reason == "PRICE_BOOK_INCOMPLETE"
+
+    invalid = _daily_store(
+        sessions,
+        _closes(sessions, truncated={("VCB", "2026-11-20")}),
+        rejections=[{"session": "2026-11-20", "symbol": "F88", "reason": "SYMBOL_ABSENT", "clock": "14:44"}],
+        tracked_count=4,
+    )
+    with pytest.raises(namespace["PublicationRefusal"]) as truncated:
+        gate(invalid)
+    assert truncated.value.reason == "PRICE_BOOK_INCOMPLETE"
+    assert truncated.value.skipped_rejections == [
+        {"clock": "14:44", "reason": "SYMBOL_ABSENT", "session": "2026-11-20", "symbol": "F88"},
+    ]
+
+    historical_ok = _daily_store(
+        sessions,
+        _closes(sessions, extra=[{"symbol": "F88", "session": "2026-11-19", "close": 47000, "clock": "14:50"}]),
+        tracked_count=3,
+    )
+    assert gate(historical_ok)["action"] == "publish"
+    assert gate(historical_ok)["skipped_rejections"] == []
+
+    priced_again = _daily_store(
+        sessions,
+        _closes(sessions, extra=[{"symbol": "F88", "session": "2026-11-20", "close": 47400, "clock": "14:50"}]),
+        tracked_count=3,
+    )
+    with pytest.raises(namespace["PublicationRefusal"]) as returned:
+        gate(priced_again)
+    assert returned.value.reason == "PRICE_BOOK_INCOMPLETE"
+
+    unexplained = _daily_store(sessions, _closes(sessions), tracked_count=5)
+    with pytest.raises(namespace["PublicationRefusal"]) as mismatch:
+        gate(unexplained)
+    assert mismatch.value.reason == "UNIVERSE_MISMATCH"
+
+
 def test_daily_pins_published_generations_and_the_live_watchlist():
     from research.guardian_research.universe import load_tracked_symbols
 
@@ -1180,9 +1261,10 @@ def test_daily_pins_published_generations_and_the_live_watchlist():
     assert prior["as_of"] == "2026-11-19"
     assert prior["generation_id"] == "2026-11-19_41f36ca0cad9_63b98229a9f9"
     assert prior["trading_sessions"][-2:] == ["2026-11-18", "2026-11-19"]
-    assert len(namespace["require_universe"](load_tracked_symbols())) == 143
+    assert len(namespace["require_universe"](load_tracked_symbols())) == 142
+    assert "F88" not in load_tracked_symbols()
     with pytest.raises(namespace["PublicationRefusal"]) as short:
-        namespace["require_universe"](tuple(f"S{index:03d}" for index in range(142)))
+        namespace["require_universe"](tuple(f"S{index:03d}" for index in range(141)))
     assert short.value.reason == "UNIVERSE_MISMATCH"
     receipt = namespace["safe_receipt"](_daily_store(["2026-11-20", "2026-11-23"], _closes(["2026-11-20", "2026-11-23"])))
     assert receipt["new_session_ok"] == 3

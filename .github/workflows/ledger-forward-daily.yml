@@ -96,7 +96,7 @@ jobs:
           DURABLE_FILES = ("identities.jsonl", "links.jsonl", "conflicts.jsonl", "manifest.json")
           INDEX_SCHEMA = "v2_research_forward_index.v1"
           MISSING_STATUSES = {"NOT_YET_OBSERVED", "T0_REFERENCE_MISSING", "TARGET_MISSING"}
-          TRACKED_COUNT = 143
+          TRACKED_COUNT = 142
           MAX_PUSH_ATTEMPTS = 3
           # UTC weekday 1-5 is Monday-Friday. The 23:40 UTC slot is 06:40 ICT the next day, Tuesday-Saturday.
           SCHEDULED_SLOTS = (
@@ -107,9 +107,10 @@ jobs:
           )
 
           class PublicationRefusal(RuntimeError):
-              def __init__(self, reason: str):
+              def __init__(self, reason: str, skipped_rejections: list | None = None):
                   super().__init__(reason)
                   self.reason = reason
+                  self.skipped_rejections = list(skipped_rejections or [])
 
           def require_dispatch_context(enabled: str | None, confirm: str | None, ref: str | None, event: str | None) -> str:
               if enabled != "true":
@@ -253,7 +254,23 @@ jobs:
                   raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
               return set(seen)
 
-          def require_complete_session(store: dict, tracked: set[str]) -> None:
+          def _rejection_record(item: dict, session: str) -> dict:
+              return {
+                  "clock": str(item.get("clock") or ""),
+                  "reason": str(item.get("reason") or ""),
+                  "session": session,
+                  "symbol": str(item.get("symbol") or "").strip().upper(),
+              }
+
+          def require_complete_session(store: dict, tracked: set[str]) -> list[dict]:
+              """Accept a session only when every tracked symbol has one OK row.
+
+              A rejection for a symbol outside the current watchlist is reported
+              and does not, by itself, refuse the session. Rejections on older
+              sessions are not evaluated again. The previous session contributes
+              only its OK rows that are still tracked, so a retired symbol cannot
+              remain in the prior set.
+              """
               sessions = [str(item) for item in store.get("trading_sessions") or []]
               if len(sessions) < 2:
                   raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
@@ -262,16 +279,32 @@ jobs:
               rejections = store.get("rejections")
               if not isinstance(rejections, list):
                   raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+              skipped = []
+              blocked = False
               for item in rejections:
-                  if isinstance(item, dict) and str(item.get("session") or "") == new_session:
-                      raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+                  if not isinstance(item, dict) or str(item.get("session") or "") != new_session:
+                      continue
+                  record = _rejection_record(item, new_session)
+                  if not record["symbol"] or record["symbol"] in tracked:
+                      blocked = True
+                  else:
+                      skipped.append(record)
+              skipped.sort(key=lambda record: (record["symbol"], record["reason"], record["clock"]))
+              if blocked:
+                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE", skipped)
               coverage = store.get("coverage")
-              if not isinstance(coverage, dict) or coverage.get("tracked_count") != len(tracked):
-                  raise PublicationRefusal("UNIVERSE_MISMATCH")
-              current = _ok_symbols(store, new_session, tracked, strict=True)
-              prior = _ok_symbols(store, previous, tracked, strict=False)
-              if not prior or not current.issuperset(prior):
-                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE")
+              declared = coverage.get("tracked_count") if isinstance(coverage, dict) else None
+              outside = {record["symbol"] for record in skipped}
+              if not isinstance(declared, int) or declared != len(tracked) + len(outside):
+                  raise PublicationRefusal("UNIVERSE_MISMATCH", skipped)
+              try:
+                  current = _ok_symbols(store, new_session, tracked, strict=True)
+                  prior = _ok_symbols(store, previous, tracked, strict=False)
+              except PublicationRefusal as refusal:
+                  raise PublicationRefusal(refusal.reason, skipped) from None
+              if current != tracked or not prior or not current.issuperset(prior):
+                  raise PublicationRefusal("PRICE_BOOK_INCOMPLETE", skipped)
+              return skipped
 
           def assess_publication(
               store: dict,
@@ -312,8 +345,8 @@ jobs:
                       raise PublicationRefusal("CALENDAR_GAP")
               elif mode == "holiday":
                   raise PublicationRefusal("GAP_ABSENT")
-              require_complete_session(store, tracked)
-              return {"action": "publish", "as_of": as_of}
+              skipped = require_complete_session(store, tracked)
+              return {"action": "publish", "as_of": as_of, "skipped_rejections": skipped}
 
           def load_prior(repo: Path) -> dict:
               index_path = repo / OUTCOMES_ROOT / "index.json"
@@ -691,7 +724,7 @@ jobs:
               if action == "already_published":
                   if porcelain_paths(repo):
                       raise PublicationRefusal("WORKSPACE_DIRTY")
-                  print(json.dumps({"as_of": as_of, "generation_id": generation_id, "mode": "already_published", "ok": True}, sort_keys=True))
+                  print(json.dumps({"as_of": as_of, "generation_id": generation_id, "mode": "already_published", "ok": True, "skipped_rejections": decision.get("skipped_rejections") or []}, sort_keys=True))
                   return 0
               published = _run_builder(repo, reference, publish=True)
               require_publish_result(published, generation_id, as_of)
@@ -708,6 +741,7 @@ jobs:
                   "mode": "publish",
                   "ok": True,
                   "rebases": pushed["rebases"],
+                  "skipped_rejections": decision.get("skipped_rejections") or [],
               }, sort_keys=True))
               return 0
 
@@ -715,7 +749,7 @@ jobs:
               try:
                   raise SystemExit(publish_main())
               except PublicationRefusal as refusal:
-                  print(json.dumps({"ok": False, "reason": refusal.reason}, sort_keys=True))
+                  print(json.dumps({"ok": False, "reason": refusal.reason, "skipped_rejections": refusal.skipped_rejections}, sort_keys=True))
                   raise SystemExit(1)
               except Exception:
                   print(json.dumps({"ok": False, "reason": "UNEXPECTED"}, sort_keys=True))

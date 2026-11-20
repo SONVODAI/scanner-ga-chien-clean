@@ -252,7 +252,7 @@ def test_partial_scan_does_not_seal_and_the_retry_does(tmp_path: Path):
         root=tmp_path,
     )
     assert sealed["status"] == "created"
-    assert sealed["tracked_count"] == 143
+    assert sealed["tracked_count"] == 142
     by_symbol = {row["symbol"]: row for row in sealed["document"]["rows"]}
     assert by_symbol["HPG"]["classification"] == "HOLD"
     assert by_symbol["SSI"]["classification"] == "SELL"

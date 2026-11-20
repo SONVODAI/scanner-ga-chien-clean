@@ -247,7 +247,7 @@ def test_observed_at_and_vnindex_witness_are_required(monkeypatch, tmp_path: Pat
 def test_partial_stale_and_incomplete_143_payloads_are_refused(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
     tracked = load_tracked_symbols()
-    assert len(tracked) == 143
+    assert len(tracked) == 142
     partial = _run(
         now=EVENING,
         root=tmp_path,
@@ -760,7 +760,7 @@ def test_full_universe_backup_requires_143_and_rejects_partial(monkeypatch, tmp_
     _enable(monkeypatch)
     _local_only(monkeypatch)
     tracked = load_tracked_symbols()
-    assert len(tracked) == 143
+    assert len(tracked) == 142
     ok = _run(
         now=datetime(2026, 11, 6, 21, 30, tzinfo=VN),
         root=tmp_path / "full",
@@ -769,10 +769,10 @@ def test_full_universe_backup_requires_143_and_rejects_partial(monkeypatch, tmp_
         project_root=tmp_path / "full-freeze",
     )
     assert ok["status"] == "created"
-    assert ok["tracked_count"] == 143
+    assert ok["tracked_count"] == 142
     document = read_snapshot(Path(ok["path"]))
     assert document["session_witness"]["bar_session"] == SESSION
-    assert len(document["rows"]) == 143
+    assert len(document["rows"]) == 142
 
     partial = _run(
         now=datetime(2026, 11, 6, 22, 30, tzinfo=VN),
@@ -941,7 +941,7 @@ def test_missing_or_incomplete_freeze_is_refused_without_a_rescan(monkeypatch, t
     assert not (tmp_path / "missing" / "sessions").exists()
 
     tracked = load_tracked_symbols()
-    assert len(tracked) == 143
+    assert len(tracked) == 142
     incomplete_root = tmp_path / "incomplete"
     _write_agreed_freeze(incomplete_root, tracked[:-1])
     incomplete = _run(
