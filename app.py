@@ -168,7 +168,7 @@ WATCHLIST = sorted(list(set([
     "BVH", "SBT", "PNJ",
     "VIC", "VHM", "VRE", "NVL", "DXG", "DXS", "DIG", "CEO", "TCH",
     "EVF", "SAB", "VPL", "PDR", "DPG", "NHA", "HDC", "NTL", "HHS",
-    "NLG", "KDH", "HUT", "F88",
+    "NLG", "KDH", "HUT",
 ])))
 
 # =========================================================

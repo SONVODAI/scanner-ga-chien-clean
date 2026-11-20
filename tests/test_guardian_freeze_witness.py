@@ -338,7 +338,7 @@ def test_legacy_and_2026_11_12_without_a_stamp_create_no_session_file(monkeypatc
 def test_incomplete_143_symbol_batch_is_refused(monkeypatch, tmp_path: Path):
     _enable(monkeypatch)
     tracked = load_tracked_symbols()
-    assert len(tracked) == 143
+    assert len(tracked) == 142
     from tests.test_guardian_close_job import _write_agreed_freeze
 
     project = tmp_path / "repo"
