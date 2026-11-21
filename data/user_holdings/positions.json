@@ -1,20 +1,4 @@
 {
   "schema": "user_holdings.v1",
-  "positions": [
-    {
-      "symbol": "NLG",
-      "entry_price": 22350.0,
-      "entry_date": "2026-09-15"
-    },
-    {
-      "symbol": "TCH",
-      "entry_price": 11363.0,
-      "entry_date": "2026-09-26"
-    },
-    {
-      "symbol": "EVF",
-      "entry_price": 11700.0,
-      "entry_date": "2026-10-20"
-    }
-  ]
+  "positions": []
 }
