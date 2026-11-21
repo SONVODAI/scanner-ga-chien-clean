@@ -1,4 +1,20 @@
 {
   "schema": "user_holdings.v1",
-  "positions": []
+  "positions": [
+    {
+      "symbol": "PVS",
+      "entry_price": 27044.0,
+      "entry_date": "2026-11-20"
+    },
+    {
+      "symbol": "GAS",
+      "entry_price": 70000.0,
+      "entry_date": "2026-11-20"
+    },
+    {
+      "symbol": "BSR",
+      "entry_price": 23500.0,
+      "entry_date": "2026-11-20"
+    }
+  ]
 }
