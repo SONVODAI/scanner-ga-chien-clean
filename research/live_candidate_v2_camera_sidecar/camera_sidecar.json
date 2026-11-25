@@ -23,9 +23,9 @@
     "eligible_from"
   ],
   "session": "2026-11-25",
-  "observed_at": "2026-11-25T10:07:03.443163+07:00",
-  "generated_at": "2026-11-25T10:07:03.443163+07:00",
-  "market_real": 3.2,
+  "observed_at": "2026-11-25T19:35:21.625403+07:00",
+  "generated_at": "2026-11-25T19:35:21.625403+07:00",
+  "market_real": 2.0,
   "market_permission": "WATCHLIST - MARKET YẾU",
   "notes": [
     "Candidate != BUY.",
@@ -9579,7 +9579,7 @@
       "symbol": "FOX",
       "session": "2026-11-25",
       "candidate_first_seen_ts": "2026-11-23T12:57:07Z",
-      "candidate_updated_ts": "2026-11-25T10:07:03.443163+07:00",
+      "candidate_updated_ts": "2026-11-25T19:35:21.625403+07:00",
       "eligible_from": "2026-11-25T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -9596,7 +9596,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=0 → 5 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=0 → 5 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 3.2,
+      "market_real": 2.0,
       "market_permission": "WATCHLIST - MARKET YẾU",
       "provenance": [
         {
@@ -9656,7 +9656,7 @@
       "symbol": "SBT",
       "session": "2026-11-25",
       "candidate_first_seen_ts": "2026-11-23T12:57:07Z",
-      "candidate_updated_ts": "2026-11-25T10:07:03.443163+07:00",
+      "candidate_updated_ts": "2026-11-25T19:35:21.625403+07:00",
       "eligible_from": "2026-11-25T09:15:00+07:00",
       "source": "market_aware_sweetspot",
       "nomination_source": "market_aware_sweetspot",
@@ -9673,7 +9673,7 @@
       "nomination_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=0 → 5 | RSI14=40 → 45",
       "candidate_reason": "SWEET OBSERVE RS5=-5 → 0 | RS10=0 → 5 | RSI14=40 → 45",
       "elite_buy_grade": "",
-      "market_real": 3.2,
+      "market_real": 2.0,
       "market_permission": "WATCHLIST - MARKET YẾU",
       "provenance": [
         {
