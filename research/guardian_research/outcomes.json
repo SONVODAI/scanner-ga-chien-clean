@@ -169,10 +169,10 @@
     "SELL": {
       "horizons": {
         "T+1": {
-          "adverse_close_path_average_pct": -0.652,
+          "adverse_close_path_average_pct": -0.6532,
           "adverse_close_path_worst_pct": -7.9787,
           "adverse_sample": 730,
-          "average_return_pct": -0.652,
+          "average_return_pct": -0.6532,
           "discontinuity": 0,
           "downside_p10_pct": -2.502,
           "downside_p25_pct": -1.5798,
@@ -273,19 +273,19 @@
           "win_rate_above_5pct": null
         },
         "T+3": {
-          "adverse_close_path_average_pct": -2.1113,
+          "adverse_close_path_average_pct": -2.1126,
           "adverse_close_path_worst_pct": -12.7807,
           "adverse_sample": 515,
-          "average_return_pct": -1.4531,
+          "average_return_pct": -1.4548,
           "discontinuity": 0,
           "downside_p10_pct": -4.5786,
-          "downside_p25_pct": -2.9515,
+          "downside_p25_pct": -2.9663,
           "evidence": "MEASURED",
           "immature": 328,
           "loss_rate": 0.6769,
-          "loss_rate_at_or_below_minus_3pct": 0.2442,
+          "loss_rate_at_or_below_minus_3pct": 0.2462,
           "loss_rate_at_or_below_minus_5pct": 0.0885,
-          "loss_rate_below_minus_3pct": 0.2442,
+          "loss_rate_below_minus_3pct": 0.2462,
           "loss_rate_below_minus_5pct": 0.0865,
           "median_return_pct": -1.4737,
           "missing": 13,
@@ -299,10 +299,10 @@
           "win_rate_above_5pct": 0.0096
         },
         "T+5": {
-          "adverse_close_path_average_pct": -3.7448,
+          "adverse_close_path_average_pct": -3.7469,
           "adverse_close_path_worst_pct": -16.4076,
           "adverse_sample": 317,
-          "average_return_pct": -2.8953,
+          "average_return_pct": -2.8979,
           "discontinuity": 0,
           "downside_p10_pct": -7.0663,
           "downside_p25_pct": -5.1031,
@@ -666,7 +666,7 @@
     "2026-11-23",
     "2026-11-25"
   ],
-  "content_sha256": "8e070bd1d0b8f854b79ac7f56845f383d609da470f4562407f9cf324b87b0408",
+  "content_sha256": "cdce21495603d4cdd0769ea55ffe4523aefe0ec865871c7d2eb6dc79779b6e71",
   "delayed_sessions_excluded": [],
   "delayed_sessions_included": [
     "2026-11-16"
@@ -23771,10 +23771,10 @@
           "status": "APPROX_AVAILABLE"
         },
         "T+5": {
-          "adverse_close_path_pct": -5.8824,
+          "adverse_close_path_pct": -6.5359,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": -5.882353,
+          "return_pct": -6.535948,
           "status": "APPROX_AVAILABLE"
         }
       },
@@ -26375,7 +26375,7 @@
           "adverse_close_path_pct": -10.2041,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": 2.782931,
+          "return_pct": 2.597403,
           "status": "APPROX_AVAILABLE"
         }
       },
@@ -38350,10 +38350,10 @@
           "status": "NOT_YET_OBSERVED"
         },
         "T+3": {
-          "adverse_close_path_pct": -2.7027,
+          "adverse_close_path_pct": -3.3784,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": -2.702703,
+          "return_pct": -3.378378,
           "status": "APPROX_AVAILABLE"
         },
         "T+5": {
@@ -40954,7 +40954,7 @@
           "adverse_close_path_pct": -6.0194,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": 7.572816,
+          "return_pct": 7.378641,
           "status": "APPROX_AVAILABLE"
         },
         "T+5": {
@@ -52908,10 +52908,10 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": -0.6897,
+          "adverse_close_path_pct": -1.3793,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": -0.689655,
+          "return_pct": -1.37931,
           "status": "APPROX_AVAILABLE"
         },
         "T+10": {
@@ -55458,10 +55458,10 @@
       "classification": "SELL",
       "horizons": {
         "T+1": {
-          "adverse_close_path_pct": 14.4628,
+          "adverse_close_path_pct": 14.2562,
           "adverse_status": "DAILY_CLOSE_PATH",
           "included_in_primary": true,
-          "return_pct": 14.46281,
+          "return_pct": 14.256198,
           "status": "APPROX_AVAILABLE"
         },
         "T+10": {
