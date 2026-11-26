@@ -95,6 +95,21 @@
       "symbol": "BVH",
       "entry_price": 56100.0,
       "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "MSR",
+      "entry_price": 56000.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "GMD",
+      "entry_price": 50300.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "VPL",
+      "entry_price": 96900.0,
+      "entry_date": "2026-11-26"
     }
   ]
 }
