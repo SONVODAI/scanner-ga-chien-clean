@@ -2,45 +2,45 @@
   "version": "BUY_ELITE_THINKING_V3_1",
   "mode": "THINKING",
   "created_at": "2026-06-25 17:13:04",
-  "updated_at": "2026-11-25 19:42:53",
-  "completed_t5": 1623,
-  "baseline_winrate": 0.3845,
+  "updated_at": "2026-11-26 08:57:55",
+  "completed_t5": 1637,
+  "baseline_winrate": 0.383,
   "observation": {
-    "date": "2026-11-25",
-    "time": "19:42:53",
-    "market_real": 2.0,
+    "date": "2026-11-26",
+    "time": "08:57:55",
+    "market_real": 2.1,
     "market_forecast": 0.0,
     "regime": "🔴 MÙA ĐÔNG",
     "regime_note": "Market yếu: chỉ lập watchlist, chưa giải ngân thật.",
-    "signals_today": 3,
+    "signals_today": 4,
     "top_watch": "VJC, POW, SBT",
-    "avg_winprob": 48.7,
-    "avg_elite_score": 46.6,
-    "high_consensus_count": 0
+    "avg_winprob": 41.2,
+    "avg_elite_score": 45.3,
+    "high_consensus_count": 1
   },
   "hypotheses": [
-    "🟡 Market REAL >= 8: n=296, WinRate=25.0%, AvgT+5=-1.97, lệch baseline -13.4% → GIẢ THUYẾT MẠNH",
-    "🟠 Storm >= 15: n=143, WinRate=31.5%, AvgT+5=-0.94, lệch baseline -7.0% → GIẢ THUYẾT"
+    "🟡 Market REAL >= 8: n=296, WinRate=25.0%, AvgT+5=-1.97, lệch baseline -13.3% → GIẢ THUYẾT MẠNH",
+    "🟠 Storm >= 15: n=145, WinRate=31.0%, AvgT+5=-0.95, lệch baseline -7.3% → GIẢ THUYẾT"
   ],
   "beliefs": [],
   "reflections": [
     "🪞 Chưa có đủ mẫu để phản biện một niềm tin cụ thể. Bot giữ thái độ: mọi kết luận chỉ đúng cho đến khi dữ liệu mới chứng minh điều ngược lại."
   ],
-  "current_thought": "🟡 Market REAL >= 8: n=296, WinRate=25.0%, AvgT+5=-1.97, lệch baseline -13.4% → GIẢ THUYẾT MẠNH",
-  "note": "Thinking Engine V3.1 đang ở chế độ THINKING. Baseline WinRate T+5 = 38.4%, Avg T+5 = -0.97%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
-  "avg_t5_return": -0.969,
+  "current_thought": "🟡 Market REAL >= 8: n=296, WinRate=25.0%, AvgT+5=-1.97, lệch baseline -13.3% → GIẢ THUYẾT MẠNH",
+  "note": "Thinking Engine V3.1 đang ở chế độ THINKING. Baseline WinRate T+5 = 38.3%, Avg T+5 = -0.97%. Bot phân biệt rõ Quan sát / Giả thuyết / Niềm tin và luôn tự phản biện.",
+  "avg_t5_return": -0.975,
   "observations": [
-    "⚪ Break trong Mùa Xuân: n=1, WinRate=0.0%, AvgT+5=-3.38, lệch baseline -38.4% → QUAN SÁT",
-    "⚪ Storm trong Mùa Xuân: n=11, WinRate=9.1%, AvgT+5=-3.64, lệch baseline -29.4% → QUAN SÁT",
-    "⚪ RSI > 72: n=10, WinRate=50.0%, AvgT+5=-0.21, lệch baseline 11.6% → QUAN SÁT",
-    "⚪ Persistence >= 5.0: n=66, WinRate=45.5%, AvgT+5=-0.41, lệch baseline 7.0% → QUAN SÁT",
-    "⚪ Market REAL < 6: n=560, WinRate=43.2%, AvgT+5=-0.89, lệch baseline 4.8% → QUAN SÁT",
-    "⚪ Nhóm Break: n=12, WinRate=41.7%, AvgT+5=2.39, lệch baseline 3.2% → QUAN SÁT",
-    "⚪ Pull trong Mùa Đông: n=354, WinRate=41.2%, AvgT+5=-1.25, lệch baseline 2.8% → QUAN SÁT",
-    "⚪ Market REAL >= 6: n=1063, WinRate=35.9%, AvgT+5=-1.01, lệch baseline -2.5% → QUAN SÁT",
-    "⚪ Có Storm xác nhận: n=673, WinRate=36.6%, AvgT+5=-1.31, lệch baseline -1.9% → QUAN SÁT",
-    "⚪ RSI 55-65: n=1001, WinRate=36.8%, AvgT+5=-1.31, lệch baseline -1.7% → QUAN SÁT",
-    "⚪ Persistence >= 3.5: n=419, WinRate=40.1%, AvgT+5=-0.79, lệch baseline 1.6% → QUAN SÁT",
-    "⚪ Xa EMA9 >4%: n=15, WinRate=40.0%, AvgT+5=2.13, lệch baseline 1.6% → QUAN SÁT"
+    "⚪ Break trong Mùa Xuân: n=1, WinRate=0.0%, AvgT+5=-3.38, lệch baseline -38.3% → QUAN SÁT",
+    "⚪ Storm trong Mùa Xuân: n=11, WinRate=9.1%, AvgT+5=-3.64, lệch baseline -29.2% → QUAN SÁT",
+    "⚪ RSI > 72: n=11, WinRate=54.5%, AvgT+5=0.05, lệch baseline 16.2% → QUAN SÁT",
+    "⚪ Persistence >= 5.0: n=67, WinRate=44.8%, AvgT+5=-0.41, lệch baseline 6.5% → QUAN SÁT",
+    "⚪ Market REAL < 6: n=574, WinRate=42.7%, AvgT+5=-0.91, lệch baseline 4.4% → QUAN SÁT",
+    "⚪ Nhóm Break: n=12, WinRate=41.7%, AvgT+5=2.39, lệch baseline 3.4% → QUAN SÁT",
+    "⚪ Market REAL >= 6: n=1063, WinRate=35.9%, AvgT+5=-1.01, lệch baseline -2.4% → QUAN SÁT",
+    "⚪ Pull trong Mùa Đông: n=367, WinRate=40.6%, AvgT+5=-1.27, lệch baseline 2.3% → QUAN SÁT",
+    "⚪ RSI 55-65: n=1010, WinRate=36.5%, AvgT+5=-1.32, lệch baseline -1.8% → QUAN SÁT",
+    "⚪ Có Storm xác nhận: n=683, WinRate=36.5%, AvgT+5=-1.29, lệch baseline -1.8% → QUAN SÁT",
+    "⚪ Xa EMA9 >4%: n=15, WinRate=40.0%, AvgT+5=2.13, lệch baseline 1.7% → QUAN SÁT",
+    "⚪ Persistence >= 3.5: n=426, WinRate=39.9%, AvgT+5=-0.81, lệch baseline 1.6% → QUAN SÁT"
   ]
 }
