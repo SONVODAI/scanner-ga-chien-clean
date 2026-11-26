@@ -258,7 +258,9 @@ def test_absent_store_is_explicit_when_remote_delivery_is_down(tmp_path: Path):
     )
     text = "\n".join(fake.captions)
     assert "ROW_STORE_UNAVAILABLE" in text
-    assert "missing_secret" in text
+    assert "DURABLE_STORE_MISSING:" in text
+    assert "missing_secret" not in text
+    assert "historical_remote_delivery" not in text
     assert fake.frames == []
 
 
