@@ -36,11 +36,12 @@ DURABLE = ROOT / "research" / "v2_research_ledger" / "durable"
 SIDECAR = ROOT / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
 SWEET = ROOT / "data" / "earning_learning" / "market_aware_sweetspot_observer_ledger.csv"
 TRACKED = {"HPG", "VCB", "SSI"}
-IDENTITIES_SHA256 = "a2e868e74e62fef8d74c0215f817194e9489cba7af523e788c42251f9c28b848"
-SIDECAR_SHA256 = "cc6a9f36dbc290ce3432531858e2253a5e357f6ccef3d96e418c069bb9167fea"
-SWEET_SHA256 = "d0b3bad0629633e94fdb209b26853f42b310fd2070bc94e87b0e83cba5ed6e50"
-IDENTITY_COUNT_BEFORE = 1434
-IDENTITY_COUNT_AFTER = 1448
+IDENTITY_PREFIX_SHA256 = "a2e868e74e62fef8d74c0215f817194e9489cba7af523e788c42251f9c28b848"
+IDENTITY_FILE_SHA256 = "aa21aa1ec5bc7d92fc7673eedc697b15cf7a242ddd5cdbd3d921374edacd629b"
+SIDECAR_SHA256 = "fd7dd7ca01f20fc6c567e31cbfcf6b209a8f3360fe04598e2af0065203fc40f8"
+SWEET_SHA256 = "088871173a5ee6c7860b83769195a4be364b0c32d09ba02a0dcf0615d3ce2656"
+IDENTITY_PREFIX_COUNT = 1434
+IDENTITY_COUNT = 1448
 
 
 class _Expander:
@@ -195,28 +196,25 @@ def _git(repo: Path, *args: str) -> None:
     )
 
 
-def test_temporary_ingest_appends_fourteen_rows_once(tmp_path: Path):
-    assert _sha256(DURABLE / "identities.jsonl") == IDENTITIES_SHA256
+def _identity_prefix(payload: bytes, count: int) -> bytes:
+    lines = payload.splitlines()
+    return b"\n".join(lines[:count]) + b"\n"
+
+
+def test_committed_identities_keep_the_sealed_prefix(tmp_path: Path):
     assert _sha256(SIDECAR) == SIDECAR_SHA256
     assert _sha256(SWEET) == SWEET_SHA256
     before_repo = (DURABLE / "identities.jsonl").read_bytes()
-    assert before_repo.count(b"\n") == IDENTITY_COUNT_BEFORE
-    copy = tmp_path / "durable"
-    shutil.copytree(DURABLE, copy, ignore=shutil.ignore_patterns(".ingest.lock"))
-    first = ingest_ledger(copy, sidecar_path=SIDECAR, sweet_csv=SWEET, evidence_dir=None)
-    assert len(first["inserted_identities"]) == 14
-    assert first["identity_count"] == IDENTITY_COUNT_AFTER
-    assert first["sealed_identities_unchanged"] is True
-    after = (copy / "identities.jsonl").read_bytes()
-    assert after.startswith(before_repo)
-    assert after.count(b"\n") == IDENTITY_COUNT_AFTER
-    inserted = []
-    for line in after[len(before_repo) :].splitlines():
-        inserted.append(json.loads(line))
-    assert len(inserted) == 14
-    blanks = [row for row in inserted if not str(row.get("symbol") or "").strip()]
+    assert before_repo.count(b"\n") == IDENTITY_COUNT
+    assert _sha256(DURABLE / "identities.jsonl") == IDENTITY_FILE_SHA256
+    prefix = _identity_prefix(before_repo, IDENTITY_PREFIX_COUNT)
+    assert hashlib.sha256(prefix).hexdigest() == IDENTITY_PREFIX_SHA256
+    assert before_repo.startswith(prefix)
+    suffix = [json.loads(line) for line in before_repo.splitlines()[IDENTITY_PREFIX_COUNT:]]
+    assert len(suffix) == IDENTITY_COUNT - IDENTITY_PREFIX_COUNT
+    blanks = [row for row in suffix if not str(row.get("symbol") or "").strip()]
     assert len(blanks) == 2
-    assert {row["symbol"] for row in inserted if str(row.get("symbol") or "").strip()} == {
+    assert {row["symbol"] for row in suffix if str(row.get("symbol") or "").strip()} == {
         "SBT",
         "FOX",
         "VHM",
@@ -230,41 +228,54 @@ def test_temporary_ingest_appends_fourteen_rows_once(tmp_path: Path):
         "TPB",
         "HDB",
     }
+    assert any(row["symbol"] == "FOX" and row["t0_date"] == "2026-11-23" for row in suffix)
+    prefix_ids = {json.loads(line)["identity_id"] for line in prefix.splitlines()}
+    assert prefix_ids.isdisjoint({row["identity_id"] for row in suffix})
+    copy = tmp_path / "durable"
+    shutil.copytree(DURABLE, copy, ignore=shutil.ignore_patterns(".ingest.lock"))
+    first = ingest_ledger(copy, sidecar_path=SIDECAR, sweet_csv=SWEET, evidence_dir=None)
+    after = (copy / "identities.jsonl").read_bytes()
+    assert after.startswith(before_repo)
+    assert first["sealed_identities_unchanged"] is True
+    assert first["identity_count"] == after.count(b"\n")
+    kept = after.splitlines()[:IDENTITY_COUNT]
+    assert kept == before_repo.splitlines()
     sealed_before = {
         json.loads(line)["identity_id"]: json.loads(line).get("sealed")
-        for line in before_repo.splitlines()
+        for line in prefix.splitlines()
     }
     sealed_after = {}
-    for line in after.splitlines():
+    for line in kept:
         row = json.loads(line)
         if row["identity_id"] in sealed_before:
             sealed_after[row["identity_id"]] = row.get("sealed")
             assert row.get("sealed") == sealed_before[row["identity_id"]]
-    assert len(sealed_after) == IDENTITY_COUNT_BEFORE
-    snapshot = after
-    second = ingest_ledger(copy, sidecar_path=SIDECAR, sweet_csv=SWEET, evidence_dir=None)
-    assert second["inserted_identities"] == []
-    assert second["identity_count"] == IDENTITY_COUNT_AFTER
-    assert (copy / "identities.jsonl").read_bytes() == snapshot
-    assert (copy / "links.jsonl").read_bytes() == (copy / "links.jsonl").read_bytes()
+    assert len(sealed_after) == IDENTITY_PREFIX_COUNT
     links_after_first = (copy / "links.jsonl").read_bytes()
     conflicts_after_first = (copy / "conflicts.jsonl").read_bytes()
     manifest_after_first = (copy / "manifest.json").read_bytes()
+    second = ingest_ledger(copy, sidecar_path=SIDECAR, sweet_csv=SWEET, evidence_dir=None)
+    assert second["inserted_identities"] == []
+    assert second["identity_count"] == first["identity_count"]
+    assert (copy / "identities.jsonl").read_bytes() == after
     third = ingest_ledger(copy, sidecar_path=SIDECAR, sweet_csv=SWEET, evidence_dir=None)
     assert third["inserted_identities"] == []
     assert (copy / "links.jsonl").read_bytes() == links_after_first
     assert (copy / "conflicts.jsonl").read_bytes() == conflicts_after_first
     assert (copy / "manifest.json").read_bytes() == manifest_after_first
-    assert _sha256(DURABLE / "identities.jsonl") == IDENTITIES_SHA256
+    assert (DURABLE / "identities.jsonl").read_bytes() == before_repo
+    assert _sha256(DURABLE / "identities.jsonl") == IDENTITY_FILE_SHA256
     for relative, digest in PINNED_GENERATIONS.items():
         assert _sha256(ROOT / relative) == digest
 
     sessions = ["2026-11-18", "2026-11-20"]
     reference = tmp_path / "reference.json"
     reference.write_text(json.dumps(_book(sessions), sort_keys=True) + "\n", encoding="utf-8")
-    document = build_forward_document(copy, reference)
+    pristine = tmp_path / "pristine"
+    shutil.copytree(DURABLE, pristine, ignore=shutil.ignore_patterns(".ingest.lock"))
+    document = build_forward_document(pristine, reference)
     assert document["official_pnl"] is False
-    assert document["identity_count"] == IDENTITY_COUNT_AFTER
+    assert document["identity_count"] == IDENTITY_COUNT
     blank_ids = {row["identity_id"] for row in blanks}
     blank_rows = [row for row in document["rows"] if row["identity_id"] in blank_ids]
     assert len(blank_rows) == 2
@@ -285,7 +296,7 @@ def test_temporary_ingest_appends_fourteen_rows_once(tmp_path: Path):
     ]
     assert all(row["symbol"] for row in performance)
     assert all(row["population"] != "sweetspot_blank" for row in performance)
-    observations = deduped_research_observations(DurableRowStore(copy))
+    observations = deduped_research_observations(DurableRowStore(pristine))
     assert all(symbol for _source, symbol, _session in observations)
     assert not any(row["symbol"] == "" for row in observations.values())
 
@@ -514,4 +525,311 @@ def test_commit_allowlist_refuses_stray_files_and_historical_rewrites(tmp_path: 
 def test_repo_generation_pins_are_unchanged():
     for relative, digest in PINNED_GENERATIONS.items():
         assert _sha256(ROOT / relative) == digest
-    assert _sha256(DURABLE / "identities.jsonl") == IDENTITIES_SHA256
+    payload = (DURABLE / "identities.jsonl").read_bytes()
+    assert payload.count(b"\n") == IDENTITY_COUNT
+    assert _sha256(DURABLE / "identities.jsonl") == IDENTITY_FILE_SHA256
+    assert hashlib.sha256(_identity_prefix(payload, IDENTITY_PREFIX_COUNT)).hexdigest() == IDENTITY_PREFIX_SHA256
+
+
+GAP_TRACKED = {"HPG", "SBT", "FOX", "GIL"}
+GAP_SESSIONS = ["2026-11-20", "2026-11-23", "2026-11-25", "2026-11-26"]
+
+
+def _return_pct(later: int, earlier: int) -> float:
+    return round((later / earlier - 1) * 100, 6)
+
+
+def _gap_rows(days: list[str], *, fox_close_on_23: int | None) -> list[dict]:
+    prices = {
+        "HPG": {"2026-11-20": 1000, "2026-11-23": 1100, "2026-11-25": 1100, "2026-11-26": 1210, "2026-11-27": 1210},
+        "SBT": {"2026-11-20": 1000, "2026-11-23": 1200, "2026-11-25": 1320, "2026-11-26": 1320, "2026-11-27": 1320},
+        "FOX": {"2026-11-20": 1000, "2026-11-25": 1050, "2026-11-26": 1050, "2026-11-27": 1050},
+        "GIL": {"2026-11-20": 1000, "2026-11-25": 1000, "2026-11-26": 1100, "2026-11-27": 1100},
+    }
+    if fox_close_on_23 is not None:
+        prices["FOX"]["2026-11-23"] = fox_close_on_23
+    rows = []
+    for day in days:
+        for symbol in sorted(prices):
+            close = prices[symbol].get(day)
+            if close is None:
+                continue
+            rows.append({"symbol": symbol, "session": day, "close": close, "clock": "14:50"})
+    return rows
+
+
+def _gap_store(days: list[str], *, fox_close_on_23: int | None = None) -> dict:
+    rejections = [
+        {"session": "2026-11-23", "symbol": "GIL", "reason": "LAST_BAR_BEFORE_CLOSE", "clock": "14:25"},
+    ]
+    if fox_close_on_23 is None:
+        rejections.append(
+            {"session": "2026-11-23", "symbol": "FOX", "reason": "LAST_BAR_BEFORE_CLOSE", "clock": "14:40"}
+        )
+    return _book(days, _gap_rows(days, fox_close_on_23=fox_close_on_23), rejections=rejections, tracked_count=len(GAP_TRACKED))
+
+
+def _gap_ledger(tmp_path: Path) -> tuple[Path, Path]:
+    root = tmp_path / "tree"
+    sidecar = root / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
+    sweet = root / "data" / "earning_learning" / "market_aware_sweetspot_observer_ledger.csv"
+    sidecar.parent.mkdir(parents=True, exist_ok=True)
+    sidecar.write_text(
+        json.dumps(
+            {
+                "freeze_ledger": [
+                    {
+                        "breakout_ref_at_first_seen": 1000,
+                        "candidate_first_seen_ts": "2026-11-20T02:00:00Z",
+                        "ema9_at_first_seen": 1000,
+                        "price_at_first_seen": 1000,
+                        "session": "2026-11-20",
+                        "symbol": "HPG",
+                    },
+                    {
+                        "breakout_ref_at_first_seen": 1000,
+                        "candidate_first_seen_ts": "2026-11-20T02:00:01Z",
+                        "ema9_at_first_seen": 1000,
+                        "price_at_first_seen": 1000,
+                        "session": "2026-11-20",
+                        "symbol": "GIL",
+                    },
+                ],
+                "observed_at": "2026-11-20T10:00:00+07:00",
+                "rows": [],
+                "session": "2026-11-20",
+            }
+        ),
+        encoding="utf-8",
+    )
+    _sweet(
+        sweet,
+        [
+            {
+                "observer_id": "sbt23",
+                "t0_date": "2026-11-23",
+                "symbol": "SBT",
+                "observer_status": "OBSERVE",
+                "price_t0": 1200,
+                "created_at": "2026-11-23T02:00:00Z",
+            },
+            {
+                "observer_id": "fox23",
+                "t0_date": "2026-11-23",
+                "symbol": "FOX",
+                "observer_status": "OBSERVE",
+                "price_t0": 1000,
+                "created_at": "2026-11-23T02:00:01Z",
+            },
+        ],
+    )
+    ledger = root / "research" / "v2_research_ledger" / "durable"
+    ingest_ledger(ledger, sidecar_path=sidecar, sweet_csv=sweet, evidence_dir=None)
+    for name in ("links.jsonl", "conflicts.jsonl"):
+        path = ledger / name
+        if not path.exists():
+            path.write_text("", encoding="utf-8")
+    outcomes = root / "research" / "v2_research_ledger" / "outcomes"
+    outcomes.mkdir(parents=True, exist_ok=True)
+    return ledger, outcomes
+
+
+def _generation(outcomes: Path, item: dict) -> dict:
+    return json.loads((outcomes / "generations" / f"{item['generation_id']}.json").read_text(encoding="utf-8"))
+
+
+def _row(document: dict, symbol: str, t0_date: str) -> dict:
+    return next(row for row in document["rows"] if row["symbol"] == symbol and row["t0_date"] == t0_date)
+
+
+def test_explained_symbol_holes_let_the_later_sessions_publish():
+    store = _gap_store(GAP_SESSIONS)
+    assert "2026-11-24" not in store["trading_sessions"]
+    assert {row["symbol"] for row in store["rows"] if row["session"] == "2026-11-23"} == {"HPG", "SBT"}
+    gate = session_gate(slice_reference(store, "2026-11-23"), GAP_TRACKED)
+    assert gate["ok"] is True
+    assert gate["missing"] == []
+    assert gate["skipped"] == []
+    shrunk = _gap_store(GAP_SESSIONS)
+    shrunk["coverage"] = {"tracked_count": 2}
+    shrunk["content_sha256"] = _digest(shrunk)
+    mismatch = session_gate(slice_reference(shrunk, "2026-11-23"), GAP_TRACKED)
+    assert mismatch["ok"] is False
+    assert mismatch["reason"] == "UNIVERSE_MISMATCH"
+    plan = plan_catchup(store, _prior(["2026-11-20"], store), GAP_TRACKED, today="2026-11-27")
+    assert plan["stopped"] is None
+    assert plan["sessions"] == ["2026-11-23", "2026-11-25", "2026-11-26"]
+    assert "2026-11-24" not in plan["sessions"]
+
+
+def test_wide_failure_and_integrity_rejections_still_stop_the_walk():
+    wide_days = ["2026-11-20", "2026-11-23", "2026-11-25"]
+    wide_rows = [
+        row for row in _gap_rows(wide_days, fox_close_on_23=None) if row["session"] != "2026-11-23"
+    ]
+    wide = _book(
+        wide_days,
+        wide_rows,
+        rejections=[
+            {"session": "2026-11-23", "symbol": symbol, "reason": "SYMBOL_ABSENT", "clock": ""}
+            for symbol in sorted(GAP_TRACKED)
+        ],
+        tracked_count=len(GAP_TRACKED),
+    )
+    wide_plan = plan_catchup(wide, _prior(["2026-11-20"], wide), GAP_TRACKED, today="2026-11-27")
+    assert wide_plan["sessions"] == []
+    assert wide_plan["stopped"]["session"] == "2026-11-23"
+    assert wide_plan["stopped"]["reason"] == "PRICE_BOOK_INCOMPLETE"
+    assert {"symbol": "", "reason": "NO_OK_ROWS", "session": "2026-11-23"} in wide_plan["stopped"]["missing"]
+
+    silent = _gap_store(GAP_SESSIONS)
+    silent["rows"] = [row for row in silent["rows"] if not (row["session"] == "2026-11-25" and row["symbol"] == "SBT")]
+    silent["content_sha256"] = _digest(silent)
+    silent_plan = plan_catchup(silent, _prior(["2026-11-20"], silent), GAP_TRACKED, today="2026-11-27")
+    assert silent_plan["sessions"] == ["2026-11-23"]
+    assert silent_plan["stopped"]["session"] == "2026-11-25"
+    assert {"symbol": "SBT", "reason": "SYMBOL_ABSENT", "session": "2026-11-25"} in silent_plan["stopped"]["missing"]
+    assert "2026-11-26" not in silent_plan["sessions"]
+
+    def refuse(reason: str, symbol: str = "HPG") -> None:
+        store = _gap_store(GAP_SESSIONS)
+        store["rejections"] = list(store["rejections"]) + [
+            {"session": "2026-11-23", "symbol": symbol, "reason": reason, "clock": "14:50"}
+        ]
+        store["content_sha256"] = _digest(store)
+        plan = plan_catchup(store, _prior(["2026-11-20"], store), GAP_TRACKED, today="2026-11-27")
+        assert plan["sessions"] == []
+        assert plan["stopped"]["session"] == "2026-11-23"
+        assert plan["stopped"]["reason"] == "PRICE_BOOK_INCOMPLETE"
+        assert any(item["symbol"] == symbol and item["reason"] == reason for item in plan["stopped"]["missing"])
+
+    refuse("SOURCE_MISMATCH")
+    refuse("CONFLICTING_CLOSE")
+    refuse("SESSION_DATE_MISMATCH")
+    refuse("PRICE_INVALID")
+    refuse("QUALITY_NOT_OK")
+    refuse("LAST_BAR_BEFORE_CLOSE", "HPG")
+
+    truncated_rows = _gap_rows(GAP_SESSIONS, fox_close_on_23=None)
+    for row in truncated_rows:
+        if row["symbol"] == "HPG" and row["session"] == "2026-11-23":
+            row["clock"] = "14:40"
+    truncated = _gap_store(GAP_SESSIONS)
+    truncated["rows"] = build_reference_store(
+        pd.DataFrame(truncated_rows), GAP_SESSIONS, as_of=GAP_SESSIONS[-1]
+    )["rows"]
+    truncated["content_sha256"] = _digest(truncated)
+    truncated_plan = plan_catchup(truncated, _prior(["2026-11-20"], truncated), GAP_TRACKED, today="2026-11-27")
+    assert truncated_plan["sessions"] == []
+    assert {"symbol": "HPG", "reason": "QUALITY_NOT_OK", "session": "2026-11-23"} in truncated_plan["stopped"]["missing"]
+
+
+def test_fox_hole_excludes_only_its_horizons_and_recovers_later(tmp_path: Path):
+    from research.approximate_returns.report import _performance
+
+    identities_before = (DURABLE / "identities.jsonl").read_bytes()
+    pins_before = {relative: _sha256(ROOT / relative) for relative, digest in PINNED_GENERATIONS.items()}
+    assert pins_before == dict(PINNED_GENERATIONS)
+    store = _gap_store(GAP_SESSIONS)
+    plan = plan_catchup(store, _prior(["2026-11-20"], store), GAP_TRACKED, today="2026-11-27")
+    assert plan["sessions"] == ["2026-11-23", "2026-11-25", "2026-11-26"]
+    ledger, outcomes = _gap_ledger(tmp_path)
+    written = publish_catchup(ledger, outcomes, store, plan["sessions"])
+    assert [item["as_of"] for item in written] == plan["sessions"]
+    again = publish_catchup(ledger, outcomes, store, plan["sessions"])
+    assert [item["file_status"] for item in again] == ["unchanged", "unchanged", "unchanged"]
+    assert [item["index_status"] for item in again] == ["unchanged", "unchanged", "unchanged"]
+    first_path = outcomes / "generations" / f"{written[0]['generation_id']}.json"
+    first_bytes = first_path.read_bytes()
+    sealed = _generation(outcomes, written[0])
+    matured = _generation(outcomes, written[-1])
+    for document in (sealed, matured):
+        assert "2026-11-24" not in document["trading_sessions"]
+        fox = _row(document, "FOX", "2026-11-23")
+        assert fox["reference_t0_present"] is False
+        assert fox["t0_price_used_as_denominator"] is False
+        for cell in fox["horizons"].values():
+            assert cell["status"] == "T0_REFERENCE_MISSING"
+            assert cell["return_pct"] is None
+            assert cell["included_in_primary"] is False
+            assert cell["target_session"] is None
+        hpg = _row(document, "HPG", "2026-11-20")
+        assert hpg["horizons"]["T+1"]["status"] == "APPROX_AVAILABLE"
+        assert hpg["horizons"]["T+1"]["return_pct"] == _return_pct(1100, 1000)
+        assert hpg["horizons"]["T+1"]["included_in_primary"] is True
+        assert hpg["horizons"]["T+1"]["target_session"] == "2026-11-23"
+        gil = _row(document, "GIL", "2026-11-20")
+        assert gil["horizons"]["T+1"]["status"] == "TARGET_MISSING"
+        assert gil["horizons"]["T+1"]["return_pct"] is None
+        assert gil["horizons"]["T+1"]["included_in_primary"] is False
+        assert gil["horizons"]["T+1"]["target_session"] == "2026-11-23"
+    sbt = _row(matured, "SBT", "2026-11-23")
+    assert sbt["horizons"]["T+1"] == {
+        "included_in_primary": True,
+        "return_pct": _return_pct(1320, 1200),
+        "status": "APPROX_AVAILABLE",
+        "target_session": "2026-11-25",
+    }
+    assert sbt["horizons"]["T+3"]["status"] == "NOT_YET_OBSERVED"
+    assert sbt["horizons"]["T+3"]["return_pct"] is None
+    assert _row(matured, "HPG", "2026-11-20")["horizons"]["T+3"]["return_pct"] == _return_pct(1210, 1000)
+    assert _row(matured, "HPG", "2026-11-20")["horizons"]["T+3"]["included_in_primary"] is True
+    gil = _row(matured, "GIL", "2026-11-20")
+    assert gil["horizons"]["T+3"]["status"] == "APPROX_AVAILABLE"
+    assert gil["horizons"]["T+3"]["return_pct"] == _return_pct(1100, 1000)
+    assert gil["horizons"]["T+3"]["included_in_primary"] is True
+
+    sweet = [row for row in matured["rows"] if row["population"] == "sweetspot"]
+    sweet_t1 = _performance(sweet, "T+1")
+    assert sweet_t1["primary"] == 1
+    assert sweet_t1["missing"] == 1
+    assert sweet_t1["average_return_pct"] == _return_pct(1320, 1200)
+    assert sweet_t1["median_return_pct"] == _return_pct(1320, 1200)
+    assert sweet_t1["win_rate_above_3pct"] == 1.0
+    assert round((sweet_t1["average_return_pct"] + 0) / 2, 4) != sweet_t1["average_return_pct"]
+    coverage = matured["coverage"]["sweetspot"]["horizons"]["T+1"]
+    assert coverage["usable_primary"] == 1
+    assert coverage["APPROX_AVAILABLE"] == 1
+    assert coverage["T0_REFERENCE_MISSING"] == 1
+    assert coverage["usable_primary"] == coverage["APPROX_AVAILABLE"]
+    brain = [row for row in matured["rows"] if row["population"] == "brain_unlinked"]
+    brain_t1 = _performance(brain, "T+1")
+    assert brain_t1["primary"] == 1
+    assert brain_t1["missing"] == 1
+    assert brain_t1["average_return_pct"] == _return_pct(1100, 1000)
+    assert brain_t1["median_return_pct"] == _return_pct(1100, 1000)
+    assert brain_t1["win_rate_above_3pct"] == 1.0
+    assert matured["coverage"]["brain_unlinked"]["horizons"]["T+1"]["TARGET_MISSING"] == 1
+
+    repaired_days = GAP_SESSIONS + ["2026-11-27"]
+    repaired = _gap_store(repaired_days, fox_close_on_23=1020)
+    repaired_plan = plan_catchup(
+        repaired,
+        {
+            "as_of": "2026-11-26",
+            "reference_sha256": written[-1]["reference_sha256"],
+            "trading_sessions": list(GAP_SESSIONS),
+        },
+        GAP_TRACKED,
+        today="2026-11-27",
+    )
+    assert repaired_plan["stopped"] is None
+    assert repaired_plan["sessions"] == ["2026-11-27"]
+    repaired_written = publish_catchup(ledger, outcomes, repaired, repaired_plan["sessions"])
+    assert repaired_written[0]["file_status"] == "written"
+    assert first_path.read_bytes() == first_bytes
+    healed = _generation(outcomes, repaired_written[0])
+    assert "2026-11-24" not in healed["trading_sessions"]
+    fox = _row(healed, "FOX", "2026-11-23")
+    assert fox["reference_t0_present"] is True
+    assert fox["t0_price_used_as_denominator"] is False
+    assert fox["horizons"]["T+1"]["status"] == "APPROX_AVAILABLE"
+    assert fox["horizons"]["T+1"]["included_in_primary"] is True
+    assert fox["horizons"]["T+1"]["return_pct"] == _return_pct(1050, 1020)
+    assert fox["horizons"]["T+1"]["return_pct"] != 0
+    gil = _row(healed, "GIL", "2026-11-20")
+    assert gil["horizons"]["T+1"]["status"] == "TARGET_MISSING"
+    assert gil["horizons"]["T+1"]["return_pct"] is None
+    assert (DURABLE / "identities.jsonl").read_bytes() == identities_before
+    for relative, digest in PINNED_GENERATIONS.items():
+        assert _sha256(ROOT / relative) == digest

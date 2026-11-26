@@ -33,6 +33,9 @@ from research.v2_research_ledger.incremental_ingest import incremental_ingest
 
 ICT = ZoneInfo("Asia/Ho_Chi_Minh")
 TRACKED_COUNT = 142
+# A tracked symbol with no OK close is an isolated hole only for these reasons.
+# Any other rejection is an integrity failure and still refuses the session.
+ABSENCE_REASONS = frozenset({"LAST_BAR_BEFORE_CLOSE", "SYMBOL_ABSENT"})
 NEXT_CONFIRMATION = "publish-next-session"
 HOLIDAY_CONFIRMATION = "publish-holiday-gap"
 DURABLE_ROOT = "research/v2_research_ledger/durable"
@@ -148,7 +151,19 @@ def plan_catchup(
 
 
 def session_gate(store: Mapping[str, Any], tracked: set[str]) -> dict[str, Any]:
-    """Same completeness rule as the daily workflow, with the failing symbol named."""
+    """Accept a session when every tracked symbol is priced or explicitly absent.
+
+    One OK close keeps that symbol. A tracked symbol with no OK close is an
+    isolated hole only when every rejection for it on this session is
+    ``LAST_BAR_BEFORE_CLOSE`` or ``SYMBOL_ABSENT``. The rejection is not stored
+    as a price. Horizons that need the missing close stay
+    ``T0_REFERENCE_MISSING`` or ``TARGET_MISSING``.
+
+    A session with no OK close is a wide failure and is refused: nothing shows
+    that the session produced a close window. One integrity rejection, a non-OK
+    row, a duplicate, a silent drop, or an absence rejection beside an OK close
+    also refuses the session. Later sessions are then left for a later run.
+    """
     sessions = [str(item) for item in store.get("trading_sessions") or []]
     if len(sessions) < 2:
         return _gate(False, "PRICE_BOOK_INCOMPLETE", [])
@@ -159,6 +174,7 @@ def session_gate(store: Mapping[str, Any], tracked: set[str]) -> dict[str, Any]:
         return _gate(False, "PRICE_BOOK_INCOMPLETE", [])
     skipped = []
     blocked = []
+    absence = []
     for item in rejections:
         if not isinstance(item, dict) or str(item.get("session") or "") != new_session:
             continue
@@ -168,11 +184,16 @@ def session_gate(store: Mapping[str, Any], tracked: set[str]) -> dict[str, Any]:
             "session": new_session,
             "symbol": str(item.get("symbol") or "").strip().upper(),
         }
-        if not record["symbol"] or record["symbol"] in tracked:
+        if not record["symbol"]:
             blocked.append(record)
-        else:
+        elif record["symbol"] not in tracked:
             skipped.append(record)
+        elif record["reason"] in ABSENCE_REASONS:
+            absence.append(record)
+        else:
+            blocked.append(record)
     skipped.sort(key=lambda record: (record["symbol"], record["reason"], record["clock"]))
+    blocked.sort(key=lambda record: (record["symbol"], record["reason"], record["clock"]))
     if blocked:
         return _gate(False, "PRICE_BOOK_INCOMPLETE", blocked, skipped)
     coverage = store.get("coverage")
@@ -188,16 +209,25 @@ def session_gate(store: Mapping[str, Any], tracked: set[str]) -> dict[str, Any]:
     current, current_problems = _ok_symbols(store, new_session, tracked, strict=True)
     if current_problems:
         return _gate(False, "PRICE_BOOK_INCOMPLETE", current_problems, skipped)
+    contradicted = [record for record in absence if record["symbol"] in current]
+    contradicted.sort(key=lambda record: (record["symbol"], record["reason"], record["clock"]))
+    if contradicted:
+        return _gate(False, "PRICE_BOOK_INCOMPLETE", contradicted, skipped)
     prior, prior_problems = _ok_symbols(store, previous, tracked, strict=False)
     if prior_problems:
         return _gate(False, "PRICE_BOOK_INCOMPLETE", prior_problems, skipped)
     if not prior:
         return _gate(False, "PRICE_BOOK_INCOMPLETE", [{"symbol": "", "reason": "PRIOR_SESSION_EMPTY", "session": previous}], skipped)
-    if current != tracked or not current.issuperset(prior):
-        missing = [{"symbol": symbol, "reason": "SYMBOL_ABSENT", "session": new_session} for symbol in sorted(tracked - current)]
+    holes = {record["symbol"] for record in absence}
+    if not current:
+        return _gate(False, "PRICE_BOOK_INCOMPLETE", [{"symbol": "", "reason": "NO_OK_ROWS", "session": new_session}], skipped)
+    unexplained = sorted(tracked - current - holes)
+    dropped = sorted((prior - current) - holes)
+    if unexplained or dropped:
+        missing = [{"symbol": symbol, "reason": "SYMBOL_ABSENT", "session": new_session} for symbol in unexplained]
         missing.extend(
             {"symbol": symbol, "reason": "PRIOR_SYMBOL_DROPPED", "session": new_session}
-            for symbol in sorted(prior - current)
+            for symbol in dropped
         )
         return _gate(False, "PRICE_BOOK_INCOMPLETE", missing, skipped)
     return _gate(True, "", [], skipped)
