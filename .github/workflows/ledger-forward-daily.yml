@@ -674,76 +674,8 @@ jobs:
               }, sort_keys=True))
 
           def publish_main() -> int:
-              mode = require_dispatch_context(
-                  os.environ.get("LEDGER_FORWARD_DAILY_ENABLED"),
-                  os.environ.get("CONFIRM"),
-                  os.environ.get("GITHUB_REF"),
-                  os.environ.get("GITHUB_EVENT_NAME"),
-              )
-              repo = Path(".").resolve()
-              assert_pinned_history(repo)
-              reference = Path("/tmp/reference_store.json")
-              fetched = fetch_published_store(
-                  os.environ.get("GUARDIAN_REFERENCE_URL", ""),
-                  os.environ.get("GUARDIAN_REFERENCE_TOKEN", ""),
-                  reference,
-              )
-              if fetched is None:
-                  raise PublicationRefusal("REFERENCE_NOT_VALIDATED")
-              store = validated_store(reference)
-              print(json.dumps(safe_receipt(store), sort_keys=True))
-              tracked = require_universe(load_tracked_symbols())
-              prior = load_prior(repo)
-              moment = datetime.datetime.now(ICT)
-              decision = assess_publication(
-                  store,
-                  prior,
-                  today_ict=moment.date().isoformat(),
-                  mode=mode,
-                  tracked=tracked,
-                  moment=moment,
-              )
-              if decision["action"] != "publish":
-                  _hold(repo, reference, prior, decision)
-                  return 0
-              try:
-                  document = build_forward_document(repo / DURABLE_ROOT, reference)
-              except ForwardBuildError as exc:
-                  raise PublicationRefusal(exc.reason) from None
-              violations = missing_return_violations(document)
-              if violations:
-                  raise PublicationRefusal("MISSING_RETURN_NOT_NULL")
-              as_of = decision["as_of"]
-              if [str(item) for item in document.get("trading_sessions") or []] != [str(item) for item in store.get("trading_sessions") or []]:
-                  raise PublicationRefusal("CALENDAR_INVALID")
-              baseline_durable = durable_hashes(repo)
-              baseline_generations = generation_snapshot(repo)
-              report = _run_builder(repo, reference, publish=False)
-              action = publication_action(report, violations, as_of)
-              generation_id = str(report["generation_id"])
-              if action == "already_published":
-                  if porcelain_paths(repo):
-                      raise PublicationRefusal("WORKSPACE_DIRTY")
-                  print(json.dumps({"as_of": as_of, "generation_id": generation_id, "mode": "already_published", "ok": True, "skipped_rejections": decision.get("skipped_rejections") or []}, sort_keys=True))
-                  return 0
-              published = _run_builder(repo, reference, publish=True)
-              require_publish_result(published, generation_id, as_of)
-              assert_immutable(repo, baseline_durable, baseline_generations, generation_id)
-              commit_publication(repo, generation_id, as_of, baseline_durable, baseline_generations)
-              pushed = push_fast_forward(repo, generation_id, as_of, baseline_durable, baseline_generations)
-              print(json.dumps({
-                  "as_of": as_of,
-                  "commit": pushed["commit"],
-                  "file_status": "written",
-                  "generation_id": generation_id,
-                  "index_status": "written",
-                  "missing_return_violations": 0,
-                  "mode": "publish",
-                  "ok": True,
-                  "rebases": pushed["rebases"],
-                  "skipped_rejections": decision.get("skipped_rejections") or [],
-              }, sort_keys=True))
-              return 0
+              from research.v2_research_ledger.daily_publish import run_scheduled_publication
+              return run_scheduled_publication()
 
           if __name__ == "__main__":
               try:

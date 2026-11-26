@@ -7,6 +7,8 @@ panel is not filled in from later files.
 
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
 from typing import Any
 
 from research.v2_research_ledger.contract import HORIZONS, SOURCE_BRAIN_A, SOURCE_SWEETSPOT
@@ -16,6 +18,7 @@ from research.v2_research_ledger.forward_outcomes import (
     ForwardBuildError,
     attachable_outcomes,
     display_horizon,
+    file_hashes,
     population_for,
 )
 
@@ -54,23 +57,20 @@ def load_row_panel(store: DurableRowStore, *, outcomes_root: Any = None) -> dict
         reasons.append("UNAVAILABLE:row_horizons")
     else:
         reasons.append("ATTACHED:forward_outcomes")
+    freshness = _freshness(store, manifest, attached, reasons)
     by_source: dict[str, int] = {}
     for row in rows:
         label = str(row.get("source") or "")
         by_source[label] = by_source.get(label, 0) + 1
     return {
-        "as_of": None,
+        "as_of": freshness.get("latest_measured_session") if freshness.get("fingerprint_matches") is True else None,
         "coverage": {
             "by_source": by_source,
             "deduped_research_observations": len(deduped),
             "rows": len(rows),
             "sidecar_identities": sidecar_identities,
         },
-        "freshness": {
-            "reasons": reasons,
-            "source_health": health,
-            "status": "UNVERIFIED",
-        },
+        "freshness": freshness,
         "forward_outcomes": {
             "as_of": None if attached is None else attached.get("as_of"),
             "calculation_version": None if attached is None else attached.get("calculation_version"),
@@ -82,9 +82,92 @@ def load_row_panel(store: DurableRowStore, *, outcomes_root: Any = None) -> dict
         "price_book": "absent" if attached is None else "APPROX_LAST_5M_CLOSE",
         "rows": rows,
         "schema": PANEL_SCHEMA,
-        "source_updated_at": None,
+        "source_updated_at": freshness.get("source_updated_at") if freshness.get("fingerprint_matches") is True else None,
         "t_plus_recomputed": False,
     }
+
+
+def _freshness(
+    store: DurableRowStore,
+    manifest: dict[str, Any],
+    attached: dict[str, Any] | None,
+    reasons: list[str],
+) -> dict[str, Any]:
+    """Clocks come from the attached generation. A missing field stays missing."""
+    if attached is None:
+        return {"fingerprint_matches": False, "reasons": reasons, "source_health": _health(manifest), "status": "UNVERIFIED"}
+    try:
+        fingerprint_matches = attached.get("ledger_hashes") == file_hashes(store.directory)
+    except (OSError, UnicodeError):
+        fingerprint_matches = False
+    if not fingerprint_matches:
+        reasons.append("FINGERPRINT_MISMATCH")
+        return {"fingerprint_matches": False, "reasons": reasons, "source_health": _health(manifest), "status": "UNVERIFIED"}
+    source_state = _source_state(manifest, store.directory)
+    if source_state == "MATCHED":
+        status = "VERIFIED"
+    elif source_state == "LATE":
+        status = "LATE"
+        reasons.append("SOURCE_LATE")
+    else:
+        status = "MISSING"
+        reasons.append("SOURCE_EVIDENCE_MISSING")
+    sealed = [str(row.get("t0_date") or "") for row in attached.get("rows") or [] if isinstance(row, dict) and row.get("t0_date")]
+    return {
+        "artifact_generated_at": attached.get("artifact_generated_at") or None,
+        "fingerprint_matches": True,
+        "latest_measured_session": attached.get("as_of") or None,
+        "latest_sealed_t0": max(sealed) if sealed else None,
+        "latest_t0": max(sealed) if sealed else None,
+        "reasons": reasons,
+        "source_health": _health(manifest),
+        "source_updated_at": attached.get("source_updated_at") or None,
+        "status": status,
+    }
+
+
+def _health(manifest: dict[str, Any]) -> dict[str, dict[str, str]]:
+    return {
+        "action_evidence": {"status": (manifest.get("action_evidence") or {}).get("status") or "MISSING"},
+        "historical_row_panel": {"status": "UNAVAILABLE"},
+        "sidecar": {"status": (manifest.get("sidecar") or {}).get("status") or "MISSING"},
+        "sweetspot": {"status": (manifest.get("sweetspot") or {}).get("status") or "MISSING"},
+    }
+
+
+def _source_state(manifest: dict[str, Any], store_dir: Path) -> str:
+    """MATCHED when both source files still have the sealed hashes. Otherwise LATE or MISSING."""
+    for key in ("sidecar", "sweetspot"):
+        block = manifest.get(key) if isinstance(manifest.get(key), dict) else {}
+        recorded = str(block.get("sha256") or "")
+        relative = str(block.get("path") or "")
+        if not recorded or not relative:
+            return "MISSING"
+        found = _source_file(store_dir, relative)
+        if found is None:
+            return "MISSING"
+        if _sha256_file(found) != recorded:
+            return "LATE"
+    return "MATCHED"
+
+
+def _source_file(store_dir: Path, relative: str) -> Path | None:
+    parts = Path(relative).parts
+    if not relative or relative.startswith("/") or ".." in parts:
+        return None
+    for root in (store_dir, *store_dir.parents):
+        candidate = root / relative
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def deduped_research_observations(store: DurableRowStore) -> dict[tuple[str, str, str], dict[str, Any]]:
