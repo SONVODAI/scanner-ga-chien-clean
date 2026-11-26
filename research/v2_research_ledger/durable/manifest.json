@@ -1,6 +1,5 @@
 {
   "action_evidence": {
-    "path": "research/v2_research_ledger/evidence",
     "status": "MISSING"
   },
   "approximate_view_modified": false,
@@ -10,21 +9,93 @@
     "detail": "The 1055-row research panel file is not in the repository.",
     "status": "UNAVAILABLE"
   },
-  "identity_count": 1434,
+  "identity_count": 1448,
   "link_count": 131,
   "schema": "v2_research_row_store_manifest.v1",
   "schema_records": "v2_research_row_store.v1",
   "sidecar": {
+    "admission": [
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|c132d63bc2c6606b",
+        "reason": null,
+        "symbol": "HDB"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|af3931aefc8b269a",
+        "reason": null,
+        "symbol": "HUT"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|69817ca5d1203c36",
+        "reason": null,
+        "symbol": "KBC"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|000ea429b60b4fd7",
+        "reason": null,
+        "symbol": "PC1"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|9630197a174ae1bf",
+        "reason": null,
+        "symbol": "PTB"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|939d233d092fd1fb",
+        "reason": null,
+        "symbol": "TCM"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|fd1ac741e6f59767",
+        "reason": null,
+        "symbol": "TPB"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|93c5ab474f63d985",
+        "reason": null,
+        "symbol": "VHM"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|0c79a63de0187de4",
+        "reason": null,
+        "symbol": "VRE"
+      },
+      {
+        "candidate_first_seen_ts": "2026-11-25T12:42:41Z",
+        "classification": "EXISTING_OBSERVATION",
+        "identity_id": "sweet|b69998d75beaf3a0",
+        "reason": null,
+        "symbol": "VSC"
+      }
+    ],
     "freeze_rows": 1192,
     "linked_current_rows": 0,
     "path": "research/live_candidate_v2_camera_sidecar/camera_sidecar.json",
-    "sha256": "753f11d837896256733cabd4fb86b8b9aa9cd5841c3f196f6d310d5903aff08f",
+    "sha256": "d91546c702cb7cc6951a082db12205dbcee104171a9b0ea1cf4810cf119c13fb",
     "status": "PRESENT"
   },
   "sweetspot": {
     "path": "data/earning_learning/market_aware_sweetspot_observer_ledger.csv",
-    "rows": 242,
-    "sha256": "c6270d9b89be8448ad380fe6560c0d2975f6ee0551381cd6b9ba3791dfa153fd",
+    "rows": 256,
+    "sha256": "d0b3bad0629633e94fdb209b26853f42b310fd2070bc94e87b0e83cba5ed6e50",
     "status": "PRESENT"
   },
   "t_plus_recomputed": false
