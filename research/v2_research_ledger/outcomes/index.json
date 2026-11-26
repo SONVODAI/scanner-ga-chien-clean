@@ -41,6 +41,48 @@
       },
       "path": "generations/2026-11-20_41f36ca0cad9_a15e1c653ed5.json",
       "reference_sha256": "a15e1c653ed55f20f02942bcbf6f1fd5d7c6fc1000f5518e7b662f62a3dc478d"
+    },
+    {
+      "as_of": "2026-11-23",
+      "calculation_version": "ledger_forward.v1",
+      "generation_id": "2026-11-23_34d256ee9aa4_9b75f7ca8b7a",
+      "identity_count": 1451,
+      "ledger_hashes": {
+        "conflicts.jsonl": "ed13a4a6b9b66017993f85471137b04b9fa536dd950b6dfd93c4e1f07d4db82d",
+        "identities.jsonl": "9e0f8670acf927de3c4a2217b6a8fba8569c6cafcdd4c839eca183989b2dddab",
+        "links.jsonl": "377ff151d96c290c062efdfe32118b02d49efaaa30c98d5871fe6ac5b1fd2ec4",
+        "manifest.json": "3f7b81113cf557531311f11d8e0bababa2786b9875cc5ec89e75a79df744570b"
+      },
+      "path": "generations/2026-11-23_34d256ee9aa4_9b75f7ca8b7a.json",
+      "reference_sha256": "9b75f7ca8b7ac3034d3a107c9a3db3ae0c40e136e44fd0961e176de29904baba"
+    },
+    {
+      "as_of": "2026-11-25",
+      "calculation_version": "ledger_forward.v1",
+      "generation_id": "2026-11-25_34d256ee9aa4_0305e72aa55e",
+      "identity_count": 1451,
+      "ledger_hashes": {
+        "conflicts.jsonl": "ed13a4a6b9b66017993f85471137b04b9fa536dd950b6dfd93c4e1f07d4db82d",
+        "identities.jsonl": "9e0f8670acf927de3c4a2217b6a8fba8569c6cafcdd4c839eca183989b2dddab",
+        "links.jsonl": "377ff151d96c290c062efdfe32118b02d49efaaa30c98d5871fe6ac5b1fd2ec4",
+        "manifest.json": "3f7b81113cf557531311f11d8e0bababa2786b9875cc5ec89e75a79df744570b"
+      },
+      "path": "generations/2026-11-25_34d256ee9aa4_0305e72aa55e.json",
+      "reference_sha256": "0305e72aa55e869d8d33a2fb4238c0b4d17be4e1fe4110180e547453e6ce8dc7"
+    },
+    {
+      "as_of": "2026-11-26",
+      "calculation_version": "ledger_forward.v1",
+      "generation_id": "2026-11-26_34d256ee9aa4_9c6953f846ee",
+      "identity_count": 1451,
+      "ledger_hashes": {
+        "conflicts.jsonl": "ed13a4a6b9b66017993f85471137b04b9fa536dd950b6dfd93c4e1f07d4db82d",
+        "identities.jsonl": "9e0f8670acf927de3c4a2217b6a8fba8569c6cafcdd4c839eca183989b2dddab",
+        "links.jsonl": "377ff151d96c290c062efdfe32118b02d49efaaa30c98d5871fe6ac5b1fd2ec4",
+        "manifest.json": "3f7b81113cf557531311f11d8e0bababa2786b9875cc5ec89e75a79df744570b"
+      },
+      "path": "generations/2026-11-26_34d256ee9aa4_9c6953f846ee.json",
+      "reference_sha256": "9c6953f846eecd7b750e7467bea1d41e10ef4707175d2610a40f8dbf3e9099b8"
     }
   ],
   "schema": "v2_research_forward_index.v1"
