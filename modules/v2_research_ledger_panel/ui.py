@@ -149,6 +149,11 @@ class _FingerprintRace(Exception):
     """The sealed bytes changed between the cache key and the read."""
 
 
+def _shown_clock(value: object) -> str:
+    text = str(value).strip() if value is not None else ""
+    return text or "missing"
+
+
 def _sha256_file(path: Path) -> str:
     if not path.is_file():
         return "absent"
@@ -405,7 +410,14 @@ def render_v2_research_ledger_panel(
             if delivered is not None:
                 freshness_state = delivered.state
             elif from_row_store:
-                freshness_state = "UNVERIFIED"
+                recorded = str(fresh.get("status") or "")
+                matched = fresh.get("fingerprint_matches") is True
+                if recorded == "VERIFIED" and matched:
+                    freshness_state = "VERIFIED"
+                elif recorded in {"LATE", "MISSING"} and matched:
+                    freshness_state = recorded
+                else:
+                    freshness_state = "UNVERIFIED"
             elif cache_reason:
                 freshness_state = "STALE"
             else:
@@ -420,6 +432,17 @@ def render_v2_research_ledger_panel(
                 f"latest action bar={fresh.get('latest_action_bar') or 'unknown'}. "
                 f"freshness={freshness_state}."
             )
+            if from_row_store:
+                st.caption(
+                    "latest sealed T0="
+                    f"{_shown_clock(fresh.get('latest_sealed_t0'))}. "
+                    "latest measured T+ session="
+                    f"{_shown_clock(fresh.get('latest_measured_session'))}. "
+                    "artifact generation time="
+                    f"{_shown_clock(fresh.get('artifact_generated_at'))}. "
+                    "source update time="
+                    f"{_shown_clock(fresh.get('source_updated_at'))}."
+                )
             st.caption(format_row_composition(rows))
             if source_counts:
                 rendered = ", ".join(f"{name}={count}" for name, count in sorted(source_counts.items()))
