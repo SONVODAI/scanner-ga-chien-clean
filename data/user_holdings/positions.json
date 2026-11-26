@@ -2,19 +2,99 @@
   "schema": "user_holdings.v1",
   "positions": [
     {
-      "symbol": "PVS",
-      "entry_price": 27044.0,
-      "entry_date": "2026-11-20"
-    },
-    {
       "symbol": "GAS",
       "entry_price": 70000.0,
       "entry_date": "2026-11-20"
     },
     {
       "symbol": "BSR",
-      "entry_price": 23500.0,
-      "entry_date": "2026-11-20"
+      "entry_price": 23000.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "DGW",
+      "entry_price": 38900.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "PET",
+      "entry_price": 48500.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "SHS",
+      "entry_price": 12900.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "TCH",
+      "entry_price": 12850.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "CII",
+      "entry_price": 13550.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "CEO",
+      "entry_price": 11000.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "VGC",
+      "entry_price": 38050.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "DRI",
+      "entry_price": 12400.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "GEE",
+      "entry_price": 60000.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "NT2",
+      "entry_price": 23950.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "BFC",
+      "entry_price": 60000.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "CTD",
+      "entry_price": 71000.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "VGS",
+      "entry_price": 18300.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "TVN",
+      "entry_price": 8700.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "MSH",
+      "entry_price": 30600.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "ANV",
+      "entry_price": 15750.0,
+      "entry_date": "2026-11-26"
+    },
+    {
+      "symbol": "BVH",
+      "entry_price": 56100.0,
+      "entry_date": "2026-11-26"
     }
   ]
 }
