@@ -83,6 +83,20 @@
       },
       "path": "generations/2026-11-26_34d256ee9aa4_9c6953f846ee.json",
       "reference_sha256": "9c6953f846eecd7b750e7467bea1d41e10ef4707175d2610a40f8dbf3e9099b8"
+    },
+    {
+      "as_of": "2026-11-27",
+      "calculation_version": "ledger_forward.v1",
+      "generation_id": "2026-11-27_4ac50091fc8c_bc1c95132c1d",
+      "identity_count": 1457,
+      "ledger_hashes": {
+        "conflicts.jsonl": "ed13a4a6b9b66017993f85471137b04b9fa536dd950b6dfd93c4e1f07d4db82d",
+        "identities.jsonl": "0a5dceb684009b43bf5057da40bfa3d8a81db327cc18c06e1431af7d9d9612d3",
+        "links.jsonl": "377ff151d96c290c062efdfe32118b02d49efaaa30c98d5871fe6ac5b1fd2ec4",
+        "manifest.json": "68abeeaa4fc5e2f55fa17cb5bbf70a35a30fda0dff8224b0ae6c2596d312dc33"
+      },
+      "path": "generations/2026-11-27_4ac50091fc8c_bc1c95132c1d.json",
+      "reference_sha256": "bc1c95132c1d452967890e18860b0cc567576a565b828d0a6c8edf09a945fbbe"
     }
   ],
   "schema": "v2_research_forward_index.v1"
