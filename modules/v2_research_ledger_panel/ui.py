@@ -18,7 +18,6 @@ from research.v2_research_ledger.delivery_view import (
     DeliveryView,
     load_delivery,
 )
-from research.v2_research_ledger.remote_delivery import fetch_research_trio, resolve_remote_config
 from research.v2_research_ledger.freshness import (
     STALE_DATA,
     divergence,
@@ -258,28 +257,6 @@ def _isolate_panel(st: Any, draw: Any) -> None:
     fragment(draw)()
 
 
-def _show_historical_remote(st: Any, view: DeliveryView | None, *, unavailable_reason: str | None) -> None:
-    """Show a remote trio separately. Its rows are not the durable store population."""
-    if view is None or not isinstance(view.board, dict):
-        if unavailable_reason:
-            st.caption(f"historical_remote_delivery=UNAVAILABLE reason={unavailable_reason}.")
-        return
-    rows = [row for row in (view.board.get("rows") or []) if isinstance(row, dict)]
-    fresh = view.board.get("freshness") if isinstance(view.board.get("freshness"), dict) else {}
-    latest = fresh.get("latest_t0") or "unknown"
-    st.caption(
-        "historical_remote_delivery "
-        f"state={view.state} "
-        f"historical_rows={len(rows)} "
-        f"latest T0 (provenance)={latest}. "
-        "This is not the durable store population."
-    )
-    if view.state == SOURCE_STALE:
-        st.warning(f"{SOURCE_STALE}: historical remote delivery is stale.")
-    if rows:
-        st.dataframe(project_table(rows), use_container_width=True, hide_index=True)
-
-
 def render_v2_research_ledger_panel(
     st_module: Any = None,
     *,
@@ -294,21 +271,15 @@ def render_v2_research_ledger_panel(
     remote_view: DeliveryView | None = None,
     row_store: Path | None = None,
 ) -> None:
-    """Expandable table inside RESEARCH / SHADOW. Reads research artifacts only."""
+    """Expandable table inside RESEARCH / SHADOW. Reads research artifacts only.
+
+    ``remote_view`` is accepted so existing callers stay valid. Historical
+    remote delivery is not rendered.
+    """
+    del remote_view
     st = st_module
     if st is None:
         import streamlit as st  # type: ignore
-    historical_view = None
-    historical_unavailable = None
-    # The remote trio is a full-app read. A fragment rerun does not reach this call.
-    if remote and delivery_dir is None and board_path is None:
-        if remote_view is None:
-            url, token = resolve_remote_config()
-            remote_view = fetch_research_trio(url, token)
-        if remote_view.state == DELIVERY_UNAVAILABLE or remote_view.board is None:
-            historical_unavailable = remote_view.reason or "unavailable"
-        else:
-            historical_view = remote_view
 
     def _draw() -> None:
         delivered = None
@@ -324,10 +295,6 @@ def render_v2_research_ledger_panel(
                     st.warning(f"{label}: {store_reason}.")
                     if store_state == "MISSING":
                         st.warning("ROW_STORE_UNAVAILABLE: the durable research row store is not present.")
-                    st.warning("Historical remote data is not the current durable store.")
-                    if historical_unavailable:
-                        st.warning(f"{DELIVERY_UNAVAILABLE}: {historical_unavailable}.")
-                    _show_historical_remote(st, historical_view, unavailable_reason=historical_unavailable)
                 return
             from_row_store = True
             status, path = "OK", store_path
@@ -486,8 +453,6 @@ def render_v2_research_ledger_panel(
             )
             if not selected:
                 st.warning(f"{NO_DATA}: no stored candidates match these filters.")
-                if from_row_store:
-                    _show_historical_remote(st, historical_view, unavailable_reason=historical_unavailable)
                 return
             st.dataframe(project_table(selected), use_container_width=True, hide_index=True)
             history = []
@@ -505,7 +470,5 @@ def render_v2_research_ledger_panel(
             if history:
                 st.caption("Action history for the rows above. WAIT and later states stay listed.")
                 st.dataframe(history, use_container_width=True, hide_index=True)
-            if from_row_store:
-                _show_historical_remote(st, historical_view, unavailable_reason=historical_unavailable)
 
     _isolate_panel(st, _draw)

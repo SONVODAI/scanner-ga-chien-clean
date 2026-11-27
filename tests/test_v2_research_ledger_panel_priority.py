@@ -1,4 +1,4 @@
-"""The durable store is the current ledger panel. A remote trio stays historical."""
+"""The durable store is the current ledger panel. Historical remote delivery is not rendered."""
 
 from __future__ import annotations
 
@@ -90,7 +90,8 @@ def _remote(state: str, symbol: str, latest: str) -> DeliveryView:
             "freshness": {"latest_t0": latest, "reasons": [state]},
             "rows": [
                 {
-                    "action_state": "WAIT",
+                    "action_state": "NO_OBSERVATION",
+                    "horizons": {"T+1": {"return_pct": None, "status": "MISSING_PRICE"}},
                     "source": "brain_a_scan_setup",
                     "symbol": symbol,
                     "t0_date": latest,
@@ -118,13 +119,17 @@ def test_valid_store_takes_precedence_over_accepted_remote_data(tmp_path: Path):
         row_store=directory,
     )
     text = "\n".join(fake.captions)
+    rendered = json.dumps(fake.frames)
     assert "durable_row_store identities=1" in text
     assert "research_rows=1" in text
     assert f"row_horizons={HORIZON_STATUS}" in text
-    assert "historical_remote_delivery state=DATA_FRESH historical_rows=1" in text
-    assert "This is not the durable store population." in text
+    assert "historical_remote_delivery" not in text
+    assert "This is not the durable store population." not in text
+    assert "MISSING_PRICE" not in text
+    assert "MISSING_PRICE" not in rendered
     assert _symbols(fake.frames[0]) == {"HPG"}
-    assert _symbols(fake.frames[-1]) == {"OLD"}
+    assert all("OLD" not in _symbols(frame) for frame in fake.frames)
+    assert len(fake.frames) == 1
 
 
 def test_source_stale_remote_delivery_cannot_hide_the_durable_store(tmp_path: Path):
@@ -137,18 +142,20 @@ def test_source_stale_remote_delivery_cannot_hide_the_durable_store(tmp_path: Pa
         row_store=directory,
     )
     text = "\n".join(fake.captions)
+    rendered = json.dumps(fake.frames)
     assert "durable_row_store identities=1" in text
     assert "research_rows=1" in text
     assert "freshness=UNVERIFIED" in text
     assert "latest T0 (provenance)=unknown" in text
-    assert "historical_remote_delivery state=SOURCE_STALE historical_rows=1 latest T0 (provenance)=2026-11-04" in text
-    assert "SOURCE_STALE: historical remote delivery is stale." in text
+    assert "historical_remote_delivery" not in text
+    assert "SOURCE_STALE: historical remote delivery is stale." not in text
+    assert "MISSING_PRICE" not in rendered
     assert _symbols(fake.frames[0]) == {"HPG"}
-    assert "OLD" not in _symbols(fake.frames[0])
-    assert _symbols(fake.frames[-1]) == {"OLD"}
+    assert all("OLD" not in _symbols(frame) for frame in fake.frames)
+    assert len(fake.frames) == 1
 
 
-def test_invalid_store_is_an_explicit_warning_and_historical_stays_labeled(tmp_path: Path):
+def test_invalid_store_is_an_explicit_warning_without_historical_remote(tmp_path: Path):
     directory = tmp_path / "broken"
     directory.mkdir()
     (directory / "manifest.json").write_text('{"schema":"not-the-store"}\n', encoding="utf-8")
@@ -162,11 +169,12 @@ def test_invalid_store_is_an_explicit_warning_and_historical_stays_labeled(tmp_p
     )
     text = "\n".join(fake.captions)
     assert "DURABLE_STORE_INVALID:" in text
-    assert "Historical remote data is not the current durable store." in text
+    assert "Historical remote data is not the current durable store." not in text
+    assert "historical_remote_delivery" not in text
+    assert "SOURCE_STALE: historical remote delivery is stale." not in text
     assert "durable_row_store identities=" not in text
     assert "research_rows=" not in text
-    assert "historical_remote_delivery state=SOURCE_STALE historical_rows=1" in text
-    assert _symbols(fake.frames[0]) == {"OLD"}
+    assert fake.frames == []
 
 
 def test_committed_store_is_the_current_population():
@@ -184,6 +192,26 @@ def test_committed_store_is_the_current_population():
     assert "historical_rows=1" in text
     assert "HISTORICAL" not in _symbols(fake.frames[0])
     assert _symbols(fake.frames[-1]) == {"HISTORICAL"}
+
+
+def test_committed_store_does_not_render_historical_remote():
+    identity_count = len(DurableRowStore(STORE).identities)
+    fake = _FakeStreamlit()
+    render_v2_research_ledger_panel(
+        fake,
+        remote=True,
+        remote_view=_remote(SOURCE_STALE, "HISTORICAL", "2026-11-04"),
+        row_store=STORE,
+    )
+    text = "\n".join(fake.captions)
+    rendered = json.dumps(fake.frames)
+    assert f"durable_row_store identities={identity_count}" in text
+    assert "historical_remote_delivery" not in text
+    assert "SOURCE_STALE: historical remote delivery is stale." not in text
+    assert "MISSING_PRICE" not in rendered
+    assert "HISTORICAL" not in rendered
+    assert fake.frames
+    assert "latest sealed T0=" in text
 
 
 def test_approximate_view_is_unchanged_by_panel_rendering(tmp_path: Path):

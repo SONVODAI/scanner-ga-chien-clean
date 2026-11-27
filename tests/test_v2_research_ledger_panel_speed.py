@@ -351,7 +351,8 @@ def test_fake_streamlit_without_fragment_still_renders(tmp_path: Path):
     )
     text = "\n".join(fake.captions)
     assert "DURABLE_STORE_INVALID:" in text
-    assert "Historical remote data is not the current durable store." in text
+    assert "Historical remote data is not the current durable store." not in text
+    assert "historical_remote_delivery" not in text
     assert "durable_row_store identities=" not in text
 
     recorded: list[dict] = []
@@ -405,7 +406,8 @@ def test_fragment_body_has_no_timer_rerun_or_remote_fetch():
 
     assert _calls(draw, "fetch_research_trio") == []
     assert _calls(draw, "resolve_remote_config") == []
-    assert _calls(render, "fetch_research_trio")
+    assert _calls(render, "fetch_research_trio") == []
+    assert _calls(render, "resolve_remote_config") == []
     isolate_calls = [
         node
         for node in ast.walk(tree)
@@ -541,13 +543,14 @@ def test_fragment_rerun_changes_t0_without_the_scan_prefix(tmp_path: Path):
         lines = log_path.read_text(encoding="utf-8").splitlines()
         return {name: lines.count(name) for name in ("SCAN", "WRITE", "FETCH", "VALIDATE", "AFTER")}
 
-    original_fetch = ui.fetch_research_trio
+    had_fetch = hasattr(ui, "fetch_research_trio")
+    original_fetch = getattr(ui, "fetch_research_trio", None)
     original_board = ui._validated_durable_board
     try:
         app = AppTest.from_string(script).run(timeout=60)
         assert not app.exception
         first = _counts()
-        assert first == {"SCAN": 1, "WRITE": 1, "FETCH": 1, "VALIDATE": 1, "AFTER": 1}
+        assert first == {"SCAN": 1, "WRITE": 1, "FETCH": 0, "VALIDATE": 1, "AFTER": 1}
         date_box = next(box for box in app.selectbox if box.label == "T0 date")
         assert "all" in date_box.options
         initial_rows = len(app.dataframe[0].value)
@@ -566,10 +569,13 @@ def test_fragment_rerun_changes_t0_without_the_scan_prefix(tmp_path: Path):
         full = _counts()
         assert full["SCAN"] == 2
         assert full["WRITE"] == 2
-        assert full["FETCH"] == 2
+        assert full["FETCH"] == 0
         assert full["AFTER"] == 2
         assert full["VALIDATE"] == 1
         assert len(app.dataframe[0].value) == 1434
     finally:
-        ui.fetch_research_trio = original_fetch
+        if had_fetch:
+            ui.fetch_research_trio = original_fetch
+        elif hasattr(ui, "fetch_research_trio"):
+            del ui.fetch_research_trio
         ui._validated_durable_board = original_board
