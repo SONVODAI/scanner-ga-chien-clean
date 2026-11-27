@@ -4,9 +4,9 @@
   "trade_date": "2026-11-27",
   "input_rows": 142,
   "valid_rows": 142,
-  "observations_added": 142,
-  "observations_updated": 0,
-  "outcomes_added": 426,
+  "observations_added": 0,
+  "observations_updated": 142,
+  "outcomes_added": 0,
   "knowledge_rows": 16066,
   "lifecycle_rows": 11377,
   "continuation_rows": 5524,
@@ -20,7 +20,7 @@
   "github_sync": "GITHUB_PARTIAL",
   "skipped_reason": null,
   "error": null,
-  "last_run_at": "2026-11-27T14:19:22Z",
+  "last_run_at": "2026-11-27T15:08:47Z",
   "brain_generation": "GEN3_EXPERIENCE",
   "feature_version": "DECISION_CONTEXT_V1"
 }
