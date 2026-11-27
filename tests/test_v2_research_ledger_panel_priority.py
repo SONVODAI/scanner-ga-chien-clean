@@ -195,6 +195,7 @@ def test_committed_store_is_the_current_population():
 
 
 def test_committed_store_does_not_render_historical_remote():
+    identity_count = len(DurableRowStore(STORE).identities)
     fake = _FakeStreamlit()
     render_v2_research_ledger_panel(
         fake,
@@ -204,7 +205,7 @@ def test_committed_store_does_not_render_historical_remote():
     )
     text = "\n".join(fake.captions)
     rendered = json.dumps(fake.frames)
-    assert "durable_row_store identities=1434" in text
+    assert f"durable_row_store identities={identity_count}" in text
     assert "historical_remote_delivery" not in text
     assert "SOURCE_STALE: historical remote delivery is stale." not in text
     assert "MISSING_PRICE" not in rendered
