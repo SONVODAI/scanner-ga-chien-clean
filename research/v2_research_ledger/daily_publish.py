@@ -42,6 +42,7 @@ DURABLE_ROOT = "research/v2_research_ledger/durable"
 OUTCOMES_ROOT = "research/v2_research_ledger/outcomes"
 INDEX_RELATIVE = f"{OUTCOMES_ROOT}/index.json"
 DURABLE_FILES = ("identities.jsonl", "links.jsonl", "conflicts.jsonl", "manifest.json")
+RESEARCH_FILES = ("identities.jsonl", "links.jsonl", "conflicts.jsonl")
 DURABLE_PATHS = tuple(f"{DURABLE_ROOT}/{name}" for name in DURABLE_FILES)
 LOCK_RELATIVE = f"{DURABLE_ROOT}/.ingest.lock"
 INDEX_SCHEMA = "v2_research_forward_index.v1"
@@ -279,10 +280,16 @@ def run_scheduled_publication(
     now: datetime.datetime | None = None,
     push: bool = True,
 ) -> int:
-    """Ingest, then catch up. A refusal still commits an allowlisted append."""
+    """Ingest, then catch up.
+
+    A refusal commits an allowlisted append only when identities, links, or
+    conflicts changed. A manifest rewrite that only records a new source
+    fingerprint is put back and is not committed.
+    """
     root = Path(repo or ".").resolve()
     baseline: dict[str, str] | None = None
     ingested_ok = False
+    before_research: dict[str, Any] | None = None
     try:
         _dispatch_mode()
         assert_pinned_generations(root)
@@ -294,6 +301,7 @@ def run_scheduled_publication(
         tracked = _require_universe(load_tracked_symbols())
         baseline = generation_snapshot(root)
         ledger = root / DURABLE_ROOT
+        before_research = _research_snapshot(ledger)
         sidecar, sweet = _default_sources(root)
         ingested = ingest_ledger(ledger, sidecar_path=sidecar, sweet_csv=sweet, evidence_dir=None)
         ingested_ok = True
@@ -319,7 +327,9 @@ def run_scheduled_publication(
         print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
         return 0 if stopped is None else 1
     except CatchupRefusal as refusal:
-        saved = _save_progress(root, baseline, push=push) if ingested_ok and baseline is not None else None
+        saved = None
+        if ingested_ok and baseline is not None and before_research is not None:
+            saved = _save_progress(root, baseline, push=push, before_research=before_research)
         return _finish(False, refusal.reason, session=refusal.session, missing=refusal.missing, skipped=refusal.skipped, save=saved)
 
 
@@ -646,15 +656,62 @@ def _commit_message(plan: Mapping[str, Any], published: list[dict[str, Any]], in
     return "Research ledger daily catch-up found nothing to publish"
 
 
-def _save_progress(repo: Path, baseline: Mapping[str, str], *, push: bool) -> str | None:
-    """Keep an allowlisted append when a later session is refused. Push failures stay visible."""
+def _save_progress(
+    repo: Path,
+    baseline: Mapping[str, str],
+    *,
+    push: bool,
+    before_research: Mapping[str, Any] | None = None,
+) -> str | None:
+    """Keep an allowlisted append when a refusal still has new research rows.
+
+    Identities, links, and conflicts are the research data. When none of those
+    files changed, a manifest update is only the source fingerprint: the
+    manifest bytes from before ingest are restored and nothing is committed.
+    Push failures stay visible when a real append is committed.
+    """
+    root = Path(repo)
+    if before_research is not None and not _research_changed(root / DURABLE_ROOT, before_research):
+        _restore_manifest(root / DURABLE_ROOT, before_research)
+        if not _porcelain(root):
+            return None
     try:
-        commit = commit_catchup(repo, baseline, "Append research ledger identities")
+        commit = commit_catchup(root, baseline, "Append research ledger identities")
         if push and commit is not None:
-            push_fast_forward(repo)
+            push_fast_forward(root)
         return commit
     except CatchupRefusal as refusal:
         return refusal.reason
+
+
+def _research_snapshot(ledger: Path) -> dict[str, Any]:
+    root = Path(ledger)
+    snapshot: dict[str, Any] = {}
+    for name in RESEARCH_FILES:
+        path = root / name
+        snapshot[name] = _sha256(path) if path.is_file() else None
+    manifest = root / "manifest.json"
+    snapshot["manifest.json"] = manifest.read_bytes() if manifest.is_file() else None
+    return snapshot
+
+
+def _research_changed(ledger: Path, before: Mapping[str, Any]) -> bool:
+    root = Path(ledger)
+    for name in RESEARCH_FILES:
+        path = root / name
+        current = _sha256(path) if path.is_file() else None
+        if current != before.get(name):
+            return True
+    return False
+
+
+def _restore_manifest(ledger: Path, before: Mapping[str, Any]) -> None:
+    original = before.get("manifest.json")
+    if not isinstance(original, bytes):
+        return
+    path = Path(ledger) / "manifest.json"
+    if path.is_file() and path.read_bytes() != original:
+        path.write_bytes(original)
 
 
 def _finish(ok: bool, reason: str, **extra: Any) -> int:
