@@ -22,11 +22,12 @@ from research.v2_research_ledger.daily_publish import (
     ingest_ledger,
     plan_catchup,
     publish_catchup,
+    run_scheduled_publication,
     session_gate,
     slice_reference,
 )
 from research.v2_research_ledger.durable_store import DurableRowStore
-from research.v2_research_ledger.forward_outcomes import build_forward_document
+from research.v2_research_ledger.forward_outcomes import attachable_outcomes, build_forward_document
 from research.v2_research_ledger.delivery_view import DELIVERY_UNAVAILABLE, DeliveryView
 from research.v2_research_ledger.panel_board import deduped_research_observations, load_row_panel
 from modules.v2_research_ledger_panel.ui import render_v2_research_ledger_panel
@@ -833,3 +834,207 @@ def test_fox_hole_excludes_only_its_horizons_and_recovers_later(tmp_path: Path):
     assert (DURABLE / "identities.jsonl").read_bytes() == identities_before
     for relative, digest in PINNED_GENERATIONS.items():
         assert _sha256(ROOT / relative) == digest
+
+
+def _copy_pins(root: Path) -> None:
+    for relative in PINNED_GENERATIONS:
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
+
+
+def _seal_publication_repo(tmp_path: Path) -> tuple[Path, Path, dict]:
+    """A committed ledger and one generation. The caller mutates the sidecar afterwards."""
+    sessions = ["2026-11-25", "2026-11-26"]
+    ledger, outcomes = _ledger(tmp_path, "2026-11-20")
+    root = tmp_path / "tree"
+    store = _book(sessions)
+    publish_catchup(ledger, outcomes, store, [sessions[-1]])
+    _copy_pins(root)
+    _git(root, "init", "-b", "main")
+    _git(root, "add", ".")
+    _git(root, "commit", "-m", "seed sealed generation")
+    sealed = {
+        "manifest": (ledger / "manifest.json").read_bytes(),
+        "identities": (ledger / "identities.jsonl").read_bytes(),
+        "links": (ledger / "links.jsonl").read_bytes(),
+        "conflicts": (ledger / "conflicts.jsonl").read_bytes(),
+        "generation": next(path for path in (outcomes / "generations").glob("*.json") if path.name not in {Path(item).name for item in PINNED_GENERATIONS}),
+        "store": store,
+        "sessions": sessions,
+    }
+    sealed["generation_bytes"] = sealed["generation"].read_bytes()
+    return root, ledger, sealed
+
+
+def _revised_book(tmp_path: Path, store: dict) -> Path:
+    revised = json.loads(json.dumps(store))
+    revised["rows"][0]["close"] = 1
+    revised.pop("content_sha256", None)
+    revised["content_sha256"] = _digest(revised)
+    path = tmp_path / "revised_price_book.json"
+    path.write_text(json.dumps(revised), encoding="utf-8")
+    return path
+
+
+def _schedule_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LEDGER_FORWARD_DAILY_ENABLED", "true")
+    monkeypatch.setenv("GITHUB_REF", "refs/heads/main")
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "schedule")
+    monkeypatch.delenv("CONFIRM", raising=False)
+
+
+def _commit_sidecar_snapshot(root: Path) -> None:
+    """Land the sidecar the way the camera publisher does: committed, ledger untouched."""
+    _git(root, "add", "--", "research/live_candidate_v2_camera_sidecar/camera_sidecar.json")
+    _git(root, "commit", "-m", "camera sidecar snapshot")
+
+
+def _refuse_revised(root: Path, book: Path, capsys: pytest.CaptureFixture[str]) -> dict:
+    moment = datetime.datetime(2026, 11, 27, 7, 32, tzinfo=datetime.timezone(datetime.timedelta(hours=7)))
+    code = run_scheduled_publication(root, reference_path=book, now=moment, push=False)
+    captured = capsys.readouterr()
+    report = json.loads(captured.out)
+    assert code == 1
+    assert report["ok"] is False
+    assert report["reason"] == "PRICE_BOOK_REVISED"
+    assert report["session"] == "2026-11-26"
+    return report
+
+
+def _head_count(root: Path) -> int:
+    completed = subprocess.run(["git", "-C", str(root), "rev-list", "--count", "HEAD"], check=True, capture_output=True, text=True)
+    return int(completed.stdout.strip())
+
+
+def _head_files(root: Path) -> str:
+    completed = subprocess.run(
+        ["git", "-C", str(root), "show", "--name-only", "--format=%s", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout
+
+
+def test_revised_price_book_does_not_commit_a_sidecar_fingerprint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+    """The 27/11 failure: PRICE_BOOK_REVISED, sidecar bytes changed, no new identity or link."""
+    root, ledger, sealed = _seal_publication_repo(tmp_path)
+    sidecar = root / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
+    document = json.loads(sidecar.read_text(encoding="utf-8"))
+    document["observed_at"] = "2026-11-27T06:20:00+07:00"
+    sidecar.write_text(json.dumps(document), encoding="utf-8")
+    _commit_sidecar_snapshot(root)
+    _schedule_env(monkeypatch)
+    report = _refuse_revised(root, _revised_book(tmp_path, sealed["store"]), capsys)
+    assert report["save"] is None
+    assert _head_count(root) == 2
+    assert (ledger / "manifest.json").read_bytes() == sealed["manifest"]
+    assert (ledger / "identities.jsonl").read_bytes() == sealed["identities"]
+    assert (ledger / "links.jsonl").read_bytes() == sealed["links"]
+    assert (ledger / "conflicts.jsonl").read_bytes() == sealed["conflicts"]
+    assert sealed["generation"].read_bytes() == sealed["generation_bytes"]
+    attached = attachable_outcomes(ledger)
+    assert attached is not None
+    assert attached["as_of"] == "2026-11-26"
+    panel = load_row_panel(DurableRowStore(ledger))
+    assert panel is not None
+    assert panel["price_book"] == "APPROX_LAST_5M_CLOSE"
+    assert panel["forward_outcomes"]["status"] == "attached"
+    assert panel["forward_outcomes"]["as_of"] == "2026-11-26"
+    assert panel["freshness"]["fingerprint_matches"] is True
+    assert panel["freshness"]["status"] == "LATE"
+    assert panel["freshness"]["latest_sealed_t0"]
+    assert panel["freshness"]["latest_measured_session"] == "2026-11-26"
+    fake = _FakeStreamlit()
+    render_v2_research_ledger_panel(fake, remote=True, row_store=ledger)
+    text = "\n".join(fake.captions)
+    assert "Price book: APPROX_LAST_5M_CLOSE" in text
+    assert "row_horizons=attached as_of=2026-11-26" in text
+    assert "freshness=LATE" in text
+    assert "Price book: absent" not in text
+
+
+def test_refused_publish_keeps_a_new_identity_and_the_sealed_generation_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+    root, ledger, sealed = _seal_publication_repo(tmp_path)
+    sidecar = root / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
+    document = json.loads(sidecar.read_text(encoding="utf-8"))
+    document["freeze_ledger"].append(
+        {
+            "breakout_ref_at_first_seen": 18100.0,
+            "candidate_first_seen_ts": "2026-11-26T02:00:00Z",
+            "ema9_at_first_seen": 17990.0,
+            "price_at_first_seen": 18000.0,
+            "session": "2026-11-26",
+            "symbol": "VCB",
+        }
+    )
+    sidecar.write_text(json.dumps(document), encoding="utf-8")
+    _commit_sidecar_snapshot(root)
+    _schedule_env(monkeypatch)
+    report = _refuse_revised(root, _revised_book(tmp_path, sealed["store"]), capsys)
+    identities = (ledger / "identities.jsonl").read_bytes()
+    assert identities.startswith(sealed["identities"])
+    assert len(identities) > len(sealed["identities"])
+    assert b"VCB" in identities
+    assert sealed["generation"].read_bytes() == sealed["generation_bytes"]
+    assert isinstance(report["save"], str) and len(report["save"]) == 40
+    assert _head_count(root) == 3
+    committed = _head_files(root)
+    assert "identities.jsonl" in committed
+    assert "generations/" not in committed
+    assert attachable_outcomes(ledger) is None
+
+
+def test_refused_publish_keeps_a_new_link_and_the_sealed_generation_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+    root, ledger, sealed = _seal_publication_repo(tmp_path)
+    sidecar = root / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
+    document = json.loads(sidecar.read_text(encoding="utf-8"))
+    document["rows"] = [
+        {
+            "breakout_ref_at_first_seen": 27100.0,
+            "candidate_first_seen_ts": "2026-11-20T02:00:00Z",
+            "ema9_at_first_seen": 26990.0,
+            "price_at_first_seen": 27000.0,
+            "session": "2026-11-20",
+            "source": "brain_a_scan_setup",
+            "status": "NOMINATED",
+            "symbol": "HPG",
+        }
+    ]
+    sidecar.write_text(json.dumps(document), encoding="utf-8")
+    _commit_sidecar_snapshot(root)
+    _schedule_env(monkeypatch)
+    report = _refuse_revised(root, _revised_book(tmp_path, sealed["store"]), capsys)
+    assert (ledger / "identities.jsonl").read_bytes() == sealed["identities"]
+    links = (ledger / "links.jsonl").read_bytes()
+    assert links.startswith(sealed["links"])
+    assert len(links) > len(sealed["links"])
+    assert sealed["generation"].read_bytes() == sealed["generation_bytes"]
+    assert isinstance(report["save"], str) and len(report["save"]) == 40
+    committed = _head_files(root)
+    assert "links.jsonl" in committed
+    assert "generations/" not in committed
+    assert attachable_outcomes(ledger) is None
+
+
+def test_refused_publish_keeps_a_new_conflict_and_the_sealed_identity(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+    root, ledger, sealed = _seal_publication_repo(tmp_path)
+    sidecar = root / "research" / "live_candidate_v2_camera_sidecar" / "camera_sidecar.json"
+    document = json.loads(sidecar.read_text(encoding="utf-8"))
+    document["freeze_ledger"][0]["price_at_first_seen"] = 1
+    sidecar.write_text(json.dumps(document), encoding="utf-8")
+    _commit_sidecar_snapshot(root)
+    _schedule_env(monkeypatch)
+    report = _refuse_revised(root, _revised_book(tmp_path, sealed["store"]), capsys)
+    assert (ledger / "identities.jsonl").read_bytes() == sealed["identities"]
+    conflicts = (ledger / "conflicts.jsonl").read_bytes()
+    assert conflicts.startswith(sealed["conflicts"])
+    assert len(conflicts) > len(sealed["conflicts"])
+    assert sealed["generation"].read_bytes() == sealed["generation_bytes"]
+    assert isinstance(report["save"], str) and len(report["save"]) == 40
+    committed = _head_files(root)
+    assert "conflicts.jsonl" in committed
+    assert "identities.jsonl" not in committed
+    assert "generations/" not in committed
+    assert attachable_outcomes(ledger) is None
