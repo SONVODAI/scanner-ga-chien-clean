@@ -83,6 +83,173 @@ jobs:
           }, sort_keys=True))
           PY
 
+      - name: Read-only daily gate on the downloaded Price Book
+        run: |
+          set -euo pipefail
+          python - << 'PY'
+          import copy
+          import datetime
+          import hashlib
+          import json
+          import textwrap
+          from collections import Counter
+          from pathlib import Path
+
+          from research.guardian_research.reference_export import read_reference_store
+          from research.guardian_research.universe import load_tracked_symbols
+
+          reference = Path("/tmp/reference_store.json")
+          before = reference.read_bytes()
+          store = read_reference_store(reference)
+          if store is None:
+              print(json.dumps({"ok": False, "reason": "REFERENCE_NOT_VALIDATED"}, sort_keys=True))
+              raise SystemExit(1)
+          workflow = Path(".github/workflows/ledger-forward-daily.yml").read_text(encoding="utf-8")
+          begin = "# BEGIN LEDGER_FORWARD_DAILY\n"
+          start = workflow.index(begin) + len(begin)
+          stop = workflow.index("# END LEDGER_FORWARD_DAILY", start)
+          namespace = {"__name__": "ledger_forward_daily_gate"}
+          exec(compile(textwrap.dedent(workflow[start:stop]), "ledger-forward-daily.yml", "exec"), namespace)
+          try:
+              tracked = namespace["require_universe"](load_tracked_symbols())
+              prior = namespace["load_prior"](Path(".").resolve())
+          except namespace["PublicationRefusal"] as refusal:
+              print(json.dumps({"ok": False, "reason": refusal.reason, "verdict": "REJECT"}, sort_keys=True))
+              raise SystemExit(1)
+          moment = datetime.datetime.now(namespace["ICT"])
+          sessions = [str(item) for item in store.get("trading_sessions") or []]
+          new_session = sessions[-1]
+          previous_session = sessions[-2]
+
+          def decide(document):
+              try:
+                  decision = namespace["assess_publication"](
+                      document,
+                      prior,
+                      today_ict=moment.date().isoformat(),
+                      mode="schedule",
+                      tracked=tracked,
+                      moment=moment,
+                  )
+              except namespace["PublicationRefusal"] as refusal:
+                  return {
+                      "as_of": document.get("as_of"),
+                      "reason": refusal.reason,
+                      "skipped_rejections": refusal.skipped_rejections,
+                      "verdict": "REJECT",
+                  }
+              action = str(decision.get("action") or "")
+              skipped = decision.get("skipped_rejections") or []
+              if action == "publish":
+                  return {
+                      "as_of": decision.get("as_of"),
+                      "reason": "PUBLISH_ALLOWED",
+                      "skipped_rejections": skipped,
+                      "verdict": "ACCEPT",
+                  }
+              return {
+                  "as_of": decision.get("as_of"),
+                  "reason": action,
+                  "skipped_rejections": skipped,
+                  "verdict": "REJECT",
+              }
+
+          def new_ok_counts(document):
+              counts = Counter()
+              for row in document.get("rows") or []:
+                  if str(row.get("session") or "") != new_session or str(row.get("quality") or "") != "OK":
+                      continue
+                  counts[str(row.get("symbol") or "").strip().upper()] += 1
+              return counts
+
+          real_counts = new_ok_counts(store)
+          coverage = store.get("coverage") if isinstance(store.get("coverage"), dict) else {}
+          real = decide(store)
+          chosen = next((symbol for symbol, count in sorted(real_counts.items()) if symbol in tracked and count == 1), "")
+
+          def without_chosen(document):
+              trial = copy.deepcopy(document)
+              trial["rows"] = [
+                  row for row in (trial.get("rows") or [])
+                  if not (str(row.get("session") or "") == new_session and str(row.get("symbol") or "").strip().upper() == chosen)
+              ]
+              trial["rejections"] = list(trial.get("rejections") or []) + [
+                  {"clock": "", "reason": "SYMBOL_ABSENT", "session": new_session, "symbol": chosen}
+              ]
+              return trial
+
+          def bad_quality(document):
+              trial = copy.deepcopy(document)
+              trial["rows"] = []
+              changed = False
+              for row in document.get("rows") or []:
+                  item = dict(row)
+                  if not changed and str(item.get("session") or "") == new_session and str(item.get("symbol") or "").strip().upper() == chosen:
+                      item["quality"] = "TRUNCATED"
+                      changed = True
+                  trial["rows"].append(item)
+              return trial
+
+          def duplicate_ok(document):
+              trial = copy.deepcopy(document)
+              original = [
+                  dict(row) for row in (document.get("rows") or [])
+                  if str(row.get("session") or "") == new_session and str(row.get("symbol") or "").strip().upper() == chosen
+              ]
+              trial["rows"] = list(trial.get("rows") or []) + original
+              return trial
+
+          def unexplained_count(document):
+              trial = copy.deepcopy(document)
+              declared = coverage.get("tracked_count")
+              trial["coverage"] = dict(coverage)
+              trial["coverage"]["tracked_count"] = declared + 1 if isinstance(declared, int) else 1
+              return trial
+
+          probes = []
+          if not chosen:
+              probes.append({"actual": "PROBE_SETUP_ABSENT", "expected": "PRICE_BOOK_INCOMPLETE", "matched": False, "name": "missing_tracked_price", "symbol": "", "verdict": "REJECT"})
+          else:
+              expected = {
+                  "missing_tracked_price": ("PRICE_BOOK_INCOMPLETE", without_chosen),
+                  "invalid_quality": ("PRICE_BOOK_INCOMPLETE", bad_quality),
+                  "duplicate_ok": ("PRICE_BOOK_INCOMPLETE", duplicate_ok),
+                  "unexplained_count": ("UNIVERSE_MISMATCH", unexplained_count),
+              }
+              for name, (reason, build) in expected.items():
+                  result = decide(build(store))
+                  probes.append({
+                      "actual": result["reason"],
+                      "expected": reason,
+                      "matched": result["verdict"] == "REJECT" and result["reason"] == reason,
+                      "name": name,
+                      "symbol": chosen,
+                      "verdict": result["verdict"],
+                  })
+          after = reference.read_bytes()
+          report = {
+              "content_sha256": store.get("content_sha256"),
+              "declared_tracked_count": coverage.get("tracked_count"),
+              "duplicate_ok_symbols": sum(1 for count in real_counts.values() if count > 1),
+              "f88_in_watchlist": "F88" in tracked,
+              "file_sha256": hashlib.sha256(before).hexdigest(),
+              "file_unchanged": before == after,
+              "new_session": new_session,
+              "new_session_ok_rows": sum(real_counts.values()),
+              "new_session_ok_symbols": len(real_counts),
+              "previous_session": previous_session,
+              "prior_as_of": prior.get("as_of"),
+              "probes": probes,
+              "real": real,
+              "session_count": len(sessions),
+              "symbols_never_seen": coverage.get("symbols_never_seen"),
+              "watchlist_count": len(tracked),
+          }
+          print(json.dumps(report, sort_keys=True))
+          if not report["file_unchanged"] or any(item.get("verdict") == "ACCEPT" or item.get("matched") is False for item in probes):
+              raise SystemExit(1)
+          PY
+
       - name: Dry-run Ledger T+ against the committed outcomes
         run: |
           set -euo pipefail
