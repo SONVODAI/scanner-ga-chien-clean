@@ -14,33 +14,11 @@
   "schema": "v2_research_row_store_manifest.v1",
   "schema_records": "v2_research_row_store.v1",
   "sidecar": {
-    "admission": [
-      {
-        "candidate_first_seen_ts": "2026-11-26T12:51:40Z",
-        "classification": "EXISTING_OBSERVATION",
-        "identity_id": "sweet|d34ded48ad74d3e1",
-        "reason": null,
-        "symbol": "HUT"
-      },
-      {
-        "candidate_first_seen_ts": "2026-11-26T12:51:40Z",
-        "classification": "EXISTING_OBSERVATION",
-        "identity_id": "sweet|428e6b4124478b44",
-        "reason": null,
-        "symbol": "KBC"
-      },
-      {
-        "candidate_first_seen_ts": "2026-11-26T12:51:40Z",
-        "classification": "EXISTING_OBSERVATION",
-        "identity_id": "sweet|0e7a129e60ee845d",
-        "reason": null,
-        "symbol": "OCB"
-      }
-    ],
+    "admission": [],
     "freeze_rows": 1192,
     "linked_current_rows": 0,
     "path": "research/live_candidate_v2_camera_sidecar/camera_sidecar.json",
-    "sha256": "18b0cafd145520049d548e20574a39a2c02d71187ea97aa4743e332d14ad52a6",
+    "sha256": "d69c0fbf0c6f496e37b68202b6e2b3538c1f22adf672215bf28099d3f6a47e6a",
     "status": "PRESENT"
   },
   "sweetspot": {
